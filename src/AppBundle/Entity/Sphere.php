@@ -58,7 +58,7 @@ class Sphere
      *
      * @param string $code
      *
-     * @return Faction
+     * @return Sphere
      */
     public function setCode($code)
     {
@@ -82,7 +82,7 @@ class Sphere
      *
      * @param string $name
      *
-     * @return Faction
+     * @return Sphere
      */
     public function setName($name)
     {
@@ -106,7 +106,7 @@ class Sphere
      *
      * @param boolean $isPrimary
      *
-     * @return Faction
+     * @return Sphere
      */
     public function setIsPrimary($isPrimary)
     {
@@ -130,7 +130,7 @@ class Sphere
      *
      * @param string $octgnid
      *
-     * @return Faction
+     * @return Sphere
      */
     public function setOctgnid($octgnid)
     {
@@ -154,7 +154,7 @@ class Sphere
      *
      * @param \AppBundle\Entity\Card $card
      *
-     * @return Faction
+     * @return Sphere
      */
     public function addCard(\AppBundle\Entity\Card $card)
     {

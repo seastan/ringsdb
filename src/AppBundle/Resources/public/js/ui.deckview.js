@@ -29,8 +29,8 @@
                 DisplaySort = 'position';
                 ui.refresh_deck()();
                 break;
-            case 'btn-sort-faction':
-                DisplaySort = 'faction';
+            case 'btn-sort-sphere':
+                DisplaySort = 'sphere';
                 ui.refresh_deck()();
                 break;
             case 'btn-sort-name':

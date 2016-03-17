@@ -117,9 +117,9 @@
      * @memberOf suggestions
      */
     suggestions.div = function div(record) {
-        var faction = record.faction_code;
+        var sphere = record.sphere_code;
         var influ = "";
-        for (var i = 0; i < record.factioncost; i++)
+        for (var i = 0; i < record.spherecost; i++)
             influ += "&bull;";
 
         var radios = '';
@@ -130,8 +130,8 @@
                 + '" value="' + i + '">' + i + '</label>';
         }
 
-        var imgsrc = record.faction_code == "neutral" ? "" : '<img src="'
-        + Url_FactionImage.replace('xxx', record.faction_code)
+        var imgsrc = record.sphere_code == "neutral" ? "" : '<img src="'
+        + Url_sphereImage.replace('xxx', record.sphere_code)
         + '.png" alt="' + record.name + '">';
         var div = $('<tr class="card-container" data-code="'
             + record.code
@@ -141,11 +141,11 @@
             + '</div></td><td><a class="card" href="'
             + Routing.generate('cards_zoom', {card_code: record.code})
             + '" data-target="#cardModal" data-remote="false" data-toggle="modal">'
-            + record.name + '</a></td><td class="influence-' + faction
+            + record.name + '</a></td><td class="influence-' + sphere
             + '">' + influ + '</td><td class="type" title="' + record.type
             + '"><img src="/web/bundles/app/images/types/'
             + record.type_code + '.png" alt="' + record.type + '">'
-            + '</td><td class="faction" title="' + record.faction + '">'
+            + '</td><td class="sphere" title="' + record.sphere + '">'
             + imgsrc + '</td></tr>');
 
         return div;

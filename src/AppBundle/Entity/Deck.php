@@ -172,10 +172,6 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      */
     private $user;
     /**
-     * @var \AppBundle\Entity\Faction
-     */
-    private $faction;
-    /**
      * @var \AppBundle\Entity\Pack
      */
     private $lastPack;
@@ -449,28 +445,6 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      */
     public function getUser() {
         return $this->user;
-    }
-
-    /**
-     * Set faction
-     *
-     * @param \AppBundle\Entity\Faction $faction
-     *
-     * @return Deck
-     */
-    public function setFaction(\AppBundle\Entity\Faction $faction = null) {
-        $this->faction = $faction;
-
-        return $this;
-    }
-
-    /**
-     * Get faction
-     *
-     * @return \AppBundle\Entity\Faction
-     */
-    public function getFaction() {
-        return $this->faction;
     }
 
     /**

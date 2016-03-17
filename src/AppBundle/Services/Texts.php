@@ -2,6 +2,8 @@
 
 namespace AppBundle\Services;
 
+use Symfony\Component\Debug\Exception\ContextErrorException;
+
 class Texts {
     public function __construct($root_dir) {
         $config = \HTMLPurifier_Config::create(['Cache.SerializerPath' => $root_dir]);
@@ -91,7 +93,11 @@ class Texts {
      */
     public function slugify($filename) {
         $filename = mb_ereg_replace('[^\w\-]', '-', $filename);
-        $filename = iconv('utf-8', 'us-ascii//TRANSLIT', $filename);
+        try {
+            $filename = iconv('utf-8', 'us-ascii//TRANSLIT', $filename);
+        } catch (ContextErrorException $e)  {
+            $filename = iconv('utf-8', 'us-ascii//IGNORE', $filename);
+        }
         $filename = preg_replace('/[^\w\-]/', '', $filename);
         $filename = preg_replace('/\-+/', '-', $filename);
         $filename = trim($filename, '-');

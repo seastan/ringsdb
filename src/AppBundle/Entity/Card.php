@@ -1,180 +1,104 @@
-<?php 
+<?php
 
 namespace AppBundle\Entity;
 
-class Card
-{
-
+class Card {
     /**
      * @var integer
      */
     private $id;
-
     /**
      * @var integer
      */
     private $position;
-
     /**
      * @var string
      */
     private $code;
-
     /**
      * @var string
      */
     private $name;
-
     /**
      * @var string
      */
     private $traits;
-
     /**
      * @var string
      */
     private $text;
-
     /**
      * @var string
      */
     private $flavor;
-
     /**
      * @var boolean
      */
     private $isUnique;
-
     /**
      * @var integer
      */
     private $cost;
-
     /**
      * @var integer
      */
     private $threat;
-
     /**
      * @var integer
      */
     private $willpower;
-
     /**
      * @var integer
      */
     private $attack;
-
     /**
      * @var integer
      */
     private $defense;
-
     /**
      * @var integer
      */
     private $health;
-
     /**
      * @var integer
      */
     private $victory;
-
     /**
      * @var integer
      */
     private $quantity;
-
     /**
      * @var integer
      */
     private $deckLimit;
-
     /**
      * @var string
      */
     private $illustrator;
-
     /**
      * @var string
      */
     private $octgnid;
-
     /**
      * @var \DateTime
      */
     private $dateCreation;
-
     /**
      * @var \DateTime
      */
     private $dateUpdate;
-
-    /**
-     * @var integer
-     */
-    private $income;
-
-    /**
-     * @var integer
-     */
-    private $initiative;
-
-    /**
-     * @var integer
-     */
-    private $claim;
-
-    /**
-     * @var integer
-     */
-    private $reserve;
-
-    /**
-     * @var integer
-     */
-    private $strength;
-
-    /**
-     * @var boolean
-     */
-    private $isLoyal;
-
-    /**
-     * @var boolean
-     */
-    private $isMilitary;
-
-    /**
-     * @var boolean
-     */
-    private $isIntrigue;
-
-    /**
-     * @var boolean
-     */
-    private $isPower;
-
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
     private $reviews;
-
     /**
      * @var \AppBundle\Entity\Pack
      */
     private $pack;
-
     /**
      * @var \AppBundle\Entity\Type
      */
     private $type;
-
-    /**
-     * @var \AppBundle\Entity\Faction
-     */
-    private $faction;
-
     /**
      * @var \AppBundle\Entity\Sphere
      */
@@ -183,8 +107,7 @@ class Card
     /**
      * Constructor
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->reviews = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
@@ -193,8 +116,7 @@ class Card
      *
      * @return integer
      */
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
 
@@ -205,8 +127,7 @@ class Card
      *
      * @return Card
      */
-    public function setPosition($position)
-    {
+    public function setPosition($position) {
         $this->position = $position;
 
         return $this;
@@ -217,8 +138,7 @@ class Card
      *
      * @return integer
      */
-    public function getPosition()
-    {
+    public function getPosition() {
         return $this->position;
     }
 
@@ -229,8 +149,7 @@ class Card
      *
      * @return Card
      */
-    public function setCode($code)
-    {
+    public function setCode($code) {
         $this->code = $code;
 
         return $this;
@@ -241,8 +160,7 @@ class Card
      *
      * @return string
      */
-    public function getCode()
-    {
+    public function getCode() {
         return $this->code;
     }
 
@@ -253,8 +171,7 @@ class Card
      *
      * @return Card
      */
-    public function setName($name)
-    {
+    public function setName($name) {
         $this->name = $name;
 
         return $this;
@@ -265,8 +182,7 @@ class Card
      *
      * @return string
      */
-    public function getName()
-    {
+    public function getName() {
         return $this->name;
     }
 
@@ -277,8 +193,7 @@ class Card
      *
      * @return Card
      */
-    public function setTraits($traits)
-    {
+    public function setTraits($traits) {
         $this->traits = $traits;
 
         return $this;
@@ -289,8 +204,7 @@ class Card
      *
      * @return string
      */
-    public function getTraits()
-    {
+    public function getTraits() {
         return $this->traits;
     }
 
@@ -301,8 +215,7 @@ class Card
      *
      * @return Card
      */
-    public function setText($text)
-    {
+    public function setText($text) {
         $this->text = $text;
 
         return $this;
@@ -313,8 +226,7 @@ class Card
      *
      * @return string
      */
-    public function getText()
-    {
+    public function getText() {
         return $this->text;
     }
 
@@ -325,8 +237,7 @@ class Card
      *
      * @return Card
      */
-    public function setFlavor($flavor)
-    {
+    public function setFlavor($flavor) {
         $this->flavor = $flavor;
 
         return $this;
@@ -337,8 +248,7 @@ class Card
      *
      * @return string
      */
-    public function getFlavor()
-    {
+    public function getFlavor() {
         return $this->flavor;
     }
 
@@ -349,8 +259,7 @@ class Card
      *
      * @return Card
      */
-    public function setIsUnique($isUnique)
-    {
+    public function setIsUnique($isUnique) {
         $this->isUnique = $isUnique;
 
         return $this;
@@ -361,8 +270,7 @@ class Card
      *
      * @return boolean
      */
-    public function getIsUnique()
-    {
+    public function getIsUnique() {
         return $this->isUnique;
     }
 
@@ -373,8 +281,7 @@ class Card
      *
      * @return Card
      */
-    public function setCost($cost)
-    {
+    public function setCost($cost) {
         $this->cost = $cost;
 
         return $this;
@@ -385,8 +292,7 @@ class Card
      *
      * @return integer
      */
-    public function getCost()
-    {
+    public function getCost() {
         return $this->cost;
     }
 
@@ -397,8 +303,7 @@ class Card
      *
      * @return Card
      */
-    public function setThreat($threat)
-    {
+    public function setThreat($threat) {
         $this->threat = $threat;
 
         return $this;
@@ -409,8 +314,7 @@ class Card
      *
      * @return integer
      */
-    public function getThreat()
-    {
+    public function getThreat() {
         return $this->threat;
     }
 
@@ -421,8 +325,7 @@ class Card
      *
      * @return Card
      */
-    public function setWillpower($willpower)
-    {
+    public function setWillpower($willpower) {
         $this->willpower = $willpower;
 
         return $this;
@@ -433,8 +336,7 @@ class Card
      *
      * @return integer
      */
-    public function getWillpower()
-    {
+    public function getWillpower() {
         return $this->willpower;
     }
 
@@ -445,8 +347,7 @@ class Card
      *
      * @return Card
      */
-    public function setAttack($attack)
-    {
+    public function setAttack($attack) {
         $this->attack = $attack;
 
         return $this;
@@ -457,8 +358,7 @@ class Card
      *
      * @return integer
      */
-    public function getAttack()
-    {
+    public function getAttack() {
         return $this->attack;
     }
 
@@ -469,8 +369,7 @@ class Card
      *
      * @return Card
      */
-    public function setDefense($defense)
-    {
+    public function setDefense($defense) {
         $this->defense = $defense;
 
         return $this;
@@ -481,8 +380,7 @@ class Card
      *
      * @return integer
      */
-    public function getDefense()
-    {
+    public function getDefense() {
         return $this->defense;
     }
 
@@ -493,8 +391,7 @@ class Card
      *
      * @return Card
      */
-    public function setHealth($health)
-    {
+    public function setHealth($health) {
         $this->health = $health;
 
         return $this;
@@ -505,8 +402,7 @@ class Card
      *
      * @return integer
      */
-    public function getHealth()
-    {
+    public function getHealth() {
         return $this->health;
     }
 
@@ -517,8 +413,7 @@ class Card
      *
      * @return Card
      */
-    public function setVictory($victory)
-    {
+    public function setVictory($victory) {
         $this->victory = $victory;
 
         return $this;
@@ -529,8 +424,7 @@ class Card
      *
      * @return integer
      */
-    public function getVictory()
-    {
+    public function getVictory() {
         return $this->victory;
     }
 
@@ -541,8 +435,7 @@ class Card
      *
      * @return Card
      */
-    public function setQuantity($quantity)
-    {
+    public function setQuantity($quantity) {
         $this->quantity = $quantity;
 
         return $this;
@@ -553,8 +446,7 @@ class Card
      *
      * @return integer
      */
-    public function getQuantity()
-    {
+    public function getQuantity() {
         return $this->quantity;
     }
 
@@ -565,8 +457,7 @@ class Card
      *
      * @return Card
      */
-    public function setDeckLimit($deckLimit)
-    {
+    public function setDeckLimit($deckLimit) {
         $this->deckLimit = $deckLimit;
 
         return $this;
@@ -577,8 +468,7 @@ class Card
      *
      * @return integer
      */
-    public function getDeckLimit()
-    {
+    public function getDeckLimit() {
         return $this->deckLimit;
     }
 
@@ -589,8 +479,7 @@ class Card
      *
      * @return Card
      */
-    public function setIllustrator($illustrator)
-    {
+    public function setIllustrator($illustrator) {
         $this->illustrator = $illustrator;
 
         return $this;
@@ -601,8 +490,7 @@ class Card
      *
      * @return string
      */
-    public function getIllustrator()
-    {
+    public function getIllustrator() {
         return $this->illustrator;
     }
 
@@ -613,8 +501,7 @@ class Card
      *
      * @return Card
      */
-    public function setOctgnid($octgnid)
-    {
+    public function setOctgnid($octgnid) {
         $this->octgnid = $octgnid;
 
         return $this;
@@ -625,8 +512,7 @@ class Card
      *
      * @return string
      */
-    public function getOctgnid()
-    {
+    public function getOctgnid() {
         return $this->octgnid;
     }
 
@@ -637,8 +523,7 @@ class Card
      *
      * @return Card
      */
-    public function setDateCreation($dateCreation)
-    {
+    public function setDateCreation($dateCreation) {
         $this->dateCreation = $dateCreation;
 
         return $this;
@@ -649,8 +534,7 @@ class Card
      *
      * @return \DateTime
      */
-    public function getDateCreation()
-    {
+    public function getDateCreation() {
         return $this->dateCreation;
     }
 
@@ -661,8 +545,7 @@ class Card
      *
      * @return Card
      */
-    public function setDateUpdate($dateUpdate)
-    {
+    public function setDateUpdate($dateUpdate) {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
@@ -673,225 +556,8 @@ class Card
      *
      * @return \DateTime
      */
-    public function getDateUpdate()
-    {
+    public function getDateUpdate() {
         return $this->dateUpdate;
-    }
-
-    /**
-     * Set income
-     *
-     * @param integer $income
-     *
-     * @return Card
-     */
-    public function setIncome($income)
-    {
-        $this->income = $income;
-
-        return $this;
-    }
-
-    /**
-     * Get income
-     *
-     * @return integer
-     */
-    public function getIncome()
-    {
-        return $this->income;
-    }
-
-    /**
-     * Set initiative
-     *
-     * @param integer $initiative
-     *
-     * @return Card
-     */
-    public function setInitiative($initiative)
-    {
-        $this->initiative = $initiative;
-
-        return $this;
-    }
-
-    /**
-     * Get initiative
-     *
-     * @return integer
-     */
-    public function getInitiative()
-    {
-        return $this->initiative;
-    }
-
-    /**
-     * Set claim
-     *
-     * @param integer $claim
-     *
-     * @return Card
-     */
-    public function setClaim($claim)
-    {
-        $this->claim = $claim;
-
-        return $this;
-    }
-
-    /**
-     * Get claim
-     *
-     * @return integer
-     */
-    public function getClaim()
-    {
-        return $this->claim;
-    }
-
-    /**
-     * Set reserve
-     *
-     * @param integer $reserve
-     *
-     * @return Card
-     */
-    public function setReserve($reserve)
-    {
-        $this->reserve = $reserve;
-
-        return $this;
-    }
-
-    /**
-     * Get reserve
-     *
-     * @return integer
-     */
-    public function getReserve()
-    {
-        return $this->reserve;
-    }
-
-    /**
-     * Set strength
-     *
-     * @param integer $strength
-     *
-     * @return Card
-     */
-    public function setStrength($strength)
-    {
-        $this->strength = $strength;
-
-        return $this;
-    }
-
-    /**
-     * Get strength
-     *
-     * @return integer
-     */
-    public function getStrength()
-    {
-        return $this->strength;
-    }
-
-    /**
-     * Set isLoyal
-     *
-     * @param boolean $isLoyal
-     *
-     * @return Card
-     */
-    public function setIsLoyal($isLoyal)
-    {
-        $this->isLoyal = $isLoyal;
-
-        return $this;
-    }
-
-    /**
-     * Get isLoyal
-     *
-     * @return boolean
-     */
-    public function getIsLoyal()
-    {
-        return $this->isLoyal;
-    }
-
-    /**
-     * Set isMilitary
-     *
-     * @param boolean $isMilitary
-     *
-     * @return Card
-     */
-    public function setIsMilitary($isMilitary)
-    {
-        $this->isMilitary = $isMilitary;
-
-        return $this;
-    }
-
-    /**
-     * Get isMilitary
-     *
-     * @return boolean
-     */
-    public function getIsMilitary()
-    {
-        return $this->isMilitary;
-    }
-
-    /**
-     * Set isIntrigue
-     *
-     * @param boolean $isIntrigue
-     *
-     * @return Card
-     */
-    public function setIsIntrigue($isIntrigue)
-    {
-        $this->isIntrigue = $isIntrigue;
-
-        return $this;
-    }
-
-    /**
-     * Get isIntrigue
-     *
-     * @return boolean
-     */
-    public function getIsIntrigue()
-    {
-        return $this->isIntrigue;
-    }
-
-    /**
-     * Set isPower
-     *
-     * @param boolean $isPower
-     *
-     * @return Card
-     */
-    public function setIsPower($isPower)
-    {
-        $this->isPower = $isPower;
-
-        return $this;
-    }
-
-    /**
-     * Get isPower
-     *
-     * @return boolean
-     */
-    public function getIsPower()
-    {
-        return $this->isPower;
     }
 
     /**
@@ -901,8 +567,7 @@ class Card
      *
      * @return Card
      */
-    public function addReview(\AppBundle\Entity\Review $review)
-    {
+    public function addReview(\AppBundle\Entity\Review $review) {
         $this->reviews[] = $review;
 
         return $this;
@@ -913,8 +578,7 @@ class Card
      *
      * @param \AppBundle\Entity\Review $review
      */
-    public function removeReview(\AppBundle\Entity\Review $review)
-    {
+    public function removeReview(\AppBundle\Entity\Review $review) {
         $this->reviews->removeElement($review);
     }
 
@@ -923,8 +587,7 @@ class Card
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getReviews()
-    {
+    public function getReviews() {
         return $this->reviews;
     }
 
@@ -935,8 +598,7 @@ class Card
      *
      * @return Card
      */
-    public function setPack(\AppBundle\Entity\Pack $pack = null)
-    {
+    public function setPack(\AppBundle\Entity\Pack $pack = null) {
         $this->pack = $pack;
 
         return $this;
@@ -947,8 +609,7 @@ class Card
      *
      * @return \AppBundle\Entity\Pack
      */
-    public function getPack()
-    {
+    public function getPack() {
         return $this->pack;
     }
 
@@ -959,8 +620,7 @@ class Card
      *
      * @return Card
      */
-    public function setType(\AppBundle\Entity\Type $type = null)
-    {
+    public function setType(\AppBundle\Entity\Type $type = null) {
         $this->type = $type;
 
         return $this;
@@ -971,33 +631,8 @@ class Card
      *
      * @return \AppBundle\Entity\Type
      */
-    public function getType()
-    {
+    public function getType() {
         return $this->type;
-    }
-
-    /**
-     * Set faction
-     *
-     * @param \AppBundle\Entity\Faction $faction
-     *
-     * @return Card
-     */
-    public function setFaction(\AppBundle\Entity\Faction $faction = null)
-    {
-        $this->faction = $faction;
-
-        return $this;
-    }
-
-    /**
-     * Get faction
-     *
-     * @return \AppBundle\Entity\Faction
-     */
-    public function getFaction()
-    {
-        return $this->faction;
     }
 
     /**
@@ -1007,8 +642,7 @@ class Card
      *
      * @return Card
      */
-    public function setSphere(\AppBundle\Entity\Sphere $sphere = null)
-    {
+    public function setSphere(\AppBundle\Entity\Sphere $sphere = null) {
         $this->sphere = $sphere;
 
         return $this;
@@ -1019,15 +653,14 @@ class Card
      *
      * @return \AppBundle\Entity\Sphere
      */
-    public function getSphere()
-    {
+    public function getSphere() {
         return $this->sphere;
     }
+
     /**
      * @var integer
      */
     private $quest;
-
 
     /**
      * Set quest
@@ -1036,8 +669,7 @@ class Card
      *
      * @return Card
      */
-    public function setQuest($quest)
-    {
+    public function setQuest($quest) {
         $this->quest = $quest;
 
         return $this;
@@ -1048,8 +680,7 @@ class Card
      *
      * @return integer
      */
-    public function getQuest()
-    {
+    public function getQuest() {
         return $this->quest;
     }
 }

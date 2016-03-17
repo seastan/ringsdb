@@ -112,7 +112,6 @@ class Oauth2Controller extends Controller
 	 *      {"name"="name", "dataType"="string", "required"=true, "description"="Name of the Deck"},
 	 *      {"name"="decklist_id", "dataType"="integer", "required"=false, "description"="Identifier of the Decklist from which the Deck is copied"},
 	 *      {"name"="description_md", "dataType"="string", "required"=false, "description"="Description of the Decklist in Markdown"},
-	 *      {"name"="faction_code", "dataType"="string", "required"=false, "description"="Code of the faction of the Deck"},
 	 *      {"name"="tags", "dataType"="string", "required"=false, "description"="Space-separated list of tags"},
 	 *      {"name"="slots", "dataType"="string", "required"=true, "description"="Content of the Decklist as a JSON object"},
 	 *  },
@@ -135,21 +134,6 @@ class Oauth2Controller extends Controller
 			{
 				throw $this->createAccessDeniedException("Access denied to this object.");
 			}
-		}
-		
-		$faction_code = filter_var($request->get('faction_code'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
-		if(!$faction_code) {
-			return new JsonResponse([
-					'success' => FALSE,
-					'msg' => "Faction code missing"
-			]);
-		}
-		$faction = $this->getDoctrine()->getManager()->getRepository('AppBundle:Faction')->findOneBy(['code' => $faction_code]);
-		if(!$faction) {
-			return new JsonResponse([
-					'success' => FALSE,
-					'msg' => "Faction code invalid"
-			]);
 		}
 		
 		$slots = (array) json_decode($request->get('slots'));
@@ -182,7 +166,7 @@ class Oauth2Controller extends Controller
 		$description = trim($request->get('description'));
 		$tags = filter_var($request->get('tags'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
 		
-		$this->get('decks')->saveDeck($this->getUser(), $deck, $decklist_id, $name, $faction, $description, $tags, $slots, null);
+		$this->get('decks')->saveDeck($this->getUser(), $deck, $decklist_id, $name, $description, $tags, $slots, null);
 		
 		$this->getDoctrine()->getManager()->flush();
 		

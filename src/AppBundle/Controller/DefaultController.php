@@ -42,7 +42,8 @@ class DefaultController extends Controller {
             if ($decklist) {
                 $array['decklist'] = $decklist;
 
-                $array['hero_deck'] = $decklist->getSlots()->getHeroDeck();
+                $heroDeck = $decklist->getSlots()->getHeroDeck();
+                $array['hero_deck'] = $heroDeck;
 
                 $countByType = $decklist->getSlots()->getCountByType();
                 $counts = [];
@@ -53,8 +54,8 @@ class DefaultController extends Controller {
                 $array['count_by_type'] = join(' &bull; ', $counts);
 
                 $spheres = [];
-                foreach ($decklist->getSpheres() as $s) {
-                    $spheres[] = $s->getName();
+                foreach ($heroDeck as $h) {
+                    $spheres[] = $h->getCard()->getSphere()->getName();
                 }
                 $array['sphere_names'] = join(' / ', array_unique($spheres));
 

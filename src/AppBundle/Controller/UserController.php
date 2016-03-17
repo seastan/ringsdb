@@ -7,14 +7,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
-class UserController extends Controller
-{
-
+class UserController extends Controller {
     /*
 	 * displays details about a user and the list of decklists he published
 	 */
-    public function publicProfileAction ($user_id, $user_name, $page, Request $request)
-    {
+    public function publicProfileAction($user_id, $user_name, $page, Request $request) {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
@@ -24,12 +21,13 @@ class UserController extends Controller
 
         /* @var $user \AppBundle\Entity\User */
         $user = $em->getRepository('AppBundle:User')->find($user_id);
-        if (! $user)
+        if (!$user) {
             throw new NotFoundHttpException("No such user.");
+        }
 
-        return $this->render('AppBundle:User:profile_public.html.twig', array(
-                'user'=> $user
-        ));
+        return $this->render('AppBundle:User:profile_public.html.twig', [
+            'user' => $user
+        ]);
     }
 
     public function editProfileAction() {
@@ -110,7 +108,7 @@ class UserController extends Controller
                 'public_profile_url' => $public_profile_url,
                 'id' => $user_id,
                 'name' => $user->getUsername(),
-                'faction' => $user->getColor(),
+                'sphere' => $user->getColor(),
                 'donation' => $user->getDonation(),
             ];
 
@@ -127,17 +125,17 @@ class UserController extends Controller
 
                     $content['is_liked'] = (boolean)$dbh->executeQuery("SELECT
         				count(*)
-        				from decklist d
-        				join vote v on v.decklist_id=d.id
-        				where v.user_id=?
-        				and d.id=?", [$user_id, $decklist_id])->fetch(\PDO::FETCH_NUM)[0];
+        				FROM decklist d
+        				JOIN vote v ON v.decklist_id=d.id
+        				WHERE v.user_id=?
+        				AND d.id=?", [$user_id, $decklist_id])->fetch(\PDO::FETCH_NUM)[0];
 
                     $content['is_favorite'] = (boolean)$dbh->executeQuery("SELECT
         				count(*)
-        				from decklist d
-        				join favorite f on f.decklist_id=d.id
-        				where f.user_id=?
-        				and d.id=?", [$user_id, $decklist_id])->fetch(\PDO::FETCH_NUM)[0];
+        				FROM decklist d
+        				JOIN favorite f ON f.decklist_id=d.id
+        				WHERE f.user_id=?
+        				AND d.id=?", [$user_id, $decklist_id])->fetch(\PDO::FETCH_NUM)[0];
 
                     $content['is_author'] = ($user_id == $decklist->getUser()->getId());
 
@@ -178,22 +176,21 @@ class UserController extends Controller
         return $response;
     }
 
-    public function remindAction($username)
-    {
-    	$user = $this->get('fos_user.user_manager')->findUserByUsername($username);
-    	if(!$user) {
-    		throw new NotFoundHttpException("Cannot find user from username [$username]");
-    	}
-    	if(!$user->getConfirmationToken()) {
-    		return $this->render('AppBundle:User:remind-no-token.html.twig');
-    	}
+    public function remindAction($username) {
+        $user = $this->get('fos_user.user_manager')->findUserByUsername($username);
+        if (!$user) {
+            throw new NotFoundHttpException("Cannot find user from username [$username]");
+        }
+        if (!$user->getConfirmationToken()) {
+            return $this->render('AppBundle:User:remind-no-token.html.twig');
+        }
 
-    	$this->get('fos_user.mailer')->sendConfirmationEmailMessage($user);
+        $this->get('fos_user.mailer')->sendConfirmationEmailMessage($user);
 
-    	$this->get('session')->set('fos_user_send_confirmation_email/email', $user->getEmail());
+        $this->get('session')->set('fos_user_send_confirmation_email/email', $user->getEmail());
 
-    	$url = $this->get('router')->generate('fos_user_registration_check_email');
-    	return $this->redirect($url);
+        $url = $this->get('router')->generate('fos_user_registration_check_email');
+
+        return $this->redirect($url);
     }
-
 }

@@ -30,14 +30,14 @@
                     <div style="background-color: white; padding: 10px 20px 20px 20px">
                         <div class="small pull-right">{{ macros.decklist_social_icons(data.decklist ) }}</div>
                         <div>{{ data.sphere_names }}</div>
-                        <p class="text-center" style="margin-top: 10px;">{{ data.count_by_type | raw }}</p>
                         <p class="text-center small hero-card-list">
                             {% for hero in data.hero_deck %}
                                 {% set card = hero.getCard() %}
                                 <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" href="">{{ card.name }} <i>({{ card.pack.name }})</i></a>
                             {% endfor %}
                         </p>
-                        <div class="text-center small"><a href="{{ path('decklists_list', { type:'find', faction: data.sphere.code }) }}">More using this sphere</a></div>
+                        <p class="text-center">{{ data.count_by_type | raw }}</p>
+                        <div class="text-center small"><a href="{{ path('decklists_list', { type:'find', sphere: data.sphere.code }) }}">More using this sphere</a></div>
                         <div style="clear:both"></div>
                     </div>
                 </div>

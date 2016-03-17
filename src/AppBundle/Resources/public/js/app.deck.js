@@ -13,6 +13,7 @@
         too_many_heroes: "Contains too many Heroes",
         duplicated_unique_heroes: "More than one hero with the same unique name",
         too_few_heroes: "Contains too few Heroes",
+        too_few_cards: "Contains too few cards",
         invalid_cards: "Contains forbidden cards"
     };
     var header_tpl = _.template('<h5><span class="icon icon-<%= code %>"></span> <%= name %> (<%= quantity %>)</h5>');
