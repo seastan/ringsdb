@@ -1,0 +1,41 @@
+{% extends 'AppBundle:Search:display.html.twig' %}
+
+{% block main %}
+
+    <table class="rwd-table table table-striped table-condensed">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Sphere</th>
+            <th>Type</th>
+            <th class="cost" title="Cost/Threat" data-toggle="tooltip" data-container="body">Cost</th>
+            <th class="willpower"><span class="icon-willpower"></span></th>
+            <th class="attack"><span class="icon-attack"></span></th>
+            <th class="defense"><span class="icon-defense"></span></th>
+            <th class="health"><span class="icon-health"></span></th>
+            <th>Traits</th>
+            <th>Set</th>
+        </tr>
+        </thead>
+
+        {% for i in 0..cards | length - 1 %}
+
+            <tr class="{% if i % 2==0 %}even{% else %}odd{% endif %}">
+                {% set card = cards[i] %}
+                <td>
+                    <a href="{{ card.url }}" class="card-tip{% if card.available == false %} card-preview{% endif %}" data-code="{{ card.code }}">{{ card.name }}</a>
+                </td>
+                <td><span class="icon icon-{{ card.sphere_code }} fg-{{ card.sphere_code }}"></span> {{ card.sphere_name }}</td>
+                <td><span class="icon icon-{{ card.type_code }} fg-{{ card.sphere_code }}"></span> {{ card.type_name }}</td>
+                <td class="cost">{% if card.type_name == 'Hero' %}{{ card.threat }}{% else %}{{ card.cost }}{% endif %}</td>
+                <td class="willpower">{{ card.willpower }}</td>
+                <td class="attack">{{ card.attack }}</td>
+                <td class="defense">{{ card.defense }}</td>
+                <td class="health">{{ card.health }}</td>
+                <td>{{ card.traits }}</td>
+                <td>{{ card.pack_name }} {{ card.position }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

@@ -1,0 +1,125 @@
+AppBundle\Entity\Card:
+    type: entity
+    table: card
+    manyToOne:
+        pack:
+            targetEntity: Pack
+            inversedBy: cards
+            joinColumn:
+                name: pack_id
+                referencedColumnName: id
+        type:
+            targetEntity: Type
+            inversedBy: cards
+            joinColumn:
+                name: type_id
+                referencedColumnName: id
+        sphere:
+            targetEntity: Sphere
+            inversedBy: cards
+            joinColumn:
+                name: sphere_id
+                referencedColumnName: id
+        #encounter:
+        #    targetEntity: Encounter
+        #    inversedBy: cards
+        #    nullable: true
+        #    joinColumn:
+        #        name: encounter_id
+        #        referencedColumnName: id
+        #decktype:
+        #    targetEntity: Decktype
+        #    inversedBy: cards
+        #    nullable: true
+        #    joinColumn:
+        #        name: decktype_id
+        #        referencedColumnName: id
+    oneToMany:
+        reviews:
+            targetEntity: Review
+            orderBy: {'dateCreation':'DESC'}
+            mappedBy: card
+    fields:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+        position:
+            type: smallint
+            nullable: false
+        code:
+            type: string
+            length: 255
+            nullable: false
+        name:
+            type: string
+            length: 1024
+            nullable: false
+        traits:
+            type: string
+            length: 255
+            nullable: true
+        text:
+            type: text
+            nullable: true
+        flavor:
+            type: text
+            nullable: true
+        isUnique:
+            type: boolean
+            nullable: false
+            column: is_unique
+        cost:
+            type: string
+            length: 3
+            nullable: true
+        threat:
+            type: smallint
+            nullable: true
+        willpower:
+            type: smallint
+            nullable: true
+        attack:
+            type: smallint
+            nullable: true
+        defense:
+            type: smallint
+            nullable: true
+        health:
+            type: smallint
+            nullable: true
+        victory:
+            type: smallint
+            nullable: true
+        quest:
+            type: smallint
+            nullable: true
+        quantity:
+            type: smallint
+            nullable: false
+        deckLimit:
+            type: smallint
+            nullable: true
+            column: deck_limit
+        illustrator:
+            type: string
+            length: 255
+            nullable: true
+        octgnid:
+            type: string
+            nullable: true
+        dateCreation:
+            type: datetime
+            nullable: false
+            column: date_creation
+            gedmo:
+                timestampable:
+                    on: create
+        dateUpdate:
+            type: datetime
+            nullable: false
+            column: date_update
+            gedmo:
+                timestampable:
+                    on: update

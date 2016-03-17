@@ -1,0 +1,67 @@
+{% extends 'AppBundle::layout.html.twig' %}
+{% import "AppBundle::macros.html.twig" as macros %}
+
+{% block javascripts %}
+    {% javascripts '@AppBundle/Resources/public/js/ui.builder.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+    <div class="main white container">
+        <form action="{{ path('deck_initbuild') }}" method="post" enctype="application/x-www-form-urlencoded">
+            <h2>
+                Select your heroes
+                <span class="starting-threat">Starting Threat: <span>0</span></span>
+            </h2>
+
+            <div class="row selected-heroes">
+                <div class="col-md-4">
+                    <div class="selected-hero-placeholder">
+                        <span class="no-hero-selected">No hero selected</span>
+                        <input type="hidden" name="hero1"/>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="selected-hero-placeholder">
+                        <span class="no-hero-selected">No hero selected</span>
+                        <input type="hidden" name="hero2"/>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="selected-hero-placeholder">
+                        <span class="no-hero-selected">No hero selected</span>
+                        <input type="hidden" name="hero3"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary btn-block">Create the deck and start building</button>
+                </div>
+            </div>
+
+            <div class="row heroes-list-row">
+                <div class="col-md-7 col-md-offset-1 col-sm-8">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><b>Available Heroes</b></div>
+                        <ul class="list-group heroes-list">
+                            {% for card in heroes %}
+                                <a href="" class="list-group-item" data-code="{{ card.code }}">
+                                    <span class="icon icon-{{ card.sphere_code }} fg-{{ card.sphere_code }}"></span>
+                                    <span>{{ card.name }}</span> <span class="small">({{ card.pack_name }})</span>
+                                </a>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="initHero" class="col-md-3 col-sm-4 hidden-xs">
+                    <img src="" class="img-responsive" id="cardimg" alt="Hero">
+                </div>
+            </div>
+        </form>
+
+    </div>
+{% endblock %}

@@ -1,0 +1,30 @@
+admin_sphere:
+    path:  /
+    defaults: { _controller: "AppBundle:Sphere:index" }
+
+admin_sphere_show:
+    path:  /{id}/show
+    defaults: { _controller: "AppBundle:Sphere:show" }
+
+admin_sphere_new:
+    path:  /new
+    defaults: { _controller: "AppBundle:Sphere:new" }
+
+admin_sphere_create:
+    path:  /create
+    defaults: { _controller: "AppBundle:Sphere:create" }
+    methods: [ post ]
+
+admin_sphere_edit:
+    path:  /{id}/edit
+    defaults: { _controller: "AppBundle:Sphere:edit" }
+
+admin_sphere_update:
+    path:  /{id}/update
+    defaults: { _controller: "AppBundle:Sphere:update" }
+    methods: [ post, put ]
+
+admin_sphere_delete:
+    path:  /{id}/delete
+    defaults: { _controller: "AppBundle:Sphere:delete" }
+    methods: [ post, delete ]

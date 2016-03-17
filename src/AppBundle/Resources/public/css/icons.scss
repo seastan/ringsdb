@@ -1,0 +1,132 @@
+@font-face {
+  font-family: 'ringsdb';
+  src: url('../fonts/ringsdb.eot?h6hjpm');
+  src: url('../fonts/ringsdb.eot?h6hjpm#iefix') format('embedded-opentype'),
+  url('../fonts/ringsdb.ttf?h6hjpm') format('truetype'),
+  url('../fonts/ringsdb.woff?h6hjpm') format('woff'),
+  url('../fonts/ringsdb.svg?h6hjpm#ringsdb') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'ringsdb' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-hero:before {
+  content: "\e914";
+}
+
+.icon-attachment:before {
+  content: "\e912";
+}
+
+.icon-event:before {
+  content: "\e913";
+}
+
+.icon-ally:before {
+  content: "\e916";
+}
+
+.icon-player-side-quest:before {
+  content: "\e911";
+}
+
+.icon-neutral:before {
+  content: "\e915";
+}
+
+.icon-spirit:before {
+  content: "\e900";
+}
+
+.icon-tactics:before {
+  content: "\e901";
+}
+
+.icon-lore:before {
+  content: "\e902";
+}
+
+.icon-leadership:before {
+  content: "\e903";
+}
+
+.icon-baggins:before {
+  content: "[b]";
+}
+
+.icon-fellowship:before {
+  content: "[f]";
+}
+
+
+.icon-threat:before {
+  content: "\e904";
+}
+
+.icon-cost:before {
+  content: "\e916";
+}
+
+.icon-willpower:before {
+  content: "\e905";
+  margin-left: -2px;
+  vertical-align: middle;
+}
+
+.icon-attack:before {
+  content: "\e906";
+  margin-left: -2px;
+  vertical-align: middle;
+}
+
+.icon-defense:before {
+  content: "\e907";
+  margin-left: -2px;
+  vertical-align: middle;
+}
+
+.icon-health:before {
+  content: "\e908";
+  margin-left: -2px;
+  vertical-align: middle;
+}
+
+.icon-unique:before {
+  content: "\e90e";
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.panel-title .icon-unique {
+  line-height: 1px;
+}
+
+.icon-rule:before {
+  content: "\e909\e90b\e90c\e90a";
+}
+
+.icon-onering:before {
+  content: "\e90d";
+}
+
+.icon-logo:before {
+  content: "\e90f";
+}
+
+.icon-logo-h:before {
+  content: "\e910";
+}

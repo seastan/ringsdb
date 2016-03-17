@@ -1,0 +1,94 @@
+{% extends 'AppBundle::layout.html.twig' %}
+{% import "AppBundle::macros.html.twig" as macros %}
+
+{% block javascripts %}
+    {% javascripts '@AppBundle/Resources/public/js/ui.decklist.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <script type="text/javascript">
+        var Commenters = {{ commenters | json_encode | raw }};
+        app.deck.init({{ decklist | json_encode | raw }});
+        app.user.params.decklist_id = {{ decklist.id }};
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row title">
+            <div class="col-xs-12">
+                <div class="ribbon">
+                    {%  for sphere in decklist.spheres %}
+                        <div class="ribbon-{{ sphere.code }}"><span class="icon icon-{{ sphere.code }}"></span></div>
+                    {% endfor %}
+                </div>
+
+                <h1 class="decklist-name bg-sphere text-center">
+                    {{ decklist.name }}
+                    <span class="dropdown">
+                        <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" id="dropdownVersions">
+                            {{ decklist.version }}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownVersions">
+                            <li class="dropdown-header">Versions</li>
+                            {% for other_decklist in versions %}
+                                <li class="{% if other_decklist.id == decklist.id %}disabled{% endif %}">
+                                    <a href="{{ path('decklist_detail', { 'decklist_id': other_decklist.id, 'decklist_name': other_decklist.nameCanonical|e('url') }) }}">
+                                        {{ other_decklist.version }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </span>
+                </h1>
+            </div>
+            <div class="col-xs-12">
+                <div class="social">
+                    <div class="pull-right">
+                        <span class="hidden-xs">published: </span>
+                        <time datetime="{{ decklist.dateCreation|date('c') }}">{{ decklist.dateCreation|date('M d, Y') }}</time>
+                        {{ macros.decklist_social_icons(decklist) }}
+                    </div>
+                    {% if duplicate %}
+                        <small>
+                            Duplicate of
+                            <a href="{{ path('decklist_detail', { 'decklist_id': duplicate.id, 'decklist_name': duplicate.nameCanonical|e('url') }) }}">
+                                {{ duplicate.name }} {{ duplicate.version }}
+                            </a>
+                        </small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main white container">
+        <div class="row">
+            <div class="col-md-6">
+                <div id="deck-content" style="margin-bottom: 10px"></div>
+                {% include 'AppBundle:Builder:deck-charts.html.twig' %}
+                {% include 'AppBundle:Builder:draw-simulator.html.twig' %}
+                {% include 'AppBundle:Decklist:table-predecessor.html.twig' %}
+                {% include 'AppBundle:Decklist:table-successor.html.twig' %}
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="pull-right btn-group" role="group">{% include 'AppBundle:Decklist:toolbar.html.twig' %}</div>
+                    </div>
+                    <div class="col-md-12">
+                        {% include 'AppBundle:Decklist:author-and-description.html.twig' %}
+                    </div>
+                    <div class="col-md-12">
+                        {% include 'AppBundle:Decklist:comments.html.twig' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'AppBundle:Decklist:export-modal.html.twig' %}
+    {% include 'AppBundle:Decklist:delete-modal.html.twig' %}
+    {% include 'AppBundle:Decklist:odds-modal.html.twig' %}
+    {% include 'AppBundle:Decklist:compare-modal.html.twig' %}
+{% endblock %}

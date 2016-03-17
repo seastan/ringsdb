@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ pagetitle|default('Deckbuilder') }} &middot; RingsDB</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <link rel="icon" sizes="192x192" href="/icon-192.png"/>
+    <link rel="apple-touch-icon" sizes="120x120" href="/icon-120.png"/>
+    <link rel="shortcut icon" href="/favicon.ico?v=2"/>
+
+    {% if pagedescription is defined %}
+        <meta name="description" content="{{ pagedescription }}">
+    {% endif %}
+
+    {% if app.environment == 'dev' %}
+        {% stylesheets filter="cssrewrite,scssphp" output="css/app.css"
+            'bundles/app/cdn/css/googlefonts.css'
+            'bundles/app/cdn/css/font-awesome.min.css'
+            'bundles/app/cdn/css/jquery.qtip.css'
+            'bundles/app/cdn/css/bootstrap-markdown.min.css' %}
+            <link rel="stylesheet" href="{{ asset_url }}"/>
+        {% endstylesheets %}
+    {% else %}
+        <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Amiri:400,400italic,700,700italic|Julius+Sans+One|Open+Sans:400,400italic,700,700italic|Open+Sans+Condensed:300">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.1/jquery.qtip.css">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.10.0/css/bootstrap-markdown.min.css">
+    {% endif %}
+
+    {% stylesheets filter="cssrewrite,scssphp" output="css/app.css"
+        'bundles/app/css/bootstrap.css'
+        'bundles/app/css/style.scss'
+        'bundles/app/css/icons.scss' %}
+        <link rel="stylesheet" href="{{ asset_url }}"/>
+    {% endstylesheets %}
+
+    <!--[if lt IE 9]>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.js"></script>
+    <![endif]-->
+
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+    <div id="wrapper">
+        <nav class="navbar navbar-default navbar-static-top" role="navigation">
+            <div class="container">
+
+                {% block navbar %}
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="{{ path('index') }}"><span class="icon icon-logo logo"></span> RingsDB</a>
+                    </div>
+
+                    <div class="navbar-collapse collapse">
+                        <ul class="nav navbar-nav">
+                            <li><a href="{{ path('decks_list') }}">My Decks</a></li>
+                            <li><a href="{{ path('decklists_list') }}">Decklists</a></li>
+                            <li><a href="{{ path('cards_search') }}">Cards</a></li>
+                            {# <li class="hidden-sm"><a href="{{ path('card_reviews_list') }}">Reviews</a></li> #}
+                        </ul>
+
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="dropdown hidden-xs hidden-lg">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="fa fa-search"></span></a>
+                                <div class="dropdown-menu">
+                                    <form action="{{ path('cards_find') }}" target="_blank">
+                                        <input type="text" placeholder="Card Search" class="form-control " name="q">
+                                    </form>
+                                </div>
+                            </li>
+                            <li id="login">
+                                <a href="#" class="disabled"><span class="fa fa-user"></span></a>
+                            </li>
+                        </ul>
+                        <form class="navbar-form navbar-right visible-lg-block visible-xs-block external" action="{{ path('cards_find') }}" target="_blank">
+                            <div class="form-group">
+                                <input type="text" placeholder="Card Search" class="form-control smart-filter-help" name="q">
+                            </div>
+                        </form>
+                    </div>
+                {% endblock %}
+            </div>
+        </nav>
+
+        {% block body %}{% endblock %}
+        <div id="push"></div>
+    </div>
+
+    <footer class="hidden-print">
+        <div class="container">
+            {% block footer %}
+                <div class="row">
+                    <div class="col-xs-12">
+                        <ul class="list-inline">
+                            <li><a href="{{ path('about') }}">About</a></li>
+                            <li><a href="{{ path('api_intro') }}">API</a></li>
+                            <li><a href="{{ path('donators') }}">Donators</a> <span class="fa fa-gift donator" title="The Gracious Donator"></span></li>
+                        </ul>
+
+                        <p>
+                            Original <a href="http://thronesdb.com" target="_blank">ThronesDB</a> and <a href="http://netrunnerdb.com" target="_blank">NetrunnerDB</a> code designed and built by Alsciende.
+                            Adapted to The Lord of the Rings: The Card Game by Sydtrack. Contact: <a href="https://reddit.com/user/Sydtrack/" title="Reddit"><span class="fa fa-reddit-alien"></span></a>
+                        </p>
+
+                        <p>Please post bug reports and feature requests on <a href="https://github.com/Sydtrack/ringsdb/issues">GitHub</a>.</p>
+
+                        <p>
+                            The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games.
+                            This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+                        </p>
+
+                        <div class="site-rule"><span class="icon-rule"></span></div>
+                    </div>
+                </div>
+            {% endblock %}
+        </div>
+    </footer>
+
+    {% include 'AppBundle:Modale:card.html.twig' %}
+
+    <script src="{{ asset('/bundles/fosjsrouting/js/router.js') }}"></script>
+    <script src="{{ path('fos_js_routing_js', { "callback": "fos.Router.setData" }) }}"></script>
+
+
+    {% if app.environment == 'dev' %}
+        {% javascripts filter="?jsqueeze" output="js/app.js"
+            '@AppBundle/Resources/public/cdn/js/jquery.min.js'
+            '@AppBundle/Resources/public/cdn/js/underscore-min.js'
+            '@AppBundle/Resources/public/cdn/js/jquery.qtip.js'
+            '@AppBundle/Resources/public/cdn/js/typeahead.jquery.min.js'
+            '@AppBundle/Resources/public/cdn/js/marked.min.js'
+            '@AppBundle/Resources/public/cdn/js/jquery.textcomplete.min.js'
+            '@AppBundle/Resources/public/cdn/js/moment.min.js'
+            '@AppBundle/Resources/public/cdn/js/highcharts.js'
+            '@AppBundle/Resources/public/cdn/js/bootstrap-markdown.min.js' %}
+            <script src="{{ asset_url }}"></script>
+        {% endjavascripts %}
+    {% else %}
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.1/jquery.qtip.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.jquery.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/0.2.2/jquery.textcomplete.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highcharts/4.2.3/highcharts.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.10.0/js/bootstrap-markdown.min.js"></script>
+    {% endif %}
+
+    <script type="text/javascript">
+        var app = {};
+        moment.locale('en-US');
+
+        $(function() {
+            {% for flashMessage in app.session.flashbag.get('notice') %}
+                app.ui.insert_alert_message('success', {{ flashMessage | json_encode | raw }});
+            {% endfor %}
+
+            {% for flashMessage in app.session.flashbag.get('warning') %}
+                app.ui.insert_alert_message('warning', {{ flashMessage | json_encode | raw }});
+            {% endfor %}
+
+            {% for flashMessage in app.session.flashbag.get('error') %}
+                app.ui.insert_alert_message('danger', {{ flashMessage | json_encode | raw }});
+            {% endfor %}
+        });
+    </script>
+
+    {% if app.environment == 'prod' %}
+        {% include 'AppBundle::google-analytics.html.twig' %}
+    {% endif %}
+
+    {% javascripts filter="?jsqueeze" output="js/app.js"
+        '@AppBundle/Resources/public/js/bootstrap.js'
+        '@AppBundle/Resources/public/js/fdb-all.min.js'
+        '@AppBundle/Resources/public/js/app.data.js'
+        '@AppBundle/Resources/public/js/app.format.js'
+        '@AppBundle/Resources/public/js/app.tip.js'
+        '@AppBundle/Resources/public/js/app.card_modal.js'
+        '@AppBundle/Resources/public/js/app.user.js'
+        '@AppBundle/Resources/public/js/app.binomial.js'
+        '@AppBundle/Resources/public/js/app.hypergeometric.js'
+        '@AppBundle/Resources/public/js/app.draw_simulator.js'
+        '@AppBundle/Resources/public/js/app.textcomplete.js'
+        '@AppBundle/Resources/public/js/app.markdown.js'
+        '@AppBundle/Resources/public/js/app.smart_filter.js'
+        '@AppBundle/Resources/public/js/app.deck.js'
+        '@AppBundle/Resources/public/js/app.diff.js'
+        '@AppBundle/Resources/public/js/app.deck_history.js'
+        '@AppBundle/Resources/public/js/app.deck_charts.js'
+        '@AppBundle/Resources/public/js/app.ui.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

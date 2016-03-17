@@ -1,0 +1,22 @@
+<div class="col-sm-4" style="margin-bottom:.5em">
+	<select name="sort" class="form-control">
+		<option value="name"     {% if sort|default('name') == "name"     %}selected{% endif %}>Sort by Name</option>
+		<option value="set"      {% if sort|default('name') == "set"      %}selected{% endif %}>Sort by Set</option>
+		<option value="sphere"   {% if sort|default('name') == "sphere "  %}selected{% endif %}>Sort by Sphere</option>
+		<option value="type"     {% if sort|default('name') == "type"     %}selected{% endif %}>Sort by Type</option>
+		<option value="cost"     {% if sort|default('name') == "cost"     %}selected{% endif %}>Sort by Cost/Threat</option>
+		<option value="willpower"{% if sort|default('name') == "willpower"%}selected{% endif %}>Sort by Willpower</option>
+		<option value="attack"   {% if sort|default('name') == "attack"   %}selected{% endif %}>Sort by Attack</option>
+		<option value="defense"  {% if sort|default('name') == "defense"  %}selected{% endif %}>Sort by Defense</option>
+		<option value="health"   {% if sort|default('name') == "health"   %}selected{% endif %}>Sort by Health</option>
+	</select>
+</div>
+<div class="col-sm-4" style="margin-bottom:.5em">
+	<select name="view" class="form-control">
+		<option value="list"    {% if view|default('list') == "list"    %}selected{% endif %}>View as a Checklist</option>
+		<option value="spoiler" {% if view|default('list') == "spoiler" %}selected{% endif %}>View as a Spoiler</option>
+		<option value="card"    {% if view|default('list') == "card"    %}selected{% endif %}>View as Full Cards</option>
+		<option value="scan"    {% if view|default('list') == "scan"    %}selected{% endif %}>View as Scans only</option>
+		<option value="short"   {% if view|default('list') == "short"   %}selected{% endif %}>View as Simple List</option>
+	</select>
+</div>

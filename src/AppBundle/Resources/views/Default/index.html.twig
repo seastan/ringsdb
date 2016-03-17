@@ -1,0 +1,63 @@
+{% extends 'AppBundle::layout.html.twig' %}
+{% import "AppBundle::macros.html.twig" as macros %}
+
+{% block body %}
+
+    <div class="main container">
+        <h1 class="site-title hidden-xs">RingsDB</h1>
+        <div class="site-rule"><span class="icon-rule"></span></div>
+        <div class="site-slogan">Deckbuilder for The Lord of the Rings LCG</div>
+    </div>
+
+    <div class="main container">
+        <div class="row">
+            {% for data in decklists_by_sphere %}
+                <div class="col-md-6" style="margin-bottom:30px">
+                    <div class="bg-sphere bg-{{ data.sphere.code }}" style="padding: 10px 10px 8px 10px">
+                        <div class="media">
+                            <div class="media-left" style="font-size: 30px">
+                                <span class="icon icon-{{ data.sphere.code }}"></span>
+                            </div>
+                            <div class="media-body">
+                                <h4 class="media-heading" style="white-space:nowrap"><a href="{{ path('decklist_detail', { decklist_id: data.decklist.id, decklist_name: data.decklist.nameCanonical }) }}">{{ data.decklist.name }}</a></h4>
+
+                                <div class="small">by <span class="username">{{ macros.username(data.decklist.user) }}</span> &middot;
+                                    <time datetime="{{ data.decklist.dateCreation|date('c') }}">{{ data.decklist.dateCreation|date('M d, Y') }}</time>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="background-color: white; padding: 10px 20px 20px 20px">
+                        <div class="small pull-right">{{ macros.decklist_social_icons(data.decklist ) }}</div>
+                        <div>{{ data.sphere_names }}</div>
+                        <p class="text-center" style="margin-top: 10px;">{{ data.count_by_type | raw }}</p>
+                        <p class="text-center small hero-card-list">
+                            {% for hero in data.hero_deck %}
+                                {% set card = hero.getCard() %}
+                                <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" href="">{{ card.name }} <i>({{ card.pack.name }})</i></a>
+                            {% endfor %}
+                        </p>
+                        <div class="text-center small"><a href="{{ path('decklists_list', { type:'find', faction: data.sphere.code }) }}">More using this sphere</a></div>
+                        <div style="clear:both"></div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script type="application/ld+json">
+        {
+           "@context": "http://schema.org",
+           "@type": "WebSite",
+           "url": "https://ringsdb.com/",
+           "potentialAction": {
+                "@type": "SearchAction",
+                "target": "http://ringsdb.com/find/?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+           }
+        }
+    </script>
+{% endblock %}

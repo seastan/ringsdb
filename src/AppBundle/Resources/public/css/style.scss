@@ -1,0 +1,1080 @@
+#wrapper {
+  min-height: 100%;
+  border-bottom: 5px solid #330000;
+  padding-bottom: 100px;
+}
+
+.navbar-default {
+  font-size: 16px;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+/********* CARDS ************/
+
+.card-content {
+  font: 16px/20px 'Amiri', serif;
+
+  abbr[title] {
+    border-bottom: none;
+  }
+}
+
+.card-name {
+  font-family: 'Julius Sans One', sans-serif;
+  font-weight: 700;
+}
+
+.card-type {
+  font-weight: 700;
+}
+
+.card-traits, .card-text i {
+  font-weight: 700;
+  font-style: italic;
+}
+
+.card-text {
+  border-left: 1px solid #888888;
+}
+
+.card-text p {
+  margin: 6px;
+}
+
+.card-flavor {
+  font-style: italic;
+
+  cite {
+    white-space: nowrap;
+
+    &::before {
+      /* en dash followed by non-breaking zero-width space */
+      content: "\2013\FEFF";
+    }
+  }
+}
+
+.card-full-image {
+  width: 360px;
+}
+
+.table-expanded > thead > tr > th,
+.table-expanded > tbody > tr > th,
+.table-expanded > tfoot > tr > th,
+.table-expanded > thead > tr > td,
+.table-expanded > tbody > tr > td,
+.table-expanded > tfoot > tr > td {
+  padding: 16px 8px;
+}
+
+.navbar-static-top {
+  z-index: auto;
+}
+
+.display-spoiler-card {
+  margin-bottom: 1em;
+  h4 {
+    border-bottom: 1px solid #DDDDDD;
+  }
+}
+
+.deck-loading {
+  padding: 50px 0;
+  text-align: center;
+}
+
+.tab-content {
+  padding-top: 15px;
+}
+
+.dropdown-menu {
+  label {
+    margin: 0;
+  }
+
+  input[type=checkbox], input[type=radio] {
+    margin: -4px 8px 0 -6px;
+  }
+}
+
+html, body {
+  height: 100%;
+  min-height: 100%;
+  background-color: #F5F5F5;
+}
+
+th, td {
+  &.type, &.sphere, &.cost, &.willpower, &.attack, &.defense, &.health {
+    text-align: center;
+  }
+}
+
+.container.main {
+  margin-bottom: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+
+  &.white {
+    background-color: #fff;
+  }
+
+  &.admin {
+    background-color: #fff;
+    border: 1px solid red;
+  }
+}
+
+div.tags span.tag {
+  font-size: 75%;
+  color: darkgray;
+
+  &:not(:first-child)::before {
+    content: " - ";
+  }
+}
+
+.decks-actions .btn {
+  margin-bottom: 3px;
+}
+
+.social-icons > * {
+  margin-left: 5px
+}
+
+.social-icon-like {
+  color: red
+}
+
+.social-icon-favorite {
+  color: orange
+}
+
+.social-icon-comment {
+  color: green
+}
+
+.social-icon-version {
+  color: blue
+}
+
+/*** generic ****/
+
+.smaller {
+  font-size: 70%;
+}
+
+/********** icon-bg ***********/
+
+.icon-bg:before {
+  width: 100%;
+  height: 100%;
+  font-size: 8em;
+  text-align: center;
+  display: block;
+  position: absolute;
+  line-height: 2em;
+  left: 0;
+  opacity: 0.1;
+  z-index: 0;
+}
+
+/********* ONE DECK *********/
+
+.media-left {
+  min-width: 48px;
+  text-align: center;
+}
+
+.deck-intro .media-left {
+  font-size: 96px;
+}
+
+.deck-intro .media-left span {
+  padding: 10px;
+}
+
+.deck-content {
+  margin-bottom: 15px;
+}
+
+.deck-content .invalid-card {
+  text-decoration: line-through;
+}
+
+/********** DECK EDITOR ************/
+
+#collection-grid .col-sm-6 .media, #collection-grid .col-sm-4 .media {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px dotted lightgray;
+  overflow: hidden;
+}
+
+#collection-grid .col-sm-6 .media-object {
+  height: 100px;
+}
+
+#collection-grid .col-sm-4 .media-object {
+  height: 70px;
+}
+
+/********* LIST OF DECKS ************/
+
+.list-decks > tbody > tr > td {
+  vertical-align: middle;
+}
+
+.list-decks img {
+  height: 63px;
+  width: 45px;
+  border-radius: 4px;
+}
+
+#tag_toggles button {
+  margin-bottom: 4px;
+  margin-right: 4px;
+}
+
+/************ DECK GALLERY **********/
+
+#deck-gallery table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  overflow: hidden;
+
+  td {
+    padding: 0;
+
+    > div {
+      height: 100px;
+      overflow: visible;
+      position: relative;
+
+      > img {
+        height: 100%;
+        border: 1px solid white;
+        border-radius: 10px;
+      }
+
+      > div {
+        background: rgba(0, 0, 0, 0.5);
+        position: absolute;
+        left: 1px;
+        bottom: 1px;
+        color: white;
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        border-radius: 15px;
+        font-family: monospace;
+      }
+    }
+  }
+}
+
+/********* DRAW SIMULATOR ************/
+
+#table-draw-simulator-content {
+  img {
+    width: 98px;
+    margin: 5px;
+    box-shadow: black 0px 0px 5px;
+    border-radius: 5px;
+
+    &.trashed {
+      opacity: 0.25;
+      box-shadow: none;
+
+      &:hover {
+        opacity: 0.75;
+      }
+    }
+  }
+
+  div.card-proxy {
+    background: #888888;
+    color: white;
+    width: 99px;
+    height: 138px;
+    float: left;
+    margin: 5px;
+    box-shadow: black 0 0 5px;
+    border-radius: 5px;
+
+    div {
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+      text-align: center
+    }
+  }
+
+  img.card-proxy.trashed {
+    opacity: 0.25;
+    box-shadow: none;
+
+    &:hover {
+      opacity: 0.75;
+    }
+  }
+}
+
+#draw-simulator-special {
+  display: none;
+}
+
+/*********** TYPEAHEAD **************/
+
+.twitter-typeahead {
+  width: 100%;
+  background-color: #FFFFFF;
+
+  .tt-hint {
+    color: #AAAAAA;
+    margin-left: 11px;
+    margin-top: 4px;
+    display: none;
+  }
+
+  .tt-query {
+    margin-bottom: 0
+  }
+}
+
+.tt-menu, .tt-dropdown-menu {
+  min-width: 160px;
+  margin-top: 2px;
+  padding: 5px 0;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border: 1px solid rgba(0, 0, 0, .2);
+  *border-right-width: 2px;
+  *border-bottom-width: 2px;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+  -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box
+}
+
+.tt-suggestion {
+  display: block;
+  padding: 3px 20px;
+  cursor: pointer;
+}
+
+.tt-suggestion.tt-cursor {
+  color: #FFFFFF;
+  background-color: #0081C2;
+  background-image: -moz-linear-gradient(top, #0088CC, #0077B3);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088CC), to(#0077B3));
+  background-image: -webkit-linear-gradient(top, #0088CC, #0077B3);
+  background-image: -o-linear-gradient(top, #0088CC, #0077B3);
+  background-image: linear-gradient(to bottom, #0088CC, #0077B3);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0077b3', GradientType=0)
+}
+
+.tt-suggestion.tt-cursor a {
+  color: #FFFFFF
+}
+
+.tt-suggestion p {
+  margin: 0
+}
+
+/************** QTIP ****************/
+.qtip-game {
+  border-radius: 2px
+}
+
+.qtip-game-text {
+  min-width: 360px;
+  max-width: 360px;
+  font-size: 15px;
+}
+
+.qtip-game-image {
+  max-width: 500px;
+}
+
+/***************** THUMBNAIL CARD IMAGE **************/
+
+.card-thumbnail {
+  background-attachment: scroll;
+  background-origin: padding-box;
+  background-clip: border-box;
+  background-repeat: no-repeat;
+  margin: 0 0 5px 5px;
+  position: relative;
+  border: 1px solid #000000;
+  float: right;
+}
+
+.card-thumbnail-player-side-quest {
+  margin-top: 5px;
+}
+
+.card-thumbnail-1x {
+  width: 200px;
+  height: 200px;
+  background-size: 300px 418px;
+}
+
+.card-thumbnail-2x {
+  width: 100px;
+  height: 100px;
+  background-size: 150px 209px;
+}
+
+.card-thumbnail-3x {
+  width: 67px;
+  height: 67px;
+  background-size: 100px 139px;
+}
+
+.card-thumbnail-4x {
+  width: 50px;
+  height: 50px;
+  background-size: 75px 105px;
+}
+
+.card-thumbnail-5x {
+  width: 40px;
+  height: 40px;
+  background-size: 60px 84px;
+}
+
+.card-thumbnail-1x.card-thumbnail-hero {
+  background-position: -90px -3px;
+}
+
+.card-thumbnail-2x.card-thumbnail-hero {
+  background-position: -46px -3px;
+}
+
+.card-thumbnail-3x.card-thumbnail-hero {
+  background-position: -30px -3px;
+}
+
+.card-thumbnail-4x.card-thumbnail-hero {
+  background-position: -22px -3px;
+}
+
+.card-thumbnail-5x.card-thumbnail-hero {
+  background-position: -17px -3px;
+}
+
+.card-thumbnail-1x.card-thumbnail-ally {
+  background-position: -90px 0;
+}
+
+.card-thumbnail-2x.card-thumbnail-ally {
+  background-position: -46px 0;
+}
+
+.card-thumbnail-3x.card-thumbnail-ally {
+  background-position: -30px 0;
+}
+
+.card-thumbnail-4x.card-thumbnail-ally {
+  background-position: -22px 0;
+}
+
+.card-thumbnail-5x.card-thumbnail-ally {
+  background-position: -16px 0;
+}
+
+.card-thumbnail-1x.card-thumbnail-attachment {
+  background-position: -55px -44px;
+}
+
+.card-thumbnail-2x.card-thumbnail-attachment {
+  background-position: -30px -22px;
+}
+
+.card-thumbnail-3x.card-thumbnail-attachment {
+  background-position: -18px -15px;
+}
+
+.card-thumbnail-4x.card-thumbnail-attachment {
+  background-position: -15px -13px;
+}
+
+.card-thumbnail-5x.card-thumbnail-attachment {
+  background-position: -13px -12px;
+}
+
+.card-thumbnail-1x.card-thumbnail-event {
+  background-position: -55px 0;
+}
+
+.card-thumbnail-2x.card-thumbnail-event {
+  background-position: -30px 0;
+}
+
+.card-thumbnail-3x.card-thumbnail-event {
+  background-position: -20px 0;
+}
+
+.card-thumbnail-4x.card-thumbnail-event {
+  background-position: -17px 0;
+}
+
+.card-thumbnail-5x.card-thumbnail-event {
+  background-position: -14px 0;
+}
+
+.card-thumbnail-1x.card-thumbnail-player-side-quest {
+  width: 400px;
+  height: 100px;
+  background-size: 418px 300px;
+  background-position: -9px -53px
+}
+
+.card-thumbnail-2x.card-thumbnail-player-side-quest {
+  width: 200px;
+  height: 50px;
+  background-size: 209px 150px;
+  background-position: -7px -28px;
+}
+
+.card-thumbnail-3x.card-thumbnail-player-side-quest {
+  width: 133px;
+  height: 33px;
+  background-size: 139px 100px;
+  background-position: -3px -15px
+}
+
+.card-thumbnail-4x.card-thumbnail-player-side-quest {
+  width: 100px;
+  height: 25px;
+  background-size: 105px 75px;
+  background-position: -5px -13px;
+}
+
+.card-thumbnail-5x.card-thumbnail-player-side-quest {
+  width: 80px;
+  height: 20px;
+  background-size: 84px 60px;
+  background-position: -5px -10px
+}
+
+/************** INDEX PAGE ***************/
+
+h1.site-title {
+  font-family: 'Julius Sans One', sans-serif;
+  position: relative;
+  font-size: 116px;
+  text-align: center;
+  margin-top: 0;
+}
+
+div.site-rule {
+  font-size: 35px;
+  margin-top: -15px;
+  text-align: center;
+}
+
+div.site-slogan {
+  font-family: 'Open Sans Condensed', sans-serif;
+  position: relative;
+  font-size: 40px;
+  text-align: center;
+}
+
+/************ LIST OF DECKLISTS **************/
+
+.decklist-hero-image {
+  width: 165px;
+  img {
+    height: 64px;
+  }
+}
+
+/************* DECKLIST *********************/
+
+.row.title {
+  padding-top: 20px;
+  padding-bottom: 10px;
+  background-color: #E0E0E0;
+  position: relative;
+}
+
+#deck-description h1 {
+  font-size: 171%;
+}
+
+#deck-description h2 {
+  font-size: 143%;
+}
+
+#deck-description h3 {
+  font-size: 121%;
+}
+
+#deck-description h4 {
+  font-size: 107%;
+}
+
+
+@mixin ribbon($color, $ribbon-thickness, $notch-color, $notch-side) {
+  background: linear-gradient(darken($color, 5%) 0%, darken($color, 25%) 100%);
+  float: left;
+  position: relative;
+  padding-#{$notch-side}: $ribbon-thickness;
+  @if $notch-side == left {
+    height: $ribbon-thickness;
+    line-height: $ribbon-thickness;
+    right: -2px;
+    padding-right: 10px;
+    text-align: right;
+  } @else if $notch-side == right {
+    height: $ribbon-thickness;
+    line-height: $ribbon-thickness;
+    left: -2px;
+    padding-left: 10px;
+  } @else if $notch-side == bottom {
+    text-align: center;
+    width: $ribbon-thickness;
+    margin-top: -2px;
+    padding-top: 10px;
+  } @else {
+    text-align: center;
+    width: $ribbon-thickness;
+    bottom: -2px;
+    padding-bottom: 10px;
+  }
+
+  &:before {
+    content: '';
+    display: block;
+    height: 0;
+    width: 0;
+    border: $ribbon-thickness/2 solid transparent;
+    border-#{$notch-side}-color: $notch-color;
+    position: absolute;
+    #{$notch-side}: -1px;
+  }
+}
+
+// and then the ribbons...
+
+.ribbon {
+  position: absolute;
+  top: -20px;
+  left: 5px;
+}
+
+.ribbon-tactics {
+  @include ribbon(#C00106, 40px, #E0E0E0, bottom);
+  box-shadow: -1px 0 1px rgba(0,0,0,0.35);
+  margin-left: 5px;
+  color: #FFF;
+  span {
+    line-height: 40px;
+    font-size: 35px;
+  }
+}
+
+
+.ribbon-spirit {
+  @include ribbon(#00B1D4, 40px, #E0E0E0, bottom);
+  box-shadow: -1px 0 1px rgba(0,0,0,0.35);
+  margin-left: 5px;
+  color: #FFF;
+  span {
+    line-height: 40px;
+    font-size: 35px;
+  }
+}
+
+
+.ribbon-lore {
+  @include ribbon(#51B848, 40px, #E0E0E0, bottom);
+  box-shadow: -1px 0 1px rgba(0,0,0,0.35);
+  margin-left: 5px;
+  color: #FFF;
+  span {
+    line-height: 40px;
+    font-size: 26px;
+  }
+}
+
+.ribbon-leadership {
+  @include ribbon(#AD62A5, 40px, #E0E0E0, bottom);
+  box-shadow: -1px 0 1px rgba(0,0,0,0.35);
+  margin-left: 5px;
+  color: #FFF;
+  span {
+    line-height: 40px;
+    font-size: 28px;
+  }
+}
+
+.ribbon-neutral {
+  @include ribbon(#777777, 40px, #E0E0E0, bottom);
+  box-shadow: -1px 0 1px rgba(0,0,0,0.35);
+  margin-left: 5px;
+  color: #FFF;
+  span {
+    line-height: 40px;
+    font-size: 28px;
+  }
+}
+
+.ribbon-baggins {
+  @include ribbon(#B39E26, 40px, #E0E0E0, bottom);
+  box-shadow: -1px 0 1px rgba(0,0,0,0.35);
+  margin-left: 5px;
+  color: #FFF;
+  span {
+    line-height: 40px;
+    font-size: 28px;
+  }
+}
+
+.ribbon-fellowship {
+  @include ribbon(#B56C0C, 40px, #E0E0E0, bottom);
+  box-shadow: -1px 0 1px rgba(0,0,0,0.35);
+  margin-left: 5px;
+  color: #FFF;
+  span {
+    line-height: 40px;
+    font-size: 28px;
+  }
+}
+
+
+.title .decklist-name {
+  font-family: 'Julius Sans One', sans-serif;
+  padding-left: 150px;
+  padding-right: 150px;
+}
+
+/************** SPHERE COLORS **************/
+.bg-sphere a, .bg-sphere span, .bg-sphere small, .bg-sphere button {
+  color: inherit;
+  background-color: transparent !important;
+}
+
+.bg-tactics {
+  background: lighten(#c00106, 30%);
+  color: darken(#c00106, 30%);
+}
+
+.bg-spirit {
+  background: lighten(#00B1D4, 30%);
+  color: darken(#00B1D4, 30%);
+}
+
+.bg-leadership {
+  background: lighten(#AD62A5, 20%);
+  color: darken(#AD62A5, 30%);
+}
+
+.bg-lore {
+  background: lighten(#51B848, 20%);
+  color: darken(#51B848, 30%);
+}
+
+.bg-baggins {
+  background: linear-gradient(to bottom, #B39E26 0%, darken(#B39E26, 20%) 100%);
+}
+
+.bg-fellowship {
+  background: linear-gradient(to bottom, #B56C0C 0%, darken(#B56C0C, 20%) 100%);
+}
+
+.hero-card-list {
+  a {
+    margin-right: 10px;
+    white-space: nowrap;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+.cg-spirit {
+  border-color: #00B1D4;
+
+  .panel-heading {
+    background-color: #EBF5F9;
+    border-color: #00B1D4;
+  }
+}
+
+.cg-leadership {
+  border-color: #AD62A5;
+
+  .panel-heading {
+    background-color: #EFE8F1;
+    border-color: #AD62A5;
+  }
+}
+
+.cg-lore {
+  border-color: #51B848;
+
+  .panel-heading {
+    background-color: #E3EEE1;
+    border-color: #51B848;
+  }
+}
+
+.cg-tactics {
+  border-color: #c00106;
+
+  .panel-heading {
+    background-color: #FEF4F4;
+    border-color: #c00106;
+  }
+}
+
+.cg-baggins {
+  border-color: #B39E26;
+
+  .panel-heading {
+    background-color: #FEECBA;
+    border-color: #B39E26;
+  }
+}
+
+.cg-fellowship {
+  border-color: #B56C0C;
+
+  .panel-heading {
+    background-color: #FECC99;
+    border-color: #B56C0C;
+  }
+}
+
+.fg-leadership, .icon-leadership.icon-bg:before {
+  color: #AD62A5;
+}
+
+.fg-tactics, .icon-tactics.icon-bg:before {
+  color: #c00106;
+}
+
+.fg-spirit, .icon-spirit.icon-bg:before {
+  color: #00B1D4;
+}
+
+.fg-lore, .icon-lore.icon-bg:before {
+  color: #51B848;
+}
+
+.fg-baggins, .icon-baggins.icon-bg:before {
+  color: #B39E26;
+}
+
+.fg-fellowship, .icon-fellowship.icon-bg:before {
+  color: #B56C0C;
+}
+
+.fg-neutral, .icon-neutral.icon-bg:before {
+  color: #616161;
+}
+
+.sphere-selector span.icon {
+  font-size: 18px;
+
+  &:before {
+    vertical-align: middle;
+  }
+}
+
+.rwd-table .icon:before {
+  width: 22px;
+  font-size: larger;
+  vertical-align: middle;
+  text-align: center;
+  display: inline-block;
+}
+
+/**************** REVIEW ON CARD PAGE ******************/
+
+article.review {
+  margin-top: 2em;
+  padding-top: 2em;
+  border-top: 1px solid #DDDDDD;
+}
+
+article.review:first-child {
+  margin-top: 0;
+}
+
+article.review .review-like {
+  float: left;
+  font-size: 120%;
+  width: 50px
+}
+
+article.review .review-content {
+  margin-left: 50px
+}
+
+article.review .review-text :first-child {
+  margin-top: 0px
+}
+
+article.review .review-date {
+  clear: both;
+  text-align: right
+}
+
+article.review .review-author {
+  text-align: right
+}
+
+article.review .review-comment {
+  border-top: 1px solid #DDDDDD;
+  padding: 0.5em;
+}
+
+/****************** BOOTSTRAP MARKDOWN *******************/
+
+.md-editor.md-fullscreen-mode {
+  z-index: 99;
+}
+
+/* PRINT STYLESHEETS */
+
+@media print {
+  a[href]:after {
+    content: none !important;
+  }
+
+  #wrapper {
+    border: none;
+    padding: 0;
+    min-height: auto;
+  }
+}
+
+/*************** DECK(LIST) COMPARE *****************/
+
+.diff {
+  background: rgba(255, 0, 0, .1);
+}
+
+footer {
+  padding-top: 20px;
+  background-color: #003300;
+  color: #9A9A9A;
+}
+
+footer div.site-rule {
+  font-size: 30px;
+  margin-top: 0;
+}
+
+footer a {
+  color: #F3B217;
+}
+
+.selected-heroes {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .selected-hero {
+    flex: 1;
+    cursor: pointer;
+  }
+}
+
+.selected-hero-placeholder {
+  border: 1px dashed #c5c5c5;
+  min-height: 200px;
+
+  line-height: 200px;
+  text-align: center;
+  margin-bottom: 20px;
+
+  span.no-hero-selected {
+    color: #c5c5c5;
+    display: inline-block;
+    vertical-align: middle;
+    text-transform: uppercase;
+    font-size: 20px;
+    line-height: 32px;
+    word-spacing: 1500000px;
+    font-family: 'Julius Sans One', sans-serif;
+  }
+}
+
+.selected-hero ~ .selected-hero-placeholder {
+  display: none;
+}
+
+.starting-threat {
+  font-size: 16px;
+  padding-top: 14px;
+  float: right;
+}
+
+@media (max-width: 991px) {
+  .selected-heroes {
+    display: block !important;
+  }
+
+  .selected-hero-placeholder {
+  }
+}
+
+.heroes-list-row {
+  margin-top: 20px;
+}
+
+.heroes-list {
+  font-size: 16px;
+
+  .icon:before {
+    width: 30px;
+    font-size: larger;
+    vertical-align: middle;
+    text-align: center;
+    display: inline-block;
+  }
+}
+
+#initHero img[src=""] {
+  visibility: hidden;
+}
+
+.tooltip-inner, .popover-content {
+  ul {
+    margin-top: 3px;
+    padding-left: 0;
+
+    li {
+      list-style: none;
+      text-align: left;
+    }
+  }
+
+  p {
+    text-align: left;
+    margin: 0 5px 5px 5px;
+  }
+}

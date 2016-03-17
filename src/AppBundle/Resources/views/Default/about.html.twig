@@ -1,0 +1,77 @@
+{% extends 'AppBundle::layout.html.twig' %}
+
+{% block title %}About{% endblock %}
+
+{% block body %}
+    <div class="main white container">
+
+        <h1>{{ block('title') }}</h1>
+
+        <p>This website is dedicated to providing a fast, powerful and exhaustive deck builder and search engine for {{ game_name }} cards, along with card descriptions and card images.</p>
+        <p>This website is optimized for mobile browsing (WebKit).</p>
+
+        <h2>Credits</h2>
+
+        <p>I would like to thank especially:</p>
+        <ul>
+            <li>Alsciende for developing NetrunnerDB and ThronesDB, providing the base work for this deck builder.</li>
+        </ul>
+
+        <h2>Search syntax</h2>
+
+        <ul>
+            <li>a search string is a conjunction of one or more <b>conditions</b> separated by one or more spaces</li>
+            <li>a <b>condition</b> is either:
+                <ul>
+                    <li>a <b>word</b> or <b>expression</b> or <b>disjunction</b></li>
+                    <li>a <b>criteria</b> followed by an <b>operator</b> followed by a <b>word</b> or <b>expression</b> or <b>disjunction</b>
+                </ul>
+            </li>
+            <li>a <b>word</b> must match <code>/[\w\-]/</code>: letters, digits, dash</li>
+            <li>an <b>expression</b> is any text between <code>"</code></li>
+            <li>a <b>disjunction</b> is several <b>words</b> or <b>expressions</b> separated by <code>|</code></li>
+            <li>a <b>criteria</b> is a single letter:
+                <ul>
+                    <li><code>b</code> &ndash; threat</li>
+                    <li><code>o</code> &ndash; cost</li>
+                    <li><code>w</code> &ndash; willpower</li>
+                    <li><code>a</code> &ndash; attack</li>
+                    <li><code>d</code> &ndash; defense</li>
+                    <li><code>h</code> &ndash; hit points</li>
+                    <li><code>c</code> &ndash; cycle</li>
+                    <li><code>e</code> &ndash; adventure pack</li>
+                    <li><code>t</code> &ndash; type</li>
+                    <li><code>s</code> &ndash; sphere</li>
+                    <li><code>u</code> &ndash; unique</li>
+                    <li><code>k</code> &ndash; traits</li>
+                    <li><code>x</code> &ndash; text</li>
+                    <li><code>f</code> &ndash; flavor text</li>
+                    <li><code>i</code> &ndash; illustrator</li>
+                    <li><code>y</code> &ndash; quantity in pack</li>
+                    <li><code>r</code> &ndash; release date</li>
+                </ul>
+            </li>
+            <li>an <b>operator</b> is either:
+                <ul>
+                    <li><code>:</code> &ndash; equals</li>
+                    <li><code>!</code> &ndash; different from</li>
+                    <li><code>&lt;</code> &ndash; less than</li>
+                    <li><code>&gt;</code> &ndash; more than</li>
+                </ul>
+            </li>
+            <li><b>Special case</b> <code>r</code> (release date) uses only the operators <code>&lt;</code> (inclusive) and <code>&gt;</code> (exclusive) and only understands the arguments <code>now</code> or a date YYYY-MM-DD</li>
+        </ul>
+
+        <h2>Search examples</h2>
+
+        <ul>
+            <li><span style="border:1px solid #888;font-family:monospace;padding:0 2px">t:ally</span> searches for all Allies</li>
+            <li><span style="border:1px solid #888;font-family:monospace;padding:0 2px">t:attachment k:trap</span> searches for every Attachment that has the trait Trap</li>
+            <li><span style="border:1px solid #888;font-family:monospace;padding:0 2px">x:"enemy in play"</span> searches for all cards with the text "enemy in play"</li>
+            <li><span style="border:1px solid #888;font-family:monospace;padding:0 2px">t:attachment|event s:lore</span> searches for all Attachments and Events from Lore Sphere</li>
+            <li><span style="border:1px solid #888;font-family:monospace;padding:0 2px">s:lore|spirit w&gt;3</span> searches for all Lore and Spirit cards with Willpower greater than 3</li>
+            <li><span style="border:1px solid #888;font-family:monospace;padding:0 2px">t:attachment k!item|weapon</span> searches for all Attachments that are neither item or nor weapon</li>
+            <li><span style="border:1px solid #888;font-family:monospace;padding:0 2px">r&lt;2012-01-01</span> searches for all cards released up to Jan 1, 2012</li>
+        </ul>
+    </div>
+{% endblock %}

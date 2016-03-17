@@ -1,0 +1,47 @@
+{{ deck.name }}
+
+{% set first_pack = deck.included_packs | first %}
+{% set last_pack = deck.included_packs | last %}
+Packs: {% if deck.included_packs|length > 1 %}
+From {{ first_pack.pack.name }}{% if first_pack.nb > 1 %} ({{ first_pack.nb }}){% endif %} to {{ last_pack.pack.name }}{% if last_pack.nb > 1 %} ({{ last_pack.nb }}){% endif %}
+{% else %}
+{{ first_pack.pack.name }}{% if first_pack.nb > 1 %} ({{ first_pack.nb }}){% endif %}
+{% endif %}
+
+
+{% set heroes = deck.slots_by_type.hero %}
+Heroes ({{ heroes | length }})
+
+{% for slot in heroes %}
+{{ slot.quantity }}x {{ slot.card.name }} ({{ slot.card.pack.name }})
+{% endfor %}
+
+{% set allies = deck.slots_by_type.ally %}
+Allies ({{ allies | length }})
+
+{% for slot in allies %}
+{{ slot.quantity }}x {{ slot.card.name }} ({{ slot.card.pack.name }})
+{% endfor %}
+
+{% set attachments = deck.slots_by_type.attachment %}
+Attachments ({{ attachments | length }})
+
+{% for slot in attachments %}
+{{ slot.quantity }}x {{ slot.card.name }} ({{ slot.card.pack.name }})
+{% endfor %}
+
+{% set events = deck.slots_by_type.event %}
+Events ({{ events | length }})
+
+{% for slot in events %}
+{{ slot.quantity }}x {{ slot.card.name }} ({{ slot.card.pack.name }})
+{% endfor %}
+
+{% set sidequests = deck.slots_by_type['player-side-quest'] %}
+Player Side Quests ({{ sidequests | length }})
+
+{% for slot in sidequests %}
+{{ slot.quantity }}x {{ slot.card.name }} ({{ slot.card.pack.name }})
+{% endfor %}
+
+{{ footer|default('') }}

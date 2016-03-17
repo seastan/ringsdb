@@ -1,0 +1,36 @@
+{% extends 'AppBundle::layout.html.twig' %}
+
+{% block body %}
+    <div class="main white container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>The Gracious Donators</h1>
+
+                <p class="lead">RingsDB wouldn't be the same without them. Many, many thanks.</p>
+
+                {#
+                <p>To show our appreciation, the content of the site is free of ads for Donators.</p>
+
+                <p>
+                    To become a Donator and help run the site, you can use
+                    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=QVQBX78J3VCM2">Paypal (€)</a>
+                    or
+                    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=FXEPSXHMWBU9Q">Paypal ($)</a>.
+                </p>
+                #}
+
+                <p>For now, we are not accepting donations. Thank you for your interest.</p>
+
+                <ul>
+                    {% for donator in donators %}
+                        <li>
+                            <a href="{{ path('user_profile_public', { user_id: donator.id, user_name: donator.username | e('url')}) }}" class="username fg-{{ donator.color }}">{{ donator.username }}</a>
+                            <span class="fa fa-gift donator" title="RingsDB Donator"></span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
