@@ -8,11 +8,11 @@
             <th>Name</th>
             <th>Sphere</th>
             <th>Type</th>
-            <th class="cost" title="Cost/Threat" data-toggle="tooltip" data-container="body">Cost</th>
-            <th class="willpower"><span class="icon-willpower"></span></th>
-            <th class="attack"><span class="icon-attack"></span></th>
-            <th class="defense"><span class="icon-defense"></span></th>
-            <th class="health"><span class="icon-health"></span></th>
+            <th class="hidden-xs cost" title="Cost/Threat" data-toggle="tooltip" data-container="body">Cost</th>
+            <th class="hidden-xs willpower"><span class="icon-willpower"></span></th>
+            <th class="hidden-xs attack"><span class="icon-attack"></span></th>
+            <th class="hidden-xs defense"><span class="icon-defense"></span></th>
+            <th class="hidden-xs health"><span class="icon-health"></span></th>
             <th>Traits</th>
             <th>Set</th>
         </tr>
@@ -25,13 +25,13 @@
                 <td>
                     <a href="{{ card.url }}" class="card-tip{% if card.available == false %} card-preview{% endif %}" data-code="{{ card.code }}">{{ card.name }}</a>
                 </td>
-                <td><span class="icon icon-{{ card.sphere_code }} fg-{{ card.sphere_code }}"></span> {{ card.sphere_name }}</td>
-                <td><span class="icon icon-{{ card.type_code }} fg-{{ card.sphere_code }}"></span> {{ card.type_name }}</td>
-                <td class="cost">{% if card.type_name == 'Hero' %}{{ card.threat }}{% else %}{{ card.cost }}{% endif %}</td>
-                <td class="willpower">{{ card.willpower }}</td>
-                <td class="attack">{{ card.attack }}</td>
-                <td class="defense">{{ card.defense }}</td>
-                <td class="health">{{ card.health }}</td>
+                <td><span class="icon icon-{{ card.sphere_code }} fg-{{ card.sphere_code }}"></span> <span class="hidden-xs">{{ card.sphere_name }}</span></td>
+                <td><span class="icon icon-{{ card.type_code }} fg-{{ card.sphere_code }}"></span> <span class="hidden-xs">{{ card.type_name }}</span></td>
+                <td class="hidden-xs cost">{% if card.type_name == 'Hero' %}{{ card.threat }}{% else %}{{ card.cost }}{% endif %}</td>
+                <td class="hidden-xs willpower">{{ card.willpower }}</td>
+                <td class="hidden-xs attack">{{ card.attack }}</td>
+                <td class="hidden-xs defense">{{ card.defense }}</td>
+                <td class="hidden-xs health">{{ card.health }}</td>
                 <td>{{ card.traits }}</td>
                 <td>{{ card.pack_name }} {{ card.position }}</td>
             </tr>
