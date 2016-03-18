@@ -608,7 +608,7 @@
     /**
      * @memberOf ui
      */
-    ui.setup_typeahead = function setup_typeahead() {
+    ui.setup_typeahead = function() {
         function findMatches(q, cb) {
             if (q.match(/^\w:/)) {
                 return;
@@ -627,7 +627,7 @@
             source: findMatches,
             templates: {
                 suggestion: function(card) {
-                    return $('<div><strong>' + card.name + '</strong> <small><i>' + card.pack_name + '</i></small></div>');
+                    return $('<div class="fg-' + card.sphere_code + '"><span class="icon-fw icon-' + card.sphere_code + '"></span> <strong>' + card.name + '</strong> <small><i>' + card.pack_name + '</i></small></div>');
                 }
             }
         });
