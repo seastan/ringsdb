@@ -192,20 +192,22 @@
             y: 0
         }];
 
-        var draw_deck = app.deck.get_draw_deck();
-        draw_deck.forEach(function(card) {
+        var cards = app.deck.get_cards();
+        cards.forEach(function(card) {
             if (card.type_code == 'hero' || card.type_code == 'ally') {
+                var count = card.is_unique ? 1 : card.indeck;
+
                 if (typeof card.willpower === 'number') {
-                    data[0].y += card.willpower * card.indeck;
+                    data[0].y += card.willpower * count;
                 }
                 if (typeof card.attack === 'number') {
-                    data[1].y += card.attack * card.indeck;
+                    data[1].y += card.attack * count;
                 }
                 if (typeof card.defense === 'number') {
-                    data[2].y += card.defense * card.indeck;
+                    data[2].y += card.defense * count;
                 }
                 if (typeof card.health === 'number') {
-                    data[3].y += card.health * card.indeck;
+                    data[3].y += card.health * count;
                 }
             }
         });
@@ -218,7 +220,7 @@
                 text: "Card Stats"
             },
             subtitle: {
-                text: "Stats added for Heroes and Allies"
+                text: "Stats added for Heroes and Allies<br>Unique allies counted once"
             },
             xAxis: {
                 categories: _.pluck(data, 'label'),
