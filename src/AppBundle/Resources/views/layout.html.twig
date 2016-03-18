@@ -15,7 +15,7 @@
         <meta name="description" content="{{ pagedescription }}">
     {% endif %}
 
-    {% if app.environment == 'dev' or app.environment == 'prod' %}
+    {% if app.environment == 'dev' %}
         {% stylesheets filter="cssrewrite,scssphp" output="css/extra.css"
             'bundles/app/cdn/css/googlefonts.css'
             'bundles/app/cdn/css/font-awesome.min.css'
@@ -130,7 +130,7 @@
     <script src="{{ path('fos_js_routing_js', { "callback": "fos.Router.setData" }) }}"></script>
 
 
-    {% if app.environment == 'dev' or app.environment == 'prod' %}
+    {% if app.environment == 'dev' %}
         {% javascripts filter="?jsqueeze" output="js/extra.js"
             '@AppBundle/Resources/public/cdn/js/jquery.min.js'
             '@AppBundle/Resources/public/cdn/js/underscore-min.js'
