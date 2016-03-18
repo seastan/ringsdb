@@ -15,7 +15,7 @@
         <meta name="description" content="{{ pagedescription }}">
     {% endif %}
 
-    {% if app.environment == 'dev' %}
+    {% if app.environment == 'dev' or app.environment == 'prod' %}
         {% stylesheets filter="cssrewrite,scssphp" output="css/extra.css"
             'bundles/app/cdn/css/googlefonts.css'
             'bundles/app/cdn/css/font-awesome.min.css'
