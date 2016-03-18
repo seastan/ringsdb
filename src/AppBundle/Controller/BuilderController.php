@@ -125,7 +125,7 @@ class BuilderController extends Controller {
 
         if ($hero2) {
             $slot = new Deckslot();
-            $slot->setCard($hero1);
+            $slot->setCard($hero2);
             $slot->setQuantity(1);
             $slot->setDeck($deck);
             $deck->addSlot($slot);
@@ -133,7 +133,7 @@ class BuilderController extends Controller {
 
         if ($hero3) {
             $slot = new Deckslot();
-            $slot->setCard($hero1);
+            $slot->setCard($hero3);
             $slot->setQuantity(1);
             $slot->setDeck($deck);
             $deck->addSlot($slot);

@@ -17,7 +17,7 @@
     <div class="container">
         <div class="row title">
             <div class="col-xs-12">
-                <div class="ribbon">
+                <div class="ribbon hidden-xs">
                     {%  for sphere in decklist.spheres %}
                         <div class="ribbon-{{ sphere.code }}"><span class="icon icon-{{ sphere.code }}"></span></div>
                     {% endfor %}
@@ -51,7 +51,7 @@
                         {{ macros.decklist_social_icons(decklist) }}
                     </div>
                     {% if duplicate %}
-                        <small>
+                        <small class="hidden-xs">
                             Duplicate of
                             <a href="{{ path('decklist_detail', { 'decklist_id': duplicate.id, 'decklist_name': duplicate.nameCanonical|e('url') }) }}">
                                 {{ duplicate.name }} {{ duplicate.version }}
