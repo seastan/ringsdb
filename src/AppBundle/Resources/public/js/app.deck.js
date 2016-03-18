@@ -162,6 +162,12 @@
         return deck.get_nb_cards(hero_deck);
     };
 
+    deck.get_starting_threat = function() {
+        var hero_deck = deck.get_hero_deck();
+        var threat = _.pluck(hero_deck, 'threat');
+        return _.reduce(threat, function(memo, num) { return memo + num; }, 0);
+    };
+
     deck.get_nb_cards = function get_nb_cards(cards) {
         if (!cards) {
             cards = deck.get_cards();
@@ -233,6 +239,7 @@
         //deck.update_layout_section(data, 'images', $('<div style="margin-bottom:10px"><img src="/bundles/app/images/factions/' + deck.get_faction_code() + '.png" class="img-responsive">'));
 
         deck.update_layout_section(data, 'meta', $('<h4 style="font-weight:bold">Deck</h4>'));
+        deck.update_layout_section(data, 'meta', $('<div>Starting Threat: <b>' + deck.get_starting_threat() + '</b></div>'));
         deck.update_layout_section(data, 'meta', $('<div id="cardcount">' + deck.get_hero_deck_size() + (deck.get_hero_deck_size() == 1 ? ' Hero, ': ' Heroes, ') + deck.get_draw_deck_size() + ' Cards</div>').addClass((deck.get_draw_deck_size() < 50 || deck.get_hero_deck_size(true) > 4) ? 'text-danger' : ''));
 
         // Reserved for future features
