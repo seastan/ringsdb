@@ -168,7 +168,7 @@
      * updates the database if necessary, from fetched data
      * @memberOf data
      */
-    data.update_collection = function update_collection(data, collection, lastModifiedData, deferred) {
+    data.update_collection = function update_collection(newData, collection, lastModifiedData, deferred) {
         var lastChangeDatabase = new Date(collection.metaData().lastChange)
         var isCollectionUpdated = false;
 
@@ -179,8 +179,16 @@
          * then we update the database
          */
         if (force_update || !lastChangeDatabase || lastChangeDatabase < lastModifiedData) {
-            console.log('data is newer than database or update forced => update the database')
-            collection.setData(data);
+            console.log('data is newer than database or update forced => update the database');
+            _.forEach(newData, function(e) {
+                e.s_name = data.get_searchable_string(e.name);
+                if (e.pack_name) {
+                    e.s_pack_name = data.get_searchable_string(e.pack_name);
+                    e.s_pack_code = data.get_searchable_string(e.pack_code);
+                }
+            });
+
+            collection.setData(newData);
             isCollectionUpdated = true;
         }
 
@@ -210,6 +218,24 @@
     data.parse_cards = function parse_cards(response, textStatus, jqXHR) {
         var lastModified = new Date(jqXHR.getResponseHeader('Last-Modified'));
         data.update_collection(response, data.masters.cards, lastModified, data.dfd.cards);
+    };
+
+    data.diacriticsMap = {
+        'á': 'a',
+        'â': 'a',
+        'ä': 'a',
+        'é': 'e',
+        'í': 'i',
+        'î': 'i',
+        'ó': 'o',
+        'ú': 'u',
+        'û': 'u'
+    };
+
+    data.get_searchable_string = function(str) {
+        return str.toLowerCase().replace(/[^A-Za-z0-9\s]+/g, function(a) {
+            return data.diacriticsMap[a] || a;
+        });
     };
 
     $(function() {

@@ -31,11 +31,11 @@
                 pack = RegExp.$2.trim();
             }
 
-            var name_regexp = new RegExp('^' + ui.sanitize_characters(name) + '$', 'i');
+            var searchable_name = app.data.get_searchable_string(name);
 
             if (pack) {
-                var pack_regexp = new RegExp('^' + ui.sanitize_characters(pack) + '$', 'i');
-                card = app.data.cards.findOne({ name: name_regexp, pack_name: pack_regexp }) || app.data.cards.findOne({ name: name_regexp, pack_code: pack_regexp });
+                var searchable_pack_name = app.data.get_searchable_string(pack);
+                card = app.data.cards.findOne({ s_name: searchable_name, s_pack_name: searchable_pack_name }) || app.data.cards.findOne({ s_name: searchable_name, s_pack_code: searchable_name });
             }
 
             if (!card) {
@@ -43,7 +43,7 @@
                     console.log('Pack not found: ' + pack);
                 }
 
-                card = app.data.cards.findOne({ name: name_regexp });
+                card = app.data.cards.findOne({ s_name: searchable_name });
             }
 
             if (card) {
