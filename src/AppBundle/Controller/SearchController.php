@@ -187,8 +187,6 @@ class SearchController extends Controller {
         $view = $request->query->get('view') ?: 'list';
         $sort = $request->query->get('sort') ?: 'name';
 
-        error_log('teste');
-
         $operators = [":", "!", "<", ">"];
         $spheres = $this->getDoctrine()->getRepository('AppBundle:Sphere')->findAll();
 
