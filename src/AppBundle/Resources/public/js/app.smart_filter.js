@@ -10,6 +10,7 @@
         w: [add_integer_sf, 'willpower', "Willpower"],
         h: [add_integer_sf, 'health', "Hit Points"],
         e: [add_string_sf,  'pack_code', "Adventure Pack code"],
+        c: [add_string_sf,  'cycle_code', "Cycle code"],
         t: [add_string_sf,  'type_code', "Type"],
         s: [add_string_sf,  'sphere_code', "Sphere"],
         u: [add_boolean_sf, 'is_unique', "Uniqueness"],
@@ -53,7 +54,7 @@
         var items = _.map(configuration, function(value, key) {
             return '<li><code>' + key + '</code> &ndash; ' + value[2] + '</li>';
         });
-        return '<ul>' + items.join('') + '</ul><p>Example: <code>c:2 w>3</code> shows all cards with Cost 2 and Willpower greater than 3</p>';
+        return '<ul>' + items.join('') + '</ul><p>Example: <code>o:2 w>3</code> shows all cards with Cost 2 and Willpower greater than 3</p>';
     };
 
     function add_integer_sf(key, operator, values) {
