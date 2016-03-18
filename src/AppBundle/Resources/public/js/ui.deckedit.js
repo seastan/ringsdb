@@ -78,9 +78,11 @@
         var filter = $('[data-filter=sphere_code]').empty();
 
         var sphere_codes = app.data.cards.distinct('sphere_code').sort();
-        var neutral_index = sphere_codes.indexOf('neutral');
-        sphere_codes.splice(neutral_index, 1);
+
+        sphere_codes.splice(sphere_codes.indexOf('neutral'), 1);
         sphere_codes.unshift('neutral');
+        sphere_codes.splice(sphere_codes.indexOf('baggins'), 1);
+        sphere_codes.push('baggins');
 
         sphere_codes.forEach(function(sphere_code) {
             var example = app.data.cards.find({ 'sphere_code': sphere_code })[0];

@@ -7,115 +7,94 @@ use FOS\UserBundle\Model\User as BaseUser;
 /**
  * User
  */
-class User extends BaseUser
-{
-	public function getMaxNbDecks()
-	{
-		return 2*(100+floor($this->reputation/ 10));
-	}
+class User extends BaseUser {
+    public function getMaxNbDecks() {
+        return 2 * (100 + floor($this->reputation / 10));
+    }
 
     /**
      * @var \DateTime
      */
     private $dateCreation;
-
     /**
      * @var \DateTime
      */
     private $dateUpdate;
-
     /**
      * @var integer
      */
     private $reputation;
-
     /**
      * @var string
      */
     private $resume;
-
     /**
      * @var string
      */
     private $color;
-
     /**
      * @var integer
      */
     private $donation;
-
     /**
      * @var boolean
      */
     private $isNotifAuthor = true;
-
     /**
      * @var boolean
      */
     private $isNotifCommenter = true;
-
     /**
      * @var boolean
      */
     private $isNotifMention = true;
-
     /**
      * @var boolean
      */
     private $isNotifFollow = true;
-
     /**
      * @var boolean
      */
     private $isNotifSuccessor = true;
-
     /**
      * @var boolean
      */
     private $isShareDecks = false;
-
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
     private $decks;
-
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
     private $decklists;
-
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
     private $comments;
-
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
     private $reviews;
-
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
     private $favorites;
-
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
     private $votes;
-
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
     private $reviewvotes;
 
-	public function __construct()
-	{
-		parent::__construct();
+    public function __construct() {
+        parent::__construct();
 
-		$this->reputation = 1;
-		$this->donation = 0;
-	}
+        $this->reputation = 1;
+        $this->donation = 0;
+    }
 
     /**
      * Set dateCreation
@@ -124,8 +103,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function setDateCreation($dateCreation)
-    {
+    public function setDateCreation($dateCreation) {
         $this->dateCreation = $dateCreation;
 
         return $this;
@@ -136,8 +114,7 @@ class User extends BaseUser
      *
      * @return \DateTime
      */
-    public function getDateCreation()
-    {
+    public function getDateCreation() {
         return $this->dateCreation;
     }
 
@@ -148,8 +125,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function setDateUpdate($dateUpdate)
-    {
+    public function setDateUpdate($dateUpdate) {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
@@ -160,8 +136,7 @@ class User extends BaseUser
      *
      * @return \DateTime
      */
-    public function getDateUpdate()
-    {
+    public function getDateUpdate() {
         return $this->dateUpdate;
     }
 
@@ -172,8 +147,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function setReputation($reputation)
-    {
+    public function setReputation($reputation) {
         $this->reputation = $reputation;
 
         return $this;
@@ -184,8 +158,7 @@ class User extends BaseUser
      *
      * @return integer
      */
-    public function getReputation()
-    {
+    public function getReputation() {
         return $this->reputation;
     }
 
@@ -196,8 +169,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function setResume($resume)
-    {
+    public function setResume($resume) {
         $this->resume = $resume;
 
         return $this;
@@ -208,8 +180,7 @@ class User extends BaseUser
      *
      * @return string
      */
-    public function getResume()
-    {
+    public function getResume() {
         return $this->resume;
     }
 
@@ -220,8 +191,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function setColor($color)
-    {
+    public function setColor($color) {
         $this->color = $color;
 
         return $this;
@@ -232,8 +202,7 @@ class User extends BaseUser
      *
      * @return string
      */
-    public function getColor()
-    {
+    public function getColor() {
         return $this->color;
     }
 
@@ -244,8 +213,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function setDonation($donation)
-    {
+    public function setDonation($donation) {
         $this->donation = $donation;
 
         return $this;
@@ -256,8 +224,7 @@ class User extends BaseUser
      *
      * @return integer
      */
-    public function getDonation()
-    {
+    public function getDonation() {
         return $this->donation;
     }
 
@@ -268,8 +235,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function setIsNotifAuthor($isNotifAuthor)
-    {
+    public function setIsNotifAuthor($isNotifAuthor) {
         $this->isNotifAuthor = $isNotifAuthor;
 
         return $this;
@@ -280,8 +246,7 @@ class User extends BaseUser
      *
      * @return boolean
      */
-    public function getIsNotifAuthor()
-    {
+    public function getIsNotifAuthor() {
         return $this->isNotifAuthor;
     }
 
@@ -292,8 +257,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function setIsNotifCommenter($isNotifCommenter)
-    {
+    public function setIsNotifCommenter($isNotifCommenter) {
         $this->isNotifCommenter = $isNotifCommenter;
 
         return $this;
@@ -304,8 +268,7 @@ class User extends BaseUser
      *
      * @return boolean
      */
-    public function getIsNotifCommenter()
-    {
+    public function getIsNotifCommenter() {
         return $this->isNotifCommenter;
     }
 
@@ -316,8 +279,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function setIsNotifMention($isNotifMention)
-    {
+    public function setIsNotifMention($isNotifMention) {
         $this->isNotifMention = $isNotifMention;
 
         return $this;
@@ -328,8 +290,7 @@ class User extends BaseUser
      *
      * @return boolean
      */
-    public function getIsNotifMention()
-    {
+    public function getIsNotifMention() {
         return $this->isNotifMention;
     }
 
@@ -340,8 +301,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function setIsNotifFollow($isNotifFollow)
-    {
+    public function setIsNotifFollow($isNotifFollow) {
         $this->isNotifFollow = $isNotifFollow;
 
         return $this;
@@ -352,8 +312,7 @@ class User extends BaseUser
      *
      * @return boolean
      */
-    public function getIsNotifFollow()
-    {
+    public function getIsNotifFollow() {
         return $this->isNotifFollow;
     }
 
@@ -364,8 +323,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function setIsNotifSuccessor($isNotifSuccessor)
-    {
+    public function setIsNotifSuccessor($isNotifSuccessor) {
         $this->isNotifSuccessor = $isNotifSuccessor;
 
         return $this;
@@ -376,8 +334,7 @@ class User extends BaseUser
      *
      * @return boolean
      */
-    public function getIsNotifSuccessor()
-    {
+    public function getIsNotifSuccessor() {
         return $this->isNotifSuccessor;
     }
 
@@ -388,8 +345,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function setIsShareDecks($isShareDecks)
-    {
+    public function setIsShareDecks($isShareDecks) {
         $this->isShareDecks = $isShareDecks;
 
         return $this;
@@ -400,8 +356,7 @@ class User extends BaseUser
      *
      * @return boolean
      */
-    public function getIsShareDecks()
-    {
+    public function getIsShareDecks() {
         return $this->isShareDecks;
     }
 
@@ -412,8 +367,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function addDeck(\AppBundle\Entity\Deck $deck)
-    {
+    public function addDeck(\AppBundle\Entity\Deck $deck) {
         $this->decks[] = $deck;
 
         return $this;
@@ -424,8 +378,7 @@ class User extends BaseUser
      *
      * @param \AppBundle\Entity\Deck $deck
      */
-    public function removeDeck(\AppBundle\Entity\Deck $deck)
-    {
+    public function removeDeck(\AppBundle\Entity\Deck $deck) {
         $this->decks->removeElement($deck);
     }
 
@@ -434,8 +387,7 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getDecks()
-    {
+    public function getDecks() {
         return $this->decks;
     }
 
@@ -446,8 +398,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function addDecklist(\AppBundle\Entity\Decklist $decklist)
-    {
+    public function addDecklist(\AppBundle\Entity\Decklist $decklist) {
         $this->decklists[] = $decklist;
 
         return $this;
@@ -458,8 +409,7 @@ class User extends BaseUser
      *
      * @param \AppBundle\Entity\Decklist $decklist
      */
-    public function removeDecklist(\AppBundle\Entity\Decklist $decklist)
-    {
+    public function removeDecklist(\AppBundle\Entity\Decklist $decklist) {
         $this->decklists->removeElement($decklist);
     }
 
@@ -468,8 +418,7 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getDecklists()
-    {
+    public function getDecklists() {
         return $this->decklists;
     }
 
@@ -480,8 +429,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function addComment(\AppBundle\Entity\Comment $comment)
-    {
+    public function addComment(\AppBundle\Entity\Comment $comment) {
         $this->comments[] = $comment;
 
         return $this;
@@ -492,8 +440,7 @@ class User extends BaseUser
      *
      * @param \AppBundle\Entity\Comment $comment
      */
-    public function removeComment(\AppBundle\Entity\Comment $comment)
-    {
+    public function removeComment(\AppBundle\Entity\Comment $comment) {
         $this->comments->removeElement($comment);
     }
 
@@ -502,8 +449,7 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getComments()
-    {
+    public function getComments() {
         return $this->comments;
     }
 
@@ -514,8 +460,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function addReview(\AppBundle\Entity\Review $review)
-    {
+    public function addReview(\AppBundle\Entity\Review $review) {
         $this->reviews[] = $review;
 
         return $this;
@@ -526,8 +471,7 @@ class User extends BaseUser
      *
      * @param \AppBundle\Entity\Review $review
      */
-    public function removeReview(\AppBundle\Entity\Review $review)
-    {
+    public function removeReview(\AppBundle\Entity\Review $review) {
         $this->reviews->removeElement($review);
     }
 
@@ -536,8 +480,7 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getReviews()
-    {
+    public function getReviews() {
         return $this->reviews;
     }
 
@@ -548,9 +491,8 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function addFavorite(\AppBundle\Entity\Decklist $favorite)
-    {
-		$favorite->addFavorite($this);
+    public function addFavorite(\AppBundle\Entity\Decklist $favorite) {
+        $favorite->addFavorite($this);
         $this->favorites[] = $favorite;
 
         return $this;
@@ -561,9 +503,8 @@ class User extends BaseUser
      *
      * @param \AppBundle\Entity\Decklist $favorite
      */
-    public function removeFavorite(\AppBundle\Entity\Decklist $favorite)
-    {
-    	$favorite->removeFavorite($this);
+    public function removeFavorite(\AppBundle\Entity\Decklist $favorite) {
+        $favorite->removeFavorite($this);
         $this->favorites->removeElement($favorite);
     }
 
@@ -572,8 +513,7 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getFavorites()
-    {
+    public function getFavorites() {
         return $this->favorites;
     }
 
@@ -584,9 +524,8 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function addVote(\AppBundle\Entity\Decklist $vote)
-    {
-		$vote->addVote($this);
+    public function addVote(\AppBundle\Entity\Decklist $vote) {
+        $vote->addVote($this);
         $this->votes[] = $vote;
 
         return $this;
@@ -597,9 +536,8 @@ class User extends BaseUser
      *
      * @param \AppBundle\Entity\Decklist $vote
      */
-    public function removeVote(\AppBundle\Entity\Decklist $vote)
-    {
-    	$vote->removeVote($this);
+    public function removeVote(\AppBundle\Entity\Decklist $vote) {
+        $vote->removeVote($this);
         $this->votes->removeElement($vote);
     }
 
@@ -608,8 +546,7 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getVotes()
-    {
+    public function getVotes() {
         return $this->votes;
     }
 
@@ -620,8 +557,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function addReviewvote(\AppBundle\Entity\Review $reviewvote)
-    {
+    public function addReviewvote(\AppBundle\Entity\Review $reviewvote) {
         $this->reviewvotes[] = $reviewvote;
 
         return $this;
@@ -632,8 +568,7 @@ class User extends BaseUser
      *
      * @param \AppBundle\Entity\Review $reviewvote
      */
-    public function removeReviewvote(\AppBundle\Entity\Review $reviewvote)
-    {
+    public function removeReviewvote(\AppBundle\Entity\Review $reviewvote) {
         $this->reviewvotes->removeElement($reviewvote);
     }
 
@@ -642,20 +577,18 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getReviewvotes()
-    {
+    public function getReviewvotes() {
         return $this->reviewvotes;
     }
+
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
     private $following;
-
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
     private $followers;
-
 
     /**
      * Add following
@@ -664,8 +597,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function addFollowing(\AppBundle\Entity\User $following)
-    {
+    public function addFollowing(\AppBundle\Entity\User $following) {
         $this->following[] = $following;
 
         return $this;
@@ -676,8 +608,7 @@ class User extends BaseUser
      *
      * @param \AppBundle\Entity\User $following
      */
-    public function removeFollowing(\AppBundle\Entity\User $following)
-    {
+    public function removeFollowing(\AppBundle\Entity\User $following) {
         $this->following->removeElement($following);
     }
 
@@ -686,8 +617,7 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getFollowing()
-    {
+    public function getFollowing() {
         return $this->following;
     }
 
@@ -698,8 +628,7 @@ class User extends BaseUser
      *
      * @return User
      */
-    public function addFollower(\AppBundle\Entity\User $follower)
-    {
+    public function addFollower(\AppBundle\Entity\User $follower) {
         $this->followers[] = $follower;
 
         return $this;
@@ -710,8 +639,7 @@ class User extends BaseUser
      *
      * @param \AppBundle\Entity\User $follower
      */
-    public function removeFollower(\AppBundle\Entity\User $follower)
-    {
+    public function removeFollower(\AppBundle\Entity\User $follower) {
         $this->followers->removeElement($follower);
     }
 
@@ -720,8 +648,7 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getFollowers()
-    {
+    public function getFollowers() {
         return $this->followers;
     }
 }

@@ -5,53 +5,43 @@ namespace AppBundle\Entity;
 /**
  * Review
  */
-class Review
-{
+class Review {
     /**
      * @var integer
      */
     private $id;
-
     /**
      * @var \DateTime
      */
     private $dateCreation;
-
     /**
      * @var \DateTime
      */
     private $dateUpdate;
-
     /**
      * @var string
      */
     private $textMd;
-
     /**
      * @var string
      */
     private $textHtml;
-
     /**
      * @var integer
      */
     private $nbVotes;
-
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
     private $comments;
-
     /**
      * @var \AppBundle\Entity\Card
      */
     private $card;
-
     /**
      * @var \AppBundle\Entity\User
      */
     private $user;
-
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
@@ -60,8 +50,7 @@ class Review
     /**
      * Constructor
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->comments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->votes = new \Doctrine\Common\Collections\ArrayCollection();
     }
@@ -71,8 +60,7 @@ class Review
      *
      * @return integer
      */
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
 
@@ -83,8 +71,7 @@ class Review
      *
      * @return Review
      */
-    public function setDateCreation($dateCreation)
-    {
+    public function setDateCreation($dateCreation) {
         $this->dateCreation = $dateCreation;
 
         return $this;
@@ -95,8 +82,7 @@ class Review
      *
      * @return \DateTime
      */
-    public function getDateCreation()
-    {
+    public function getDateCreation() {
         return $this->dateCreation;
     }
 
@@ -107,8 +93,7 @@ class Review
      *
      * @return Review
      */
-    public function setDateUpdate($dateUpdate)
-    {
+    public function setDateUpdate($dateUpdate) {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
@@ -119,8 +104,7 @@ class Review
      *
      * @return \DateTime
      */
-    public function getDateUpdate()
-    {
+    public function getDateUpdate() {
         return $this->dateUpdate;
     }
 
@@ -131,8 +115,7 @@ class Review
      *
      * @return Review
      */
-    public function setTextMd($textMd)
-    {
+    public function setTextMd($textMd) {
         $this->textMd = $textMd;
 
         return $this;
@@ -143,8 +126,7 @@ class Review
      *
      * @return string
      */
-    public function getTextMd()
-    {
+    public function getTextMd() {
         return $this->textMd;
     }
 
@@ -155,8 +137,7 @@ class Review
      *
      * @return Review
      */
-    public function setTextHtml($textHtml)
-    {
+    public function setTextHtml($textHtml) {
         $this->textHtml = $textHtml;
 
         return $this;
@@ -167,8 +148,7 @@ class Review
      *
      * @return string
      */
-    public function getTextHtml()
-    {
+    public function getTextHtml() {
         return $this->textHtml;
     }
 
@@ -179,8 +159,7 @@ class Review
      *
      * @return Review
      */
-    public function setNbVotes($nbVotes)
-    {
+    public function setNbVotes($nbVotes) {
         $this->nbVotes = $nbVotes;
 
         return $this;
@@ -191,8 +170,7 @@ class Review
      *
      * @return integer
      */
-    public function getNbVotes()
-    {
+    public function getNbVotes() {
         return $this->nbVotes;
     }
 
@@ -203,8 +181,7 @@ class Review
      *
      * @return Review
      */
-    public function addComment(\AppBundle\Entity\Reviewcomment $comment)
-    {
+    public function addComment(\AppBundle\Entity\Reviewcomment $comment) {
         $this->comments[] = $comment;
 
         return $this;
@@ -215,8 +192,7 @@ class Review
      *
      * @param \AppBundle\Entity\Reviewcomment $comment
      */
-    public function removeComment(\AppBundle\Entity\Reviewcomment $comment)
-    {
+    public function removeComment(\AppBundle\Entity\Reviewcomment $comment) {
         $this->comments->removeElement($comment);
     }
 
@@ -225,8 +201,7 @@ class Review
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getComments()
-    {
+    public function getComments() {
         return $this->comments;
     }
 
@@ -237,8 +212,7 @@ class Review
      *
      * @return Review
      */
-    public function setCard(\AppBundle\Entity\Card $card = null)
-    {
+    public function setCard(\AppBundle\Entity\Card $card = null) {
         $this->card = $card;
 
         return $this;
@@ -249,8 +223,7 @@ class Review
      *
      * @return \AppBundle\Entity\Card
      */
-    public function getCard()
-    {
+    public function getCard() {
         return $this->card;
     }
 
@@ -261,8 +234,7 @@ class Review
      *
      * @return Review
      */
-    public function setUser(\AppBundle\Entity\User $user = null)
-    {
+    public function setUser(\AppBundle\Entity\User $user = null) {
         $this->user = $user;
 
         return $this;
@@ -273,8 +245,7 @@ class Review
      *
      * @return \AppBundle\Entity\User
      */
-    public function getUser()
-    {
+    public function getUser() {
         return $this->user;
     }
 
@@ -285,8 +256,7 @@ class Review
      *
      * @return Review
      */
-    public function addVote(\AppBundle\Entity\User $vote)
-    {
+    public function addVote(\AppBundle\Entity\User $vote) {
         $this->votes[] = $vote;
 
         return $this;
@@ -297,8 +267,7 @@ class Review
      *
      * @param \AppBundle\Entity\User $vote
      */
-    public function removeVote(\AppBundle\Entity\User $vote)
-    {
+    public function removeVote(\AppBundle\Entity\User $vote) {
         $this->votes->removeElement($vote);
     }
 
@@ -307,8 +276,7 @@ class Review
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getVotes()
-    {
+    public function getVotes() {
         return $this->votes;
     }
 }

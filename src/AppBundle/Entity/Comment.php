@@ -5,47 +5,38 @@ namespace AppBundle\Entity;
 /**
  * Comment
  */
-class Comment
-{
-	
+class Comment {
     /**
      * @var integer
      */
     private $id;
-
     /**
      * @var string
      */
     private $text;
-
     /**
      * @var \DateTime
      */
     private $dateCreation;
-
     /**
      * @var boolean
      */
     private $isHidden;
-
     /**
      * @var \AppBundle\Entity\User
      */
     private $user;
-
     /**
      * @var \AppBundle\Entity\Decklist
      */
     private $decklist;
-
 
     /**
      * Get id
      *
      * @return integer
      */
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
 
@@ -56,8 +47,7 @@ class Comment
      *
      * @return Comment
      */
-    public function setText($text)
-    {
+    public function setText($text) {
         $this->text = $text;
 
         return $this;
@@ -68,8 +58,7 @@ class Comment
      *
      * @return string
      */
-    public function getText()
-    {
+    public function getText() {
         return $this->text;
     }
 
@@ -80,8 +69,7 @@ class Comment
      *
      * @return Comment
      */
-    public function setDateCreation($dateCreation)
-    {
+    public function setDateCreation($dateCreation) {
         $this->dateCreation = $dateCreation;
 
         return $this;
@@ -92,8 +80,7 @@ class Comment
      *
      * @return \DateTime
      */
-    public function getDateCreation()
-    {
+    public function getDateCreation() {
         return $this->dateCreation;
     }
 
@@ -104,8 +91,7 @@ class Comment
      *
      * @return Comment
      */
-    public function setIsHidden($isHidden)
-    {
+    public function setIsHidden($isHidden) {
         $this->isHidden = $isHidden;
 
         return $this;
@@ -116,8 +102,7 @@ class Comment
      *
      * @return boolean
      */
-    public function getIsHidden()
-    {
+    public function getIsHidden() {
         return $this->isHidden;
     }
 
@@ -128,8 +113,7 @@ class Comment
      *
      * @return Comment
      */
-    public function setUser(\AppBundle\Entity\User $user = null)
-    {
+    public function setUser(\AppBundle\Entity\User $user = null) {
         $this->user = $user;
 
         return $this;
@@ -140,8 +124,7 @@ class Comment
      *
      * @return \AppBundle\Entity\User
      */
-    public function getUser()
-    {
+    public function getUser() {
         return $this->user;
     }
 
@@ -152,8 +135,7 @@ class Comment
      *
      * @return Comment
      */
-    public function setDecklist(\AppBundle\Entity\Decklist $decklist = null)
-    {
+    public function setDecklist(\AppBundle\Entity\Decklist $decklist = null) {
         $this->decklist = $decklist;
 
         return $this;
@@ -164,8 +146,7 @@ class Comment
      *
      * @return \AppBundle\Entity\Decklist
      */
-    public function getDecklist()
-    {
+    public function getDecklist() {
         return $this->decklist;
     }
 }

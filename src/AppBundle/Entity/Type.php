@@ -1,25 +1,20 @@
-<?php 
+<?php
 
 namespace AppBundle\Entity;
 
-class Type
-{
-	
+class Type {
     /**
      * @var integer
      */
     private $id;
-
     /**
      * @var string
      */
     private $code;
-
     /**
      * @var string
      */
     private $name;
-
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
@@ -28,8 +23,7 @@ class Type
     /**
      * Constructor
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->cards = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
@@ -38,8 +32,7 @@ class Type
      *
      * @return integer
      */
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
 
@@ -50,8 +43,7 @@ class Type
      *
      * @return Type
      */
-    public function setCode($code)
-    {
+    public function setCode($code) {
         $this->code = $code;
 
         return $this;
@@ -62,8 +54,7 @@ class Type
      *
      * @return string
      */
-    public function getCode()
-    {
+    public function getCode() {
         return $this->code;
     }
 
@@ -74,8 +65,7 @@ class Type
      *
      * @return Type
      */
-    public function setName($name)
-    {
+    public function setName($name) {
         $this->name = $name;
 
         return $this;
@@ -86,8 +76,7 @@ class Type
      *
      * @return string
      */
-    public function getName()
-    {
+    public function getName() {
         return $this->name;
     }
 
@@ -98,8 +87,7 @@ class Type
      *
      * @return Type
      */
-    public function addCard(\AppBundle\Entity\Card $card)
-    {
+    public function addCard(\AppBundle\Entity\Card $card) {
         $this->cards[] = $card;
 
         return $this;
@@ -110,8 +98,7 @@ class Type
      *
      * @param \AppBundle\Entity\Card $card
      */
-    public function removeCard(\AppBundle\Entity\Card $card)
-    {
+    public function removeCard(\AppBundle\Entity\Card $card) {
         $this->cards->removeElement($card);
     }
 
@@ -120,8 +107,7 @@ class Type
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getCards()
-    {
+    public function getCards() {
         return $this->cards;
     }
 }

@@ -5,46 +5,38 @@ namespace AppBundle\Entity;
 /**
  * Reviewcomment
  */
-class Reviewcomment
-{
+class Reviewcomment {
     /**
      * @var integer
      */
     private $id;
-
     /**
      * @var \DateTime
      */
     private $dateCreation;
-
     /**
      * @var \DateTime
      */
     private $dateUpdate;
-
     /**
      * @var string
      */
     private $text;
-
     /**
      * @var \AppBundle\Entity\User
      */
     private $user;
-
     /**
      * @var \AppBundle\Entity\Review
      */
     private $review;
-
 
     /**
      * Get id
      *
      * @return integer
      */
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
 
@@ -55,8 +47,7 @@ class Reviewcomment
      *
      * @return Reviewcomment
      */
-    public function setDateCreation($dateCreation)
-    {
+    public function setDateCreation($dateCreation) {
         $this->dateCreation = $dateCreation;
 
         return $this;
@@ -67,8 +58,7 @@ class Reviewcomment
      *
      * @return \DateTime
      */
-    public function getDateCreation()
-    {
+    public function getDateCreation() {
         return $this->dateCreation;
     }
 
@@ -79,8 +69,7 @@ class Reviewcomment
      *
      * @return Reviewcomment
      */
-    public function setDateUpdate($dateUpdate)
-    {
+    public function setDateUpdate($dateUpdate) {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
@@ -91,8 +80,7 @@ class Reviewcomment
      *
      * @return \DateTime
      */
-    public function getDateUpdate()
-    {
+    public function getDateUpdate() {
         return $this->dateUpdate;
     }
 
@@ -103,8 +91,7 @@ class Reviewcomment
      *
      * @return Reviewcomment
      */
-    public function setText($text)
-    {
+    public function setText($text) {
         $this->text = $text;
 
         return $this;
@@ -115,8 +102,7 @@ class Reviewcomment
      *
      * @return string
      */
-    public function getText()
-    {
+    public function getText() {
         return $this->text;
     }
 
@@ -127,8 +113,7 @@ class Reviewcomment
      *
      * @return Reviewcomment
      */
-    public function setUser(\AppBundle\Entity\User $user = null)
-    {
+    public function setUser(\AppBundle\Entity\User $user = null) {
         $this->user = $user;
 
         return $this;
@@ -139,8 +124,7 @@ class Reviewcomment
      *
      * @return \AppBundle\Entity\User
      */
-    public function getUser()
-    {
+    public function getUser() {
         return $this->user;
     }
 
@@ -151,8 +135,7 @@ class Reviewcomment
      *
      * @return Reviewcomment
      */
-    public function setReview(\AppBundle\Entity\Review $review = null)
-    {
+    public function setReview(\AppBundle\Entity\Review $review = null) {
         $this->review = $review;
 
         return $this;
@@ -163,8 +146,7 @@ class Reviewcomment
      *
      * @return \AppBundle\Entity\Review
      */
-    public function getReview()
-    {
+    public function getReview() {
         return $this->review;
     }
 }

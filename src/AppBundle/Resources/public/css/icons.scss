@@ -25,90 +25,84 @@
 }
 
 .icon-hero:before {
-  content: "\e914";
+  content: "\e61b";
+}
+
+
+.icon-ally:before {
+  content: "\e61c";
 }
 
 .icon-attachment:before {
-  content: "\e912";
+  content: "\e61d";
 }
 
 .icon-event:before {
-  content: "\e913";
-}
-
-.icon-ally:before {
-  content: "\e916";
+  content: "\e61e";
 }
 
 .icon-player-side-quest:before {
-  content: "\e911";
+  content: "\e61f";
 }
 
-.icon-neutral:before {
-  content: "\e915";
+.icon-treasure:before {
+  content: "\e620";
 }
 
 .icon-spirit:before {
-  content: "\e900";
-}
-
-.icon-tactics:before {
-  content: "\e901";
-}
-
-.icon-lore:before {
-  content: "\e902";
+  content: "\e608";
 }
 
 .icon-leadership:before {
-  content: "\e903";
+  content: "\e609";
+}
+
+.icon-tactics:before {
+  content: "\e60a";
+}
+
+.icon-lore:before {
+  content: "\e60b";
 }
 
 .icon-baggins:before {
-  content: "[b]";
+  content: "\e60c";
 }
 
 .icon-fellowship:before {
-  content: "[f]";
+  content: "\e60d";
 }
 
+.icon-neutral:before {
+  content: "\e60e";
+}
 
 .icon-threat:before {
-  content: "\e904";
+  content: "\e604";
 }
 
 .icon-cost:before {
-  content: "\e916";
+  content: "\e606";
 }
 
 .icon-willpower:before {
-  content: "\e905";
-  margin-left: -2px;
-  vertical-align: middle;
+  content: "\e600";
 }
 
 .icon-attack:before {
-  content: "\e906";
-  margin-left: -2px;
-  vertical-align: middle;
+  content: "\e601";
 }
 
 .icon-defense:before {
-  content: "\e907";
-  margin-left: -2px;
-  vertical-align: middle;
+  content: "\e602";
 }
 
 .icon-health:before {
-  content: "\e908";
-  margin-left: -2px;
-  vertical-align: middle;
+  content: "\e603";
 }
 
 .icon-unique:before {
-  content: "\e90e";
-  margin-right: 4px;
-  vertical-align: middle;
+  content: "\e607";
 }
 
 .panel-title .icon-unique {
@@ -116,17 +110,17 @@
 }
 
 .icon-rule:before {
-  content: "\e909\e90b\e90c\e90a";
+  content: "\e614\e615\e616\e617";
 }
 
 .icon-onering:before {
-  content: "\e90d";
+  content: "\e618";
 }
 
 .icon-logo:before {
-  content: "\e90f";
+  content: "\e619";
 }
 
-.icon-logo-h:before {
-  content: "\e910";
+.navbar-brand:hover .icon-logo:before {
+  content: "\e61a";
 }

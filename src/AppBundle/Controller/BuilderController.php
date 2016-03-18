@@ -197,33 +197,26 @@ class BuilderController extends Controller {
         $em = $this->getDoctrine()->getManager();
 
         $content = [];
+        $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', '\'', '\''], $text);
+
         $lines = explode("\n", $text);
-        $identity = null;
 
         foreach ($lines as $line) {
             $matches = [];
             $pack_name = null;
             $name = null;
+            $quantity = 1;
 
-            if (preg_match('/^\s*(\d)x?([\pLl\pLu\pN\-\.\'\!\: ]+)\(?([^\)]*)\)?/u', $line, $matches)) {
-                $quantity = intval($matches[1]);
-                $name = trim($matches[2]);
+            if (preg_match('/(x\d+|\d+x)/u', $line, $matches)) {
+                $quantity = intval(str_replace('x', '', $matches[1]));
+                $line = str_replace($matches[1], '', $line);
+            }
 
-                if (isset($matches[3])) {
-                    $pack_name = trim($matches[3]);
-                }
-            } else {
-                if (preg_match('/^([^\(]+).*x(\d)/', $line, $matches)) {
-                    $quantity = intval($matches[2]);
-                    $name = trim($matches[1]);
-                } else {
-                    if (empty($identity) && preg_match('/([^\(]+):([^\(]+)/', $line, $matches)) {
-                        $quantity = 1;
-                        $name = trim($matches[1] . ":" . $matches[2]);
-                        $identity = $name;
-                    } else {
-                        continue;
-                    }
+            if (preg_match('/^\s*([\pLl\pLu\pN\-\.\'\!\: ]+)\(?([^\)]*)\)?/u', $line, $matches)) {
+                $name = trim($matches[1]);
+
+                if (isset($matches[2])) {
+                    $pack_name = trim($matches[2]);
                 }
             }
 

@@ -1,6 +1,6 @@
 #wrapper {
   min-height: 100%;
-  border-bottom: 5px solid #330000;
+  border-bottom: 5px solid #550000;
   padding-bottom: 100px;
 }
 
@@ -184,7 +184,7 @@ div.tags span.tag {
 /********* ONE DECK *********/
 
 .media-left {
-  min-width: 48px;
+  min-width: 50px;
   text-align: center;
 }
 
@@ -683,8 +683,10 @@ div.site-slogan {
   margin-left: 5px;
   color: #FFF;
   span {
-    line-height: 40px;
     font-size: 35px;
+    display: block;
+    margin-top: 10px;
+    line-height: 30px;
   }
 }
 
@@ -695,8 +697,10 @@ div.site-slogan {
   margin-left: 5px;
   color: #FFF;
   span {
-    line-height: 40px;
-    font-size: 35px;
+    font-size: 30px;
+    display: block;
+    margin-top: 10px;
+    line-height: 30px;
   }
 }
 
@@ -707,8 +711,10 @@ div.site-slogan {
   margin-left: 5px;
   color: #FFF;
   span {
-    line-height: 40px;
     font-size: 26px;
+    display: block;
+    margin-top: 10px;
+    line-height: 30px;
   }
 }
 
@@ -718,8 +724,10 @@ div.site-slogan {
   margin-left: 5px;
   color: #FFF;
   span {
-    line-height: 40px;
     font-size: 28px;
+    display: block;
+    margin-top: 10px;
+    line-height: 30px;
   }
 }
 
@@ -729,8 +737,10 @@ div.site-slogan {
   margin-left: 5px;
   color: #FFF;
   span {
-    line-height: 40px;
     font-size: 28px;
+    display: block;
+    margin-top: 10px;
+    line-height: 30px;
   }
 }
 
@@ -770,31 +780,31 @@ div.site-slogan {
 }
 
 .bg-tactics {
-  background: lighten(#c00106, 30%);
-  color: darken(#c00106, 30%);
+  background: #c00106;
+  color: #FFFFFF;
 }
 
 .bg-spirit {
-  background: lighten(#00B1D4, 30%);
-  color: darken(#00B1D4, 30%);
+  background: #3380AD;
+  color: #FFFFFF;
 }
 
 .bg-leadership {
-  background: lighten(#AD62A5, 20%);
-  color: darken(#AD62A5, 30%);
+  background: #884380;
+  color: #FFFFFF;
 }
 
 .bg-lore {
-  background: lighten(#51B848, 20%);
-  color: darken(#51B848, 30%);
+  background: #357308;
+  color: #FFFFFF;
 }
 
 .bg-baggins {
-  background: linear-gradient(to bottom, #B39E26 0%, darken(#B39E26, 20%) 100%);
+  background: #E3D852;
 }
 
 .bg-fellowship {
-  background: linear-gradient(to bottom, #B56C0C 0%, darken(#B56C0C, 20%) 100%);
+  background: #E89521;
 }
 
 .hero-card-list {
@@ -892,16 +902,20 @@ div.site-slogan {
   color: #616161;
 }
 
-.sphere-selector span.icon {
-  font-size: 18px;
+.sphere-selector {
+  padding-top: 10px;
 
-  &:before {
-    vertical-align: middle;
+  span.icon {
+    font-size: 18px;
+
+    &:before {
+      vertical-align: middle;
+    }
   }
 }
 
 .rwd-table .icon:before {
-  width: 22px;
+  width: 20px;
   font-size: larger;
   vertical-align: middle;
   text-align: center;
@@ -976,6 +990,7 @@ article.review .review-comment {
 
 footer {
   padding-top: 20px;
+  padding-bottom: 10px;
   background-color: #003300;
   color: #9A9A9A;
 }

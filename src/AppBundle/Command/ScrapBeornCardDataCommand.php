@@ -69,38 +69,38 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
             $sets[] = $setname;
         } else {
             $sets = [
-                //'The Dead Marshes',
-                //'Return to Mirkwood',
-                //'Khazad-dûm',
-                //'The Redhorn Gate',
-                //'Road to Rivendell',
-                //'The Watcher in the Water',
-                //'The Long Dark',
-                //'Foundations of Stone',
-                //'Shadow and Flame',
-                //'Heirs of Númenor',
-                //'The Steward\'s Fear',
-                //'The Drúadan Forest',
-                //'Encounter at Amon Dîn',
-                //'Assault on Osgiliath',
-                //'The Blood of Gondor',
-                //'The Morgul Vale',
-                //'The Voice of Isengard',
-                //'The Dunland Trap',
-                //'The Three Trials',
-                //'Trouble in Tharbad',
-                //'The Nîn-in-Eilph',
-                //'Celebrimbor\'s Secret',
-                //'The Antlered Crown',
-                //'The Lost Realm',
-                //'The Wastes of Eriador',
-                //'Escape from Mount Gram',
-                //'Across the Ettenmoors',
-                //'The Treachery of Rhudaur',
-                //'The Battle of Carn Dûm',
-                //'The Dread Realm',
-                //'The Grey Havens',
-                //'The Hobbit: Over Hill and Under Hill',
+                'The Dead Marshes',
+                'Return to Mirkwood',
+                'Khazad-dûm',
+                'The Redhorn Gate',
+                'Road to Rivendell',
+                'The Watcher in the Water',
+                'The Long Dark',
+                'Foundations of Stone',
+                'Shadow and Flame',
+                'Heirs of Númenor',
+                'The Steward\'s Fear',
+                'The Drúadan Forest',
+                'Encounter at Amon Dîn',
+                'Assault on Osgiliath',
+                'The Blood of Gondor',
+                'The Morgul Vale',
+                'The Voice of Isengard',
+                'The Dunland Trap',
+                'The Three Trials',
+                'Trouble in Tharbad',
+                'The Nîn-in-Eilph',
+                'Celebrimbor\'s Secret',
+                'The Antlered Crown',
+                'The Lost Realm',
+                'The Wastes of Eriador',
+                'Escape from Mount Gram',
+                'Across the Ettenmoors',
+                'The Treachery of Rhudaur',
+                'The Battle of Carn Dûm',
+                'The Dread Realm',
+                'The Grey Havens',
+                'The Hobbit: Over Hill and Under Hill',
                 'The Hobbit: On the Doorstep',
                 'The Black Riders',
                 'The Road Darkens',
@@ -168,7 +168,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                 // Image URL
                 $imageurl = $cardCrawler->filter('div.titleBox > img')->last()->attr('src');
 
-                // Threat, Willpower, Attack, Defense, Health
+                // Threat, Willpower, Attack, Defense, Hit Points
                 $c = $cardCrawler->filter('div.statValueBox')->first();
 
                 $cost = $threat = $c->filter('span')->eq(1)->text();
@@ -206,6 +206,11 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                 });
 
                 $flavor = implode("<br>", $flavor);
+
+                //if ($type == 'Boon') {
+                //    $type = 'Attachment';
+                //    $sphere = 'Boon';
+                //}
 
                 // OCTGN
                 //$octgn = substr($cardCrawler->filter('img[title^="OCTGN"]')->attr('title'), -36);
@@ -246,7 +251,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
                 $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', '\'', '\''], $text);
                 $text = preg_replace('/<a title="Search:.*?>(.*?)<\/a>/', '\\1', $text);
-                $text = preg_replace('/<a title="Search:.*?>(.*?)<\/a>/', '\\1', $text);
+                $text = preg_replace('/<a title="Keyword:.*?>(.*?)<\/a>/', '\\1', $text);
                 $text = preg_replace_callback('/<img .*?src="\/Images\/(.*?)\..*?>/', function($m) {
                     return strtolower("[$m[1]]");
                 }, $text);
@@ -276,7 +281,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
                 $question = new ConfirmationQuestion("Shall I import this card?");
                 if (!$questionHelper->ask($input, $output, $question)) {
-                    break;
+                    continue;
                 }
 
                 if (!$card) {
@@ -321,7 +326,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
                 //$card->setIllustrator(trim($data['illustrator']));
 
-                //$em->persist($card);
+                $em->persist($card);
 
                 // trying to download image file
                 $card_code = $card->getCode();
@@ -331,7 +336,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                 $outputfile = $dirname . DIRECTORY_SEPARATOR . $card_code . ".png";
 
                 if (!file_exists($outputfile) || $forceImage) {
-                    $u = dirname($imageurl) . '/' . urlencode(basename($imageurl, '.png')) . '.png';
+                    $u = dirname($imageurl) . '/' . urlencode(basename($imageurl, '.jpg')) . '.jpg';
 
                     $image = file_get_contents($u);
 

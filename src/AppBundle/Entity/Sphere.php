@@ -2,34 +2,27 @@
 
 namespace AppBundle\Entity;
 
-class Sphere
-{
-
+class Sphere {
     /**
      * @var integer
      */
     private $id;
-
     /**
      * @var string
      */
     private $code;
-
     /**
      * @var string
      */
     private $name;
-
     /**
      * @var boolean
      */
     private $is_primary;
-
     /**
      * @var string
      */
     private $octgnid;
-
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
@@ -38,8 +31,7 @@ class Sphere
     /**
      * Constructor
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->cards = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
@@ -48,8 +40,7 @@ class Sphere
      *
      * @return integer
      */
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
 
@@ -60,8 +51,7 @@ class Sphere
      *
      * @return Sphere
      */
-    public function setCode($code)
-    {
+    public function setCode($code) {
         $this->code = $code;
 
         return $this;
@@ -72,8 +62,7 @@ class Sphere
      *
      * @return string
      */
-    public function getCode()
-    {
+    public function getCode() {
         return $this->code;
     }
 
@@ -84,8 +73,7 @@ class Sphere
      *
      * @return Sphere
      */
-    public function setName($name)
-    {
+    public function setName($name) {
         $this->name = $name;
 
         return $this;
@@ -96,8 +84,7 @@ class Sphere
      *
      * @return string
      */
-    public function getName()
-    {
+    public function getName() {
         return $this->name;
     }
 
@@ -108,8 +95,7 @@ class Sphere
      *
      * @return Sphere
      */
-    public function setIsPrimary($isPrimary)
-    {
+    public function setIsPrimary($isPrimary) {
         $this->is_primary = $isPrimary;
 
         return $this;
@@ -120,8 +106,7 @@ class Sphere
      *
      * @return boolean
      */
-    public function getIsPrimary()
-    {
+    public function getIsPrimary() {
         return $this->is_primary;
     }
 
@@ -132,8 +117,7 @@ class Sphere
      *
      * @return Sphere
      */
-    public function setOctgnid($octgnid)
-    {
+    public function setOctgnid($octgnid) {
         $this->octgnid = $octgnid;
 
         return $this;
@@ -144,8 +128,7 @@ class Sphere
      *
      * @return string
      */
-    public function getOctgnid()
-    {
+    public function getOctgnid() {
         return $this->octgnid;
     }
 
@@ -156,8 +139,7 @@ class Sphere
      *
      * @return Sphere
      */
-    public function addCard(\AppBundle\Entity\Card $card)
-    {
+    public function addCard(\AppBundle\Entity\Card $card) {
         $this->cards[] = $card;
 
         return $this;
@@ -168,8 +150,7 @@ class Sphere
      *
      * @param \AppBundle\Entity\Card $card
      */
-    public function removeCard(\AppBundle\Entity\Card $card)
-    {
+    public function removeCard(\AppBundle\Entity\Card $card) {
         $this->cards->removeElement($card);
     }
 
@@ -178,8 +159,7 @@ class Sphere
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getCards()
-    {
+    public function getCards() {
         return $this->cards;
     }
 }

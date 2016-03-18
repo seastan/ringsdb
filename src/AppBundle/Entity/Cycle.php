@@ -1,45 +1,40 @@
-<?php 
+<?php
 
 namespace AppBundle\Entity;
 
-class Cycle
-{
-	
+class Cycle {
     /**
      * @var integer
      */
     private $id;
-
     /**
      * @var string
      */
     private $code;
-
     /**
      * @var string
      */
     private $name;
-
     /**
      * @var integer
      */
     private $position;
-
     /**
      * @var boolean
      */
     private $isBox;
-
+    /**
+     * @var boolean
+     */
+    private $isSaga;
     /**
      * @var \DateTime
      */
     private $dateCreation;
-
     /**
      * @var \DateTime
      */
     private $dateUpdate;
-
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
@@ -48,8 +43,7 @@ class Cycle
     /**
      * Constructor
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->packs = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
@@ -58,8 +52,7 @@ class Cycle
      *
      * @return integer
      */
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
 
@@ -70,8 +63,7 @@ class Cycle
      *
      * @return Cycle
      */
-    public function setCode($code)
-    {
+    public function setCode($code) {
         $this->code = $code;
 
         return $this;
@@ -82,8 +74,7 @@ class Cycle
      *
      * @return string
      */
-    public function getCode()
-    {
+    public function getCode() {
         return $this->code;
     }
 
@@ -94,8 +85,7 @@ class Cycle
      *
      * @return Cycle
      */
-    public function setName($name)
-    {
+    public function setName($name) {
         $this->name = $name;
 
         return $this;
@@ -106,8 +96,7 @@ class Cycle
      *
      * @return string
      */
-    public function getName()
-    {
+    public function getName() {
         return $this->name;
     }
 
@@ -118,8 +107,7 @@ class Cycle
      *
      * @return Cycle
      */
-    public function setPosition($position)
-    {
+    public function setPosition($position) {
         $this->position = $position;
 
         return $this;
@@ -130,8 +118,7 @@ class Cycle
      *
      * @return integer
      */
-    public function getPosition()
-    {
+    public function getPosition() {
         return $this->position;
     }
 
@@ -142,8 +129,7 @@ class Cycle
      *
      * @return Cycle
      */
-    public function setIsBox($isBox)
-    {
+    public function setIsBox($isBox) {
         $this->isBox = $isBox;
 
         return $this;
@@ -154,97 +140,9 @@ class Cycle
      *
      * @return boolean
      */
-    public function getIsBox()
-    {
+    public function getIsBox() {
         return $this->isBox;
     }
-
-    /**
-     * Set dateCreation
-     *
-     * @param \DateTime $dateCreation
-     *
-     * @return Cycle
-     */
-    public function setDateCreation($dateCreation)
-    {
-        $this->dateCreation = $dateCreation;
-
-        return $this;
-    }
-
-    /**
-     * Get dateCreation
-     *
-     * @return \DateTime
-     */
-    public function getDateCreation()
-    {
-        return $this->dateCreation;
-    }
-
-    /**
-     * Set dateUpdate
-     *
-     * @param \DateTime $dateUpdate
-     *
-     * @return Cycle
-     */
-    public function setDateUpdate($dateUpdate)
-    {
-        $this->dateUpdate = $dateUpdate;
-
-        return $this;
-    }
-
-    /**
-     * Get dateUpdate
-     *
-     * @return \DateTime
-     */
-    public function getDateUpdate()
-    {
-        return $this->dateUpdate;
-    }
-
-    /**
-     * Add pack
-     *
-     * @param \AppBundle\Entity\Pack $pack
-     *
-     * @return Cycle
-     */
-    public function addPack(\AppBundle\Entity\Pack $pack)
-    {
-        $this->packs[] = $pack;
-
-        return $this;
-    }
-
-    /**
-     * Remove pack
-     *
-     * @param \AppBundle\Entity\Pack $pack
-     */
-    public function removePack(\AppBundle\Entity\Pack $pack)
-    {
-        $this->packs->removeElement($pack);
-    }
-
-    /**
-     * Get packs
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getPacks()
-    {
-        return $this->packs;
-    }
-    /**
-     * @var boolean
-     */
-    private $isSaga;
-
 
     /**
      * Set isSaga
@@ -253,8 +151,7 @@ class Cycle
      *
      * @return Cycle
      */
-    public function setIsSaga($isSaga)
-    {
+    public function setIsSaga($isSaga) {
         $this->isSaga = $isSaga;
 
         return $this;
@@ -265,8 +162,82 @@ class Cycle
      *
      * @return boolean
      */
-    public function getIsSaga()
-    {
+    public function getIsSaga() {
         return $this->isSaga;
+    }
+
+    /**
+     * Set dateCreation
+     *
+     * @param \DateTime $dateCreation
+     *
+     * @return Cycle
+     */
+    public function setDateCreation($dateCreation) {
+        $this->dateCreation = $dateCreation;
+
+        return $this;
+    }
+
+    /**
+     * Get dateCreation
+     *
+     * @return \DateTime
+     */
+    public function getDateCreation() {
+        return $this->dateCreation;
+    }
+
+    /**
+     * Set dateUpdate
+     *
+     * @param \DateTime $dateUpdate
+     *
+     * @return Cycle
+     */
+    public function setDateUpdate($dateUpdate) {
+        $this->dateUpdate = $dateUpdate;
+
+        return $this;
+    }
+
+    /**
+     * Get dateUpdate
+     *
+     * @return \DateTime
+     */
+    public function getDateUpdate() {
+        return $this->dateUpdate;
+    }
+
+    /**
+     * Add pack
+     *
+     * @param \AppBundle\Entity\Pack $pack
+     *
+     * @return Cycle
+     */
+    public function addPack(\AppBundle\Entity\Pack $pack) {
+        $this->packs[] = $pack;
+
+        return $this;
+    }
+
+    /**
+     * Remove pack
+     *
+     * @param \AppBundle\Entity\Pack $pack
+     */
+    public function removePack(\AppBundle\Entity\Pack $pack) {
+        $this->packs->removeElement($pack);
+    }
+
+    /**
+     * Get packs
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getPacks() {
+        return $this->packs;
     }
 }

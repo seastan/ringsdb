@@ -140,17 +140,25 @@
     /**
      * @memberOf deck
      */
-    deck.get_hero_deck = function get_hero_deck(sort) {
-        return deck.get_cards(sort, {
+    deck.get_hero_deck = function get_hero_deck(primarySpheres, sort) {
+        var where = {
             type_code: 'hero'
-        });
+        } ;
+
+        if (primarySpheres) {
+            where.sphere_code = {
+                '$nin': ['baggins', 'fellowship']
+            };
+        }
+
+        return deck.get_cards(sort, where);
     };
 
     /**
      * @memberOf deck
      */
-    deck.get_hero_deck_size = function get_hero_deck_size(sort) {
-        var hero_deck = deck.get_hero_deck();
+    deck.get_hero_deck_size = function get_hero_deck_size(primarySpheres, sort) {
+        var hero_deck = deck.get_hero_deck(primarySpheres, sort);
         return deck.get_nb_cards(hero_deck);
     };
 
@@ -225,7 +233,7 @@
         //deck.update_layout_section(data, 'images', $('<div style="margin-bottom:10px"><img src="/bundles/app/images/factions/' + deck.get_faction_code() + '.png" class="img-responsive">'));
 
         deck.update_layout_section(data, 'meta', $('<h4 style="font-weight:bold">Deck</h4>'));
-        deck.update_layout_section(data, 'meta', $('<div id="cardcount">' + deck.get_hero_deck_size() + (deck.get_hero_deck_size() == 1 ? ' Hero, ': ' Heroes, ') + deck.get_draw_deck_size() + ' Cards</div>').addClass((deck.get_draw_deck_size() < 50 || deck.get_hero_deck_size() > 3) ? 'text-danger' : ''));
+        deck.update_layout_section(data, 'meta', $('<div id="cardcount">' + deck.get_hero_deck_size() + (deck.get_hero_deck_size() == 1 ? ' Hero, ': ' Heroes, ') + deck.get_draw_deck_size() + ' Cards</div>').addClass((deck.get_draw_deck_size() < 50 || deck.get_hero_deck_size(true) > 4) ? 'text-danger' : ''));
 
         // Reserved for future features
         //deck.update_layout_section(data, 'meta', $('<div>Extra Cards deck: ' + deck.get_plot_deck_size() + ' cards</div>').addClass(deck.get_plot_deck_size() != 7 ? 'text-danger' : ''));
@@ -330,7 +338,7 @@
      */
     deck.get_problem = function get_problem() {
         // exactly 7 plots
-        if (deck.get_hero_deck_size() > 3) {
+        if (deck.get_hero_deck_size(true) > 3) {
             return 'too_many_heroes';
         }
 

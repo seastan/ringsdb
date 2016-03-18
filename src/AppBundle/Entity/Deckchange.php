@@ -5,46 +5,38 @@ namespace AppBundle\Entity;
 /**
  * Deckchange
  */
-class Deckchange
-{
+class Deckchange {
     /**
      * @var integer
      */
     private $id;
-
     /**
      * @var \DateTime
      */
     private $dateCreation;
-
     /**
      * @var string
      */
     private $variation;
-
     /**
      * @var boolean
      */
     private $isSaved;
-
     /**
      * @var string
      */
     private $version;
-
     /**
      * @var \AppBundle\Entity\Deck
      */
     private $deck;
-
 
     /**
      * Get id
      *
      * @return integer
      */
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
 
@@ -55,8 +47,7 @@ class Deckchange
      *
      * @return Deckchange
      */
-    public function setDateCreation($dateCreation)
-    {
+    public function setDateCreation($dateCreation) {
         $this->dateCreation = $dateCreation;
 
         return $this;
@@ -67,8 +58,7 @@ class Deckchange
      *
      * @return \DateTime
      */
-    public function getDateCreation()
-    {
+    public function getDateCreation() {
         return $this->dateCreation;
     }
 
@@ -79,8 +69,7 @@ class Deckchange
      *
      * @return Deckchange
      */
-    public function setVariation($variation)
-    {
+    public function setVariation($variation) {
         $this->variation = $variation;
 
         return $this;
@@ -91,8 +80,7 @@ class Deckchange
      *
      * @return string
      */
-    public function getVariation()
-    {
+    public function getVariation() {
         return $this->variation;
     }
 
@@ -103,8 +91,7 @@ class Deckchange
      *
      * @return Deckchange
      */
-    public function setIsSaved($isSaved)
-    {
+    public function setIsSaved($isSaved) {
         $this->isSaved = $isSaved;
 
         return $this;
@@ -115,8 +102,7 @@ class Deckchange
      *
      * @return boolean
      */
-    public function getIsSaved()
-    {
+    public function getIsSaved() {
         return $this->isSaved;
     }
 
@@ -127,8 +113,7 @@ class Deckchange
      *
      * @return Deckchange
      */
-    public function setDeck(\AppBundle\Entity\Deck $deck = null)
-    {
+    public function setDeck(\AppBundle\Entity\Deck $deck = null) {
         $this->deck = $deck;
 
         return $this;
@@ -139,8 +124,7 @@ class Deckchange
      *
      * @return \AppBundle\Entity\Deck
      */
-    public function getDeck()
-    {
+    public function getDeck() {
         return $this->deck;
     }
 
@@ -151,8 +135,7 @@ class Deckchange
      *
      * @return Deckchange
      */
-    public function setVersion($version)
-    {
+    public function setVersion($version) {
         $this->version = $version;
 
         return $this;
@@ -163,8 +146,7 @@ class Deckchange
      *
      * @return string
      */
-    public function getVersion()
-    {
+    public function getVersion() {
         return $this->version;
     }
 }

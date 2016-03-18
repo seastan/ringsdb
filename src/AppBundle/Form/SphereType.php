@@ -7,10 +7,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class SphereType extends AbstractType {
-  /**
-   * @param FormBuilderInterface $builder
-   * @param array $options
-   */
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     */
   public function buildForm(FormBuilderInterface $builder, array $options) {
       $builder
           ->add('code')
@@ -19,19 +19,19 @@ class SphereType extends AbstractType {
           ->add('octgnid');
   }
 
-  /**
-   * @param OptionsResolverInterface $resolver
-   */
-  public function setDefaultOptions(OptionsResolverInterface $resolver) {
-      $resolver->setDefaults(array(
-          'data_class' => 'AppBundle\Entity\Sphere'
-      ));
-  }
+    /**
+     * @param OptionsResolverInterface $resolver
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver) {
+        $resolver->setDefaults([
+            'data_class' => 'AppBundle\Entity\Sphere'
+        ]);
+    }
 
-  /**
-   * @return string
-   */
-  public function getName() {
-      return 'appbundle_sphere';
-   }
+    /**
+     * @return string
+     */
+    public function getName() {
+        return 'appbundle_sphere';
+    }
 }

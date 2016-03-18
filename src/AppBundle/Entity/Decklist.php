@@ -673,11 +673,11 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     public function getSpheres() {
         return $this->spheres;
     }
+
     /**
      * @var \AppBundle\Entity\Sphere
      */
     private $predominantSphere;
-
 
     /**
      * Set predominantSphere
@@ -686,8 +686,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      *
      * @return Decklist
      */
-    public function setPredominantSphere(\AppBundle\Entity\Sphere $predominantSphere = null)
-    {
+    public function setPredominantSphere(\AppBundle\Entity\Sphere $predominantSphere = null) {
         $this->predominantSphere = $predominantSphere;
 
         return $this;
@@ -698,8 +697,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      *
      * @return \AppBundle\Entity\Sphere
      */
-    public function getPredominantSphere()
-    {
+    public function getPredominantSphere() {
         return $this->predominantSphere;
     }
 }

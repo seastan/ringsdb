@@ -9,14 +9,13 @@ use Doctrine\ORM\Query\Lexer;
  * "BINARY" "(" StringPrimary ")"
  */
 class BinaryFunction extends FunctionNode {
-
     public $stringPrimary;
 
     /**
      * @override
      */
     public function getSql(\Doctrine\ORM\Query\SqlWalker $sqlWalker) {
-		return 'binary ' . $this->stringPrimary->dispatch($sqlWalker);
+        return 'binary ' . $this->stringPrimary->dispatch($sqlWalker);
     }
 
     /**
@@ -28,5 +27,4 @@ class BinaryFunction extends FunctionNode {
         $this->stringPrimary = $parser->StringPrimary();
         $parser->match(Lexer::T_CLOSE_PARENTHESIS);
     }
-
 }

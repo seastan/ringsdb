@@ -2,37 +2,30 @@
 
 namespace AppBundle\Entity;
 
-class Decklistslot implements \AppBundle\Model\SlotInterface
-{
-	
+class Decklistslot implements \AppBundle\Model\SlotInterface {
     /**
      * @var integer
      */
     private $id;
-
     /**
      * @var integer
      */
     private $quantity;
-
     /**
      * @var \AppBundle\Entity\Decklist
      */
     private $decklist;
-
     /**
      * @var \AppBundle\Entity\Card
      */
     private $card;
-
 
     /**
      * Get id
      *
      * @return integer
      */
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
 
@@ -43,8 +36,7 @@ class Decklistslot implements \AppBundle\Model\SlotInterface
      *
      * @return Decklistslot
      */
-    public function setQuantity($quantity)
-    {
+    public function setQuantity($quantity) {
         $this->quantity = $quantity;
 
         return $this;
@@ -55,8 +47,7 @@ class Decklistslot implements \AppBundle\Model\SlotInterface
      *
      * @return integer
      */
-    public function getQuantity()
-    {
+    public function getQuantity() {
         return $this->quantity;
     }
 
@@ -67,8 +58,7 @@ class Decklistslot implements \AppBundle\Model\SlotInterface
      *
      * @return Decklistslot
      */
-    public function setDecklist(\AppBundle\Entity\Decklist $decklist = null)
-    {
+    public function setDecklist(\AppBundle\Entity\Decklist $decklist = null) {
         $this->decklist = $decklist;
 
         return $this;
@@ -79,8 +69,7 @@ class Decklistslot implements \AppBundle\Model\SlotInterface
      *
      * @return \AppBundle\Entity\Decklist
      */
-    public function getDecklist()
-    {
+    public function getDecklist() {
         return $this->decklist;
     }
 
@@ -91,8 +80,7 @@ class Decklistslot implements \AppBundle\Model\SlotInterface
      *
      * @return Decklistslot
      */
-    public function setCard(\AppBundle\Entity\Card $card = null)
-    {
+    public function setCard(\AppBundle\Entity\Card $card = null) {
         $this->card = $card;
 
         return $this;
@@ -103,8 +91,7 @@ class Decklistslot implements \AppBundle\Model\SlotInterface
      *
      * @return \AppBundle\Entity\Card
      */
-    public function getCard()
-    {
+    public function getCard() {
         return $this->card;
     }
 }

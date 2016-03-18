@@ -8,13 +8,12 @@ use Doctrine\ORM\Query\Lexer;
 /**
  * "REPLACE" "(" StringPrimary "," StringSecondary "," StringThird ")"
  *
- * 
+ *
  * @link    www.prohoney.com
  * @since   2.0
  * @author  Igor Aleksejev
  */
 class ReplaceFunction extends FunctionNode {
-
     public $stringPrimary;
     public $stringSecondary;
     public $stringThird;
@@ -24,10 +23,10 @@ class ReplaceFunction extends FunctionNode {
      */
     public function getSql(\Doctrine\ORM\Query\SqlWalker $sqlWalker) {
 		return 'REPLACE(' .
-		            $this->stringPrimary->dispatch($sqlWalker) . ', ' .
-		            $this->stringSecondary->dispatch($sqlWalker) . ', ' .
-					$this->stringThird->dispatch($sqlWalker) .
-		        ')';
+            $this->stringPrimary->dispatch($sqlWalker) . ', ' .
+            $this->stringSecondary->dispatch($sqlWalker) . ', ' .
+            $this->stringThird->dispatch($sqlWalker) .
+        ')';
 /*        return $sqlWalker->getConnection()->getDatabasePlatform()->getReplaceExpression(
                         $this->stringPrimary, $this->stringSecondary, $this->stringThird
         );*/
@@ -46,5 +45,4 @@ class ReplaceFunction extends FunctionNode {
         $this->stringThird = $parser->StringPrimary();
         $parser->match(Lexer::T_CLOSE_PARENTHESIS);
     }
-
 }

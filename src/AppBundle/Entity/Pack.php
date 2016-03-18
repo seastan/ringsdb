@@ -1,55 +1,44 @@
-<?php 
+<?php
 
 namespace AppBundle\Entity;
 
-class Pack
-{
-	
+class Pack {
     /**
      * @var integer
      */
     private $id;
-
     /**
      * @var string
      */
     private $code;
-
     /**
      * @var string
      */
     private $name;
-
     /**
      * @var integer
      */
     private $position;
-
     /**
      * @var integer
      */
     private $size;
-
     /**
      * @var \DateTime
      */
     private $dateCreation;
-
     /**
      * @var \DateTime
      */
     private $dateUpdate;
-
     /**
      * @var \DateTime
      */
     private $dateRelease;
-
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
     private $cards;
-
     /**
      * @var \AppBundle\Entity\Cycle
      */
@@ -58,8 +47,7 @@ class Pack
     /**
      * Constructor
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->cards = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
@@ -68,8 +56,7 @@ class Pack
      *
      * @return integer
      */
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
 
@@ -80,8 +67,7 @@ class Pack
      *
      * @return Pack
      */
-    public function setCode($code)
-    {
+    public function setCode($code) {
         $this->code = $code;
 
         return $this;
@@ -92,8 +78,7 @@ class Pack
      *
      * @return string
      */
-    public function getCode()
-    {
+    public function getCode() {
         return $this->code;
     }
 
@@ -104,8 +89,7 @@ class Pack
      *
      * @return Pack
      */
-    public function setName($name)
-    {
+    public function setName($name) {
         $this->name = $name;
 
         return $this;
@@ -116,8 +100,7 @@ class Pack
      *
      * @return string
      */
-    public function getName()
-    {
+    public function getName() {
         return $this->name;
     }
 
@@ -128,8 +111,7 @@ class Pack
      *
      * @return Pack
      */
-    public function setPosition($position)
-    {
+    public function setPosition($position) {
         $this->position = $position;
 
         return $this;
@@ -140,8 +122,7 @@ class Pack
      *
      * @return integer
      */
-    public function getPosition()
-    {
+    public function getPosition() {
         return $this->position;
     }
 
@@ -152,8 +133,7 @@ class Pack
      *
      * @return Pack
      */
-    public function setSize($size)
-    {
+    public function setSize($size) {
         $this->size = $size;
 
         return $this;
@@ -164,8 +144,7 @@ class Pack
      *
      * @return integer
      */
-    public function getSize()
-    {
+    public function getSize() {
         return $this->size;
     }
 
@@ -176,8 +155,7 @@ class Pack
      *
      * @return Pack
      */
-    public function setDateCreation($dateCreation)
-    {
+    public function setDateCreation($dateCreation) {
         $this->dateCreation = $dateCreation;
 
         return $this;
@@ -188,8 +166,7 @@ class Pack
      *
      * @return \DateTime
      */
-    public function getDateCreation()
-    {
+    public function getDateCreation() {
         return $this->dateCreation;
     }
 
@@ -200,8 +177,7 @@ class Pack
      *
      * @return Pack
      */
-    public function setDateUpdate($dateUpdate)
-    {
+    public function setDateUpdate($dateUpdate) {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
@@ -212,8 +188,7 @@ class Pack
      *
      * @return \DateTime
      */
-    public function getDateUpdate()
-    {
+    public function getDateUpdate() {
         return $this->dateUpdate;
     }
 
@@ -224,8 +199,7 @@ class Pack
      *
      * @return Pack
      */
-    public function setDateRelease($dateRelease)
-    {
+    public function setDateRelease($dateRelease) {
         $this->dateRelease = $dateRelease;
 
         return $this;
@@ -236,8 +210,7 @@ class Pack
      *
      * @return \DateTime
      */
-    public function getDateRelease()
-    {
+    public function getDateRelease() {
         return $this->dateRelease;
     }
 
@@ -248,8 +221,7 @@ class Pack
      *
      * @return Pack
      */
-    public function addCard(\AppBundle\Entity\Card $card)
-    {
+    public function addCard(\AppBundle\Entity\Card $card) {
         $this->cards[] = $card;
 
         return $this;
@@ -260,8 +232,7 @@ class Pack
      *
      * @param \AppBundle\Entity\Card $card
      */
-    public function removeCard(\AppBundle\Entity\Card $card)
-    {
+    public function removeCard(\AppBundle\Entity\Card $card) {
         $this->cards->removeElement($card);
     }
 
@@ -270,8 +241,7 @@ class Pack
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getCards()
-    {
+    public function getCards() {
         return $this->cards;
     }
 
@@ -282,8 +252,7 @@ class Pack
      *
      * @return Pack
      */
-    public function setCycle(\AppBundle\Entity\Cycle $cycle = null)
-    {
+    public function setCycle(\AppBundle\Entity\Cycle $cycle = null) {
         $this->cycle = $cycle;
 
         return $this;
@@ -294,8 +263,7 @@ class Pack
      *
      * @return \AppBundle\Entity\Cycle
      */
-    public function getCycle()
-    {
+    public function getCycle() {
         return $this->cycle;
     }
 }

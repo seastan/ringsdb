@@ -20,5 +20,10 @@
             <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
         {% endfor %}
     </section>
+    <section name="Side Quest" shared="False">
+        {% for slot in deck.slots_by_type['player-side-quest'] %}
+            <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+        {% endfor %}
+    </section>
     <notes><![CDATA[]]></notes>
 </deck>

@@ -2162,7 +2162,7 @@ output {
 .form-control {
   display: block;
   width: 100%;
-  height: 34px;
+  height: 33px;
   padding: 6px 12px;
   font-size: 14px;
   line-height: 1.42857143;
@@ -4240,10 +4240,6 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   color: #f3b217;
 }
 
-.navbar-brand:hover .logo:before {
-  content: "\e910";
-}
-
 .navbar-brand:hover,
 .navbar-brand:focus {
   text-decoration: none;
@@ -4497,7 +4493,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 }
 
 .navbar-default {
-  background-color: #330000;
+  background-color: #550000;
   border-color: #220000;
 }
 
