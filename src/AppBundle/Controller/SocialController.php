@@ -40,9 +40,9 @@ class SocialController extends Controller {
 
         $yesterday = (new \DateTime())->modify('-24 hours');
         if ($user->getDateCreation() > $yesterday) {
-            $this->get('session')->getFlashBag()->set('error', "To prevent spam, newly created accounts must wait 24 hours before being allowed to publish a decklist.");
+            //$this->get('session')->getFlashBag()->set('error', "To prevent spam, newly created accounts must wait 24 hours before being allowed to publish a decklist.");
 
-            return $this->redirect($this->generateUrl('deck_view', ['deck_id' => $deck->getId()]));
+            //return $this->redirect($this->generateUrl('deck_view', ['deck_id' => $deck->getId()]));
         }
 
         $query = $em->createQuery("SELECT COUNT(d) FROM AppBundle:Decklist d WHERE d.dateCreation>:DATE AND d.user=:USER");
@@ -51,9 +51,9 @@ class SocialController extends Controller {
         $decklistsSinceYesterday = $query->getSingleScalarResult();
 
         if ($decklistsSinceYesterday > $user->getReputation()) {
-            $this->get('session')->getFlashBag()->set('error', "To prevent spam, accounts cannot publish more decklists than their reputation per 24 hours.");
+            //$this->get('session')->getFlashBag()->set('error', "To prevent spam, accounts cannot publish more decklists than their reputation per 24 hours.");
 
-            return $this->redirect($this->generateUrl('deck_view', ['deck_id' => $deck->getId()]));
+            //return $this->redirect($this->generateUrl('deck_view', ['deck_id' => $deck->getId()]));
         }
 
         $problem = $this->get('deck_validation_helper')->findProblem($deck);
@@ -100,10 +100,10 @@ class SocialController extends Controller {
 
         $yesterday = (new \DateTime())->modify('-24 hours');
         if ($user->getDateCreation() > $yesterday) {
-            return $this->render('AppBundle:Default:error.html.twig', [
-                'pagetitle' => "Spam prevention",
-                'error' => "To prevent spam, newly created accounts must wait 24 hours before being allowed to publish a decklist.",
-            ]);
+            //return $this->render('AppBundle:Default:error.html.twig', [
+            //    'pagetitle' => "Spam prevention",
+            //    'error' => "To prevent spam, newly created accounts must wait 24 hours before being allowed to publish a decklist.",
+            //]);
         }
 
         $query = $em->createQuery("SELECT COUNT(d) FROM AppBundle:Decklist d WHERE d.dateCreation>:DATE AND d.user=:USER");
@@ -112,10 +112,10 @@ class SocialController extends Controller {
         $decklistsSinceYesterday = $query->getSingleScalarResult();
 
         if ($decklistsSinceYesterday > $user->getReputation()) {
-            return $this->render('AppBundle:Default:error.html.twig', [
-                'pagetitle' => "Spam prevention",
-                'error' => "To prevent spam, accounts cannot publish more decklists than their reputation per 24 hours.",
-            ]);
+            //return $this->render('AppBundle:Default:error.html.twig', [
+            //    'pagetitle' => "Spam prevention",
+            //    'error' => "To prevent spam, accounts cannot publish more decklists than their reputation per 24 hours.",
+            //]);
         }
 
         $deck_id = intval(filter_var($request->request->get('deck_id'), FILTER_SANITIZE_NUMBER_INT));
