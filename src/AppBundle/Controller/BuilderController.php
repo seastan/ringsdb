@@ -200,6 +200,7 @@ class BuilderController extends Controller {
         $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', '\'', '\''], $text);
 
         $lines = explode("\n", $text);
+        $identity = null;
 
         foreach ($lines as $line) {
             $matches = [];

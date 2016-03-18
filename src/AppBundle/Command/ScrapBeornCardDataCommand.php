@@ -14,7 +14,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
     protected function configure() {
-        $this->setName('app:beorn:cards')
+        $this->setName('app:cards:beorn')
              ->setDescription('Download new card data from Hall of Beorn')
              ->addArgument(
                  'beornset',
