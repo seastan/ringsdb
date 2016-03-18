@@ -18,4 +18,5 @@ tags
 /.project
 /.tags_swap
 /.idea/
+user-data.sql
 .DS_Store
