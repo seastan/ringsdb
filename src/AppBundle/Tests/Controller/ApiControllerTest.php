@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class ApiControllerTest extends WebTestCase {
     public function testGetCard() {
         $client = static::createClient();
-        $client->request('GET', '/api/card/01001');
+        $client->request('GET', '/api/public/card/01001');
         $response = $client->getResponse();
         $json = $response->getContent();
         $this->assertJson($json);
@@ -21,7 +21,7 @@ class ApiControllerTest extends WebTestCase {
 
     public function testListCards() {
         $client = static::createClient();
-        $client->request('GET', '/api/cards/');
+        $client->request('GET', '/api/public/cards/');
         $response = $client->getResponse();
         $json = $response->getContent();
         $this->assertJson($json);
@@ -33,7 +33,7 @@ class ApiControllerTest extends WebTestCase {
 
     public function testListCardsByPack() {
         $client = static::createClient();
-        $client->request('GET', '/api/cards/core');
+        $client->request('GET', '/api/public/cards/core');
         $response = $client->getResponse();
         $json = $response->getContent();
         $this->assertJson($json);
@@ -50,7 +50,7 @@ class ApiControllerTest extends WebTestCase {
 
     public function testListPacks() {
         $client = static::createClient();
-        $client->request('GET', '/api/packs/');
+        $client->request('GET', '/api/public/packs/');
         $response = $client->getResponse();
         $json = $response->getContent();
         $this->assertJson($json);
@@ -62,7 +62,7 @@ class ApiControllerTest extends WebTestCase {
 
     public function testGetDecklist() {
         $client = static::createClient();
-        $client->request('GET', '/api/decklist/1');
+        $client->request('GET', '/api/public/decklist/1');
         $response = $client->getResponse();
         $json = $response->getContent();
         $this->assertJson($json);
@@ -75,7 +75,7 @@ class ApiControllerTest extends WebTestCase {
 
     public function testListDecklists() {
         $client = static::createClient();
-        $client->request('GET', '/api/decklists/2015-08-16');
+        $client->request('GET', '/api/public/decklists/2015-08-16');
         $response = $client->getResponse();
         $json = $response->getContent();
         $this->assertJson($json);
