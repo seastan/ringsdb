@@ -3,10 +3,10 @@
 
 {% block javascripts %}
     {% javascripts '@AppBundle/Resources/public/js/ui.deckview.js' %}
-    <script src="{{ asset_url }}"></script>
+        <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
     <script type="text/javascript">
-        app.deck && app.deck.init({{ deck|json_encode|raw }});
+        app.deck && app.deck.init({{ deck | json_encode | raw }});
     </script>
 {% endblock %}
 
@@ -24,66 +24,51 @@
         <div class="row">
 
             <!-- Left-side Column -->
-            <div class="col-md-6" id="deck"></div>
+            <div class="col-md-6" id="deck-content"></div>
             <!-- Left-side Column -->
 
             <!-- Right-side Column -->
             <div class="col-md-6 hidden-print">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="pull-right btn-group" role="group" id="btn-group-deck">{% include 'AppBundle:Builder:toolbar.html.twig' %}</div>
+                    </div>
+                    <div class="col-md-12" style="margin-top: 10px">
+                        <p>Version {{ deck.version }}</p>
 
-                <div style="margin-bottom:20px" id="btn-group-deck">
-                    <div style="margin-bottom:5px">
-                        {% if is_owner %}
-                            <a href="{{ path('deck_edit', { deck_id: deck_id }) }}" class="btn btn-primary"><span class="fa fa-pencil"></span> Edit</a>
-                            <a href="{{ path('deck_publish_form', { deck_id: deck_id }) }}" id="btn-publish" class="btn btn-success"><span class="fa fa-share"></span> Publish</a>
-                            <button type="button" id="btn-delete" class="btn btn-danger"><span class="fa fa-trash"></span> Delete</button>
-                        {% endif %}
-                        <a href="{{ path('deck_clone', { deck_id: deck_id }) }}" id="btn-clone" class="btn btn-info"><span class="fa fa-clone"></span> Clone</a>
-                        <button type="button" id="btn-print" class="btn btn-default"><span class="fa fa-print"></span> Print</button>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                <span class="fa fa-download"></span> Download <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu" role="menu">
-                                <li><a href="{{ path('deck_export_text', { deck_id: deck_id }) }}">Text file</a></li>
-                                <li><a href="{{ path('deck_export_octgn', { deck_id: deck_id }) }}">Octgn file</a></li>
-                            </ul>
+                        <!-- Description -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Description</h3>
+                            </div>
+                            <div class="panel-body" id="description"></div>
                         </div>
+                        <!-- Description -->
+
+                        {% include 'AppBundle:Builder:deck-charts.html.twig' %}
+                        {% include 'AppBundle:Builder:draw-simulator.html.twig' %}
+
+                        <!-- Published decklists Table -->
+                        <table class="table table-condensed" id="table-predecessor">
+                            <thead>
+                            <tr>
+                                <th colspan="4"><span class="fa fa-share"></span> Published versions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if deck.children|length %}
+                                {% for decklist in deck.children %}
+                                    {{ macros.decklist_table_row(decklist) }}
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td>None.</td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-
-                <p>Version {{ deck.version }}</p>
-
-                <!-- Description -->
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Description</h3>
-                    </div>
-                    <div class="panel-body" id="description"></div>
-                </div>
-                <!-- Description -->
-
-                {% include 'AppBundle:Builder:deck-charts.html.twig' %}
-                {% include 'AppBundle:Builder:draw-simulator.html.twig' %}
-
-                <!-- Published decklists Table -->
-                <table class="table table-condensed" id="table-predecessor">
-                    <thead>
-                    <tr>
-                        <th colspan="4"><span class="fa fa-share"></span> Published versions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% if deck.children|length %}
-                        {% for decklist in deck.children %}
-                            {{ macros.decklist_table_row(decklist) }}
-                        {% endfor %}
-                    {% else %}
-                        <tr>
-                            <td>None.</td>
-                        </tr>
-                    {% endif %}
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>

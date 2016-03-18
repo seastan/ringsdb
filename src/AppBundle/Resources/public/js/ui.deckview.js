@@ -8,7 +8,7 @@
         $('#deleteModal').modal('show');
     }
 
-    ui.do_action_deck = function do_action_deck(event) {
+    ui.do_action_deck = function (event) {
         var action_id = $(this).attr('id');
         if (!action_id) {
             return;
@@ -37,17 +37,16 @@
                 DisplaySort = 'name';
                 ui.refresh_deck()();
                 break;
-            case 'btn-display-plain':
-                export_plaintext();
+            case 'btn-export-bbcode':
+                app.deck.export_bbcode();
                 break;
-            case 'btn-display-bbcode':
-                export_bbcode();
+            case 'btn-export-markdown':
+                app.deck.export_markdown();
                 break;
-            case 'btn-display-markdown':
-                export_markdown();
+            case 'btn-export-plaintext':
+                app.deck.export_plaintext();
                 break;
         }
-
     };
 
     /**
@@ -57,14 +56,14 @@
     ui.setup_event_handlers = function setup_event_handlers() {
         $('#btn-group-deck').on({
             click: ui.do_action_deck
-        }, 'button[id],a[id]');
+        }, 'button[id], a[id]');
     };
 
     /**
      * @memberOf ui
      */
     ui.refresh_deck = function refresh_deck() {
-        app.deck.display('#deck');
+        app.deck.display('#deck-content');
         app.draw_simulator && app.draw_simulator.reset();
         app.deck_charts && app.deck_charts.setup();
     };

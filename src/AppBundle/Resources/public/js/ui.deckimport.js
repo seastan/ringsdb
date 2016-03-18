@@ -54,7 +54,7 @@
         });
 
         app.deck.init({ slots: slots });
-        app.deck.display('#deck');
+        app.deck.display('#deck-content');
 
         $('input[name=content]').val(app.deck.get_json());
     };

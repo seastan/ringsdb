@@ -30,128 +30,15 @@
                 location.href = Routing.generate('decklist_export_octgn', { decklist_id: app.deck.get_id() });
                 break;
             case 'btn-export-bbcode':
-                ui.export_bbcode();
+                app.deck.export_bbcode();
                 break;
             case 'btn-export-markdown':
-                ui.export_markdown();
+                app.deck.export_markdown();
                 break;
             case 'btn-export-plaintext':
-                ui.export_plaintext();
+                app.deck.export_plaintext();
                 break;
         }
-    };
-
-    ui.export_bbcode = function() {
-        $('#export-deck').html(ui.build_bbcode().join("\n"));
-        $('#exportModal').modal('show');
-    };
-
-    ui.build_bbcode = function() {
-        var deck = app.deck;
-        var lines = [];
-
-        lines.push("[b]" + deck.get_name() + "[/b]");
-
-        $('#deck-content h5:visible').each(function(i, type) {
-            lines.push("");
-            lines.push("[b]" + $(type).text().trim() + "[/b]");
-
-            $(type).siblings().each(function(j, line) {
-                var line = $(line);
-                var qty = line.ignore("a, span, small").text().trim().replace(/x.*/, "x");
-                var card = app.data.cards.findById(line.find('a.card').data('code'));
-
-                if (card) {
-                    lines.push(qty + ' [url=http://ringsdb.com/card/' + card.code + ']' + card.name + '[/url] [i](' + card.pack_name + ")[/i]");
-                }
-            });
-        });
-
-        lines.push("");
-        lines.push($('#cardcount').text());
-        lines.push($('#latestpack').text());
-        lines.push("");
-
-        //if (typeof Decklist != "undefined" && Decklist != null) {
-        //    lines.push("Decklist [url="+location.href+"]published on NetrunnerDB[/url].");
-        //} else {
-            lines.push("Deck built on [url=http://ringsdb.com]RingsDB[/url].");
-        //}
-
-        return lines;
-    };
-
-    ui.export_markdown = function() {
-        $('#export-deck').html(ui.build_markdown().join("\n"));
-        $('#exportModal').modal('show');
-    };
-
-
-    ui.build_markdown = function() {
-        var deck = app.deck;
-        var lines = [];
-
-        lines.push("## " + deck.get_name());
-
-        $('#deck-content h5:visible').each(function(i, type) {
-            lines.push("");
-            lines.push("###" + $(type).text().trim());
-
-            $(type).siblings().each(function(j, line) {
-                var line = $(line);
-                var qty = line.ignore("a, span, small").text().trim().replace(/x.*/, "x");
-                var card = app.data.cards.findById(line.find('a.card').data('code'));
-
-                if (card) {
-                    lines.push('* '+ qty + ' [' + card.name + '](http://ringsdb.com/card/' + card.code + ') _(' + card.pack_name + ")_");
-                }
-            });
-        });
-
-        lines.push("");
-        lines.push($('#cardcount').text() + "  ");
-        lines.push($('#latestpack').text() + "  ");
-        lines.push("");
-
-        //if(typeof Decklist != "undefined" && Decklist != null) {
-        //    lines.push("Decklist [published on NetrunnerDB]("+location.href+").");
-        //} else {
-            lines.push("Deck built on [RingsDB](http://ringsdb.com).");
-        //}
-        return lines;
-    };
-
-    ui.export_plaintext = function() {
-        $('#export-deck').html(ui.build_plaintext().join("\n"));
-        $('#exportModal').modal('show');
-    };
-
-    ui.build_plaintext = function() {
-        var deck = app.deck;
-        var lines = [];
-
-        lines.push(deck.get_name());
-
-        $('#deck-content h5:visible').each(function(i, type) {
-            lines.push("");
-            lines.push($(type).text().trim());
-
-            $(type).siblings().each(function(j, line) {
-                lines.push($(line).text().trim());
-            });
-        });
-
-        lines.push("");
-        lines.push($('#cardcount').text());
-        lines.push($('#latestpack').text());
-        lines.push("");
-
-        //if(typeof Decklist != "undefined" && Decklist != null) {
-        //    lines.push("Decklist [published on NetrunnerDB]("+location.href+").");
-        //} else {
-        lines.push("Deck built on http://ringsdb.com.");
-        //}
-        return lines;
     };
 
     ui.send_like = function(event) {

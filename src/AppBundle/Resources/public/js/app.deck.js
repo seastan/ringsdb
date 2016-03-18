@@ -390,4 +390,119 @@
         return true;
     };
 
+    deck.export_bbcode = function() {
+        $('#export-deck').html(deck.build_bbcode().join("\n"));
+        $('#exportModal').modal('show');
+    };
+
+    deck.build_bbcode = function() {
+        var lines = [];
+
+        lines.push("[b]" + deck.get_name() + "[/b]");
+
+        $('#deck-content h5:visible').each(function(i, type) {
+            lines.push("");
+            lines.push("[b]" + $(type).text().trim() + "[/b]");
+
+            $(type).siblings().each(function(j, line) {
+                var line = $(line);
+                var qty = line.ignore("a, span, small").text().trim().replace(/x.*/, "x");
+                var card = app.data.cards.findById(line.find('a.card').data('code'));
+
+                if (card) {
+                    lines.push(qty + ' [url=http://ringsdb.com/card/' + card.code + ']' + card.name + '[/url] [i](' + card.pack_name + ")[/i]");
+                }
+            });
+        });
+
+        lines.push("");
+        lines.push($('#cardcount').text());
+        lines.push($('#latestpack').text());
+        lines.push("");
+
+        if (app.user.params.decklist_id) {
+            lines.push("Decklist [url="+location.href+"]build and published on RingsDB[/url].");
+        } else {
+            lines.push("Deck built on [url=http://ringsdb.com]RingsDB[/url].");
+        }
+
+        return lines;
+    };
+
+    deck.export_markdown = function() {
+        $('#export-deck').html(deck.build_markdown().join("\n"));
+        $('#exportModal').modal('show');
+    };
+
+    deck.build_markdown = function() {
+        var lines = [];
+
+        lines.push("## " + deck.get_name());
+
+        $('#deck-content h5:visible').each(function(i, type) {
+            lines.push("");
+            lines.push("###" + $(type).text().trim());
+
+            $(type).siblings().each(function(j, line) {
+                var line = $(line);
+                var qty = line.ignore("a, span, small").text().trim().replace(/x.*/, "x");
+                var card = app.data.cards.findById(line.find('a.card').data('code'));
+
+                if (card) {
+                    lines.push('* '+ qty + ' [' + card.name + '](http://ringsdb.com/card/' + card.code + ') _(' + card.pack_name + ")_");
+                }
+            });
+        });
+
+        lines.push("");
+        lines.push($('#cardcount').text() + "  ");
+        lines.push($('#latestpack').text() + "  ");
+        lines.push("");
+
+        if (app.user.params.decklist_id) {
+            lines.push("Decklist [build and published on RingsDB]("+location.href+").");
+        } else {
+            lines.push("Deck built on [RingsDB](http://ringsdb.com).");
+        }
+        return lines;
+    };
+
+    deck.export_plaintext = function() {
+        $('#export-deck').html(deck.build_plaintext().join("\n"));
+        $('#exportModal').modal('show');
+    };
+
+    deck.build_plaintext = function() {
+        var lines = [];
+
+        lines.push(deck.get_name());
+
+        $('#deck-content h5:visible').each(function(i, type) {
+            lines.push("");
+            lines.push($(type).text().trim());
+
+            $(type).siblings().each(function(j, line) {
+                var line = $(line);
+                var card = app.data.cards.findById(line.find('a.card').data('code'));
+
+                if (card) {
+                    lines.push($(line).text().trim() + ' (' + card.pack_name + ')');
+                }
+            });
+        });
+
+        lines.push("");
+        lines.push($('#cardcount').text());
+        lines.push($('#latestpack').text());
+        lines.push("");
+
+        if (app.user.params.decklist_id) {
+            lines.push("Decklist built and published on " + location.href);
+        } else {
+            lines.push("Deck built on http://ringsdb.com.");
+        }
+        return lines;
+    };
+
+
 })(app.deck = {}, jQuery);
