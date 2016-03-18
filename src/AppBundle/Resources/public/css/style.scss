@@ -773,6 +773,15 @@ div.site-slogan {
   padding-right: 150px;
 }
 
+@media (max-width: 767px) {
+  .title .decklist-name {
+    font-size: 1.8em;
+    margin-top: 0;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
 /************** SPHERE COLORS **************/
 .bg-sphere a, .bg-sphere span, .bg-sphere small, .bg-sphere button {
   color: inherit;
