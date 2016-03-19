@@ -33,7 +33,7 @@
                         <p class="text-center small hero-card-list">
                             {% for hero in data.hero_deck %}
                                 {% set card = hero.getCard() %}
-                                <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" href="">{{ card.name }} <i>({{ card.pack.name }})</i></a>
+                                <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" href="">{{ card.name }} <i>({{ card.pack.name }})</i></a>
                             {% endfor %}
                         </p>
                         <p class="text-center">{{ data.count_by_type | raw }}</p>
