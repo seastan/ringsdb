@@ -141,11 +141,13 @@ class Decks {
 
     public function revertDeck($deck) {
         $changes = $this->getUnsavedChanges($deck);
+
         foreach ($changes as $change) {
             $this->doctrine->remove($change);
         }
+
         // if deck has only heroes, we delete it
-        if (count($deck->getSlots()->getDrawDeck()->countCards()) === 0) {
+        if ($deck->getSlots()->getDrawDeck()->countCards() === 0) {
             $this->doctrine->remove($deck);
         }
         $this->doctrine->flush();

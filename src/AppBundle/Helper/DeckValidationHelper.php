@@ -29,6 +29,10 @@ class DeckValidationHelper {
             return 'too_many_heroes';
         }
 
+        if ($heroDeckSize < 1) {
+            return 'too_few_heroes';
+        }
+
         $heroes = [];
         foreach ($heroDeck as $hero) {
             if (isset($heroes[$hero->getCard()->getName()])) {
@@ -36,10 +40,6 @@ class DeckValidationHelper {
             }
 
             $heroes[$hero->getCard()->getName()] = true;
-        }
-
-        if ($heroDeckSize < 1) {
-            return 'too_few_heroes';
         }
 
         if ($deck->getSlots()->getDrawDeck()->countCards() < 50) {

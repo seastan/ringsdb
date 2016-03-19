@@ -33,111 +33,16 @@ class BuilderController extends Controller {
         ], $response);
     }
 
-    public function initbuildAction(Request $request) {
+    public function newAction(Request $request) {
         $em = $this->getDoctrine()->getManager();
 
-        $hero1Code = $request->request->get('hero1');
-        $hero2Code = $request->request->get('hero2');
-        $hero3Code = $request->request->get('hero3');
-
-        if (!$hero1Code && !$hero2Code && !$hero3Code) {
-            $this->get('session')->getFlashBag()->set('error', "At least one hero is required.");
-
-            return $this->redirect($this->generateUrl('deck_buildform'));
-        }
-
-        $heroType = $em->getRepository('AppBundle:Type')->findOneBy(['code' => 'hero']);
-        $tags = [];
-        $names = [];
-        $lastPack = null;
-
-        $hero1 = null;
-        if ($hero1Code) {
-            $hero1 = $em->getRepository('AppBundle:Card')->findOneBy(['type' => $heroType, 'code' => $hero1Code]);
-
-            if (!$hero1) {
-                $this->get('session')->getFlashBag()->set('error', "Invalid selection for hero number 1.");
-
-                return $this->redirect($this->generateUrl('deck_buildform'));
-            }
-
-            if (!$lastPack || $hero1->getPack()->getCode() > $lastPack->getCode()) {
-                $lastPack = $hero1->getPack();
-            }
-
-            $tags[] = $hero1->getSphere()->getCode();
-            $names[] = $hero1->getName();
-        }
-
-        $hero2 = null;
-        if ($hero2Code) {
-            $hero2 = $em->getRepository('AppBundle:Card')->findOneBy(['type' => $heroType, 'code' => $hero2Code]);
-
-            if (!$hero2) {
-                $this->get('session')->getFlashBag()->set('error', "Invalid selection for hero number 2.");
-
-                return $this->redirect($this->generateUrl('deck_buildform'));
-            }
-
-            if (!$lastPack || $hero2->getPack()->getCode() > $lastPack->getCode()) {
-                $lastPack = $hero2->getPack();
-            }
-
-            $tags[] = $hero2->getSphere()->getCode();
-            $names[] = $hero2->getName();
-        }
-
-        $hero3 = null;
-        if ($hero3Code) {
-            $hero3 = $em->getRepository('AppBundle:Card')->findOneBy(['type' => $heroType, 'code' => $hero3Code]);
-
-            if (!$hero3) {
-                $this->get('session')->getFlashBag()->set('error', "Invalid selection for hero number 3.");
-
-                return $this->redirect($this->generateUrl('deck_buildform'));
-            }
-
-            if (!$lastPack || $hero3->getPack()->getCode() > $lastPack->getCode()) {
-                $lastPack = $hero3->getPack();
-            }
-
-            $tags[] = $hero3->getSphere()->getCode();
-            $names[] = $hero3->getName();
-        }
-
-        $name = sprintf("New deck: %s", implode(', ', $names));
-
         $deck = new Deck();
-        $deck->setName($name);
+        $deck->setName('New Lord of the Rings Deck');
         $deck->setDescriptionMd('');
-        $deck->setLastPack($lastPack);
-        $deck->setProblem('too_few_cards');
-        $deck->setTags(join(' ', array_unique($tags)));
+        $deck->setLastPack(null);
+        $deck->setProblem('too_few_heroes');
+        $deck->setTags('');
         $deck->setUser($this->getUser());
-
-        if ($hero1) {
-            $slot = new Deckslot();
-            $slot->setCard($hero1);
-            $slot->setQuantity(1);
-            $slot->setDeck($deck);
-            $deck->addSlot($slot);
-        }
-
-        if ($hero2) {
-            $slot = new Deckslot();
-            $slot->setCard($hero2);
-            $slot->setQuantity(1);
-            $slot->setDeck($deck);
-            $deck->addSlot($slot);
-        }
-
-        if ($hero3) {
-            $slot = new Deckslot();
-            $slot->setCard($hero3);
-            $slot->setQuantity(1);
-            $slot->setDeck($deck);
-            $deck->addSlot($slot);
-        }
 
         $em->persist($deck);
         $em->flush();

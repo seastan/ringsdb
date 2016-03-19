@@ -3,13 +3,7 @@ deck_buildform:
     path:  /new
     methods: [GET]
     defaults:
-        _controller: AppBundle:Builder:buildform
-
-deck_initbuild:
-    path: /build
-    methods: [POST]
-    defaults:
-        _controller: AppBundle:Builder:initbuild
+        _controller: AppBundle:Builder:new
 
 deck_save:
     path: /save

@@ -11,8 +11,8 @@
     var user_id;
     var problem_labels = {
         too_many_heroes: "Contains too many Heroes",
-        duplicated_unique_heroes: "More than one hero with the same unique name",
         too_few_heroes: "Contains too few Heroes",
+        duplicated_unique_heroes: "More than one hero with the same unique name",
         too_few_cards: "Contains too few cards",
         invalid_cards: "Contains forbidden cards"
     };
@@ -345,8 +345,13 @@
      */
     deck.get_problem = function get_problem() {
         // exactly 7 plots
-        if (deck.get_hero_deck_size(true) > 3) {
+        var herocount = deck.get_hero_deck_size(true);
+        if (herocount > 3) {
             return 'too_many_heroes';
+        }
+
+        if (herocount < 1) {
+            return 'too_few_heroes';
         }
 
         var heroes = deck.get_hero_deck();
