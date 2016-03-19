@@ -651,16 +651,18 @@ class BuilderController extends Controller {
                 }
 
                 if ($octgn) {
+                    $extension = 'o8d';
                     $content = $this->renderView('AppBundle:Export:octgn.xml.twig', [
                         "deck" => $deck->getTextExport()
                     ]);
                 } else {
+                    $extension = 'txt';
                     $content = $this->renderView('AppBundle:Export:plain.txt.twig', [
                         "deck" => $deck->getTextExport()
                     ]);
                 }
 
-                $filename = $this->get('texts')->slugify($deck->getName()) . '.txt';
+                $filename = $this->get('texts')->slugify($deck->getName()) . '.' . $extension;
 
                 $zip->addFromString($filename, $content);
             }
