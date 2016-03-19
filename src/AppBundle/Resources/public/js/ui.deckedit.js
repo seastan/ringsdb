@@ -218,11 +218,13 @@
      */
     ui.on_input_smartfilter = function on_input_smartfilter(event) {
         var q = $(this).val();
+
         if (q.match(/^\w[:<>!]/)) {
             app.smart_filter.update(q);
         } else {
             app.smart_filter.update('');
         }
+
         ui.refresh_list();
     };
 
@@ -322,7 +324,7 @@
      * @memberOf ui
      * @param event
      */
-    ui.on_modal_quantity_change = function on_modal_quantity_change(event) {
+    ui.on_modal_quantity_change = function (event) {
         var modal = $('#cardModal');
         var code = modal.data('code');
         var quantity = parseInt($(this).val(), 10);
@@ -332,9 +334,9 @@
         setTimeout(function () {
             $('#filter-text').typeahead('val', '').focus();
         }, 100);
-    }
+    };
 
-    ui.refresh_row = function refresh_row(card_code, quantity) {
+    ui.refresh_row = function (card_code, quantity) {
         // for each set of divs (1, 2, 3 columns)
         CardDivs.forEach(function (rows) {
             var row = rows[card_code];
@@ -613,8 +615,10 @@
             if (q.match(/^\w:/)) {
                 return;
             }
-            var regexp = new RegExp(q, 'i');
-            cb(app.data.cards.find({ name: regexp }));
+
+            var name = app.data.get_searchable_string(q);
+            var regexp = new RegExp(name, 'i');
+            cb(app.data.cards.find({ s_name: regexp }));
         }
 
         $('#filter-text').typeahead({
