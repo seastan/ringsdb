@@ -67,7 +67,10 @@
                         <tr>
                             <td class="decklist-hero-image hidden-xs">
                                 {% for hero in decklist.getSlots().getHeroDeck() %}
-                                    <img src="{{ asset('/bundles/cards/' ~ hero.getCard().code ~ '.png') }}">
+                                    {% set card = hero.getCard() %}
+                                    <a class="card card-tip" data-code="{{ card.code }}" href="">
+                                        <img src="{{ asset('/bundles/cards/' ~ card.code ~ '.png') }}">
+                                    </a>
                                 {% endfor %}
                             </td>
                             <td>
