@@ -14,8 +14,13 @@
 			+ '<h4 class="card-name">' + app.format.name(card) + '</h4>'
 			+ '<div class="card-info">' + app.format.type_cost(card) + '</div>'
 			+ '<div class="card-stats">' + app.format.stats(card) + '</div>'
-			+ '<div class="card-traits">' + app.format.traits(card) + '</div>'
-			+ '<div class="card-text">' + app.format.text(card) + '</div>'
+			+ '<div class="card-traits">' + app.format.traits(card) + '</div>';
+
+            if (card.has_errata) {
+                content += '<div class="text-muted"><small>This card was errata\'d</small></div>';
+            }
+
+            content += '<div class="card-text">' + app.format.text(card) + '</div>'
 			+ '<span class="card-pack pull-right" style="clear:right">' + app.format.pack(card) + '</span>'
 			+ '<span class="card-sphere">' + app.format.sphere(card) + '</span>';
 		} else {
