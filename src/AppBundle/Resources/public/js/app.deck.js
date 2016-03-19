@@ -5,7 +5,6 @@
     var description_md;
     var id;
     var name;
-    var slots;
     var tags;
     var unsaved;
     var user_id;
@@ -19,8 +18,6 @@
     var header_tpl = _.template('<h5><span class="icon icon-<%= code %>"></span> <%= name %> (<%= quantity %>)</h5>');
     var card_line_tpl = _.template('<span class="icon icon-<%= card.type_code %> fg-<%= card.sphere_code %>"></span> <a href="<%= card.url %>" class="card card-tip" data-toggle="modal" data-remote="false" data-target="#cardModal" data-code="<%= card.code %>"><%= card.name %></a>');
     var layouts = {};
-    var bound = false;
-    var loaded = false;
 
     /*
      * Templates for the different deck layouts, see deck.get_layout_data
@@ -30,7 +27,6 @@
     layouts[3] = _.template('<div class="deck-content"><div class="row"><div class="col-sm-4"><%= meta %><%= heroes %></div><div class="col-sm-4"><%= allies %></div><div class="col-sm-4"><%= attachments %><%= events %><%= sidequests %></div></div></div>');
 
     /**
-     * Called on page load before DOM and data
      * @memberOf deck
      */
     deck.init = function init(data) {
@@ -39,25 +35,22 @@
         description_md = data.description_md;
         id = data.id;
         name = data.name;
-        slots = data.slots;
         tags = data.tags;
         unsaved = data.unsaved;
         user_id = data.user_id;
 
-        // when app.data has finished, update the card database
-        if (loaded) {
-            deck.on_data_loaded();
-        } else if (!bound) {
-            bound = true;
-            $(document).on('data.app', deck.on_data_loaded);
+        if (app.data.isLoaded) {
+            deck.set_slots(data.slots);
+        } else {
+            console.log("deck.set_slots put on hold until data.app");
+
+            $(document).on('data.app', function () {
+                deck.set_slots(data.slots);
+            });
         }
     };
 
-    $(document).on('data.app', function() {
-        loaded = true;
-    });
-
-    deck.on_data_loaded = function deck_on_data_loaded() {
+    deck.set_slots = function set_slots(slots) {
         app.data.cards.update({}, {
             indeck: 0
         });

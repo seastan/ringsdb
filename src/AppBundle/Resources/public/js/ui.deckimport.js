@@ -39,10 +39,6 @@
             }
 
             if (!card) {
-                if (pack) {
-                    console.log('Pack not found: ' + pack);
-                }
-
                 card = app.data.cards.findOne({ s_name: searchable_name });
             }
 
