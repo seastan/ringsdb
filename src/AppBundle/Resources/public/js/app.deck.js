@@ -17,6 +17,7 @@
     };
     var header_tpl = _.template('<h5><span class="icon icon-<%= code %>"></span> <%= name %> (<%= quantity %>)</h5>');
     var card_line_tpl = _.template('<span class="icon icon-<%= card.type_code %> fg-<%= card.sphere_code %>"></span> <a href="<%= card.url %>" class="card card-tip" data-toggle="modal" data-remote="false" data-target="#cardModal" data-code="<%= card.code %>"><%= card.name %></a>');
+    var card_unique_tpl = _.template('<span class="icon icon-<%= card.type_code %> fg-<%= card.sphere_code %>"></span> <strong><a href="<%= card.url %>" class="card card-tip" data-toggle="modal" data-remote="false" data-target="#cardModal" data-code="<%= card.code %>"><%= card.name %></a></strong>');
     var layouts = {};
 
     /*
@@ -257,7 +258,7 @@
         data[section] = data[section] + element[0].outerHTML;
     };
 
-    deck.get_layout_data_one_section = function get_layout_data_one_section(sortKey, sortValue, displayLabel) {
+    deck.get_layout_data_one_section = function(sortKey, sortValue, displayLabel) {
         var section = $('<div>');
         var query = {};
         query[sortKey] = sortValue;
@@ -266,7 +267,23 @@
             $(header_tpl({ code: sortValue, name: cards[0][displayLabel], quantity: deck.get_nb_cards(cards) })).appendTo(section);
 
             cards.forEach(function(card) {
-                $('<div>').addClass(deck.can_include_card(card) ? '' : 'invalid-card').append($(card_line_tpl({ card: card }))).prepend(card.type_code != 'hero' ? card.indeck + 'x ' : '').appendTo(section);
+                var tpl = '';
+                if (card.is_unique && card.type_code != 'hero') {
+                    tpl = $(card_unique_tpl({ card: card }));
+                } else {
+                    tpl = $(card_line_tpl({ card: card }));
+                }
+
+                var div = $('<div>').append(tpl).prepend(card.type_code != 'hero' ? card.indeck + 'x ' : '').appendTo(section);
+
+                if (!deck.can_include_card(card)) {
+                    div.addClass('invalid-card')
+                }
+
+                if (!deck.i_have_this_card(card)) {
+                    div.addClass('missing-card')
+                }
+
             })
         }
         return section;
@@ -369,12 +386,12 @@
      * @memberOf deck
      * @returns
      */
-    deck.get_heroes_spheres_code = function get_heroes_spheres_code() {
+    deck.get_heroes_spheres_code = function() {
         var heroes = deck.get_hero_deck();
         return _.uniq(_.pluck(heroes, 'sphere_code'));
     };
 
-    deck.get_invalid_cards = function get_invalid_cards() {
+    deck.get_invalid_cards = function() {
         return _.filter(deck.get_cards(), function(card) {
             return !deck.can_include_card(card);
         });
@@ -384,7 +401,11 @@
      * returns true if the deck can include the card as parameter
      * @memberOf deck
      */
-    deck.can_include_card = function can_include_card(card) {
+    deck.can_include_card = function(card) {
+        return true;
+    };
+
+    deck.i_have_this_card = function() {
         return true;
     };
 

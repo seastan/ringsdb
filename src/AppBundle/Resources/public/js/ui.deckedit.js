@@ -80,9 +80,11 @@
         var sphere_codes = app.data.cards.distinct('sphere_code').sort();
 
         sphere_codes.splice(sphere_codes.indexOf('neutral'), 1);
-        sphere_codes.unshift('neutral');
+        sphere_codes.push('neutral');
         sphere_codes.splice(sphere_codes.indexOf('baggins'), 1);
         sphere_codes.push('baggins');
+        sphere_codes.splice(sphere_codes.indexOf('fellowship'), 1);
+        sphere_codes.push('fellowship');
 
         sphere_codes.forEach(function(sphere_code) {
             var example = app.data.cards.find({ 'sphere_code': sphere_code })[0];
@@ -158,14 +160,25 @@
      */
     ui.init_selectors = function init_selectors() {
         var spheres = $('[data-filter=sphere_code]');
-        spheres.find('input[name=neutral]').prop("checked", true).parent().addClass('active');
+        var types = $('[data-filter=type_code]');
 
-        _.each(app.deck.get_heroes_spheres_code(), function(sphere) {
+
+        var heroesSpheres = app.deck.get_heroes_spheres_code();
+        var defaultType = 'hero';
+
+        if (heroesSpheres.length) {
+            heroesSpheres.push('neutral');
+            defaultType = 'ally';
+        } else {
+            heroesSpheres = ['spirit', 'tactics', 'leadership', 'lore', 'neutral'];
+        }
+
+        _.each(heroesSpheres, function(sphere) {
             spheres.find('input[name=' + sphere + ']').prop("checked", true).parent().addClass('active');
         });
 
-        var types = $('[data-filter=type_code]');
-        types.find('input[name=ally]').prop("checked", true).parent().addClass('active');
+
+        types.find('input[name=' + defaultType + ']').prop("checked", true).parent().addClass('active');
     };
 
     function uncheck_all_others() {
