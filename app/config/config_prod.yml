@@ -25,3 +25,6 @@ monolog:
             level: debug
         console:
             type:  console
+
+parameters:
+  channel: https

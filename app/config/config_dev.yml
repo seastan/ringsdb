@@ -39,3 +39,7 @@ assetic:
 
 #swiftmailer:
 #    delivery_address: me@example.com
+
+
+parameters:
+  channel: http
