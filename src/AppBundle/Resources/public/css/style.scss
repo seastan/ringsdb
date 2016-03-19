@@ -589,8 +589,8 @@ h1.site-title {
 }
 
 div.site-rule {
-  font-size: 35px;
-  margin-top: -15px;
+  font-size: 18px;
+  margin-top: -28px;
   text-align: center;
 }
 
@@ -789,45 +789,19 @@ div.site-slogan {
   }
 }
 
-/************** SPHERE COLORS **************/
-.bg-sphere a, .bg-sphere span, .bg-sphere small, .bg-sphere button {
-  color: inherit;
-  background-color: transparent !important;
+.bg-deck {
+  background-color: white;
+  padding: 10px 20px 20px 20px;
+  border: 1px solid white;
 }
 
-.bg-tactics {
-  background: #c00106;
-  color: #FFFFFF;
-}
-
-.bg-spirit {
-  background: #3380AD;
-  color: #FFFFFF;
-}
-
-.bg-leadership {
-  background: #884380;
-  color: #FFFFFF;
-}
-
-.bg-lore {
-  background: #357308;
-  color: #FFFFFF;
-}
-
-.bg-baggins {
-  background: #E3D852;
-}
-
-.bg-fellowship {
-  background: #E89521;
-}
 
 .hero-card-list {
   margin-top: 10px;
 
   a {
     margin-right: 10px;
+    margin-left: 10px;
     white-space: nowrap;
 
     &:last-child {
@@ -836,59 +810,31 @@ div.site-slogan {
   }
 }
 
-.cg-spirit {
-  border-color: #00B1D4;
+/************** SPHERE COLORS **************/
+.bg-sphere a, .bg-sphere span, .bg-sphere small, .bg-sphere button {
+  color: inherit;
+  background-color: transparent !important;
+}
 
-  .panel-heading {
-    background-color: #EBF5F9;
-    border-color: #00B1D4;
+@mixin bg-color($name, $backgroundColor, $color:inherit) {
+  .bg-#{$name} {
+    background: $backgroundColor;
+    color: $color;
+  }
+
+  .border-#{$name} {
+    border-color: $backgroundColor;
   }
 }
 
-.cg-leadership {
-  border-color: #AD62A5;
+@include bg-color(leadership, #884380, #FFFFFF);
+@include bg-color(tactics, #c00106, #FFFFFF);
+@include bg-color(spirit, #3380AD, #FFFFFF);
+@include bg-color(lore, #357308, #FFFFFF);
+@include bg-color(baggins, #E3D852);
+@include bg-color(fellowship, #E89521);
+@include bg-color(neutral, #616161);
 
-  .panel-heading {
-    background-color: #EFE8F1;
-    border-color: #AD62A5;
-  }
-}
-
-.cg-lore {
-  border-color: #51B848;
-
-  .panel-heading {
-    background-color: #E3EEE1;
-    border-color: #51B848;
-  }
-}
-
-.cg-tactics {
-  border-color: #c00106;
-
-  .panel-heading {
-    background-color: #FEF4F4;
-    border-color: #c00106;
-  }
-}
-
-.cg-baggins {
-  border-color: #B39E26;
-
-  .panel-heading {
-    background-color: #FEECBA;
-    border-color: #B39E26;
-  }
-}
-
-.cg-fellowship {
-  border-color: #B56C0C;
-
-  .panel-heading {
-    background-color: #FECC99;
-    border-color: #B56C0C;
-  }
-}
 
 @mixin fg-color($name, $color) {
   .fg-#{$name}, .icon-#{$name}.icon-bg:before {

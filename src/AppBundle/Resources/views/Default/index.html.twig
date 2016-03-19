@@ -5,7 +5,7 @@
 
     <div class="main container">
         <h1 class="site-title">RingsDB</h1>
-        <div class="site-rule hidden-sm hidden-xs"><span class="icon-rule"></span></div>
+        <div class="site-rule hidden-xs"><span class="icon-rule"></span></div>
         <div class="site-slogan hidden-xs">Deckbuilder for The Lord of the Rings LCG</div>
     </div>
 
@@ -27,7 +27,7 @@
                             </div>
                         </div>
                     </div>
-                    <div style="background-color: white; padding: 10px 20px 20px 20px">
+                    <div class="bg-deck border-{{ data.sphere.code }}">
                         <div class="small pull-right">{{ macros.decklist_social_icons(data.decklist ) }}</div>
                         <div>{{ data.sphere_names }}</div>
                         <p class="text-center small hero-card-list">
@@ -36,7 +36,7 @@
                                 <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" href="">{{ card.name }} <i>({{ card.pack.code }})</i></a>
                             {% endfor %}
                         </p>
-                        <p class="text-center">{{ data.count_by_type | raw }}</p>
+                        <p class="text-center">{{ data.starting_threat | raw }} Threat &middot; {{ data.count_by_type | raw }}</p>
                         <div class="text-center small"><a href="{{ path('decklists_list', { type:'find', sphere: data.sphere.code }) }}">More using this sphere</a></div>
                         <div style="clear:both"></div>
                     </div>

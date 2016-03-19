@@ -132,6 +132,16 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
         return new SlotCollectionDecorator(new ArrayCollection($drawDeck));
     }
 
+    public function getStartingThreat() {
+        $heroDeck = $this->getHeroDeck();
+        $threat = 0;
+        foreach ($heroDeck->getSlots() as $slot) {
+            $threat += $slot->getCard()->getThreat();
+        }
+
+        return $threat;
+    }
+
     public function getSlots() {
         return $this->slots;
     }

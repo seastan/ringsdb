@@ -48,10 +48,15 @@ class DefaultController extends Controller {
                 $countByType = $decklist->getSlots()->getCountByType();
                 $counts = [];
                 foreach ($countByType as $code => $qty) {
+                    if ($code == 'hero') {
+                        continue;
+                    }
                     $typeName = $typeNames[$code];
                     $counts[] = $qty . " " . ($typeName == 'Ally' ? 'Allie' : $typeName) . "s";
                 }
                 $array['count_by_type'] = join(' &bull; ', $counts);
+
+                $array['starting_threat'] = $decklist->getSlots()->getStartingThreat();
 
                 $spheres = [];
                 foreach ($heroDeck as $h) {
