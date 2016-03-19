@@ -581,6 +581,13 @@ h1.site-title {
   margin-top: 0;
 }
 
+@media (max-width: 767px) {
+  h1.site-title {
+    font-size: 50px;
+    margin-bottom: -20px;
+  }
+}
+
 div.site-rule {
   font-size: 35px;
   margin-top: -15px;
