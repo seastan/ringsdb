@@ -683,4 +683,30 @@ class Card {
     public function getQuest() {
         return $this->quest;
     }
+    /**
+     * @var boolean
+     */
+    private $hasErrata;
+
+    /**
+     * Set hasErrata
+     *
+     * @param boolean $hasErrata
+     *
+     * @return Card
+     */
+    public function setHasErrata($hasErrata) {
+        $this->hasErrata = $hasErrata;
+
+        return $this;
+    }
+
+    /**
+     * Get hasErrata
+     *
+     * @return boolean
+     */
+    public function getHasErrata() {
+        return $this->hasErrata;
+    }
 }

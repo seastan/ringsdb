@@ -1,4 +1,4 @@
-(function app_smart_filter(smart_filter, $) {
+(function(smart_filter, $) {
 
     var SmartFilterQuery = [];
 
@@ -18,14 +18,15 @@
         x: [add_string_sf,  'text', "Text"],
         y: [add_integer_sf, 'quantity', "Quantity in pack"],
         f: [add_string_sf,  'flavor', "Flavor text"],
-        i: [add_string_sf,  'illustrator', "Illustrator"]
+        i: [add_string_sf,  'illustrator', "Illustrator"],
+        z: [add_boolean_sf, 'has_errata', "Errata'd"]
     };
 
     /**
      * called when the list is refreshed
      * @memberOf smart_filter
      */
-    smart_filter.get_query = function get_query(query) {
+    smart_filter.get_query = function(query) {
         return _.extend(query, SmartFilterQuery);
     };
 
@@ -33,7 +34,7 @@
      * called when the filter input is modified
      * @memberOf smart_filter
      */
-    smart_filter.update = function update(value) {
+    smart_filter.update = function(value) {
         var conditions = filterSyntax(value);
         SmartFilterQuery = {};
 
@@ -50,7 +51,7 @@
         }
     };
 
-    smart_filter.get_help = function get_help() {
+    smart_filter.get_help = function() {
         var items = _.map(configuration, function(value, key) {
             return '<li><code>' + key + '</code> &ndash; ' + value[2] + '</li>';
         });

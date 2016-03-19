@@ -123,3 +123,9 @@ AppBundle\Entity\Card:
             gedmo:
                 timestampable:
                     on: update
+        hasErrata:
+            type: boolean
+            nullable: false
+            column: has_errata
+            options:
+              default: false

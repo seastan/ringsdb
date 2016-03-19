@@ -27,6 +27,7 @@ class SearchController extends Controller {
 		'w' => 'willpower',
 		'x' => 'text',
 		'y' => 'quantity',
+		'z' => 'hasErrata',
 	);
 
 	public static $searchTypes = array(
@@ -48,6 +49,7 @@ class SearchController extends Controller {
 		'w' => 'integer',
 		'y' => 'integer',
 		'u' => 'boolean',
+		'z' => 'boolean',
 	);
 
 	public function formAction() {
