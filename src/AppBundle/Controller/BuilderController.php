@@ -689,11 +689,18 @@ class BuilderController extends Controller {
         if ($res === true) {
             for ($i = 0; $i < $zip->numFiles; $i++) {
                 $name = $zip->getNameIndex($i);
-                $parse = $this->parseTextImport($zip->getFromIndex($i));
 
-                $deck = new Deck();
-                $em->persist($deck);
-                $this->get('decks')->saveDeck($this->getUser(), $deck, null, $name, '', '', $parse['content']);
+                if (pathinfo($name, PATHINFO_EXTENSION) == 'o8d') {
+                    $parse = $this->parseOctgnImport($zip->getFromIndex($i));
+                } else {
+                    $parse = $this->parseTextImport($zip->getFromIndex($i));
+                }
+
+                if (isset($parse['content']) && $parse['content']) {
+                    $deck = new Deck();
+                    $em->persist($deck);
+                    $this->get('decks')->saveDeck($this->getUser(), $deck, null, $name, '', '', $parse['content'], null);
+                }
             }
         }
         $zip->close();
