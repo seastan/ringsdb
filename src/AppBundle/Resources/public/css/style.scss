@@ -1116,3 +1116,15 @@ footer a {
     margin: 0 5px 5px 5px;
   }
 }
+
+@media (max-width: 767px) {
+  .modal-image {
+    text-align: center;
+
+    .img-responsive {
+      display: inline-block;
+      max-height: 280px;
+      margin-bottom: 20px;
+    }
+  }
+}
