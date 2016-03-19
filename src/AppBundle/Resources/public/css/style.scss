@@ -1128,3 +1128,14 @@ footer a {
     }
   }
 }
+
+#tab-pane-build {
+  .dropdown-menu a {
+    padding: 0;
+
+    label {
+      padding: 3px 20px;
+      display: block;
+    }
+  }
+}
