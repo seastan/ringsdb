@@ -1,5 +1,5 @@
 remind_email:
-    path:     /remind/{username}
+    path: /remind/{username}
     defaults:
         _controller: AppBundle:User:remind
 

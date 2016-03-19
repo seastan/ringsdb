@@ -48,16 +48,17 @@ security:
                 domain:   ~ # Prend la valeur par défaut du domaine courant depuis $_SERVER
             
     access_control:
-        - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/remind, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/admin/, role: ROLE_ADMIN }
-        - { path: ^/api/public, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api/oauth2, roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/js/, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/$, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/deck/view/, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/deck/, role: ROLE_USER }
-        - { path: ^/decks, role: ROLE_USER }
-        - { path: ^/user/, role: ROLE_USER }
+        - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY,     requires_channel: https }
+        - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY,   requires_channel: https }
+        - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY,  requires_channel: http }
+        - { path: ^/remind, role: IS_AUTHENTICATED_ANONYMOUSLY,     requires_channel: http }
+        - { path: ^/admin/, role: ROLE_ADMIN,                       requires_channel: http }
+        - { path: ^/api/public, role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: http }
+        - { path: ^/api/oauth2, roles: IS_AUTHENTICATED_FULLY,      requires_channel: http }
+        - { path: ^/js/, role: IS_AUTHENTICATED_ANONYMOUSLY,        requires_channel: http }
+        - { path: ^/$, role: IS_AUTHENTICATED_ANONYMOUSLY,          requires_channel: http }
+        - { path: ^/deck/view/, role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: http }
+        - { path: ^/deck/, role: ROLE_USER,                         requires_channel: http }
+        - { path: ^/decks, role: ROLE_USER,                         requires_channel: http }
+        - { path: ^/user/, role: ROLE_USER,                         requires_channel: http }
+

@@ -9,10 +9,6 @@ services:
         class: AppBundle\Services\Decks
         arguments: ["@doctrine.orm.entity_manager", "@deck_validation_helper", "@diff", "@logger"]
 
-    highlight:
-        class: AppBundle\Services\Highlight
-        arguments: ["@doctrine.orm.entity_manager"]
-
     texts:
         class: AppBundle\Services\Texts
         arguments: ["%kernel.root_dir%"]

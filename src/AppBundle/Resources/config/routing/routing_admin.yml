@@ -1,26 +1,26 @@
 AppBundle_admin_cycle:
     resource: "@AppBundle/Resources/config/routing/admin/routing_admin_cycle.yml"
-    prefix:   /cycle
+    prefix: /cycle
 
 AppBundle_admin_pack:
     resource: "@AppBundle/Resources/config/routing/admin/routing_admin_pack.yml"
-    prefix:   /pack
+    prefix: /pack
 
 AppBundle_admin_type:
     resource: "@AppBundle/Resources/config/routing/admin/routing_admin_type.yml"
-    prefix:   /type
+    prefix: /type
 
 AppBundle_admin_sphere:
     resource: "@AppBundle/Resources/config/routing/admin/routing_admin_sphere.yml"
-    prefix:   /sphere
+    prefix: /sphere
 
 AppBundle_admin_card:
     resource: "@AppBundle/Resources/config/routing/admin/routing_admin_card.yml"
-    prefix:   /card
+    prefix: /card
 
 AppBundle_excel:
     resource: "@AppBundle/Resources/config/routing/admin/routing_admin_excel.yml"
-    prefix:   /excel
+    prefix: /excel
 
 admin:
     path: /

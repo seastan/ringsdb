@@ -1,4 +1,3 @@
-
 card_review_post:
     path: /post
     methods: [POST]

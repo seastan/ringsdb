@@ -1,4 +1,3 @@
-
 cards_list:
     path: /set/{pack_code}/{view}/{sort}/{page}
     defaults:
