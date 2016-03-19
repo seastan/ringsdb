@@ -1,8 +1,8 @@
 (function app_tip(tip, $) {
 
-	var cards_zoom_regexp = /card\/(\d\d\d\d\d\d?)$/,
-		mode = 'text',
-		hide_event = 'mouseout';
+	var cards_zoom_regexp = /card\/(\d\d\d\d\d\d?)$/;
+    var mode = 'text';
+    var hide_event = 'mouseout';
 
 	function display_card_on_element(card, element, event) {
 		var content;
@@ -59,7 +59,9 @@
 	tip.display = function display(event) {
 		var code = $(this).data('code');
 		var card = app.data.cards.findById(code);
-		if (!card) return;
+		if (!card) {
+            return;
+        }
 		display_card_on_element(card, this, event);
 	};
 
@@ -73,7 +75,8 @@
 		}
 
 		var href = $(this).get(0).href;
-		if (href && href.match(cards_zoom_regexp)) {
+
+        if (href && href.match(cards_zoom_regexp)) {
 			var code = RegExp.$1;
 			var generated_url = Routing.generate('cards_zoom', {card_code:code}, true);
 			var card = app.data.cards.findById(code);
@@ -96,7 +99,11 @@
 	};
 
 	$(document).on('start.app', function () {
-		$('body').on({
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            return;
+        }
+
+        $('body').on({
 			mouseover: tip.display
 		}, 'a.card-tip, li.card-tip');
 
