@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'ringsdb';
-  src: url('../fonts/ringsdb.eot?h6hjpm');
-  src: url('../fonts/ringsdb.eot?h6hjpm#iefix') format('embedded-opentype'),
-  url('../fonts/ringsdb.ttf?h6hjpm') format('truetype'),
-  url('../fonts/ringsdb.woff?h6hjpm') format('woff'),
-  url('../fonts/ringsdb.svg?h6hjpm#ringsdb') format('svg');
+  src: url('../fonts/ringsdb.eot?h6hjpma');
+  src: url('../fonts/ringsdb.eot?h6hjpma#iefix') format('embedded-opentype'),
+  url('../fonts/ringsdb.ttf?h6hjpma') format('truetype'),
+  url('../fonts/ringsdb.woff?h6hjpma') format('woff'),
+  url('../fonts/ringsdb.svg?h6hjpma#ringsdb') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,30 +24,34 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-hero:before {
-  content: "\e61b";
+
+@mixin icon($name, $contentA, $contentB) {
+  .icon-#{$name} {
+    position: relative;
+
+    &:before {
+      content: $contentA;
+      opacity: 0;
+    }
+
+    &:after {
+      content: $contentB;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      text-align: center;
+    }
+  }
 }
 
-
-.icon-ally:before {
-  content: "\e61c";
-}
-
-.icon-attachment:before {
-  content: "\e61d";
-}
-
-.icon-event:before {
-  content: "\e61e";
-}
-
-.icon-player-side-quest:before {
-  content: "\e61f";
-}
-
-.icon-treasure:before {
-  content: "\e620";
-}
+@include icon(hero, "\e622", "\e61b");
+@include icon(ally, "\e623", "\e61c");
+@include icon(attachment, "\e624", "\e61d");
+@include icon(event, "\e625", "\e61e");
+@include icon(player-side-quest, "\e626", "\e61f");
+@include icon(treasure, "\e627", "\e620");
 
 .icon-spirit:before {
   content: "\e608";

@@ -890,33 +890,27 @@ div.site-slogan {
   }
 }
 
-.fg-leadership, .icon-leadership.icon-bg:before {
-  color: #AD62A5;
+@mixin fg-color($name, $color) {
+  .fg-#{$name}, .icon-#{$name}.icon-bg:before {
+    color: $color;
+  }
+
+  .fg-#{$name} {
+    &.icon-hero, &.icon-ally, &.icon-attachment, &.icon-event, &.icon-player-side-quest, &.icon-treasure {
+      &:before {
+        opacity: .1;
+      }
+    }
+  }
 }
 
-.fg-tactics, .icon-tactics.icon-bg:before {
-  color: #c00106;
-}
-
-.fg-spirit, .icon-spirit.icon-bg:before {
-  color: #00B1D4;
-}
-
-.fg-lore, .icon-lore.icon-bg:before {
-  color: #51B848;
-}
-
-.fg-baggins, .icon-baggins.icon-bg:before {
-  color: #B39E26;
-}
-
-.fg-fellowship, .icon-fellowship.icon-bg:before {
-  color: #B56C0C;
-}
-
-.fg-neutral, .icon-neutral.icon-bg:before {
-  color: #616161;
-}
+@include fg-color(leadership, #AD62A5);
+@include fg-color(tactics, #c00106);
+@include fg-color(spirit, #00B1D4);
+@include fg-color(lore, #51B848);
+@include fg-color(baggins, #B39E26);
+@include fg-color(fellowship, #B56C0C);
+@include fg-color(neutral, #616161);
 
 .sphere-selector {
   padding-top: 10px;
