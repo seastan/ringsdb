@@ -616,37 +616,53 @@ class BuilderController extends Controller {
         ]);
     }
 
-    public function downloadallAction() {
-        $user = $this->getUser();
-        $em = $this->getDoctrine()->getManager();
+    public function octgnexportListAction(Request $request) {
+        $list_id = $request->get('ids');
 
-        $decks = $this->get('decks')->getByUser($user, false);
+        return $this->downloadFromSelection($list_id, true);
+    }
+
+    public function textexportListAction(Request $request) {
+        $list_id = $request->get('ids');
+
+        return $this->downloadFromSelection($list_id, false);
+    }
+
+    public function downloadFromSelection($list_id, $octgn) {
+
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
 
         $file = tempnam("tmp", "zip");
         $zip = new \ZipArchive();
         $res = $zip->open($file, \ZipArchive::OVERWRITE);
 
         if ($res === true) {
-            foreach ($decks as $deck) {
-                $content = [];
-                foreach ($deck['cards'] as $slot) {
-                    $card = $em->getRepository('AppBundle:Card')->findOneBy(['code' => $slot['card_code']]);
-                    if (!$card) {
-                        continue;
-                    }
+            foreach ($list_id as $id) {
+                /* @var $deck Deck */
+                $deck = $em->getRepository('AppBundle:Deck')->find($id);
 
-                    $cardname = $card->getName();
-                    $packname = $card->getPack()->getName();
-
-                    if ($packname == 'Core Set') {
-                        $packname = 'Core';
-                    }
-
-                    $qty = $slot['qty'];
-                    $content[] = "$cardname ($packname) x$qty";
+                if (!$deck) {
+                    continue;
                 }
-                $filename = str_replace('/', ' ', $deck['name']) . '.txt';
-                $zip->addFromString($filename, implode("\r\n", $content));
+
+                if ($this->getUser()->getId() != $deck->getUser()->getId()) {
+                    continue;
+                }
+
+                if ($octgn) {
+                    $content = $this->renderView('AppBundle:Export:octgn.xml.twig', [
+                        "deck" => $deck->getTextExport()
+                    ]);
+                } else {
+                    $content = $this->renderView('AppBundle:Export:plain.txt.twig', [
+                        "deck" => $deck->getTextExport()
+                    ]);
+                }
+
+                $filename = $this->get('texts')->slugify($deck->getName()) . '.txt';
+
+                $zip->addFromString($filename, $content);
             }
             $zip->close();
         }
@@ -696,10 +712,12 @@ class BuilderController extends Controller {
                     $parse = $this->parseTextImport($zip->getFromIndex($i));
                 }
 
+                $deckname = pathinfo($name, PATHINFO_FILENAME);
+
                 if (isset($parse['content']) && $parse['content']) {
                     $deck = new Deck();
                     $em->persist($deck);
-                    $this->get('decks')->saveDeck($this->getUser(), $deck, null, $name, '', '', $parse['content'], null);
+                    $this->get('decks')->saveDeck($this->getUser(), $deck, null, $deckname, '', '', $parse['content'], null);
                 }
             }
         }

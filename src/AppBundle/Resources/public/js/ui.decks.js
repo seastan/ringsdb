@@ -125,13 +125,25 @@
         location.href = Routing.generate('decks_diff', {deck1_id: ids[0], deck2_id: ids[1]});
     };
 
+    ui.download_text_selection = function(ids) {
+        window.location = Routing.generate('deck_export_text_list', { ids: ids });
+    };
+
+    ui.download_octgn_selection = function(ids) {
+        window.location = Routing.generate('deck_export_octgn_list', { ids: ids });
+    };
+
+
     ui.do_action_selection = function do_action_selection(event) {
         event.stopPropagation();
         var action_id = $(this).attr('id');
         var ids = $('.list-decks input:checked').map(function(index, elt) {
             return $(elt).closest('tr').data('id');
         }).get();
-        if (!action_id || !ids.length) return;
+
+        if (!action_id || !ids.length) {
+            return;
+        }
         switch (action_id) {
             case 'btn-compare':
                 ui.do_diff(ids);

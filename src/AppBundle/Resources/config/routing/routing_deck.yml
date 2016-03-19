@@ -71,12 +71,6 @@ deck_fileimport:
     defaults:
         _controller: AppBundle:Builder:fileimport
 
-deck_meteorimport:
-    path: /meteorimport
-    methods: [POST]
-    defaults:
-        _controller: AppBundle:Builder:meteorimport
-
 deck_copy:
     path: /copy/{decklist_id}
     defaults:
@@ -124,13 +118,6 @@ deck_export_text_list:
     defaults:
         _controller: AppBundle:Builder:textexportList
 
-deck_email:
-    path: /export/email/{deck_id}
-    methods: [GET]
-    defaults:
-        _controller: AppBundle:Builder:email
-        deck_id: \d+
-
 deck_publish:
     path: /can_publish/{deck_id}
     methods: [GET]
@@ -144,12 +131,6 @@ deck_autosave:
     defaults:
         _controller: AppBundle:Builder:autosave
 
-decks_download_all:
-    path: /export/all
-    methods: [GET]
-    defaults:
-        _controller: AppBundle:Builder:downloadall
-        
 decks_diff:
     path: /compare/{deck1_id}/{deck2_id}
     methods: [GET]
