@@ -997,11 +997,22 @@ article.review .review-comment {
   background: rgba(255, 0, 0, .1);
 }
 
+.paypal {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  margin-top: -3px !important;
+}
+
 footer {
   padding-top: 20px;
   padding-bottom: 10px;
   background-color: #003300;
   color: #9A9A9A;
+
+  button.paypal {
+    color: #f3b217 !important;
+  }
 }
 
 footer div.site-rule {
