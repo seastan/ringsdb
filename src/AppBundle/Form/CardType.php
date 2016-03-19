@@ -31,6 +31,7 @@ class CardType extends AbstractType {
             ->add('illustrator')
             ->add('octgnid')
             ->add('is_unique', 'checkbox', array('required' => false))
+            ->add('has_errata', 'checkbox', array('required' => false))
             ->add('file', 'file', array('label' => 'Image File', 'mapped' => false, 'required' => false));
     }
 
