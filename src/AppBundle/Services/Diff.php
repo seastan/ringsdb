@@ -76,7 +76,7 @@ class Diff {
             }
 
             // we need to find the minimum quantity among all SlotCollections
-            $minimum = min($quantities);
+            $minimum = (count($quantities) > 0) ? min($quantities) : 0;
 
             // we create a slot for this
             $slot = new Deckslot();
