@@ -17,11 +17,11 @@
                 Config = JSON.parse(stored);
             }
         }
+
         Config = _.extend({
             'show-unusable': false,
             'show-only-deck': false,
             'display-column': 1,
-            'core-set': 1,
             'show-suggestions': 0,
             'buttons-behavior': 'cumulative'
         }, Config || {});
@@ -41,11 +41,12 @@
      * inits the state of config buttons
      * @memberOf ui
      */
-    ui.init_config_buttons = function init_config_buttons() {
+    ui.init_config_buttons = function() {
         // radio
         ['display-column', 'core-set', 'show-suggestions', 'buttons-behavior'].forEach(function (radio) {
             $('input[name=' + radio + '][value=' + Config[radio] + ']').prop('checked', true);
         });
+
         // checkbox
         ['show-unusable', 'show-only-deck'].forEach(function (checkbox) {
             if (Config[checkbox]) $('input[name=' + checkbox + ']').prop('checked', true);
@@ -56,11 +57,11 @@
      * sets the maxqty of each card
      * @memberOf ui
      */
-    ui.set_max_qty = function set_max_qty() {
+    ui.set_max_qty = function() {
         app.data.cards.find().forEach(function (record) {
             var max_qty = Math.min(3, record.deck_limit);
 
-            if (record.pack_code == 'core') {
+            if (record.pack_code == 'Core') {
                 max_qty = Math.min(max_qty, record.quantity * Config['core-set']);
             }
 
@@ -68,6 +69,20 @@
                 maxqty: max_qty
             });
         });
+    };
+
+    ui.set_cores_qty = function() {
+        var cores = 1;
+        if (app.user.data.owned_packs) {
+            if (app.user.data.owned_packs.match(/1-2/)) {
+                cores++;
+            }
+            if (app.user.data.owned_packs.match(/1-3/)) {
+                cores++;
+            }
+        }
+
+        Config['core-set'] = cores;
     };
 
     /**
@@ -129,17 +144,9 @@
             name: {
                 '$exists': true
             }
-        }).forEach(function (record) {
-            // checked or unchecked ? checked by default
-            var checked = true;
-            // if not yet available, uncheck pack
-            if (record.available === "") {
-                checked = false;
-            }
-            // if user checked it previously, check pack
-            if (localStorage && localStorage.getItem('set_code_' + record.code) !== null) {
-                checked = true;
-            }
+        }).forEach(function(record) {
+            var checked = record.owned;
+
             // if pack used by cards in deck, check pack
             var cards = app.data.cards.find({
                 pack_code: record.code,
@@ -268,26 +275,33 @@
                 }
                 Config[name] = value;
                 break;
+
             case 'checkbox':
                 Config[name] = $(this).prop('checked');
                 break;
         }
+
         ui.write_config_to_storage();
+
         switch (name) {
             case 'buttons-behavior':
                 break;
+
             case 'core-set':
                 ui.set_max_qty();
                 ui.reset_list();
                 break;
+
             case 'display-column':
                 ui.update_list_template();
                 ui.refresh_list();
                 break;
+
             case 'show-suggestions':
                 ui.toggle_suggestions();
                 ui.refresh_list();
                 break;
+
             default:
                 ui.refresh_list();
         }
@@ -562,7 +576,7 @@
         var cards = app.data.cards.find(query, { '$orderBy': orderBy });
         var divs = CardDivs[Config['display-column'] - 1];
 
-        cards.forEach(function (card) {
+        cards.forEach(function(card) {
             if (Config['show-only-deck'] && !card.indeck) {
                 return;
             }
@@ -671,6 +685,7 @@
      * @memberOf ui
      */
     ui.on_dom_loaded = function on_dom_loaded() {
+        ui.set_cores_qty();
         ui.init_config_buttons();
         ui.init_filter_help();
         ui.update_sort_caret();

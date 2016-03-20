@@ -16,8 +16,7 @@
         invalid_cards: "Contains forbidden cards"
     };
     var header_tpl = _.template('<h5><span class="icon icon-<%= code %>"></span> <%= name %> (<%= quantity %>)</h5>');
-    var card_line_tpl = _.template('<span class="icon icon-<%= card.type_code %> fg-<%= card.sphere_code %>"></span> <a href="<%= card.url %>" class="card card-tip" data-toggle="modal" data-remote="false" data-target="#cardModal" data-code="<%= card.code %>"><%= card.name %></a>');
-    var card_unique_tpl = _.template('<span class="icon icon-<%= card.type_code %> fg-<%= card.sphere_code %>"></span> <strong><a href="<%= card.url %>" class="card card-tip" data-toggle="modal" data-remote="false" data-target="#cardModal" data-code="<%= card.code %>"><%= card.name %></a></strong>');
+    var card_line_tpl = _.template('<span class="icon icon-<%= card.type_code %> fg-<%= card.sphere_code %>"></span> <a href="<%= card.url %>" class="card card-tip fg-<%= card.sphere_code %>" data-toggle="modal" data-remote="false" data-target="#cardModal" data-code="<%= card.code %>"><%= card.name %></a>');
     var layouts = {};
 
     /*
@@ -239,7 +238,7 @@
         // Reserved for future features
         //deck.update_layout_section(data, 'meta', $('<div>Extra Cards deck: ' + deck.get_plot_deck_size() + ' cards</div>').addClass(deck.get_plot_deck_size() != 7 ? 'text-danger' : ''));
 
-        deck.update_layout_section(data, 'meta', $('<div id="latestpack">Cards up to <i>' + deck.get_lastest_pack().name + '</i></div>'));
+        deck.update_layout_section(data, 'meta', $('<div id="latestpack">Cards up to <i>' + (deck.get_lastest_pack().name || '-') + '</i></div>'));
 
         if (problem) {
             deck.update_layout_section(data, 'meta', $('<div class="text-danger small"><span class="fa fa-exclamation-triangle"></span> ' + problem_labels[problem] + '</div>'));
@@ -267,25 +266,24 @@
             $(header_tpl({ code: sortValue, name: cards[0][displayLabel], quantity: deck.get_nb_cards(cards) })).appendTo(section);
 
             cards.forEach(function(card) {
-                var tpl = '';
-                if (card.is_unique && card.type_code != 'hero') {
-                    tpl = $(card_unique_tpl({ card: card }));
-                } else {
-                    tpl = $(card_line_tpl({ card: card }));
-                }
+                var tpl = $(card_line_tpl({ card: card }));
 
                 var div = $('<div>').append(tpl).prepend(card.type_code != 'hero' ? card.indeck + 'x ' : '').appendTo(section);
 
+                if (card.is_unique && card.type_code != 'hero') {
+                    div.css('font-weight', 'bold');
+                }
+
                 if (!deck.can_include_card(card)) {
-                    div.addClass('invalid-card')
+                    div.addClass('invalid-card');
                 }
 
                 if (!deck.i_have_this_card(card)) {
-                    div.addClass('missing-card')
+                    div.append(' <i class="fa fa-exclamation-triangle not-in-collection" title="This card is not in my collection"></i>');
                 }
-
-            })
+            });
         }
+
         return section;
     };
 
@@ -405,8 +403,8 @@
         return true;
     };
 
-    deck.i_have_this_card = function() {
-        return true;
+    deck.i_have_this_card = function(card) {
+        return card.owned;
     };
 
     deck.export_bbcode = function() {

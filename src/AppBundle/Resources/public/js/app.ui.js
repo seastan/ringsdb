@@ -57,11 +57,36 @@
         if (typeof ui.on_data_loaded === 'function') {
             ui.on_data_loaded();
         }
+
         data_loaded.resolve();
     });
 
     $(document).on('start.app', function() {
         console.log('ui.on_all_loaded');
+
+        app.user.loaded.always(function() {
+            // setting owned packs
+            var ownedPacks = (app.user.data || {}).owned_packs;
+            var strOwnedPacks = ',' + ownedPacks + ',';
+
+            app.data.packs.update({}, {
+                owned: true
+            });
+
+            if (ownedPacks) {
+                app.data.packs.find().forEach(function(pack) {
+                    if (pack.id) {
+                        if (!strOwnedPacks.match(new RegExp(',' + pack.id + ','))) {
+                            app.data.packs.updateById(pack.code, { owned: false });
+                        }
+                    }
+                });
+            }
+
+            app.data.cards.find().forEach(function(card) {
+                app.data.cards.updateById(card.code, { owned: app.data.packs.findById(card.pack_code).owned });
+            });
+        });
 
         if (typeof ui.on_all_loaded === 'function') {
             ui.on_all_loaded();

@@ -110,6 +110,7 @@ class UserController extends Controller {
                 'name' => $user->getUsername(),
                 'sphere' => $user->getColor(),
                 'donation' => $user->getDonation(),
+                'owned_packs' => $user->getOwnedPacks()
             ];
 
             if (isset($decklist_id)) {
@@ -146,6 +147,7 @@ class UserController extends Controller {
             if (isset($card_id)) {
                 /* @var $em \Doctrine\ORM\EntityManager */
                 $em = $this->getDoctrine()->getManager();
+
                 /* @var $card \AppBundle\Entity\Card */
                 $card = $em->getRepository('AppBundle:Card')->find($card_id);
 
@@ -165,6 +167,7 @@ class UserController extends Controller {
 
         $response = new Response();
         $response->setPrivate();
+
         if (isset($jsonp)) {
             $content = "$jsonp($content)";
             $response->headers->set('Content-Type', 'application/javascript');

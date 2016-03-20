@@ -253,7 +253,6 @@
      * @memberOf ui
      */
     ui.on_all_loaded = function on_all_loaded() {
-        ui.refresh_deck();
         app.draw_simulator && app.draw_simulator.reset();
 
         app.user.loaded.done(function() {
@@ -263,6 +262,7 @@
         }).fail(function() {
             $('<p>You must be logged in to post comments.</p>').insertAfter('#comment-form');
         }).always(function() {
+            ui.refresh_deck();
             ui.setup_social_icons();
         });
     };

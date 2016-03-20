@@ -1092,3 +1092,39 @@ footer a {
     }
   }
 }
+
+.btn-inner-group {
+  display: flex !important;
+  flex-direction: row !important;
+
+  :first-child {
+    flex: 1
+  }
+
+  label {
+    width: 15% !important;
+  }
+}
+
+#owned_packs {
+  .btn.active {
+    color: #FFFFFF !important;
+    background-color: #20638F !important;
+    border-color: #194F72 !important;
+  }
+}
+
+#set-selection-menu {
+  -webkit-column-count: 3; /* Chrome, Safari, Opera */
+  -moz-column-count: 3; /* Firefox */
+  column-count: 3;
+}
+
+[data-unique="true"] {
+  font-weight: bold;
+}
+
+.not-in-collection {
+  font-weight: normal;
+  color: #999999;
+}

@@ -38,10 +38,11 @@ class ApiController extends Controller {
 
 		$lastModified = NULL;
 		foreach($list_packs as $pack) {
-			if(!$lastModified || $lastModified < $pack->getDateUpdate()) {
+			if (!$lastModified || $lastModified < $pack->getDateUpdate()) {
 				$lastModified = $pack->getDateUpdate();
 			}
 		}
+
 		$response->setLastModified($lastModified);
 		if ($response->isNotModified($request)) {
 			return $response;
@@ -61,6 +62,7 @@ class ApiController extends Controller {
 				"known" => intval($real),
 				"total" => $max,
 				"url" => $this->get('router')->generate('cards_list', array('pack_code' => $pack->getCode()), UrlGeneratorInterface::ABSOLUTE_URL),
+				"id" => $pack->getId()
 			);
 		}
 

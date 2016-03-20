@@ -125,7 +125,7 @@
     user.loaded.done(user.update).fail(user.anonymous).always(user.display_ads);
 
     $(function() {
-        if ($.isEmptyObject(user.params)) {
+        if ($.isEmptyObject(user.params) && !user.forceReload) {
             user.retrieve();
         } else {
             user.query();
