@@ -10,12 +10,12 @@
             <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
         {% endfor %}
     </section>
-    <section name="Attachments" shared="False">
+    <section name="Attachment" shared="False">
         {% for slot in deck.slots_by_type.attachment %}
             <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
         {% endfor %}
     </section>
-    <section name="Events" shared="False">
+    <section name="Event" shared="False">
         {% for slot in deck.slots_by_type.event %}
             <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
         {% endfor %}
