@@ -477,6 +477,8 @@ class SocialController extends Controller {
             return $comment->getUser()->getUsername();
         }, $decklist->getComments()->getValues());
 
+        $commenters[] = $decklist->getUser()->getUsername();
+
         $versions = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->findBy(['parent' => $decklist->getParent()], ['version' => 'DESC']);
 
         return $this->render('AppBundle:Decklist:decklist.html.twig', [

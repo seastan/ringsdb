@@ -21,7 +21,7 @@
                     }));
                 },
                 template: function(value) {
-                    return value.name + ' <small><i>' + value.pack_name + '</i></small>';
+                    return '<span style="display: inline-block; width: 2em; text-align: center" class="icon-' + value.sphere_code + '"></span> ' + value.name + ' <small><i>' + value.pack_name + '</i></small>';
                 },
                 replace: function(value) {
                     return '[' + value.name + '](' + Routing.generate('cards_zoom', { card_code: value.code }) + ')';
