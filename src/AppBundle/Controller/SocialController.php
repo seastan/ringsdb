@@ -1006,7 +1006,7 @@ class SocialController extends Controller {
             } else {
                 $category = ["label" => $cycle->getName(), "packs" => []];
                 foreach ($cycle->getPacks() as $pack) {
-                    $checked = count($packs) ? in_array($first_pack->getId(), $packs) : true;
+                    $checked = count($packs) ? in_array($pack->getId(), $packs) : true;
 
                     if ($checked) {
                         $on++;

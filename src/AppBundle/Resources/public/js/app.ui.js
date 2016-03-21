@@ -65,26 +65,32 @@
         console.log('ui.on_all_loaded');
 
         app.user.loaded.always(function() {
-            // setting owned packs
-            var ownedPacks = (app.user.data || {}).owned_packs;
-            var strOwnedPacks = ',' + ownedPacks + ',';
-
             app.data.packs.update({}, {
                 owned: true
             });
 
-            if (ownedPacks) {
-                app.data.packs.find().forEach(function(pack) {
-                    if (pack.id) {
-                        if (!strOwnedPacks.match(new RegExp(',' + pack.id + ','))) {
-                            app.data.packs.updateById(pack.code, { owned: false });
-                        }
+            if (app.user.data && app.user.data.owned_packs) {
+                var packs = app.user.data.owned_packs.split(',');
+                var nPacks = [];
+                _.forEach(packs, function(str) {
+                    nPacks.push(parseInt(str, 10));
+                });
+
+                app.data.packs.update({
+                    'id': {
+                        '$nin': nPacks
                     }
+                }, {
+                    owned: false
                 });
             }
 
-            app.data.cards.find().forEach(function(card) {
-                app.data.cards.updateById(card.code, { owned: app.data.packs.findById(card.pack_code).owned });
+            app.data.packs.find().forEach(function(pack) {
+                app.data.cards.update({
+                    'pack_code': pack.code
+                }, {
+                    owned: pack.owned
+                });
             });
         });
 
