@@ -130,12 +130,12 @@
     ui.setup_social_icons = function() {
         if (!app.user.data || app.user.data.is_author || app.user.data.is_liked) {
             var element = $('.social .social-icon-like');
-            element.replaceWith($('<span class="social-icon-like"></span').html(element.html()));
+            element.replaceWith($('<span class="social-icon-like"></span>').html(element.html()));
         }
 
         if (!app.user.data) {
             var element = $('.social .social-icon-favorite');
-            element.replaceWith($('<span class="social-icon-favorite"></span').html(element.html()));
+            element.replaceWith($('<span class="social-icon-favorite"></span>').html(element.html()));
         } else if (app.user.data.is_favorite) {
             var element = $('.social .social-icon-favorite');
             element.attr('title', "Remove from favorites");
@@ -146,7 +146,7 @@
 
         if (!app.user.data) {
             var element = $('.social .social-icon-comment');
-            element.replaceWith($('<span class="social-icon-comment"></span').html(element.html()));
+            element.replaceWith($('<span class="social-icon-comment"></span>').html(element.html()));
         }
     };
 

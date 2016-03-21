@@ -1,6 +1,4 @@
-(function ui_decklist_search(ui, $) {
-
-
+(function(ui, $) {
     ui.handle_checkbox_change = function handle_checkbox_change() {
         $('#packs-on').text($('#allowed_packs').find('input[type="checkbox"]:checked').size());
         $('#packs-off').text($('#allowed_packs').find('input[type="checkbox"]:not(:checked)').size());
