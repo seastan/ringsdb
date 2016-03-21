@@ -36,7 +36,7 @@
 
         $('#card').on('typeahead:selected typeahead:autocompleted', function(event, data) {
             var card = app.data.cards.find({
-                name: data.name
+                code: data.code
             })[0];
 
             var line = $('<p class="fg-' + card.sphere_code + '" style="padding: 3px 5px; border-radius: 3px; border: 1px solid silver"><button type="button" class="close" aria-hidden="true">&times;</button><input type="hidden" name="cards[]" value="' + card.code + '">' + card.name + ' <small><i>' + card.pack_name + '</i></small></p>');
