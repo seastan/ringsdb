@@ -1,5 +1,12 @@
 {% extends 'AppBundle::layout.html.twig' %}
 
+{% block javascripts %}
+    <script type="text/javascript">
+        app.user.forceReload = true;
+    </script>
+{% endblock %}
+
+
 {% block body %}
     <div class="container">
         <div class="row">

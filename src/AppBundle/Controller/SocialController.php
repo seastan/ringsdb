@@ -963,6 +963,18 @@ class SocialController extends Controller {
 				FROM sphere s
 				ORDER BY s.name ASC")->fetchAll();
 
+        $owned_packs = '';
+        if ($this->getUser()) {
+            $owned_packs = $this->getUser()->getOwnedPacks();
+        }
+
+        $packs = [];
+        if ($owned_packs) {
+            $packs = explode(",", $owned_packs);
+        } else {
+            $packs = $dbh->executeQuery("SELECT id FROM pack WHERE date_release is NOT NULL")->fetchAll(\PDO::FETCH_COLUMN);
+        }
+
         $categories = [];
         $on = 0;
         $off = 0;
@@ -977,12 +989,14 @@ class SocialController extends Controller {
 
             $first_pack = $cycle->getPacks()[0];
             if ($size === 1 && $first_pack->getName() == $cycle->getName()) {
-                $checked = $first_pack->getDateRelease() !== null;
+                $checked = count($packs) ? in_array($first_pack->getId(), $packs) : true;
+
                 if ($checked) {
                     $on++;
                 } else {
                     $off++;
                 }
+
                 $categories[0]["packs"][] = [
                     "id" => $first_pack->getId(),
                     "label" => $first_pack->getName(),
@@ -992,12 +1006,14 @@ class SocialController extends Controller {
             } else {
                 $category = ["label" => $cycle->getName(), "packs" => []];
                 foreach ($cycle->getPacks() as $pack) {
-                    $checked = $pack->getDateRelease() !== null;
+                    $checked = count($packs) ? in_array($first_pack->getId(), $packs) : true;
+
                     if ($checked) {
                         $on++;
                     } else {
                         $off++;
                     }
+
                     $category['packs'][] = [
                         "id" => $pack->getId(),
                         "label" => $pack->getName(),

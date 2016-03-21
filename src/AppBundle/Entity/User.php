@@ -651,4 +651,30 @@ class User extends BaseUser {
     public function getFollowers() {
         return $this->followers;
     }
+    /**
+     * @var string
+     */
+    private $ownedPacks;
+
+    /**
+     * Set ownedPacks
+     *
+     * @param string $ownedPacks
+     *
+     * @return User
+     */
+    public function setOwnedPacks($ownedPacks) {
+        $this->ownedPacks = $ownedPacks;
+
+        return $this;
+    }
+
+    /**
+     * Get ownedPacks
+     *
+     * @return string
+     */
+    public function getOwnedPacks() {
+        return $this->ownedPacks;
+    }
 }

@@ -901,20 +901,26 @@ article.review .review-content {
   margin-left: 50px
 }
 
+article.review .review-text {
+  text-align: justify;
+}
+
 article.review .review-text :first-child {
-  margin-top: 0px
+  margin-top: 0;
 }
 
 article.review .review-date {
   clear: both;
-  text-align: right
+  text-align: right;
 }
 
 article.review .review-author {
-  text-align: right
+  text-align: right;
+  margin-bottom: 5px;
 }
 
 article.review .review-comment {
+  margin-top: 2px;
   border-top: 1px solid #DDDDDD;
   padding: 0.5em;
 }
@@ -1085,4 +1091,40 @@ footer a {
       display: block;
     }
   }
+}
+
+.btn-inner-group {
+  display: flex !important;
+  flex-direction: row !important;
+
+  :first-child {
+    flex: 1
+  }
+
+  label {
+    width: 15% !important;
+  }
+}
+
+#owned_packs {
+  .btn.active {
+    color: #FFFFFF !important;
+    background-color: #20638F !important;
+    border-color: #194F72 !important;
+  }
+}
+
+#set-selection-menu {
+  -webkit-column-count: 3; /* Chrome, Safari, Opera */
+  -moz-column-count: 3; /* Firefox */
+  column-count: 3;
+}
+
+[data-unique="true"] {
+  font-weight: bold;
+}
+
+.not-in-collection {
+  font-weight: normal;
+  color: #999999;
 }
