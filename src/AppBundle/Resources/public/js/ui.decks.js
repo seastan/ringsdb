@@ -92,14 +92,19 @@
         });
     };
 
-    ui.update_tag_toggles = function update_tag_toggles() {
+    ui.update_tag_toggles = function() {
         var tags = [];
+
         $('#decks span[data-tag]').each(function(index, elt) {
             tags.push($(elt).data('tag'));
         });
+
         $('#tag_toggles').empty();
+
         _.uniq(tags).forEach(function(tag) {
-            $('<button type="button" class="btn btn-default btn-xs" data-toggle="button" data-tag="' + tag + '">' + tag + '</button>').appendTo('#tag_toggles');
+            if (tag) {
+                $('<button type="button" class="btn btn-default btn-xs" data-toggle="button" data-tag="' + tag + '">' + tag + '</button>').appendTo('#tag_toggles');
+            }
         });
     };
 
