@@ -435,7 +435,7 @@
             series: [{
                 type: "column",
                 animation: false,
-                name: 'Cost of other uniques',
+                name: 'Cost of the other uniques',
                 showInLegend: false,
                 data: data
             }, {
