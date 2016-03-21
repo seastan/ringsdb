@@ -13,11 +13,14 @@
 
         if (options.cards) {
             actions.push({
-                match: /\B#([\-+\w]*)$/,
+                match: /\B#([\-+\w\u00E0-\u00FC]*)$/,
                 search: function(term, callback) {
+                    term = app.data.get_searchable_string(term);
+                    console.log(term);
                     var regexp = new RegExp('\\b' + term, 'i');
+
                     callback(app.data.cards.find({
-                        name: regexp
+                        s_name: regexp
                     }));
                 },
                 template: function(value) {
@@ -53,7 +56,7 @@
 
         if (options.users) {
             actions.push({
-                match: /\B@([\-+\w]*)$/,
+                match: /\B@([\-+\w\u00E0-\u00FC]*)$/,
                 search: function(term, callback) {
                     var regexp = new RegExp('^' + term, 'i');
                     callback($.grep(options.users, function(user) {
