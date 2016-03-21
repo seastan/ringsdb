@@ -220,7 +220,7 @@
                 text: "Card Stats"
             },
             subtitle: {
-                text: "Stats added for Heroes and Allies<br>Unique allies counted once"
+                text: "Stats added for Heroes and Allies<br>Unique allies counted only once"
             },
             xAxis: {
                 categories: _.pluck(data, 'label'),
@@ -314,11 +314,119 @@
         });
     };
 
+
+
+    deck_charts.chart_cost_sphere = function() {
+        var spheres = {};
+        var cards = app.deck.get_draw_deck();
+
+        cards.forEach(function(card) {
+            var cost = parseInt(card.cost, 10);
+            if (isNaN(cost)) {
+                return;
+            }
+
+            var count = card.is_unique ? 1 : card.indeck;
+            var ucount = card.indeck;
+
+            if (!spheres[card.sphere_code]) {
+                spheres[card.sphere_code] = {
+                    code: card.sphere_code,
+                    name: card.sphere_name,
+                    count: [0, 0]
+                };
+            }
+
+            spheres[card.sphere_code].count[0] += count * card.cost;
+            spheres[card.sphere_code].count[1] += ucount * card.cost;
+        });
+
+        var dataUnique = [];
+        _.each(_.values(spheres), function(sphere) {
+            dataUnique.push({
+                name: sphere.name,
+                label: '<span class="icon icon-' + sphere.code + '"></span>',
+                color: sphere_colors[sphere.code],
+                y: sphere.count[0]
+            });
+        });
+
+        var data = [];
+        _.each(_.values(spheres), function(sphere) {
+            data.push({
+                name: sphere.name,
+                label: '<span class="icon icon-' + sphere.code + '"></span>',
+                color: sphere_colors[sphere.code],
+                y: sphere.count[1]
+            });
+        });
+
+        console.log(data, dataUnique);
+
+        $("#deck-chart-cost-sphere").highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: "Total Cost by Sphere"
+            },
+            subtitle: {
+                text: "Cost X ignored"
+            },
+            xAxis: {
+                categories: _.pluck(data, 'label'),
+                labels: {
+                    useHTML: true
+                },
+                title: {
+                    text: null
+                }
+            },
+            yAxis: {
+                min: 0,
+                allowDecimals: false,
+                tickInterval: 3,
+                title: null,
+                labels: {
+                    overflow: 'justify'
+                },
+                stackLabels: {
+                    enabled: true,
+                    style: {
+                        fontWeight: 'bold',
+                        color: 'gray'
+                    }
+                }
+            },
+            series: [{
+                type: "column",
+                animation: false,
+                name: 'Cost counting uniques once',
+                showInLegend: false,
+                data: dataUnique
+            }, {
+                type: "column",
+                animation: false,
+                name: 'Total cost',
+                showInLegend: false,
+                data: data
+            }],
+            plotOptions: {
+                column: {
+                    borderWidth: 0,
+                    groupPadding: 0,
+                    shadow: false
+                }
+            }
+        });
+    };
+
     deck_charts.setup = function setup() {
         deck_charts.chart_sphere();
         deck_charts.chart_type();
         deck_charts.chart_stats();
         deck_charts.chart_cost();
+        deck_charts.chart_cost_sphere();
     };
 
     $(document).on('shown.bs.tab', 'a[data-toggle=tab]', function(e) {
