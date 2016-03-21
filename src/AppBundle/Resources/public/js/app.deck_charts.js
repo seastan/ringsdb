@@ -10,6 +10,29 @@
         fellowship: '#B56C0C'
     };
 
+    function convertHex(hex, opacity) {
+        hex = hex.replace('#','');
+        var r = parseInt(hex.substring(0,2), 16);
+        var g = parseInt(hex.substring(2,4), 16);
+        var b = parseInt(hex.substring(4,6), 16);
+
+        return 'rgba(' + r +', ' + g + ', ' + b +', ' + opacity +')';
+    };
+
+    function darken(hex, pct) {
+        hex = hex.replace('#','');
+        var r = parseInt(hex.substring(0, 2), 16);
+        var g = parseInt(hex.substring(2, 4), 16);
+        var b = parseInt(hex.substring(4, 6), 16);
+
+        return '#' + pad(Math.floor(r*pct).toString(16), '00') + pad(Math.floor(g*pct).toString(16), '00') + pad(Math.floor(b*pct).toString(16), '00');
+    };
+
+    function pad(value, format) {
+        return format.substring(0, format.length - value.length) + value;
+    };
+
+
     deck_charts.chart_sphere = function chart_sphere() {
         var spheres = {};
         var draw_deck = app.deck.get_draw_deck();
@@ -83,40 +106,45 @@
 
     deck_charts.chart_type = function chart_type() {
 
-        var data = [{
-            name: 'Ally',
-            label: '<span class="icon icon-ally"></span>',
-            color: '#ea7910',
-            y: 0
-        }, {
-            name: 'Attachment',
-            label: '<span class="icon icon-attachment"></span>',
-            color: '#13522f',
-            y: 0
-        }, {
-            name: 'Event',
-            label: '<span class="icon icon-event"></span>',
-            color: '#292e5f',
-            y: 0
-        }, {
-            name: 'Player Side Quest',
-            label: '<span class="icon icon-player-side-quest"></span>',
-            color: '#c8232a',
-            y: 0
-        }];
+        var categories = {
+            'Ally': '<span class="icon icon-ally"></span>',
+            'Attachment': '<span class="icon icon-attachment"></span>',
+            'Event': '<span class="icon icon-event"></span>',
+            'Player Side Quest': '<span class="icon icon-player-side-quest"></span>'
+        };
 
         var iData = {
-            'ally': data[0],
-            'attachment': data[1],
-            'event': data[2],
-            'player-side-quest': data[3]
+            'ally': 0,
+            'attachment': 1,
+            'event': 2,
+            'player-side-quest': 3
         };
+
+        var series = [];
+        var iSeries = {}
 
         var draw_deck = app.deck.get_draw_deck();
         draw_deck.forEach(function(card) {
+            var serie;
+
+            if (!iSeries[card.sphere_code]) {
+                serie = {
+                    name: card.sphere_name,
+                    color: sphere_colors[card.sphere_code],
+                    data: [0, 0, 0, 0],
+                    type: "column",
+                    animation: false,
+                    showInLegend: false
+                };
+                iSeries[card.sphere_code] = serie;
+                series.push(serie);
+            } else {
+                serie = iSeries[card.sphere_code];
+            }
+
             var d = iData[card.type_code];
-            if (d) {
-                d.y += card.indeck;
+            if (d !== undefined) {
+                serie.data[d] += card.indeck;
             }
         });
 
@@ -131,9 +159,13 @@
                 text: ""
             },
             xAxis: {
-                categories: _.pluck(data, 'label'),
+                type: 'category',
+                categories: _.keys(categories),
                 labels: {
-                    useHTML: true
+                    useHTML: true,
+                    formatter: function() {
+                        return categories[this.value];
+                    }
                 },
                 title: {
                     text: null
@@ -149,17 +181,16 @@
                 }
             },
             tooltip: {
-                headerFormat: '<span style="font-size: 10px">{point.key}</span><br/>'
+                headerFormat: '<b>{point.x}</b><br/>',
+                pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
             },
-            series: [{
-                type: "column",
-                animation: false,
-                name: '# cards',
-                showInLegend: false,
-                data: data
-            }],
+            //tooltip: {
+            //    headerFormat: '<span style="font-size: 10px">{point.key}</span><br/>'
+            //},
+            series: series,
             plotOptions: {
                 column: {
+                    stacking: 'normal',
                     borderWidth: 0,
                     groupPadding: 0,
                     shadow: false
@@ -346,7 +377,7 @@
             dataUnique.push({
                 name: sphere.name,
                 label: '<span class="icon icon-' + sphere.code + '"></span>',
-                color: sphere_colors[sphere.code],
+                color: darken(sphere_colors[sphere.code], 0.6),
                 y: sphere.count[0]
             });
         });
@@ -360,8 +391,6 @@
                 y: sphere.count[1]
             });
         });
-
-        console.log(data, dataUnique);
 
         $("#deck-chart-cost-sphere").highcharts({
             chart: {
