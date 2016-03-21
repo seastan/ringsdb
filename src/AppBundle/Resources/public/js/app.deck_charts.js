@@ -345,8 +345,6 @@
         });
     };
 
-
-
     deck_charts.chart_cost_sphere = function() {
         var spheres = {};
         var cards = app.deck.get_draw_deck();
@@ -358,7 +356,7 @@
             }
 
             var count = card.is_unique ? 1 : card.indeck;
-            var ucount = card.indeck;
+            var ucount = card.is_unique ? Math.max(0, card.indeck - 1) : 0;
 
             if (!spheres[card.sphere_code]) {
                 spheres[card.sphere_code] = {
@@ -377,7 +375,7 @@
             dataUnique.push({
                 name: sphere.name,
                 label: '<span class="icon icon-' + sphere.code + '"></span>',
-                color: darken(sphere_colors[sphere.code], 0.6),
+                color: sphere_colors[sphere.code],
                 y: sphere.count[0]
             });
         });
@@ -387,7 +385,7 @@
             data.push({
                 name: sphere.name,
                 label: '<span class="icon icon-' + sphere.code + '"></span>',
-                color: sphere_colors[sphere.code],
+                color: darken(sphere_colors[sphere.code], 0.6),
                 y: sphere.count[1]
             });
         });
@@ -403,9 +401,12 @@
                 text: "Cost X ignored"
             },
             xAxis: {
-                categories: _.pluck(data, 'label'),
+                categories: _.pluck(data, 'name'),
                 labels: {
-                    useHTML: true
+                    useHTML: true,
+                    formatter: function() {
+                        return _.find(data, { name: this.value }).label;
+                    }
                 },
                 title: {
                     text: null
@@ -427,21 +428,26 @@
                     }
                 }
             },
+            tooltip: {
+                headerFormat: '<b>{point.x}</b><br/>',
+                pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+            },
             series: [{
+                type: "column",
+                animation: false,
+                name: 'Cost of other uniques',
+                showInLegend: false,
+                data: data
+            }, {
                 type: "column",
                 animation: false,
                 name: 'Cost counting uniques once',
                 showInLegend: false,
                 data: dataUnique
-            }, {
-                type: "column",
-                animation: false,
-                name: 'Total cost',
-                showInLegend: false,
-                data: data
             }],
             plotOptions: {
                 column: {
+                    stacking: 'normal',
                     borderWidth: 0,
                     groupPadding: 0,
                     shadow: false
