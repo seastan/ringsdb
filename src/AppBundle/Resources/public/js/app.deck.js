@@ -18,6 +18,7 @@
     var header_tpl = _.template('<h5><span class="icon icon-<%= code %>"></span> <%= name %> (<%= quantity %>)</h5>');
     var card_line_tpl = _.template('<span class="icon icon-<%= card.type_code %> fg-<%= card.sphere_code %>"></span> <a href="<%= card.url %>" class="card card-tip fg-<%= card.sphere_code %>" data-toggle="modal" data-remote="false" data-target="#cardModal" data-code="<%= card.code %>"><%= card.name %></a>');
     var layouts = {};
+    var displayFullPackInfo = false;
 
     /*
      * Templates for the different deck layouts, see deck.get_layout_data
@@ -41,6 +42,11 @@
         return layout.join('');
     };
     layouts.sphere = layouts.name = layouts.position;
+
+    $(document).on('click', '.expand-packs', function() {
+        displayFullPackInfo = true;
+        app.ui.refresh_deck();
+    });
 
     /**
      * @memberOf deck
@@ -250,8 +256,14 @@
             sizeinfo.addClass('text-danger');
         }
 
-        var packinfo = $('<div id="latestpack">Cards up to <i>' + (deck.get_lastest_pack().name || '-') + '</i></div>');
+        var packinfo;
+        if (displayFullPackInfo) {
+            packinfo = $('<div>Packs: ' + _.map(deck.get_included_packs(), function (pack) { return pack.name + (pack.quantity > 1 ? ' (' + pack.quantity + ')' : ''); }).join(', ') + '</div>');
+        } else {
+            packinfo = $('<div id="latestpack">Cards up to <i>' + (deck.get_lastest_pack().name || '-') + '</i></div>');
 
+            $('<small><i style="cursor: pointer; padding-left: 5px;" class="fa fa-plus-square-o expand-packs"></i></small>').appendTo(packinfo);
+        }
 
         deck.update_layout_section(data, 'meta', title);
         deck.update_layout_section(data, 'meta', threat);
