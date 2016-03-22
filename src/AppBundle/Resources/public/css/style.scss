@@ -440,6 +440,9 @@ div.tags span.tag {
 }
 
 .index-hero {
+  vertical-align: top;
+  max-width: 120px;
+
   text-align: center;
   display: inline-block;
 
@@ -455,7 +458,6 @@ div.tags span.tag {
 .decklist-hero-text {
   a {
     padding-left: 10px;
-    white-space: nowrap;
   }
 }
 
