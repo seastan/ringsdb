@@ -17,14 +17,11 @@ class SuggestionsCommand extends ContainerAwareCommand {
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
-        ini_set('memory_limit', '1G');
+        ini_set('memory_limit', '512M');
         $webdir = $this->getContainer()->get('kernel')->getRootDir() . "/../web";
 
-        $runner = $this->getSuggestionsForSide(1);
-        file_put_contents($webdir . "/runner.json", json_encode($runner));
-
-        $corp = $this->getSuggestionsForSide(2);
-        file_put_contents($webdir . "/corp.json", json_encode($corp));
+        $suggestions = $this->getSuggestions();
+        file_put_contents($webdir . "/suggestions.json", json_encode($suggestions));
 
         $output->writeln('done');
     }
@@ -47,7 +44,7 @@ class SuggestionsCommand extends ContainerAwareCommand {
      * also returns an array of card codes
      * x and y are private indexes, not card.id
      */
-    private function getSuggestionsForSide($side_id) {
+    private function getSuggestions() {
         $matrix = [];
 
         $dbh = $this->getContainer()->get('doctrine')->getConnection();
@@ -55,12 +52,12 @@ class SuggestionsCommand extends ContainerAwareCommand {
         $cardsByIndex = $dbh->executeQuery("SELECT
 				c.id,
                 c.code,
+                c.sphere_id,
                 count(*) nbdecks
                 FROM card c
-                JOIN deckslot d ON d.card_id=c.id
-                WHERE c.side_id=?
-                GROUP BY c.id, c.code, c.faction_id
-                ORDER BY c.id", [$side_id])->fetchAll();
+                JOIN deckslot d ON d.card_id = c.id
+                GROUP BY c.id, c.code, c.sphere_id
+                ORDER BY c.id")->fetchAll();
 
         $cardIndexById = [];
         $maxnbdecks = 0;
@@ -70,6 +67,7 @@ class SuggestionsCommand extends ContainerAwareCommand {
                 $maxnbdecks = $card['nbdecks'];
             }
         }
+
         $cardCodesByIndex = [];
         foreach ($cardsByIndex as $index => $card) {
             $cardCodesByIndex[$index] = $card['code'];
@@ -79,17 +77,9 @@ class SuggestionsCommand extends ContainerAwareCommand {
             $matrix[$index] = $index ? array_fill(0, $index, 0) : [];
         }
 
-        $decks = $dbh->executeQuery("SELECT
-				d.id
-                FROM deck d
-                WHERE d.side_id=?
-                ORDER BY d.id", [$side_id])->fetchAll();
+        $decks = $dbh->executeQuery("SELECT d.id FROM deck d ORDER BY d.id")->fetchAll();
 
-        $stmt = $dbh->prepare("SELECT
-				d.card_id
-                FROM deckslot d
-                WHERE d.deck_id=?
-                ORDER BY d.card_id");
+        $stmt = $dbh->prepare("SELECT d.card_id FROM deckslot d WHERE d.deck_id = ? ORDER BY d.card_id");
 
         foreach ($decks as $deck_id) {
             $stmt->bindValue(1, $deck_id['id']);
