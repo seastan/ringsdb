@@ -299,7 +299,7 @@
                 break;
 
             case 'show-suggestions':
-                ui.update_suggestions();
+                ui.toggle_suggestions();
                 break;
 
             default:
@@ -314,7 +314,8 @@
             $('#table-suggestions').show();
         }
 
-        if (app.suggestions) {
+        if (app.suggestions && Config['show-suggestions'] != 0) {
+            app.suggestions.setup();
             app.suggestions.number = Config['show-suggestions'];
             app.suggestions.isLoaded && app.suggestions.compute();
         }
@@ -665,7 +666,7 @@
     ui.on_deck_modified = function on_deck_modified() {
         ui.refresh_deck();
         ui.refresh_list();
-        app.suggestions && app.suggestions.compute();
+        app.suggestions && app.suggestions.initialized && app.suggestions.compute();
     };
 
 
@@ -679,7 +680,7 @@
         app.deck.display('#deck-content', DisplayOptions);
         app.draw_simulator && app.draw_simulator.reset();
         app.deck_charts && app.deck_charts.setup();
-        app.suggestions && app.suggestions.compute();
+        app.suggestions && app.suggestions.initialized && app.suggestions.compute();
     };
 
     /**
@@ -767,7 +768,6 @@
         ui.refresh_deck();
         ui.refresh_list();
         ui.setup_typeahead();
-        app.suggestions && app.suggestions.setup();
         app.deck_history && app.deck_history.setup('#history');
     };
 

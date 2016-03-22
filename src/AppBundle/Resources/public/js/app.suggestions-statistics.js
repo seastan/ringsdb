@@ -7,6 +7,7 @@
     suggestions.exclusions = [];
     suggestions.number = 3;
     suggestions.isLoaded = false;
+    suggestions.initialized = false;
 
     /**
      * @memberOf suggestions
@@ -180,6 +181,10 @@
     };
 
     suggestions.setup = function() {
+        if (suggestions.initialized) {
+            return;
+        }
+        suggestions.initialized = true;
         suggestions.query();
         $('#table-suggestions').on({
             change: suggestions.pick

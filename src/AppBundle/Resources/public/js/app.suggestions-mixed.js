@@ -22,7 +22,7 @@
     suggestions.exclusions = [];
     suggestions.number = 3;
     suggestions.isLoaded = false;
-
+    suggestions.initialized = false;
 
     suggestions.traits = ['dwarf', 'rohan', 'silvan', 'noldor', 'gondor', 'ent', 'eagle', 'dunedain', 'hobbit', 'istari', 'outlands', 'ranger', 'scout', 'outlands', 'ranged', 'sentinel', 'weapon', 'noble', 'warrior'];
 
@@ -565,7 +565,14 @@
     };
 
     suggestions.setup = function() {
+        if (suggestions.initialized) {
+            return;
+        }
+
+        suggestions.initialized = true;
+
         suggestions.query();
+
         $('#table-suggestions').on({
             change: suggestions.pick
         }, 'input[type=radio]');
