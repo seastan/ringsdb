@@ -418,6 +418,21 @@ div.tags span.tag {
 
 /***************** THUMBNAIL CARD IMAGE **************/
 
+.index-hero {
+  text-align: center;
+  display: inline-block;
+}
+
+.hero-thumbnail {
+  background-attachment: scroll;
+  background-origin: padding-box;
+  background-clip: border-box;
+  background-repeat: no-repeat;
+  margin: 0 10px;
+  position: relative;
+  border: 1px solid #000000;
+}
+
 .card-thumbnail {
   background-attachment: scroll;
   background-origin: padding-box;
@@ -809,15 +824,10 @@ div.site-slogan {
 
 .hero-card-list {
   margin-top: 10px;
+  margin-bottom: 10px;
 
   a {
-    margin-right: 10px;
-    margin-left: 10px;
     white-space: nowrap;
-
-    &:last-child {
-      margin-right: 0;
-    }
   }
 }
 

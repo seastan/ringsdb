@@ -30,12 +30,17 @@
                     <div class="bg-deck border-{{ data.sphere.code }}">
                         <div class="small pull-right">{{ macros.static_social_icons(data.decklist) }}</div>
                         <div>{{ data.sphere_names }}</div>
-                        <p class="text-center small hero-card-list">
+                        <div class="text-center small hero-card-list">
                             {% for hero in data.hero_deck %}
                                 {% set card = hero.getCard() %}
-                                <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" href="">{{ card.name }} <i>({{ card.pack.code }})</i></a>
+                                <div class="index-hero">
+                                    <div class="hero-thumbnail card-thumbnail-2x card-thumbnail-hero" style="background-image:url('{{ asset('/bundles/cards/' ~ card.code ~ '.png') }}')"></div>
+                                    <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" href="">
+                                        <span class="icon-{{ card.sphere.code }}"></span> {{ card.name }} <i>({{ card.pack.code }})</i>
+                                    </a>
+                                </div>
                             {% endfor %}
-                        </p>
+                        </div>
                         <p class="text-center">{{ data.starting_threat | raw }} Threat &middot; {{ data.count_by_type | raw }}</p>
                         <div class="text-center small"><a href="{{ path('decklists_list', { type:'find', sphere: data.sphere.code }) }}">More using this sphere</a></div>
                         <div style="clear:both"></div>
