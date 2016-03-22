@@ -689,10 +689,14 @@ div.site-slogan {
   position: absolute;
   top: -20px;
   left: 5px;
+
+  .icon {
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.9);
+  }
 }
 
 .ribbon-tactics {
-  @include ribbon(#C00106, 40px, #E0E0E0, bottom);
+  @include ribbon(#C00106, 42px, #E0E0E0, bottom);
   box-shadow: -1px 0 1px rgba(0,0,0,0.35);
   margin-left: 5px;
   color: #FFF;
@@ -706,7 +710,7 @@ div.site-slogan {
 
 
 .ribbon-spirit {
-  @include ribbon(#00B1D4, 40px, #E0E0E0, bottom);
+  @include ribbon(#00B1D4, 42px, #E0E0E0, bottom);
   box-shadow: -1px 0 1px rgba(0,0,0,0.35);
   margin-left: 5px;
   color: #FFF;
@@ -720,7 +724,7 @@ div.site-slogan {
 
 
 .ribbon-lore {
-  @include ribbon(#51B848, 40px, #E0E0E0, bottom);
+  @include ribbon(#51B848, 42px, #E0E0E0, bottom);
   box-shadow: -1px 0 1px rgba(0,0,0,0.35);
   margin-left: 5px;
   color: #FFF;
@@ -733,7 +737,7 @@ div.site-slogan {
 }
 
 .ribbon-leadership {
-  @include ribbon(#AD62A5, 40px, #E0E0E0, bottom);
+  @include ribbon(#AD62A5, 42px, #E0E0E0, bottom);
   box-shadow: -1px 0 1px rgba(0,0,0,0.35);
   margin-left: 5px;
   color: #FFF;
@@ -746,7 +750,7 @@ div.site-slogan {
 }
 
 .ribbon-neutral {
-  @include ribbon(#777777, 40px, #E0E0E0, bottom);
+  @include ribbon(#777777, 42px, #E0E0E0, bottom);
   box-shadow: -1px 0 1px rgba(0,0,0,0.35);
   margin-left: 5px;
   color: #FFF;
@@ -759,7 +763,7 @@ div.site-slogan {
 }
 
 .ribbon-baggins {
-  @include ribbon(#B39E26, 40px, #E0E0E0, bottom);
+  @include ribbon(#B39E26, 42px, #E0E0E0, bottom);
   box-shadow: -1px 0 1px rgba(0,0,0,0.35);
   margin-left: 5px;
   color: #FFF;
@@ -770,7 +774,7 @@ div.site-slogan {
 }
 
 .ribbon-fellowship {
-  @include ribbon(#B56C0C, 40px, #E0E0E0, bottom);
+  @include ribbon(#B56C0C, 42px, #E0E0E0, bottom);
   box-shadow: -1px 0 1px rgba(0,0,0,0.35);
   margin-left: 5px;
   color: #FFF;
@@ -821,6 +825,10 @@ div.site-slogan {
 .bg-sphere a, .bg-sphere span, .bg-sphere small, .bg-sphere button {
   color: inherit;
   background-color: transparent !important;
+}
+
+.bg-sphere-index {
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9);
 }
 
 @mixin bg-color($name, $backgroundColor, $color:inherit) {
