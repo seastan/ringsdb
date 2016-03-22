@@ -13,10 +13,10 @@
         t: [add_string_sf,  'type_code', "Type"],
         s: [add_string_sf,  'sphere_code', "Sphere"],
         u: [add_boolean_sf, 'is_unique', "Uniqueness"],
-        k: [add_string_sf,  'traits', "Traits"],
-        x: [add_string_sf,  'text', "Text"],
+        k: [add_string_sf,  's_traits', "Traits"],
+        x: [add_string_sf,  's_text', "Text"],
         y: [add_integer_sf, 'quantity', "Quantity in pack"],
-        f: [add_string_sf,  'flavor', "Flavor text"],
+        f: [add_string_sf,  's_flavor', "Flavor text"],
         i: [add_string_sf,  'illustrator', "Illustrator"],
         z: [add_boolean_sf, 'has_errata', "Errata'd"]
     };

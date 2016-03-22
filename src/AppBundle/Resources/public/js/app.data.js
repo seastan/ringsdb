@@ -185,6 +185,19 @@
             console.log('data is newer than database or update forced => update the database');
             _.forEach(newData, function(e) {
                 e.s_name = data.get_searchable_string(e.name);
+
+                if (e.text) {
+                    e.s_text = data.get_searchable_string(e.text, true);
+                }
+
+                if (e.traits) {
+                    e.s_traits = data.get_searchable_string(e.traits, true);
+                }
+
+                if (e.flavor) {
+                    e.s_flavor = data.get_searchable_string(e.flavor, true);
+                }
+
                 if (e.pack_name) {
                     e.s_pack_name = data.get_searchable_string(e.pack_name);
                     e.s_pack_code = data.get_searchable_string(e.pack_code);
@@ -224,6 +237,15 @@
     };
 
     data.diacriticsMap = {
+        'Á': 'A',
+        'Â': 'A',
+        'Ä': 'A',
+        'É': 'E',
+        'Í': 'I',
+        'Î': 'I',
+        'Ó': 'O',
+        'Ú': 'U',
+        'Û': 'U',
         'á': 'a',
         'â': 'a',
         'ä': 'a',
@@ -235,10 +257,16 @@
         'û': 'u'
     };
 
-    data.get_searchable_string = function(str) {
-        return str.toLowerCase().replace(/[^A-Za-z0-9\s]+/g, function(a) {
+    data.get_searchable_string = function(str, keepCase) {
+        if (!str) {
+            return str;
+        }
+
+        str = str.replace(/[^A-Za-z0-9\s]+/g, function(a) {
             return data.diacriticsMap[a] || a;
-        });
+        }).replace(/<\/?[^>]+(>|$)/g, '');
+
+        return keepCase ? str : str.toLowerCase();
     };
 
     $(function() {
