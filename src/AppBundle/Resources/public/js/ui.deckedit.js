@@ -299,8 +299,7 @@
                 break;
 
             case 'show-suggestions':
-                ui.toggle_suggestions();
-                ui.refresh_list();
+                ui.update_suggestions();
                 break;
 
             default:
@@ -311,9 +310,13 @@
     ui.toggle_suggestions = function toggle_suggestions() {
         if (Config['show-suggestions'] == 0) {
             $('#table-suggestions').hide();
-        }
-        else {
+        } else {
             $('#table-suggestions').show();
+        }
+
+        if (app.suggestions) {
+            app.suggestions.number = Config['show-suggestions'];
+            app.suggestions.isLoaded && app.suggestions.compute();
         }
     };
 
@@ -676,6 +679,7 @@
         app.deck.display('#deck-content', DisplayOptions);
         app.draw_simulator && app.draw_simulator.reset();
         app.deck_charts && app.deck_charts.setup();
+        app.suggestions && app.suggestions.compute();
     };
 
     /**
@@ -763,6 +767,7 @@
         ui.refresh_deck();
         ui.refresh_list();
         ui.setup_typeahead();
+        app.suggestions && app.suggestions.setup();
         app.deck_history && app.deck_history.setup('#history');
     };
 

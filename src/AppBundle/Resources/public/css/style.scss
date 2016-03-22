@@ -1190,3 +1190,19 @@ footer a {
   font-weight: normal;
   color: #999999;
 }
+
+#table-suggestions .card-container {
+  td:nth-child(1) {
+    width: 25px;
+  }
+
+  td:nth-child(2) {
+    width: 95px;
+  }
+
+  td:nth-child(3) {
+    width: 45px;
+    text-align: right;
+    white-space: nowrap;
+  }
+}

@@ -109,15 +109,6 @@
     /**
      * @memberOf deck
      */
-    deck.get_heroes = function get_heroes() {
-        return deck.get_cards(null, {
-            type_code: 'hero'
-        });
-    };
-
-    /**
-     * @memberOf deck
-     */
     deck.get_cards = function get_cards(sort, query) {
         sort = sort || {};
         sort['code'] = 1;
