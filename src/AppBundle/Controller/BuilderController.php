@@ -458,7 +458,7 @@ class BuilderController extends Controller {
                 $heroDeck = $em->getRepository('AppBundle:Deck')->find($deck['id'])->getSlots()->getHeroDeck();
                 $heroes = [];
                 foreach ($heroDeck as $hero) {
-                    $heroes[] = $hero->getCard()->getCode();
+                    $heroes[] = $hero->getCard();
                 }
 
                 $deck['heroes'] = $heroes;
