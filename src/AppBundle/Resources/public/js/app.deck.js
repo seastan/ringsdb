@@ -343,7 +343,7 @@
         cards.forEach(function(card) {
             if (card.type_code == 'hero' && sortKey == 'type_code') {
                 $('<div class="deck-hero"/>')
-                    .append('<div class="hero-thumbnail card-thumbnail-2x card-thumbnail-hero" style="background-image:url(\'/bundles/cards/' + card.code + '.png\'"></div>')
+                    .append('<div class="hero-thumbnail card-thumbnail-2x card-thumbnail-hero" style="background-image:url(\'/bundles/cards/' + card.code + '.png\')"></div>')
                     .append($(card_line_tpl({ card: card })))
                     .appendTo(section);
             } else {
