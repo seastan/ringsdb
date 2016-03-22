@@ -372,7 +372,7 @@ class SocialController extends Controller {
     }
 
     public function byauthorAction($username, Request $request) {
-        return $this->redirect($this->generateUrl('decklists_list', array('type' => 'author', 'author' => $username)));
+        return $this->redirect($this->generateUrl('decklists_list', array('type' => 'find', 'author' => $username)));
     }
 
     /*
@@ -419,21 +419,6 @@ class SocialController extends Controller {
                     $paginator = $decklist_manager->getEmptyList();
                 }
                 $pagetitle = "My Decklists";
-                break;
-
-            case 'author':
-                $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
-                $em = $this->getDoctrine()->getManager();
-                $user = $em->getRepository('AppBundle:User')->findOneBy(['username' => $author_name]);
-
-                if ($user) {
-                    $header = $this->renderView('AppBundle:Decklist:decklists_by_author.html.twig', ['author' => $author_name]);
-                    $paginator = $decklist_manager->findDecklistsByAuthor($user);
-                    $pagetitle = $user->getUsername() . "'s Decklists";
-                } else {
-                    $paginator = $decklist_manager->getEmptyList();
-                    $pagetitle = "Decklists";
-                }
                 break;
 
             case 'recent':
