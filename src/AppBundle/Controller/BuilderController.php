@@ -12,25 +12,6 @@ use AppBundle\Entity\Deckchange;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class BuilderController extends Controller {
-    public function buildformAction(Request $request) {
-        $response = new Response();
-        $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
-
-        $em = $this->getDoctrine()->getManager();
-
-        $heroType = $em->getRepository('AppBundle:Type')->findOneBy(['code' => 'hero']);
-        $cards = $em->getRepository('AppBundle:Card')->findBy(['type' => $heroType], ['sphere' => 'ASC', 'name' => 'ASC', 'pack' => 'ASC']);
-
-        $heroes = array_map(function($card) {
-            return $this->get('cards_data')->getCardInfo($card, false);
-        }, $cards);
-
-        return $this->render('AppBundle:Builder:initbuild.html.twig', [
-            'pagetitle' => "New deck",
-            'heroes' => $heroes
-        ], $response);
-    }
 
     public function newAction(Request $request) {
         $em = $this->getDoctrine()->getManager();

@@ -66,7 +66,7 @@ class Diff {
             foreach ($list_slots as $j => $slots) {
                 // searching the slots
                 foreach ($slots as $k => $slot) {
-                    if ($slot->getCard()->getCode() === $cardCode) {
+                    if ($slot->getCard()->getCode() == $cardCode) {
                         $card = $slot->getCard();
                         $indexes[$j] = $k;
                         $quantities[$j] = $slot->getQuantity();
