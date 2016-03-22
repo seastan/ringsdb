@@ -1,12 +1,10 @@
 (function ui_deck(ui, $) {
 
-    var DisplaySort = 'type';
-
-    function confirm_delete() {
+    ui.confirm_delete = function() {
         $('#delete-deck-name').text(app.deck.get_name());
         $('#delete-deck-id').val(app.deck.get_id());
         $('#deleteModal').modal('show');
-    }
+    };
 
     ui.do_action_deck = function (event) {
         var action_id = $(this).attr('id');
@@ -16,33 +14,49 @@
 
         switch (action_id) {
             case 'btn-delete':
-                confirm_delete();
+                ui.confirm_delete();
                 break;
+
             case 'btn-print':
                 window.print();
                 break;
+
             case 'btn-sort-type':
-                DisplaySort = 'type';
-                ui.refresh_deck()();
+                ui.refresh_deck({
+                    sort: 'type',
+                    cols: 2
+                });
                 break;
+
             case 'btn-sort-position':
-                DisplaySort = 'position';
-                ui.refresh_deck()();
+                ui.refresh_deck({
+                    sort: 'position',
+                    cols: 1
+                });
                 break;
+
             case 'btn-sort-sphere':
-                DisplaySort = 'sphere';
-                ui.refresh_deck()();
+                ui.refresh_deck({
+                    sort: 'sphere',
+                    cols: 1
+                });
                 break;
+
             case 'btn-sort-name':
-                DisplaySort = 'name';
-                ui.refresh_deck()();
+                ui.refresh_deck({
+                    sort: 'name',
+                    cols: 1
+                });
                 break;
+
             case 'btn-export-bbcode':
                 app.deck.export_bbcode();
                 break;
+
             case 'btn-export-markdown':
                 app.deck.export_markdown();
                 break;
+
             case 'btn-export-plaintext':
                 app.deck.export_plaintext();
                 break;
@@ -62,8 +76,8 @@
     /**
      * @memberOf ui
      */
-    ui.refresh_deck = function refresh_deck() {
-        app.deck.display('#deck-content');
+    ui.refresh_deck = function(options) {
+        app.deck.display('#deck-content', options);
         app.draw_simulator && app.draw_simulator.reset();
         app.deck_charts && app.deck_charts.setup();
     };

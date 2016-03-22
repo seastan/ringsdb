@@ -22,7 +22,6 @@
         </div>
 
         <div class="row">
-
             <!-- Left-side Column -->
             <div class="col-md-6" id="deck-content"></div>
             <!-- Left-side Column -->
@@ -30,10 +29,13 @@
             <!-- Right-side Column -->
             <div class="col-md-6 hidden-print">
                 <div class="row">
-                    <div class="col-md-12">
-                        <div class="pull-right btn-group" role="group" id="btn-group-deck">{% include 'AppBundle:Builder:toolbar.html.twig' %}</div>
+                    <div class="col-md-12" id="btn-group-deck">
+                        {% include 'AppBundle:Builder:toolbar.html.twig' %}
                     </div>
+
                     <div class="col-md-12" style="margin-top: 10px">
+
+
                         <p>Version {{ deck.version }}</p>
 
                         <!-- Description -->
@@ -46,25 +48,22 @@
                         <!-- Description -->
 
                         {% include 'AppBundle:Builder:deck-charts.html.twig' %}
+
                         {% include 'AppBundle:Builder:draw-simulator.html.twig' %}
 
                         <!-- Published decklists Table -->
                         <table class="table table-condensed" id="table-predecessor">
                             <thead>
-                            <tr>
-                                <th colspan="4"><span class="fa fa-share"></span> Published versions</th>
-                            </tr>
+                            <tr><th colspan="4"><span class="fa fa-share"></span> Published versions</th></tr>
                             </thead>
                             <tbody>
-                            {% if deck.children|length %}
-                                {% for decklist in deck.children %}
-                                    {{ macros.decklist_table_row(decklist) }}
-                                {% endfor %}
-                            {% else %}
-                                <tr>
-                                    <td>None.</td>
-                                </tr>
-                            {% endif %}
+                                {% if deck.children | length %}
+                                    {% for decklist in deck.children %}
+                                        {{ macros.decklist_table_row(decklist) }}
+                                    {% endfor %}
+                                {% else %}
+                                    <tr><td>None.</td></tr>
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>

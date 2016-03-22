@@ -22,9 +22,25 @@
     /*
      * Templates for the different deck layouts, see deck.get_layout_data
      */
-    layouts[1] = _.template('<div class="deck-content"><%= meta %><%= heroes %><%= allies %><%= attachments %><%= events %><%= sidequests %></div>');
-    layouts[2] = _.template('<div class="deck-content"><div class="row"><div class="col-sm-6"><%= meta %></div><div class="col-sm-6"><%= heroes %></div></div><div class="row"><div class="col-sm-6"><%= allies %></div><div class="col-sm-6"><%= attachments %><%= events %><%= sidequests %></div></div></div>');
-    layouts[3] = _.template('<div class="deck-content"><div class="row"><div class="col-sm-4"><%= meta %><%= heroes %></div><div class="col-sm-4"><%= allies %></div><div class="col-sm-4"><%= attachments %><%= events %><%= sidequests %></div></div></div>');
+
+    layouts.type = {};
+    layouts.type[1] = _.template('<div class="deck-content"><%= meta %><%= heroes %><%= allies %><%= attachments %><%= events %><%= sidequests %></div>');
+    layouts.type[2] = _.template('<div class="deck-content"><div class="row"><div class="col-sm-12"><%= meta %></div></div><div class="row"><div class="col-sm-12"><%= heroes %></div></div><div class="row"><div class="col-sm-6"><%= allies %></div><div class="col-sm-6"><%= attachments %><%= events %><%= sidequests %></div></div></div>');
+    layouts.type[3] = _.template('<div class="deck-content"><div class="row"><div class="col-sm-4"><%= meta %><%= heroes %></div><div class="col-sm-4"><%= allies %></div><div class="col-sm-4"><%= attachments %><%= events %><%= sidequests %></div></div></div>');
+
+    layouts.position = {};
+    layouts.position[1] =  function(data) {
+        var layout = [];
+        layout.push('<div class="deck-content">');
+
+        _.forEach(data, function(el) {
+            layout.push(el);
+        });
+
+        layout.push('</div>');
+        return layout.join('');
+    };
+    layouts.sphere = layouts.name = layouts.position;
 
     /**
      * @memberOf deck
@@ -42,8 +58,6 @@
         if (app.data.isLoaded) {
             deck.set_slots(data.slots);
         } else {
-            console.log("deck.set_slots put on hold until data.app");
-
             $(document).on('data.app', function () {
                 deck.set_slots(data.slots);
             });
@@ -54,6 +68,7 @@
         app.data.cards.update({}, {
             indeck: 0
         });
+
         for (code in slots) {
             if (slots.hasOwnProperty(code)) {
                 app.data.cards.updateById(code, { indeck: slots[code] });
@@ -126,19 +141,19 @@
      * @memberOf deck
      */
     deck.get_draw_deck_size = function get_draw_deck_size(sort) {
-        var draw_deck = deck.get_draw_deck();
+        var draw_deck = deck.get_draw_deck(sort);
         return deck.get_nb_cards(draw_deck);
     };
 
     /**
      * @memberOf deck
      */
-    deck.get_hero_deck = function get_hero_deck(primarySpheres, sort) {
+    deck.get_hero_deck = function get_hero_deck(primarySpheresOnly, sort) {
         var where = {
             type_code: 'hero'
-        } ;
+        };
 
-        if (primarySpheres) {
+        if (primarySpheresOnly) {
             where.sphere_code = {
                 '$nin': ['baggins', 'fellowship']
             };
@@ -191,6 +206,7 @@
                 'available': 1
             }
         });
+
         packs.forEach(function(pack) {
             pack.quantity = nb_packs[pack.code] || 0;
         });
@@ -207,82 +223,132 @@
      * @memberOf deck
      */
     deck.display = function display(container, options) {
-        options = _.extend({sort: 'type', cols: 2}, options);
+        options = _.extend({ sort: 'type', cols: 2 }, options);
 
         var layout_data = deck.get_layout_data(options);
-        var deck_content = layouts[options.cols](layout_data);
+        var deck_content = layouts[options.sort][options.cols](layout_data);
 
         $(container).removeClass('deck-loading').empty();
         $(container).append(deck_content);
     };
 
-    deck.get_layout_data = function get_layout_data(options) {
+    deck.get_layout_data = function(options) {
         var data = {
-            images: '',
-            meta: '',
-            heroes: '',
-            allies: '',
-            attachments: '',
-            events: '',
-            sidequests: ''
         };
 
         var problem = deck.get_problem();
+        var herocount = deck.get_hero_deck_size();
+        var drawcount = deck.get_draw_deck_size();
 
-        //deck.update_layout_section(data, 'images', $('<div style="margin-bottom:10px"><img src="/bundles/app/images/factions/' + deck.get_faction_code() + '.png" class="img-responsive">'));
+        var title = $('<h4 style="font-weight: bold">Main Deck</h4>');
+        var threat = $('<div>Starting Threat: <b>' + deck.get_starting_threat() + '</b></div>')
 
-        deck.update_layout_section(data, 'meta', $('<h4 style="font-weight:bold">Deck</h4>'));
-        deck.update_layout_section(data, 'meta', $('<div>Starting Threat: <b>' + deck.get_starting_threat() + '</b></div>'));
-        deck.update_layout_section(data, 'meta', $('<div id="cardcount">' + deck.get_hero_deck_size() + (deck.get_hero_deck_size() == 1 ? ' Hero, ': ' Heroes, ') + deck.get_draw_deck_size() + ' Cards</div>').addClass((deck.get_draw_deck_size() < 50 || deck.get_hero_deck_size(true) > 4) ? 'text-danger' : ''));
+        var text = [herocount, herocount == 1 ? ' Hero, ': ' Heroes, ', drawcount, drawcount == 1 ? ' Card': ' Cards' ].join(' ');
+        var sizeinfo = $('<div id="cardcount">' + text + '</div>');
 
-        // Reserved for future features
-        //deck.update_layout_section(data, 'meta', $('<div>Extra Cards deck: ' + deck.get_plot_deck_size() + ' cards</div>').addClass(deck.get_plot_deck_size() != 7 ? 'text-danger' : ''));
-
-        deck.update_layout_section(data, 'meta', $('<div id="latestpack">Cards up to <i>' + (deck.get_lastest_pack().name || '-') + '</i></div>'));
-
-        if (problem) {
-            deck.update_layout_section(data, 'meta', $('<div class="text-danger small"><span class="fa fa-exclamation-triangle"></span> ' + problem_labels[problem] + '</div>'));
+        if (drawcount < 50 || herocount == 0 || deck.get_hero_deck_size(true) > 3) {
+            sizeinfo.addClass('text-danger');
         }
 
-        deck.update_layout_section(data, 'heroes', deck.get_layout_data_one_section('type_code', 'hero', 'type_name'));
-        deck.update_layout_section(data, 'allies', deck.get_layout_data_one_section('type_code', 'ally', 'type_name'));
-        deck.update_layout_section(data, 'attachments', deck.get_layout_data_one_section('type_code', 'attachment', 'type_name'));
-        deck.update_layout_section(data, 'events', deck.get_layout_data_one_section('type_code', 'event', 'type_name'));
-        deck.update_layout_section(data, 'sidequests', deck.get_layout_data_one_section('type_code', 'player-side-quest', 'type_name'));
+        var packinfo = $('<div id="latestpack">Cards up to <i>' + (deck.get_lastest_pack().name || '-') + '</i></div>');
+
+
+        deck.update_layout_section(data, 'meta', title);
+        deck.update_layout_section(data, 'meta', threat);
+        deck.update_layout_section(data, 'meta', sizeinfo);
+        deck.update_layout_section(data, 'meta', packinfo);
+
+        if (problem) {
+            var probleminfo = $('<div class="text-danger small"><span class="fa fa-exclamation-triangle"></span> ' + problem_labels[problem] + '</div>');
+            deck.update_layout_section(data, 'meta', probleminfo);
+        }
+
+        if (options.sort == 'type') {
+            deck.update_layout_section(data, 'heroes', deck.get_layout_data_one_section('type_code', 'hero', 'type_name'));
+            deck.update_layout_section(data, 'allies', deck.get_layout_data_one_section('type_code', 'ally', 'type_name'));
+            deck.update_layout_section(data, 'attachments', deck.get_layout_data_one_section('type_code', 'attachment', 'type_name'));
+            deck.update_layout_section(data, 'events', deck.get_layout_data_one_section('type_code', 'event', 'type_name'));
+            deck.update_layout_section(data, 'sidequests', deck.get_layout_data_one_section('type_code', 'player-side-quest', 'type_name'));
+        }
+
+        if (options.sort == 'position') {
+            var packs = deck.get_included_packs();
+
+            packs.forEach(function(pack) {
+                deck.update_layout_section(data, pack.code, deck.get_layout_data_one_section('pack_code', pack.code, 'pack_name'));
+            });
+        }
+
+        if (options.sort == 'sphere') {
+            ['leadership', 'lore', 'spirit', 'tactics', 'neutral', 'baggins', 'fellowship'].forEach(function(sphere) {
+                deck.update_layout_section(data, sphere, deck.get_layout_data_one_section('sphere_code', sphere, 'sphere_name'));
+            });
+        }
+
+        if (options.sort == 'name') {
+            deck.update_layout_section(data, 'name', deck.get_layout_data_one_section('name', null, 'Cards'));
+        }
 
         return data;
     };
 
     deck.update_layout_section = function update_layout_section(data, section, element) {
-        data[section] = data[section] + element[0].outerHTML;
+        if (!data[section]) {
+            data[section] = '';
+        }
+
+        if (!element) {
+            return '';
+        }
+
+        data[section] += element[0].outerHTML;
     };
 
     deck.get_layout_data_one_section = function(sortKey, sortValue, displayLabel) {
-        var section = $('<div>');
+        var section = $('<div />');
         var query = {};
-        query[sortKey] = sortValue;
-        var cards = deck.get_cards({ name: 1 }, query);
-        if (cards.length) {
-            $(header_tpl({ code: sortValue, name: cards[0][displayLabel], quantity: deck.get_nb_cards(cards) })).appendTo(section);
 
-            cards.forEach(function(card) {
-                var tpl = $(card_line_tpl({ card: card }));
-
-                var div = $('<div>').append(tpl).prepend(card.type_code != 'hero' ? card.indeck + 'x ' : '').appendTo(section);
-
-                if (card.is_unique && card.type_code != 'hero') {
-                    div.css('font-weight', 'bold');
-                }
-
-                if (!deck.can_include_card(card)) {
-                    div.addClass('invalid-card');
-                }
-
-                if (!deck.i_have_this_card(card)) {
-                    div.append(' <i class="fa fa-exclamation-triangle not-in-collection" title="This card is not in my collection"></i>');
-                }
-            });
+        if (sortValue) {
+            query[sortKey] = sortValue;
         }
+
+        var cards;
+
+        if (sortKey == 'type_code' || sortKey == 'name') {
+            cards = deck.get_cards({ name: 1 }, query);
+        } else if (sortKey == 'pack_code') {
+            cards = deck.get_cards({ position: 1 }, query);
+        } else {
+            cards = deck.get_cards({ type_code: 1, code: 1 }, query);
+        }
+
+        if (!cards.length) {
+            return null;
+        }
+
+        $(header_tpl({ code: sortValue, name: cards[0][displayLabel] || 'Cards', quantity: deck.get_nb_cards(cards) })).appendTo(section);
+
+        cards.forEach(function(card) {
+            var tpl = $(card_line_tpl({ card: card }));
+
+            var div = $('<div />').append(tpl).prepend(sortKey != 'type_code' || card.type_code != 'hero' ? card.indeck + 'x ' : '').appendTo(section);
+
+            if (card.is_unique && card.type_code != 'hero') {
+                div.find('a').css('font-weight', 'bold');
+            }
+
+            if (!deck.can_include_card(card)) {
+                div.addClass('invalid-card');
+            }
+
+            if (!deck.i_have_this_card(card)) {
+                div.append(' <i class="fa fa-exclamation-triangle not-in-collection" title="This card is not in my collection"></i>');
+            }
+
+            if (sortKey == 'pack_code') {
+                div.append(' <small class="text-muted" style="padding-left: 2px">(#' + card.position + ')</small>');
+            }
+        });
 
         return section;
     };
@@ -520,6 +586,4 @@
         }
         return lines;
     };
-
-
 })(app.deck = {}, jQuery);

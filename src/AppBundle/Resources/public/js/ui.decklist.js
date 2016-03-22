@@ -22,19 +22,52 @@
         if (!action_id) {
             return;
         }
+
         switch (action_id) {
             case 'btn-download-text':
                 location.href = Routing.generate('decklist_export_text', { decklist_id: app.deck.get_id() });
                 break;
+
             case 'btn-download-octgn':
                 location.href = Routing.generate('decklist_export_octgn', { decklist_id: app.deck.get_id() });
                 break;
+
+            case 'btn-sort-type':
+                ui.refresh_deck({
+                    sort: 'type',
+                    cols: 2
+                });
+                break;
+
+            case 'btn-sort-position':
+                ui.refresh_deck({
+                    sort: 'position',
+                    cols: 1
+                });
+                break;
+
+            case 'btn-sort-sphere':
+                ui.refresh_deck({
+                    sort: 'sphere',
+                    cols: 1
+                });
+                break;
+
+            case 'btn-sort-name':
+                ui.refresh_deck({
+                    sort: 'name',
+                    cols: 1
+                });
+                break;
+
             case 'btn-export-bbcode':
                 app.deck.export_bbcode();
                 break;
+
             case 'btn-export-markdown':
                 app.deck.export_markdown();
                 break;
+
             case 'btn-export-plaintext':
                 app.deck.export_plaintext();
                 break;
@@ -228,8 +261,8 @@
     /**
      * @memberOf ui
      */
-    ui.refresh_deck = function refresh_deck() {
-        app.deck.display('#deck-content');
+    ui.refresh_deck = function(options) {
+        app.deck.display('#deck-content', options);
         app.deck_charts && app.deck_charts.setup();
     };
 

@@ -5,6 +5,7 @@
     var SortOrder = 1;
     var CardDivs = [[], [], []];
     var Config = null;
+    var DisplayOptions;
 
     /**
      * reads ui configuration from localStorage
@@ -445,6 +446,45 @@
         $('#cardModal').on('change', 'input[type=radio]', ui.on_modal_quantity_change);
 
         $('thead').on('click', 'a[data-sort]', ui.on_table_sort_click);
+
+        $('#menu-sort').on('click', 'a[id]', ui.do_action_deck);
+    };
+
+    ui.do_action_deck = function (event) {
+        var action_id = $(this).attr('id');
+        if (!action_id) {
+            return;
+        }
+
+        switch (action_id) {
+            case 'btn-sort-type':
+                ui.refresh_deck({
+                    sort: 'type',
+                    cols: 2
+                });
+                break;
+
+            case 'btn-sort-position':
+                ui.refresh_deck({
+                    sort: 'position',
+                    cols: 1
+                });
+                break;
+
+            case 'btn-sort-sphere':
+                ui.refresh_deck({
+                    sort: 'sphere',
+                    cols: 1
+                });
+                break;
+
+            case 'btn-sort-name':
+                ui.refresh_deck({
+                    sort: 'name',
+                    cols: 1
+                });
+                break;
+        }
     };
 
     /**
@@ -561,7 +601,8 @@
         var counter = 0;
         var container = $('#collection-table').empty();
         var grid = $('#collection-grid').empty();
-        var filters = ui.get_filters();
+        var filters = Config['show-only-deck'] ? {} :ui.get_filters();
+
         var query = app.smart_filter.get_query(filters);
         var orderBy = {};
 
@@ -628,8 +669,11 @@
     /**
      * @memberOf ui
      */
-    ui.refresh_deck = function refresh_deck() {
-        app.deck.display('#deck-content');
+    ui.refresh_deck = function(options) {
+        if (options) {
+            DisplayOptions = options;
+        }
+        app.deck.display('#deck-content', DisplayOptions);
         app.draw_simulator && app.draw_simulator.reset();
         app.deck_charts && app.deck_charts.setup();
     };
