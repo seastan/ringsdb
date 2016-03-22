@@ -18,5 +18,6 @@ tags
 /.project
 /.tags_swap
 /.idea/
+/web/suggestions.json
 user-data.sql
 .DS_Store
