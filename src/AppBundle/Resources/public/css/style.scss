@@ -418,12 +418,21 @@ div.tags span.tag {
 
 /***************** THUMBNAIL CARD IMAGE **************/
 
+.hero-card-list {
+  margin-bottom: 10px;
+
+  a {
+    white-space: nowrap;
+  }
+}
+
+
 .index-hero {
   text-align: center;
   display: inline-block;
 
   .hero-thumbnail {
-    margin: 0 10px;
+    margin: 10px 10px 0 10px;
   }
 }
 
@@ -843,15 +852,6 @@ div.site-slogan {
   border: 1px solid white;
 }
 
-
-.hero-card-list {
-  margin-top: 10px;
-  margin-bottom: 10px;
-
-  a {
-    white-space: nowrap;
-  }
-}
 
 /************** SPHERE COLORS **************/
 .bg-sphere a, .bg-sphere span, .bg-sphere small, .bg-sphere button {
