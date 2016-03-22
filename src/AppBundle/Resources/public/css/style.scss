@@ -438,6 +438,14 @@ div.tags span.tag {
   }
 }
 
+@media (max-width: 767px) {
+  .decklist-hero-text {
+    display: block;
+    margin-top: 15px;
+    margin-left: -10px;
+  }
+}
+
 
 .decklist-hero {
   text-align: center;
