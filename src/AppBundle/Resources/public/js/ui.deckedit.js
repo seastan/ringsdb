@@ -301,10 +301,13 @@
 
             case 'show-suggestions':
                 ui.toggle_suggestions();
+<<<<<<< 91f0b31ac1116ec29b117ba99c85061dc51de475
                 break;
 
             case 'compact-mode':
                 ui.toggle_compact_mode();
+=======
+>>>>>>> Deckedit will only load suggestion data if suggestions are enabled
                 break;
 
             default:
