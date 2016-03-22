@@ -371,10 +371,14 @@ class SocialController extends Controller {
         return $this->renderView('AppBundle:Search:form.html.twig', $params);
     }
 
+    public function byauthorAction($username, Request $request) {
+        return $this->redirect($this->generateUrl('decklists_list', array('type' => 'author', 'author' => $username)));
+    }
+
     /*
 	 * displays the lists of decklists
 	 */
-    public function listAction($type, $sphere = null, $page = 1, Request $request) {
+    public function listAction($type, $sphere = null, $page = 1, Request $request, $username = null) {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
@@ -386,9 +390,6 @@ class SocialController extends Controller {
         $decklist_manager->setLimit(30);
         $decklist_manager->setPage($page);
 
-        $request_attributes = $request->attributes->all();
-
-        $pagetitle = "Decklists";
         $header = '';
 
         switch ($type) {
@@ -418,6 +419,21 @@ class SocialController extends Controller {
                     $paginator = $decklist_manager->getEmptyList();
                 }
                 $pagetitle = "My Decklists";
+                break;
+
+            case 'author':
+                $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
+                $em = $this->getDoctrine()->getManager();
+                $user = $em->getRepository('AppBundle:User')->findOneBy(['username' => $author_name]);
+
+                if ($user) {
+                    $header = $this->renderView('AppBundle:Decklist:decklists_by_author.html.twig', ['author' => $author_name]);
+                    $paginator = $decklist_manager->findDecklistsByAuthor($user);
+                    $pagetitle = $user->getUsername() . "'s Decklists";
+                } else {
+                    $paginator = $decklist_manager->getEmptyList();
+                    $pagetitle = "Decklists";
+                }
                 break;
 
             case 'recent':
@@ -959,11 +975,7 @@ class SocialController extends Controller {
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
 
         $dbh = $this->getDoctrine()->getConnection();
-        $spheres = $dbh->executeQuery("SELECT
-				s.name,
-				s.code
-				FROM sphere s
-				ORDER BY s.name ASC")->fetchAll();
+        $spheres = $dbh->executeQuery("SELECT s.name, s.code FROM sphere s ORDER BY s.name ASC")->fetchAll();
 
         $owned_packs = '';
         if ($this->getUser()) {

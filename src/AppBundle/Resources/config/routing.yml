@@ -33,6 +33,12 @@ app_collection:
     resource: "@AppBundle/Resources/config/routing/routing_collection.yml"
     prefix: /collection
 
+app_decklist_byauthor:
+    path: /d/{username}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Social:byauthor
+
 
 index:
     path: /
