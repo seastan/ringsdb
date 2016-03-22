@@ -4238,6 +4238,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 
 .navbar-brand .logo {
   color: #f3b217;
+  font-size: 22px;
 }
 
 .navbar-brand:hover,
