@@ -426,6 +426,18 @@ div.tags span.tag {
   }
 }
 
+.hero-deck-list {
+  .deck-hero {
+    text-align: center;
+    float: left;
+    margin-right: 15px;
+    max-width: 115px;
+
+    .hero-thumbnail {
+      margin: 5px auto 0 auto;
+    }
+  }
+}
 
 .index-hero {
   text-align: center;

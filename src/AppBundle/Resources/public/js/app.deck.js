@@ -329,26 +329,37 @@
         $(header_tpl({ code: sortValue, name: cards[0][displayLabel] || 'Cards', quantity: deck.get_nb_cards(cards) })).appendTo(section);
 
         cards.forEach(function(card) {
-            var tpl = $(card_line_tpl({ card: card }));
+            if (card.type_code == 'hero' && sortKey == 'type_code') {
+                $('<div class="deck-hero"/>')
+                    .append('<div class="hero-thumbnail card-thumbnail-2x card-thumbnail-hero" style="background-image:url(\'/bundles/cards/' + card.code + '.png\'"></div>')
+                    .append($(card_line_tpl({ card: card })))
+                    .appendTo(section);
+            } else {
+                var tpl = $(card_line_tpl({ card: card }));
 
-            var div = $('<div />').append(tpl).prepend(sortKey != 'type_code' || card.type_code != 'hero' ? card.indeck + 'x ' : '').appendTo(section);
+                var div = $('<div />').append(tpl).prepend(sortKey != 'type_code' || card.type_code != 'hero' ? card.indeck + 'x ' : '').appendTo(section);
 
-            if (card.is_unique && card.type_code != 'hero') {
-                div.find('a').css('font-weight', 'bold');
-            }
+                if (card.is_unique && card.type_code != 'hero') {
+                    div.find('a').css('font-weight', 'bold');
+                }
 
-            if (!deck.can_include_card(card)) {
-                div.addClass('invalid-card');
-            }
+                if (!deck.can_include_card(card)) {
+                    div.addClass('invalid-card');
+                }
 
-            if (!deck.i_have_this_card(card)) {
-                div.append(' <i class="fa fa-exclamation-triangle not-in-collection" title="This card is not in my collection"></i>');
-            }
+                if (!deck.i_have_this_card(card)) {
+                    div.append(' <i class="fa fa-exclamation-triangle not-in-collection" title="This card is not in my collection"></i>');
+                }
 
-            if (sortKey == 'pack_code') {
-                div.append(' <small class="text-muted" style="padding-left: 2px">(#' + card.position + ')</small>');
+                if (sortKey == 'pack_code') {
+                    div.append(' <small class="text-muted" style="padding-left: 2px">(#' + card.position + ')</small>');
+                }
             }
         });
+
+        if (sortKey == 'type_code') {
+            section.find('.deck-hero').wrapAll('<div class="hero-deck-list"/>');
+        }
 
         return section;
     };
