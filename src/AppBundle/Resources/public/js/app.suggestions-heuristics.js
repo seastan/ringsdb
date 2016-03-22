@@ -663,6 +663,7 @@
             return;
         }
         suggestions.initialized = true;
+
         $('#table-suggestions').on({
             change: suggestions.pick
         }, 'input[type=radio]');
