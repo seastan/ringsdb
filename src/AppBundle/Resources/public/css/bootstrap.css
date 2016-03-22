@@ -4571,19 +4571,19 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 
 @media (max-width: 767px) {
   .navbar-default .navbar-nav .open .dropdown-menu > li > a {
-    color: #333333;
+    color: #F5F5F5;
   }
 
   .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover,
   .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
-    color: #000000;
+    color: #F3B217;
     background-color: transparent;
   }
 
   .navbar-default .navbar-nav .open .dropdown-menu > .active > a,
   .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover,
   .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
-    color: #222222;
+    color: #330000;
     background-color: #D3AB0C;
   }
 
