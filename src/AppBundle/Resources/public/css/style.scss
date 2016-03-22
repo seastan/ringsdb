@@ -1205,3 +1205,14 @@ footer a {
     white-space: nowrap;
   }
 }
+
+#collection.compact {
+  td {
+    padding: 0 !important;
+    font-size: 10px !important;
+
+    .btn-xs {
+      line-height: 1.2;
+    }
+  }
+}

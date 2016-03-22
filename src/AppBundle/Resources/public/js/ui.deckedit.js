@@ -22,6 +22,7 @@
         Config = _.extend({
             'show-unusable': false,
             'show-only-deck': false,
+            'compact-mode': false,
             'display-column': 1,
             'show-suggestions': 0,
             'buttons-behavior': 'cumulative'
@@ -49,7 +50,7 @@
         });
 
         // checkbox
-        ['show-unusable', 'show-only-deck'].forEach(function (checkbox) {
+        ['show-unusable', 'show-only-deck', 'compact-mode'].forEach(function (checkbox) {
             if (Config[checkbox]) $('input[name=' + checkbox + ']').prop('checked', true);
         })
     };
@@ -302,12 +303,16 @@
                 ui.toggle_suggestions();
                 break;
 
+            case 'compact-mode':
+                ui.toggle_compact_mode();
+                break;
+
             default:
                 ui.refresh_list();
         }
     };
 
-    ui.toggle_suggestions = function toggle_suggestions() {
+    ui.toggle_suggestions = function() {
         if (Config['show-suggestions'] == 0) {
             $('#table-suggestions').hide();
         } else {
@@ -318,6 +323,14 @@
             app.suggestions.setup();
             app.suggestions.number = Config['show-suggestions'];
             app.suggestions.isLoaded && app.suggestions.compute();
+        }
+    };
+
+    ui.toggle_compact_mode = function() {
+        if (Config['compact-mode']) {
+            $('#collection').addClass('compact');
+        } else {
+            $('#collection').removeClass('compact');
         }
     };
 
@@ -739,6 +752,7 @@
         ui.init_filter_help();
         ui.update_sort_caret();
         ui.toggle_suggestions();
+        ui.toggle_compact_mode();
         ui.setup_event_handlers();
         app.textcomplete && app.textcomplete.setup('#description');
         app.markdown && app.markdown.setup('#description', '#description-preview')
