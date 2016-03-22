@@ -1,10 +1,14 @@
 (function ui_decklist_edit(ui, $) {
 
+    ui.refresh_deck = function() {
+        app.deck.display('#decklist', { cols: 1 });
+    };
+
     /**
      * called when the DOM is loaded
      * @memberOf ui
      */
-    ui.on_dom_loaded = function on_dom_loaded() {
+    ui.on_dom_loaded = function() {
         $('#descriptionMd').markdown({
             autofocus: true,
             iconlibrary: 'fa',
@@ -48,7 +52,7 @@
         });
     };
 
-    ui.on_button_heading = function ui_on_button_heading(heading, e) {
+    ui.on_button_heading = function(heading, e) {
         // Append/remove # surround the selection
         var chunk, cursor, selected = e.getSelection(), content = e.getContent(), pointer, prevChar;
 
@@ -144,7 +148,7 @@
      */
     ui.on_all_loaded = function on_all_loaded() {
         app.textcomplete.setup('#descriptionMd');
-        app.deck.display('#decklist', {cols: 1});
+        ui.refresh_deck();
     };
 
 

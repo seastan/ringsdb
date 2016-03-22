@@ -362,6 +362,7 @@
 
         if (sortKey == 'type_code') {
             section.find('.deck-hero').wrapAll('<div class="hero-deck-list"/>');
+            section.append('<div style="clear: both;" />');
         }
 
         return section;
