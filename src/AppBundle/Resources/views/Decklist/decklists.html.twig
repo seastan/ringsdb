@@ -68,9 +68,9 @@
                             <td class="decklist-hero-image hidden-xs">
                                 {% for hero in decklist.getSlots().getHeroDeck() %}
                                     {% set card = hero.getCard() %}
-                                    <a class="card card-tip" data-code="{{ card.code }}" href="">
-                                        <img src="{{ asset('/bundles/cards/' ~ card.code ~ '.png') }}">
-                                    </a>
+                                    <div class="decklist-hero border-light-{{ card.sphere.code }}">
+                                        <div class="hero-thumbnail card-thumbnail-4x card-thumbnail-hero card card-tip" style="background-image:url('{{ asset('/bundles/cards/' ~ card.code ~ '.png') }}')" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false"></div>
+                                    </div>
                                 {% endfor %}
                             </td>
                             <td>
@@ -85,6 +85,14 @@
                                             <a href="{{ path('user_profile_public', {user_id:decklist.user.id,user_name:decklist.user.username|e('url')}) }}" class="{{ decklist.user.color }}">{{ decklist.user.username }}</a>
                                             {% if decklist.user.donation > 0 %}<span class="fa fa-gift donator" title="RingsDB Gracious Donator"></span>{% endif %}
                                             <small class="reputation">{{ decklist.user.reputation }}</small>
+                                        </span>
+                                        <span class="small decklist-hero-text">
+                                            {% for hero in decklist.getSlots().getHeroDeck() %}
+                                                {% set card = hero.getCard() %}
+                                                <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" href="">
+                                                    <span class="icon-{{ card.sphere.code }}"></span> {{ card.name }} <i>({{ card.pack.code }})</i>
+                                                </a>
+                                            {% endfor %}
                                         </span>
                                     </h5>
                                 </article>

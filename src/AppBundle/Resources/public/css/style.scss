@@ -421,6 +421,28 @@ div.tags span.tag {
 .index-hero {
   text-align: center;
   display: inline-block;
+
+  .hero-thumbnail {
+    margin: 0 10px;
+  }
+}
+
+.decklist-hero-image {
+  width: 175px;
+}
+
+.decklist-hero-text {
+  a {
+    padding-left: 10px
+  }
+}
+
+
+.decklist-hero {
+  text-align: center;
+  display: inline-block;
+
+  border-bottom: 7px solid black;
 }
 
 .hero-thumbnail {
@@ -428,7 +450,6 @@ div.tags span.tag {
   background-origin: padding-box;
   background-clip: border-box;
   background-repeat: no-repeat;
-  margin: 0 10px;
   position: relative;
   border: 1px solid #000000;
 }
@@ -623,14 +644,6 @@ div.site-slogan {
   text-align: center;
 }
 
-/************ LIST OF DECKLISTS **************/
-
-.decklist-hero-image {
-  width: 165px;
-  img {
-    height: 64px;
-  }
-}
 
 /************* DECKLIST *********************/
 
@@ -849,6 +862,10 @@ div.site-slogan {
 
   .border-#{$name} {
     border-color: $backgroundColor;
+  }
+
+  .border-light-#{$name} {
+    border-color: rgba($backgroundColor, .3);
   }
 }
 

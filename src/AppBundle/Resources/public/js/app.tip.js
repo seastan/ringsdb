@@ -80,7 +80,7 @@
 			var code = RegExp.$1;
 			var generated_url = Routing.generate('cards_zoom', {card_code:code}, true);
 			var card = app.data.cards.findById(code);
-			if(card && href === generated_url) {
+			if (card && href === generated_url) {
 				display_card_on_element(card, this, event);
 			}
 		}
@@ -105,7 +105,7 @@
 
         $('body').on({
 			mouseover: tip.display
-		}, 'a.card-tip, li.card-tip');
+		}, 'a.card-tip, li.card-tip, div.card-tip');
 
 		$('body').on({
 			mouseover: tip.guess
