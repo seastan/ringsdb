@@ -420,10 +420,6 @@ div.tags span.tag {
 
 .hero-card-list {
   margin-bottom: 10px;
-
-  a {
-    white-space: nowrap;
-  }
 }
 
 .hero-deck-list {
@@ -458,6 +454,7 @@ div.tags span.tag {
 .decklist-hero-text {
   a {
     padding-left: 10px;
+    white-space: nowrap;
   }
 }
 
