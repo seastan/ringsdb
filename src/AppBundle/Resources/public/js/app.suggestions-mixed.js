@@ -73,7 +73,7 @@
      * @memberOf suggestions
      */
     suggestions.compute = function compute() {
-        if (suggestions.number) {
+        if (suggestions.number && app.data.cards) {
             suggestions.cardsInDeck = app.deck.get_cards();
 
             if (suggestions.cardsInDeck.length == 0) {
