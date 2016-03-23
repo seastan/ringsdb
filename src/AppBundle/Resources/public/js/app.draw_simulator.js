@@ -24,6 +24,19 @@
             .on('click', 'button.btn', draw_simulator.handle_click)
             .on('click', 'img, div.card-proxy', draw_simulator.toggle_opacity);
         container = $('#table-draw-simulator-content');
+
+
+        $('#oddsModal input').on('input', draw_simulator.calculate_modal_odds);
+        draw_simulator.calculate_modal_odds();
+    };
+
+    draw_simulator.calculate_modal_odds = function() {
+        var initial_size = parseInt($('#odds-calculator-N').val(), 10);
+        var draw_count = parseInt($('#odds-calculator-n').val(), 10);
+        var card_count = parseInt($('#odds-calculator-K').val(), 10);
+        var cards_drawn = parseInt($('#odds-calculator-k').val(), 10);
+        var odd = app.hypergeometric.get_cumul(cards_drawn, initial_size, card_count, draw_count);
+        $('#odds-calculator-p').text(Math.round(100 * odd));
     };
 
     /**
@@ -44,7 +57,7 @@
     /**
      * @memberOf draw_simulator
      */
-    draw_simulator.update_odds = function update_odds() {
+    draw_simulator.update_odds = function() {
         for (var i = 1; i <= 3; i++) {
             var odd = app.hypergeometric.get_cumul(1, initial_size, i, draw_count);
             $('#draw-simulator-odds-' + i).text(Math.round(100 * odd));
