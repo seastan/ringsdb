@@ -482,7 +482,7 @@ class ApiController extends Controller {
 
 		$qb = $em->createQueryBuilder();
 		// Select decklists
-		$qb->select('d');
+		$qb->select('d.id, d.name, d.nameCanonical, d.dateCreation, d.dateUpdate');
 		$qb->from('AppBundle:Decklist', 'd');
 
 		// high popularity
@@ -521,6 +521,8 @@ class ApiController extends Controller {
             ]);
             unset($decklist['descriptionMd']);
             unset($decklist['descriptionHtml']);
+            $decklist['dateCreation'] = $decklist['dateCreation']->format('c');
+            $decklist['dateUpdate'] = $decklist['dateUpdate']->format('c');
         }
 
         $content = json_encode($decklists);
