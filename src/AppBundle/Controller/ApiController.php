@@ -503,7 +503,7 @@ class ApiController extends Controller {
         $decklists = $query->getArrayResult();
 
         $lastModified = NULL;
-        foreach($decklists as $decklist) {
+        foreach($decklists as &$decklist) {
             if (!$lastModified || $lastModified < $decklist['dateUpdate']) {
                 $lastModified = $decklist['dateUpdate'];
             }
@@ -512,6 +512,14 @@ class ApiController extends Controller {
         $response->setLastModified($lastModified);
         if ($response->isNotModified($request)) {
             return $response;
+        }
+
+        foreach($decklists as &$decklist) {
+            $decklist['url'] = $this->generateUrl('decklist_detail', [
+                'decklist_id' => $decklist['id'],
+                'decklist_name' => $decklist['nameCanonical']
+            ]);
+            unset($decklist['descriptionMd']);
         }
 
         $content = json_encode($decklists);
