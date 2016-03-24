@@ -48,6 +48,15 @@ api_decklists_by_date:
         _format: json
         date: \d\d\d\d-\d\d-\d\d
 
+api_decklists_by_card:
+    path: /decklists/top_by_card/{card_code}.{_format}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Api:listTopDecklistsByCard
+        _format: json
+    requirements:
+        _format: json
+
 user_info:
     path: /user/info
     defaults:

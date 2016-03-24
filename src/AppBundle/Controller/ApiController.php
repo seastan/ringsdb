@@ -116,12 +116,12 @@ class ApiController extends Controller {
 		$card = $this->getDoctrine()->getRepository('AppBundle:Card')->findOneBy(["code" => $card_code]);
 
 		// check the last-modified-since header
-
 		$lastModified = null;
 		/* @var $card \AppBundle\Entity\Card */
 		if (!$lastModified || $lastModified < $card->getDateUpdate()) {
 			$lastModified = $card->getDateUpdate();
 		}
+
 		$response->setLastModified($lastModified);
 		if ($response->isNotModified($request)) {
 			return $response;
@@ -415,6 +415,95 @@ class ApiController extends Controller {
 		if ($response->isNotModified($request)) {
 			return $response;
 		}
+
+		$content = json_encode($decklists);
+
+		if (isset($jsonp)) {
+			$content = "$jsonp($content)";
+			$response->headers->set('Content-Type', 'application/javascript');
+		} else {
+			$response->headers->set('Content-Type', 'application/json');
+		}
+
+		$response->setContent($content);
+
+		return $response;
+	}
+
+	/**
+	 * Get the top 10 decklists published containing given card, as an array of JSON objects.
+	 *
+	 * @ApiDoc(
+	 *  section="Decklist",
+	 *  resource=true,
+	 *  description="Top 10 Decklists containing a specific card",
+	 *  parameters={
+	 *      {"name"="jsonp", "dataType"="string", "required"=false, "description"="JSONP callback"}
+	 *  },
+	 *  requirements={
+	 *      {
+	 *          "name"="card_code",
+	 *          "dataType"="string",
+	 *          "description"="The code of the card to get, e.g. '01001'"
+	 *      },
+	 *      {
+	 *          "name"="_format",
+	 *          "dataType"="string",
+	 *          "requirement"="json",
+	 *          "description"="The format of the returned data. Only 'json' is supported at the moment."
+	 *      }
+	 *  },
+	 * )
+	 * @param Request $request
+	 */
+	public function listTopDecklistsByCardAction($card_code, Request $request) {
+		$response = new Response();
+		$response->setPublic();
+		$response->setMaxAge($this->container->getParameter('cache_expiration'));
+		$response->headers->add(['Access-Control-Allow-Origin' => '*']);
+
+		$jsonp = $request->query->get('jsonp');
+
+		$format = $request->getRequestFormat();
+		if ($format !== 'json') {
+			$response->setContent($request->getRequestFormat() . ' format not supported. Only json is supported.');
+
+			return $response;
+		}
+
+        $em = $this->getDoctrine()->getManager();
+
+		$card = $this->getDoctrine()->getRepository('AppBundle:Card')->findOneBy(['code' => $card_code]);
+		if (!$card) {
+			$response->setContent(json_encode([ 'success' => false, 'error' => 'Card not found.' ]));
+
+			return $response;
+		}
+
+		$qb = $em->createQueryBuilder();
+		// Select decklists
+		$qb->select('d');
+		$qb->from('AppBundle:Decklist', 'd');
+
+		// high popularity
+		$qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
+		$qb->orderBy('popularity', 'DESC');
+
+		// containing the card
+		$qb->innerJoin('d.slots', "s");
+		$qb->andWhere("s.card = :card");
+		$qb->setParameter("card", $card);
+
+		// limit 10
+		$qb->setMaxResults(10);
+
+		$query = $qb->getQuery();
+		$query->useResultCache('listTopDecklistsByCardAction' . $card_code);
+		$query->setResultCacheLifetime($this->container->getParameter('cache_expiration'));
+
+
+		/* @var $decklists \Doctrine\Common\Collections\ArrayCollection */
+        $decklists = $query->getArrayResult();
 
 		$content = json_encode($decklists);
 
