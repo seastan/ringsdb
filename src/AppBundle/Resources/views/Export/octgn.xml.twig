@@ -14,6 +14,9 @@
 {% for slot in deck.slots_by_type.attachment %}
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
 {% endfor %}
+{% for slot in deck.slots_by_type.treasure %}
+    <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+{% endfor %}
   </section>
   <section name="Event" shared="False">
 {% for slot in deck.slots_by_type.event %}

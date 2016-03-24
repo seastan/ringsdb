@@ -1,6 +1,6 @@
 (function app_fuzzy_search(fuzzy_search, $) {
 
-    var types = ['hero', 'ally', 'event', 'attachment'];
+    var types = ['hero', 'ally', 'event', 'attachment', 'player-side-quest', 'treasure'];
     var dict = [];
 
     /**

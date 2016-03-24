@@ -48,7 +48,7 @@ class DefaultController extends Controller {
                 $countByType = $decklist->getSlots()->getCountByType();
                 $counts = [];
                 foreach ($countByType as $code => $qty) {
-                    if ($code == 'hero') {
+                    if ($code == 'hero' || $qty == 0) {
                         continue;
                     }
                     $typeName = $typeNames[$code];

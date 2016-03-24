@@ -679,7 +679,7 @@
     ui.on_deck_modified = function on_deck_modified() {
         ui.refresh_deck();
         ui.refresh_list();
-        app.suggestions && app.suggestions.initialized && app.suggestions.compute();
+        app.suggestions && Config['show-suggestions'] != 0 && app.suggestions.compute();
     };
 
 
@@ -693,7 +693,7 @@
         app.deck.display('#deck-content', DisplayOptions);
         app.draw_simulator && app.draw_simulator.reset();
         app.deck_charts && app.deck_charts.setup();
-        app.suggestions && app.suggestions.initialized && app.suggestions.compute();
+        app.suggestions && Config['show-suggestions'] != 0 && app.suggestions.compute();
     };
 
     /**

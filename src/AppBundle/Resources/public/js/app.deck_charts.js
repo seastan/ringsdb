@@ -110,18 +110,23 @@
             'Ally': '<span class="icon icon-ally"></span>',
             'Attachment': '<span class="icon icon-attachment"></span>',
             'Event': '<span class="icon icon-event"></span>',
-            'Player Side Quest': '<span class="icon icon-player-side-quest"></span>'
+            'Player Side Quest': '<span class="icon icon-player-side-quest"></span>',
+            'Treasure': '<span class="icon icon-treasure"></span>'
         };
 
         var iData = {
-            'ally': 0,
-            'attachment': 1,
-            'event': 2,
-            'player-side-quest': 3
+            'ally': { i: 0, name: 'Ally' },
+            'attachment': { i: 1, name: 'Attachment' },
+            'event': { i: 2, name: 'Event' },
+            'player-side-quest': { i: 3, name: 'Player Side Quest' },
+            'treasure': { i: 4, name: 'Treasure' }
         };
 
+        var validTypes = {};
+        var validIndexes = {};
+
         var series = [];
-        var iSeries = {}
+        var iSeries = {};
 
         var draw_deck = app.deck.get_draw_deck();
         draw_deck.forEach(function(card) {
@@ -131,7 +136,7 @@
                 serie = {
                     name: card.sphere_name,
                     color: sphere_colors[card.sphere_code],
-                    data: [0, 0, 0, 0],
+                    data: [0, 0, 0, 0, 0],
                     type: "column",
                     animation: false,
                     showInLegend: false
@@ -144,8 +149,20 @@
 
             var d = iData[card.type_code];
             if (d !== undefined) {
-                serie.data[d] += card.indeck;
+                validTypes[d.name] = true;
+                validIndexes[d.i] = true;
+                serie.data[d.i] += card.indeck;
             }
+        });
+
+        categories = _.omit(categories, function(value, key) {
+            return !validTypes[key];
+        });
+
+        _.each(series, function(serie) {
+            serie.data = _.filter(serie.data, function(value, index) {
+                return validIndexes[index];
+            });
         });
 
         $("#deck-chart-type").highcharts({

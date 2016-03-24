@@ -44,4 +44,13 @@ Player Side Quests ({{ sidequests | length }})
 {{ slot.quantity }}x {{ slot.card.name }} ({{ slot.card.pack.name }})
 {% endfor %}
 
+{% if deck.slots_by_type['treasure']|length %}
+{% set treasures = deck.slots_by_type['treasure'] %}
+Treasures ({{ treasures | length }})
+
+{% for slot in treasures %}
+{{ slot.quantity }}x {{ slot.card.name }} ({{ slot.card.pack.name }})
+{% endfor %}
+{% endif %}
+
 {{ footer|default('') }}
