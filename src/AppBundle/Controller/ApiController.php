@@ -475,7 +475,7 @@ class ApiController extends Controller {
 
 		$card = $this->getDoctrine()->getRepository('AppBundle:Card')->findOneBy(['code' => $card_code]);
 		if (!$card) {
-			$response->setContent(json_encode([ 'success' => false, 'error' => 'Card not found.' ]));
+			$response->setContent('[]');
 
 			return $response;
 		}
