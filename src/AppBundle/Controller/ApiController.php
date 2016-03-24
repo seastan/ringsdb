@@ -498,14 +498,23 @@ class ApiController extends Controller {
 		$qb->setMaxResults(10);
 
 		$query = $qb->getQuery();
-		$query->useResultCache('listTopDecklistsByCardAction' . $card_code);
-		$query->setResultCacheLifetime($this->container->getParameter('cache_expiration'));
 
-
-		/* @var $decklists \Doctrine\Common\Collections\ArrayCollection */
+        /* @var $decklists \Doctrine\Common\Collections\ArrayCollection */
         $decklists = $query->getArrayResult();
 
-		$content = json_encode($decklists);
+        $lastModified = NULL;
+        foreach($decklists as $decklist) {
+            if (!$lastModified || $lastModified < $decklist['dateUpdate']) {
+                $lastModified = $decklist['dateUpdate'];
+            }
+        }
+
+        $response->setLastModified($lastModified);
+        if ($response->isNotModified($request)) {
+            return $response;
+        }
+
+        $content = json_encode($decklists);
 
 		if (isset($jsonp)) {
 			$content = "$jsonp($content)";
