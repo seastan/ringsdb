@@ -520,6 +520,7 @@ class ApiController extends Controller {
                 'decklist_name' => $decklist['nameCanonical']
             ]);
             unset($decklist['descriptionMd']);
+            unset($decklist['descriptionHtml']);
         }
 
         $content = json_encode($decklists);
