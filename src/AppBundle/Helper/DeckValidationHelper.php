@@ -8,11 +8,14 @@ class DeckValidationHelper {
 
     public function getInvalidCards($deck) {
         $invalidCards = [];
+
+        /*
         foreach ($deck->getSlots() as $slot) {
             if (!$this->canIncludeCard($deck, $slot->getCard())) {
                 $invalidCards[] = $slot->getCard();
             }
         }
+        */
 
         return $invalidCards;
     }
@@ -21,7 +24,7 @@ class DeckValidationHelper {
         return true;
     }
 
-    public function findProblem($deck) {
+    public function findProblem($deck, $casualPlay = false) {
         $heroDeck = $deck->getSlots()->getHeroDeck();
         $heroDeckSize = $heroDeck->countCards();
 
@@ -42,13 +45,17 @@ class DeckValidationHelper {
             $heroes[$hero->getCard()->getName()] = true;
         }
 
-        if ($deck->getSlots()->getDrawDeck()->countCards() < 50) {
+        $cardsCount = $deck->getSlots()->getDrawDeck()->countCards();
+        if ($cardsCount < 40) {
             return 'too_few_cards';
+        } else if ($cardsCount < 50 && !$casualPlay) {
+            return 'invalid_for_tournament_play';
         }
 
         if (!empty($this->getInvalidCards($deck))) {
             return 'invalid_cards';
         }
+
         return null;
     }
 
@@ -60,6 +67,7 @@ class DeckValidationHelper {
             'too_many_heroes' => "Contains too many Heroes",
             'too_few_heroes' => "Contains too few Heroes",
             'too_few_cards' => "Contains too few cards",
+            'invalid_for_tournament_play' => "Invalid for tournament play for having less than 50 cards",
             'duplicated_unique_heroes' => "More than one hero with the same unique name",
             'invalid_cards' => "Contains forbidden cards"
         ];

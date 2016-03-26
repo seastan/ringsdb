@@ -58,7 +58,7 @@ class SocialController extends Controller {
         }
         */
 
-        $problem = $this->get('deck_validation_helper')->findProblem($deck);
+        $problem = $this->get('deck_validation_helper')->findProblem($deck, true);
         if ($problem) {
             $this->get('session')->getFlashBag()->set('error', "This deck cannot be published because it is invalid.");
 

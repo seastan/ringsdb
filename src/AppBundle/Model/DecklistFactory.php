@@ -18,7 +18,7 @@ class DecklistFactory {
     }
 
     public function createDecklistFromDeck(Deck $deck, $name = null, $descriptionMd = null) {
-        $problem = $this->deckValidationHelper->findProblem($deck);
+        $problem = $this->deckValidationHelper->findProblem($deck, true);
         if ($problem) {
             throw new \Exception('This deck cannot be published  because it is invalid: "' . $this->deckValidationHelper->getProblemLabel($problem) . '".');
         }

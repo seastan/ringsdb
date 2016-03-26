@@ -11,6 +11,7 @@
     var problem_labels = {
         too_many_heroes: "Contains too many Heroes",
         too_few_heroes: "Contains too few Heroes",
+        invalid_for_tournament_play: "Invalid for tournament play for having less than 50 cards",
         duplicated_unique_heroes: "More than one hero with the same unique name",
         too_few_cards: "Contains too few cards",
         invalid_cards: "Contains forbidden cards"
@@ -548,8 +549,11 @@
         }
 
         // at least 50 others cards
-        if (deck.get_draw_deck_size() < 50) {
+        var decksize = deck.get_draw_deck_size();
+        if (decksize < 40) {
             return 'too_few_cards';
+        } else if (decksize < 50) {
+            return 'invalid_for_tournament_play';
         }
 
         // no invalid card
