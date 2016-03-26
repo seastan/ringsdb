@@ -644,6 +644,7 @@
             url: Routing.generate('cards_zoom', { card_code: card.code }),
             card: card
         });
+
         return $(html);
     };
 
@@ -690,6 +691,10 @@
             var row = divs[card.code];
             if (!row) {
                 row = divs[card.code] = ui.build_row(card);
+            }
+
+            if (card.is_unique) {
+                row.find('a').css('font-weight', 'bold');
             }
 
             row.data("code", card.code).addClass('card-container');
