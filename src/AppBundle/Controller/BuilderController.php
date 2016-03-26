@@ -541,10 +541,10 @@ class BuilderController extends Controller {
         $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
 
         $content = ['main' => [], 'side' => []];
-        foreach ($deck->getSlots() as $slot) {
+        foreach ($decklist->getSlots() as $slot) {
             $content['main'][$slot->getCard()->getCode()] = $slot->getQuantity();
         }
-        foreach ($deck->getSideslots() as $slot) {
+        foreach ($decklist->getSideslots() as $slot) {
             $content['side'][$slot->getCard()->getCode()] = $slot->getQuantity();
         }
 
