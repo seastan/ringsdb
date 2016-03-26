@@ -51,7 +51,7 @@
     /**
      * @memberOf deck
      */
-    deck.init = function init(data) {
+    deck.init = function(data) {
         date_creation = data.date_creation;
         date_update = data.date_update;
         description_md = data.description_md;
@@ -62,22 +62,33 @@
         user_id = data.user_id;
 
         if (app.data.isLoaded) {
-            deck.set_slots(data.slots);
+            deck.set_slots(data.slots, data.sideslots);
         } else {
             $(document).on('data.app', function () {
-                deck.set_slots(data.slots);
+                deck.set_slots(data.slots, data.sideslots);
             });
         }
     };
 
-    deck.set_slots = function set_slots(slots) {
+    deck.set_slots = function(slots, sideslots) {
         app.data.cards.update({}, {
-            indeck: 0
+            indeck: 0,
+            insidedeck: 0
         });
 
-        for (code in slots) {
+        for (var code in slots) {
             if (slots.hasOwnProperty(code)) {
-                app.data.cards.updateById(code, { indeck: slots[code] });
+                app.data.cards.updateById(code, {
+                    indeck: slots[code]
+                });
+            }
+        }
+
+        for (var side_code in sideslots) {
+            if (sideslots.hasOwnProperty(side_code)) {
+                app.data.cards.updateById(side_code, {
+                    insidedeck: sideslots[side_code]
+                });
             }
         }
     };
@@ -86,7 +97,7 @@
      * @memberOf deck
      * @returns string
      */
-    deck.get_id = function get_id() {
+    deck.get_id = function() {
         return id;
     };
 
@@ -94,7 +105,7 @@
      * @memberOf deck
      * @returns string
      */
-    deck.get_name = function get_name() {
+    deck.get_name = function() {
         return name;
     };
 
@@ -102,14 +113,14 @@
      * @memberOf deck
      * @returns string
      */
-    deck.get_description_md = function get_description_md() {
+    deck.get_description_md = function() {
         return description_md;
     };
 
     /**
      * @memberOf deck
      */
-    deck.get_cards = function get_cards(sort, query) {
+    deck.get_cards = function(sort, query) {
         sort = sort || {};
         sort['code'] = 1;
 
@@ -123,10 +134,24 @@
         });
     };
 
+    deck.get_side_cards = function(sort, query) {
+        sort = sort || {};
+        sort['code'] = 1;
+
+        query = query || {};
+        query.insidedeck = {
+            '$gt': 0
+        };
+
+        return app.data.cards.find(query, {
+            '$orderBy': sort
+        });
+    };
+
     /**
      * @memberOf deck
      */
-    deck.get_draw_deck = function get_draw_deck(sort) {
+    deck.get_draw_deck = function(sort) {
         return deck.get_cards(sort, {
             type_code: {
                 '$nin': ['hero']
@@ -134,10 +159,12 @@
         });
     };
 
+
+
     /**
      * @memberOf deck
      */
-    deck.get_draw_deck_size = function get_draw_deck_size(sort) {
+    deck.get_draw_deck_size = function(sort) {
         var draw_deck = deck.get_draw_deck(sort);
         return deck.get_nb_cards(draw_deck);
     };
@@ -145,7 +172,7 @@
     /**
      * @memberOf deck
      */
-    deck.get_hero_deck = function get_hero_deck(primarySpheresOnly, sort) {
+    deck.get_hero_deck = function(primarySpheresOnly, sort) {
         var where = {
             type_code: 'hero'
         };
@@ -162,34 +189,51 @@
     /**
      * @memberOf deck
      */
-    deck.get_hero_deck_size = function get_hero_deck_size(primarySpheres, sort) {
+    deck.get_hero_deck_size = function(primarySpheres, sort) {
         var hero_deck = deck.get_hero_deck(primarySpheres, sort);
         return deck.get_nb_cards(hero_deck);
+    };
+
+    deck.get_heroes_spheres = function() {
+        var heroes = deck.get_hero_deck();
+        return _.uniq(_.pluck(heroes, 'sphere_code'));
     };
 
     deck.get_starting_threat = function() {
         var hero_deck = deck.get_hero_deck();
         var threat = _.pluck(hero_deck, 'threat');
-        return _.reduce(threat, function(memo, num) { return memo + num; }, 0);
+        var total = _.reduce(threat, function(memo, num) { return memo + num; }, 0);
+
+        // Reduce threat for Mirlonde
+        var mirlonde = _.find(hero_deck, { name: 'Mirlonde', pack_code: 'TDF' });
+        if (mirlonde) {
+            _.each(hero_deck, function(hero) {
+                if (hero.sphere_code == 'lore') {
+                    total--;
+                }
+            });
+        }
+
+        return total;
     };
 
-    deck.get_nb_cards = function get_nb_cards(cards) {
+    deck.get_nb_cards = function(cards, is_sideboard) {
         if (!cards) {
-            cards = deck.get_cards();
+            cards = is_sideboard ? deck.get_side_cards() : deck.get_cards();
         }
-        var quantities = _.pluck(cards, 'indeck');
+        var quantities = _.pluck(cards, is_sideboard ? 'insidedeck' : 'indeck');
         return _.reduce(quantities, function(memo, num) { return memo + num; }, 0);
     };
 
     /**
      * @memberOf deck
      */
-    deck.get_included_packs = function() {
-        var cards = deck.get_cards();
+    deck.get_included_packs = function(is_sideboard) {
+        var cards = is_sideboard ? deck.get_side_cards() : deck.get_cards();
         var nb_packs = {};
 
         cards.forEach(function(card) {
-            nb_packs[card.pack_code] = Math.max(nb_packs[card.pack_code] || 0, card.indeck / card.quantity);
+            nb_packs[card.pack_code] = Math.max(nb_packs[card.pack_code] || 0, Math.ceil(card.indeck / card.quantity));
         });
 
         var pack_codes = _.uniq(_.pluck(cards, 'pack_code'));
@@ -211,22 +255,62 @@
         return packs;
     };
 
-    deck.get_lastest_pack = function() {
-        var packs = deck.get_included_packs();
+    deck.get_lastest_pack = function(is_sideboard) {
+        var packs = deck.get_included_packs(is_sideboard);
         return packs[packs.length - 1] || {};
     };
 
     /**
      * @memberOf deck
      */
-    deck.display = function display(container, options) {
+    deck.display = function(container, options, is_sideboard) {
         options = _.extend({ sort: 'type', cols: 2 }, options);
 
-        var layout_data = deck.get_layout_data(options);
-        var deck_content = layouts[options.sort][options.cols](layout_data);
+        var layout_data = is_sideboard ? deck.get_side_layout_data(options) : deck.get_layout_data(options);
+        var deck_content = layout_data ? layouts[options.sort][options.cols](layout_data) : '';
 
-        $(container).removeClass('deck-loading').empty();
-        $(container).append(deck_content);
+        $(container).removeClass('deck-loading').empty().append(deck_content);
+    };
+
+    deck.get_side_layout_data = function(options) {
+        var data = {
+        };
+
+        var packs = deck.get_included_packs(true);
+
+        if (!packs.length) {
+            return null;
+        }
+
+        var title = $('<h4 style="font-weight: bold">Sideboard</h4>');
+        deck.update_layout_section(data, 'meta', title);
+
+        if (options.sort == 'type') {
+            deck.update_layout_section(data, 'heroes', deck.get_layout_data_one_section('type_code', 'hero', 'type_name', true));
+            deck.update_layout_section(data, 'allies', deck.get_layout_data_one_section('type_code', 'ally', 'type_name', true));
+            deck.update_layout_section(data, 'attachments', deck.get_layout_data_one_section('type_code', 'attachment', 'type_name', true));
+            deck.update_layout_section(data, 'events', deck.get_layout_data_one_section('type_code', 'event', 'type_name', true));
+            deck.update_layout_section(data, 'sidequests', deck.get_layout_data_one_section('type_code', 'player-side-quest', 'type_name', true));
+            deck.update_layout_section(data, 'treasures', deck.get_layout_data_one_section('type_code', 'treasure', 'type_name', true));
+        }
+
+        if (options.sort == 'position') {
+            packs.forEach(function(pack) {
+                deck.update_layout_section(data, pack.code, deck.get_layout_data_one_section('pack_code', pack.code, 'pack_name', true));
+            });
+        }
+
+        if (options.sort == 'sphere') {
+            ['leadership', 'lore', 'spirit', 'tactics', 'neutral', 'baggins', 'fellowship'].forEach(function(sphere) {
+                deck.update_layout_section(data, sphere, deck.get_layout_data_one_section('sphere_code', sphere, 'sphere_name', true));
+            });
+        }
+
+        if (options.sort == 'name') {
+            deck.update_layout_section(data, 'name', deck.get_layout_data_one_section('name', null, 'Cards', true));
+        }
+
+        return data;
     };
 
     deck.get_layout_data = function(options) {
@@ -247,13 +331,17 @@
             sizeinfo.addClass('text-danger');
         }
 
+        var packs = deck.get_included_packs();
+
         var packinfo;
         if (displayFullPackInfo) {
-            packinfo = $('<div>Packs: ' + _.map(deck.get_included_packs(), function (pack) { return pack.name + (pack.quantity > 1 ? ' (' + pack.quantity + ')' : ''); }).join(', ') + '</div>');
+            packinfo = $('<div>Packs: ' + _.map(packs, function (pack) { return pack.name + (pack.quantity > 1 ? ' (' + pack.quantity + ')' : ''); }).join(', ') + '</div>');
         } else {
             packinfo = $('<div id="latestpack">Cards up to <i>' + (deck.get_lastest_pack().name || '-') + '</i></div>');
 
-            $('<small><i style="cursor: pointer; padding-left: 5px;" class="fa fa-plus-square-o expand-packs"></i></small>').appendTo(packinfo);
+            if (packs.length) {
+                $('<small><i style="cursor: pointer; padding-left: 5px;" class="fa fa-plus-square-o expand-packs"></i></small>').appendTo(packinfo);
+            }
         }
 
         deck.update_layout_section(data, 'meta', title);
@@ -276,8 +364,6 @@
         }
 
         if (options.sort == 'position') {
-            var packs = deck.get_included_packs();
-
             packs.forEach(function(pack) {
                 deck.update_layout_section(data, pack.code, deck.get_layout_data_one_section('pack_code', pack.code, 'pack_name'));
             });
@@ -296,7 +382,7 @@
         return data;
     };
 
-    deck.update_layout_section = function update_layout_section(data, section, element) {
+    deck.update_layout_section = function(data, section, element) {
         if (!data[section]) {
             data[section] = '';
         }
@@ -308,9 +394,12 @@
         data[section] += element[0].outerHTML;
     };
 
-    deck.get_layout_data_one_section = function(sortKey, sortValue, displayLabel) {
+    deck.get_layout_data_one_section = function(sortKey, sortValue, displayLabel, is_sideboard) {
         var section = $('<div />');
         var query = {};
+
+        var getCards = is_sideboard ? deck.get_side_cards : deck.get_cards;
+        var key = is_sideboard ? 'insidedeck' : 'indeck';
 
         if (sortValue) {
             query[sortKey] = sortValue;
@@ -319,29 +408,34 @@
         var cards;
 
         if (sortKey == 'type_code' || sortKey == 'name') {
-            cards = deck.get_cards({ name: 1 }, query);
+            cards = getCards({ name: 1 }, query);
         } else if (sortKey == 'pack_code') {
-            cards = deck.get_cards({ position: 1 }, query);
+            cards = getCards({ position: 1 }, query);
         } else {
-            cards = deck.get_cards({ type_code: 1, code: 1 }, query);
+            cards = getCards({ type_code: 1, code: 1 }, query);
         }
 
         if (!cards.length) {
             return null;
         }
 
-        $(header_tpl({ code: sortValue, name: cards[0][displayLabel] || 'Cards', quantity: deck.get_nb_cards(cards) })).appendTo(section);
+        $(header_tpl({ code: sortValue, name: cards[0][displayLabel] || 'Cards', quantity: deck.get_nb_cards(cards, is_sideboard) })).appendTo(section);
 
         cards.forEach(function(card) {
-            if (card.type_code == 'hero' && sortKey == 'type_code') {
-                $('<div class="deck-hero"/>')
+            if (card.type_code == 'hero' && sortKey == 'type_code' && !is_sideboard) {
+                var div = $('<div class="deck-hero"/>')
                     .append('<div class="hero-thumbnail card-thumbnail-2x card-thumbnail-hero" style="background-image:url(\'/bundles/cards/' + card.code + '.png\')"></div>')
-                    .append($(card_line_tpl({ card: card })))
-                    .appendTo(section);
+                    .append($(card_line_tpl({ card: card })));
+
+                if (!deck.i_have_this_card(card)) {
+                    div.append(' <i class="fa fa-exclamation-triangle not-in-collection" title="This card is not in my collection"></i>');
+                }
+
+                div.appendTo(section);
             } else {
                 var tpl = $(card_line_tpl({ card: card }));
 
-                var div = $('<div />').append(tpl).prepend(sortKey != 'type_code' || card.type_code != 'hero' ? card.indeck + 'x ' : '').appendTo(section);
+                var div = $('<div />').append(tpl).prepend(sortKey != 'type_code' || card.type_code != 'hero' ? card[key] + 'x ' : '').appendTo(section);
 
                 if (card.is_unique && card.type_code != 'hero') {
                     div.find('a').css('font-weight', 'bold');
@@ -371,69 +465,71 @@
 
     /**
      * @memberOf deck
-     * @return boolean true if at least one other card quantity was updated
+     * @return integer final count indeck for card_code. each copy in sideboard removes one from the deck
      */
-    deck.set_card_copies = function set_card_copies(card_code, nb_copies) {
+    deck.set_card_copies = function(card_code, nb_copies, is_sideboard) {
         var card = app.data.cards.findById(card_code);
         if (!card) {
             return false;
         }
 
-        var updated_other_card = false;
+        var update = {};
 
-        // card-specific rules
-        // Reserved for future features
-        /*
-        switch (card.type_code) {
-            case 'agenda':
-                app.data.cards.update({
-                    type_code: 'agenda'
-                }, {
-                    indeck: 0
-                });
-                updated_other_card = true;
-                break;
+        if (!is_sideboard) {
+            update.indeck = nb_copies;
+            update.insidedeck = Math.min(card.insidedeck, card.maxqty - nb_copies);
+        } else {
+            update.insidedeck = nb_copies;
+            update.indeck = Math.min(card.indeck, card.maxqty - nb_copies);
         }
-        */
 
-        app.data.cards.updateById(card_code, {
-            indeck: nb_copies
-        });
+        app.data.cards.updateById(card_code, update);
         app.deck_history && app.deck_history.notify_change();
 
-        return updated_other_card;
+        return update.indeck;
     };
 
     /**
      * @memberOf deck
      */
-    deck.get_content = function get_content() {
+    deck.get_content = function() {
         var cards = deck.get_cards();
-        var content = {};
+        var side_cards = deck.get_side_cards();
+
+        var content = {
+            main: {},
+            side: {}
+        };
+
         cards.forEach(function(card) {
-            content[card.code] = card.indeck;
+            content.main[card.code] = card.indeck;
         });
+
+        side_cards.forEach(function(card) {
+            content.side[card.code] = card.insidedeck;
+        });
+
         return content;
     };
 
     /**
      * @memberOf deck
      */
-    deck.get_json = function get_json() {
+    deck.get_json = function() {
         return JSON.stringify(deck.get_content());
     };
 
     /**
      * @memberOf deck
      */
-    deck.get_export = function get_export(format) {
+    deck.get_export = function(format) {
 
     };
 
     /**
      * @memberOf deck
      */
-    deck.get_problem = function get_problem() {
+    deck.get_problem = function() {
         // exactly 7 plots
         var herocount = deck.get_hero_deck_size(true);
         if (herocount > 3) {
@@ -462,15 +558,6 @@
         }
     };
 
-    /**
-     * @memberOf deck
-     * @returns
-     */
-    deck.get_heroes_spheres_code = function() {
-        var heroes = deck.get_hero_deck();
-        return _.uniq(_.pluck(heroes, 'sphere_code'));
-    };
-
     deck.get_invalid_cards = function() {
         return _.filter(deck.get_cards(), function(card) {
             return !deck.can_include_card(card);
@@ -497,77 +584,90 @@
     deck.build_bbcode = function() {
         var lines = [];
 
-        lines.push("[b]" + deck.get_name() + "[/b]");
+        lines.push('[b]' + deck.get_name() + '[/b]');
 
-        $('#deck-content h5:visible').each(function(i, type) {
-            lines.push("");
-            lines.push("[b]" + $(type).text().trim() + "[/b]");
+        $('#deck-content, #deck-side-content').find('h4:visible, h5:visible').each(function(i, type) {
+            lines.push('');
 
-            $(type).siblings().each(function(j, line) {
+            if (type.tagName.toLowerCase() == 'h4') {
+                lines.push('[i]' + $(type).text().trim() + '[/i]');
+                return;
+            } else {
+                lines.push('[b]' + $(type).text().trim() + '[/b]');
+            }
+
+            $(this).parent().find('> div:not(.hero-deck-list), .hero-deck-list > div').each(function(j, line) {
                 var line = $(line);
-                var qty = line.ignore("a, span, small").text().trim().replace(/x.*/, "x");
+                var qty = line.ignore('a, span, small').text().trim().replace(/x.*/, 'x');
                 var card = app.data.cards.findById(line.find('a.card').data('code'));
 
                 if (card) {
-                    lines.push(qty + ' [url=http://ringsdb.com/card/' + card.code + ']' + card.name + '[/url] [i](' + card.pack_name + ")[/i]");
+                    var str = qty + ' [url=http://ringsdb.com/card/' + card.code + ']' + card.name + '[/url] [i](' + card.pack_name + ')[/i]';
+                    lines.push(str.trim());
                 }
             });
         });
 
-        lines.push("");
+        lines.push('');
         lines.push($('#cardcount').text());
         lines.push($('#latestpack').text());
-        lines.push("");
+        lines.push('');
 
         if (app.user.params.decklist_id) {
-            lines.push("Decklist [url="+location.href+"]build and published on RingsDB[/url].");
+            lines.push('Decklist [url='+location.href+']build and published on RingsDB[/url].');
         } else {
-            lines.push("Deck built on [url=http://ringsdb.com]RingsDB[/url].");
+            lines.push('Deck built on [url=http://ringsdb.com]RingsDB[/url].');
         }
 
         return lines;
     };
 
     deck.export_markdown = function() {
-        $('#export-deck').html(deck.build_markdown().join("\n"));
+        $('#export-deck').html(deck.build_markdown().join('\n'));
         $('#exportModal').modal('show');
     };
 
     deck.build_markdown = function() {
         var lines = [];
 
-        lines.push("## " + deck.get_name());
+        lines.push('#' + deck.get_name());
 
-        $('#deck-content h5:visible').each(function(i, type) {
-            lines.push("");
-            lines.push("###" + $(type).text().trim());
+        $('#deck-content, #deck-side-content').find('h4:visible, h5:visible').each(function(i, type) {
+            lines.push('');
 
-            $(type).siblings().each(function(j, line) {
+            if (type.tagName.toLowerCase() == 'h4') {
+                lines.push('##*' + $(type).text().trim() + '*');
+                return;
+            } else {
+                lines.push('###' + $(type).text().trim());
+            }
+
+            $(this).parent().find('> div:not(.hero-deck-list), .hero-deck-list > div').each(function(j, line) {
                 var line = $(line);
-                var qty = line.ignore("a, span, small").text().trim().replace(/x.*/, "x");
+                var qty = line.ignore('a, span, small').text().trim().replace(/x.*/, 'x');
                 var card = app.data.cards.findById(line.find('a.card').data('code'));
 
                 if (card) {
-                    lines.push('* '+ qty + ' [' + card.name + '](http://ringsdb.com/card/' + card.code + ') _(' + card.pack_name + ")_");
+                    lines.push('* ' + qty + ' [' + card.name + '](http://ringsdb.com/card/' + card.code + ') _(' + card.pack_name + ')_');
                 }
             });
         });
 
-        lines.push("");
-        lines.push($('#cardcount').text() + "  ");
-        lines.push($('#latestpack').text() + "  ");
-        lines.push("");
+        lines.push('');
+        lines.push($('#cardcount').text() + '  ');
+        lines.push($('#latestpack').text() + '  ');
+        lines.push('');
 
         if (app.user.params.decklist_id) {
-            lines.push("Decklist [build and published on RingsDB]("+location.href+").");
+            lines.push('Decklist [build and published on RingsDB]('+location.href+').');
         } else {
-            lines.push("Deck built on [RingsDB](http://ringsdb.com).");
+            lines.push('Deck built on [RingsDB](http://ringsdb.com).');
         }
         return lines;
     };
 
     deck.export_plaintext = function() {
-        $('#export-deck').html(deck.build_plaintext().join("\n"));
+        $('#export-deck').html(deck.build_plaintext().join('\n'));
         $('#exportModal').modal('show');
     };
 
@@ -576,11 +676,15 @@
 
         lines.push(deck.get_name());
 
-        $('#deck-content h5:visible').each(function(i, type) {
-            lines.push("");
-            lines.push($(type).text().trim());
+        $('#deck-content, #deck-side-content').find('h4:visible, h5:visible').each(function(i, type) {
+            lines.push('');
+            lines.push($(this).text().trim());
 
-            $(type).siblings().each(function(j, line) {
+            if (type.tagName.toLowerCase() == 'h4') {
+                return;
+            }
+
+            $(this).parent().find('> div:not(.hero-deck-list), .hero-deck-list > div').each(function(j, line) {
                 var line = $(line);
                 var card = app.data.cards.findById(line.find('a.card').data('code'));
 
@@ -590,15 +694,15 @@
             });
         });
 
-        lines.push("");
+        lines.push('');
         lines.push($('#cardcount').text());
         lines.push($('#latestpack').text());
-        lines.push("");
+        lines.push('');
 
         if (app.user.params.decklist_id) {
-            lines.push("Decklist built and published on " + location.href);
+            lines.push('Decklist built and published on ' + location.href);
         } else {
-            lines.push("Deck built on http://ringsdb.com.");
+            lines.push('Deck built on http://ringsdb.com.');
         }
         return lines;
     };

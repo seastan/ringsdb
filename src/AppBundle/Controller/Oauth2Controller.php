@@ -118,63 +118,63 @@ class Oauth2Controller extends Controller
 	 * )
 	 * @param Request $request
 	 */
-	public function saveDeckAction($id, Request $request)
-	{
-		/* @var $deck \AppBundle\Entity\Deck */
-
-		if(!$id)
-		{
-			$deck = new Deck();
-			$this->getDoctrine()->getManager()->persist($deck);
-		}
-		else
-		{
-			$deck = $this->getDoctrine()->getRepository('AppBundle:Deck')->find($id);
-			if($deck->getUser()->getId() !== $this->getUser()->getId())
-			{
-				throw $this->createAccessDeniedException("Access denied to this object.");
-			}
-		}
-		
-		$slots = (array) json_decode($request->get('slots'));
-		if (!count($slots)) {
-			return new JsonResponse([
-					'success' => FALSE,
-					'msg' => "Slots missing"
-			]);
-		}
-		foreach($slots as $card_code => $qty)
-		{
-			if(!is_string($card_code) || !is_integer($qty))
-			{
-				return new JsonResponse([
-						'success' => FALSE,
-						'msg' => "Slots invalid"
-				]);
-			}
-		}
-		
-		$name = filter_var($request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
-		if(!$name) {
-			return new JsonResponse([
-					'success' => FALSE,
-					'msg' => "Name missing"
-			]);
-		}
-		
-		$decklist_id = filter_var($request->get('decklist_id'), FILTER_SANITIZE_NUMBER_INT);
-		$description = trim($request->get('description'));
-		$tags = filter_var($request->get('tags'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
-		
-		$this->get('decks')->saveDeck($this->getUser(), $deck, $decklist_id, $name, $description, $tags, $slots, null);
-		
-		$this->getDoctrine()->getManager()->flush();
-		
-		return new JsonResponse([
-				'success' => TRUE,
-				'msg' => $deck->getId()
-		]);
-	}
+	//public function saveDeckAction($id, Request $request)
+	//{
+	//	/* @var $deck \AppBundle\Entity\Deck */
+    //
+	//	if(!$id)
+	//	{
+	//		$deck = new Deck();
+	//		$this->getDoctrine()->getManager()->persist($deck);
+	//	}
+	//	else
+	//	{
+	//		$deck = $this->getDoctrine()->getRepository('AppBundle:Deck')->find($id);
+	//		if($deck->getUser()->getId() !== $this->getUser()->getId())
+	//		{
+	//			throw $this->createAccessDeniedException("Access denied to this object.");
+	//		}
+	//	}
+	//
+	//	$slots = (array) json_decode($request->get('slots'));
+	//	if (!count($slots)) {
+	//		return new JsonResponse([
+	//				'success' => FALSE,
+	//				'msg' => "Slots missing"
+	//		]);
+	//	}
+	//	foreach($slots as $card_code => $qty)
+	//	{
+	//		if(!is_string($card_code) || !is_integer($qty))
+	//		{
+	//			return new JsonResponse([
+	//					'success' => FALSE,
+	//					'msg' => "Slots invalid"
+	//			]);
+	//		}
+	//	}
+	//
+	//	$name = filter_var($request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+	//	if(!$name) {
+	//		return new JsonResponse([
+	//				'success' => FALSE,
+	//				'msg' => "Name missing"
+	//		]);
+	//	}
+	//
+	//	$decklist_id = filter_var($request->get('decklist_id'), FILTER_SANITIZE_NUMBER_INT);
+	//	$description = trim($request->get('description'));
+	//	$tags = filter_var($request->get('tags'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+	//
+	//	$this->get('decks')->saveDeck($this->getUser(), $deck, $decklist_id, $name, $description, $tags, $slots, null);
+	//
+	//	$this->getDoctrine()->getManager()->flush();
+	//
+	//	return new JsonResponse([
+	//			'success' => TRUE,
+	//			'msg' => $deck->getId()
+	//	]);
+	//}
 
 	/**
 	 * Try to publish one Deck of the authenticated user

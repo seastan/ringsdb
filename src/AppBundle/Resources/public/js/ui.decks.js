@@ -127,7 +127,11 @@
     };
 
     ui.do_diff = function do_diff(ids) {
-        location.href = Routing.generate('decks_diff', {deck1_id: ids[0], deck2_id: ids[1]});
+        if (ids.length < 2) {
+            return false;
+        }
+
+        location.href = Routing.generate('decks_diff', { deck1_id: ids[0], deck2_id: ids[1] });
     };
 
     ui.download_text_selection = function(ids) {

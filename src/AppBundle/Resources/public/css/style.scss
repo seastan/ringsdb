@@ -1238,3 +1238,29 @@ footer a {
     }
   }
 }
+
+.modal-qty-container, .modal-side-qty-container, .modal-move-card-container {
+  display: inline-block;
+
+  label {
+    display: block;
+    margin-bottom: 0;
+    text-align: left;
+  }
+}
+
+.modal-side-qty-container, .modal-move-card-container {
+  margin-left: 50px;
+}
+
+@media (max-width: 767px) {
+  .modal-side-qty-container {
+    margin-left: 15px;
+  }
+}
+
+#deck-side-content {
+  h4 {
+    margin-bottom: 0;
+  }
+}

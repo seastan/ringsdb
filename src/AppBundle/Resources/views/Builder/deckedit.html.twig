@@ -25,10 +25,11 @@
                 <div id="deck-content" class="deck-loading">
                     <i class="fa fa-spinner fa-spin fa-5x"></i>
                 </div>
+                <div id="deck-side-content"></div>
 
                 {% include 'AppBundle:Builder:table-suggestions.html.twig' %}
 
-                <form method="POST" action="{{ path('deck_save') }}" id="save_form" role="form" style="margin-bottom:1em">
+                <form method="POST" action="{{ path('deck_save') }}" id="save_form" role="form" style="margin-bottom: 1em; margin-top: 2em;">
                     <input type="hidden" id="deck-save-id" name="id" value="{{ deck.id }}">
                     <input type="hidden" id="deck-save-as-copy" name="copy" value="0">
                     <input type="hidden" id="deck-cancel-edits" name="cancel_edits" value="0">
@@ -36,7 +37,7 @@
                     <input type="hidden" name="description">
                     <input type="hidden" name="tags">
                     <div class="form-group">
-                        <label for="name">Name</label>
+                        <label for="name">Deck Name</label>
                         <input type="text" class="form-control decklist-name" name="name" value="{{ deck.name }}">
                     </div>
                     <button type="submit" class="btn btn-success">Save</button>
@@ -53,9 +54,9 @@
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active"><a href="#tab-pane-build" aria-controls="tab-pane-build" role="tab" data-toggle="tab"><span class="fa fa-puzzle-piece"></span> Build</a></li>
                         <li role="presentation"><a href="#tab-pane-infos" aria-controls="tab-pane-infos" role="tab" data-toggle="tab"><span class="fa fa-pencil-square-o"></span> Notes</a></li>
-                        <li role="presentation"><a href="#tab-pane-draw" aria-controls="tab-pane-draw" role="tab" data-toggle="tab"><span class="fa fa-repeat"></span> Test</a></li>
-                        <li role="presentation"><a href="#tab-pane-charts" aria-controls="tab-pane-charts" role="tab" data-toggle="tab"><span class="fa fa-bar-chart"></span> Charts</a></li>
-                        <li role="presentation"><a href="#tab-pane-history" aria-controls="tab-pane-history" role="tab" data-toggle="tab" id="tab-header-history"><span class="fa fa-history"></span> History</a></li>
+                        <li role="presentation"><a href="#tab-pane-draw" aria-controls="tab-pane-draw" role="tab" data-toggle="tab"><span class="fa fa-repeat"></span> <span class="hidden-xs">Test</span></a></li>
+                        <li role="presentation"><a href="#tab-pane-charts" aria-controls="tab-pane-charts" role="tab" data-toggle="tab"><span class="fa fa-bar-chart"></span> <span class="hidden-xs">Charts</span></a></li>
+                        <li role="presentation"><a href="#tab-pane-history" aria-controls="tab-pane-history" role="tab" data-toggle="tab" id="tab-header-history"><span class="fa fa-history"></span> <span class="hidden-xs">History</span></a></li>
                     </ul>
                     <div class="tab-content">
                         <div role="tabpanel" class="tab-pane active" id="tab-pane-build">

@@ -8,7 +8,7 @@
     /**
      * @memberOf binomial
      */
-    binomial.get = function (n, k) {
+    binomial.get = function(n, k) {
         if (k === 0) {
             return 1;
         }

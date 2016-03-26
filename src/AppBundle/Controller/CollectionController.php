@@ -28,16 +28,16 @@ class CollectionController extends Controller {
 
             $first_pack = $cycle->getPacks()[0];
             if ($size === 1 && $first_pack->getName() == $cycle->getName()) {
-                $checked = count($oPacks) ? in_array($first_pack->getId(), $oPacks) : true;
+                $checked = count($oPacks) ? in_array($first_pack->getId(), $oPacks) : ($first_pack->getDateRelease() != null);
 
                 $categories[0]["packs"][] = ["code" => $first_pack->getCode(), "id" => $first_pack->getId(), "label" => $first_pack->getName(), "checked" => $checked, "future" => $first_pack->getDateRelease() === null];
 
                 if ($first_pack->getCode() == 'Core') {
                     //Core 2
-                    $checked = count($oPacks) ? in_array($first_pack->getId()."-2", $oPacks) : true;
+                    $checked = count($oPacks) ? in_array($first_pack->getId()."-2", $oPacks) : ($first_pack->getDateRelease() != null);
                     $categories[0]["packs"][] = ["code" => $first_pack->getCode(), "id" => $first_pack->getId().'-2', "label" => "2", "checked" => $checked, "future" => $first_pack->getDateRelease() === null];
                     //Core 3
-                    $checked = count($oPacks) ? in_array($first_pack->getId()."-3", $oPacks) : true;
+                    $checked = count($oPacks) ? in_array($first_pack->getId()."-3", $oPacks) : ($first_pack->getDateRelease() != null);
                     $categories[0]["packs"][] = ["code" => $first_pack->getCode(), "id" => $first_pack->getId().'-3', "label" => "3", "checked" => $checked, "future" => $first_pack->getDateRelease() === null];
                 }
 
@@ -45,7 +45,7 @@ class CollectionController extends Controller {
                 $category = ["label" => $cycle->getName(), "packs" => []];
 
                 foreach ($cycle->getPacks() as $pack) {
-                    $checked = count($oPacks) ? in_array($pack->getId(), $oPacks) : true;
+                    $checked = count($oPacks) ? in_array($pack->getId(), $oPacks) : ($pack->getDateRelease() != null);
                     $category['packs'][] = ["code" => $pack->getCode(), "id" => $pack->getId(), "label" => $pack->getName(), "checked" => $checked, "future" => $pack->getDateRelease() === null];
                 }
                 $categories[] = $category;

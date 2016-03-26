@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use AppBundle\Helper\DeckValidationHelper;
 use AppBundle\Services\Texts;
 use AppBundle\Entity\Decklistslot;
+use AppBundle\Entity\Decklistsideslot;
 
 class DecklistFactory {
     public function __construct(EntityManager $doctrine, DeckValidationHelper $deckValidationHelper, Texts $texts) {
@@ -30,6 +31,10 @@ class DecklistFactory {
 
         if (empty($name)) {
             $name = $deck->getName();
+
+            if (empty($name)) {
+                $name = 'Untitled Deck';
+            }
         }
         $name = substr($name, 0, 60);
 
@@ -43,7 +48,12 @@ class DecklistFactory {
         $predominantSphere = $this->doctrine->getRepository('AppBundle:Sphere')->findOneBy(["code" => $predominantSphere]);
 
         $heroes = $deck->getSlots()->getHeroDeck();
-        $new_content = json_encode($deck->getSlots()->getContent());
+
+        $content = [
+            'main' => $deck->getSlots()->getContent(),
+            'side' => $deck->getSideslots()->getContent(),
+        ];
+        $new_content = json_encode($content);
         $new_signature = md5($new_content);
 
         $decklist = new Decklist();
@@ -67,6 +77,14 @@ class DecklistFactory {
             $decklistslot->setCard($slot->getCard());
             $decklistslot->setDecklist($decklist);
             $decklist->getSlots()->add($decklistslot);
+        }
+
+        foreach ($deck->getSideslots() as $slot) {
+            $decklistslot = new Decklistsideslot();
+            $decklistslot->setQuantity($slot->getQuantity());
+            $decklistslot->setCard($slot->getCard());
+            $decklistslot->setDecklist($decklist);
+            $decklist->getSideslots()->add($decklistslot);
         }
 
         $decklist->setPredominantSphere($predominantSphere);

@@ -5,7 +5,7 @@
     /**
      * @memberOf card_modal
      */
-    card_modal.display_modal = function display_modal(event, element) {
+    card_modal.display_modal = function(event, element) {
         event.preventDefault();
         $(element).qtip('destroy', true);
         fill_modal($(element).data('code'));
@@ -14,9 +14,16 @@
     /**
      * @memberOf card_modal
      */
-    card_modal.typeahead = function typeahead(event, card) {
+    card_modal.typeahead = function(event, card) {
         fill_modal(card.code);
         $('#cardModal').modal('show');
+    };
+
+    card_modal.updateModal = function() {
+        var modal = $('#cardModal');
+        var code = modal.data('code');
+
+        fill_modal(code);
     };
 
     function fill_modal(code) {
@@ -37,36 +44,67 @@
             '<div class="card-text"><small>' + app.format.text(card) + '</small></div>'
         );
 
-        var qtyelt = modal.find('.modal-qty');
-        if (qtyelt) {
-            var qty = '';
-            for (var i = 0; i <= card.maxqty; i++) {
-                qty += '<label class="btn btn-default"><input type="radio" name="qty" value="' + i + '">' + i + '</label>';
+        if (!app.ui.deckedit) {
+            return;
+        }
+
+        var row = modal.find('.modal-qty-row').empty();
+        var container = $('<div class="modal-qty-container"><label>Main Deck</label></div>').appendTo(row);
+        var qtyelt = $('<div class="btn-group" data-toggle="buttons"></div>').appendTo(container);
+
+        for (var i = 0; i <= card.maxqty; i++) {
+            var label = $('<label class="btn btn-default"><input type="radio" name="qty" value="' + i + '">' + i + '</label>');
+
+            if (i == card.indeck) {
+                label.addClass('active');
             }
-            qtyelt.html(qty);
 
-            qtyelt.find('label').each(function (index, element) {
-                if (index == card.indeck) $(element).addClass('active');
-                else $(element).removeClass('active');
-            });
+            label.appendTo(qtyelt);
+        }
 
-        } else {
-            if (qtyelt) qtyelt.closest('.row').remove();
+        if (card.maxqty > 1) {
+            container = $('<div class="modal-move-card-container hidden-xs"><label>&#160;</label></div>').appendTo(row);
+            qtyelt = $('<div class="btn-group" data-toggle="buttons"></div>').appendTo(container);
+
+            var left = $('<label class="btn btn-default" data-direction="left"><span class="fa fa-angle-left"</label>').appendTo(qtyelt);
+            var right = $('<label class="btn btn-default" data-direction="right"><span class="fa fa-angle-right"</label>').appendTo(qtyelt);
+
+            if (card.insidedeck == 0) {
+                left.addClass('disabled');
+            }
+
+            if (card.indeck == 0) {
+                right.addClass('disabled');
+            }
+        }
+
+        container = $('<div class="modal-side-qty-container"><label>Sideboard</label></div>').appendTo(row);
+        qtyelt = $('<div class="btn-group" data-toggle="buttons"></div>').appendTo(container);
+
+        for (var i = 0; i <= card.maxqty; i++) {
+            var label = $('<label class="btn btn-default"><input type="radio" name="side-qty" value="' + i + '">' + i + '</label>');
+
+            if (i == card.insidedeck) {
+                label.addClass('active');
+            }
+
+            label.appendTo(qtyelt);
         }
     }
 
-    $(function () {
+    $(document).ready(function () {
         $('body').on({
             click: function (event) {
                 var element = $(this);
+
                 if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) {
                     event.stopPropagation();
                     return;
                 }
+
                 card_modal.display_modal(event, element);
             }
         }, '.card');
-
-    })
+    });
 
 })(app.card_modal = {}, jQuery);

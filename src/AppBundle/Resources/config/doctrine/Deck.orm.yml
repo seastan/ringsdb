@@ -27,6 +27,10 @@ AppBundle\Entity\Deck:
             targetEntity: Deckslot
             mappedBy: deck
             cascade: ["persist","remove"]
+        sideslots:
+            targetEntity: Decksideslot
+            mappedBy: deck
+            cascade: ["persist","remove"]
         children:
             targetEntity: Decklist
             orderBy: { 'dateCreation': 'DESC' }

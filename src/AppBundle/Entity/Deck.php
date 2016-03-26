@@ -9,6 +9,8 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     public function getHistory() {
         $slots = $this->getSlots();
         $cards = $slots->getContent();
+        $sideslots = $this->getSideslots();
+        $sidecards = $sideslots->getContent();
 
         $snapshots = [];
         $changes = $this->getChanges();
@@ -26,13 +28,17 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
 
         // recreating the versions with the variation info, starting from $preversion
         $preversion = $cards;
+        $sidepreversion = $sidecards;
         foreach ($savedChanges as $change) {
             $variation = json_decode($change->getVariation(), true);
             $row = [
                 'variation' => $variation,
                 'is_saved' => $change->getIsSaved(),
                 'version' => $change->getVersion(),
-                'content' => $preversion,
+                'content' => [
+                    'main' => $preversion,
+                    'side' => $sidepreversion
+                ],
                 'date_creation' => $change->getDateCreation()->format('c'),
             ];
             array_unshift($snapshots, $row);
@@ -46,13 +52,41 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
                     }
                 }
             }
+
             foreach ($variation[1] as $code => $qty) {
                 if (!isset($preversion[$code])) {
                     $preversion[$code] = 0;
                 }
                 $preversion[$code] = $preversion[$code] + $qty;
             }
+
+            if (!isset($variation[2])) {
+                $variation[2] = [];
+            }
+
+            foreach ($variation[2] as $code => $qty) {
+                if (isset($sidepreversion[$code])) {
+                    $sidepreversion[$code] = $sidepreversion[$code] - $qty;
+                    if ($sidepreversion[$code] == 0) {
+                        unset ($sidepreversion[$code]);
+                    }
+                }
+            }
+
+            if (!isset($variation[3])) {
+                $variation[3] = [];
+            }
+
+            foreach ($variation[3] as $code => $qty) {
+                if (!isset($sidepreversion[$code])) {
+                    $sidepreversion[$code] = 0;
+                }
+                $sidepreversion[$code] = $sidepreversion[$code] + $qty;
+            }
+
+
             ksort($preversion);
+            ksort($sidepreversion);
         }
 
         // add last know version with empty diff
@@ -60,13 +94,17 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
             'variation' => null,
             'is_saved' => true,
             'version' => "0.0",
-            'content' => $preversion,
+            'content' => [
+                'main' => $preversion,
+                'side' => $sidepreversion,
+            ],
             'date_creation' => $this->getDateCreation()->format('c')
         ];
         array_unshift($snapshots, $row);
 
         // recreating the snapshots with the variation info, starting from $postversion
         $postversion = $cards;
+        $sidepostversion = $sidecards;
         foreach ($unsavedChanges as $change) {
             $variation = json_decode($change->getVariation(), true);
             $row = [
@@ -83,16 +121,44 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
                 }
                 $postversion[$code] = $postversion[$code] + $qty;
             }
+
             foreach ($variation[1] as $code => $qty) {
                 $postversion[$code] = $postversion[$code] - $qty;
                 if ($postversion[$code] == 0) {
                     unset ($postversion[$code]);
                 }
             }
+
+            if (!isset($variation[2])) {
+                $variation[2] = [];
+            }
+
+            foreach ($variation[2] as $code => $qty) {
+                if (!isset ($sidepostversion[$code])) {
+                    $sidepostversion[$code] = 0;
+                }
+                $sidepostversion[$code] = $sidepostversion[$code] + $qty;
+            }
+
+            if (!isset($variation[3])) {
+                $variation[3] = [];
+            }
+
+            foreach ($variation[3] as $code => $qty) {
+                $sidepostversion[$code] = $sidepostversion[$code] - $qty;
+                if ($sidepostversion[$code] == 0) {
+                    unset ($sidepostversion[$code]);
+                }
+            }
+
             ksort($postversion);
+            ksort($sidepostversion);
 
             // add postversion with variation that lead to it
-            $row['content'] = $postversion;
+            $row['content'] = [
+                'main' => $postversion,
+                'side' => $sidepostversion
+            ];
             array_push($snapshots, $row);
         }
 
@@ -162,6 +228,10 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
+    private $sideslots;
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
     private $children;
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -185,6 +255,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      */
     public function __construct() {
         $this->slots = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->sideslots = new \Doctrine\Common\Collections\ArrayCollection();
         $this->children = new \Doctrine\Common\Collections\ArrayCollection();
         $this->changes = new \Doctrine\Common\Collections\ArrayCollection();
         $this->minorVersion = 0;
@@ -361,6 +432,37 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      */
     public function getSlots() {
         return new \AppBundle\Model\SlotCollectionDecorator($this->slots);
+    }
+
+    /**
+     * Add sideslot
+     *
+     * @param \AppBundle\Entity\Decksideslot $sideslot
+     *
+     * @return Deck
+     */
+    public function addSideslot(\AppBundle\Entity\Decksideslot $sideslot) {
+        $this->sideslots[] = $sideslot;
+
+        return $this;
+    }
+
+    /**
+     * Remove sideslot
+     *
+     * @param \AppBundle\Entity\Decksideslot $sideslot
+     */
+    public function removeSideslot(\AppBundle\Entity\Decksideslot $sideslot) {
+        $this->sideslots->removeElement($sideslot);
+    }
+
+    /**
+     * Get sideslots
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getSideslots() {
+        return new \AppBundle\Model\SlotCollectionDecorator($this->sideslots);
     }
 
     /**

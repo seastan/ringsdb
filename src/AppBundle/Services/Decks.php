@@ -3,8 +3,8 @@
 namespace AppBundle\Services;
 
 use Doctrine\ORM\EntityManager;
-use AppBundle\Entity\Deck;
 use AppBundle\Entity\Deckslot;
+use AppBundle\Entity\Decksideslot;
 use Symfony\Bridge\Monolog\Logger;
 use AppBundle\Entity\Deckchange;
 use AppBundle\Helper\DeckValidationHelper;
@@ -30,8 +30,6 @@ class Decks {
     }
 
     public function saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, $source_deck) {
-        $deck_content = [];
-
         if ($decklist_id) {
             $decklist = $this->doctrine->getRepository('AppBundle:Decklist')->find($decklist_id);
             if ($decklist) {
@@ -43,11 +41,13 @@ class Decks {
         $deck->setDescriptionMd($description);
         $deck->setUser($user);
         $deck->setMinorVersion($deck->getMinorVersion() + 1);
+
         $cards = [];
         /* @var $latestPack \AppBundle\Entity\Pack */
         $latestPack = null;
         $spheres = [];
-        foreach ($content as $card_code => $qty) {
+
+        foreach ($content['main'] as $card_code => $qty) {
             $card = $this->doctrine->getRepository('AppBundle:Card')->findOneBy([
                 "code" => $card_code
             ]);
@@ -68,9 +68,38 @@ class Decks {
                     }
                 }
             }
+
             $cards[$card_code] = $card;
             if ($card->getType()->getCode() == 'hero') {
                 $spheres[] = $card->getSphere()->getCode();
+            }
+
+            if ($qty > $card->getDeckLimit()) {
+                if (is_array($content['main'])) {
+                    $content['main'][$card_code] = $card->getDeckLimit();
+                } else {
+                    $content['main']->$card_code = $card->getDeckLimit();
+                }
+            }
+        }
+
+        foreach ($content['side'] as $card_code => $qty) {
+            $card = $this->doctrine->getRepository('AppBundle:Card')->findOneBy([
+                "code" => $card_code
+            ]);
+
+            if (!$card) {
+                continue;
+            }
+
+            $cards[$card_code] = $card;
+
+            if ($qty > $card->getDeckLimit()) {
+                if (is_array($content['side'])) {
+                    $content['side'][$card_code] = $card->getDeckLimit();
+                } else {
+                    $content['side']->$card_code = $card->getDeckLimit();
+                }
             }
         }
 
@@ -92,18 +121,28 @@ class Decks {
         if ($source_deck) {
             // compute diff between current content and saved content
             list ($listings) = $this->diff->diffContents([
-                $content,
+                $content['main'],
                 $source_deck->getSlots()->getContent()
             ]);
+
+            list ($sideListings) = $this->diff->diffContents([
+                $content['side'],
+                $source_deck->getSideslots()->getContent()
+            ]);
+
+            $listings[2] = $sideListings[0];
+            $listings[3] = $sideListings[1];
+
             // remove all change (autosave) since last deck update (changes are sorted)
             $changes = $this->getUnsavedChanges($deck);
             foreach ($changes as $change) {
                 $this->doctrine->remove($change);
             }
+
             $this->doctrine->flush();
             // save new change unless empty
-            if (count($listings [0]) || count($listings [1])) {
-                $change = new Deckchange ();
+            if (count($listings[0]) || count($listings[1]) || count($listings[2]) || count($listings[3])) {
+                $change = new Deckchange();
                 $change->setDeck($deck);
                 $change->setVariation(json_encode($listings));
                 $change->setIsSaved(true);
@@ -111,6 +150,7 @@ class Decks {
                 $this->doctrine->persist($change);
                 $this->doctrine->flush();
             }
+
             // copy version
             $deck->setMajorVersion($source_deck->getMajorVersion());
             $deck->setMinorVersion($source_deck->getMinorVersion());
@@ -121,17 +161,27 @@ class Decks {
             $this->doctrine->remove($slot);
         }
 
-        foreach ($content as $card_code => $qty) {
-            $card = $cards [$card_code];
+        foreach ($deck->getSideslots() as $slot) {
+            $deck->removeSideslot($slot);
+            $this->doctrine->remove($slot);
+        }
+
+        foreach ($content['main'] as $card_code => $qty) {
+            $card = $cards[$card_code];
             $slot = new Deckslot();
             $slot->setQuantity($qty);
             $slot->setCard($card);
             $slot->setDeck($deck);
             $deck->addSlot($slot);
-            $deck_content [$card_code] = [
-                'card' => $card,
-                'qty' => $qty
-            ];
+        }
+
+        foreach ($content['side'] as $card_code => $qty) {
+            $card = $cards[$card_code];
+            $slot = new Decksideslot();
+            $slot->setQuantity($qty);
+            $slot->setCard($card);
+            $slot->setDeck($deck);
+            $deck->addSideslot($slot);
         }
 
         $deck->setProblem($this->deck_validation_helper->findProblem($deck));

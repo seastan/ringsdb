@@ -1,5 +1,3 @@
-Mark cards with erratas
-
 Separate Boons and Burdens from Attachments
 
 Allow Fellowship and Baggins Heroes

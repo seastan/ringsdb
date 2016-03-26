@@ -77,7 +77,8 @@
      * @memberOf ui
      */
     ui.refresh_deck = function(options) {
-        app.deck.display('#deck-content', options);
+        app.deck.display('#deck-content', options, false);
+        app.deck.display('#deck-side-content', options, true);
         app.draw_simulator && app.draw_simulator.reset();
         app.deck_charts && app.deck_charts.setup();
     };

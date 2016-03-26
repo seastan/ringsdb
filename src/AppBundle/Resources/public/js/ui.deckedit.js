@@ -1,5 +1,7 @@
 (function ui_deck(ui, $) {
 
+    ui.deckedit = true;
+
     var DisplayColumnsTpl = '';
     var SortKey = 'type_code';
     var SortOrder = 1;
@@ -11,9 +13,10 @@
      * reads ui configuration from localStorage
      * @memberOf ui
      */
-    ui.read_config_from_storage = function read_config_from_storage() {
+    ui.read_config_from_storage = function() {
         if (localStorage) {
             var stored = localStorage.getItem('ui.deck.config');
+
             if (stored) {
                 Config = JSON.parse(stored);
             }
@@ -33,7 +36,7 @@
      * write ui configuration to localStorage
      * @memberOf ui
      */
-    ui.write_config_to_storage = function write_config_to_storage() {
+    ui.write_config_to_storage = function() {
         if (localStorage) {
             localStorage.setItem('ui.deck.config', JSON.stringify(Config));
         }
@@ -91,8 +94,8 @@
      * builds the sphere selector
      * @memberOf ui
      */
-    ui.build_sphere_selector = function build_sphere_selector() {
-        var filter = $('[data-filter=sphere_code]').empty();
+    ui.build_sphere_selector = function() {
+        var filter = $('[data-filter="sphere_code"]').empty();
 
         var sphere_codes = app.data.cards.distinct('sphere_code').sort();
 
@@ -105,11 +108,16 @@
 
         sphere_codes.forEach(function(sphere_code) {
             var example = app.data.cards.find({ 'sphere_code': sphere_code })[0];
-            var label = $('<label class="btn btn-default btn-sm" data-code="' + sphere_code + '" title="' + example.sphere_name + '"></label>');
-            label.append('<input type="checkbox" name="' + sphere_code + '"><span class="icon-' + sphere_code + '"></span>').tooltip({ container: 'body' });
 
-            filter.append(label);
+            var label = $('<label class="btn btn-default btn-sm" data-code="' + sphere_code + '" title="' + example.sphere_name + '"></label>');
+
+            $('<input type="checkbox" name="' + sphere_code + '"><span class="icon-' + sphere_code + '"></span>')
+                .tooltip({ container: 'body' })
+                .appendTo(label);
+
+            label.appendTo(filter);
         });
+
         filter.button();
     };
 
@@ -117,21 +125,25 @@
      * builds the type selector
      * @memberOf ui
      */
-    ui.build_type_selector = function build_type_selector() {
-        var filter = $('[data-filter=type_code]').empty();
+    ui.build_type_selector = function() {
+        var filter = $('[data-filter="type_code"]').empty();
 
         var type_codes = app.data.cards.distinct('type_code').sort();
-        var neutral_index = type_codes.indexOf('hero');
-        type_codes.splice(neutral_index, 1);
+        type_codes.splice(type_codes.indexOf('hero'), 1);
         type_codes.unshift('hero');
 
-        type_codes.forEach(function (type_code) {
-            var example = app.data.cards.find({ 'type_code': type_code})[0];
-            var label = $('<label class="btn btn-default btn-sm" data-code="' + type_code + '" title="' + example.type_name + '"></label>');
-            label.append('<input type="checkbox" name="' + type_code + '"><span class="icon-' + type_code + '"></span>').tooltip({ container: 'body' });
+        type_codes.forEach(function(type_code) {
+            var example = app.data.cards.find({ 'type_code': type_code })[0];
 
-            filter.append(label);
+            var label = $('<label class="btn btn-default btn-sm" data-code="' + type_code + '" title="' + example.type_name + '"></label>');
+
+            $('<input type="checkbox" name="' + type_code + '"><span class="icon-' + type_code + '"></span>')
+                .tooltip({ container: 'body' })
+                .appendTo(label);
+
+            label.appendTo(filter);
         });
+
         filter.button();
     };
 
@@ -139,8 +151,8 @@
      * builds the pack selector
      * @memberOf ui
      */
-    ui.build_pack_selector = function build_pack_selector() {
-        $('[data-filter=pack_code]').empty();
+    ui.build_pack_selector = function() {
+        $('[data-filter="pack_code"]').empty();
 
         app.data.packs.find({
             name: {
@@ -152,15 +164,17 @@
             // if pack used by cards in deck, check pack
             var cards = app.data.cards.find({
                 pack_code: record.code,
-                indeck: {
-                    '$gt': 0
-                }
+                '$or': [
+                    { indeck: { '$gt': 0 } },
+                    { insidedeck: { '$gt': 0 }
+                }]
             });
+
             if (cards.length) {
                 checked = true;
             }
 
-            $('<li><a href="#"><label><input type="checkbox" name="' + record.code + '"' + (checked ? ' checked="checked"' : '') + '>' + record.name + '</label></a></li>').appendTo('[data-filter=pack_code]');
+            $('<li><a href=""><label><input type="checkbox" name="' + record.code + '"' + (checked ? ' checked="checked"' : '') + '>' + record.name + '</label></a></li>').appendTo('[data-filter=pack_code]');
         });
     };
 
@@ -168,11 +182,10 @@
      * @memberOf ui
      */
     ui.init_selectors = function init_selectors() {
-        var spheres = $('[data-filter=sphere_code]');
-        var types = $('[data-filter=type_code]');
+        var spheres = $('[data-filter="sphere_code"]');
+        var types = $('[data-filter="type_code"]');
 
-
-        var heroesSpheres = app.deck.get_heroes_spheres_code();
+        var heroesSpheres = app.deck.get_heroes_spheres();
         var defaultType = 'hero';
 
         if (heroesSpheres.length) {
@@ -185,7 +198,6 @@
         _.each(heroesSpheres, function(sphere) {
             spheres.find('input[name=' + sphere + ']').prop("checked", true).parent().addClass('active');
         });
-
 
         types.find('input[name=' + defaultType + ']').prop("checked", true).parent().addClass('active');
     };
@@ -212,8 +224,9 @@
      * @memberOf ui
      * @param event
      */
-    ui.on_click_filter = function on_click_filter(event) {
+    ui.on_click_filter = function(event) {
         var dropdown = $(this).closest('ul').hasClass('dropdown-menu');
+
         if (dropdown) {
             if (event.shiftKey) {
                 if (!event.altKey) {
@@ -238,7 +251,7 @@
      * @memberOf ui
      * @param event
      */
-    ui.on_input_smartfilter = function on_input_smartfilter(event) {
+    ui.on_input_smartfilter = function() {
         var q = $(this).val();
 
         if (q.match(/^\w[:<>!]/)) {
@@ -254,18 +267,19 @@
      * @memberOf ui
      * @param event
      */
-    ui.on_submit_form = function on_submit_form(event) {
+    ui.on_submit_form = function on_submit_form() {
         var deck_json = app.deck.get_json();
-        $('input[name=content]').val(deck_json);
-        $('input[name=description]').val($('textarea[name=description_]').val());
-        $('input[name=tags]').val($('input[name=tags_]').val());
+
+        $('input[name="content"]').val(deck_json);
+        $('input[name="description"]').val($('textarea[name="description_"]').val());
+        $('input[name="tags"]').val($('input[name="tags_"]').val());
     };
 
     /**
      * @memberOf ui
      * @param event
      */
-    ui.on_config_change = function on_config_change(event) {
+    ui.on_config_change = function on_config_change() {
         var name = $(this).attr('name');
         var type = $(this).prop('type');
 
@@ -317,12 +331,12 @@
             $('#table-suggestions').hide();
         } else {
             $('#table-suggestions').show();
-        }
 
-        if (app.suggestions && Config['show-suggestions'] != 0) {
-            app.suggestions.setup();
-            app.suggestions.number = Config['show-suggestions'];
-            app.suggestions.isLoaded && app.suggestions.compute();
+            if (app.suggestions) {
+                app.suggestions.setup();
+                app.suggestions.number = Config['show-suggestions'];
+                app.suggestions.isLoaded && app.suggestions.compute();
+            }
         }
     };
 
@@ -338,7 +352,7 @@
      * @memberOf ui
      * @param event
      */
-    ui.on_table_sort_click = function on_table_sort_click(event) {
+    ui.on_table_sort_click = function(event) {
         event.preventDefault();
         var new_sort = $(this).data('sort');
 
@@ -357,33 +371,64 @@
      * @memberOf ui
      * @param event
      */
-    ui.on_list_quantity_change = function on_list_quantity_change(event) {
+    ui.on_list_quantity_change = function() {
         var row = $(this).closest('.card-container');
         var code = row.data('code');
         var quantity = parseInt($(this).val(), 10);
-        //	row[quantity ? "addClass" : "removeClass"]('in-deck');
+
         ui.on_quantity_change(code, quantity);
     };
 
-    /**
-     * @memberOf ui
-     * @param event
-     */
-    ui.on_modal_quantity_change = function (event) {
+    ui.on_modal_quantity_change = function() {
         var modal = $('#cardModal');
         var code = modal.data('code');
-        var quantity = parseInt($(this).val(), 10);
-        modal.modal('hide');
-        ui.on_quantity_change(code, quantity);
+        var input = $(this);
 
-        setTimeout(function () {
+        var quantity = parseInt(input.val(), 10);
+        var type = input.attr('name');
+
+        ui.on_quantity_change(code, quantity, type == 'side-qty');
+
+        modal.modal('hide');
+
+        setTimeout(function() {
             $('#filter-text').typeahead('val', '').focus();
         }, 100);
     };
 
-    ui.refresh_row = function (card_code, quantity) {
+    ui.on_modal_move_cards = function() {
+        var modal = $('#cardModal');
+        var code = modal.data('code');
+        var button = $(this);
+
+        var direction = button.data('direction');
+
+        var card = app.data.cards.findById(code);
+        if (!card) {
+            return false;
+        }
+
+        if (direction == 'left' && card.insidedeck > 0) {
+            ui.on_quantity_change(code, card.insidedeck - 1, true);
+            ui.on_quantity_change(code, card.indeck + 1, false);
+        }
+
+        if (direction == 'right' && card.indeck > 0) {
+            ui.on_quantity_change(code, card.indeck - 1, false);
+            ui.on_quantity_change(code, card.insidedeck + 1, true);
+        }
+
+        app.card_modal.updateModal();
+    };
+
+    ui.on_modal_key_press = function(event) {
+        var num = parseInt(event.which, 10) - 48;
+        $('#cardModal').find('input[type=radio][name=qty][value=' + num + ']').trigger('change');
+    };
+
+    ui.refresh_row = function(card_code, quantity) {
         // for each set of divs (1, 2, 3 columns)
-        CardDivs.forEach(function (rows) {
+        CardDivs.forEach(function(rows) {
             var row = rows[card_code];
             if (!row) {
                 return;
@@ -391,7 +436,7 @@
 
             // rows[card_code] is the card row of our card
             // for each "quantity switch" on that row
-            row.find('input[name="qty-' + card_code + '"]').each(function (i, element) {
+            row.find('input[name="qty-' + card_code + '"]').each(function(i, element) {
                 // if that switch is NOT the one with the new quantity, uncheck it
                 // else, check it
                 if ($(element).val() != quantity) {
@@ -406,22 +451,17 @@
     /**
      * @memberOf ui
      */
-    ui.on_quantity_change = function on_quantity_change(card_code, quantity) {
-        var update_all = app.deck.set_card_copies(card_code, quantity);
+    ui.on_quantity_change = function(card_code, quantity, is_sideboard) {
+        var card_quantity = app.deck.set_card_copies(card_code, quantity, is_sideboard);
         ui.refresh_deck();
-
-        if (update_all) {
-            ui.refresh_list();
-        } else {
-            ui.refresh_row(card_code, quantity);
-        }
+        ui.refresh_row(card_code, card_quantity);
     };
 
     /**
      * sets up event handlers ; dataloaded not fired yet
      * @memberOf ui
      */
-    ui.setup_event_handlers = function setup_event_handlers() {
+    ui.setup_event_handlers = function() {
         $('[data-filter]').on({
             change: ui.refresh_list,
             click: ui.on_click_filter
@@ -431,11 +471,11 @@
 
         $('#save_form').on('submit', ui.on_submit_form);
 
-        $('#btn-save-as-copy').on('click', function (event) {
+        $('#btn-save-as-copy').on('click', function() {
             $('#deck-save-as-copy').val(1);
         });
 
-        $('#btn-cancel-edits').on('click', function (event) {
+        $('#btn-cancel-edits').on('click', function() {
             var unsaved_edits = app.deck_history.get_unsaved_edits();
             if (unsaved_edits.length) {
                 var confirmation = confirm("This operation will revert the changes made to the deck since " + unsaved_edits[0].date_creation.calendar() + ". The last " + (unsaved_edits.length > 1 ? unsaved_edits.length + " edits" : "edit") + " will be lost. Do you confirm?");
@@ -456,18 +496,18 @@
         $('#config-options').on('change', 'input', ui.on_config_change);
         $('#collection').on('change', 'input[type=radio]', ui.on_list_quantity_change);
 
-        $('#cardModal').on('keypress', function (event) {
-            var num = parseInt(event.which, 10) - 48;
-            $('#cardModal input[type=radio][value=' + num + ']').trigger('change');
-        });
-        $('#cardModal').on('change', 'input[type=radio]', ui.on_modal_quantity_change);
+        // Card Modal
+        $('#cardModal')
+            .on('keypress', ui.on_modal_key_press)
+            .on('change', 'input[type=radio]', ui.on_modal_quantity_change)
+            .on('click', '.modal-move-card-container label', ui.on_modal_move_cards);
 
         $('thead').on('click', 'a[data-sort]', ui.on_table_sort_click);
 
         $('#menu-sort').on('click', 'a[id]', ui.do_action_deck);
     };
 
-    ui.do_action_deck = function (event) {
+    ui.do_action_deck = function(event) {
         var action_id = $(this).attr('id');
         if (!action_id) {
             return;
@@ -508,11 +548,11 @@
      * returns the current card filters as an array
      * @memberOf ui
      */
-    ui.get_filters = function get_filters() {
+    ui.get_filters = function() {
         var filters = {};
 
         $('[data-filter]').each(
-            function (index, div) {
+            function(index, div) {
                 var column_name = $(div).data('filter');
                 var arr = [];
 
@@ -534,7 +574,7 @@
      * updates internal variables when display columns change
      * @memberOf ui
      */
-    ui.update_list_template = function update_list_template() {
+    ui.update_list_template = function() {
         switch (Config['display-column']) {
             case 1:
                 DisplayColumnsTpl = _.template([
@@ -551,6 +591,7 @@
                     '</tr>'
                 ].join(''));
                 break;
+
             case 2:
                 DisplayColumnsTpl = _.template([
                     '<div class="col-sm-6">',
@@ -564,6 +605,7 @@
                     '</div>'
                 ].join(''));
                 break;
+
             case 3:
                 DisplayColumnsTpl = _.template([
                     '<div class="col-sm-4">',
@@ -576,6 +618,7 @@
                     '</div>',
                     '</div>'
                 ].join(''));
+                break;
         }
     };
 
@@ -583,7 +626,7 @@
      * builds a row for the list of available cards
      * @memberOf ui
      */
-    ui.build_row = function build_row(card) {
+    ui.build_row = function(card) {
         var radios = '', radioTpl = _.template(
             '<label class="btn btn-xs btn-default <%= active %>"><input type="radio" name="qty-<%= card.code %>" value="<%= i %>"><%= i %></label>'
         );
@@ -598,13 +641,13 @@
 
         var html = DisplayColumnsTpl({
             radios: radios,
-            url: Routing.generate('cards_zoom', {card_code: card.code}),
+            url: Routing.generate('cards_zoom', { card_code: card.code }),
             card: card
         });
         return $(html);
     };
 
-    ui.reset_list = function reset_list() {
+    ui.reset_list = function() {
         CardDivs = [[], [], []];
         ui.refresh_list();
     };
@@ -618,12 +661,12 @@
         var counter = 0;
         var container = $('#collection-table').empty();
         var grid = $('#collection-grid').empty();
-        var filters = Config['show-only-deck'] ? {} :ui.get_filters();
+        var filters = Config['show-only-deck'] ? {} : ui.get_filters();
 
         var query = app.smart_filter.get_query(filters);
         var orderBy = {};
 
-        SortKey.split('|').forEach(function (key) {
+        SortKey.split('|').forEach(function(key) {
             orderBy[key] = SortOrder;
         });
 
@@ -635,7 +678,7 @@
         var divs = CardDivs[Config['display-column'] - 1];
 
         cards.forEach(function(card) {
-            if (Config['show-only-deck'] && !card.indeck) {
+            if (Config['show-only-deck'] && !card.indeck && !card.insidedeck) {
                 return;
             }
 
@@ -676,12 +719,11 @@
      * called when the deck is modified and we don't know what has changed
      * @memberOf ui
      */
-    ui.on_deck_modified = function on_deck_modified() {
+    ui.on_deck_modified = function() {
         ui.refresh_deck();
         ui.refresh_list();
         app.suggestions && Config['show-suggestions'] != 0 && app.suggestions.compute();
     };
-
 
     /**
      * @memberOf ui
@@ -690,7 +732,8 @@
         if (options) {
             DisplayOptions = options;
         }
-        app.deck.display('#deck-content', DisplayOptions);
+        app.deck.display('#deck-content', DisplayOptions, false);
+        app.deck.display('#deck-side-content', DisplayOptions, true);
         app.draw_simulator && app.draw_simulator.reset();
         app.deck_charts && app.deck_charts.setup();
         app.suggestions && Config['show-suggestions'] != 0 && app.suggestions.compute();
@@ -726,13 +769,13 @@
         });
     };
 
-    ui.update_sort_caret = function update_sort_caret() {
+    ui.update_sort_caret = function() {
         var elt = $('[data-sort="' + SortKey + '"]');
         $(elt).closest('tr').find('th').removeClass('dropup').find('span.caret').remove();
         $(elt).after('<span class="caret"></span>').closest('th').addClass(SortOrder > 0 ? '' : 'dropup');
     };
 
-    ui.init_filter_help = function init_filter_help() {
+    ui.init_filter_help = function() {
         $('#filter-text-button').popover({
             container: 'body',
             content: app.smart_filter.get_help(),
@@ -746,7 +789,7 @@
      * called when the DOM is loaded
      * @memberOf ui
      */
-    ui.on_dom_loaded = function on_dom_loaded() {
+    ui.on_dom_loaded = function() {
         ui.set_cores_qty();
         ui.init_config_buttons();
         ui.init_filter_help();
@@ -764,7 +807,7 @@
      * called when the app data is loaded
      * @memberOf ui
      */
-    ui.on_data_loaded = function on_data_loaded() {
+    ui.on_data_loaded = function() {
         ui.set_max_qty();
         app.draw_simulator && app.draw_simulator.on_data_loaded();
     };
@@ -773,7 +816,7 @@
      * called when both the DOM and the data app have finished loading
      * @memberOf ui
      */
-    ui.on_all_loaded = function on_all_loaded() {
+    ui.on_all_loaded = function() {
         ui.update_list_template();
         ui.build_sphere_selector();
         ui.build_type_selector();

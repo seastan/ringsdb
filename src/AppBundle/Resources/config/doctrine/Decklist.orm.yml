@@ -40,6 +40,10 @@ AppBundle\Entity\Decklist:
             targetEntity: Decklistslot
             mappedBy: decklist
             cascade: ["persist","remove"]
+        sideslots:
+            targetEntity: Decklistsideslot
+            mappedBy: decklist
+            cascade: ["persist","remove"]
         comments:
             targetEntity: Comment
             orderBy: { 'dateCreation': 'ASC' }

@@ -28,6 +28,13 @@
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
 {% endfor %}
   </section>
+  <section name="Sideboard" shared="False">
+{% for group in deck.sideslots_by_type %}
+{% for slot in group %}
+    <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+{% endfor %}
+{% endfor %}
+  </section>
   <section name="Quest" shared="True" />
   <section name="Encounter" shared="True" />
   <section name="Special" shared="True" />

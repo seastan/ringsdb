@@ -38,18 +38,31 @@ Events ({{ events | length }})
 {% endfor %}
 
 {% set sidequests = deck.slots_by_type['player-side-quest'] %}
+{% if sidequests | length %}
 Player Side Quests ({{ sidequests | length }})
 
 {% for slot in sidequests %}
 {{ slot.quantity }}x {{ slot.card.name }} ({{ slot.card.pack.name }})
 {% endfor %}
 
-{% if deck.slots_by_type['treasure']|length %}
+{% endif %}
 {% set treasures = deck.slots_by_type['treasure'] %}
+{% if treasures | length %}
 Treasures ({{ treasures | length }})
 
 {% for slot in treasures %}
 {{ slot.quantity }}x {{ slot.card.name }} ({{ slot.card.pack.name }})
+{% endfor %}
+
+{% endif %}
+{% if deck.has_sideboard %}
+
+Sideboard
+
+{% for group in deck.sideslots_by_type %}
+{% for slot in group %}
+{{ slot.quantity }}x {{ slot.card.name }} ({{ slot.card.pack.name }})
+{% endfor %}
 {% endfor %}
 {% endif %}
 

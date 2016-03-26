@@ -26,14 +26,17 @@
 
         changed_since_last_autosave = false;
 
-        var result = app.diff.compute_simple([current_deck, last_snapshot]);
-        if (!result) {
+        var result = app.diff.compute_simple([current_deck.main, last_snapshot.main]);
+        var sideResult = app.diff.compute_simple([current_deck.side, last_snapshot.side]);
+        if (!result && !sideResult) {
             return;
         }
 
-        var diff = result[0];
+        var diff = result[0].concat(sideResult[0]);
         var diff_json = JSON.stringify(diff);
-        if (diff_json == '[{},{}]') {
+        console.log(diff_json);
+
+        if (diff_json == '[{},{},{},{}]') {
             return;
         }
 
@@ -48,7 +51,7 @@
             },
             type: 'POST',
             success: function(data, textStatus, jqXHR) {
-                deck_history.add_snapshot({datecreation: data, variation: diff, content: current_deck, is_saved: false});
+                deck_history.add_snapshot({ datecreation: data, variation: diff, content: current_deck, is_saved: false });
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 console.log('[' + moment().format('YYYY-MM-DD HH:mm:ss') + '] Error on ' + this.url, textStatus, errorThrown);
@@ -64,7 +67,7 @@
     /**
      * @memberOf deck_history
      */
-    deck_history.autosave_interval = function autosave_interval() {
+    deck_history.autosave_interval = function() {
         // if we are in the process of an ajax autosave request, do nothing now
         if (ajax_in_process) {
             return;
@@ -89,7 +92,7 @@
     /**
      * @memberOf deck_history
      */
-    deck_history.add_snapshot = function add_snapshot(snapshot) {
+    deck_history.add_snapshot = function(snapshot) {
 
         snapshot.date_creation = snapshot.date_creation ? moment(snapshot.date_creation) : moment();
         snapshots.push(snapshot);
@@ -98,14 +101,30 @@
         if (snapshot.variation) {
             _.each(snapshot.variation[0], function(qty, code) {
                 var card = app.data.cards.findById(code);
-                if (!card) return;
-                list.push('+' + qty + ' ' + '<a href="' + Routing.generate('cards_zoom', {card_code: code}) + '" class="card-tip" data-code="' + code + '">' + card.name + '</a>');
+                if (!card) {
+                    return;
+                }
+                list.push('+' + qty + ' ' + '<a href="' + Routing.generate('cards_zoom', { card_code: code }) + '" class="card-tip" data-code="' + code + '">' + card.name + '</a>');
             });
 
             _.each(snapshot.variation[1], function(qty, code) {
                 var card = app.data.cards.findById(code);
                 if (!card) return;
-                list.push('&minus;' + qty + ' ' + '<a href="' + Routing.generate('cards_zoom', {card_code: code}) + '" class="card-tip" data-code="' + code + '">' + card.name + '</a>');
+                list.push('&minus;' + qty + ' ' + '<a href="' + Routing.generate('cards_zoom', { card_code: code }) + '" class="card-tip" data-code="' + code + '">' + card.name + '</a>');
+            });
+
+            _.each(snapshot.variation[2], function(qty, code) {
+                var card = app.data.cards.findById(code);
+                if (!card) {
+                    return;
+                }
+                list.push('+' + qty + ' ' + '<a href="' + Routing.generate('cards_zoom', { card_code: code }) + '" class="card-tip" data-code="' + code + '">' + card.name + '</a> (s)');
+            });
+
+            _.each(snapshot.variation[3], function(qty, code) {
+                var card = app.data.cards.findById(code);
+                if (!card) return;
+                list.push('&minus;' + qty + ' ' + '<a href="' + Routing.generate('cards_zoom', { card_code: code }) + '" class="card-tip" data-code="' + code + '">' + card.name + '</a> (s)');
             });
         } else {
             list.push("First version");
@@ -119,7 +138,7 @@
     /**
      * @memberOf deck_history
      */
-    deck_history.load_snapshot = function load_snapshot(event) {
+    deck_history.load_snapshot = function(event) {
 
         var index = $(this).data('index');
         var snapshot = snapshots[index];
@@ -127,13 +146,21 @@
             return;
         }
 
+        console.log(snapshot.content.side);
+
         app.data.cards.find({}).forEach(function(card) {
             var indeck = 0;
-            if (snapshot.content[card.code]) {
-                indeck = snapshot.content[card.code];
+            var insidedeck = 0;
+            if (snapshot.content.main[card.code]) {
+                indeck = snapshot.content.main[card.code];
+            }
+
+            if (snapshot.content.side[card.code]) {
+                insidedeck = snapshot.content.side[card.code];
             }
             app.data.cards.updateById(card.code, {
-                indeck: indeck
+                indeck: indeck,
+                insidedeck: insidedeck
             });
         });
 

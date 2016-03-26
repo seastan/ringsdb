@@ -89,6 +89,44 @@
                 {% endfor %}
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-xs-12">
+                <h4>Sideboard</h4>
+            </div>
+        </div>
+
+        <!--  sideboard intersection -->
+        <div class="row">
+            <div class="col-xs-6">
+                {% for slot in side_deck.slots %}
+                    <div>{{ macros.slot_with_icons(slot) }}</div>
+                {% endfor %}
+            </div>
+            <div class="col-xs-6">
+                {% for slot in side_deck.slots %}
+                    <div>{{ macros.slot_with_icons(slot) }}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!--  draw decks differences -->
+        <div class="row">
+            <div class="col-xs-6">
+                {% for slot in deck1.sideslots %}
+                    {% if slot.quantity > 0 %}
+                        <div class="diff">{{ macros.slot_with_icons(slot) }}</div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="col-xs-6">
+                {% for slot in deck2.sideslots %}
+                    {% if slot.quantity > 0 %}
+                        <div class="diff">{{ macros.slot_with_icons(slot) }}</div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
     </div>
 
 {% endblock %}

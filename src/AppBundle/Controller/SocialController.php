@@ -38,11 +38,12 @@ class SocialController extends Controller {
             throw $this->createAccessDeniedException("You don't have access to this decklist.");
         }
 
+        /*
         $yesterday = (new \DateTime())->modify('-24 hours');
         if ($user->getDateCreation() > $yesterday) {
-            //$this->get('session')->getFlashBag()->set('error', "To prevent spam, newly created accounts must wait 24 hours before being allowed to publish a decklist.");
+            $this->get('session')->getFlashBag()->set('error', "To prevent spam, newly created accounts must wait 24 hours before being allowed to publish a decklist.");
 
-            //return $this->redirect($this->generateUrl('deck_view', ['deck_id' => $deck->getId()]));
+            return $this->redirect($this->generateUrl('deck_view', ['deck_id' => $deck->getId()]));
         }
 
         $query = $em->createQuery("SELECT COUNT(d) FROM AppBundle:Decklist d WHERE d.dateCreation>:DATE AND d.user=:USER");
@@ -51,29 +52,41 @@ class SocialController extends Controller {
         $decklistsSinceYesterday = $query->getSingleScalarResult();
 
         if ($decklistsSinceYesterday > $user->getReputation()) {
-            //$this->get('session')->getFlashBag()->set('error', "To prevent spam, accounts cannot publish more decklists than their reputation per 24 hours.");
+            $this->get('session')->getFlashBag()->set('error', "To prevent spam, accounts cannot publish more decklists than their reputation per 24 hours.");
 
-            //return $this->redirect($this->generateUrl('deck_view', ['deck_id' => $deck->getId()]));
+            return $this->redirect($this->generateUrl('deck_view', ['deck_id' => $deck->getId()]));
         }
+        */
 
         $problem = $this->get('deck_validation_helper')->findProblem($deck);
         if ($problem) {
             $this->get('session')->getFlashBag()->set('error', "This deck cannot be published because it is invalid.");
 
-            return $this->redirect($this->generateUrl('deck_view', ['deck_id' => $deck->getId()]));
+            return $this->redirect($this->generateUrl('deck_view', [ 'deck_id' => $deck->getId() ]));
         }
 
-        $new_content = json_encode($deck->getSlots()->getContent());
+        $content = [
+            'main' => $deck->getSlots()->getContent(),
+            'side' => $deck->getSideslots()->getContent(),
+        ];
+
+        $new_content = json_encode($content);
         $new_signature = md5($new_content);
-        $old_decklists = $this->getDoctrine()->getRepository('AppBundle:Decklist')->findBy(['signature' => $new_signature]);
+        $old_decklists = $this->getDoctrine()->getRepository('AppBundle:Decklist')->findBy([ 'signature' => $new_signature ]);
 
         /* @var $decklist \AppBundle\Entity\Decklist */
         foreach ($old_decklists as $decklist) {
-            if (json_encode($decklist->getSlots()->getContent()) == $new_content) {
+            $deck_content = [
+                'main' => $decklist->getSlots()->getContent(),
+                'side' => $decklist->getSideslots()->getContent(),
+            ];
+
+            if (json_encode($deck_content) == $new_content) {
                 $url = $this->generateUrl('decklist_detail', [
                     'decklist_id' => $decklist->getId(),
                     'decklist_name' => $decklist->getNameCanonical()
                 ]);
+
                 $this->get('session')->getFlashBag()->set('warning', "This deck <a href=\"$url\">has already been published</a> before. You are going to create a duplicate.");
             }
         }
@@ -98,12 +111,13 @@ class SocialController extends Controller {
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
 
+        /*
         $yesterday = (new \DateTime())->modify('-24 hours');
         if ($user->getDateCreation() > $yesterday) {
-            //return $this->render('AppBundle:Default:error.html.twig', [
-            //    'pagetitle' => "Spam prevention",
-            //    'error' => "To prevent spam, newly created accounts must wait 24 hours before being allowed to publish a decklist.",
-            //]);
+            return $this->render('AppBundle:Default:error.html.twig', [
+                'pagetitle' => "Spam prevention",
+                'error' => "To prevent spam, newly created accounts must wait 24 hours before being allowed to publish a decklist.",
+            ]);
         }
 
         $query = $em->createQuery("SELECT COUNT(d) FROM AppBundle:Decklist d WHERE d.dateCreation>:DATE AND d.user=:USER");
@@ -112,11 +126,12 @@ class SocialController extends Controller {
         $decklistsSinceYesterday = $query->getSingleScalarResult();
 
         if ($decklistsSinceYesterday > $user->getReputation()) {
-            //return $this->render('AppBundle:Default:error.html.twig', [
-            //    'pagetitle' => "Spam prevention",
-            //    'error' => "To prevent spam, accounts cannot publish more decklists than their reputation per 24 hours.",
-            //]);
+            return $this->render('AppBundle:Default:error.html.twig', [
+                'pagetitle' => "Spam prevention",
+                'error' => "To prevent spam, accounts cannot publish more decklists than their reputation per 24 hours.",
+            ]);
         }
+        */
 
         $deck_id = intval(filter_var($request->request->get('deck_id'), FILTER_SANITIZE_NUMBER_INT));
 
@@ -130,6 +145,7 @@ class SocialController extends Controller {
         $descriptionMd = trim($request->request->get('descriptionMd'));
 
         $precedent_id = trim($request->request->get('precedent'));
+
         if (!preg_match('/^\d+$/', $precedent_id)) {
             // route decklist_detail hard-coded
             if (preg_match('/view\/(\d+)/', $precedent_id, $matches)) {
@@ -353,8 +369,8 @@ class SocialController extends Controller {
             $cards = $dbh->executeQuery("SELECT
     				c.name,
     				c.code,
-                    s.code as sphere_code,
-                    p.name as pack_name
+                    s.code AS sphere_code,
+                    p.name AS pack_name
     				FROM card c
                     INNER JOIN sphere s ON s.id = c.sphere_id
                     INNER JOIN pack p ON p.id = c.pack_id
@@ -372,7 +388,7 @@ class SocialController extends Controller {
     }
 
     public function byauthorAction($username, Request $request) {
-        return $this->redirect($this->generateUrl('decklists_list', array('type' => 'find', 'author' => $username)));
+        return $this->redirect($this->generateUrl('decklists_list', ['type' => 'find', 'author' => $username]));
     }
 
     /*
@@ -674,14 +690,7 @@ class SocialController extends Controller {
         $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
 
         if ($decklist->getUser()->getId() != $user->getId()) {
-            $query = $em->getRepository('AppBundle:Decklist')
-                ->createQueryBuilder('d')
-                ->innerJoin('d.votes', 'u')
-                ->where('d.id = :decklist_id')
-                ->andWhere('u.id = :user_id')
-                ->setParameter('decklist_id', $decklist_id)
-                ->setParameter('user_id', $user->getId())
-                ->getQuery();
+            $query = $em->getRepository('AppBundle:Decklist')->createQueryBuilder('d')->innerJoin('d.votes', 'u')->where('d.id = :decklist_id')->andWhere('u.id = :user_id')->setParameter('decklist_id', $decklist_id)->setParameter('user_id', $user->getId())->getQuery();
 
             $result = $query->getResult();
             if (empty($result)) {
@@ -701,7 +710,6 @@ class SocialController extends Controller {
 	 * (unused) returns an ordered list of decklists similar to the one given
 	 */
     public function findSimilarDecklists($decklist_id, $number) {
-
         $dbh = $this->getDoctrine()->getConnection();
 
         $list = $dbh->executeQuery("SELECT
@@ -971,7 +979,7 @@ class SocialController extends Controller {
         if ($owned_packs) {
             $packs = explode(",", $owned_packs);
         } else {
-            $packs = $dbh->executeQuery("SELECT id FROM pack WHERE date_release is NOT NULL")->fetchAll(\PDO::FETCH_COLUMN);
+            $packs = $dbh->executeQuery("SELECT id FROM pack WHERE date_release IS NOT NULL")->fetchAll(\PDO::FETCH_COLUMN);
         }
 
         $categories = [];
@@ -1055,8 +1063,8 @@ class SocialController extends Controller {
         $users = $dbh->executeQuery("SELECT * FROM user WHERE donation > 0 ORDER BY donation DESC, username", [])->fetchAll(\PDO::FETCH_ASSOC);
 
         return $this->render('AppBundle:Default:donators.html.twig', [
-                'pagetitle' => 'The Gracious Donators',
-                'donators' => $users
-            ], $response);
+            'pagetitle' => 'The Gracious Donators',
+            'donators' => $users
+        ], $response);
     }
 }

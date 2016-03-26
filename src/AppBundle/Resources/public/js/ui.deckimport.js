@@ -1,9 +1,12 @@
 (function ui_deckimport(ui, $) {
 
 
-    ui.on_content_change = function on_content_change(event) {
+    ui.on_content_change = function(event) {
         var text = $(content).val();
         var slots = {};
+        var sideslots = {};
+
+        var add_to_sideboard = false;
 
         text = text.replace(/[\u2018\u2019]/g, "'");
 
@@ -43,14 +46,25 @@
             }
 
             if (card) {
-                slots[card.code] = qty;
+                //qty = Math.min(qty, card.deck_limit);
+
+                if (add_to_sideboard) {
+                    sideslots[card.code] = qty;
+                } else {
+                    slots[card.code] = qty;
+                }
+            } else if (name.toLowerCase() == 'sideboard') {
+                add_to_sideboard = true;
+                console.log('remaining cards will be added to sideboard');
             } else {
                 console.log('rejecting string [' + name + ']');
             }
         });
 
-        app.deck.init({ slots: slots });
-        app.deck.display('#deck-content');
+        app.deck.init({ slots: slots, sideslots: sideslots });
+        app.deck.display('#deck-content', null, false);
+        app.deck.display('#deck-side-content', null, true);
+
 
         $('input[name=content]').val(app.deck.get_json());
     };

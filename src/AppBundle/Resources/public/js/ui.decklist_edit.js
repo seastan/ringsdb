@@ -1,7 +1,8 @@
 (function ui_decklist_edit(ui, $) {
 
     ui.refresh_deck = function() {
-        app.deck.display('#decklist', { cols: 1 });
+        app.deck.display('#decklist-content', { cols: 1 }, false);
+        app.deck.display('#decklist-side-content', { cols: 1 }, true);
     };
 
     /**

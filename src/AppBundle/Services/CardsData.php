@@ -118,9 +118,17 @@ class CardsData {
 
         foreach ($conditions as $condition) {
             $searchCode = array_shift($condition);
-            $searchName = \AppBundle\Controller\SearchController::$searchKeys[$searchCode];
-            $searchType = \AppBundle\Controller\SearchController::$searchTypes[$searchCode];
             $operator = array_shift($condition);
+
+            $searchName = '';
+            if (isset(\AppBundle\Controller\SearchController::$searchKeys[$searchCode])) {
+                $searchName = \AppBundle\Controller\SearchController::$searchKeys[$searchCode];
+            }
+
+            $searchType = '';
+            if (isset(\AppBundle\Controller\SearchController::$searchTypes[$searchCode])) {
+                $searchType = \AppBundle\Controller\SearchController::$searchTypes[$searchCode];
+            }
 
             switch ($searchType) {
                 case 'boolean': {

@@ -81,7 +81,12 @@ class BuilderController extends Controller {
     public function parseTextImport($text) {
         $em = $this->getDoctrine()->getManager();
 
-        $content = [];
+        $content = [
+            'main' => [],
+            'side' => [],
+        ];
+        $addToSideboard = false;
+
         $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', '\'', '\''], $text);
 
         $lines = explode("\n", $text);
@@ -92,6 +97,11 @@ class BuilderController extends Controller {
             $pack_name = null;
             $name = null;
             $quantity = 1;
+
+            if (trim($line) == 'Sideboard') {
+                $addToSideboard = true;
+                continue;
+            }
 
             if (preg_match('/(x\d+|\d+x)/u', $line, $matches)) {
                 $quantity = intval(str_replace('x', '', $matches[1]));
@@ -129,7 +139,11 @@ class BuilderController extends Controller {
             }
 
             if ($card) {
-                $content[$card->getCode()] = $quantity;
+                if ($addToSideboard) {
+                    $content['side'][$card->getCode()] = $quantity;
+                } else {
+                    $content['main'][$card->getCode()] = $quantity;
+                }
             }
         }
 
@@ -146,10 +160,17 @@ class BuilderController extends Controller {
         $crawler->addXmlContent($octgn);
 
         // read octgnid
-        $cardcrawler = $crawler->filter('deck > section > card');
         $octgnids = [];
+        $sideoctgnids = [];
+
+        $cardcrawler = $crawler->filter('deck > section[name!="Sideboard"] > card');
         foreach ($cardcrawler as $domElement) {
             $octgnids[$domElement->getAttribute('id')] = intval($domElement->getAttribute('qty'));
+        }
+
+        $cardcrawler = $crawler->filter('deck > section[name="Sideboard"] > card');
+        foreach ($cardcrawler as $domElement) {
+            $sideoctgnids[$domElement->getAttribute('id')] = intval($domElement->getAttribute('qty'));
         }
 
         // read desc
@@ -170,10 +191,24 @@ class BuilderController extends Controller {
             }
         }
 
+        $sidecontent = [];
+        foreach ($sideoctgnids as $octgnid => $qty) {
+            $card = $em->getRepository('AppBundle:Card')->findOneBy([
+                'octgnid' => $octgnid
+            ]);
+
+            if ($card) {
+                $sidecontent[$card->getCode()] = $qty;
+            }
+        }
+
         $description = implode("\n", $descriptions);
 
         return [
-            "content" => $content,
+            "content" => [
+                'main' => $content,
+                'side' => $sidecontent,
+            ],
             "description" => $description
         ];
     }
@@ -247,9 +282,12 @@ class BuilderController extends Controller {
             ]);
         }
 
-        $content = [];
+        $content = ['main' => [], 'side' => []];
         foreach ($deck->getSlots() as $slot) {
-            $content[$slot->getCard()->getCode()] = $slot->getQuantity();
+            $content['main'][$slot->getCard()->getCode()] = $slot->getQuantity();
+        }
+        foreach ($deck->getSideslots() as $slot) {
+            $content['side'][$slot->getCard()->getCode()] = $slot->getQuantity();
         }
 
         return $this->forward('AppBundle:Builder:save', [
@@ -293,11 +331,15 @@ class BuilderController extends Controller {
         }
 
         $content = (array)json_decode($request->get('content'));
-        if (!count($content)) {
+        if (!isset($content['main']) || !count($content['main'])) {
             return new Response('Cannot import empty deck');
         }
 
         $name = filter_var($request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+        if (empty($name)) {
+            $name = 'Untitled Deck';
+        }
+
         $decklist_id = filter_var($request->get('decklist_id'), FILTER_SANITIZE_NUMBER_INT);
         $description = trim($request->get('description'));
         $tags = filter_var($request->get('tags'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
@@ -363,6 +405,13 @@ class BuilderController extends Controller {
 
     public function editAction($deck_id) {
         $deck = $this->getDoctrine()->getManager()->getRepository('AppBundle:Deck')->find($deck_id);
+
+        if (!$deck) {
+            return $this->render('AppBundle:Default:error.html.twig', [
+                'pagetitle' => "Error",
+                'error' => "This deck doesn't exist."
+            ]);
+        }
 
         if ($this->getUser()->getId() != $deck->getUser()->getId()) {
             return $this->render('AppBundle:Default:error.html.twig', [
@@ -434,12 +483,14 @@ class BuilderController extends Controller {
 
         $heroIntersection = $this->get('diff')->getSlotsDiff([$deck1->getSlots()->getHeroDeck(), $deck2->getSlots()->getHeroDeck()]);
         $drawIntersection = $this->get('diff')->getSlotsDiff([$deck1->getSlots()->getDrawDeck(), $deck2->getSlots()->getDrawDeck()]);
+        $sideIntersection = $this->get('diff')->getSlotsDiff([$deck1->getSideSlots(), $deck2->getSideSlots()]);
 
         return $this->render('AppBundle:Compare:deck_compare.html.twig', [
             'deck1' => $deck1,
             'deck2' => $deck2,
             'hero_deck' => $heroIntersection,
             'draw_deck' => $drawIntersection,
+            'side_deck' => $sideIntersection,
         ]);
     }
 
@@ -489,9 +540,12 @@ class BuilderController extends Controller {
 
         $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
 
-        $content = [];
-        foreach ($decklist->getSlots() as $slot) {
-            $content[$slot->getCard()->getCode()] = $slot->getQuantity();
+        $content = ['main' => [], 'side' => []];
+        foreach ($deck->getSlots() as $slot) {
+            $content['main'][$slot->getCard()->getCode()] = $slot->getQuantity();
+        }
+        foreach ($deck->getSideslots() as $slot) {
+            $content['side'][$slot->getCard()->getCode()] = $slot->getQuantity();
         }
 
         return $this->forward('AppBundle:Builder:save', [
@@ -634,12 +688,12 @@ class BuilderController extends Controller {
         }
 
         $diff = (array)json_decode($request->get('diff'));
-        if (count($diff) != 2) {
+        if (count($diff) != 4 && count($diff) != 2) {
             $this->get('logger')->error("cannot use diff", $diff);
             throw new BadRequestHttpException("Wrong content " . json_encode($diff));
         }
 
-        if (count($diff[0]) || count($diff[1])) {
+        if (count($diff[0]) || count($diff[1]) || count($diff[2]) || count($diff[3])) {
             $change = new Deckchange();
             $change->setDeck($deck);
             $change->setVariation(json_encode($diff));

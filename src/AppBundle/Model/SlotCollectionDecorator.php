@@ -60,16 +60,25 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
             $pack = $card->getPack();
-            if (!isset($packs[$pack->getPosition()])) {
-                $packs[$pack->getPosition()] = [
+
+            if ($pack->getDateRelease()) {
+                $pos= $pack->getDateRelease()->format('c');
+            } else {
+                $pos = 'U';
+            }
+
+            $pos = $pos . $pack->getPosition();
+
+            if (!isset($packs[$pos])) {
+                $packs[$pos] = [
                     'pack' => $pack,
                     'nb' => 0
                 ];
             }
 
             $nbpacks = ceil($slot->getQuantity() / $card->getQuantity());
-            if ($packs[$pack->getPosition()]['nb'] < $nbpacks) {
-                $packs[$pack->getPosition()]['nb'] = $nbpacks;
+            if ($packs[$pos]['nb'] < $nbpacks) {
+                $packs[$pos]['nb'] = $nbpacks;
             }
         }
         ksort($packs);
@@ -135,8 +144,25 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
     public function getStartingThreat() {
         $heroDeck = $this->getHeroDeck();
         $threat = 0;
+        $mirlonde = false;
+
         foreach ($heroDeck->getSlots() as $slot) {
-            $threat += $slot->getCard()->getThreat();
+            $card = $slot->getCard();
+            $threat += $card->getThreat();
+
+            if ($card->getName() == 'Mirlonde' && $card->getPack()->getCode() == 'TDF') {
+                $mirlonde = true;
+            }
+        }
+
+        if ($mirlonde) {
+            foreach ($heroDeck->getSlots() as $slot) {
+                $card = $slot->getCard();
+
+                if ($card->getSphere()->getCode() == 'lore') {
+                    $threat--;
+                }
+            }
         }
 
         return $threat;
