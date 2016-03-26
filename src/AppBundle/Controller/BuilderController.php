@@ -540,6 +540,14 @@ class BuilderController extends Controller {
 
         $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
 
+        if (!$decklist) {
+            return $this->render('AppBundle:Default:error.html.twig', [
+                'pagetitle' => "Error",
+                'error' => 'This deck cannot be found.'
+            ]);
+        }
+
+
         $content = ['main' => [], 'side' => []];
         foreach ($decklist->getSlots() as $slot) {
             $content['main'][$slot->getCard()->getCode()] = $slot->getQuantity();
