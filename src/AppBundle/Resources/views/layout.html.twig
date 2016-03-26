@@ -43,6 +43,10 @@
     <![endif]-->
 
     {% block stylesheets %}{% endblock %}
+
+    {% if app.environment == 'prod' %}
+        {% include 'AppBundle::google-analytics.html.twig' %}
+    {% endif %}
 </head>
 <body>
     <div id="wrapper">
@@ -191,10 +195,6 @@
             {% endfor %}
         });
     </script>
-
-    {% if app.environment == 'prod' %}
-        {% include 'AppBundle::google-analytics.html.twig' %}
-    {% endif %}
 
     {% javascripts filter="?jsqueeze" output="js/app.js"
         '@AppBundle/Resources/public/js/bootstrap.js'
