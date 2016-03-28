@@ -270,7 +270,11 @@
         var layout_data = is_sideboard ? deck.get_side_layout_data(options) : deck.get_layout_data(options);
         var deck_content = layout_data ? layouts[options.sort][options.cols](layout_data) : '';
 
-        $(container).removeClass('deck-loading').empty().append(deck_content);
+        var c = $(container).removeClass('deck-loading').empty().append(deck_content);
+
+        if (options.cols == 1) {
+            c.find('.hero-thumbnail').removeClass('card-thumbnail-2x').addClass('card-thumbnail-3x');
+        }
     };
 
     deck.get_side_layout_data = function(options) {
