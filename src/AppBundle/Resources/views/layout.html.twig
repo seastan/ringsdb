@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ pagetitle | default('Deckbuilder') }} &middot; RingsDB &middot; A LotR LCG Deckbuilder</title>
+    <title>{{ pagetitle | default('Deckbuilder') }} &middot; RingsDB</title>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +12,7 @@
     <link rel="shortcut icon" href="/favicon.ico?v=2"/>
 
     {% if pagedescription is defined %}
-        <meta name="description" content="{{ pagedescription }}">
+        <meta name="description" content="{{ pagedescription }} &middot; RingsDB, a LotR LCG Deckbuilder">
     {% endif %}
 
     {% if app.environment == 'dev' or app.environment == 'prod' %}
