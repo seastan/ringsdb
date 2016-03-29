@@ -435,6 +435,27 @@ div.tags span.tag {
   }
 }
 
+.index-decklist-row {
+  display: flex;
+  flex-direction: row;
+
+  > div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .bg-deck {
+      flex: 1;
+    }
+  }
+}
+
+@media (max-width: 991px) {
+  .index-decklist-row {
+    display: block;
+  }
+}
+
 .index-hero {
   vertical-align: top;
   max-width: 120px;
