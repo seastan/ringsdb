@@ -345,7 +345,7 @@
             packinfo = $('<div id="latestpack">Cards up to <i>' + (deck.get_lastest_pack().name || '-') + '</i></div>');
 
             if (packs.length) {
-                $('<small><i style="cursor: pointer; padding-left: 5px;" class="fa fa-plus-square-o expand-packs"></i></small>').appendTo(packinfo);
+                $('<small><i style="cursor: pointer; padding-left: 5px;" class="fa fa-eye expand-packs"></i></small>').appendTo(packinfo);
             }
         }
 
