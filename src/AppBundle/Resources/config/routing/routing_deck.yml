@@ -132,4 +132,3 @@ decks_diff:
     requirements:
         deck1_id: \d+
         deck2_id: \d+
-        
