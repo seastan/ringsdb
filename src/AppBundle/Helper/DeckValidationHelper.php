@@ -46,7 +46,7 @@ class DeckValidationHelper {
         }
 
         $cardsCount = $deck->getSlots()->getDrawDeck()->countCards();
-        if ($cardsCount < 40) {
+        if ($cardsCount < 30) {
             return 'too_few_cards';
         } else if ($cardsCount < 50 && !$casualPlay) {
             return 'invalid_for_tournament_play';

@@ -554,7 +554,7 @@
 
         // at least 50 others cards
         var decksize = deck.get_draw_deck_size();
-        if (decksize < 40) {
+        if (decksize < 30) {
             return 'too_few_cards';
         } else if (decksize < 50) {
             return 'invalid_for_tournament_play';
