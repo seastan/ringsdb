@@ -49,6 +49,7 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label for="quest">Quest</label>
+                                    <small class="pull-right"><strong><a href="" id="btn-randomize">Randomize</a></strong></small>
                                     <select class="form-control" name="quest" id="quest">
                                         {% for quest in quests %}
                                             <option value="{{ quest.id }}">{{ quest.name }}</option>

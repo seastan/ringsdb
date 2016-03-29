@@ -43,6 +43,18 @@
             headerOnly = true;
             ui.refresh_deck();
         });
+
+        $('#btn-randomize').on('click', function(e) {
+            e.preventDefault();
+
+            var randomIntFromInterval = function(min, max) {
+                return Math.floor(Math.random() * (max - min + 1) + min);
+            };
+
+            var quest = $('#quest');
+            var scenarios = quest.find('option');
+            quest.val(scenarios[randomIntFromInterval(0, scenarios.size() - 1)].value).trigger('input');
+        });
     };
 
     ui.init_markdown = function() {
