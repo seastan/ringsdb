@@ -149,6 +149,10 @@
         }).trigger('input');
     };
 
+    ui.init_date_picker = function() {
+        $('#date')[0].valueAsDate = new Date();
+    };
+
         /**
      * called when the DOM is loaded
      * @memberOf ui
@@ -159,6 +163,7 @@
         ui.init_quest_selector();
         ui.init_quest_mode_selector();
         ui.init_result_selector();
+        ui.init_date_picker();
     };
 
     ui.on_button_heading = function(heading, e) {
