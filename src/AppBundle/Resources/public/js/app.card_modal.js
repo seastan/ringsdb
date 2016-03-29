@@ -69,7 +69,7 @@
             var left = $('<label class="btn btn-default" data-direction="left"><span class="fa fa-angle-left"</label>').appendTo(qtyelt);
             var right = $('<label class="btn btn-default" data-direction="right"><span class="fa fa-angle-right"</label>').appendTo(qtyelt);
 
-            if (card.insidedeck == 0) {
+            if (card.insideboard == 0) {
                 left.addClass('disabled');
             }
 
@@ -84,7 +84,7 @@
         for (var i = 0; i <= card.maxqty; i++) {
             var label = $('<label class="btn btn-default"><input type="radio" name="side-qty" value="' + i + '">' + i + '</label>');
 
-            if (i == card.insidedeck) {
+            if (i == card.insideboard) {
                 label.addClass('active');
             }
 

@@ -17,6 +17,10 @@ app_decklist:
     resource: "@AppBundle/Resources/config/routing/routing_decklist.yml"
     prefix: /decklist
 
+app_questlog:
+    resource: "@AppBundle/Resources/config/routing/routing_questlog.yml"
+    prefix: /questlog
+
 app_review:
     resource: "@AppBundle/Resources/config/routing/routing_review.yml"
     prefix: /review
@@ -32,13 +36,6 @@ app_user:
 app_collection:
     resource: "@AppBundle/Resources/config/routing/routing_collection.yml"
     prefix: /collection
-
-app_decklist_byauthor:
-    path: /d/{username}
-    methods: [GET]
-    defaults:
-        _controller: AppBundle:Social:byauthor
-
 
 index:
     path: /
@@ -57,6 +54,12 @@ decks_list:
     methods: [GET]
     defaults:
         _controller: AppBundle:Builder:list
+
+decklist_byauthor:
+    path: /d/{username}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Social:byauthor
 
 decklists_searchform:
     path: /decklists/search

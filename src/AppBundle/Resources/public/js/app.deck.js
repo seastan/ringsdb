@@ -74,7 +74,7 @@
     deck.set_slots = function(slots, sideslots) {
         app.data.cards.update({}, {
             indeck: 0,
-            insidedeck: 0
+            insideboard: 0
         });
 
         for (var code in slots) {
@@ -88,7 +88,7 @@
         for (var side_code in sideslots) {
             if (sideslots.hasOwnProperty(side_code)) {
                 app.data.cards.updateById(side_code, {
-                    insidedeck: sideslots[side_code]
+                    insideboard: sideslots[side_code]
                 });
             }
         }
@@ -140,7 +140,7 @@
         sort['code'] = 1;
 
         query = query || {};
-        query.insidedeck = {
+        query.insideboard = {
             '$gt': 0
         };
 
@@ -222,7 +222,7 @@
         if (!cards) {
             cards = is_sideboard ? deck.get_side_cards() : deck.get_cards();
         }
-        var quantities = _.pluck(cards, is_sideboard ? 'insidedeck' : 'indeck');
+        var quantities = _.pluck(cards, is_sideboard ? 'insideboard' : 'indeck');
         return _.reduce(quantities, function(memo, num) { return memo + num; }, 0);
     };
 
@@ -326,7 +326,14 @@
         var herocount = deck.get_hero_deck_size();
         var drawcount = deck.get_draw_deck_size();
 
-        var title = $('<h4 style="font-weight: bold">Main Deck</h4>');
+        var title;
+        if (options.special_meta) {
+            title = $('<h4 style="font-weight: bold">' + deck.get_name() + '</h4>');
+        } else {
+            title = $('<h4 style="font-weight: bold">Main Deck</h4>');
+        }
+
+
         var threat = $('<div>Starting Threat: <b>' + deck.get_starting_threat() + '</b></div>')
 
         var text = [herocount, herocount == 1 ? ' Hero, ': ' Heroes, ', drawcount, drawcount == 1 ? ' Card': ' Cards' ].join(' ');
@@ -352,20 +359,32 @@
         deck.update_layout_section(data, 'meta', title);
         deck.update_layout_section(data, 'meta', threat);
         deck.update_layout_section(data, 'meta', sizeinfo);
-        deck.update_layout_section(data, 'meta', packinfo);
 
-        if (problem) {
-            var probleminfo = $('<div class="text-danger small"><span class="fa fa-exclamation-triangle"></span> ' + problem_labels[problem] + '</div>');
-            deck.update_layout_section(data, 'meta', probleminfo);
+        if (!options.special_meta) {
+            deck.update_layout_section(data, 'meta', packinfo);
+
+            if (problem) {
+                var probleminfo = $('<div class="text-danger small"><span class="fa fa-exclamation-triangle"></span> ' + problem_labels[problem] + '</div>');
+                deck.update_layout_section(data, 'meta', probleminfo);
+            }
         }
 
         if (options.sort == 'type') {
             deck.update_layout_section(data, 'heroes', deck.get_layout_data_one_section('type_code', 'hero', 'type_name'));
-            deck.update_layout_section(data, 'allies', deck.get_layout_data_one_section('type_code', 'ally', 'type_name'));
-            deck.update_layout_section(data, 'attachments', deck.get_layout_data_one_section('type_code', 'attachment', 'type_name'));
-            deck.update_layout_section(data, 'events', deck.get_layout_data_one_section('type_code', 'event', 'type_name'));
-            deck.update_layout_section(data, 'sidequests', deck.get_layout_data_one_section('type_code', 'player-side-quest', 'type_name'));
-            deck.update_layout_section(data, 'treasures', deck.get_layout_data_one_section('type_code', 'treasure', 'type_name'));
+
+            if (!options.header_only) {
+                deck.update_layout_section(data, 'allies', deck.get_layout_data_one_section('type_code', 'ally', 'type_name'));
+                deck.update_layout_section(data, 'attachments', deck.get_layout_data_one_section('type_code', 'attachment', 'type_name'));
+                deck.update_layout_section(data, 'events', deck.get_layout_data_one_section('type_code', 'event', 'type_name'));
+                deck.update_layout_section(data, 'sidequests', deck.get_layout_data_one_section('type_code', 'player-side-quest', 'type_name'));
+                deck.update_layout_section(data, 'treasures', deck.get_layout_data_one_section('type_code', 'treasure', 'type_name'));
+            } else {
+                deck.update_layout_section(data, 'allies', '');
+                deck.update_layout_section(data, 'attachments', '');
+                deck.update_layout_section(data, 'events', '');
+                deck.update_layout_section(data, 'sidequests', '');
+                deck.update_layout_section(data, 'treasures', '');
+            }
         }
 
         if (options.sort == 'position') {
@@ -404,7 +423,7 @@
         var query = {};
 
         var getCards = is_sideboard ? deck.get_side_cards : deck.get_cards;
-        var key = is_sideboard ? 'insidedeck' : 'indeck';
+        var key = is_sideboard ? 'insideboard' : 'indeck';
 
         if (sortValue) {
             query[sortKey] = sortValue;
@@ -482,9 +501,9 @@
 
         if (!is_sideboard) {
             update.indeck = nb_copies;
-            update.insidedeck = Math.min(card.insidedeck, card.maxqty - nb_copies);
+            update.insideboard = Math.min(card.insideboard, card.maxqty - nb_copies);
         } else {
-            update.insidedeck = nb_copies;
+            update.insideboard = nb_copies;
             update.indeck = Math.min(card.indeck, card.maxqty - nb_copies);
         }
 
@@ -511,7 +530,7 @@
         });
 
         side_cards.forEach(function(card) {
-            content.side[card.code] = card.insidedeck;
+            content.side[card.code] = card.insideboard;
         });
 
         return content;
@@ -594,7 +613,7 @@
 
         lines.push('[b]' + deck.get_name() + '[/b]');
 
-        $('#deck-content, #deck-side-content').find('h4:visible, h5:visible').each(function(i, type) {
+        $('#deck-content, #sideboard-content').find('h4:visible, h5:visible').each(function(i, type) {
             lines.push('');
 
             if (type.tagName.toLowerCase() == 'h4') {
@@ -640,7 +659,7 @@
 
         lines.push('#' + deck.get_name());
 
-        $('#deck-content, #deck-side-content').find('h4:visible, h5:visible').each(function(i, type) {
+        $('#deck-content, #sideboard-content').find('h4:visible, h5:visible').each(function(i, type) {
             lines.push('');
 
             if (type.tagName.toLowerCase() == 'h4') {
@@ -684,7 +703,7 @@
 
         lines.push(deck.get_name());
 
-        $('#deck-content, #deck-side-content').find('h4:visible, h5:visible').each(function(i, type) {
+        $('#deck-content, #sideboard-content').find('h4:visible, h5:visible').each(function(i, type) {
             lines.push('');
             lines.push($(this).text().trim());
 

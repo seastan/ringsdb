@@ -34,7 +34,6 @@
 
         var diff = result[0].concat(sideResult[0]);
         var diff_json = JSON.stringify(diff);
-        console.log(diff_json);
 
         if (diff_json == '[{},{},{},{}]') {
             return;
@@ -150,17 +149,17 @@
 
         app.data.cards.find({}).forEach(function(card) {
             var indeck = 0;
-            var insidedeck = 0;
+            var insideboard = 0;
             if (snapshot.content.main[card.code]) {
                 indeck = snapshot.content.main[card.code];
             }
 
             if (snapshot.content.side[card.code]) {
-                insidedeck = snapshot.content.side[card.code];
+                insideboard = snapshot.content.side[card.code];
             }
             app.data.cards.updateById(card.code, {
                 indeck: indeck,
-                insidedeck: insidedeck
+                insideboard: insideboard
             });
         });
 

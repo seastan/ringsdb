@@ -10,7 +10,7 @@
     </div>
 
     <div class="main container">
-        <div class="row">
+        <div class="row index-decklist-row">
             {% for data in decklists_by_sphere %}
                 <div class="col-md-6" style="margin-bottom:30px">
                     <div class="bg-sphere bg-sphere-index bg-{{ data.sphere.code }}" style="padding: 10px 10px 8px 10px">
@@ -46,6 +46,8 @@
                         <div style="clear:both"></div>
                     </div>
                 </div>
+
+                {% if loop.index == 2 %}</div><div class="row index-decklist-row">{% endif %}
             {% endfor %}
         </div>
     </div>

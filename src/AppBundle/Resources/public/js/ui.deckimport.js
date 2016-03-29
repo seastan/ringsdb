@@ -63,7 +63,7 @@
 
         app.deck.init({ slots: slots, sideslots: sideslots });
         app.deck.display('#deck-content', null, false);
-        app.deck.display('#deck-side-content', null, true);
+        app.deck.display('#sideboard-content', null, true);
 
 
         $('input[name=content]').val(app.deck.get_json());

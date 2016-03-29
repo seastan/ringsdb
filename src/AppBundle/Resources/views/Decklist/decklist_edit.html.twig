@@ -5,6 +5,7 @@
     {% javascripts '@AppBundle/Resources/public/js/ui.decklist_edit.js' %}
         <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
+
     <script type="text/javascript">
         app.deck.init({{ decklist | json_encode | raw }});
     </script>
