@@ -1,0 +1,54 @@
+AppBundle\Entity\Scenario:
+    type: entity
+    table: scenario
+    manyToOne:
+        pack:
+            targetEntity: Pack
+            joinColumn:
+                name: pack_id
+                referencedColumnName: id
+    manyToMany:
+        encounters:
+            targetEntity: Encounter
+            orderBy: { 'pack': 'ASC' }
+            joinTable:
+                name: scenario_encounter
+                cascade: ["persist","remove"]
+                joinColumns:
+                    scenario_id:
+                        referencedColumnName: id
+                inverseJoinColumns:
+                    encounter_id:
+                        referencedColumnName: id
+
+    fields:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+        position:
+            type: smallint
+            nullable: false
+        code:
+            type: string
+            length: 255
+            nullable: false
+        name:
+            type: string
+            length: 1024
+            nullable: false
+        dateCreation:
+            type: datetime
+            nullable: false
+            column: date_creation
+            gedmo:
+                timestampable:
+                    on: create
+        dateUpdate:
+            type: datetime
+            nullable: false
+            column: date_update
+            gedmo:
+                timestampable:
+                    on: update

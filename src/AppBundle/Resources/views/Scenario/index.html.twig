@@ -1,0 +1,37 @@
+{% extends 'AppBundle:Admin:base.html.twig' %}
+
+{% block content -%}
+    <h1>Scenario list</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Pack</th>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Encounters</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td><a href="{{ path('admin_scenario_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td>{{ entity.pack.name }}</td>
+                <td>{{ entity.code }}</td>
+                <td>{{ entity.name }}</td>
+                <td>{{ entity.encounters | join('<br>') | raw }}</td>
+                <td>
+                    <a href="{{ path('admin_scenario_show', { 'id': entity.id }) }}" class="btn btn-default btn-sm">show</a>
+                    <a href="{{ path('admin_scenario_edit', { 'id': entity.id }) }}" class="btn btn-default btn-sm">edit</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('admin_scenario_new') }}" class="btn btn-default">
+        Create a new entry
+    </a>
+{% endblock %}

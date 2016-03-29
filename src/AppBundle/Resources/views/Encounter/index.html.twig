@@ -1,0 +1,37 @@
+{% extends 'AppBundle:Admin:base.html.twig' %}
+
+{% block content -%}
+    <h1>Encounter list</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Pack</th>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Image</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td><a href="{{ path('admin_encounter_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td>{% if entity.pack %}{{ entity.pack.name }}{% endif %}</td>
+                <td>{{ entity.code }}</td>
+                <td>{{ entity.name }}</td>
+                <td><img style="width: 30px;" src="{{ asset('/bundles/app/images/encounters/' ~ entity.name ~ '.png') }}"></td>
+                <td>
+                    <a href="{{ path('admin_encounter_show', { 'id': entity.id }) }}" class="btn btn-default btn-sm">show</a>
+                    <a href="{{ path('admin_encounter_edit', { 'id': entity.id }) }}" class="btn btn-default btn-sm">edit</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('admin_encounter_new') }}" class="btn btn-default">
+        Create a new entry
+    </a>
+{% endblock %}

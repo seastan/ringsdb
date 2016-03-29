@@ -538,4 +538,72 @@ class ApiController extends Controller {
 
 		return $response;
 	}
+
+
+	/**
+	 * Get the description of a scenario as a JSON object.
+	 *
+	 * @ApiDoc(
+	 *  section="Scenario",
+	 *  resource=true,
+	 *  description="One Scenario",
+	 *  parameters={
+	 *      {"name"="jsonp", "dataType"="string", "required"=false, "description"="JSONP callback"}
+	 *  },
+	 *  requirements={
+	 *      {
+	 *          "name"="scenario_id",
+	 *          "dataType"="integer",
+	 *          "description"="The code of the scenario to get, e.g. '01001'"
+	 *      },
+	 *      {
+	 *          "name"="_format",
+	 *          "dataType"="string",
+	 *          "requirement"="json",
+	 *          "description"="The format of the returned data. Only 'json' is supported at the moment."
+	 *      }
+	 *  },
+	 * )
+	 * @param Request $request
+	 */
+	public function getScenarioAction($scenario_id, Request $request) {
+
+		$response = new Response();
+		$response->setPublic();
+		$response->setMaxAge($this->container->getParameter('cache_expiration'));
+		$response->headers->add(['Access-Control-Allow-Origin' => '*']);
+
+		$jsonp = $request->query->get('jsonp');
+
+        /* @var $scenario \AppBundle\Entity\Scenario */
+        $scenario = $this->getDoctrine()->getRepository('AppBundle:Scenario')->findOneBy(['id' => $scenario_id]);
+
+		// check the last-modified-since header
+		$lastModified = null;
+		if (!$lastModified || $lastModified < $scenario->getDateUpdate()) {
+			$lastModified = $scenario->getDateUpdate();
+		}
+
+		$response->setLastModified($lastModified);
+		if ($response->isNotModified($request)) {
+			return $response;
+		}
+
+		// build the response
+
+		/* @var $card \AppBundle\Entity\Scenario */
+		//$scenario = $this->get('cards_data')->getCardInfo($card, true, "en");
+
+		$content = json_encode($scenario);
+		if (isset($jsonp)) {
+			$content = "$jsonp($content)";
+			$response->headers->set('Content-Type', 'application/javascript');
+		} else {
+			$response->headers->set('Content-Type', 'application/json');
+		}
+		$response->setContent($content);
+
+		return $response;
+	}
+
 }
