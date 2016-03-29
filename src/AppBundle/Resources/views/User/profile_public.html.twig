@@ -12,9 +12,9 @@
 
             <div>
                 {% if user.decklists|length > 1 %}
-                    <a href="{{ path('decklists_list', { type: 'find', page: 1, author: user.username }) }}">{{ user.decklists | length }} published decklists.</a>
+                    <a href="{{ path('decklist_byauthor', { username: user.username }) }}">{{ user.decklists | length }} published decklists.</a>
                 {% elseif user.decklists|length == 1 %}
-                    <a href="{{ path('decklists_list', { type: 'find', page: 1, author:user.username }) }}">One published decklist.</a>
+                    <a href="{{ path('decklist_byauthor', { username: user.username }) }}">One published decklist.</a>
                 {% else %}
                     No published decklist.
                 {% endif %}
