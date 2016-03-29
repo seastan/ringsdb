@@ -1281,11 +1281,12 @@ footer a {
 
 .selected-deck-placeholder {
   border: 1px dashed #c5c5c5;
-  min-height: 200px;
 
-  line-height: 200px;
+  min-height: 245px;
+  line-height: 211px;
   text-align: center;
   margin-bottom: 20px;
+  padding: 0 10px 10px 10px;
 
   span.no-deck-selected {
     color: #c5c5c5;
@@ -1350,6 +1351,10 @@ footer a {
 
 .selected-deck-content {
   padding: 0 10px 10px 10px;
-  border: 1px dashed #c5c5c5;
+  border: 1px dashed transparent;
   margin-bottom: 20px;
+
+  .deck-loading {
+    min-height: 211px;
+  }
 }

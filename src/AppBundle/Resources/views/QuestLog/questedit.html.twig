@@ -18,6 +18,11 @@
 {% block body %}
     <div class="main white container">
         <form action="{{ path('questlog_save') }}" method="post" enctype="application/x-www-form-urlencoded">
+            <input type="hidden" name="deck1" value="{% if deck1 is not null %}{{ deck1.id }}{% endif %}"/>
+            <input type="hidden" name="deck2" value="{% if deck2 is not null %}{{ deck2.id }}{% endif %}"/>
+            <input type="hidden" name="deck3" value="{% if deck3 is not null %}{{ deck3.id }}{% endif %}"/>
+            <input type="hidden" name="deck4" value="{% if deck4 is not null %}{{ deck4.id }}{% endif %}"/>
+
             <fieldset>
                 <legend>
                     Deck Selection
@@ -29,54 +34,10 @@
                     </a>
                 </legend>
                 <div class="row selected-decks">
-                    <div class="col-sm-3">
-                        <div class="selected-deck-placeholder {% if deck1 is not null %}hidden{% endif %}">
-                            <span class="no-deck-selected">No deck selected</span>
-                            <input type="hidden" name="deck1"/>
-                        </div>
-                        <div class="small hidden selected-deck-content">
-                            <div id="deck1-content"></div>
-                            <a class="btn btn-xs btn-primary btn-block" data-action="swap" data-deck="1">
-                                <span class="fa fa-fw fa-exchange"></span> Swap <span class="hidden-sm">sideboard</span> cards
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="selected-deck-placeholder {% if deck2 is not null %}hidden{% endif %}">
-                            <span class="no-deck-selected">No deck selected</span>
-                            <input type="hidden" name="deck2"/>
-                        </div>
-                        <div class="small hidden selected-deck-content">
-                            <div id="deck2-content"></div>
-                            <a class="btn btn-xs btn-primary btn-block" data-action="swap" data-deck="2">
-                                <span class="fa fa-fw fa-exchange"></span> Swap <span class="hidden-sm">sideboard</span> cards
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="selected-deck-placeholder {% if deck3 is not null %}hidden{% endif %}">
-                            <span class="no-deck-selected">No deck selected</span>
-                            <input type="hidden" name="deck3"/>
-                        </div>
-                        <div class="small hidden selected-deck-content">
-                            <div id="deck3-content"></div>
-                            <a class="btn btn-xs btn-primary btn-block" data-action="swap" data-deck="3">
-                                <span class="fa fa-fw fa-exchange"></span> Swap <span class="hidden-sm">sideboard</span> cards
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="selected-deck-placeholder {% if deck4 is not null %}hidden{% endif %}">
-                            <span class="no-deck-selected">No deck selected</span>
-                            <input type="hidden" name="deck4"/>
-                        </div>
-                        <div class="small hidden selected-deck-content">
-                            <div id="deck4-content"></div>
-                            <a class="btn btn-xs btn-primary btn-block" data-action="swap" data-deck="4">
-                                <span class="fa fa-fw fa-exchange"></span> Swap <span class="hidden-sm">sideboard</span> cards
-                            </a>
-                        </div>
-                    </div>
+                    {% include 'AppBundle:QuestLog:selected-deck.html.twig' with { deck: deck1, deck_number: 1 } %}
+                    {% include 'AppBundle:QuestLog:selected-deck.html.twig' with { deck: deck2, deck_number: 2 } %}
+                    {% include 'AppBundle:QuestLog:selected-deck.html.twig' with { deck: deck3, deck_number: 3 } %}
+                    {% include 'AppBundle:QuestLog:selected-deck.html.twig' with { deck: deck4, deck_number: 4 } %}
                 </div>
             </fieldset>
 
@@ -100,7 +61,7 @@
                             <div class="col-sm-3">
                                 <div class="form-group">
                                     <label for="date">Date</label>
-                                    <div><input class="form-control" size="40" id="date" name="date" value=""></div>
+                                    <div><input type="date" class="form-control" size="40" id="date" name="date" value=""></div>
                                 </div>
                             </div>
                             <div class="col-sm-3">

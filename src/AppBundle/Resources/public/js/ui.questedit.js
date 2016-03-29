@@ -47,7 +47,6 @@
 
     ui.init_markdown = function() {
         $('#descriptionMd').markdown({
-            autofocus: true,
             iconlibrary: 'fa',
             hiddenButtons: ['cmdHeading', 'cmdImage', 'cmdCode'],
             footer: 'Press # to insert a card name, $ to insert a game symbol.',
@@ -138,6 +137,18 @@
         }).trigger('input');
     };
 
+    ui.init_result_selector = function() {
+        $('#victory').on('input', function() {
+            var victory = $(this).val();
+
+            if (victory == 'no') {
+                $('#score').prop('disabled', true);
+            } else {
+                $('#score').prop('disabled', false);
+            }
+        }).trigger('input');
+    };
+
         /**
      * called when the DOM is loaded
      * @memberOf ui
@@ -147,6 +158,7 @@
         ui.init_markdown();
         ui.init_quest_selector();
         ui.init_quest_mode_selector();
+        ui.init_result_selector();
     };
 
     ui.on_button_heading = function(heading, e) {
