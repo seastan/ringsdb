@@ -45,7 +45,7 @@
                                         <a href="{{ path('cards_zoom',{ card_code:review.card.code}) }}#review-{{ review.id }}" data-code="{{ review.card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" class="card card-name">{{ review.card.name }}</a>
                                     </h4>
                                 </div>
-                                <article class="review" data-code="{{ review.id }}" id="review-{{ review.id }}" style="margin-top: 1em;">
+                                <article class="review" data-id="{{ review.id }}" id="review-{{ review.id }}" style="margin-top: 1em;">
                                     <div class="review-like">
                                         <a id="review-social-icon-like" href="#" class="social-icon-like" data-toggle="tooltip" data-placement="bottom" title="Like that review">
                                             <span class="fa fa-heart"></span> <span class="num">{{ review.nbVotes }}</span>

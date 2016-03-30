@@ -87,11 +87,14 @@ class ReviewController extends Controller {
         }
 
         $review_id = filter_var($request->get('review_id'), FILTER_SANITIZE_NUMBER_INT);
+
         /* @var $review Review */
         $review = $em->getRepository('AppBundle:Review')->find($review_id);
+
         if (!$review) {
             throw new BadRequestHttpException("Unable to find review.");
         }
+
         if ($review->getUser()->getId() !== $user->getId()) {
             throw new UnauthorizedHttpException("You cannot edit this review.");
         }
@@ -125,6 +128,7 @@ class ReviewController extends Controller {
         }
 
         $review_id = filter_var($request->request->get('id'), FILTER_SANITIZE_NUMBER_INT);
+
         /* @var $review Review */
         $review = $em->getRepository('AppBundle:Review')->find($review_id);
         if (!$review) {
