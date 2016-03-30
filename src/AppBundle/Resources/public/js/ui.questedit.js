@@ -212,7 +212,7 @@
             deck_list_xhr.abort();
         }
 
-        deck_list_xhr = $.ajax(Routing.generate('api_private_user_decks', { username: username }), {
+        deck_list_xhr = $.ajax(Routing.generate('api_private_user_decks', { username: encodeURIComponent(username) }), {
             type: 'GET',
             dataType: 'json',
             success: function(data, textStatus, jqXHR) {

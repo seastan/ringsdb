@@ -21,10 +21,12 @@ class ApiPrivateController extends Controller {
 			return $deck->getDateUpdate();
 		}, $decks);
 
-		$response->setLastModified(max($dateUpdates));
-		if ($response->isNotModified($request)) {
-			return $response;
-		}
+        if (count($dateUpdates)) {
+            $response->setLastModified(max($dateUpdates));
+            if ($response->isNotModified($request)) {
+                return $response;
+            }
+        }
 
 		$content = json_encode($decks);
 
@@ -70,10 +72,12 @@ class ApiPrivateController extends Controller {
 			return $deck->getDateUpdate();
 		}, $decks);
 
-		$response->setLastModified(max($dateUpdates));
-		if ($response->isNotModified($request)) {
-			return $response;
-		}
+        if (count($dateUpdates)) {
+            $response->setLastModified(max($dateUpdates));
+            if ($response->isNotModified($request)) {
+                return $response;
+            }
+        }
 
 		$content = json_encode($decks);
 
@@ -103,7 +107,6 @@ class ApiPrivateController extends Controller {
 
             return $response;
         }
-
 
         $user = $deck->getUser();
         if (!$user->getIsShareDecks() && $user != $this->getUser()) {
