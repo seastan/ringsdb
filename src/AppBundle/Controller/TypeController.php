@@ -12,29 +12,26 @@ use AppBundle\Form\TypeType;
  * Type controller.
  *
  */
-class TypeController extends Controller
-{
-
+class TypeController extends Controller {
     /**
      * Lists all Type entities.
      *
      */
-    public function indexAction()
-    {
+    public function indexAction() {
         $em = $this->getDoctrine()->getManager();
 
         $entities = $em->getRepository('AppBundle:Type')->findAll();
 
-        return $this->render('AppBundle:Type:index.html.twig', array(
+        return $this->render('AppBundle:Type:index.html.twig', [
             'entities' => $entities,
-        ));
+        ]);
     }
+
     /**
      * Creates a new Type entity.
      *
      */
-    public function createAction(Request $request)
-    {
+    public function createAction(Request $request) {
         $entity = new Type();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
@@ -44,13 +41,13 @@ class TypeController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('admin_type_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('admin_type_show', ['id' => $entity->getId()]));
         }
 
-        return $this->render('AppBundle:Type:new.html.twig', array(
+        return $this->render('AppBundle:Type:new.html.twig', [
             'entity' => $entity,
-            'form'   => $form->createView(),
-        ));
+            'form' => $form->createView(),
+        ]);
     }
 
     /**
@@ -60,12 +57,11 @@ class TypeController extends Controller
      *
      * @return \Symfony\Component\Form\Form The form
      */
-    private function createCreateForm(Type $entity)
-    {
-        $form = $this->createForm(new TypeType(), $entity, array(
+    private function createCreateForm(Type $entity) {
+        $form = $this->createForm(new TypeType(), $entity, [
             'action' => $this->generateUrl('admin_type_create'),
             'method' => 'POST',
-        ));
+        ]);
 
         return $form;
     }
@@ -74,23 +70,21 @@ class TypeController extends Controller
      * Displays a form to create a new Type entity.
      *
      */
-    public function newAction()
-    {
+    public function newAction() {
         $entity = new Type();
-        $form   = $this->createCreateForm($entity);
+        $form = $this->createCreateForm($entity);
 
-        return $this->render('AppBundle:Type:new.html.twig', array(
+        return $this->render('AppBundle:Type:new.html.twig', [
             'entity' => $entity,
-            'form'   => $form->createView(),
-        ));
+            'form' => $form->createView(),
+        ]);
     }
 
     /**
      * Finds and displays a Type entity.
      *
      */
-    public function showAction($id)
-    {
+    public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('AppBundle:Type')->find($id);
@@ -101,18 +95,17 @@ class TypeController extends Controller
 
         $deleteForm = $this->createDeleteForm($id);
 
-        return $this->render('AppBundle:Type:show.html.twig', array(
-            'entity'      => $entity,
+        return $this->render('AppBundle:Type:show.html.twig', [
+            'entity' => $entity,
             'delete_form' => $deleteForm->createView(),
-        ));
+        ]);
     }
 
     /**
      * Displays a form to edit an existing Type entity.
      *
      */
-    public function editAction($id)
-    {
+    public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('AppBundle:Type')->find($id);
@@ -124,37 +117,36 @@ class TypeController extends Controller
         $editForm = $this->createEditForm($entity);
         $deleteForm = $this->createDeleteForm($id);
 
-        return $this->render('AppBundle:Type:edit.html.twig', array(
-            'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
+        return $this->render('AppBundle:Type:edit.html.twig', [
+            'entity' => $entity,
+            'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
-        ));
+        ]);
     }
 
     /**
-    * Creates a form to edit a Type entity.
-    *
-    * @param Type $entity The entity
-    *
-    * @return \Symfony\Component\Form\Form The form
-    */
-    private function createEditForm(Type $entity)
-    {
-        $form = $this->createForm(new TypeType(), $entity, array(
-            'action' => $this->generateUrl('admin_type_update', array('id' => $entity->getId())),
+     * Creates a form to edit a Type entity.
+     *
+     * @param Type $entity The entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createEditForm(Type $entity) {
+        $form = $this->createForm(new TypeType(), $entity, [
+            'action' => $this->generateUrl('admin_type_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
-        ));
+        ]);
 
-        $form->add('submit', 'submit', array('label' => 'Update'));
+        $form->add('submit', 'submit', ['label' => 'Update']);
 
         return $form;
     }
+
     /**
      * Edits an existing Type entity.
      *
      */
-    public function updateAction(Request $request, $id)
-    {
+    public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('AppBundle:Type')->find($id);
@@ -170,21 +162,21 @@ class TypeController extends Controller
         if ($editForm->isValid()) {
             $em->flush();
 
-            return $this->redirect($this->generateUrl('admin_type_edit', array('id' => $id)));
+            return $this->redirect($this->generateUrl('admin_type_edit', ['id' => $id]));
         }
 
-        return $this->render('AppBundle:Type:edit.html.twig', array(
-            'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
+        return $this->render('AppBundle:Type:edit.html.twig', [
+            'entity' => $entity,
+            'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
-        ));
+        ]);
     }
+
     /**
      * Deletes a Type entity.
      *
      */
-    public function deleteAction(Request $request, $id)
-    {
+    public function deleteAction(Request $request, $id) {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
@@ -210,12 +202,10 @@ class TypeController extends Controller
      *
      * @return \Symfony\Component\Form\Form The form
      */
-    private function createDeleteForm($id)
-    {
+    private function createDeleteForm($id) {
         return $this->createFormBuilder()
-            ->setAction($this->generateUrl('admin_type_delete', array('id' => $id)))
+            ->setAction($this->generateUrl('admin_type_delete', ['id' => $id]))
             ->setMethod('DELETE')
-            ->getForm()
-        ;
+            ->getForm();
     }
 }

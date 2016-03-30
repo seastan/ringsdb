@@ -127,16 +127,16 @@ class UserController extends Controller {
                     $content['is_liked'] = (boolean)$dbh->executeQuery("SELECT
         				count(*)
         				FROM decklist d
-        				JOIN vote v ON v.decklist_id=d.id
-        				WHERE v.user_id=?
-        				AND d.id=?", [$user_id, $decklist_id])->fetch(\PDO::FETCH_NUM)[0];
+        				JOIN vote v ON v.decklist_id = d.id
+        				WHERE v.user_id = ?
+        				AND d.id = ?", [$user_id, $decklist_id])->fetch(\PDO::FETCH_NUM)[0];
 
                     $content['is_favorite'] = (boolean)$dbh->executeQuery("SELECT
         				count(*)
         				FROM decklist d
-        				JOIN favorite f ON f.decklist_id=d.id
-        				WHERE f.user_id=?
-        				AND d.id=?", [$user_id, $decklist_id])->fetch(\PDO::FETCH_NUM)[0];
+        				JOIN favorite f ON f.decklist_id = d.id
+        				WHERE f.user_id = ?
+        				AND d.id = ?", [$user_id, $decklist_id])->fetch(\PDO::FETCH_NUM)[0];
 
                     $content['is_author'] = ($user_id == $decklist->getUser()->getId());
 
