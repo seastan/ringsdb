@@ -23,13 +23,13 @@
             <input type="hidden" name="deck3" value="{% if deck3 is not null %}{{ deck3.id }}{% endif %}"/>
             <input type="hidden" name="deck4" value="{% if deck4 is not null %}{{ deck4.id }}{% endif %}"/>
 
-            <fieldset>
+            <fieldset id="deck-selection">
                 <legend>
                     Deck Selection
-                    <a class="btn btn-xs btn-default pull-right" id="btn-show-cards">
+                    <a class="btn btn-xs btn-default pull-right" data-action="show-cards">
                         <span class="fa fa-eye"></span> Show cards
                     </a>
-                    <a class="btn btn-xs btn-default pull-right hidden" id="btn-hide-cards">
+                    <a class="btn btn-xs btn-default pull-right hidden" data-action="hide-cards">
                         <span class="fa fa-eye-slash"></span> Hide cards
                     </a>
                 </legend>
@@ -116,4 +116,6 @@
             </div>
         </form>
     </div>
+
+    {% include 'AppBundle:Modale:deck_selection.html.twig' %}
 {% endblock %}

@@ -1,0 +1,50 @@
+<!-- Modal -->
+<div class="modal fade" id="deckSelectionModal" tabindex="-1" role="dialog" aria-labelledby="deckSelectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3 class="modal-title" id="deckSelectionModalLabel">Select a Deck</h3>
+            </div>
+            <div class="modal-body">
+                <div class="row" style="margin-bottom: 15px;">
+                    <div class="col-md-12 text-center">
+                        <div class="btn-group">
+                            <label class="btn btn-default active" data-action="my-decks">My Decks</label>
+                            <label class="btn btn-default" data-action="other-decks">Another Player's Decks</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row hidden" id="deckSelectionAnotherPlayerBox">
+                    <div class="col-md-12">
+                        <form onsubmit="app.ui.submit_search_user_decks(event)">
+                            <div class="form-group">
+                                <label for="deckSelectionById">Type an username or a deck url and click in search</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" tabindex="1" id="deckSelectionById">
+                                    <span class="input-group-btn">
+                                        <button type="submit" class="btn btn-primary" type="submit">Search</button>
+                                    </span>
+                                </div>
+                                <p class="help-block">
+                                    For now, RingsDB can only log quests using private decks.
+                                    You will only be able to see and select decks from another user if
+                                    they check the "Share my decks" option in their profile page.
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-expanded list-decks" style="margin-bottom: 0">
+                            <tbody id="deckSelectionList">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->

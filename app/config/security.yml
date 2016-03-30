@@ -54,12 +54,13 @@ security:
         - { path: ^/remind, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: ROLE_ADMIN }
         - { path: ^/api/public, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/private, role: ROLE_USER }
         - { path: ^/api/oauth2, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/js/, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/$, role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: http }
         - { path: ^/deck/view/, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/deck/, role: ROLE_USER }
         - { path: ^/decks, role: ROLE_USER }
         - { path: ^/user/, role: ROLE_USER }
         - { path: ^/collection/, role: ROLE_USER }
+        - { path: ^/questlog/, role: ROLE_USER }
 

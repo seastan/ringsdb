@@ -1,0 +1,19 @@
+api_private_my_decks:
+    path: /decks
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:ApiPrivate:listDecks
+
+api_private_user_decks:
+    path: /decks_by_user/{username}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:ApiPrivate:listUserDecks
+
+api_private_load_deck:
+    path: /deck/load/{id}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:ApiPrivate:loadDeck
+    requirements:
+        id: \d+

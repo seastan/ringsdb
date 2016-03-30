@@ -1358,3 +1358,17 @@ footer a {
     min-height: 211px;
   }
 }
+
+@media (max-width: 1199px) {
+  .selected-deck-placeholder {
+    min-height: 205px;
+    line-height: 171px;
+  }
+
+  .selected-deck-content {
+    .deck-loading {
+      min-height: 171px;
+    }
+  }
+}
+

@@ -223,7 +223,7 @@ class BuilderController extends Controller {
         if (!$deck->getUser()->getIsShareDecks() && !$is_owner) {
             return $this->render('AppBundle:Default:error.html.twig', [
                 'pagetitle' => "Error",
-                'error' => 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share your decks" on their account.'
+                'error' => 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.'
             ]);
         }
 
@@ -251,7 +251,7 @@ class BuilderController extends Controller {
         if (!$deck->getUser()->getIsShareDecks() && !$is_owner) {
             return $this->render('AppBundle:Default:error.html.twig', [
                 'pagetitle' => "Error",
-                'error' => 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share your decks" on their account.'
+                'error' => 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.'
             ]);
         }
 
@@ -278,7 +278,7 @@ class BuilderController extends Controller {
         if (!$deck->getUser()->getIsShareDecks() && !$is_owner) {
             return $this->render('AppBundle:Default:error.html.twig', [
                 'pagetitle' => "Error",
-                'error' => 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share your decks" on their account.'
+                'error' => 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.'
             ]);
         }
 
@@ -440,7 +440,7 @@ class BuilderController extends Controller {
         if (!$deck->getUser()->getIsShareDecks() && !$is_owner) {
             return $this->render('AppBundle:Default:error.html.twig', [
                 'pagetitle' => "Error",
-                'error' => 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share your decks" on their account.'
+                'error' => 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.'
             ]);
         }
 
@@ -469,7 +469,7 @@ class BuilderController extends Controller {
         if (!$deck1->getUser()->getIsShareDecks() && !$is_owner) {
             return $this->render('AppBundle:Default:error.html.twig', [
                     'pagetitle' => "Error",
-                    'error' => 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share your decks" on their account.'
+                    'error' => 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.'
                 ]);
         }
 
@@ -477,7 +477,7 @@ class BuilderController extends Controller {
         if (!$deck2->getUser()->getIsShareDecks() && !$is_owner) {
             return $this->render('AppBundle:Default:error.html.twig', [
                     'pagetitle' => "Error",
-                    'error' => 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share your decks" on their account.'
+                    'error' => 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.'
                 ]);
         }
 

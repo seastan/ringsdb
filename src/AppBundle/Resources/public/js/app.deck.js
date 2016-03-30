@@ -8,14 +8,7 @@
     var tags;
     var unsaved;
     var user_id;
-    var problem_labels = {
-        too_many_heroes: "Contains too many Heroes",
-        too_few_heroes: "Contains too few Heroes",
-        invalid_for_tournament_play: "Invalid for tournament play for having less than 50 cards",
-        duplicated_unique_heroes: "More than one hero with the same unique name",
-        too_few_cards: "Contains too few cards",
-        invalid_cards: "Contains forbidden cards"
-    };
+
     var header_tpl = _.template('<h5><span class="icon icon-<%= code %>"></span> <%= name %> (<%= quantity %>)</h5>');
     var card_line_tpl = _.template('<span class="icon icon-<%= card.type_code %> fg-<%= card.sphere_code %>"></span> <a href="<%= card.url %>" class="card card-tip fg-<%= card.sphere_code %>" data-toggle="modal" data-remote="false" data-target="#cardModal" data-code="<%= card.code %>"><%= card.name %></a>');
     var layouts = {};
@@ -48,6 +41,16 @@
         displayFullPackInfo = true;
         app.ui.refresh_deck();
     });
+
+
+    deck.problem_labels = {
+        too_many_heroes: "Contains too many Heroes",
+        too_few_heroes: "Contains too few Heroes",
+        invalid_for_tournament_play: "Invalid for tournament play for having less than 50 cards",
+        duplicated_unique_heroes: "More than one hero with the same unique name",
+        too_few_cards: "Contains too few cards",
+        invalid_cards: "Contains forbidden cards"
+    };
 
     /**
      * @memberOf deck
@@ -364,7 +367,7 @@
             deck.update_layout_section(data, 'meta', packinfo);
 
             if (problem) {
-                var probleminfo = $('<div class="text-danger small"><span class="fa fa-exclamation-triangle"></span> ' + problem_labels[problem] + '</div>');
+                var probleminfo = $('<div class="text-danger small"><span class="fa fa-exclamation-triangle"></span> ' + deck.problem_labels[problem] + '</div>');
                 deck.update_layout_section(data, 'meta', probleminfo);
             }
         }

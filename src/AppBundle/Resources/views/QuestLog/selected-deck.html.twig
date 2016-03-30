@@ -2,7 +2,7 @@
     <div class="selected-deck-placeholder {% if deck is not null %}hidden{% endif %}">
         <span class="no-deck-selected">No deck selected</span>
         <div class="text-center" style="line-height: 1.42857">
-            <a class="btn btn-xs btn-default" data-action="swap" data-deck="{{ deck_number }}">
+            <a class="btn btn-xs btn-default" data-action="select-deck" data-deck="{{ deck_number }}">
                 Select deck
             </a>
         </div>
@@ -11,10 +11,15 @@
         <div id="deck{{ deck_number }}-content" class="deck-loading">
             <i class="fa fa-spinner fa-spin fa-5x"></i>
         </div>
-        <div class="text-center">
-            <a class="btn btn-xs btn-primary" data-action="swap" data-deck="{{ deck_number }}">
-                <span class="fa fa-fw fa-exchange"></span> Swap <span class="hidden-sm">sideboard</span> cards
-            </a>
+        <div class="text-right">
+            <div class="btn-group btn-group-xs">
+                <a class="btn btn-default" data-action="swap-cards" data-deck="{{ deck_number }}" data-toggle="tooltip" data-container="body" title="Swap sideboard cards">
+                    <span class="fa fa-fw fa-exchange"></span> Swap cards
+                </a>
+                <a class="btn btn-default" data-action="remove-deck" data-deck="{{ deck_number }}" data-toggle="tooltip" data-container="body" title="Remove deck">
+                    <span class="fa fa-fw fa-times"></span>
+                </a>
+            </div>
         </div>
     </div>
 </div>

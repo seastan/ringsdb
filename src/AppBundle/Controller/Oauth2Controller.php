@@ -10,8 +10,7 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use AppBundle\Entity\Deck;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class Oauth2Controller extends Controller
-{
+class Oauth2Controller extends Controller {
 	/**
 	 * Get the description of all the Decks of the authenticated user
 	 *
@@ -22,30 +21,29 @@ class Oauth2Controller extends Controller
 	 * )
 	 * @param Request $request
 	 */
-	public function listDecksAction(Request $request)
-	{
+	public function listDecksAction(Request $request) {
 		$response = new Response();
-		$response->headers->add(array('Access-Control-Allow-Origin' => '*'));
-		
+		$response->headers->add(['Access-Control-Allow-Origin' => '*']);
+
 		/* @var $decks \AppBundle\Entity\Deck[] */
 		$decks = $this->getDoctrine()->getRepository('AppBundle:Deck')->findBy(['user' => $this->getUser()]);
 
-		$dateUpdates = array_map(function ($deck) {
+		$dateUpdates = array_map(function($deck) {
 			return $deck->getDateUpdate();
 		}, $decks);
-		
+
 		$response->setLastModified(max($dateUpdates));
 		if ($response->isNotModified($request)) {
 			return $response;
 		}
 
 		$content = json_encode($decks);
-		
+
 		$response->headers->set('Content-Type', 'application/json');
 		$response->setContent($content);
+
 		return $response;
 	}
-	
 
 	/**
 	 * Get the description of one Deck of the authenticated user
@@ -65,31 +63,30 @@ class Oauth2Controller extends Controller
 	 * )
 	 * @param Request $request
 	 */
-	public function loadDeckAction($id)
-	{
+	public function loadDeckAction($id) {
 		$response = new Response();
-		$response->headers->add(array('Access-Control-Allow-Origin' => '*'));
-		
+		$response->headers->add(['Access-Control-Allow-Origin' => '*']);
+
 		/* @var $deck \AppBundle\Entity\Deck */
 		$deck = $this->getDoctrine()->getRepository('AppBundle:Deck')->find($id);
 
-		if($deck->getUser()->getId() !== $this->getUser()->getId())
-		{
+		if ($deck->getUser()->getId() !== $this->getUser()->getId()) {
 			throw $this->createAccessDeniedException("Access denied to this object.");
 		}
-		
+
 		$response->setLastModified($deck->getDateUpdate());
 		if ($response->isNotModified($request)) {
 			return $response;
 		}
 
 		$content = json_encode($deck);
-		
+
 		$response->headers->set('Content-Type', 'application/json');
 		$response->setContent($content);
+
 		return $response;
 	}
-	
+
 
 	/**
 	 * Save one Deck of the authenticated user. The parameters are the same as in the response to the load method, but only a few are writable.
@@ -121,7 +118,7 @@ class Oauth2Controller extends Controller
 	//public function saveDeckAction($id, Request $request)
 	//{
 	//	/* @var $deck \AppBundle\Entity\Deck */
-    //
+	//
 	//	if(!$id)
 	//	{
 	//		$deck = new Deck();
