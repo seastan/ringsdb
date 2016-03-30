@@ -80,7 +80,7 @@
                         </ul>
 
                         <ul class="nav navbar-nav navbar-right">
-                            <li class="dropdown hidden-xs hidden-lg">
+                            <li class="dropdown hidden-xs hidden-md hidden-lg">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="fa fa-search"></span></a>
                                 <div class="dropdown-menu">
                                     <form action="{{ path('cards_find') }}" target="_blank">
@@ -92,7 +92,7 @@
                                 <a href="#" class="disabled"><span class="fa fa-user"></span></a>
                             </li>
                         </ul>
-                        <form class="navbar-form navbar-right visible-lg-block visible-xs-block external" action="{{ path('cards_find') }}" target="_blank">
+                        <form class="navbar-form navbar-right visible-lg-block visible-md-block visible-xs-block external" action="{{ path('cards_find') }}">
                             <div class="form-group">
                                 <input type="text" placeholder="Card Search" class="form-control smart-filter-help" name="q">
                             </div>
