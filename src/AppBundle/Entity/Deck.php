@@ -258,6 +258,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
         $this->sideslots = new \Doctrine\Common\Collections\ArrayCollection();
         $this->children = new \Doctrine\Common\Collections\ArrayCollection();
         $this->changes = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->fellowships = new \Doctrine\Common\Collections\ArrayCollection();
         $this->minorVersion = 0;
         $this->majorVersion = 0;
     }
@@ -639,5 +640,41 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
 
     public function getVersion() {
         return $this->majorVersion . "." . $this->minorVersion;
+    }
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $fellowships;
+
+    /**
+     * Add fellowship
+     *
+     * @param \AppBundle\Entity\FellowshipDeck $fellowship
+     *
+     * @return Deck
+     */
+    public function addFellowship(\AppBundle\Entity\FellowshipDeck $fellowship) {
+        $this->fellowships[] = $fellowship;
+
+        return $this;
+    }
+
+    /**
+     * Remove fellowship
+     *
+     * @param \AppBundle\Entity\FellowshipDeck $fellowship
+     */
+    public function removeFellowship(\AppBundle\Entity\FellowshipDeck $fellowship) {
+        $this->fellowships->removeElement($fellowship);
+    }
+
+    /**
+     * Get fellowships
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getFellowships() {
+        return $this->fellowships;
     }
 }
