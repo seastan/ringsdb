@@ -20,4 +20,5 @@ tags
 /.idea/
 /web/suggestions.json
 user-data.sql
+beorn.json
 .DS_Store
