@@ -53,7 +53,7 @@ class FellowshipController extends Controller {
             throw $this->createNotFoundException("This fellowship does not exists.");
         }
 
-        if ($fellowship->getUser()->getIsShareDecks() && $user->getId() !== $fellowship->getUser()->getId()) {
+        if ($user->getId() !== $fellowship->getUser()->getId()) {
             throw $this->createAccessDeniedException("Access denied to this object.");
         }
 
@@ -72,7 +72,6 @@ class FellowshipController extends Controller {
             $data['deck' . $fellowship_deck->getDeckNumber()] = $fellowship_deck->getDeck();
         }
 
-
         return $this->render('AppBundle:Quest:fellowshipedit.html.twig', $data, $response);
     }
 
@@ -81,29 +80,24 @@ class FellowshipController extends Controller {
         $fellowship = $this->getDoctrine()->getManager()->getRepository('AppBundle:Fellowship')->find($fellowship_id);
 
         if (!$fellowship) {
-            return $this->render('AppBundle:Default:error.html.twig', [
-                'pagetitle' => "Error",
-                'error' => "This Fellowship doesn't exist."
-            ]);
+            throw $this->createNotFoundException("This fellowship does not exists.");
         }
 
         $is_owner = $this->getUser() && $this->getUser()->getId() == $fellowship->getUser()->getId();
+
         if (!$fellowship->getUser()->getIsShareDecks() && !$is_owner) {
-            return $this->render('AppBundle:Default:error.html.twig', [
-                'pagetitle' => "Error",
-                'error' => 'You are not allowed to view this fellowship. To get access, you can ask the fellowship owner to enable "Share my decks" on their account.'
-            ]);
+            throw $this->createAccessDeniedException('You are not allowed to view this fellowship. To get access, you can ask the it\'s owner to enable "Share my decks" on their account.');
         }
 
         /* @var $fellowship_decks \AppBundle\Entity\FellowshipDeck[] */
         $fellowship_decks = $fellowship->getDecks();
         $data = [
             'pagetitle' => "Fellowship",
-            'fellowship' => $fellowship,
             'deck1' => null,
             'deck2' => null,
             'deck3' => null,
             'deck4' => null,
+            'fellowship' => $fellowship,
             'is_owner' => $is_owner,
         ];
 
@@ -128,7 +122,7 @@ class FellowshipController extends Controller {
             $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
 
             if (!$fellowship) {
-                throw $this->createNotFoundException("This Fellowship does not exists.");
+                throw $this->createNotFoundException("This fellowship does not exists.");
             }
 
             if ($user->getId() !== $fellowship->getUser()->getId()) {
@@ -170,7 +164,7 @@ class FellowshipController extends Controller {
                 $deck = $em->getRepository('AppBundle:Deck')->find($deck_id);
 
                 if (!$deck) {
-                    throw $this->createNotFoundException("A selected deck does not exists.");
+                    throw $this->createNotFoundException("One of the selected decks does not exists.");
                 }
 
                 $deck_user = $deck->getUser();

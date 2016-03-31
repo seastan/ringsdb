@@ -59,6 +59,12 @@ decks_list:
     defaults:
         _controller: AppBundle:Builder:list
 
+fellowships_list:
+    path: /fellowships
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Fellowship:list
+
 decklist_byauthor:
     path: /d/{username}
     methods: [GET]

@@ -2,7 +2,6 @@
 namespace AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -10,6 +9,8 @@ use AppBundle\Entity\Deck;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\Deckchange;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class BuilderController extends Controller {
 
@@ -293,7 +294,7 @@ class BuilderController extends Controller {
         return $this->forward('AppBundle:Builder:save', [
             'name' => $deck->getName() . ' (clone)',
             'content' => json_encode($content),
-            'deck_id' => $deck->getParent() ? $deck->getParent()->getId() : null
+            'decklist_id' => $deck->getParent() ? $deck->getParent()->getId() : null
         ]);
     }
 
@@ -302,7 +303,7 @@ class BuilderController extends Controller {
 
         $user = $this->getUser();
         if (count($user->getDecks()) > $user->getMaxNbDecks()) {
-            return new Response('You have reached the maximum number of decks allowed. Delete some decks or increase your reputation.');
+            throw new UnprocessableEntityHttpException('You have reached the maximum number of decks allowed. Delete some decks or increase your reputation.');
         }
 
         $id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
@@ -316,7 +317,7 @@ class BuilderController extends Controller {
             $source_deck = $deck;
         }
 
-        $cancel_edits = (boolean)filter_var($request->get('cancel_edits'), FILTER_SANITIZE_NUMBER_INT);
+        $cancel_edits = (boolean) filter_var($request->get('cancel_edits'), FILTER_SANITIZE_NUMBER_INT);
         if ($cancel_edits) {
             if ($deck) {
                 $this->get('decks')->revertDeck($deck);
@@ -325,12 +326,12 @@ class BuilderController extends Controller {
             return $this->redirect($this->generateUrl('decks_list'));
         }
 
-        $is_copy = (boolean)filter_var($request->get('copy'), FILTER_SANITIZE_NUMBER_INT);
+        $is_copy = (boolean) filter_var($request->get('copy'), FILTER_SANITIZE_NUMBER_INT);
         if ($is_copy || !$id) {
             $deck = new Deck();
         }
 
-        $content = (array)json_decode($request->get('content'));
+        $content = (array) json_decode($request->get('content'));
         if (!isset($content['main']) || !count($content['main'])) {
             return new Response('Cannot import empty deck');
         }

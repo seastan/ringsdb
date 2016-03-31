@@ -1081,6 +1081,10 @@ article.review .review-comment {
   z-index: 99;
 }
 
+.md-preview, .md-input {
+  padding: 5px !important;
+}
+
 /* PRINT STYLESHEETS */
 
 @media print {
