@@ -134,7 +134,15 @@
         location.href = Routing.generate('decks_diff', { deck1_id: ids[0], deck2_id: ids[1] });
     };
 
-    ui.do_quest = function(ids) {
+    ui.create_fellowship = function(ids) {
+        if (ids.length < 1 || ids.length > 4) {
+            return false;
+        }
+
+        location.href = Routing.generate('fellowship_new', { deck1_id: ids[0], deck2_id: ids[1], deck3_id: ids[2], deck4_id: ids[3] });
+    };
+
+    ui.create_quest = function(ids) {
         if (ids.length < 1 || ids.length > 4) {
             return false;
         }
@@ -162,8 +170,11 @@
             return;
         }
         switch (action_id) {
+            case 'btn-fellowship':
+                ui.create_fellowship(ids);
+                break;
             case 'btn-quest':
-                ui.do_quest(ids);
+                ui.create_quest(ids);
                 break;
             case 'btn-compare':
                 ui.do_diff(ids);

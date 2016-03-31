@@ -17,7 +17,31 @@ class Fellowship {
     /**
      * @var string
      */
+    private $nameCanonical;
+    /**
+     * @var string
+     */
     private $descriptionMd;
+    /**
+     * @var string
+     */
+    private $descriptionHtml;
+    /**
+     * @var boolean
+     */
+    private $isPublic;
+    /**
+     * @var integer
+     */
+    private $nbVotes;
+    /**
+     * @var integer
+     */
+    private $nbFavorites;
+    /**
+     * @var integer
+     */
+    private $nbComments;
     /**
      * @var \DateTime
      */
@@ -35,14 +59,21 @@ class Fellowship {
      */
     private $decklists;
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $comments;
+    /**
      * @var \AppBundle\Entity\User
      */
     private $user;
     /**
-     * @var boolean
+     * @var \Doctrine\Common\Collections\Collection
      */
-    private $isPublic;
-
+    private $favorites;
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $votes;
 
     /**
      * Constructor
@@ -50,6 +81,9 @@ class Fellowship {
     public function __construct() {
         $this->decks = new \Doctrine\Common\Collections\ArrayCollection();
         $this->decklists = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->comments = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->favorites = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->votes = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -84,6 +118,28 @@ class Fellowship {
     }
 
     /**
+     * Set nameCanonical
+     *
+     * @param string $nameCanonical
+     *
+     * @return Fellowship
+     */
+    public function setNameCanonical($nameCanonical) {
+        $this->nameCanonical = $nameCanonical;
+
+        return $this;
+    }
+
+    /**
+     * Get nameCanonical
+     *
+     * @return string
+     */
+    public function getNameCanonical() {
+        return $this->nameCanonical;
+    }
+
+    /**
      * Set descriptionMd
      *
      * @param string $descriptionMd
@@ -103,6 +159,116 @@ class Fellowship {
      */
     public function getDescriptionMd() {
         return $this->descriptionMd;
+    }
+
+    /**
+     * Set descriptionHtml
+     *
+     * @param string $descriptionHtml
+     *
+     * @return Fellowship
+     */
+    public function setDescriptionHtml($descriptionHtml) {
+        $this->descriptionHtml = $descriptionHtml;
+
+        return $this;
+    }
+
+    /**
+     * Get descriptionHtml
+     *
+     * @return string
+     */
+    public function getDescriptionHtml() {
+        return $this->descriptionHtml;
+    }
+
+    /**
+     * Set isPublic
+     *
+     * @param boolean $isPublic
+     *
+     * @return Fellowship
+     */
+    public function setIsPublic($isPublic) {
+        $this->isPublic = $isPublic;
+
+        return $this;
+    }
+
+    /**
+     * Get isPublic
+     *
+     * @return boolean
+     */
+    public function getIsPublic() {
+        return $this->isPublic;
+    }
+
+    /**
+     * Set nbVotes
+     *
+     * @param integer $nbVotes
+     *
+     * @return Fellowship
+     */
+    public function setNbVotes($nbVotes) {
+        $this->nbVotes = $nbVotes;
+
+        return $this;
+    }
+
+    /**
+     * Get nbVotes
+     *
+     * @return integer
+     */
+    public function getNbVotes() {
+        return $this->nbVotes;
+    }
+
+    /**
+     * Set nbFavorites
+     *
+     * @param integer $nbFavorites
+     *
+     * @return Fellowship
+     */
+    public function setNbFavorites($nbFavorites) {
+        $this->nbFavorites = $nbFavorites;
+
+        return $this;
+    }
+
+    /**
+     * Get nbFavorites
+     *
+     * @return integer
+     */
+    public function getNbFavorites() {
+        return $this->nbFavorites;
+    }
+
+    /**
+     * Set nbComments
+     *
+     * @param integer $nbComments
+     *
+     * @return Fellowship
+     */
+    public function setNbComments($nbComments) {
+        $this->nbComments = $nbComments;
+
+        return $this;
+    }
+
+    /**
+     * Get nbComments
+     *
+     * @return integer
+     */
+    public function getNbComments() {
+        return $this->nbComments;
     }
 
     /**
@@ -212,6 +378,37 @@ class Fellowship {
     }
 
     /**
+     * Add comment
+     *
+     * @param \AppBundle\Entity\Fellowshipcomment $comment
+     *
+     * @return Fellowship
+     */
+    public function addComment(\AppBundle\Entity\Fellowshipcomment $comment) {
+        $this->comments[] = $comment;
+
+        return $this;
+    }
+
+    /**
+     * Remove comment
+     *
+     * @param \AppBundle\Entity\Fellowshipcomment $comment
+     */
+    public function removeComment(\AppBundle\Entity\Fellowshipcomment $comment) {
+        $this->comments->removeElement($comment);
+    }
+
+    /**
+     * Get comments
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getComments() {
+        return $this->comments;
+    }
+
+    /**
      * Set user
      *
      * @param \AppBundle\Entity\User $user
@@ -234,24 +431,65 @@ class Fellowship {
     }
 
     /**
-     * Set isPublic
+     * Add favorite
      *
-     * @param boolean $isPublic
+     * @param \AppBundle\Entity\User $favorite
      *
      * @return Fellowship
      */
-    public function setIsPublic($isPublic) {
-        $this->isPublic = $isPublic;
+    public function addFavorite(\AppBundle\Entity\User $favorite) {
+        $this->favorites[] = $favorite;
 
         return $this;
     }
 
     /**
-     * Get isPublic
+     * Remove favorite
      *
-     * @return boolean
+     * @param \AppBundle\Entity\User $favorite
      */
-    public function getIsPublic() {
-        return $this->isPublic;
+    public function removeFavorite(\AppBundle\Entity\User $favorite) {
+        $this->favorites->removeElement($favorite);
+    }
+
+    /**
+     * Get favorites
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getFavorites() {
+        return $this->favorites;
+    }
+
+    /**
+     * Add vote
+     *
+     * @param \AppBundle\Entity\User $vote
+     *
+     * @return Fellowship
+     */
+    public function addVote(\AppBundle\Entity\User $vote) {
+        $this->votes[] = $vote;
+
+        return $this;
+    }
+
+    /**
+     * Remove vote
+     *
+     * @param \AppBundle\Entity\User $vote
+     */
+    public function removeVote(\AppBundle\Entity\User $vote) {
+        $this->votes->removeElement($vote);
+    }
+
+    /**
+     * Get votes
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getVotes() {
+        return $this->votes;
     }
 }
+

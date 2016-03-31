@@ -15,7 +15,7 @@ class ApiPrivateController extends Controller {
 		$response = new Response();
 
 		/* @var $decks \AppBundle\Entity\Deck[] */
-		$decks = $this->getDoctrine()->getRepository('AppBundle:Deck')->findBy(['user' => $this->getUser()]);
+		$decks = $this->getDoctrine()->getRepository('AppBundle:Deck')->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC']);
 
 		$dateUpdates = array_map(function($deck) {
 			return $deck->getDateUpdate();
@@ -66,7 +66,7 @@ class ApiPrivateController extends Controller {
         }
 
         /* @var $decks \AppBundle\Entity\Deck[] */
-		$decks = $this->getDoctrine()->getRepository('AppBundle:Deck')->findBy(['user' => $user]);
+		$decks = $this->getDoctrine()->getRepository('AppBundle:Deck')->findBy(['user' => $user], ['dateCreation' => 'DESC']);
 
 		$dateUpdates = array_map(function($deck) {
 			return $deck->getDateUpdate();

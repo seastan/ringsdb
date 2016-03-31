@@ -17,6 +17,10 @@ app_decklist:
     resource: "@AppBundle/Resources/config/routing/routing_decklist.yml"
     prefix: /decklist
 
+app_fellowship:
+    resource: "@AppBundle/Resources/config/routing/routing_fellowship.yml"
+    prefix: /fellowship
+
 app_questlog:
     resource: "@AppBundle/Resources/config/routing/routing_questlog.yml"
     prefix: /questlog

@@ -1,0 +1,81 @@
+{% extends 'AppBundle::layout.html.twig' %}
+{% import "AppBundle::macros.html.twig" as macros %}
+
+{% block javascripts %}
+    {% javascripts '@AppBundle/Resources/public/js/ui.fellowshipedit.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <script type="text/javascript">
+        var Decks = {};
+        Decks[1] = {{ deck1 | json_encode | raw }};
+        Decks[2] = {{ deck2 | json_encode | raw }};
+        Decks[3] = {{ deck3 | json_encode | raw }};
+        Decks[4] = {{ deck4 | json_encode | raw }};
+
+        app.deck_selection && app.deck_selection.init(Decks);
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="main white container">
+        <form action="{{ path('fellowship_save') }}" method="post" enctype="application/x-www-form-urlencoded">
+            <input type="hidden" name="deck1_id" />
+            <input type="hidden" name="deck2_id" />
+            <input type="hidden" name="deck3_id" />
+            <input type="hidden" name="deck4_id" />
+            <input type="hidden" name="fellowship_id" value="{% if fellowship is defined %}{{ fellowship.id }}{% endif %}"/>
+
+            <fieldset id="deck-selection">
+                <legend>
+                    Deck Selection
+                    <a class="btn btn-xs btn-default pull-right" data-action="show-cards">
+                        <span class="fa fa-eye"></span> Show cards
+                    </a>
+                    <a class="btn btn-xs btn-default pull-right hidden" data-action="hide-cards">
+                        <span class="fa fa-eye-slash"></span> Hide cards
+                    </a>
+                </legend>
+                <div class="row selected-decks">
+                    {% include 'AppBundle:Quest:selected-deck.html.twig' with { deck: deck1, deck_number: 1 } %}
+                    {% include 'AppBundle:Quest:selected-deck.html.twig' with { deck: deck2, deck_number: 2 } %}
+                    {% include 'AppBundle:Quest:selected-deck.html.twig' with { deck: deck3, deck_number: 3 } %}
+                    {% include 'AppBundle:Quest:selected-deck.html.twig' with { deck: deck4, deck_number: 4 } %}
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Fellowship Details</legend>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input class="form-control" name="name" id="name" value="{% if fellowship is defined %}{{ fellowship.name }}{% endif %}"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label for="name">Description</label>
+                            <textarea class="form-control" autocapitalize="none" autocomplete="off" rows="10" name="descriptionMd" id="descriptionMd" style="padding: 5px;">{% if fellowship is defined %}{{ fellowship.descriptionMd }}{% endif %}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="row">
+                <div class="col-md-12">
+                    {% if fellowship is defined %}
+                        <button type="submit" class="btn btn-success">Save</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-primary">Create this fellowship</button>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% include 'AppBundle:Modale:deck_selection.html.twig' %}
+{% endblock %}

@@ -67,7 +67,7 @@
      * sets up event handlers ; dataloaded not fired yet
      * @memberOf ui
      */
-    ui.setup_event_handlers = function setup_event_handlers() {
+    ui.setup_event_handlers = function() {
         $('#btn-group-deck').on({
             click: ui.do_action_deck
         }, 'button[id], a[id]');

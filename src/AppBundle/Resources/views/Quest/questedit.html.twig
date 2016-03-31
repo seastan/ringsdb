@@ -12,16 +12,18 @@
         Decks[2] = {{ deck2 | json_encode | raw }};
         Decks[3] = {{ deck3 | json_encode | raw }};
         Decks[4] = {{ deck4 | json_encode | raw }};
+
+        app.deck_selection && app.deck_selection.init(Decks);
     </script>
 {% endblock %}
 
 {% block body %}
     <div class="main white container">
         <form action="{{ path('questlog_save') }}" method="post" enctype="application/x-www-form-urlencoded">
-            <input type="hidden" name="deck1" value="{% if deck1 is not null %}{{ deck1.id }}{% endif %}"/>
-            <input type="hidden" name="deck2" value="{% if deck2 is not null %}{{ deck2.id }}{% endif %}"/>
-            <input type="hidden" name="deck3" value="{% if deck3 is not null %}{{ deck3.id }}{% endif %}"/>
-            <input type="hidden" name="deck4" value="{% if deck4 is not null %}{{ deck4.id }}{% endif %}"/>
+            <input type="hidden" name="deck1_id" />
+            <input type="hidden" name="deck2_id" />
+            <input type="hidden" name="deck3_id" />
+            <input type="hidden" name="deck4_id" />
 
             <fieldset id="deck-selection">
                 <legend>
@@ -34,15 +36,16 @@
                     </a>
                 </legend>
                 <div class="row selected-decks">
-                    {% include 'AppBundle:QuestLog:selected-deck.html.twig' with { deck: deck1, deck_number: 1 } %}
-                    {% include 'AppBundle:QuestLog:selected-deck.html.twig' with { deck: deck2, deck_number: 2 } %}
-                    {% include 'AppBundle:QuestLog:selected-deck.html.twig' with { deck: deck3, deck_number: 3 } %}
-                    {% include 'AppBundle:QuestLog:selected-deck.html.twig' with { deck: deck4, deck_number: 4 } %}
+                    {% include 'AppBundle:Quest:selected-deck.html.twig' with { deck: deck1, deck_number: 1 } %}
+                    {% include 'AppBundle:Quest:selected-deck.html.twig' with { deck: deck2, deck_number: 2 } %}
+                    {% include 'AppBundle:Quest:selected-deck.html.twig' with { deck: deck3, deck_number: 3 } %}
+                    {% include 'AppBundle:Quest:selected-deck.html.twig' with { deck: deck4, deck_number: 4 } %}
                 </div>
             </fieldset>
 
             <fieldset>
                 <legend>Quest Details</legend>
+
                 <div class="row">
                     <div class="col-md-9">
                         <div class="row">

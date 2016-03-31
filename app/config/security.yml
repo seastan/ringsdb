@@ -63,4 +63,5 @@ security:
         - { path: ^/user/, role: ROLE_USER }
         - { path: ^/collection/, role: ROLE_USER }
         - { path: ^/questlog/, role: ROLE_USER }
+        - { path: ^/fellowship/, role: ROLE_USER }
 

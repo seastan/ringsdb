@@ -355,6 +355,8 @@ class BuilderController extends Controller {
         $em = $this->getDoctrine()->getManager();
 
         $deck_id = filter_var($request->get('deck_id'), FILTER_SANITIZE_NUMBER_INT);
+
+        /* @var $deck \AppBundle\Entity\Deck */
         $deck = $em->getRepository('AppBundle:Deck')->find($deck_id);
         if (!$deck) {
             return $this->redirect($this->generateUrl('decks_list'));
@@ -364,13 +366,17 @@ class BuilderController extends Controller {
             throw new UnauthorizedHttpException("You don't have access to this deck.");
         }
 
-        foreach ($deck->getChildren() as $decklist) {
-            $decklist->setParent(null);
-        }
-        $em->remove($deck);
-        $em->flush();
+        if ($deck->getFellowships()->count()) {
+            $this->get('session')->getFlashBag()->set('danger', "You can't delete a deck that is member of a fellowship.");
+        } else {
+            foreach ($deck->getChildren() as $decklist) {
+                $decklist->setParent(null);
+            }
+            $em->remove($deck);
+            $em->flush();
 
-        $this->get('session')->getFlashBag()->set('notice', "Deck deleted.");
+            $this->get('session')->getFlashBag()->set('notice', "Deck deleted.");
+        }
 
         return $this->redirect($this->generateUrl('decks_list'));
     }
@@ -609,7 +615,7 @@ class BuilderController extends Controller {
                     ]);
                 }
 
-                $filename = $this->get('texts')->slugify($deck->getName()) . '.' . $extension;
+                $filename = $this->get('texts')->slugify($deck->getName()) . ' ' . $deck->getVersion() . '.' . $extension;
 
                 $zip->addFromString($filename, $content);
             }

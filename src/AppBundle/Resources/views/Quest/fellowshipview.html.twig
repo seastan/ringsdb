@@ -1,0 +1,100 @@
+{% extends 'AppBundle::layout.html.twig' %}
+{% import "AppBundle::macros.html.twig" as macros %}
+
+{% block javascripts %}
+    {% javascripts '@AppBundle/Resources/public/js/ui.fellowshipview.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <script type="text/javascript">
+        var Decks = {};
+        Decks[1] = {{ deck1 | json_encode | raw }};
+        Decks[2] = {{ deck2 | json_encode | raw }};
+        Decks[3] = {{ deck3 | json_encode | raw }};
+        Decks[4] = {{ deck4 | json_encode | raw }};
+
+        app.deck_selection && app.deck_selection.init(Decks);
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="main white container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 style="border-bottom:1px solid lightgray">{{ fellowship.name }}</h1>
+                {#{% if fellowship.problem %}#}
+                    {#<div class="alert alert-danger" role="alert">{{ deck_validation_helper.problemLabel(deck.problem) }}</div>#}
+                {#{% endif %}#}
+            </div>
+        </div>
+
+        <div class="row selected-decks hidden">
+            <div class="col-md-3 col-sm-6 deck">
+                <div class="selected-deck-content small view">
+                    <div id="deck1-content" class="deck-loading">
+                        <i class="fa fa-spinner fa-spin fa-5x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 deck">
+                <div class="selected-deck-content small view">
+                    <div id="deck2-content" class="deck-loading">
+                        <i class="fa fa-spinner fa-spin fa-5x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="visible-sm-block" style="clear: both"></div>
+            <div class="col-md-3 col-sm-6 deck">
+                <div class="selected-deck-content small view">
+                    <div id="deck3-content" class="deck-loading">
+                        <i class="fa fa-spinner fa-spin fa-5x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 deck">
+                <div class="selected-deck-content small view">
+                    <div id="deck4-content" class="deck-loading">
+                        <i class="fa fa-spinner fa-spin fa-5x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h3 class="username">
+                    <span class="fa fa-user"></span>
+                    {{ macros.username(fellowship.user) }}
+                </h3>
+            </div>
+        </div>
+
+        <div class="row hidden-print">
+            <div class="col-md-12" id="btn-group-deck">
+                {% include 'AppBundle:Quest:toolbar.html.twig' %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default" style="margin-bottom: 0">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Description</h3>
+                    </div>
+                    <div class="panel-body" id="fellowship-description">
+                        {% if fellowship.descriptionHtml is empty  %}
+                            <i>No description.</i>
+                        {% else %}
+                            {{ fellowship.descriptionHtml | raw }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {% include 'AppBundle:Modale:delete_fellowship.html.twig' %}
+    {% include 'AppBundle:Modale:export.html.twig' %}
+
+{% endblock %}

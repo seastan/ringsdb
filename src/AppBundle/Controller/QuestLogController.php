@@ -13,66 +13,71 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class QuestLogController extends Controller {
 
+    public function newWithFellowshipAction($fellowship_id) {
+        /* @var $user \AppBundle\Entity\User */
+        $user = $this->getUser();
+
+        /* @var $fellowship \AppBundle\Entity\Fellowship */
+        $fellowship = $this->getDoctrine()->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+
+        if (!$fellowship) {
+            throw $this->createNotFoundException("This fellowship does not exists.");
+        }
+
+        if ($fellowship->getUser()->getIsShareDecks() && $user->getId() !== $fellowship->getUser()->getId()) {
+            throw $this->createAccessDeniedException("Access denied to this object.");
+        }
+
+        $quests = $this->getDoctrine()->getRepository('AppBundle:Scenario')->findBy([], ['position' => 'ASC']);
+
+
+        /* @var $fellowship_decks \AppBundle\Entity\FellowshipDeck[] */
+        $fellowship_decks = $fellowship->getDecks();
+        $data = [
+            'deck1_id' => null,
+            'deck2_id' => null,
+            'deck3_id' => null,
+            'deck4_id' => null,
+        ];
+
+        foreach ($fellowship_decks as $fellowship_deck) {
+            $data['deck' . $fellowship_deck->getDeckNumber() . '_id'] = $fellowship_deck->getDeck()->getId();
+        }
+
+        return $this->redirect($this->generateUrl('questlog_new', $data));
+    }
+
     public function newAction($deck1_id, $deck2_id, $deck3_id, $deck4_id) {
         $response = new Response();
 
         $quests = $this->getDoctrine()->getRepository('AppBundle:Scenario')->findBy([], ['position' => 'ASC']);
 
-        $deck1 = null;
-        if ($deck1_id) {
-            $deck1 = $this->getDoctrine()->getManager()->getRepository('AppBundle:Deck')->find($deck1_id);
+        $decks = [];
+        $deck_ids = func_get_args();
 
-            if ($deck1) {
-                $user = $deck1->getUser();
-                if ($user->getIsShareDecks() && $user->getId() != $this->getUser()->getId()) {
-                    $deck1 = null;
+        for ($i = 0; $i < 4; $i++) {
+            $decks[$i] = null;
+
+            if ($deck_ids[$i]) {
+                $decks[$i] = $this->getDoctrine()->getManager()->getRepository('AppBundle:Deck')->find($deck_ids[$i]);
+
+                if ($decks[$i]) {
+                    $user = $decks[$i]->getUser();
+
+                    if (!$user->getIsShareDecks() && $user->getId() != $this->getUser()->getId()) {
+                        $decks[$i] = null;
+                    }
                 }
             }
         }
 
-        $deck2 = null;
-        if ($deck2_id) {
-            $deck2 = $this->getDoctrine()->getManager()->getRepository('AppBundle:Deck')->find($deck2_id);
-
-            if ($deck2) {
-                $user = $deck2->getUser();
-                if ($user->getIsShareDecks() && $user->getId() != $this->getUser()->getId()) {
-                    $deck2 = null;
-                }
-            }
-        }
-
-        $deck3 = null;
-        if ($deck3_id) {
-            $deck3 = $this->getDoctrine()->getManager()->getRepository('AppBundle:Deck')->find($deck3_id);
-
-            if ($deck3) {
-                $user = $deck3->getUser();
-                if ($user->getIsShareDecks() && $user->getId() != $this->getUser()->getId()) {
-                    $deck3 = null;
-                }
-            }
-        }
-
-        $deck4 = null;
-        if ($deck4_id) {
-            $deck4 = $this->getDoctrine()->getManager()->getRepository('AppBundle:Deck')->find($deck4_id);
-
-            if ($deck4) {
-                $user = $deck4->getUser();
-                if ($user->getIsShareDecks() && $user->getId() != $this->getUser()->getId()) {
-                    $deck4 = null;
-                }
-            }
-        }
-
-        return $this->render('AppBundle:QuestLog:questedit.html.twig', [
+        return $this->render('AppBundle:Quest:questedit.html.twig', [
             'quests' => $quests,
             'pagetitle' => "Log a Quest",
-            'deck1' => $deck1,
-            'deck2' => $deck2,
-            'deck3' => $deck3,
-            'deck4' => $deck4,
+            'deck1' => $decks[0],
+            'deck2' => $decks[1],
+            'deck3' => $decks[2],
+            'deck4' => $decks[3],
         ], $response);
     }
 }

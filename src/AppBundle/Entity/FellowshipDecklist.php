@@ -97,4 +97,18 @@ class FellowshipDecklist {
     public function getDecklist() {
         return $this->$decklist;
     }
+
+    /**
+     * Set decklist
+     *
+     * @param \AppBundle\Entity\Decklist $decklist
+     *
+     * @return FellowshipDecklist
+     */
+    public function setDecklist(\AppBundle\Entity\Decklist $decklist = null)
+    {
+        $this->decklist = $decklist;
+
+        return $this;
+    }
 }

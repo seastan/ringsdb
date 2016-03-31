@@ -469,6 +469,24 @@ div.tags span.tag {
   }
 }
 
+@media print {
+  .deck-hero {
+    text-align: left !important;
+    display: block !important;
+    float: none !important;
+    margin-right: 0 !important;
+    max-width: none !important;
+
+    .hero-thumbnail {
+      display: none !important;
+    }
+
+    .icon {
+      display: inline-block !important;
+    }
+  }
+}
+
 
 .index-decklist-row {
   display: flex;
@@ -754,19 +772,19 @@ div.site-slogan {
   position: relative;
 }
 
-#deck-description h1 {
+#deck-description h1, #fellowship-description h1 {
   font-size: 171%;
 }
 
-#deck-description h2 {
+#deck-description h2, #fellowship-description h2 {
   font-size: 143%;
 }
 
-#deck-description h3 {
+#deck-description h3, #fellowship-description h3 {
   font-size: 121%;
 }
 
-#deck-description h4 {
+#deck-description h4, #fellowship-description h4 {
   font-size: 107%;
 }
 
@@ -1356,6 +1374,10 @@ footer a {
 
   .deck-loading {
     min-height: 211px;
+  }
+
+  &.view {
+    margin-bottom: 0;
   }
 }
 
