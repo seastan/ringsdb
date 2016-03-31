@@ -10,8 +10,11 @@ class ApiPrivateController extends Controller {
 	public function listDecksAction(Request $request) {
 		$response = new Response();
 
-		/* @var $decks \AppBundle\Entity\Deck[] */
-		$decks = $this->getDoctrine()->getRepository('AppBundle:Deck')->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC']);
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $decks \AppBundle\Entity\Deck[] */
+		$decks = $em->getRepository('AppBundle:Deck')->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC']);
 
         $dateUpdates = array_map(function($deck) {
             /* @var $deck \AppBundle\Entity\Deck */
@@ -36,8 +39,11 @@ class ApiPrivateController extends Controller {
 	public function listUserDecksAction($username, Request $request) {
 		$response = new Response();
 
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
         /* @var $user \AppBundle\Entity\User */
-        $user = $this->getDoctrine()->getRepository('AppBundle:User')->findOneBy(['username' => $username]);
+        $user = $em->getRepository('AppBundle:User')->findOneBy(['username' => $username]);
 
         if (!$user) {
             $content = json_encode([
@@ -64,7 +70,7 @@ class ApiPrivateController extends Controller {
         }
 
         /* @var $decks \AppBundle\Entity\Deck[] */
-		$decks = $this->getDoctrine()->getRepository('AppBundle:Deck')->findBy(['user' => $user], ['dateCreation' => 'DESC']);
+		$decks = $em->getRepository('AppBundle:Deck')->findBy(['user' => $user], ['dateCreation' => 'DESC']);
 
 		$dateUpdates = array_map(function($deck) {
             /* @var $deck \AppBundle\Entity\Deck */
@@ -92,8 +98,11 @@ class ApiPrivateController extends Controller {
 	public function loadDeckAction($id, Request $request) {
 		$response = new Response();
 
-		/* @var $deck \AppBundle\Entity\Deck */
-		$deck = $this->getDoctrine()->getRepository('AppBundle:Deck')->find($id);
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $deck \AppBundle\Entity\Deck */
+		$deck = $em->getRepository('AppBundle:Deck')->find($id);
 
         if (!$deck) {
             $content = json_encode([
