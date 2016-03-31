@@ -5,19 +5,16 @@ namespace AppBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ApiPrivateController extends Controller {
-	/**
-	 * Get the description of all the Decks of the authenticated user
-	 */
 	public function listDecksAction(Request $request) {
 		$response = new Response();
 
 		/* @var $decks \AppBundle\Entity\Deck[] */
 		$decks = $this->getDoctrine()->getRepository('AppBundle:Deck')->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC']);
 
-		$dateUpdates = array_map(function($deck) {
+        $dateUpdates = array_map(function($deck) {
+            /* @var $deck \AppBundle\Entity\Deck */
 			return $deck->getDateUpdate();
 		}, $decks);
 
@@ -41,6 +38,7 @@ class ApiPrivateController extends Controller {
 
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getDoctrine()->getRepository('AppBundle:User')->findOneBy(['username' => $username]);
+
         if (!$user) {
             $content = json_encode([
                 'success' => false,
@@ -69,7 +67,8 @@ class ApiPrivateController extends Controller {
 		$decks = $this->getDoctrine()->getRepository('AppBundle:Deck')->findBy(['user' => $user], ['dateCreation' => 'DESC']);
 
 		$dateUpdates = array_map(function($deck) {
-			return $deck->getDateUpdate();
+            /* @var $deck \AppBundle\Entity\Deck */
+            return $deck->getDateUpdate();
 		}, $decks);
 
         if (count($dateUpdates)) {
@@ -87,7 +86,7 @@ class ApiPrivateController extends Controller {
 		return $response;
 	}
 
-	/**
+	/*
 	 * Get the description of one Deck of the authenticated user
 	 */
 	public function loadDeckAction($id, Request $request) {
@@ -108,6 +107,7 @@ class ApiPrivateController extends Controller {
             return $response;
         }
 
+        /* @var $user \AppBundle\Entity\User */
         $user = $deck->getUser();
         if (!$user->getIsShareDecks() && $user != $this->getUser()) {
             $content = json_encode([
