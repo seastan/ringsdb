@@ -1419,26 +1419,25 @@ footer a {
   }
 
   .fellowship-name {
-    margin-top: 2px;
-    margin-bottom: 8px;
-    display: block;
+    margin-top: 5px;
+    margin-bottom: 15px;
   }
 
   .fellowships-actions {
-    width: 140px;
+    margin: 4px 0;
+    float: right;
 
-    .btn {
-      margin-bottom: 3px;
-      white-space: nowrap;
+    .social {
+      margin: 10px 20px 0 20px;
     }
   }
 }
 
 .fellowship-heroes {
+  float:left;
   white-space: nowrap;
-  display: inline-block;
-  margin-right: 15px;
   font-size: 0;
+  margin-right: 10px;
 
   .decklist-hero {
     margin-right: 5px;
@@ -1447,4 +1446,32 @@ footer a {
   &:last-child {
     margin-right: 0;
   }
+}
+
+.fellowship-deck-info {
+  h4 {
+    margin-top: 5px;
+    margin-bottom: 4px;
+  }
+}
+
+.fellowship-hero-text {
+  a {
+    padding-right: 10px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 767px) {
+  .fellowship-hero-text {
+    clear: both;
+    display: block;
+    margin-top: 15px;
+  }
+}
+
+
+.fellowships-table-buttons {
+  float: right;
+  margin-top: 25px;
 }
