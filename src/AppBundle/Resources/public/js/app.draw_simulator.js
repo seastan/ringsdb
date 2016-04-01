@@ -26,7 +26,8 @@
         container = $('#table-draw-simulator-content');
 
 
-        $('#oddsModal').on({ change: draw_simulator.compute_odds }, 'input');
+        $('#oddsModal').on('input', 'input', draw_simulator.compute_odds);
+        draw_simulator.compute_odds();
     };
 
     /**
