@@ -491,5 +491,31 @@ class Fellowship {
     public function getVotes() {
         return $this->votes;
     }
-}
 
+    /**
+     * @var integer
+     */
+    private $nbDecks;
+
+    /**
+     * Set nbDecks
+     *
+     * @param integer $nbDecks
+     *
+     * @return Fellowship
+     */
+    public function setNbDecks($nbDecks) {
+        $this->nbDecks = $nbDecks;
+
+        return $this;
+    }
+
+    /**
+     * Get nbDecks
+     *
+     * @return integer
+     */
+    public function getNbDecks() {
+        return $this->nbDecks;
+    }
+}

@@ -73,6 +73,9 @@ AppBundle\Entity\Fellowship:
             type: boolean
             nullable: false
             column: is_public
+        nbDecks:
+            type: integer
+            column: nb_decks
         nbVotes:
             type: integer
             column: nb_votes
