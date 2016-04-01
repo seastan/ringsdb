@@ -26,3 +26,6 @@ AppBundle\Entity\Sphere:
         octgnid:
             type: string
             nullable: true
+    uniqueConstraints:
+        sphere_code_idx:
+            columns: [ code ]

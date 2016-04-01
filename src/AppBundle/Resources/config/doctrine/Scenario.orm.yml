@@ -52,3 +52,6 @@ AppBundle\Entity\Scenario:
             gedmo:
                 timestampable:
                     on: update
+    uniqueConstraints:
+        scenario_code_idx:
+            columns: [ code ]
