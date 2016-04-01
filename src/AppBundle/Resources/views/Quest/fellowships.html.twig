@@ -29,7 +29,7 @@
                 <h1>My fellowships</h1>
 
                 <table class="table list-fellowships">
-                    <tbody id="fellowship">
+                    <tbody id="fellowships">
                     {% for fellowship in fellowships %}
                         {% set decks = fellowship.decks | merge(fellowship.decklists) %}
 
@@ -44,7 +44,7 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         {% for deck in decks %}
-                                            <div class="fellowship-heroes">
+                                            <div class="fellowship-heroes" data-id="{{ deck.deck.id }}">
                                                 {% for hero in deck.deck.getSlots().getHeroDeck() %}
                                                     {% set card = hero.getCard() %}
                                                     <div class="decklist-hero border-light-{{ card.sphere.code }}">
@@ -93,8 +93,8 @@
     </div>
 
     {% include 'AppBundle:Modale:file.html.twig' %}
-    {% include 'AppBundle:Modale:delete.html.twig' %}
-    {% include 'AppBundle:Modale:delete_list.html.twig' %}
+    {% include 'AppBundle:Modale:delete_fellowship.html.twig' %}
+    {% include 'AppBundle:Modale:delete_fellowship_list.html.twig' %}
     {% include 'AppBundle:Modale:export.html.twig' %}
     {% include 'AppBundle:Modale:odds.html.twig' %}
     {% include 'AppBundle:Modale:tag_add.html.twig' %}

@@ -1,8 +1,12 @@
 (function(ui, $) {
 
     ui.confirm_delete = function() {
+        $('#delete-fellowship-name').text(Fellowship.name);
+        $('#delete-fellowship-id').val(Fellowship.id);
         $('#deleteModal').modal('show');
     };
+
+
 
     ui.do_action_deck = function (event) {
         var action_id = $(this).attr('id');

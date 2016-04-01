@@ -72,3 +72,9 @@ fellowship_delete:
     methods: [POST]
     defaults:
         _controller: AppBundle:Fellowship:delete
+
+fellowship_delete_list:
+    path: /delete_list
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:Fellowship:deleteList

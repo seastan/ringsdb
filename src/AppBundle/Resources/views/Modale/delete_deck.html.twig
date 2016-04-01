@@ -4,14 +4,14 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h3 class="modal-title" id="deleteModalLabel">Delete fellowship</h3>
+				<h3 class="modal-title" id="deleteModalLabel">Delete deck</h3>
 			</div>
 			<div class="modal-body">
 				<div class="row">
 					<div class="col-md-12">
-						<form action="{{ path('fellowship_delete') }}" method="POST" enctype="application/x-www-form-urlencoded" id="delete-fellowship-form">
-							<input type="hidden" name="fellowship_id" id="delete-fellowship-id" value="">
-							<p>Are you sure that you want to delete the fellowship <b id="delete-fellowship-name"></b>?</p>
+						<form action="{{ path('deck_delete') }}" method="POST" enctype="application/x-www-form-urlencoded" id="delete-deck-form">
+							<input type="hidden" name="deck_id" id="delete-deck-id" value="">
+							<p>Are you sure that you want to delete the deck <b id="delete-deck-name"></b>?</p>
 							<div class="pull-right">
 								<button type="submit" class="btn btn-danger">Yes, delete</button>
 								<button type="button" class="btn btn-default" onclick="$('#deleteModal').modal('hide')">Cancel</button>

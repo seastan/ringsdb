@@ -13,6 +13,11 @@
         Decks[3] = {{ deck3 | json_encode | raw }};
         Decks[4] = {{ deck4 | json_encode | raw }};
 
+        var Fellowship = {
+            id: {{ fellowship.id }},
+            name: {{ fellowship.name | json_encode | raw }}
+        };
+
         app.deck_selection && app.deck_selection.init(Decks);
     </script>
 {% endblock %}
