@@ -36,7 +36,10 @@
                             <td class="hidden-xs"><input type="checkbox"></td>
                             <td>
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-sm-6 col-md-7 col-lg-8">
+                                        <h4 class="fellowship-name"><a href="{{ path('fellowship_view', { fellowship_id: fellowship.id }) }}">{{ fellowship.name }}</a></h4>
+                                    </div>
+                                    <div class="col-sm-6 col-md-5 col-lg-4">
                                         <div class="fellowships-actions">
                                             {% for deck in decks %}
                                                 <i class="fa fa-user"></i>
@@ -57,7 +60,6 @@
                                                 <span class="fa fa-trash-o fa-fw"></span>
                                             </button>
                                         </div>
-                                        <h4 class="fellowship-name"><a href="{{ path('fellowship_view', { fellowship_id: fellowship.id }) }}">{{ fellowship.name }}</a></h4>
                                     </div>
                                 </div>
                                 <div class="row">

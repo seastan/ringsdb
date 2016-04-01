@@ -504,6 +504,13 @@ div.tags span.tag {
   }
 }
 
+@media (max-width: 767px) {
+  .index-decklist-row {
+    display: block;
+  }
+}
+
+
 .index-hero {
   vertical-align: top;
   max-width: 120px;
@@ -1409,13 +1416,17 @@ footer a {
 
 /********* LIST OF FELLOWSHIPS ************/
 
-.list-fellowships > tbody > tr > td {
-  vertical-align: middle;
-}
 
 .list-fellowships {
   tr > td:first-child {
     width: 35px;
+    line-height: 20px;
+    padding-top: 13px;
+
+    input {
+      vertical-align: middle;
+      margin: 0;
+    }
   }
 
   .fellowship-name {
@@ -1425,10 +1436,23 @@ footer a {
 
   .fellowships-actions {
     margin: 4px 0;
-    float: right;
+    text-align: right;
 
     .social {
       margin: 10px 20px 0 20px;
+    }
+  }
+}
+
+
+@media (max-width: 767px) {
+  .list-fellowships {
+    .fellowship-name {
+      margin-bottom: 10px;
+    }
+
+    .fellowships-actions {
+      margin-bottom: 15px;
     }
   }
 }
@@ -1454,6 +1478,7 @@ footer a {
     margin-bottom: 4px;
   }
 }
+
 
 .fellowship-hero-text {
   a {
