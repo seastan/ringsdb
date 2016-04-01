@@ -1,0 +1,80 @@
+fellowship_new:
+    path: /new/{deck1_id}/{deck2_id}/{deck3_id}/{deck4_id}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Fellowship:new
+        deck1_id: null
+        deck2_id: null
+        deck3_id: null
+        deck4_id: null
+    requirements:
+        deck1_id: \d+
+        deck2_id: \d+
+        deck3_id: \d+
+        deck4_id: \d+
+
+fellowship_save:
+    path: /save
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:Fellowship:save
+
+fellowship_edit:
+    path: /edit/{fellowship_id}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Fellowship:edit
+    requirements:
+        fellowship_id: \d+
+
+fellowship_view:
+    path: /view/{fellowship_id}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Fellowship:view
+    requirements:
+        fellowship_id: \d+
+
+fellowship_publish:
+    path: /publish/{fellowship_id}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Fellowship:publishForm
+    requirements:
+        fellowship_id: \d+
+
+fellowship_clone:
+    path: /clone/{fellowship_id}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Fellowship:clone
+    requirements:
+        fellowship_id: \d+
+
+fellowship_export_text:
+    path: /export/text/{fellowship_id}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Fellowship:textexport
+    requirements:
+        fellowship_id: \d+
+
+fellowship_export_octgn:
+    path: /export/octgn/{fellowship_id}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Fellowship:octgnexport
+    requirements:
+        fellowship_id: \d+
+
+fellowship_delete:
+    path: /delete
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:Fellowship:delete
+
+fellowship_delete_list:
+    path: /delete_list
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:Fellowship:deleteList

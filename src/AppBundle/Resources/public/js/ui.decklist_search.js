@@ -14,8 +14,11 @@
             }
 
             var name = app.data.get_searchable_string(q);
-            var regexp = new RegExp(name, 'i');
-            cb(app.data.cards.find({ s_name: regexp }));
+            var regexp1 = new RegExp('^' + name, 'i');
+            var regexp2 = new RegExp('.+' + name, 'i');
+            var startsWith = app.data.cards.find({ s_name: regexp1 });
+            var contains = app.data.cards.find({ s_name: regexp2 });
+            cb(startsWith.concat(contains));
         }
 
         $('#card').typeahead({

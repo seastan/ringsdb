@@ -6,7 +6,6 @@
      * options: cards, icons, users
      */
     textcomplete.setup = function setup(textarea, options) {
-
         options = _.extend({cards: true, icons: true, users: false}, options);
 
         var actions = [];
@@ -73,7 +72,6 @@
         }
 
         $(textarea).textcomplete(actions);
-
     }
 
 })(app.textcomplete = {}, jQuery);

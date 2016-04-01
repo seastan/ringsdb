@@ -1,0 +1,27 @@
+AppBundle\Entity\FellowshipDeck:
+    type: entity
+    table: fellowship_deck
+    manyToOne:
+        fellowship:
+            targetEntity: Fellowship
+            nullable: false
+            inversedBy: decks
+            joinColumn:
+                name: fellowship_id
+                referencedColumnName: id
+        deck:
+            targetEntity: Deck
+            nullable: false
+            inversedBy: fellowships
+            joinColumn:
+                name: deck_id
+                referencedColumnName: id
+    fields:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+        deckNumber:
+            type: smallint
+            column: deck_number

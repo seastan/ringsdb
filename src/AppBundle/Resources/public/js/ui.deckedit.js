@@ -68,6 +68,8 @@
 
             if (record.pack_code == 'Core') {
                 max_qty = Math.min(max_qty, record.quantity * Config['core-set']);
+            } else {
+                max_qty = Math.min(max_qty, record.quantity);
             }
 
             app.data.cards.updateById(record.code, {
@@ -166,7 +168,7 @@
                 pack_code: record.code,
                 '$or': [
                     { indeck: { '$gt': 0 } },
-                    { insidedeck: { '$gt': 0 }
+                    { insideboard: { '$gt': 0 }
                 }]
             });
 
@@ -408,14 +410,14 @@
             return false;
         }
 
-        if (direction == 'left' && card.insidedeck > 0) {
-            ui.on_quantity_change(code, card.insidedeck - 1, true);
+        if (direction == 'left' && card.insideboard > 0) {
+            ui.on_quantity_change(code, card.insideboard - 1, true);
             ui.on_quantity_change(code, card.indeck + 1, false);
         }
 
         if (direction == 'right' && card.indeck > 0) {
             ui.on_quantity_change(code, card.indeck - 1, false);
-            ui.on_quantity_change(code, card.insidedeck + 1, true);
+            ui.on_quantity_change(code, card.insideboard + 1, true);
         }
 
         app.card_modal.updateModal();
@@ -679,7 +681,7 @@
         var divs = CardDivs[Config['display-column'] - 1];
 
         cards.forEach(function(card) {
-            if (Config['show-only-deck'] && !card.indeck && !card.insidedeck) {
+            if (Config['show-only-deck'] && !card.indeck && !card.insideboard) {
                 return;
             }
 
@@ -738,7 +740,7 @@
             DisplayOptions = options;
         }
         app.deck.display('#deck-content', DisplayOptions, false);
-        app.deck.display('#deck-side-content', DisplayOptions, true);
+        app.deck.display('#sideboard-content', DisplayOptions, true);
         app.draw_simulator && app.draw_simulator.reset();
         app.deck_charts && app.deck_charts.setup();
         app.suggestions && Config['show-suggestions'] != 0 && app.suggestions.compute();
@@ -754,8 +756,11 @@
             }
 
             var name = app.data.get_searchable_string(q);
-            var regexp = new RegExp(name, 'i');
-            cb(app.data.cards.find({ s_name: regexp }));
+            var regexp1 = new RegExp('^' + name, 'i');
+            var regexp2 = new RegExp('.+' + name, 'i');
+            var startsWith = app.data.cards.find({ s_name: regexp1 });
+            var contains = app.data.cards.find({ s_name: regexp2 });
+            cb(startsWith.concat(contains));
         }
 
         $('#filter-text').typeahead({

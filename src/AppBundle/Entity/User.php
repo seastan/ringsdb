@@ -677,4 +677,40 @@ class User extends BaseUser {
     public function getOwnedPacks() {
         return $this->ownedPacks;
     }
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $fellowships;
+
+    /**
+     * Add fellowship
+     *
+     * @param \AppBundle\Entity\Fellowship $fellowship
+     *
+     * @return User
+     */
+    public function addFellowship(\AppBundle\Entity\Fellowship $fellowship) {
+        $this->fellowships[] = $fellowship;
+
+        return $this;
+    }
+
+    /**
+     * Remove fellowship
+     *
+     * @param \AppBundle\Entity\Fellowship $fellowship
+     */
+    public function removeFellowship(\AppBundle\Entity\Fellowship $fellowship) {
+        $this->fellowships->removeElement($fellowship);
+    }
+
+    /**
+     * Get fellowships
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getFellowships() {
+        return $this->fellowships;
+    }
 }

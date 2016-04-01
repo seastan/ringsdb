@@ -11,18 +11,16 @@
 					<div class="col-md-12">
 						<form action="{{ path('deck_delete_list') }}" method="POST" enctype="application/x-www-form-urlencoded" id="delete-deck-list-form">
 							<input type="hidden" name="ids" id="delete-deck-list-id" value="">
-							<p>
-							Are you sure that you want to delete all the decks selected?
-							</p>
+							<p>Are you sure that you want to delete all the selected decks?</p>
 							<div class="pull-right">
 								<button type="submit" class="btn btn-danger">Yes, delete</button>
 								<button type="button" class="btn btn-default" onclick="$('#deleteListModal').modal('hide')">Cancel</button>
 							</div>
 						</form>
-					</div><!-- /#modal-info -->
-				</div><!-- /.row -->
-			</div><!-- /.modal-body -->
-		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 <!-- Modal -->

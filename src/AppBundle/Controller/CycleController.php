@@ -12,30 +12,27 @@ use AppBundle\Form\CycleType;
  * Cycle controller.
  *
  */
-class CycleController extends Controller
-{
-
+class CycleController extends Controller {
     /**
      * Lists all Cycle entities.
      *
      */
-    public function indexAction()
-    {
+    public function indexAction() {
         $em = $this->getDoctrine()->getManager();
 
         $entities = $em->getRepository('AppBundle:Cycle')->findAll();
 
-        return $this->render('AppBundle:Cycle:index.html.twig', array(
+        return $this->render('AppBundle:Cycle:index.html.twig', [
             'entities' => $entities,
-        ));
+        ]);
     }
+
     /**
      * Creates a new Cycle entity.
      *
      */
-    public function createAction(Request $request)
-    {
-        $entity  = new Cycle();
+    public function createAction(Request $request) {
+        $entity = new Cycle();
         $form = $this->createForm(new CycleType(), $entity);
         $form->bind($request);
 
@@ -44,36 +41,34 @@ class CycleController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('admin_cycle_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('admin_cycle_show', ['id' => $entity->getId()]));
         }
 
-        return $this->render('AppBundle:Cycle:new.html.twig', array(
+        return $this->render('AppBundle:Cycle:new.html.twig', [
             'entity' => $entity,
-            'form'   => $form->createView(),
-        ));
+            'form' => $form->createView(),
+        ]);
     }
 
     /**
      * Displays a form to create a new Cycle entity.
      *
      */
-    public function newAction()
-    {
+    public function newAction() {
         $entity = new Cycle();
-        $form   = $this->createForm(new CycleType(), $entity);
+        $form = $this->createForm(new CycleType(), $entity);
 
-        return $this->render('AppBundle:Cycle:new.html.twig', array(
+        return $this->render('AppBundle:Cycle:new.html.twig', [
             'entity' => $entity,
-            'form'   => $form->createView(),
-        ));
+            'form' => $form->createView(),
+        ]);
     }
 
     /**
      * Finds and displays a Cycle entity.
      *
      */
-    public function showAction($id)
-    {
+    public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('AppBundle:Cycle')->find($id);
@@ -84,17 +79,17 @@ class CycleController extends Controller
 
         $deleteForm = $this->createDeleteForm($id);
 
-        return $this->render('AppBundle:Cycle:show.html.twig', array(
-            'entity'      => $entity,
-            'delete_form' => $deleteForm->createView(),        ));
+        return $this->render('AppBundle:Cycle:show.html.twig', [
+            'entity' => $entity,
+            'delete_form' => $deleteForm->createView(),
+        ]);
     }
 
     /**
      * Displays a form to edit an existing Cycle entity.
      *
      */
-    public function editAction($id)
-    {
+    public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('AppBundle:Cycle')->find($id);
@@ -106,19 +101,18 @@ class CycleController extends Controller
         $editForm = $this->createForm(new CycleType(), $entity);
         $deleteForm = $this->createDeleteForm($id);
 
-        return $this->render('AppBundle:Cycle:edit.html.twig', array(
-            'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
+        return $this->render('AppBundle:Cycle:edit.html.twig', [
+            'entity' => $entity,
+            'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
-        ));
+        ]);
     }
 
     /**
      * Edits an existing Cycle entity.
      *
      */
-    public function updateAction(Request $request, $id)
-    {
+    public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('AppBundle:Cycle')->find($id);
@@ -135,21 +129,21 @@ class CycleController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('admin_cycle_edit', array('id' => $id)));
+            return $this->redirect($this->generateUrl('admin_cycle_edit', ['id' => $id]));
         }
 
-        return $this->render('AppBundle:Cycle:edit.html.twig', array(
-            'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
+        return $this->render('AppBundle:Cycle:edit.html.twig', [
+            'entity' => $entity,
+            'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
-        ));
+        ]);
     }
+
     /**
      * Deletes a Cycle entity.
      *
      */
-    public function deleteAction(Request $request, $id)
-    {
+    public function deleteAction(Request $request, $id) {
         $form = $this->createDeleteForm($id);
         $form->bind($request);
 
@@ -175,11 +169,7 @@ class CycleController extends Controller
      *
      * @return \Symfony\Component\Form\Form The form
      */
-    private function createDeleteForm($id)
-    {
-        return $this->createFormBuilder(array('id' => $id))
-            ->add('id', 'hidden')
-            ->getForm()
-        ;
+    private function createDeleteForm($id) {
+        return $this->createFormBuilder(['id' => $id])->add('id', 'hidden')->getForm();
     }
 }

@@ -45,8 +45,9 @@
         event.preventDefault();
         var obj = $(this);
         var review_id = obj.closest('article.review').data('id');
+
         $.post(Routing.generate('card_review_like'), {
-            id : review_id
+            id: review_id
         }, function(data, textStatus, jqXHR) {
             obj.find('.num').text(jqXHR.responseJSON.nbVotes);
         });

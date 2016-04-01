@@ -22,6 +22,20 @@
 	<small title="User Reputation">{{ user.reputation }}</small>
 {% endmacro %}
 
+{% macro static_fellowship_social_icons(fellowship) %}
+	<span class="social-icons">
+		<span class="social-icon-like" data-toggle="tooltip" data-placement="bottom" title="Likes">
+			<span class="fa fa-heart"></span> <span class="num">{{ fellowship.nbVotes }}</span>
+		</span>
+		<span class="social-icon-favorite" data-toggle="tooltip" data-placement="bottom" title="Favorites">
+			<span class="fa fa-star"></span> <span class="num">{{ fellowship.nbFavorites }}</span>
+		</span>
+		<span class="social-icon-comment" data-toggle="tooltip" data-placement="bottom" title="Comments">
+			<span class="fa fa-comment"></span> <span class="num">{{ fellowship.nbComments }}</span>
+		</span>
+	</span>
+{% endmacro %}
+
 {% macro static_social_icons(decklist) %}
 	<span class="social-icons">
 		<span class="social-icon-like" data-toggle="tooltip" data-placement="bottom" title="Likes">

@@ -1,0 +1,28 @@
+questlog_new:
+    path: /new/{deck1_id}/{deck2_id}/{deck3_id}/{deck4_id}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:QuestLog:new
+        deck1_id: null
+        deck2_id: null
+        deck3_id: null
+        deck4_id: null
+    requirements:
+        deck1_id: \d+
+        deck2_id: \d+
+        deck3_id: \d+
+        deck4_id: \d+
+
+questlog_new_with_fellowship:
+    path: /new_with_fellowship/{fellowship_id}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:QuestLog:newWithFellowship
+    requirements:
+        fellowship_id: \d+
+
+questlog_save:
+    path: /save
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:QuestLog:save

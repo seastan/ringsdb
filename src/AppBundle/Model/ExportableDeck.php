@@ -13,6 +13,7 @@ class ExportableDeck {
             'date_update' => $this->getDateUpdate()->format('c'),
             'description_md' => $this->getDescriptionMd(),
             'user_id' => $this->getUser()->getId(),
+            'heroes' => $slots->getHeroDeck()->getContent(),
             'slots' => $slots->getContent(),
             'sideslots' => $sideslots->getContent(),
             'version' => $this->getVersion(),

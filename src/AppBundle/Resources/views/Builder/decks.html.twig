@@ -12,10 +12,11 @@
             <!-- Right-side column -->
             <div class="col-md-4 col-md-push-8">
 
-                <div class="row" style="margin-bottom:10px">
+                <div class="row" style="margin-bottom: 5px">
                     <div class="col-md-12">
-                        <a href="{{ path('deck_buildform') }}" class="btn btn-default btn-sm"{% if cannotcreate %} disabled="disabled"{% endif %}><span class="fa fa-plus"></span> New Deck</a>
-                        <div class="btn-group">
+                        <a href="{{ path('deck_buildform') }}" class="btn btn-default btn-sm"{% if cannotcreate %} disabled="disabled"{% endif %} style="margin-bottom: 5px;"><span class="fa fa-plus"></span> New Deck</a>
+
+                        <div class="btn-group" style="margin-bottom: 5px;">
                             <button type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown"{% if cannotcreate %} disabled="disabled"{% endif %}>
                                 <span class="fa fa-upload"></span> Import Deck <span class="caret"></span>
                             </button>
@@ -25,11 +26,15 @@
                                 <li><a href="#" onclick="$('#archiveModal').modal('show')" id="btn-import-archive">Archive</a></li>
                             </ul>
                         </div>
-                        <div class="btn-group" id="btn-group-selection">
+
+                        <div class="btn-group" id="btn-group-selection" style="margin-bottom: 5px;">
                             <button type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown">
                                 <span class="fa fa-check-square-o"></span> With Selection <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu" role="menu">
+                                {#<li class="dropdown-header"><span class="fa fa-book"></span> Questing</li>#}
+                                {#<li><a href="#" id="btn-fellowship">Create a Fellowship</a></li>#}
+                                {#<li><a href="#" id="btn-quest">Log a Quest</a></li>#}
                                 <li class="dropdown-header"><span class="fa fa-exchange"></span> Compare</li>
                                 <li><a href="#" id="btn-compare">Compare two decks</a></li>
                                 <li class="dropdown-header"><span class="fa fa-tag"></span> Tags</li>
@@ -40,7 +45,7 @@
                                 <li><a href="#" id="btn-download-text">Download as Text files</a></li>
                                 <li><a href="#" id="btn-download-octgn">Download as Octgn files</a></li>
                                 <li class="dropdown-header"><span class="fa fa-trash-o"></span> Delete</li>
-                                <li><a href="#" id="btn-delete-selected"><span style="color:red" class="fa fa-exclamation-triangle"></span> Delete all decks selected</a></li>
+                                <li><a href="#" id="btn-delete-selected"><span style="color:red" class="fa fa-exclamation-triangle"></span> Delete all selected decks</a></li>
                             </ul>
                         </div>
                     </div>
@@ -48,7 +53,6 @@
                 <div class="row" style="margin-bottom:10px">
                     <div class="col-md-12" id="tag_toggles" data-toggle="tooltip" title="Click to switch to this tag. Shift-click to toggle this tag."></div>
                 </div>
-
             </div>
             <!-- / Right-side column -->
 
@@ -84,8 +88,9 @@
                                 </div>
                             </td>
                             <td class="decks-actions text-right">
-                                <a href="{{ path('deck_edit',{deck_id:deck.id}) }}" class="btn btn-xs btn-default" data-toggle="tooltip" title="Edit"><span class="fa fa-pencil fa-fw"></span></a>
-                                <a href="{{ path('deck_publish_form',{deck_id:deck.id}) }}" class="btn btn-xs btn-default" data-toggle="tooltip" title="Publish"><span class="fa fa-share fa-fw"></span></a>
+                                <a href="{{ path('deck_edit', { deck_id: deck.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" title="Edit"><span class="fa fa-pencil fa-fw"></span></a>
+                                {#<a href="{{ path('questlog_new', { deck1_id: deck.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" title="Log a Quest"><span class="fa fa-book fa-fw"></span></a>#}
+                                <a href="{{ path('deck_publish_form', { deck_id:deck.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" title="Publish"><span class="fa fa-share fa-fw"></span></a>
                                 <button class="btn btn-xs btn-default btn-delete-deck" data-toggle="tooltip" title="Delete"><span class="fa fa-trash-o fa-fw"></span></button>
                             </td>
                         </tr>
@@ -94,15 +99,15 @@
                 </table>
 
                 <div id="deck-content"></div>
-                <div id="deck-side-content"></div>
+                <div id="sideboard-content"></div>
             </div>
             <!-- / Left-side column -->
 
         </div>
-    </div><!-- /.container -->
+    </div>
 
     {% include 'AppBundle:Modale:file.html.twig' %}
-    {% include 'AppBundle:Modale:delete.html.twig' %}
+    {% include 'AppBundle:Modale:delete_deck.html.twig' %}
     {% include 'AppBundle:Modale:delete_list.html.twig' %}
     {% include 'AppBundle:Modale:export.html.twig' %}
     {% include 'AppBundle:Modale:odds.html.twig' %}

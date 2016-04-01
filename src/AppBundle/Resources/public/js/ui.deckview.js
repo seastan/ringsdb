@@ -67,7 +67,7 @@
      * sets up event handlers ; dataloaded not fired yet
      * @memberOf ui
      */
-    ui.setup_event_handlers = function setup_event_handlers() {
+    ui.setup_event_handlers = function() {
         $('#btn-group-deck').on({
             click: ui.do_action_deck
         }, 'button[id], a[id]');
@@ -78,7 +78,7 @@
      */
     ui.refresh_deck = function(options) {
         app.deck.display('#deck-content', options, false);
-        app.deck.display('#deck-side-content', options, true);
+        app.deck.display('#sideboard-content', options, true);
         app.draw_simulator && app.draw_simulator.reset();
         app.deck_charts && app.deck_charts.setup();
     };

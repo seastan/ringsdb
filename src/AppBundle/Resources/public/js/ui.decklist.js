@@ -263,7 +263,7 @@
      */
     ui.refresh_deck = function(options) {
         app.deck.display('#deck-content', options, false);
-        app.deck.display('#deck-side-content', options, true);
+        app.deck.display('#sideboard-content', options, true);
         app.deck_charts && app.deck_charts.setup();
     };
 

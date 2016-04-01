@@ -3,6 +3,11 @@ AppBundle_api_public:
     resource: "@AppBundle/Resources/config/routing/api/routing_api_public.yml"
     prefix: /public
 
+# these routes are available to logged users
+AppBundle_api_private:
+    resource: "@AppBundle/Resources/config/routing/api/routing_api_private.yml"
+    prefix: /private
+
 # these routes are available to users with an OAuth2 access_token
 AppBundle_api_oauth2:
     resource: "@AppBundle/Resources/config/routing/api/routing_api_oauth2.yml"
@@ -12,4 +17,3 @@ api_intro:
     path: /
     defaults:
         _controller: AppBundle:Default:apiIntro
-    

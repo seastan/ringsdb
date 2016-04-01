@@ -181,5 +181,4 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
 
         return $arr;
     }
-
 }

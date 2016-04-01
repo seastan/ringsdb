@@ -114,6 +114,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
         $this->favorites = new \Doctrine\Common\Collections\ArrayCollection();
         $this->votes = new \Doctrine\Common\Collections\ArrayCollection();
         $this->spheres = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->fellowships = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -735,5 +736,41 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      */
     public function getPredominantSphere() {
         return $this->predominantSphere;
+    }
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $fellowships;
+
+    /**
+     * Add fellowship
+     *
+     * @param \AppBundle\Entity\FellowshipDeck $fellowship
+     *
+     * @return Decklist
+     */
+    public function addFellowship(\AppBundle\Entity\FellowshipDeck $fellowship) {
+        $this->fellowships[] = $fellowship;
+
+        return $this;
+    }
+
+    /**
+     * Remove fellowship
+     *
+     * @param \AppBundle\Entity\FellowshipDeck $fellowship
+     */
+    public function removeFellowship(\AppBundle\Entity\FellowshipDeck $fellowship) {
+        $this->fellowships->removeElement($fellowship);
+    }
+
+    /**
+     * Get fellowships
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getFellowships() {
+        return $this->fellowships;
     }
 }

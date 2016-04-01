@@ -23,6 +23,7 @@ class ApiController extends Controller {
 	 *  },
 	 * )
 	 * @param Request $request
+	 * @return Response
 	 */
 	public function listPacksAction(Request $request) {
 		$response = new Response();
@@ -32,10 +33,13 @@ class ApiController extends Controller {
 
 		$jsonp = $request->query->get('jsonp');
 
-		$list_packs = $this->getDoctrine()->getRepository('AppBundle:Pack')->findBy(array(), array("dateRelease" => "ASC", "position" => "ASC"));
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $list_packs \AppBundle\Entity\Pack[] */
+		$list_packs = $em->getRepository('AppBundle:Pack')->findBy(array(), array("dateRelease" => "ASC", "position" => "ASC"));
 
 		// check the last-modified-since header
-
 		$lastModified = NULL;
 		foreach($list_packs as $pack) {
 			if (!$lastModified || $lastModified < $pack->getDateUpdate()) {
@@ -49,6 +53,7 @@ class ApiController extends Controller {
 		}
 
 		$packs = array();
+
 		/* @var $pack \AppBundle\Entity\Pack */
 		foreach($list_packs as $pack) {
 			$real = count($pack->getCards());
@@ -103,9 +108,9 @@ class ApiController extends Controller {
 	 *  },
 	 * )
 	 * @param Request $request
+     * @return Response
 	 */
 	public function getCardAction($card_code, Request $request) {
-
 		$response = new Response();
 		$response->setPublic();
 		$response->setMaxAge($this->container->getParameter('cache_expiration'));
@@ -113,11 +118,14 @@ class ApiController extends Controller {
 
 		$jsonp = $request->query->get('jsonp');
 
-		$card = $this->getDoctrine()->getRepository('AppBundle:Card')->findOneBy(["code" => $card_code]);
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $card \AppBundle\Entity\Card */
+        $card = $em->getRepository('AppBundle:Card')->findOneBy(["code" => $card_code]);
 
 		// check the last-modified-since header
 		$lastModified = null;
-		/* @var $card \AppBundle\Entity\Card */
 		if (!$lastModified || $lastModified < $card->getDateUpdate()) {
 			$lastModified = $card->getDateUpdate();
 		}
@@ -128,7 +136,6 @@ class ApiController extends Controller {
 		}
 
 		// build the response
-
 		/* @var $card \AppBundle\Entity\Card */
 		$card = $this->get('cards_data')->getCardInfo($card, true, "en");
 
@@ -156,9 +163,9 @@ class ApiController extends Controller {
 	 *  },
 	 * )
 	 * @param Request $request
+     * @return Response
 	 */
 	public function listCardsAction(Request $request) {
-
 		$response = new Response();
 		$response->setPublic();
 		$response->setMaxAge($this->container->getParameter('cache_expiration'));
@@ -166,10 +173,13 @@ class ApiController extends Controller {
 
 		$jsonp = $request->query->get('jsonp');
 
-		$list_cards = $this->getDoctrine()->getRepository('AppBundle:Card')->findBy([], ["code" => "ASC"]);
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $list_cards \AppBundle\Entity\Card[] */
+        $list_cards = $em->getRepository('AppBundle:Card')->findBy([], ["code" => "ASC"]);
 
 		// check the last-modified-since header
-
 		$lastModified = null;
 		/* @var $card \AppBundle\Entity\Card */
 		foreach ($list_cards as $card) {
@@ -177,6 +187,7 @@ class ApiController extends Controller {
 				$lastModified = $card->getDateUpdate();
 			}
 		}
+
 		$response->setLastModified($lastModified);
 		if ($response->isNotModified($request)) {
 			return $response;
@@ -227,6 +238,7 @@ class ApiController extends Controller {
 	 *  },
 	 * )
 	 * @param Request $request
+     * @return Response
 	 */
 	public function listCardsByPackAction($pack_code, Request $request) {
 		$response = new Response();
@@ -243,7 +255,11 @@ class ApiController extends Controller {
 			return $response;
 		}
 
-		$pack = $this->getDoctrine()->getRepository('AppBundle:Pack')->findOneBy(['code' => $pack_code]);
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $pack \AppBundle\Entity\Pack */
+		$pack = $em->getRepository('AppBundle:Pack')->findOneBy(['code' => $pack_code]);
 		if (!$pack) {
 			die();
 		}
@@ -254,6 +270,8 @@ class ApiController extends Controller {
 
 		$cards = [];
 		$last_modified = null;
+
+        /* @var $rows \AppBundle\Entity\Card[] */
 		if ($query && $rows = $this->get('cards_data')->get_search_rows($conditions, "set")) {
 			for ($rowindex = 0; $rowindex < count($rows); $rowindex++) {
 				if (empty($last_modified) || $last_modified < $rows[$rowindex]->getDateUpdate()) {
@@ -308,6 +326,7 @@ class ApiController extends Controller {
 	 *  },
 	 * )
 	 * @param Request $request
+     * @return Response
 	 */
 	public function getDecklistAction($decklist_id, Request $request) {
 		$response = new Response();
@@ -324,8 +343,11 @@ class ApiController extends Controller {
 			return $response;
 		}
 
-		/* @var $decklist \AppBundle\Entity\Decklist */
-		$decklist = $this->getDoctrine()->getRepository('AppBundle:Decklist')->find($decklist_id);
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $decklist \AppBundle\Entity\Decklist */
+		$decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
 		if (!$decklist) {
 			die();
 		}
@@ -375,6 +397,7 @@ class ApiController extends Controller {
 	 *  },
 	 * )
 	 * @param Request $request
+     * @return Response
 	 */
 	public function listDecklistsByDateAction($date, Request $request) {
 		$response = new Response();
@@ -401,13 +424,17 @@ class ApiController extends Controller {
 		$criteria->where($expr->gte('dateCreation', $start));
 		$criteria->andWhere($expr->lt('dateCreation', $end));
 
-		/* @var $decklists \Doctrine\Common\Collections\ArrayCollection */
-		$decklists = $this->getDoctrine()->getRepository('AppBundle:Decklist')->matching($criteria);
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $decklists \Doctrine\Common\Collections\ArrayCollection */
+		$decklists = $em->getRepository('AppBundle:Decklist')->matching($criteria);
 		if (!$decklists) {
 			die();
 		}
 
 		$dateUpdates = $decklists->map(function($decklist) {
+            /* @var $decklist \AppBundle\Entity\Decklist */
 			return $decklist->getDateUpdate();
 		})->toArray();
 
@@ -455,6 +482,7 @@ class ApiController extends Controller {
 	 *  },
 	 * )
 	 * @param Request $request
+     * @return Response
 	 */
 	public function listTopDecklistsByCardAction($card_code, Request $request) {
 		$response = new Response();
@@ -471,6 +499,7 @@ class ApiController extends Controller {
 			return $response;
 		}
 
+        /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
 		$card = $this->getDoctrine()->getRepository('AppBundle:Card')->findOneBy(['code' => $card_code]);
@@ -521,6 +550,7 @@ class ApiController extends Controller {
             ]);
             unset($decklist['descriptionMd']);
             unset($decklist['descriptionHtml']);
+
             $decklist['dateCreation'] = $decklist['dateCreation']->format('c');
             $decklist['dateUpdate'] = $decklist['dateUpdate']->format('c');
         }
@@ -538,4 +568,70 @@ class ApiController extends Controller {
 
 		return $response;
 	}
+
+
+	/**
+	 * Get the description of a scenario as a JSON object.
+	 *
+	 * @ApiDoc(
+	 *  section="Scenario",
+	 *  resource=true,
+	 *  description="One Scenario",
+	 *  parameters={
+	 *      {"name"="jsonp", "dataType"="string", "required"=false, "description"="JSONP callback"}
+	 *  },
+	 *  requirements={
+	 *      {
+	 *          "name"="scenario_id",
+	 *          "dataType"="integer",
+	 *          "description"="The code of the scenario to get, e.g. '01001'"
+	 *      },
+	 *      {
+	 *          "name"="_format",
+	 *          "dataType"="string",
+	 *          "requirement"="json",
+	 *          "description"="The format of the returned data. Only 'json' is supported at the moment."
+	 *      }
+	 *  },
+	 * )
+	 * @param Request $request
+     * @return Response
+	 */
+	public function getScenarioAction($scenario_id, Request $request) {
+		$response = new Response();
+		$response->setPublic();
+		$response->setMaxAge($this->container->getParameter('cache_expiration'));
+		$response->headers->add(['Access-Control-Allow-Origin' => '*']);
+
+		$jsonp = $request->query->get('jsonp');
+
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $scenario \AppBundle\Entity\Scenario */
+        $scenario = $em->getRepository('AppBundle:Scenario')->findOneBy(['id' => $scenario_id]);
+
+		// check the last-modified-since header
+		$lastModified = null;
+		if (!$lastModified || $lastModified < $scenario->getDateUpdate()) {
+			$lastModified = $scenario->getDateUpdate();
+		}
+
+		$response->setLastModified($lastModified);
+		if ($response->isNotModified($request)) {
+			return $response;
+		}
+
+		$content = json_encode($scenario);
+		if (isset($jsonp)) {
+			$content = "$jsonp($content)";
+			$response->headers->set('Content-Type', 'application/javascript');
+		} else {
+			$response->headers->set('Content-Type', 'application/json');
+		}
+		$response->setContent($content);
+
+		return $response;
+	}
+
 }

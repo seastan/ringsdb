@@ -56,6 +56,10 @@ AppBundle\Entity\Decklist:
         children:
             targetEntity: Deck
             mappedBy: parent
+        fellowships:
+            targetEntity: FellowshipDecklist
+            mappedBy: decklist
+            cascade: ["persist","remove"]
     manyToMany:
         spheres:
             targetEntity: Sphere

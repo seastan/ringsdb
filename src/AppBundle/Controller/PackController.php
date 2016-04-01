@@ -12,30 +12,27 @@ use AppBundle\Form\PackType;
  * Pack controller.
  *
  */
-class PackController extends Controller
-{
-
+class PackController extends Controller {
     /**
      * Lists all Pack entities.
      *
      */
-    public function indexAction()
-    {
+    public function indexAction() {
         $em = $this->getDoctrine()->getManager();
 
         $entities = $em->getRepository('AppBundle:Pack')->findAll();
 
-        return $this->render('AppBundle:Pack:index.html.twig', array(
+        return $this->render('AppBundle:Pack:index.html.twig', [
             'entities' => $entities,
-        ));
+        ]);
     }
+
     /**
      * Creates a new Pack entity.
      *
      */
-    public function createAction(Request $request)
-    {
-        $entity  = new Pack();
+    public function createAction(Request $request) {
+        $entity = new Pack();
         $form = $this->createForm(new PackType(), $entity);
         $form->bind($request);
 
@@ -44,7 +41,7 @@ class PackController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('admin_pack_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('admin_pack_show', ['id' => $entity->getId()]));
         }
 
         return $this->render('AppBundle:Pack:new.html.twig', array(
@@ -57,10 +54,9 @@ class PackController extends Controller
      * Displays a form to create a new Pack entity.
      *
      */
-    public function newAction()
-    {
+    public function newAction() {
         $entity = new Pack();
-        $form   = $this->createForm(new PackType(), $entity);
+        $form = $this->createForm(new PackType(), $entity);
 
         return $this->render('AppBundle:Pack:new.html.twig', array(
             'entity' => $entity,
@@ -72,8 +68,7 @@ class PackController extends Controller
      * Finds and displays a Pack entity.
      *
      */
-    public function showAction($id)
-    {
+    public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('AppBundle:Pack')->find($id);
@@ -84,17 +79,17 @@ class PackController extends Controller
 
         $deleteForm = $this->createDeleteForm($id);
 
-        return $this->render('AppBundle:Pack:show.html.twig', array(
-            'entity'      => $entity,
-            'delete_form' => $deleteForm->createView(),        ));
+        return $this->render('AppBundle:Pack:show.html.twig', [
+            'entity' => $entity,
+            'delete_form' => $deleteForm->createView(),
+        ]);
     }
 
     /**
      * Displays a form to edit an existing Pack entity.
      *
      */
-    public function editAction($id)
-    {
+    public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('AppBundle:Pack')->find($id);
@@ -106,19 +101,18 @@ class PackController extends Controller
         $editForm = $this->createForm(new PackType(), $entity);
         $deleteForm = $this->createDeleteForm($id);
 
-        return $this->render('AppBundle:Pack:edit.html.twig', array(
-            'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
+        return $this->render('AppBundle:Pack:edit.html.twig', [
+            'entity' => $entity,
+            'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
-        ));
+        ]);
     }
 
     /**
      * Edits an existing Pack entity.
      *
      */
-    public function updateAction(Request $request, $id)
-    {
+    public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('AppBundle:Pack')->find($id);
@@ -135,21 +129,21 @@ class PackController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('admin_pack_edit', array('id' => $id)));
+            return $this->redirect($this->generateUrl('admin_pack_edit', ['id' => $id]));
         }
 
-        return $this->render('AppBundle:Pack:edit.html.twig', array(
-            'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
+        return $this->render('AppBundle:Pack:edit.html.twig', [
+            'entity' => $entity,
+            'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
-        ));
+        ]);
     }
+
     /**
      * Deletes a Pack entity.
      *
      */
-    public function deleteAction(Request $request, $id)
-    {
+    public function deleteAction(Request $request, $id) {
         $form = $this->createDeleteForm($id);
         $form->bind($request);
 
@@ -175,11 +169,9 @@ class PackController extends Controller
      *
      * @return \Symfony\Component\Form\Form The form
      */
-    private function createDeleteForm($id)
-    {
+    private function createDeleteForm($id) {
         return $this->createFormBuilder(array('id' => $id))
             ->add('id', 'hidden')
-            ->getForm()
-        ;
+            ->getForm();
     }
 }

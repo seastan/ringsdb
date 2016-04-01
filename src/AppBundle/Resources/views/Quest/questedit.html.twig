@@ -1,0 +1,124 @@
+{% extends 'AppBundle::layout.html.twig' %}
+{% import "AppBundle::macros.html.twig" as macros %}
+
+{% block javascripts %}
+    {% javascripts '@AppBundle/Resources/public/js/ui.questedit.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <script type="text/javascript">
+        var Decks = {};
+        Decks[1] = {{ deck1 | json_encode | raw }};
+        Decks[2] = {{ deck2 | json_encode | raw }};
+        Decks[3] = {{ deck3 | json_encode | raw }};
+        Decks[4] = {{ deck4 | json_encode | raw }};
+
+        app.deck_selection && app.deck_selection.init(Decks);
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="main white container">
+        <form action="{{ path('questlog_save') }}" method="post" enctype="application/x-www-form-urlencoded">
+            <input type="hidden" name="deck1_id" />
+            <input type="hidden" name="deck2_id" />
+            <input type="hidden" name="deck3_id" />
+            <input type="hidden" name="deck4_id" />
+
+            <fieldset id="deck-selection">
+                <legend>
+                    Deck Selection
+                    <a class="btn btn-xs btn-default pull-right" data-action="show-cards">
+                        <span class="fa fa-eye"></span> Show cards
+                    </a>
+                    <a class="btn btn-xs btn-default pull-right hidden" data-action="hide-cards">
+                        <span class="fa fa-eye-slash"></span> Hide cards
+                    </a>
+                </legend>
+                <div class="row selected-decks">
+                    {% include 'AppBundle:Quest:selected-deck.html.twig' with { deck: deck1, deck_number: 1 } %}
+                    {% include 'AppBundle:Quest:selected-deck.html.twig' with { deck: deck2, deck_number: 2 } %}
+                    {% include 'AppBundle:Quest:selected-deck.html.twig' with { deck: deck3, deck_number: 3 } %}
+                    {% include 'AppBundle:Quest:selected-deck.html.twig' with { deck: deck4, deck_number: 4 } %}
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Quest Details</legend>
+
+                <div class="row">
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="quest">Quest</label>
+                                    <small class="pull-right"><strong><a href="" id="btn-randomize">Randomize</a></strong></small>
+                                    <select class="form-control" name="quest" id="quest">
+                                        {% for quest in quests %}
+                                            <option value="{{ quest.id }}">{{ quest.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="date">Date</label>
+                                    <div><input type="date" class="form-control" size="40" id="date" name="date" value=""></div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="difficulty">Quest Mode</label>
+                                    <div>
+                                        <select class="form-control" name="difficulty" id="difficulty">
+                                            <option value="normal">Normal</option>
+                                            <option value="easy">Easy</option>
+                                            <option value="nightmare">Nightmare</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="victory">Result</label>
+                                    <div>
+                                        <select class="form-control" name="victory" id="victory">
+                                            <option value="yes">Success</option>
+                                            <option value="no">Failure</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="score">Score</label>
+                                    <div><input type="number" class="form-control" id="score" name="score" value=""></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="descriptionMd">Quest Notes</label>
+                                    <textarea class="form-control" autocapitalize="none" autocomplete="off" rows="8" name="descriptionMd" id="descriptionMd"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3" id="quest-info"></div>
+                </div>
+            </fieldset>
+
+
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary btn-block">Log this Quest</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% include 'AppBundle:Modale:deck_selection.html.twig' %}
+{% endblock %}

@@ -69,10 +69,12 @@
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">My Collection <span class="caret"></span></a>
                                 <ul class="dropdown-menu" role="menu">
                                     <li><a href="{{ path('decks_list') }}">Decks</a></li>
+                                    <li><a href="{{ path('fellowships_list') }}">Fellowships</a></li>
                                     <li><a href="{{ path('collection_packs') }}">Adventure Packs</a></li>
                                 </ul>
                             </li>
                             <li><a href="{{ path('decks_list') }}" class="visible-xs-block">My Decks</a></li>
+                            <li><a href="{{ path('fellowships_list') }}" class="visible-xs-block">My Fellowships</a></li>
                             <li><a href="{{ path('collection_packs') }}" class="visible-xs-block">My Adventure Packs</a></li>
                             <li><a href="{{ path('decklists_list') }}">Decklists</a></li>
                             <li><a href="{{ path('cards_search') }}">Cards</a></li>
@@ -119,7 +121,10 @@
 
                         <p>
                             Original <a href="http://thronesdb.com" target="_blank">ThronesDB</a> and <a href="http://netrunnerdb.com" target="_blank">NetrunnerDB</a> code designed and built by Alsciende.
-                            Adapted to The Lord of the Rings: The Card Game by Sydtrack. Contact: <a href="https://reddit.com/user/Sydtrack/" title="Reddit"><span class="fa fa-reddit-alien"></span></a> <a href="mailto:sydtrack@ringsdb.com" title="Email"><span class="fa fa-envelope"></span></a>
+                            Adapted to The Lord of the Rings: The Card Game by Sydtrack. Contact:
+                            <a href="mailto:sydtrack@ringsdb.com" title="Email"><span class="fa fa-envelope"></span></a>
+                            <a href="https://www.facebook.com/RingsDB/" title="Facebook" target="_blank"><span class="fa fa-facebook-official"></span></a>
+                            <a href="https://reddit.com/user/Sydtrack/" title="Reddit" target="_blank"><span class="fa fa-reddit-alien"></span></a>
                         </p>
 
                         <p>Please post bug reports and feature requests on <a href="https://github.com/Sydtrack/ringsdb/issues">GitHub</a>.</p>
@@ -214,6 +219,7 @@
         '@AppBundle/Resources/public/js/app.diff.js'
         '@AppBundle/Resources/public/js/app.deck_history.js'
         '@AppBundle/Resources/public/js/app.deck_charts.js'
+        '@AppBundle/Resources/public/js/app.deck_selection.js'
         '@AppBundle/Resources/public/js/app.suggestions-mixed.js'
         '@AppBundle/Resources/public/js/app.ui.js' %}
         <script src="{{ asset_url }}"></script>

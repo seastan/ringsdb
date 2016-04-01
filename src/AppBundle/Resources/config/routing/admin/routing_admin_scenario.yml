@@ -1,0 +1,30 @@
+admin_scenario:
+    path:  /
+    defaults: { _controller: "AppBundle:Scenario:index" }
+
+admin_scenario_show:
+    path:  /{id}/show
+    defaults: { _controller: "AppBundle:Scenario:show" }
+
+admin_scenario_new:
+    path:  /new
+    defaults: { _controller: "AppBundle:Scenario:new" }
+
+admin_scenario_create:
+    path:  /create
+    defaults: { _controller: "AppBundle:Scenario:create" }
+    methods: [ post ]
+
+admin_scenario_edit:
+    path:  /{id}/edit
+    defaults: { _controller: "AppBundle:Scenario:edit" }
+
+admin_scenario_update:
+    path:  /{id}/update
+    defaults: { _controller: "AppBundle:Scenario:update" }
+    methods: [ post, put ]
+
+admin_scenario_delete:
+    path:  /{id}/delete
+    defaults: { _controller: "AppBundle:Scenario:delete" }
+    methods: [ post, delete ]

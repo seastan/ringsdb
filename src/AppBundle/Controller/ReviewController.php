@@ -6,12 +6,8 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Entity\Review;
 use AppBundle\Entity\Card;
-use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use AppBundle\Entity\Comment;
 use AppBundle\Entity\Reviewcomment;
 use \Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -87,11 +83,14 @@ class ReviewController extends Controller {
         }
 
         $review_id = filter_var($request->get('review_id'), FILTER_SANITIZE_NUMBER_INT);
+
         /* @var $review Review */
         $review = $em->getRepository('AppBundle:Review')->find($review_id);
+
         if (!$review) {
             throw new BadRequestHttpException("Unable to find review.");
         }
+
         if ($review->getUser()->getId() !== $user->getId()) {
             throw new UnauthorizedHttpException("You cannot edit this review.");
         }
@@ -125,6 +124,7 @@ class ReviewController extends Controller {
         }
 
         $review_id = filter_var($request->request->get('id'), FILTER_SANITIZE_NUMBER_INT);
+
         /* @var $review Review */
         $review = $em->getRepository('AppBundle:Review')->find($review_id);
         if (!$review) {

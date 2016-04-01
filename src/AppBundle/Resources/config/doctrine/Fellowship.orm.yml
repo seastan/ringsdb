@@ -1,0 +1,98 @@
+AppBundle\Entity\Fellowship:
+    type: entity
+    table: fellowship
+    manyToOne:
+        user:
+            targetEntity: User
+            nullable: false
+            inversedBy: fellowships
+            joinColumn:
+                name: user_id
+                referencedColumnName: id
+    oneToMany:
+        decks:
+            targetEntity: FellowshipDeck
+            mappedBy: fellowship
+            cascade: ["persist","remove"]
+        decklists:
+            targetEntity: FellowshipDecklist
+            mappedBy: fellowship
+            cascade: ["persist","remove"]
+        comments:
+            targetEntity: Fellowshipcomment
+            orderBy: { 'dateCreation': 'ASC' }
+            mappedBy: fellowship
+            cascade: ["persist","remove"]
+    manyToMany:
+        favorites:
+            targetEntity: User
+            inversedBy: favorites
+            joinTable:
+                name: fellowship_favorite
+                cascade: ["persist","remove"]
+                joinColumns:
+                    fellowship_id:
+                        referencedColumnName: id
+                inverseJoinColumns:
+                    user_id:
+                        referencedColumnName: id
+        votes:
+            targetEntity: User
+            inversedBy: votes
+            joinTable:
+                name: fellowship_vote
+                cascade: ["persist","remove"]
+                joinColumns:
+                    fellowship_id:
+                        referencedColumnName: id
+                inverseJoinColumns:
+                    user_id:
+                        referencedColumnName: id
+    fields:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+        name:
+            type: string
+            length: 255
+        nameCanonical:
+            type: string
+            length: 255
+            column: name_canonical
+        descriptionMd:
+            type: text
+            nullable: true
+            column: description_md
+        descriptionHtml:
+            type: text
+            nullable: true
+            column: description_html
+        isPublic:
+            type: boolean
+            nullable: false
+            column: is_public
+        nbVotes:
+            type: integer
+            column: nb_votes
+        nbFavorites:
+            type: integer
+            column: nb_favorites
+        nbComments:
+            type: integer
+            column: nb_comments
+        dateCreation:
+            type: datetime
+            nullable: false
+            column: date_creation
+            gedmo:
+                timestampable:
+                    on: create
+        dateUpdate:
+            type: datetime
+            nullable: false
+            column: date_update
+            gedmo:
+                timestampable:
+                    on: update
