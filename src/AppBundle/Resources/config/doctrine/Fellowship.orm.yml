@@ -5,7 +5,7 @@ AppBundle\Entity\Fellowship:
         user:
             targetEntity: User
             nullable: false
-            inversedBy: decks
+            inversedBy: fellowships
             joinColumn:
                 name: user_id
                 referencedColumnName: id

@@ -1,0 +1,106 @@
+{% extends 'AppBundle::layout.html.twig' %}
+{% import "AppBundle::macros.html.twig" as macros %}
+
+{% block javascripts %}
+    {% javascripts '@AppBundle/Resources/public/js/ui.fellowships.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+    <div class="main white container">
+        <div class="row">
+            <!-- Left-side column -->
+            <div class="col-md-12">
+                <div class="pull-right">
+                    <a href="{{ path('fellowship_new') }}" class="btn btn-default btn-sm" style="margin-bottom: 5px;"><span class="fa fa-plus"></span> New Fellowship</a>
+
+                    <div class="btn-group hidden-xs" id="btn-group-selection" style="margin-bottom: 5px;">
+                        <button type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown">
+                            <span class="fa fa-check-square-o"></span> With Selection <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li class="dropdown-header"><span class="fa fa-trash-o"></span> Delete</li>
+                            <li><a href="#" id="btn-delete-selected"><span style="color:red" class="fa fa-exclamation-triangle"></span> Delete all selected fellowships</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h1>My fellowships</h1>
+
+                <table class="table list-fellowships">
+                    <tbody id="fellowship">
+                    {% for fellowship in fellowships %}
+                        {% set decks = fellowship.decks | merge(fellowship.decklists) %}
+
+                        <tr data-id="{{ fellowship.id }}">
+                            <td class="hidden-xs"><input type="checkbox"></td>
+                            <td>
+                                <div class="row fellowship-name">
+                                    <div class="col-md-12">
+                                        <a href="{{ path('fellowship_view', { fellowship_id: fellowship.id }) }}">{{ fellowship.name }}</a>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% for deck in decks %}
+                                            <div class="fellowship-heroes">
+                                                {% for hero in deck.deck.getSlots().getHeroDeck() %}
+                                                    {% set card = hero.getCard() %}
+                                                    <div class="decklist-hero border-light-{{ card.sphere.code }}">
+                                                        <div class="hero-thumbnail card-thumbnail-3x card-thumbnail-hero card card-tip" style="background-image:url('{{ asset('/bundles/cards/' ~ card.code ~ '.png') }}')" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false"></div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                            {% if not loop.last %}<div class="block visible-xs-block" style="height: 5px;"></div>{% endif %}
+                                            {% if loop.index == 2 %}<div class="block hidden-lg hidden-xs" style="height: 15px;"></div>{% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="fellowships-actions text-center">
+                                <a href="{{ path('fellowship_edit', { fellowship_id: fellowship.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" data-container="body" title="Edit">
+                                    <span class="fa fa-pencil fa-fw"></span>
+                                </a>
+                                <button class="btn btn-xs btn-default btn-log-quest" data-toggle="tooltip" data-container="body" title="Log a Quest">
+                                    <span class="fa fa-book fa-fw"></span>
+                                </button>
+                                <a href="{{ path('fellowship_publish', { fellowship_id: fellowship.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" data-container="body" title="Publish">
+                                    <span class="fa fa-share fa-fw"></span>
+                                </a>
+                                <button class="btn btn-xs btn-default btn-delete-fellowship" data-toggle="tooltip" data-container="body" title="Delete">
+                                    <span class="fa fa-trash-o fa-fw"></span>
+                                </button>
+
+                                <div>
+                                    <small>{{ macros.static_fellowship_social_icons(fellowship) }}</small>
+                                </div>
+
+                                <div>
+                                    {% for deck in decks %}
+                                        <i class="fa fa-user"></i>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- / Left-side column -->
+
+        </div>
+    </div>
+
+    {% include 'AppBundle:Modale:file.html.twig' %}
+    {% include 'AppBundle:Modale:delete.html.twig' %}
+    {% include 'AppBundle:Modale:delete_list.html.twig' %}
+    {% include 'AppBundle:Modale:export.html.twig' %}
+    {% include 'AppBundle:Modale:odds.html.twig' %}
+    {% include 'AppBundle:Modale:tag_add.html.twig' %}
+    {% include 'AppBundle:Modale:tag_remove.html.twig' %}
+    {% include 'AppBundle:Modale:tag_clear.html.twig' %}
+    {% include 'AppBundle:Modale:diff.html.twig' %}
+    {% include 'AppBundle:Modale:archive.html.twig' %}
+
+{% endblock %}

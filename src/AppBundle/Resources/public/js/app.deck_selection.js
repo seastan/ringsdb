@@ -11,7 +11,7 @@
 
     var modal_deck_number;
     deck_selection.init_buttons = function() {
-        $('#deck-selection, #deckSelectionModal').on('click', 'a[data-action], label[data-action]', function(e) {
+        $('#deck-selection, #deckSelectionModal').on('click', 'a[data-action], label[data-action]', function() {
             var btn = $(this);
             var action = btn.data('action');
             if (!action) {
@@ -34,10 +34,10 @@
                     break;
 
                 case 'select-deck':
-                    $('#deckSelectionModal').modal('show');
+                    var modal = $('#deckSelectionModal').modal('show');
                     modal_deck_number = btn.data('deck');
 
-                    $('#deckSelectionModal').find('label[data-action="my-decks"]').trigger('click');
+                    modal.find('label[data-action="my-decks"]').trigger('click');
                     break;
 
                 case 'my-decks':
@@ -63,7 +63,6 @@
         });
     };
 
-
     // Unfortunately, to allow many decks on a single screen at once would require big changes to app.deck and app.data.
     // We will activate each deck at once to ease this change.
     var selectedDeck = null;
@@ -87,13 +86,93 @@
             $('.selected-deck-content').eq(selectedDeck - 1).addClass('hidden');
             $('input[name="deck' + selectedDeck + '_id"]').val('');
         }
+
+        deck_selection.show_conflicts();
+    };
+
+    deck_selection.show_conflicts = function() {
+        if (deck_selection.disable_conflict) {
+            return;
+        }
+
+        var cores = 1;
+        if (app.user.data.owned_packs) {
+            if (app.user.data.owned_packs.match(/1-2/)) {
+                cores++;
+            }
+
+            if (app.user.data.owned_packs.match(/1-3/)) {
+                cores++;
+            }
+        }
+
+        var cardCount = {};
+        var cards;
+        for (var i = 1; i <= 4; i++) {
+            if (!Decks[i]) {
+                continue;
+            }
+
+            app.deck.init(Decks[i]);
+            cards = app.deck.get_cards();
+
+            cards.forEach(function(card) {
+                if (!cardCount[card.code]) {
+                    cardCount[card.code] = {
+                        total: 0,
+                        decks: 0,
+                        card: card
+                    };
+                }
+
+                cardCount[card.code].total += card.indeck;
+                cardCount[card.code].decks++;
+            });
+        }
+
+        _.each(cardCount, function(record) {
+            var card = record.card;
+            var errors = [];
+
+            if (card.is_unique && record.decks > 1) {
+                errors.push('This unique card is being used in more than one selected deck.');
+            }
+
+            var max_qty = card.quantity;
+
+            if (card.pack_code == 'Core') {
+                max_qty = card.quantity * cores;
+            }
+
+            if (card.owned && record.total > max_qty) {
+                errors.push('A total of ' + record.total + ' copies of this card are being used between selected decks but you only have ' + max_qty + (max_qty == 1 ? ' copy' : ' copies') + ' in your collection.');
+            }
+
+            if (errors.length) {
+                var div = $('.card[data-code="' + card.code + '"]');
+                var mark = div.siblings('.fa-exclamation-triangle');
+                if (mark.size()) {
+                    errors.push(mark.eq(0).attr('title'));
+                    mark.remove();
+                }
+
+                if (card.type_code == 'hero') {
+                    div.siblings('.hero-thumbnail').addClass('conflicted-hero').attr('title', errors.join('\n\n'));
+                } else {
+                    div.after(' <i class="fa fa-ban card-conflict" title="' + errors.join('\n\n') + '"></i>');
+                }
+            }
+        });
     };
 
     deck_selection.refresh_deck = function() {
+        deck_selection.disable_conflict = true;
         for (var i = 1; i <= 4; i++) {
             deck_selection.activate_deck(i);
             deck_selection.display_deck();
         }
+        deck_selection.disable_conflict = false;
+        deck_selection.show_conflicts();
     };
 
     deck_selection.display_deck_selection_list = function(deck_number, decks) {

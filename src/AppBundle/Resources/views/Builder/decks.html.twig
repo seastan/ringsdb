@@ -12,10 +12,11 @@
             <!-- Right-side column -->
             <div class="col-md-4 col-md-push-8">
 
-                <div class="row" style="margin-bottom:10px">
+                <div class="row" style="margin-bottom: 5px">
                     <div class="col-md-12">
-                        <a href="{{ path('deck_buildform') }}" class="btn btn-default btn-sm"{% if cannotcreate %} disabled="disabled"{% endif %}><span class="fa fa-plus"></span> New Deck</a>
-                        <div class="btn-group">
+                        <a href="{{ path('deck_buildform') }}" class="btn btn-default btn-sm"{% if cannotcreate %} disabled="disabled"{% endif %} style="margin-bottom: 5px;"><span class="fa fa-plus"></span> New Deck</a>
+
+                        <div class="btn-group" style="margin-bottom: 5px;">
                             <button type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown"{% if cannotcreate %} disabled="disabled"{% endif %}>
                                 <span class="fa fa-upload"></span> Import Deck <span class="caret"></span>
                             </button>
@@ -25,11 +26,8 @@
                                 <li><a href="#" onclick="$('#archiveModal').modal('show')" id="btn-import-archive">Archive</a></li>
                             </ul>
                         </div>
-                    </div>
-                </div>
-                <div class="row" style="margin-bottom:10px">
-                    <div class="col-md-12">
-                        <div class="btn-group" id="btn-group-selection">
+
+                        <div class="btn-group" id="btn-group-selection" style="margin-bottom: 5px;">
                             <button type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown">
                                 <span class="fa fa-check-square-o"></span> With Selection <span class="caret"></span>
                             </button>

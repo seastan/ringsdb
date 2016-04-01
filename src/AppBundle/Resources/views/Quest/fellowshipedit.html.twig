@@ -19,6 +19,18 @@
 
 {% block body %}
     <div class="main white container">
+        {% if fellowship is not defined %}
+        <div class="row">
+            <div class="col-md-12">
+                <h1 style="border-bottom:1px solid lightgray">New Fellowship</h1>
+                <p class="help-block" style="margin-bottom: 30px;">
+                    A fellowship is a link between decks that work well together or are meant to be played together.
+                    You are not limited to your own decks, but unpublished decks from other players will be copied to your collection after the fellowship is saved.
+                </p>
+            </div>
+        </div>
+        {% endif %}
+
         <form action="{{ path('fellowship_save') }}" method="post" enctype="application/x-www-form-urlencoded">
             <input type="hidden" name="deck1_id" />
             <input type="hidden" name="deck2_id" />
@@ -69,6 +81,7 @@
                 <div class="col-md-12">
                     {% if fellowship is defined %}
                         <button type="submit" class="btn btn-success">Save</button>
+                        <a href="{{ path('fellowship_view', { fellowship_id: fellowship.id }) }}" class="btn btn-link">Cancel</a>
                     {% else %}
                         <button type="submit" class="btn btn-primary">Create this fellowship</button>
                     {% endif %}

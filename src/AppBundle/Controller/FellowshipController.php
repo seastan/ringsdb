@@ -9,6 +9,27 @@ use Symfony\Component\HttpFoundation\Request;
 
 class FellowshipController extends Controller {
 
+    public function listAction() {
+        /* @var $user \AppBundle\Entity\User */
+        $user = $this->getUser();
+
+        /* @var $fellowships \AppBundle\Entity\Fellowship[] */
+        $fellowships = $user->getFellowships();
+
+        if (count($fellowships)) {
+            return $this->render('AppBundle:Quest:fellowships.html.twig', [
+                'pagetitle' => "My Fellowships",
+                'pagedescription' => "Create fellowships, a link between decks that work well together or are meant to be played together.",
+                'fellowships' => $fellowships,
+            ]);
+        } else {
+            return $this->render('AppBundle:Quest:no-fellowships.html.twig', [
+                'pagetitle' => "My Fellowships",
+                'pagedescription' => "Create fellowships, a link between decks that work well together or are meant to be played together.",
+            ]);
+        }
+    }
+
     public function newAction($deck1_id, $deck2_id, $deck3_id, $deck4_id) {
         $response = new Response();
 
@@ -19,9 +40,11 @@ class FellowshipController extends Controller {
             $decks[$i] = null;
 
             if ($deck_ids[$i]) {
+                /* @var $decks \AppBundle\Entity\Deck[] */
                 $decks[$i] = $this->getDoctrine()->getManager()->getRepository('AppBundle:Deck')->find($deck_ids[$i]);
 
                 if ($decks[$i]) {
+                    /* @var $user \AppBundle\Entity\User */
                     $user = $decks[$i]->getUser();
 
                     if (!$user->getIsShareDecks() && $user->getId() != $this->getUser()->getId()) {
@@ -187,5 +210,49 @@ class FellowshipController extends Controller {
         return $this->redirect($this->generateUrl('fellowship_view', [
             'fellowship_id' => $fellowship->getId()
         ]));
+    }
+
+    public function deleteAction(Request $request) {
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $user \AppBundle\Entity\User */
+        $user = $this->getUser();
+        if (!$user) {
+            throw new UnauthorizedHttpException("You must be logged in for this operation.");
+        }
+
+        $fellowship_id = filter_var($request->get('fellowship_id'), FILTER_SANITIZE_NUMBER_INT);
+
+        /* @var $fellowship \AppBundle\Entity\Fellowship */
+        $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+        if (!$fellowship) {
+            return $this->redirect($this->generateUrl('fellowships_list'));
+        }
+
+        if (!$fellowship || $fellowship->getUser()->getId() != $user->getId()) {
+            throw new UnauthorizedHttpException("You don't have access to this fellowship.");
+        }
+
+        if ($fellowship->getnbVotes() || $fellowship->getNbfavorites() || $fellowship->getNbcomments()) {
+            $this->get('session')->getFlashBag()->set('danger', "You can't delete a published fellowship.");
+        } else {
+            /* @var $decks \AppBundle\Entity\FellowshipDeck[] */
+            $decks = $fellowship->getDecks();
+            foreach ($decks as $deck) {
+                $em->remove($deck);
+            }
+
+            /* @var $decks \AppBundle\Entity\FellowshipDecklist[] */
+            $decklists = $fellowship->getDecklists();
+            foreach ($decklists as $decklist) {
+                $em->remove($decklist);
+            }
+
+            $em->remove($fellowship);
+            $em->flush();
+        }
+
+        return $this->redirect($this->generateUrl('fellowships_list'));
     }
 }

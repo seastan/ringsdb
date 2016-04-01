@@ -249,6 +249,7 @@ div.tags span.tag {
   margin-right: 4px;
 }
 
+
 /************ DECK GALLERY **********/
 
 #deck-gallery table {
@@ -1237,6 +1238,14 @@ footer a {
   color: #999999;
 }
 
+.card-conflict {
+  color: #DD0000;
+}
+
+.conflicted-hero {
+  border: 2px solid #DD0000;
+}
+
 #table-suggestions .card-container {
   td:nth-child(1) {
     width: 25px;
@@ -1398,3 +1407,44 @@ footer a {
   }
 }
 
+/********* LIST OF FELLOWSHIPS ************/
+
+.list-fellowships > tbody > tr > td {
+  vertical-align: middle;
+}
+
+.list-fellowships {
+  tr > td:first-child {
+    width: 35px;
+  }
+
+  .fellowship-name {
+    margin-top: 2px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .fellowships-actions {
+    width: 140px;
+
+    .btn {
+      margin-bottom: 3px;
+      white-space: nowrap;
+    }
+  }
+}
+
+.fellowship-heroes {
+  white-space: nowrap;
+  display: inline-block;
+  margin-right: 15px;
+  font-size: 0;
+
+  .decklist-hero {
+    margin-right: 5px;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+}

@@ -455,7 +455,7 @@
                     .append($(card_line_tpl({ card: card })));
 
                 if (!deck.i_have_this_card(card)) {
-                    div.append(' <i class="fa fa-exclamation-triangle not-in-collection" title="This card is not in my collection"></i>');
+                    div.append(' <i class="fa fa-exclamation-triangle not-in-collection" title="This card is not in my collection."></i>');
                 }
 
                 div.appendTo(section);
