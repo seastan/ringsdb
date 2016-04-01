@@ -19,24 +19,25 @@
     /**
      * @memberOf draw_simulator
      */
-    draw_simulator.on_dom_loaded = function on_dom_loaded() {
+    draw_simulator.on_dom_loaded = function() {
         $('#table-draw-simulator')
             .on('click', 'button.btn', draw_simulator.handle_click)
             .on('click', 'img, div.card-proxy', draw_simulator.toggle_opacity);
         container = $('#table-draw-simulator-content');
 
 
-        $('#oddsModal input').on('input', draw_simulator.calculate_modal_odds);
-        draw_simulator.calculate_modal_odds();
+        $('#oddsModal').on({ change: draw_simulator.compute_odds }, 'input');
     };
 
-    draw_simulator.calculate_modal_odds = function() {
-        var initial_size = parseInt($('#odds-calculator-N').val(), 10);
-        var draw_count = parseInt($('#odds-calculator-n').val(), 10);
-        var card_count = parseInt($('#odds-calculator-K').val(), 10);
-        var cards_drawn = parseInt($('#odds-calculator-k').val(), 10);
-        var odd = app.hypergeometric.get_cumul(cards_drawn, initial_size, card_count, draw_count);
-        $('#odds-calculator-p').text(Math.round(100 * odd));
+    /**
+     * @memberOf draw_simulator
+     */
+    draw_simulator.compute_odds = function() {
+        var inputs = {};
+        $.each(['N', 'K', 'n', 'k'], function(i, key) {
+            inputs[key] = parseInt($('#odds-calculator-' + key).val(), 10) || 0;
+        });
+        $('#odds-calculator-p').text(Math.round(100 * app.hypergeometric.get_cumul(inputs.k, inputs.N, inputs.K, inputs.n)));
     };
 
     /**
