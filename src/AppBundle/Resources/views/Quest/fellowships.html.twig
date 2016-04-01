@@ -50,12 +50,15 @@
                                             <a href="{{ path('fellowship_edit', { fellowship_id: fellowship.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" data-container="body" title="Edit">
                                                 <span class="fa fa-pencil fa-fw"></span>
                                             </a>
-                                            <button class="btn btn-xs btn-default btn-log-quest" data-toggle="tooltip" data-container="body" title="Log a Quest">
-                                                <span class="fa fa-book fa-fw"></span>
-                                            </button>
+
+                                            {#<button class="btn btn-xs btn-default btn-log-quest" data-toggle="tooltip" data-container="body" title="Log a Quest">#}
+                                                {#<span class="fa fa-book fa-fw"></span>#}
+                                            {#</button>#}
+
                                             <a href="{{ path('fellowship_publish', { fellowship_id: fellowship.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" data-container="body" title="Publish">
                                                 <span class="fa fa-share fa-fw"></span>
                                             </a>
+
                                             <button class="btn btn-xs btn-default btn-delete-fellowship" data-toggle="tooltip" data-container="body" title="Delete">
                                                 <span class="fa fa-trash-o fa-fw"></span>
                                             </button>
@@ -63,7 +66,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-8">
+                                    <div class="col-md-12">
                                         {% for deck in decks %}
                                             <div class="fellowship-heroes" data-id="{{ deck.deck.id }}">
                                                 {% for hero in deck.deck.getSlots().getHeroDeck() %}
@@ -87,13 +90,6 @@
                                             </div>
                                             <div class="block" style="height: 15px; clear:both;"></div>
                                         {% endfor %}
-                                    </div>
-                                    <div class="col-md-4">
-                                        <h4 style="margin-top: 5px; margin-bottom: 4px;"><i>Last Quests</i></h4>
-                                        <h5>The History of the Drunk Hobbit</h5>
-                                        <h5>Darling, I Lost the Ring</h5>
-                                        <h5>Fluffy Sauron Goes to New York</h5>
-                                        <h5>The Battle of the Five Bros</h5>
                                     </div>
                                 </div>
                             </td>

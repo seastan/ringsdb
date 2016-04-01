@@ -137,7 +137,8 @@ div.tags span.tag {
 }
 
 .decks-actions {
-  width: 80px;
+  //width: 80px;
+  width: 110px;
 
   .btn {
     margin-bottom: 3px;
@@ -1103,7 +1104,7 @@ article.review .review-comment {
   #wrapper {
     border: none;
     padding: 0;
-    min-height: auto;
+    min-height: unset;
   }
 }
 
