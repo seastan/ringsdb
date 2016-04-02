@@ -83,7 +83,7 @@
                                         <time class="pull-right" datetime="{{ decklist.dateCreation|date('c') }}">{{ decklist.dateCreation|date('M d') }}</time>
                                         <span class="username">
                                             <a href="{{ path('user_profile_public', {user_id:decklist.user.id,user_name:decklist.user.username|e('url')}) }}" class="{{ decklist.user.color }}">{{ decklist.user.username }}</a>
-                                            {% if decklist.user.donation > 0 %}<span class="fa fa-gift donator" title="RingsDB Gracious Donator"></span>{% endif %}
+                                            {% if decklist.user.donation > 0 %}<span class="fa fa-gift patron" title="RingsDB Gracious Patron"></span>{% endif %}
                                             <small class="reputation">{{ decklist.user.reputation }}</small>
                                         </span>
                                         <span class="small decklist-hero-text">

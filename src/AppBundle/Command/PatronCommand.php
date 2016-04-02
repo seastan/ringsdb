@@ -11,10 +11,10 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use AppBundle\Entity\Review;
 use AppBundle\Entity\Reviewcomment;
 
-class DonatorCommand extends ContainerAwareCommand {
+class PatronCommand extends ContainerAwareCommand {
     protected function configure() {
         $this
-            ->setName('app:donator')
+            ->setName('app:patron')
             ->setDescription('Add a donation to a user by email address or username')
             ->addArgument(
                 'email',

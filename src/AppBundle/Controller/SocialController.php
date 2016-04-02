@@ -1053,7 +1053,7 @@ class SocialController extends Controller {
         ], $response);
     }
 
-    public function donatorsAction(Request $request) {
+    public function patronsAction(Request $request) {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
@@ -1062,9 +1062,9 @@ class SocialController extends Controller {
 
         $users = $dbh->executeQuery("SELECT * FROM user WHERE donation > 0 ORDER BY donation DESC, username", [])->fetchAll(\PDO::FETCH_ASSOC);
 
-        return $this->render('AppBundle:Default:donators.html.twig', [
-            'pagetitle' => 'The Gracious Donators',
-            'donators' => $users
+        return $this->render('AppBundle:Default:patrons.html.twig', [
+            'pagetitle' => 'The Gracious Patrons',
+            'patrons' => $users
         ], $response);
     }
 }

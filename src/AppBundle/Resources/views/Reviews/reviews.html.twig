@@ -60,7 +60,7 @@
                                         </div>
                                         <div class="review-author">
                                             <a href="{{ path('user_profile_public', { user_id: review.user.id, user_name: review.user.username|e('url')}) }}" rel="author" class="username fg-{{ review.user.color }}">{{ review.user.username }}</a>
-                                            {% if review.user.donation > 0 %}<span class="fa fa-gift donator" title="RingsDB Gracious Donator"></span>{% endif %}
+                                            {% if review.user.donation > 0 %}<span class="fa fa-gift patron" title="RingsDB Gracious Patron"></span>{% endif %}
                                             <small class="reputation">{{ review.user.reputation }}</small>
                                         </div>
 
@@ -69,7 +69,7 @@
                                                 <div class="review-comment text-muted small">{{ comment.text }}
                                                     &mdash;
                                                     <a title="{{ comment.user.reputation }} reputation" href="{{ path('user_profile_public', { user_id: comment.user.id, user_name:comment.user.username|e('url')}) }}" rel="author" class="username {{ comment.user.color }}">{{ comment.user.username }}</a>
-                                                    {% if comment.user.donation > 0 %}<span class="fa fa-gift donator" title="RingsDB Gracious Donator"></span>{% endif %}
+                                                    {% if comment.user.donation > 0 %}<span class="fa fa-gift patron" title="RingsDB Gracious Patron"></span>{% endif %}
                                                     <time datetime="{{ comment.dateCreation|date('c') }}" title="{{ comment.dateCreation|date('F jS, Y') }}">{{ comment.dateCreation|date('n/j/y') }}</time>
                                                 </div>
                                             {% endfor %}

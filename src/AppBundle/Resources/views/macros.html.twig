@@ -18,7 +18,7 @@
 
 {% macro username(user) %}
 	<a href="{{ path('user_profile_public', {user_id:user.id,user_name:user.username|e('url')}) }}" class="username fg-{{ user.color }}">{{ user.username }}</a>
-	{% if user.donation > 0 %}<span class="fa fa-gift donator" title="RingsDB Gracious Donator"></span>{% endif %}
+	{% if user.donation > 0 %}<span class="fa fa-gift patron" title="RingsDB Gracious Patron"></span>{% endif %}
 	<small title="User Reputation">{{ user.reputation }}</small>
 {% endmacro %}
 

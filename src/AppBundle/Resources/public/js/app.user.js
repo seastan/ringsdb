@@ -105,7 +105,7 @@
     user.display_ads = function display_ads() {
         return;
 
-        // show ads if not donator
+        // show ads if not patron
         if (user.data && user.data.donation > 0) return;
 
         adsbygoogle = window.adsbygoogle || [];
@@ -117,7 +117,7 @@
 
         if ($('ins.adsbygoogle').filter(':visible').length === 0) {
             $('div.ad').each(function(index, element) {
-                $(element).addClass('ad-blocked').html("No ad,<br>no <span class=\"icon icon-credit\"></span>.<br>Like app?<br>Whitelist us<br>or <a href=\"" + Routing.generate('donators') + "\">donate</a>.");
+                $(element).addClass('ad-blocked').html("No ad,<br>no <span class=\"icon icon-credit\"></span>.<br>Like app?<br>Whitelist us<br>or <a href=\"" + Routing.generate('patrons') + "\">donate</a>.");
             });
         }
     };
