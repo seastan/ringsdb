@@ -61,10 +61,10 @@ security:
         - { path: ^/user/, role: ROLE_USER }
         - { path: ^/collection/, role: ROLE_USER }
         - { path: ^/questlog/, role: ROLE_USER }
-        - { path: ^/deck/view/, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/deck/, role: ROLE_USER }
+        - { path: ^/deck/view/, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/decks, role: ROLE_USER }
-        - { path: ^/fellowship/view/, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/fellowship/, role: ROLE_USER }
+        - { path: ^/fellowship/view/, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/fellowships, role: ROLE_USER }
 
