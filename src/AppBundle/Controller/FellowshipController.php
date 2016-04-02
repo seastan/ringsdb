@@ -303,6 +303,55 @@ class FellowshipController extends Controller {
         return $this->redirect($this->generateUrl('fellowships_list'));
     }
 
+    public function deleteListAction(Request $request) {
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $user \AppBundle\Entity\User */
+        $user = $this->getUser();
+        if (!$user) {
+            throw new AccessDeniedHttpException("You must be logged in for this operation.");
+        }
+
+        $list_id = explode('-', $request->get('ids'));
+        $message = null;
+
+        foreach ($list_id as $id) {
+            /* @var $fellowship \AppBundle\Entity\Fellowship */
+            $fellowship = $em->getRepository('AppBundle:Fellowship')->find($id);
+            if (!$fellowship) {
+                continue;
+            }
+
+            if ($user->getId() != $fellowship->getUser()->getId()) {
+                continue;
+            }
+
+            if ($fellowship->getNbVotes() || $fellowship->getNbfavorites() || $fellowship->getNbcomments()) {
+                $message = "You can't delete a published fellowship. Unpublished selected fellowships were deleted.";
+            } else {
+                /* @var $decks \AppBundle\Entity\FellowshipDeck[] */
+                $decks = $fellowship->getDecks();
+                foreach ($decks as $deck) {
+                    $em->remove($deck);
+                }
+
+                /* @var $decks \AppBundle\Entity\FellowshipDecklist[] */
+                $decklists = $fellowship->getDecklists();
+                foreach ($decklists as $decklist) {
+                    $em->remove($decklist);
+                }
+
+                $em->remove($fellowship);
+            }
+        }
+        $em->flush();
+
+        $this->get('session')->getFlashBag()->set('notice', $message ?: "Decks deleted.");
+
+        return $this->redirect($this->generateUrl('fellowships_list'));
+    }
+
     public function octgnexportAction($fellowship_id) {
         return $this->downloadFromSelection($fellowship_id, true);
     }
