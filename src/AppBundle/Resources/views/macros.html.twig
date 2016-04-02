@@ -16,6 +16,18 @@
 </tr>
 {% endmacro %}
 
+{% macro fellowship_deck_table_row(fellowship) %}
+    <tr>
+        <td class="fellowship-name"><a href="{{ path('fellowship_view', { 'fellowship_id': fellowship.id }) }}">{{ fellowship.name }}</a></td>
+        <td>
+            {% for i in 1..fellowship.nbDecks %}
+                <i class="fa fa-user"></i>
+            {% endfor %}
+        </td>
+    </tr>
+{% endmacro %}
+
+
 {% macro username(user) %}
 	<a href="{{ path('user_profile_public', {user_id:user.id,user_name:user.username|e('url')}) }}" class="username fg-{{ user.color }}">{{ user.username }}</a>
 	{% if user.donation > 0 %}<span class="fa fa-gift patron" title="RingsDB Gracious Patron"></span>{% endif %}

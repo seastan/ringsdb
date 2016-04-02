@@ -1508,3 +1508,20 @@ footer a {
   width: 18px;
   display: inline-block;
 }
+
+#table-fellowships {
+  td:last-child {
+    width: 80px;
+    text-align: right;
+  }
+}
+
+#table-predecessor {
+  td {
+    text-align: right;
+  }
+
+  td:first-child {
+    text-align: left;
+  }
+}

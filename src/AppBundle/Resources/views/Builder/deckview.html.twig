@@ -54,10 +54,27 @@
 
                         {% include 'AppBundle:Builder:draw-simulator.html.twig' %}
 
+
+                        <!-- Fellowships Table -->
+                        <table class="table table-condensed" id="table-fellowships">
+                            <thead>
+                            <tr><th colspan="2"><span class="fa fa-users"></span> Fellowships</th></tr>
+                            </thead>
+                            <tbody>
+                            {% if deck.fellowships | length %}
+                                {% for fellowship in deck.fellowships %}
+                                    {{ macros.fellowship_deck_table_row(fellowship.fellowship) }}
+                                {% endfor %}
+                            {% else %}
+                                <tr><td>None.</td></tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+
                         <!-- Published decklists Table -->
                         <table class="table table-condensed" id="table-predecessor">
                             <thead>
-                            <tr><th colspan="4"><span class="fa fa-share"></span> Published versions</th></tr>
+                            <tr><th colspan="5"><span class="fa fa-share"></span> Published versions</th></tr>
                             </thead>
                             <tbody>
                                 {% if deck.children | length %}
