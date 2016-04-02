@@ -9,6 +9,7 @@
 
     deck_selection.cols = 1;
     deck_selection.headerOnly = true;
+    deck_selection.options = {};
 
     var modal_deck_number;
     deck_selection.init_buttons = function() {
@@ -77,7 +78,10 @@
 
     deck_selection.display_deck = function() {
         if (Decks[selectedDeck]) {
-            app.deck.display('#deck' + selectedDeck + '-content', { cols: deck_selection.cols, special_meta: true, header_only: deck_selection.headerOnly }, false);
+            var cols = Math.min(deck_selection.cols, deck_selection.options.maxcols || 100);
+            var sort = deck_selection.options.sort || 'type';
+
+            app.deck.display('#deck' + selectedDeck + '-content', { cols: cols, sort: sort, special_meta: true, header_only: deck_selection.headerOnly }, false);
             $('.selected-deck-placeholder').eq(selectedDeck - 1).addClass('hidden');
             $('.selected-deck-content').eq(selectedDeck - 1).removeClass('hidden');
             $('input[name="deck' + selectedDeck + '_id"]').val(Decks[selectedDeck].id);
@@ -199,7 +203,8 @@
         });
     };
 
-    deck_selection.refresh_deck = function() {
+    deck_selection.refresh_deck = function(options) {
+        deck_selection.options = options || deck_selection.options;
         deck_selection.disable_conflict = true;
         for (var i = 1; i <= 4; i++) {
             deck_selection.activate_deck(i);

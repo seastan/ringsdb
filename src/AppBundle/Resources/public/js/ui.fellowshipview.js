@@ -21,6 +21,34 @@
                 window.print();
                 break;
 
+            case 'btn-sort-type':
+                app.deck_selection.refresh_deck({
+                    sort: 'type',
+                    maxcols: 2
+                });
+                break;
+
+            case 'btn-sort-position':
+                app.deck_selection.refresh_deck({
+                    sort: 'position',
+                    maxcols: 1
+                });
+                break;
+
+            case 'btn-sort-sphere':
+                app.deck_selection.refresh_deck({
+                    sort: 'sphere',
+                    maxcols: 1
+                });
+                break;
+
+            case 'btn-sort-name':
+                app.deck_selection.refresh_deck({
+                    sort: 'name',
+                    maxcols: 1
+                });
+                break;
+
             case 'btn-export-bbcode':
                 app.deck.export_bbcode(true);
                 break;
