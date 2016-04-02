@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class FellowshipController extends Controller {
 
@@ -202,6 +203,7 @@ class FellowshipController extends Controller {
         $fellowship->setDescriptionHtml($descriptionHtml);
 
         $nb_decks = 0;
+        $skip = 0;
         for ($i = 1; $i <= 4; $i++) {
             $deck_id = intval(filter_var($request->request->get("deck".$i."_id"), FILTER_SANITIZE_NUMBER_INT));
             $is_decklist = filter_var($request->get("deck".$i."_is_decklist"), FILTER_SANITIZE_STRING) == 'true';
@@ -227,7 +229,7 @@ class FellowshipController extends Controller {
 
                     $fellowship_deck = new FellowshipDeck();
                     $fellowship_deck->setDeck($deck);
-                    $fellowship_deck->setDeckNumber($i);
+                    $fellowship_deck->setDeckNumber($i - $skip);
                     $fellowship_deck->setFellowship($fellowship);
 
                     $fellowship->addDeck($fellowship_deck);
@@ -241,14 +243,20 @@ class FellowshipController extends Controller {
 
                     $fellowship_decklist = new FellowshipDecklist();
                     $fellowship_decklist->setDecklist($decklist);
-                    $fellowship_decklist->setDeckNumber($i);
+                    $fellowship_decklist->setDeckNumber($i - $skip);
                     $fellowship_decklist->setFellowship($fellowship);
 
                     $fellowship->addDecklist($fellowship_decklist);
                 }
                 $nb_decks++;
+            } else {
+                $skip++;
             }
         }
+        if ($nb_decks == 0) {
+            throw new UnprocessableEntityHttpException("You can't save an empty fellowship.");
+        }
+
         $fellowship->setNbDecks($nb_decks);
 
         $em->persist($fellowship);
