@@ -1,9 +1,15 @@
 {% extends 'AppBundle::layout.html.twig' %}
 
-{% block title %}Error 404{% endblock %}
+{% block title %}Not Found{% endblock %}
 
 {% block body %}
     <div class="container">
-        <div class="alert alert-danger" role="alert">That page doesn't exist!</div>
+        <div class="alert alert-danger" role="alert">
+            {% if exception.message defined %}
+                {{ exception.message }}
+            {% else %}
+                That page doesn't exist!
+            {% endif %}
+        </div>
     </div>
 {% endblock %}
