@@ -75,6 +75,7 @@
                                                 {% set decklist = deck.decklist %}
                                                 {% set social = true %}
                                             {% endif %}
+
                                             <div class="fellowship-heroes" data-id="{{ decklist.id }}">
                                                 {% for hero in decklist.getSlots().getHeroDeck() %}
                                                     {% set card = hero.getCard() %}
@@ -85,7 +86,12 @@
                                             </div>
 
                                             <div class="fellowship-deck-info">
-                                                <h4 style=""><i>{{ decklist.name }}</i></h4>
+
+                                                {% if social %}
+                                                    <h4 style=""><i><a href="{{ path('decklist_detail', { decklist_id: decklist.id, 'decklist_name': decklist.nameCanonical|e('url') }) }}">{{ decklist.name }}</a></i></h4>
+                                                {% else %}
+                                                    <h4 style=""><i><a href="{{ path('deck_view', { deck_id: decklist.id }) }}">{{ decklist.name }}</a></i></h4>
+                                                {% endif %}
                                                 <span class="small fellowship-hero-text hidden-xs">
                                                     {% for hero in decklist.getSlots().getHeroDeck() %}
                                                         {% set card = hero.getCard() %}
