@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class FellowshipController extends Controller {
@@ -76,11 +77,11 @@ class FellowshipController extends Controller {
         $fellowship = $this->getDoctrine()->getRepository('AppBundle:Fellowship')->find($fellowship_id);
 
         if (!$fellowship) {
-            throw $this->createNotFoundException("This fellowship does not exists.");
+            throw new NotFoundHttpException("This fellowship does not exists.");
         }
 
         if ($user->getId() !== $fellowship->getUser()->getId()) {
-            throw $this->createAccessDeniedException("Access denied to this object.");
+            throw new UnauthorizedHttpException("Access denied to this object.");
         }
 
         $data = [
@@ -112,13 +113,13 @@ class FellowshipController extends Controller {
         $fellowship = $this->getDoctrine()->getManager()->getRepository('AppBundle:Fellowship')->find($fellowship_id);
 
         if (!$fellowship) {
-            throw $this->createNotFoundException("This fellowship does not exists.");
+            throw new NotFoundHttpException("This fellowship does not exists.");
         }
 
         $is_owner = $this->getUser() && $this->getUser()->getId() == $fellowship->getUser()->getId();
 
         if (!$fellowship->getUser()->getIsShareDecks() && !$is_owner) {
-            throw $this->createAccessDeniedException('You are not allowed to view this fellowship. To get access, you can ask the it\'s owner to enable "Share my decks" on their account.');
+            throw new UnauthorizedHttpException('You are not allowed to view this fellowship. To get access, you can ask the it\'s owner to enable "Share my decks" on their account.');
         }
 
         $data = [
@@ -160,11 +161,11 @@ class FellowshipController extends Controller {
             $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
 
             if (!$fellowship) {
-                throw $this->createNotFoundException("This fellowship does not exists.");
+                throw new NotFoundHttpException("This fellowship does not exists.");
             }
 
             if ($user->getId() !== $fellowship->getUser()->getId()) {
-                throw $this->createAccessDeniedException("Access denied to this object.");
+                throw new UnauthorizedHttpException("Access denied to this object.");
             }
 
             foreach ($fellowship->getDecks() as $deck) {
@@ -211,13 +212,13 @@ class FellowshipController extends Controller {
                     $deck = $em->getRepository('AppBundle:Deck')->find($deck_id);
 
                     if (!$deck) {
-                        throw $this->createNotFoundException("One of the selected decks does not exists.");
+                        throw new NotFoundHttpException("One of the selected decks does not exists.");
                     }
 
                     $deck_user = $deck->getUser();
                     $is_owner = $user->getId() == $deck_user->getId();
                     if (!$is_owner && !$deck_user->getIsShareDecks()) {
-                        throw $this->createAccessDeniedException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
+                        throw new UnauthorizedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
                     }
 
                     if (!$is_owner) {
@@ -235,7 +236,7 @@ class FellowshipController extends Controller {
                     $decklist = $em->getRepository('AppBundle:Decklist')->find($deck_id);
 
                     if (!$decklist) {
-                        throw $this->createNotFoundException("One of the selected decks does not exists.");
+                        throw new NotFoundHttpException("One of the selected decks does not exists.");
                     }
 
                     $fellowship_decklist = new FellowshipDecklist();

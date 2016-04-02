@@ -1,0 +1,9 @@
+{% extends 'AppBundle::layout.html.twig' %}
+
+{% block title %}Access Denied{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="alert alert-danger" role="alert">{{ exception.message }}</div>
+    </div>
+{% endblock %}
