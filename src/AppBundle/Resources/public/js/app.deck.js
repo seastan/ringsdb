@@ -340,7 +340,7 @@
         var threat = $('<div>Starting Threat: <b>' + deck.get_starting_threat() + '</b></div>')
 
         var text = [herocount, herocount == 1 ? ' Hero, ': ' Heroes, ', drawcount, drawcount == 1 ? ' Card': ' Cards' ].join(' ');
-        var sizeinfo = $('<div class="cardcount">' + text + '</div>');
+        var sizeinfo = $('<div class="deckcardcount">' + text + '</div>');
 
         if (drawcount < 50 || herocount == 0 || deck.get_hero_deck_size(true) > 3) {
             sizeinfo.addClass('text-danger');
@@ -455,14 +455,14 @@
                     .append($(card_line_tpl({ card: card })));
 
                 if (!deck.i_have_this_card(card)) {
-                    div.append(' <i class="fa fa-exclamation-triangle not-in-collection" title="This card is not in my collection."></i>');
+                    div.append('&#160;<i class="fa fa-exclamation-triangle not-in-collection" title="This card is not in my collection."></i>');
                 }
 
                 div.appendTo(section);
             } else {
                 var tpl = $(card_line_tpl({ card: card }));
 
-                var div = $('<div />').append(tpl).prepend(sortKey != 'type_code' || card.type_code != 'hero' ? card[key] + 'x ' : '').appendTo(section);
+                var div = $('<div />').append(tpl).prepend(sortKey != 'type_code' || card.type_code != 'hero' ? '<span class="card-count">' +card[key] + 'x</span> ' : '').appendTo(section);
 
                 if (card.is_unique && card.type_code != 'hero') {
                     div.find('a').css('font-weight', 'bold');
@@ -473,7 +473,8 @@
                 }
 
                 if (!deck.i_have_this_card(card)) {
-                    div.append(' <i class="fa fa-exclamation-triangle not-in-collection" title="This card is not in my collection"></i>');
+                    //div.append('&#160;<i class="fa fa-exclamation-triangle not-in-collection" title="This card is not in my collection"></i>');
+                    div.find('.card-count').addClass('limited-pool-conflict').attr('title', 'This card is not in my collection');
                 }
 
                 if (sortKey == 'pack_code') {
@@ -645,7 +646,7 @@
             });
 
 
-            var count = content.find('.cardcount').text();
+            var count = content.find('.deckcardcount').text();
             if (count) {
                 lines.push(count);
             }
@@ -705,7 +706,7 @@
             });
 
 
-            var count = content.find('.cardcount').text();
+            var count = content.find('.deckcardcount').text();
             if (count) {
                 lines.push(count);
             }
@@ -760,7 +761,7 @@
                 lines.push('');
             });
 
-            var count = content.find('.cardcount').text();
+            var count = content.find('.deckcardcount').text();
             if (count) {
                 lines.push(count);
             }

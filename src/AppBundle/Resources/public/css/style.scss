@@ -1246,12 +1246,24 @@ footer a {
   color: #999999;
 }
 
-.card-conflict {
+.unique-card-conflict {
   color: #DD0000;
 }
 
+.limited-pool-conflict {
+  font-weight: bold;
+  color: #FF9229;
+}
+
 .conflicted-hero {
-  border: 2px solid #DD0000;
+  .hero-thumbnail {
+    border: 1px solid #DD0000;
+    opacity: 0.2;
+  }
+
+  a {
+    text-decoration: line-through;
+  }
 }
 
 #table-suggestions .card-container {
@@ -1490,4 +1502,9 @@ footer a {
 .fellowships-table-buttons {
   float: right;
   margin-top: 25px;
+}
+
+.card-count {
+  width: 18px;
+  display: inline-block;
 }

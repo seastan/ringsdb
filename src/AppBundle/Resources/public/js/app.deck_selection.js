@@ -1,6 +1,7 @@
 (function(deck_selection, $) {
 
     var Decks = {};
+    var HeroConflicts = false;
 
     deck_selection.init = function(decks) {
         Decks = decks;
@@ -92,12 +93,22 @@
         deck_selection.show_conflicts();
     };
 
+    deck_selection.check_problems = function(e) {
+        if (HeroConflicts) {
+            e.preventDefault();
+            alert("You are not able to save a fellowship with conflicting heroes.");
+        }
+    };
+
     deck_selection.show_conflicts = function() {
         if (deck_selection.disable_conflict) {
             return;
         }
 
-        $('.card-conflict').remove();
+        HeroConflicts = false;
+        $('.conflicted-hero').removeClass('conflicted-hero');
+        $('.limited-pool-conflict').removeClass('limited-pool-conflict').removeAttr('title');
+        $('.card-conflict, .problem').remove();
 
         var cores = 1;
         if (app.user.data.owned_packs) {
@@ -113,6 +124,7 @@
         }
 
         var cardCount = {};
+        var cardNames = {};
         var cards;
         for (var i = 1; i <= 4; i++) {
             if (!Decks[i]) {
@@ -131,17 +143,39 @@
                     };
                 }
 
+                if (!cardNames[card.s_name]) {
+                    cardNames[card.s_name] = {
+                        total: 0,
+                        decks: 0
+                    }
+                }
+
                 cardCount[card.code].total += card.indeck;
                 cardCount[card.code].decks++;
+
+                cardNames[card.s_name].total += card.indeck;
+                cardNames[card.s_name].decks++;
             });
         }
 
         _.each(cardCount, function(record) {
             var card = record.card;
-            var errors = [];
 
-            if (card.is_unique && record.decks > 1) {
-                errors.push('This unique card is being used in more than one selected deck.');
+            // Adding ban symbol to repeated unique cards
+            if (card.is_unique && (record.decks > 1 || cardNames[card.s_name].decks > 1)) {
+                var div = $('.card[data-code="' + card.code + '"]');
+
+                if (card.type_code == 'hero') {
+                    HeroConflicts = true;
+                    div.parent().addClass('conflicted-hero');
+
+                    var content = div.closest('.deck-content');
+                    if (content.find('.problem').size() == 0) {
+                        $('<div class="text-danger problem"><span class="fa fa-exclamation-triangle"></span> Hero conflicts between selected decks</div>').insertAfter(content.find('.deckcardcount'));
+                    }
+                } else {
+                    div.after('&#160;<i class="fa fa-ban card-conflict text-danger" title="This unique card is being used in more than one selected deck."></i>');
+                }
             }
 
             var max_qty = card.quantity;
@@ -151,22 +185,10 @@
             }
 
             if (card.owned && record.total > max_qty) {
-                errors.push('A total of ' + record.total + ' copies of this card are being used between selected decks but you only have ' + max_qty + (max_qty == 1 ? ' copy' : ' copies') + ' in your collection.');
-            }
+                var span = $('.card[data-code="' + card.code + '"]').siblings('.card-count');
 
-            if (errors.length) {
-                var div = $('.card[data-code="' + card.code + '"]');
-                var mark = div.siblings('.fa-exclamation-triangle');
-                if (mark.size()) {
-                    errors.push(mark.eq(0).attr('title'));
-                    mark.hide();
-                }
-
-                if (card.type_code == 'hero') {
-                    div.siblings('.hero-thumbnail').addClass('conflicted-hero').attr('title', errors.join('\n\n'));
-                } else {
-                    div.after(' <i class="fa fa-ban card-conflict" title="' + errors.join('\n\n') + '"></i>');
-                }
+                span.addClass('limited-pool-conflict')
+                    .attr('title', 'A total of ' + record.total + ' copies of this card are being used between selected decks but you only have ' + max_qty + (max_qty == 1 ? ' copy' : ' copies') + ' in your collection.');
             }
         });
     };

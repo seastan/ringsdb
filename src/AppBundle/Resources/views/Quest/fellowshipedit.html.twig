@@ -31,7 +31,7 @@
         </div>
         {% endif %}
 
-        <form action="{{ path('fellowship_save') }}" method="post" enctype="application/x-www-form-urlencoded">
+        <form action="{{ path('fellowship_save') }}" method="post" enctype="application/x-www-form-urlencoded" onsubmit="app.deck_selection.check_problems(event)">
             <input type="hidden" name="deck1_id" />
             <input type="hidden" name="deck2_id" />
             <input type="hidden" name="deck3_id" />
