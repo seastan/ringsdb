@@ -55,9 +55,9 @@
                                                 {#<span class="fa fa-book fa-fw"></span>#}
                                             {#</button>#}
 
-                                            {#<a href="{{ path('fellowship_publish', { fellowship_id: fellowship.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" data-container="body" title="Publish">#}
-                                                {#<span class="fa fa-share fa-fw"></span>#}
-                                            {#</a>#}
+                                            <a href="{{ path('fellowship_view', { fellowship_id: fellowship.id }) }}" class="btn btn-xs btn-default disabled" disabled data-toggle="tooltip" data-container="body" title="Publish">
+                                                <span class="fa fa-share fa-fw"></span>
+                                            </a>
 
                                             <button class="btn btn-xs btn-default btn-delete-fellowship" data-toggle="tooltip" data-container="body" title="Delete">
                                                 <span class="fa fa-trash-o fa-fw"></span>
