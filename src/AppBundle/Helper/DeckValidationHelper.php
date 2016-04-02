@@ -64,8 +64,8 @@ class DeckValidationHelper {
             return '';
         }
         $labels = [
-            'too_many_heroes' => "Contains too many Heroes",
-            'too_few_heroes' => "Contains too few Heroes",
+            'too_many_heroes' => "Contains too many heroes",
+            'too_few_heroes' => "Contains too few heroes",
             'too_few_cards' => "Contains too few cards",
             'invalid_for_tournament_play' => "Invalid for tournament play for having less than 50 cards",
             'duplicated_unique_heroes' => "More than one hero with the same unique name",

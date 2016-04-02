@@ -80,11 +80,13 @@
             $('.selected-deck-placeholder').eq(selectedDeck - 1).addClass('hidden');
             $('.selected-deck-content').eq(selectedDeck - 1).removeClass('hidden');
             $('input[name="deck' + selectedDeck + '_id"]').val(Decks[selectedDeck].id);
+            $('input[name="deck' + selectedDeck + '_is_decklist"]').val(Decks[selectedDeck].is_published);
         } else {
             $('#deck' + selectedDeck + '-content').empty();
             $('.selected-deck-placeholder').eq(selectedDeck - 1).removeClass('hidden');
             $('.selected-deck-content').eq(selectedDeck - 1).addClass('hidden');
             $('input[name="deck' + selectedDeck + '_id"]').val('');
+            $('input[name="deck' + selectedDeck + '_is_decklist"]').val(false);
         }
 
         deck_selection.show_conflicts();
@@ -94,6 +96,8 @@
         if (deck_selection.disable_conflict) {
             return;
         }
+
+        $('.card-conflict').remove();
 
         var cores = 1;
         if (app.user.data.owned_packs) {
@@ -153,7 +157,7 @@
                 var mark = div.siblings('.fa-exclamation-triangle');
                 if (mark.size()) {
                     errors.push(mark.eq(0).attr('title'));
-                    mark.remove();
+                    mark.hide();
                 }
 
                 if (card.type_code == 'hero') {
@@ -179,7 +183,6 @@
         var tbody = $('#deckSelectionList').empty();
         var tr;
         var td;
-        var tags;
 
         if (!decks || decks.success === false) {
             $('<tr />')
@@ -190,9 +193,13 @@
         }
 
         _.each(decks, function(deck) {
+            if (deck.problem) {
+                return;
+            }
+
             var disabled = false;
             for (var i = 1; i <= 4; i++) {
-                if (Decks[i] && Decks[i].id == deck.id) {
+                if (Decks[i] && Decks[i].id == deck.id && Decks[i].is_published == deck.is_published) {
                     disabled = true;
                 }
             }
@@ -217,20 +224,24 @@
             td = $('<td />').appendTo(tr);
             td.text(deck.name + ' ' + deck.version + ' ');
 
-            if (deck.problem) {
-                td.append('<div class="text-danger small"><span class="fa fa-exclamation-triangle"></span> ' + app.deck.problem_labels[deck.problem] + '</div>');
+            if (deck.is_published) {
+                var social = [];
+                social.push('<span class="social-icons">');
+                social.push('<span class="social-icon-like"><span class="fa fa-heart"></span> <span class="num">' + deck.nb_votes + '</span></span>');
+                social.push('<span class="social-icon-favorite"><span class="fa fa-star"></span> <span class="num">' + deck.nb_favorites + '</span></span>');
+                social.push('<span class="social-icon-comment"><span class="fa fa-comment"></span> <span class="num">' + deck.nb_comments + '</span></span>');
+                social.push('</span>');
+
+                $('<div class="deck-info" />').append(social.join('')).appendTo(td);
+            } else {
+                $('<div class="tags"><span class="tag">Unpublished.</span></div>').appendTo(td);
             }
 
-            tags = $('<div class="tags" />').appendTo(td);
-            _.each(deck.tags.split(' '), function(tag) {
-                $('<span class="tag" />').text(tag).appendTo(tags);
-            });
-
-            td = $('<td class="decks-actions text-right" />').appendTo(tr);
-            var button = $('<a href="" class="btn btn-xs btn-default text-success" title="Select this Deck"><span class="fa fa-check fa-fw"></span></a>').appendTo(td);
+            td = $('<td class="deck-selection-actions text-right" />').appendTo(tr);
             if (disabled) {
-                button.addClass('disabled').css('cursor', 'not-allowed');
+                $('<label class="btn btn-xs btn-default disabled">Selected</label>').appendTo(td);
             } else {
+                var button = $('<a href="" class="btn btn-xs btn-default" title="Select this Deck"><span class="fa fa-check fa-fw text-success"></span></a>').appendTo(td);
                 button.on('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();

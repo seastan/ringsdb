@@ -17,9 +17,9 @@ app_decklist:
     resource: "@AppBundle/Resources/config/routing/routing_decklist.yml"
     prefix: /decklist
 
-#app_fellowship:
-#    resource: "@AppBundle/Resources/config/routing/routing_fellowship.yml"
-#    prefix: /fellowship
+app_fellowship:
+    resource: "@AppBundle/Resources/config/routing/routing_fellowship.yml"
+    prefix: /fellowship
 
 #app_questlog:
 #    resource: "@AppBundle/Resources/config/routing/routing_questlog.yml"
@@ -65,11 +65,11 @@ decks_list:
     defaults:
         _controller: AppBundle:Builder:list
 
-#fellowships_list:
-#    path: /fellowships
-#    methods: [GET]
-#    defaults:
-#        _controller: AppBundle:Fellowship:list
+fellowships_list:
+    path: /fellowships
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Fellowship:list
 
 decklist_byauthor:
     path: /d/{username}

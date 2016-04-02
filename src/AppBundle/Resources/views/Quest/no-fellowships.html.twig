@@ -1,0 +1,25 @@
+{% extends 'AppBundle::layout.html.twig' %}
+
+{% block body %}
+
+    <div class="jumbotron" id="no-fellowship-available">
+        <div class="container">
+            <h1>What, no fellowships?</h1>
+            <p>
+                A fellowship is a link between decks that work well together or are meant to be played together.
+                You can <span class="fake-inline-button text-primary"><span class="fa fa-pencil"></span> Edit</span> them until you're satisfied,
+                then <span class="fake-inline-button text-primary"><span class="fa fa-share"></span> Publish</span> them for others to discuss.
+            </p>
+            <p>
+                You can <span class="fake-inline-button text-primary"><span class="fa fa-plus"></span> Create</span> fellowships with one to four decks.
+                While fellowships with a single deck are great for solo play, the ones with multiple decks are great to play with your friends.
+                You are not limited to your own decks, but unpublished decks from other players will be copied to your collection after the fellowship is
+                <span class="fake-inline-button text-primary"><span class="fa fa-save"></span> Saved</span>.
+            </p>
+        </div>
+    </div>
+    <div style="text-align:center">
+        <a href="{{ path('fellowship_new') }}" class="btn btn-default btn-lg"><span class="fa fa-plus"></span> Create a Fellowship</a>
+    </div>
+
+{% endblock %}

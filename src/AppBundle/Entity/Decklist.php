@@ -5,6 +5,10 @@ namespace AppBundle\Entity;
 class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializable {
     public function jsonSerialize() {
         $array = parent::getArrayExport();
+        $array['is_published'] = true;
+        $array['nb_votes'] = $this->getNbVotes();
+        $array['nb_favorites'] = $this->getNbFavorites();
+        $array['nb_comments'] = $this->getNbComments();
 
         return $array;
     }
@@ -298,7 +302,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      *
      * @return integer
      */
-    public function getnbVotes() {
+    public function getNbVotes() {
         return $this->nbVotes;
     }
 
@@ -772,5 +776,19 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      */
     public function getFellowships() {
         return $this->fellowships;
+    }
+
+
+    // Used to reduce json export data
+    private $is_simple_export;
+
+    public function setIsSimpleExport($is_simple_export) {
+        $this->is_simple_export = $is_simple_export;
+
+        return $this;
+    }
+
+    public function getIsSimpleExport() {
+        return $this->is_simple_export;
     }
 }

@@ -95,7 +95,7 @@ class FellowshipDecklist {
      * @return \AppBundle\Entity\Decklist
      */
     public function getDecklist() {
-        return $this->$decklist;
+        return $this->decklist;
     }
 
     /**
@@ -105,8 +105,7 @@ class FellowshipDecklist {
      *
      * @return FellowshipDecklist
      */
-    public function setDecklist(\AppBundle\Entity\Decklist $decklist = null)
-    {
+    public function setDecklist(\AppBundle\Entity\Decklist $decklist = null) {
         $this->decklist = $decklist;
 
         return $this;

@@ -275,7 +275,7 @@ class SocialController extends Controller {
             throw new UnauthorizedHttpException("You don't have access to this decklist.");
         }
 
-        if ($decklist->getnbVotes() || $decklist->getNbfavorites() || $decklist->getNbcomments()) {
+        if ($decklist->getNbVotes() || $decklist->getNbfavorites() || $decklist->getNbcomments()) {
             throw new UnauthorizedHttpException("Cannot delete this decklist.");
         }
 

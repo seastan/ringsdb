@@ -6,6 +6,7 @@ class ExportableDeck {
     public function getArrayExport($withUnsavedChanges = false) {
         $slots = $this->getSlots();
         $sideslots = $this->getSideslots();
+
         $array = [
             'id' => $this->getId(),
             'name' => $this->getName(),

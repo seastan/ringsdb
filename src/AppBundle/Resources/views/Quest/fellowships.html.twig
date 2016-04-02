@@ -55,9 +55,9 @@
                                                 {#<span class="fa fa-book fa-fw"></span>#}
                                             {#</button>#}
 
-                                            <a href="{{ path('fellowship_publish', { fellowship_id: fellowship.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" data-container="body" title="Publish">
-                                                <span class="fa fa-share fa-fw"></span>
-                                            </a>
+                                            {#<a href="{{ path('fellowship_publish', { fellowship_id: fellowship.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" data-container="body" title="Publish">#}
+                                                {#<span class="fa fa-share fa-fw"></span>#}
+                                            {#</a>#}
 
                                             <button class="btn btn-xs btn-default btn-delete-fellowship" data-toggle="tooltip" data-container="body" title="Delete">
                                                 <span class="fa fa-trash-o fa-fw"></span>
@@ -68,8 +68,15 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         {% for deck in decks %}
-                                            <div class="fellowship-heroes" data-id="{{ deck.deck.id }}">
-                                                {% for hero in deck.deck.getSlots().getHeroDeck() %}
+                                            {% if deck.deck is defined %}
+                                                {% set decklist = deck.deck %}
+                                                {% set social = false %}
+                                            {% else %}
+                                                {% set decklist = deck.decklist %}
+                                                {% set social = true %}
+                                            {% endif %}
+                                            <div class="fellowship-heroes" data-id="{{ decklist.id }}">
+                                                {% for hero in decklist.getSlots().getHeroDeck() %}
                                                     {% set card = hero.getCard() %}
                                                     <div class="decklist-hero border-light-{{ card.sphere.code }}">
                                                         <div class="hero-thumbnail card-thumbnail-4x card-thumbnail-hero card card-tip" style="background-image:url('{{ asset('/bundles/cards/' ~ card.code ~ '.png') }}')" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false"></div>
@@ -78,15 +85,18 @@
                                             </div>
 
                                             <div class="fellowship-deck-info">
-                                                <h4 style=""><i>{{ deck.deck.name }}</i></h4>
+                                                <h4 style=""><i>{{ decklist.name }}</i></h4>
                                                 <span class="small fellowship-hero-text hidden-xs">
-                                                    {% for hero in deck.deck.getSlots().getHeroDeck() %}
+                                                    {% for hero in decklist.getSlots().getHeroDeck() %}
                                                         {% set card = hero.getCard() %}
                                                         <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" href="">
                                                             <span class="icon-{{ card.sphere.code }}"></span> {{ card.name }} <i>({{ card.pack.code }})</i>
                                                         </a>
                                                     {% endfor %}
                                                 </span>
+                                                {% if social %}
+                                                    <small class="social">{{ macros.static_social_icons(decklist) }}</small>
+                                                {% endif %}
                                             </div>
                                             <div class="block" style="height: 15px; clear:both;"></div>
                                         {% endfor %}

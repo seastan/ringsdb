@@ -3,9 +3,12 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\Fellowship;
 use AppBundle\Entity\FellowshipDeck;
+use AppBundle\Entity\FellowshipDecklist;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class FellowshipController extends Controller {
 
@@ -80,8 +83,6 @@ class FellowshipController extends Controller {
             throw $this->createAccessDeniedException("Access denied to this object.");
         }
 
-        /* @var $fellowship_decks \AppBundle\Entity\FellowshipDeck[] */
-        $fellowship_decks = $fellowship->getDecks();
         $data = [
             'pagetitle' => "Edit Fellowship",
             'deck1' => null,
@@ -91,8 +92,16 @@ class FellowshipController extends Controller {
             'fellowship' => $fellowship
         ];
 
+        /* @var $fellowship_decks \AppBundle\Entity\FellowshipDeck[] */
+        $fellowship_decks = $fellowship->getDecks();
         foreach ($fellowship_decks as $fellowship_deck) {
             $data['deck' . $fellowship_deck->getDeckNumber()] = $fellowship_deck->getDeck();
+        }
+
+        /* @var $fellowship_decks \AppBundle\Entity\FellowshipDecklist[] */
+        $fellowship_decklists = $fellowship->getDecklists();
+        foreach ($fellowship_decklists as $fellowship_decklist) {
+            $data['deck' . $fellowship_decklist->getDeckNumber()] = $fellowship_decklist->getDecklist();
         }
 
         return $this->render('AppBundle:Quest:fellowshipedit.html.twig', $data, $response);
@@ -112,8 +121,6 @@ class FellowshipController extends Controller {
             throw $this->createAccessDeniedException('You are not allowed to view this fellowship. To get access, you can ask the it\'s owner to enable "Share my decks" on their account.');
         }
 
-        /* @var $fellowship_decks \AppBundle\Entity\FellowshipDeck[] */
-        $fellowship_decks = $fellowship->getDecks();
         $data = [
             'pagetitle' => "Fellowship",
             'deck1' => null,
@@ -124,8 +131,16 @@ class FellowshipController extends Controller {
             'is_owner' => $is_owner,
         ];
 
+        /* @var $fellowship_decks \AppBundle\Entity\FellowshipDeck[] */
+        $fellowship_decks = $fellowship->getDecks();
         foreach ($fellowship_decks as $fellowship_deck) {
             $data['deck' . $fellowship_deck->getDeckNumber()] = $fellowship_deck->getDeck();
+        }
+
+        /* @var $fellowship_decks \AppBundle\Entity\FellowshipDecklist[] */
+        $fellowship_decklists = $fellowship->getDecklists();
+        foreach ($fellowship_decklists as $fellowship_decklist) {
+            $data['deck' . $fellowship_decklist->getDeckNumber()] = $fellowship_decklist->getDecklist();
         }
 
         return $this->render('AppBundle:Quest:fellowshipview.html.twig', $data);
@@ -156,12 +171,18 @@ class FellowshipController extends Controller {
                 $fellowship->removeDeck($deck);
                 $em->remove($deck);
             }
+
+            foreach ($fellowship->getDecklists() as $deck) {
+                $fellowship->removeDecklist($deck);
+                $em->remove($deck);
+            }
         } else {
             $fellowship = new Fellowship();
             $fellowship->setIsPublic(false);
             $fellowship->setNbVotes(0);
             $fellowship->setNbComments(0);
             $fellowship->setNbFavorites(0);
+            $fellowship->setNbDecks(0);
         }
 
         $name = trim(filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
@@ -179,30 +200,55 @@ class FellowshipController extends Controller {
         $fellowship->setDescriptionMd($descriptionMd);
         $fellowship->setDescriptionHtml($descriptionHtml);
 
+        $nb_decks = 0;
         for ($i = 1; $i <= 4; $i++) {
             $deck_id = intval(filter_var($request->request->get("deck".$i."_id"), FILTER_SANITIZE_NUMBER_INT));
+            $is_decklist = filter_var($request->get("deck".$i."_is_decklist"), FILTER_SANITIZE_STRING) == 'true';
 
             if ($deck_id) {
-                /* @var $deck \AppBundle\Entity\Deck */
-                $deck = $em->getRepository('AppBundle:Deck')->find($deck_id);
+                if (!$is_decklist) {
+                    /* @var $deck \AppBundle\Entity\Deck */
+                    $deck = $em->getRepository('AppBundle:Deck')->find($deck_id);
 
-                if (!$deck) {
-                    throw $this->createNotFoundException("One of the selected decks does not exists.");
+                    if (!$deck) {
+                        throw $this->createNotFoundException("One of the selected decks does not exists.");
+                    }
+
+                    $deck_user = $deck->getUser();
+                    $is_owner = $user->getId() == $deck_user->getId();
+                    if (!$is_owner && !$deck_user->getIsShareDecks()) {
+                        throw $this->createAccessDeniedException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
+                    }
+
+                    if (!$is_owner) {
+                        $deck = $this->get('decks')->cloneDeck($deck, $user);
+                    }
+
+                    $fellowship_deck = new FellowshipDeck();
+                    $fellowship_deck->setDeck($deck);
+                    $fellowship_deck->setDeckNumber($i);
+                    $fellowship_deck->setFellowship($fellowship);
+
+                    $fellowship->addDeck($fellowship_deck);
+                } else {
+                    /* @var $decklist \AppBundle\Entity\Decklist */
+                    $decklist = $em->getRepository('AppBundle:Decklist')->find($deck_id);
+
+                    if (!$decklist) {
+                        throw $this->createNotFoundException("One of the selected decks does not exists.");
+                    }
+
+                    $fellowship_decklist = new FellowshipDecklist();
+                    $fellowship_decklist->setDecklist($decklist);
+                    $fellowship_decklist->setDeckNumber($i);
+                    $fellowship_decklist->setFellowship($fellowship);
+
+                    $fellowship->addDecklist($fellowship_decklist);
                 }
-
-                $deck_user = $deck->getUser();
-                if (!$deck_user->getIsShareDecks() && $user->getId() != $deck_user->getId()) {
-                    throw $this->createAccessDeniedException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
-                }
-
-                $fellowship_deck = new FellowshipDeck();
-                $fellowship_deck->setDeck($deck);
-                $fellowship_deck->setDeckNumber($i);
-                $fellowship_deck->setFellowship($fellowship);
-
-                $fellowship->addDeck($fellowship_deck);
+                $nb_decks++;
             }
         }
+        $fellowship->setNbDecks($nb_decks);
 
         $em->persist($fellowship);
         $em->flush();
@@ -234,7 +280,7 @@ class FellowshipController extends Controller {
             throw new UnauthorizedHttpException("You don't have access to this fellowship.");
         }
 
-        if ($fellowship->getnbVotes() || $fellowship->getNbfavorites() || $fellowship->getNbcomments()) {
+        if ($fellowship->getNbVotes() || $fellowship->getNbfavorites() || $fellowship->getNbcomments()) {
             $this->get('session')->getFlashBag()->set('danger', "You can't delete a published fellowship.");
         } else {
             /* @var $decks \AppBundle\Entity\FellowshipDeck[] */
@@ -254,5 +300,88 @@ class FellowshipController extends Controller {
         }
 
         return $this->redirect($this->generateUrl('fellowships_list'));
+    }
+
+    public function octgnexportAction($fellowship_id) {
+        return $this->downloadFromSelection($fellowship_id, true);
+    }
+
+    public function textexportAction($fellowship_id) {
+        return $this->downloadFromSelection($fellowship_id, false);
+    }
+
+    public function downloadFromSelection($fellowship_id, $octgn) {
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $user \AppBundle\Entity\User */
+        $user = $this->getUser();
+        if (!$user) {
+            throw new UnauthorizedHttpException("You must be logged in for this operation.");
+        }
+
+        /* @var $fellowship \AppBundle\Entity\Fellowship */
+        $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+        if (!$fellowship) {
+            throw new UnauthorizedHttpException("You don't have access to this fellowship.");
+        }
+
+        $fellowship_user = $fellowship->getUser();
+
+        if ($fellowship_user->getId() != $user->getId() && !$fellowship_user->getIsShareDecks()) {
+            throw new UnauthorizedHttpException("You don't have access to this fellowship.");
+        }
+
+        $file = tempnam("tmp", "zip");
+        $zip = new \ZipArchive();
+        $res = $zip->open($file, \ZipArchive::OVERWRITE);
+
+        if ($res === true) {
+            $decks = [];
+
+            /* @var $fellowship_decks \AppBundle\Entity\FellowshipDeck[] */
+            $fellowship_decks = $fellowship->getDecks();
+            foreach ($fellowship_decks as $fellowship_deck) {
+                $decks[] = $fellowship_deck->getDeck();
+            }
+
+            /* @var $fellowship_decks \AppBundle\Entity\FellowshipDecklist[] */
+            $fellowship_decklists = $fellowship->getDecklists();
+            foreach ($fellowship_decklists as $fellowship_decklist) {
+                $decks[] = $fellowship_decklist->getDecklist();
+            }
+
+            foreach ($decks as $deck) {
+                if (!$deck) {
+                    continue;
+                }
+
+                if ($octgn) {
+                    $extension = 'o8d';
+                    $content = $this->renderView('AppBundle:Export:octgn.xml.twig', [
+                        "deck" => $deck->getTextExport()
+                    ]);
+                } else {
+                    $extension = 'txt';
+                    $content = $this->renderView('AppBundle:Export:plain.txt.twig', [
+                        "deck" => $deck->getTextExport()
+                    ]);
+                }
+
+                $filename = $this->get('texts')->slugify($deck->getName()) . ' ' . $deck->getVersion() . '.' . $extension;
+
+                $zip->addFromString($filename, $content);
+            }
+            $zip->close();
+        }
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/zip');
+        $response->headers->set('Content-Length', filesize($file));
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->get('texts')->slugify('RingsDB - Fellowship ' . $fellowship_id) . '.zip'));
+
+        $response->setContent(file_get_contents($file));
+        unlink($file);
+
+        return $response;
     }
 }

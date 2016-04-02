@@ -6,8 +6,6 @@
         $('#deleteModal').modal('show');
     };
 
-
-
     ui.do_action_deck = function (event) {
         var action_id = $(this).attr('id');
         if (!action_id) {
@@ -36,11 +34,13 @@
                 break;
 
             case 'btn-download-text':
-                ui.download_text_selection(_.pluck(Decks, 'id'));
+                event.preventDefault();
+                ui.download_text(Fellowship.id);
                 break;
 
             case 'btn-download-octgn':
-                ui.download_octgn_selection(_.pluck(Decks, 'id'));
+                event.preventDefault();
+                ui.download_octgn(Fellowship.id);
                 break;
 
             case 'btn-log-quest':
@@ -48,22 +48,27 @@
                 event.stopPropagation();
 
                 var ids = _.pluck(Decks, 'id');
+                var publisheds = _.pluck(Decks, 'is_published');
                 ui.log_quest({
                     'deck1_id': ids[0],
                     'deck2_id': ids[1],
                     'deck3_id': ids[2],
-                    'deck4_id': ids[3]
+                    'deck4_id': ids[3],
+                    'deck1_is_decklist': publisheds[0],
+                    'deck2_is_decklist': publisheds[1],
+                    'deck3_is_decklist': publisheds[2],
+                    'deck4_is_decklist': publisheds[3]
                 });
                 break;
         }
     };
 
-    ui.download_text_selection = function(ids) {
-        window.location = Routing.generate('deck_export_text_list', { ids: ids });
+    ui.download_text = function(id) {
+        window.location = Routing.generate('fellowship_export_text', { fellowship_id: id });
     };
 
-    ui.download_octgn_selection = function(ids) {
-        window.location = Routing.generate('deck_export_octgn_list', { ids: ids });
+    ui.download_octgn = function(id) {
+        window.location = Routing.generate('fellowship_export_octgn', { fellowship_id: id });
     };
 
     ui.log_quest = function(data) {

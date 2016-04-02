@@ -167,6 +167,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
 
     public function jsonSerialize() {
         $array = parent::getArrayExport();
+        $array['is_published'] = false;
         $array['problem'] = $this->getProblem();
         $array['tags'] = $this->getTags();
 

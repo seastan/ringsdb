@@ -2,6 +2,7 @@
 
 namespace AppBundle\Services;
 
+use AppBundle\Entity\Deck;
 use Doctrine\ORM\EntityManager;
 use AppBundle\Entity\Deckslot;
 use AppBundle\Entity\Decksideslot;
@@ -29,7 +30,43 @@ class Decks {
         return $list;
     }
 
+    public function cloneDeck($deck, $user) {
+        /* @var $deck \AppBundle\Entity\Deck */
+        if (!$deck) {
+            throw new NotFoundHttpException("This deck doesn't exist.");
+        }
+
+        $content = [
+            'main' => [],
+            'side' => []
+        ];
+
+        foreach ($deck->getSlots() as $slot) {
+            $content['main'][$slot->getCard()->getCode()] = $slot->getQuantity();
+        }
+
+        foreach ($deck->getSideslots() as $slot) {
+            $content['side'][$slot->getCard()->getCode()] = $slot->getQuantity();
+        }
+
+        $name = $deck->getName();
+        $description = $deck->getDescriptionMd();
+        $decklist_id = $deck->getParent() ? $deck->getParent()->getId() : null;
+        $tags = '';
+
+        if (empty($name)) {
+            $name = 'Untitled Deck';
+        }
+
+        /* @var $deck \AppBundle\Entity\Deck */
+        $deck = new Deck();
+        $this->saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, null);
+        $this->doctrine->flush();
+        return $deck;
+    }
+
     public function saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, $source_deck) {
+        /* @var $deck \AppBundle\Entity\Deck */
         if ($decklist_id) {
             $decklist = $this->doctrine->getRepository('AppBundle:Decklist')->find($decklist_id);
             if ($decklist) {

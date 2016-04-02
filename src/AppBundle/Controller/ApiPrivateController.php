@@ -13,13 +13,26 @@ class ApiPrivateController extends Controller {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
+        /* @var $decklists \AppBundle\Entity\Decklist[] */
+        $decklists = $em->getRepository('AppBundle:Decklist')->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC']);
+
+        foreach($decklists as &$decklist) {
+            $decklist->setDescriptionMd('');
+        }
+
         /* @var $decks \AppBundle\Entity\Deck[] */
-		$decks = $em->getRepository('AppBundle:Deck')->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC']);
+        $decks = $em->getRepository('AppBundle:Deck')->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC']);
+
+        foreach($decks as &$deck) {
+            $deck->setDescriptionMd('');
+        }
+
+        $decklists = array_merge($decklists, $decks);
 
         $dateUpdates = array_map(function($deck) {
             /* @var $deck \AppBundle\Entity\Deck */
 			return $deck->getDateUpdate();
-		}, $decks);
+		}, $decklists);
 
         if (count($dateUpdates)) {
             $response->setLastModified(max($dateUpdates));
@@ -28,7 +41,7 @@ class ApiPrivateController extends Controller {
             }
         }
 
-		$content = json_encode($decks);
+		$content = json_encode($decklists);
 
 		$response->headers->set('Content-Type', 'application/json');
 		$response->setContent($content);
@@ -57,25 +70,30 @@ class ApiPrivateController extends Controller {
             return $response;
         }
 
-        if (!$user->getIsShareDecks() && $user->getId() != $this->getUser()->getId()) {
-            $content = json_encode([
-                'success' => false,
-                'error' => 'You are not allowed to view this user\'s decks. To get access, you can ask him/her to enable "Share my decks" on their account.'
-            ]);
+        $show_private_decks = $user->getIsShareDecks() || $user->getId() == $this->getUser()->getId();
 
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent($content);
+        /* @var $decklists \AppBundle\Entity\Decklist[] */
+        $decklists = $em->getRepository('AppBundle:Decklist')->findBy(['user' => $user], ['dateCreation' => 'DESC']);
 
-            return $response;
+        foreach($decklists as &$decklist) {
+            $decklist->setDescriptionMd('');
         }
 
-        /* @var $decks \AppBundle\Entity\Deck[] */
-		$decks = $em->getRepository('AppBundle:Deck')->findBy(['user' => $user], ['dateCreation' => 'DESC']);
+        if ($show_private_decks) {
+            /* @var $decks \AppBundle\Entity\Deck[] */
+            $decks = $em->getRepository('AppBundle:Deck')->findBy(['user' => $user], ['dateCreation' => 'DESC']);
 
-		$dateUpdates = array_map(function($deck) {
+            foreach($decks as &$deck) {
+                $deck->setDescriptionMd('');
+            }
+
+            $decklists = array_merge($decklists, $decks);
+        }
+
+        $dateUpdates = array_map(function($deck) {
             /* @var $deck \AppBundle\Entity\Deck */
             return $deck->getDateUpdate();
-		}, $decks);
+		}, $decklists);
 
         if (count($dateUpdates)) {
             $response->setLastModified(max($dateUpdates));
@@ -84,7 +102,7 @@ class ApiPrivateController extends Controller {
             }
         }
 
-		$content = json_encode($decks);
+		$content = json_encode($decklists);
 
 		$response->headers->set('Content-Type', 'application/json');
 		$response->setContent($content);
