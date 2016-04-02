@@ -108,6 +108,8 @@
             if (app.user.data.owned_packs.match(/1-3/)) {
                 cores++;
             }
+        } else {
+            cores = 3;
         }
 
         var cardCount = {};
