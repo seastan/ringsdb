@@ -61,8 +61,10 @@
                             <tr><th colspan="2"><span class="fa fa-users"></span> Fellowships</th></tr>
                             </thead>
                             <tbody>
-                            {% if deck.fellowships | length %}
-                                {% for fellowship in deck.fellowships %}
+                            {% set fellowships = deck.allFellowships %}
+
+                            {% if fellowships | length %}
+                                {% for fellowship in fellowships %}
                                     {{ macros.fellowship_deck_table_row(fellowship.fellowship) }}
                                 {% endfor %}
                             {% else %}

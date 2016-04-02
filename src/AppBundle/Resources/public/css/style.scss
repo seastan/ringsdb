@@ -1514,6 +1514,10 @@ footer a {
     width: 80px;
     text-align: right;
   }
+
+  td:first-child {
+    text-align: left;
+  }
 }
 
 #table-predecessor {

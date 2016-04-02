@@ -647,6 +647,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      * @var \Doctrine\Common\Collections\Collection
      */
     private $fellowships;
+    private $allFellowships;
 
     /**
      * Add fellowship
@@ -677,5 +678,20 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      */
     public function getFellowships() {
         return $this->fellowships;
+    }
+
+    /**
+     * Get allFellowships
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getAllFellowships() {
+        $childrenFellowships = $this->getFellowships()->toArray();
+
+        foreach($this->getChildren() as &$child) {
+            $childrenFellowships = array_merge($childrenFellowships, $child->getFellowships()->toArray());
+        }
+
+        return array_unique($childrenFellowships);
     }
 }
