@@ -105,17 +105,27 @@
         if (deckcount == 3) {
             $('.selected-decks .deck')
                 .removeClass('col-md-3')
-                .removeClass('col-sm-6')
-                .addClass('col-sm-4');
+                .addClass('col-md-4');
         } else if (deckcount == 2) {
+            $('.selected-decks .deck')
+                .removeClass('col-md-3')
+                .removeClass('col-sm-6')
+                .addClass('col-md-3')
+                .addClass('col-sm-6');
+
+            $('<div class="col-md-6 col-sm-12"></div>').append($('#description')).appendTo('.selected-decks');
+        } else if (deckcount == 1) {
             $('.selected-decks .deck')
                 .removeClass('col-md-3')
                 .removeClass('col-sm-6')
                 .addClass('col-md-6')
                 .find('.selected-deck-content')
                 .removeClass('small');
+
             app.deck_selection.cols = 2;
+            $('<div class="col-md-6"></div>').append($('#description')).appendTo('.selected-decks');
         }
+
 
         $('.selected-decks').removeClass('hidden');
     };

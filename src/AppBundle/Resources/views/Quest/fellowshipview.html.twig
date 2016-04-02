@@ -65,38 +65,39 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-12">
-                <h3 class="username">
-                    <span class="fa fa-user"></span>
-                    {{ macros.username(fellowship.user) }}
-                </h3>
+        <div id="description">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="username">
+                        <span class="fa fa-user"></span>
+                        {{ macros.username(fellowship.user) }}
+                    </h3>
+                </div>
             </div>
-        </div>
 
-        <div class="row hidden-print">
-            <div class="col-md-12" id="btn-group-deck">
-                {% include 'AppBundle:Quest:toolbar.html.twig' %}
+            <div class="row hidden-print">
+                <div class="col-md-12" id="btn-group-deck">
+                    {% include 'AppBundle:Quest:toolbar.html.twig' %}
+                </div>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-default" style="margin-bottom: 0">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Description</h3>
-                    </div>
-                    <div class="panel-body" id="fellowship-description">
-                        {% if fellowship.descriptionHtml is empty  %}
-                            <i>No description.</i>
-                        {% else %}
-                            {{ fellowship.descriptionHtml | raw }}
-                        {% endif %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default" style="margin-bottom: 0">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Description</h3>
+                        </div>
+                        <div class="panel-body" id="fellowship-description">
+                            {% if fellowship.descriptionHtml is empty  %}
+                                <i>No description.</i>
+                            {% else %}
+                                {{ fellowship.descriptionHtml | raw }}
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 
     {% include 'AppBundle:Modale:delete_fellowship.html.twig' %}
