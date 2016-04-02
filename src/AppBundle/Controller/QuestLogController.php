@@ -2,14 +2,7 @@
 namespace AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use AppBundle\Entity\Deck;
-use Symfony\Component\HttpFoundation\Request;
-use AppBundle\Entity\Deckchange;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class QuestLogController extends Controller {
 

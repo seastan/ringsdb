@@ -1,21 +1,21 @@
 <?php
 namespace AppBundle\Controller;
 
-use \DateTime;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use AppBundle\Entity\Comment;
 use AppBundle\Entity\Deck;
 use AppBundle\Entity\Decklist;
-use AppBundle\Entity\Comment;
 use AppBundle\Entity\User;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use AppBundle\Form\DecklistType;
 use AppBundle\Model\DecklistManager;
 use AppBundle\Services\Pagination;
-use AppBundle\Form\DecklistType;
+use DateTime;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class SocialController extends Controller {
@@ -267,16 +267,16 @@ class SocialController extends Controller {
 
         $user = $this->getUser();
         if (!$user) {
-            throw new UnauthorizedHttpException("You must be logged in for this operation.");
+            throw new AccessDeniedHttpException("You must be logged in for this operation.");
         }
 
         $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
         if (!$decklist || $decklist->getUser()->getId() != $user->getId()) {
-            throw new UnauthorizedHttpException("You don't have access to this decklist.");
+            throw new AccessDeniedHttpException("You don't have access to this decklist.");
         }
 
         if ($decklist->getNbVotes() || $decklist->getNbfavorites() || $decklist->getNbcomments()) {
-            throw new UnauthorizedHttpException("Cannot delete this decklist.");
+            throw new AccessDeniedHttpException("Cannot delete this decklist.");
         }
 
         $precedent = $decklist->getPrecedent();
@@ -516,7 +516,7 @@ class SocialController extends Controller {
 
         $user = $this->getUser();
         if (!$user) {
-            throw new UnauthorizedHttpException('You must be logged in to comment.');
+            throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 
         $decklist_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
@@ -566,7 +566,7 @@ class SocialController extends Controller {
         /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
-            throw new UnauthorizedHttpException('You must be logged in to comment.');
+            throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 
         $decklist_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
@@ -652,7 +652,7 @@ class SocialController extends Controller {
         /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
-            throw new UnauthorizedHttpException('You must be logged in to comment.');
+            throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 
         /* @var $em \Doctrine\ORM\EntityManager */
@@ -682,7 +682,7 @@ class SocialController extends Controller {
 
         $user = $this->getUser();
         if (!$user) {
-            throw new UnauthorizedHttpException('You must be logged in to comment.');
+            throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 
         $decklist_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);

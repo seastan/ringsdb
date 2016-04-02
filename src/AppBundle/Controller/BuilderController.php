@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\Deck;
 use AppBundle\Entity\Deckchange;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class BuilderController extends Controller {
@@ -45,7 +45,7 @@ class BuilderController extends Controller {
         }
 
         if ($this->getUser()->getId() != $deck->getUser()->getId()) {
-            throw new UnauthorizedHttpException("You are not allowed to view this deck.");
+            throw new AccessDeniedHttpException("You are not allowed to view this deck.");
         }
 
         return $this->render('AppBundle:Builder:deckedit.html.twig', [
@@ -68,7 +68,7 @@ class BuilderController extends Controller {
         $is_owner = $this->getUser() && $this->getUser()->getId() == $deck->getUser()->getId();
 
         if (!$deck->getUser()->getIsShareDecks() && !$is_owner) {
-            throw new UnauthorizedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
+            throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
         }
 
         return $this->render('AppBundle:Builder:deckview.html.twig', [
@@ -277,7 +277,7 @@ class BuilderController extends Controller {
         $is_owner = $this->getUser() && $this->getUser()->getId() == $deck->getUser()->getId();
 
         if (!$deck->getUser()->getIsShareDecks() && !$is_owner) {
-            throw new UnauthorizedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
+            throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
         }
 
         $content = $this->renderView('AppBundle:Export:plain.txt.twig', [
@@ -309,7 +309,7 @@ class BuilderController extends Controller {
         $is_owner = $this->getUser() && $this->getUser()->getId() == $deck->getUser()->getId();
 
         if (!$deck->getUser()->getIsShareDecks() && !$is_owner) {
-            throw new UnauthorizedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
+            throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
         }
 
         $content = $this->renderView('AppBundle:Export:octgn.xml.twig', [
@@ -340,7 +340,7 @@ class BuilderController extends Controller {
         $is_owner = $this->getUser() && $this->getUser()->getId() == $deck->getUser()->getId();
 
         if (!$deck->getUser()->getIsShareDecks() && !$is_owner) {
-            throw new UnauthorizedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
+            throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
         }
 
         $content = [
@@ -382,7 +382,7 @@ class BuilderController extends Controller {
             $deck = $em->getRepository('AppBundle:Deck')->find($id);
 
             if (!$deck || $user->getId() != $deck->getUser()->getId()) {
-                throw new UnauthorizedHttpException("You don't have access to this deck.");
+                throw new AccessDeniedHttpException("You don't have access to this deck.");
             }
 
             $source_deck = $deck;
@@ -436,7 +436,7 @@ class BuilderController extends Controller {
         }
 
         if ($this->getUser()->getId() != $deck->getUser()->getId()) {
-            throw new UnauthorizedHttpException("You don't have access to this deck.");
+            throw new AccessDeniedHttpException("You don't have access to this deck.");
         }
 
         if (count($deck->getFellowships())) {
@@ -499,12 +499,12 @@ class BuilderController extends Controller {
 
         $is_owner = $this->getUser() && $this->getUser()->getId() == $deck1->getUser()->getId();
         if (!$deck1->getUser()->getIsShareDecks() && !$is_owner) {
-            throw new UnauthorizedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
+            throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
         }
 
         $is_owner = $this->getUser() && $this->getUser()->getId() == $deck2->getUser()->getId();
         if (!$deck2->getUser()->getIsShareDecks() && !$is_owner) {
-            throw new UnauthorizedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
+            throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
         }
 
         $diff = $this->get('diff');
@@ -732,7 +732,7 @@ class BuilderController extends Controller {
         }
 
         if ($user->getId() != $deck->getUser()->getId()) {
-            throw new UnauthorizedHttpException("You don't have access to this deck.");
+            throw new AccessDeniedHttpException("You don't have access to this deck.");
         }
 
         $diff = (array) json_decode($request->get('diff'));

@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class FellowshipController extends Controller {
 
@@ -81,7 +81,7 @@ class FellowshipController extends Controller {
         }
 
         if ($user->getId() !== $fellowship->getUser()->getId()) {
-            throw new UnauthorizedHttpException("Access denied to this object.");
+            throw new AccessDeniedHttpException("Access denied to this object.");
         }
 
         $data = [
@@ -119,7 +119,7 @@ class FellowshipController extends Controller {
         $is_owner = $this->getUser() && $this->getUser()->getId() == $fellowship->getUser()->getId();
 
         if (!$fellowship->getUser()->getIsShareDecks() && !$is_owner) {
-            throw new UnauthorizedHttpException('You are not allowed to view this fellowship. To get access, you can ask the it\'s owner to enable "Share my decks" on their account.');
+            throw new AccessDeniedHttpException('You are not allowed to view this fellowship. To get access, you can ask the it\'s owner to enable "Share my decks" on their account.');
         }
 
         $data = [
@@ -165,7 +165,7 @@ class FellowshipController extends Controller {
             }
 
             if ($user->getId() !== $fellowship->getUser()->getId()) {
-                throw new UnauthorizedHttpException("Access denied to this object.");
+                throw new AccessDeniedHttpException("Access denied to this object.");
             }
 
             foreach ($fellowship->getDecks() as $deck) {
@@ -218,7 +218,7 @@ class FellowshipController extends Controller {
                     $deck_user = $deck->getUser();
                     $is_owner = $user->getId() == $deck_user->getId();
                     if (!$is_owner && !$deck_user->getIsShareDecks()) {
-                        throw new UnauthorizedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
+                        throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
                     }
 
                     if (!$is_owner) {
@@ -266,7 +266,7 @@ class FellowshipController extends Controller {
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
         if (!$user) {
-            throw new UnauthorizedHttpException("You must be logged in for this operation.");
+            throw new AccessDeniedHttpException("You must be logged in for this operation.");
         }
 
         $fellowship_id = filter_var($request->get('fellowship_id'), FILTER_SANITIZE_NUMBER_INT);
@@ -278,7 +278,7 @@ class FellowshipController extends Controller {
         }
 
         if (!$fellowship || $fellowship->getUser()->getId() != $user->getId()) {
-            throw new UnauthorizedHttpException("You don't have access to this fellowship.");
+            throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
 
         if ($fellowship->getNbVotes() || $fellowship->getNbfavorites() || $fellowship->getNbcomments()) {
@@ -318,19 +318,19 @@ class FellowshipController extends Controller {
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
         if (!$user) {
-            throw new UnauthorizedHttpException("You must be logged in for this operation.");
+            throw new AccessDeniedHttpException("You must be logged in for this operation.");
         }
 
         /* @var $fellowship \AppBundle\Entity\Fellowship */
         $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
         if (!$fellowship) {
-            throw new UnauthorizedHttpException("You don't have access to this fellowship.");
+            throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
 
         $fellowship_user = $fellowship->getUser();
 
         if ($fellowship_user->getId() != $user->getId() && !$fellowship_user->getIsShareDecks()) {
-            throw new UnauthorizedHttpException("You don't have access to this fellowship.");
+            throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
 
         $file = tempnam("tmp", "zip");

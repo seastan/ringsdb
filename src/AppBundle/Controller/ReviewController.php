@@ -1,16 +1,16 @@
 <?php
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Symfony\Component\HttpFoundation\Response;
-use AppBundle\Entity\Review;
 use AppBundle\Entity\Card;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use AppBundle\Entity\Review;
 use AppBundle\Entity\Reviewcomment;
-use \Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class ReviewController extends Controller {
 
@@ -79,7 +79,7 @@ class ReviewController extends Controller {
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
         if (!$user) {
-            throw new UnauthorizedHttpException("You are not logged in.");
+            throw new AccessDeniedHttpException("You are not logged in.");
         }
 
         $review_id = filter_var($request->get('review_id'), FILTER_SANITIZE_NUMBER_INT);
@@ -92,7 +92,7 @@ class ReviewController extends Controller {
         }
 
         if ($review->getUser()->getId() !== $user->getId()) {
-            throw new UnauthorizedHttpException("You cannot edit this review.");
+            throw new AccessDeniedHttpException("You cannot edit this review.");
         }
 
         $review_raw = trim($request->get('review'));

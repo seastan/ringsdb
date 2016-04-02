@@ -5,9 +5,6 @@ namespace AppBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use AppBundle\Entity\Deck;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class Oauth2Controller extends Controller {
