@@ -146,7 +146,8 @@
                 if (!cardNames[card.s_name]) {
                     cardNames[card.s_name] = {
                         total: 0,
-                        decks: 0
+                        decks: 0,
+                        heroes: 0
                     }
                 }
 
@@ -155,6 +156,9 @@
 
                 cardNames[card.s_name].total += card.indeck;
                 cardNames[card.s_name].decks++;
+                if (card.type_code == 'hero') {
+                    cardNames[card.s_name].heroes++;
+                }
             });
         }
 
@@ -166,12 +170,14 @@
                 var div = $('.card[data-code="' + card.code + '"]');
 
                 if (card.type_code == 'hero') {
-                    HeroConflicts = true;
-                    div.parent().addClass('conflicted-hero');
+                    if (cardNames[card.s_name].heroes > 1) {
+                        HeroConflicts = true;
+                        div.parent().addClass('conflicted-hero');
 
-                    var content = div.closest('.deck-content');
-                    if (content.find('.problem').size() == 0) {
-                        $('<div class="text-danger problem"><span class="fa fa-exclamation-triangle"></span> Hero conflicts between selected decks</div>').insertAfter(content.find('.deckcardcount'));
+                        var content = div.closest('.deck-content');
+                        if (content.find('.problem').size() == 0) {
+                            $('<div class="text-danger problem"><span class="fa fa-exclamation-triangle"></span> Hero conflicts between selected decks</div>').insertAfter(content.find('.deckcardcount'));
+                        }
                     }
                 } else {
                     div.after('&#160;<i class="fa fa-ban card-conflict text-danger" title="This unique card is being used in more than one selected deck."></i>');
@@ -289,9 +295,9 @@
             return;
         }
 
-        var match = username_or_url.match(/\/view\/(\d+)/);
+        var match = username_or_url.match(/\/(deck|decklist)\/view\/(\d+)/);
         if (match) {
-            deck_selection.load_deck(modal_deck_number, match[1]);
+            deck_selection.load_deck(modal_deck_number, match[2], match[1] == 'decklist');
         } else {
             deck_selection.load_user_deck_list(modal_deck_number, username_or_url);
         }
@@ -331,14 +337,16 @@
         });
     };
 
-    deck_selection.load_deck = function(deck_number, deck_id) {
+    deck_selection.load_deck = function(deck_number, deck_id, is_decklist) {
         $('#deckSelectionList').empty().append('<div class="deck-loading"><i class="fa fa-spinner fa-spin fa-5x"></i></div>');
 
         if (deck_list_xhr) {
             deck_list_xhr.abort();
         }
 
-        deck_list_xhr = $.ajax(Routing.generate('api_private_load_deck', { id: deck_id }), {
+        var route = is_decklist ? Routing.generate('api_decklist', { decklist_id: deck_id  }) : Routing.generate('api_private_load_deck', { id: deck_id });
+
+        deck_list_xhr = $.ajax(route, {
             type: 'GET',
             dataType: 'json',
             success: function(data) {
