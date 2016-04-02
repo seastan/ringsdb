@@ -102,6 +102,8 @@
                                                 </span>
                                                 {% if social %}
                                                     <small class="social">{{ macros.static_social_icons(decklist) }}</small>
+                                                {% else %}
+                                                    <div class="tags" style="display: inline-block"><span class="tag">Unpublished.</span></div>
                                                 {% endif %}
                                             </div>
                                             <div class="block" style="height: 15px; clear:both;"></div>
