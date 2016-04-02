@@ -5,7 +5,7 @@
 {% block body %}
     <div class="container">
         <div class="alert alert-danger" role="alert">
-            {% if exception.message defined %}
+            {% if exception.message is defined %}
                 {{ exception.message }}
             {% else %}
                 That page doesn't exist!
