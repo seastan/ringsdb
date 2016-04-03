@@ -195,9 +195,11 @@
                             (card.s_name == 'saruman' && card.pack_code == 'VoI')
                         );
 
-                        var color = leaves_play ? 'text-muted' : 'text-danger';
-
-                        div.after('&#160;<i class="fa fa-ban card-conflict ' + color + '" title="This unique card is being used in more than one selected deck."></i>');
+                        if (leaves_play) {
+                            div.after('&#160;<i class="fa fa-ban card-conflict text-faded" title="This unique card is being used in more than one selected deck, but it\'s effect includes leaving play at the end of the round."></i>');
+                        } else {
+                            div.after('&#160;<i class="fa fa-ban card-conflict text-danger" title="This unique card is being used in more than one selected deck."></i>');
+                        }
                     }
                 }
             }
