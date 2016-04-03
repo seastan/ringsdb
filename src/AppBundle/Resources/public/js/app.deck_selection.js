@@ -185,7 +185,20 @@
                         }
                     }
                 } else {
-                    div.after('&#160;<i class="fa fa-ban card-conflict text-danger" title="This unique card is being used in more than one selected deck."></i>');
+                    if (cardNames[card.s_name].heroes) {
+                        div.after('&#160;<i class="fa fa-ban card-conflict text-danger" title="This unique card conflicts with a hero being used in a selected deck."></i>');
+                    } else {
+                        var leaves_play = (
+                            (card.s_name == 'gandalf' && card.pack_code == 'Core') ||
+                            (card.s_name == 'galadriel' && card.pack_code == 'TRD') ||
+                            (card.s_name == 'elrond' && card.pack_code == 'TRD') ||
+                            (card.s_name == 'saruman' && card.pack_code == 'VoI')
+                        );
+
+                        if (!leaves_play) {
+                            div.after('&#160;<i class="fa fa-ban card-conflict text-danger" title="This unique card is being used in more than one selected deck."></i>');
+                        }
+                    }
                 }
             }
 
