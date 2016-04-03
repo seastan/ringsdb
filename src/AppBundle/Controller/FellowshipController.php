@@ -402,6 +402,12 @@ class FellowshipController extends Controller {
             return $this->redirect($this->generateUrl('fellowship_view', [ 'fellowship_id' => $fellowship->getId() ]));
         }
 
+        if ($fellowship->getIsPublic()) {
+            $this->get('session')->getFlashBag()->set('error', "This fellowship is already published.");
+
+            return $this->redirect($this->generateUrl('fellowship_view', [ 'fellowship_id' => $fellowship->getId() ]));
+        }
+
         $data = [
             'pagetitle' => "Publish Fellowship",
             'deck1' => null,
@@ -490,6 +496,12 @@ class FellowshipController extends Controller {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
 
+        if ($fellowship->getIsPublic()) {
+            $this->get('session')->getFlashBag()->set('error', "This fellowship is already published.");
+
+            return $this->redirect($this->generateUrl('fellowship_view', [ 'fellowship_id' => $fellowship->getId() ]));
+        }
+
         $name = trim(filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
         $name = substr($name, 0, 60);
         if (empty($name)) {
@@ -509,7 +521,7 @@ class FellowshipController extends Controller {
         $fellowship->setDatePublish(new \DateTime());
 
         foreach ($fellowship->getDecks() as &$fellowship_deck) {
-            /* @var $deck \AppBundle\Entity\FellowshipDeck */
+            /* @var $fellowship_deck \AppBundle\Entity\FellowshipDeck */
             $new_id = intval(filter_var($request->request->get('deck_selection_' . $fellowship_deck->getDeckNumber()), FILTER_SANITIZE_NUMBER_INT));
 
             if ($new_id) {
@@ -519,7 +531,9 @@ class FellowshipController extends Controller {
                     throw new NotFoundHttpException("One of the selected decks does not exists.");
                 }
             } else {
+                $deck = $fellowship_deck->getDeck();
                 $decklist = $this->get('decklist_factory')->createDecklistFromDeck($deck, $deck->getName(), $deck->getDescriptionMd());
+                $em->persist($decklist);
             }
 
             $fellowship_decklist = new FellowshipDecklist();
@@ -527,6 +541,7 @@ class FellowshipController extends Controller {
             $fellowship_decklist->setDeckNumber($fellowship_deck->getDeckNumber());
             $fellowship_decklist->setFellowship($fellowship);
 
+            $em->remove($fellowship_deck);
             $fellowship->removeDeck($fellowship_deck);
             $fellowship->addDecklist($fellowship_decklist);
         }
