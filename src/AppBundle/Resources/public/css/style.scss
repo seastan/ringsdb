@@ -1323,7 +1323,7 @@ footer a {
 .selected-deck-placeholder {
   border: 1px dashed #c5c5c5;
 
-  min-height: 245px;
+  min-height: 211px;
   line-height: 211px;
   text-align: center;
   margin-bottom: 20px;
@@ -1421,7 +1421,7 @@ footer a {
 
 
 .list-fellowships {
-  tr > td:first-child {
+  .fellowship-checkbox {
     width: 35px;
     line-height: 20px;
     padding-top: 13px;
@@ -1441,8 +1441,12 @@ footer a {
     margin: 4px 0;
     text-align: right;
 
+    .deck-count {
+      margin-right: 20px;
+    }
+
     .social {
-      margin: 10px 20px 0 20px;
+      margin: 10px 20px 0 0;
     }
   }
 }

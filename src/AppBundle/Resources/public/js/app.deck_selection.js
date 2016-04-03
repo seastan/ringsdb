@@ -95,6 +95,7 @@
         }
 
         deck_selection.show_conflicts();
+        $(document).trigger('deck-changed');
     };
 
     deck_selection.check_problems = function(e) {

@@ -69,20 +69,21 @@
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">My Collection <span class="caret"></span></a>
                                 <ul class="dropdown-menu" role="menu">
                                     <li><a href="{{ path('decks_list') }}">Decks</a></li>
-                                    <li><a href="{{ path('fellowships_list') }}">Fellowships</a></li>
+                                    <li><a href="{{ path('myfellowships_list') }}">Fellowships</a></li>
                                     <li><a href="{{ path('collection_packs') }}">Adventure Packs</a></li>
                                 </ul>
                             </li>
                             <li><a href="{{ path('decks_list') }}" class="visible-xs-block">My Decks</a></li>
-                            <li><a href="{{ path('fellowships_list') }}" class="visible-xs-block">My Fellowships</a></li>
+                            <li><a href="{{ path('myfellowships_list') }}" class="visible-xs-block">My Fellowships</a></li>
                             <li><a href="{{ path('collection_packs') }}" class="visible-xs-block">My Adventure Packs</a></li>
                             <li><a href="{{ path('decklists_list') }}">Decklists</a></li>
+                            <li><a href="{{ path('fellowships_list') }}">Fellowships</a></li>
                             <li><a href="{{ path('cards_search') }}">Cards</a></li>
                             <li class="hidden-sm"><a href="{{ path('card_reviews_list') }}">Reviews</a></li>
                         </ul>
 
                         <ul class="nav navbar-nav navbar-right">
-                            <li class="dropdown hidden-xs hidden-md hidden-lg">
+                            <li class="dropdown hidden-xs hidden-lg">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="fa fa-search"></span></a>
                                 <div class="dropdown-menu">
                                     <form action="{{ path('cards_find') }}" target="_blank">
@@ -94,7 +95,7 @@
                                 <a href="#" class="disabled"><span class="fa fa-user"></span></a>
                             </li>
                         </ul>
-                        <form class="navbar-form navbar-right visible-lg-block visible-md-block visible-xs-block external" action="{{ path('cards_find') }}">
+                        <form class="navbar-form navbar-right visible-lg-block visible-xs-block external" action="{{ path('cards_find') }}">
                             <div class="form-group">
                                 <input type="text" placeholder="Card Search" class="form-control smart-filter-help" name="q">
                             </div>

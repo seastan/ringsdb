@@ -7,16 +7,20 @@ AppBundle\Entity\User:
             orderBy: {'dateUpdate':'DESC'}
             mappedBy: user
             cascade: ["remove"]
+        decklists:
+            targetEntity: Decklist
+            mappedBy: user
         fellowships:
             targetEntity: Fellowship
             orderBy: {'dateUpdate':'DESC'}
             mappedBy: user
             cascade: ["remove"]
-        decklists:
-            targetEntity: Decklist
-            mappedBy: user
         comments:
             targetEntity: Comment
+            orderBy: {'dateCreation':'DESC'}
+            mappedBy: user
+        fellowship_comments:
+            targetEntity: Fellowshipcomment
             orderBy: {'dateCreation':'DESC'}
             mappedBy: user
         reviews:
@@ -30,6 +34,14 @@ AppBundle\Entity\User:
             cascade: ["remove"]
         votes:
             targetEntity: Decklist
+            mappedBy: votes
+            cascade: ["remove"]
+        fellowship_favorites:
+            targetEntity: Fellowship
+            mappedBy: favorites
+            cascade: ["remove"]
+        fellowship_votes:
+            targetEntity: Fellowship
             mappedBy: votes
             cascade: ["remove"]
         reviewvotes:

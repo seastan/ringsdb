@@ -25,7 +25,7 @@
     };
 
     ui.insert_alert_message = function ui_insert_alert_message(type, message) {
-        var alert = $('<div class="alert" role="alert"></div>').addClass('alert-' + type).append(message);
+        var alert = $('<div class="alert hidden-print" role="alert"></div>').addClass('alert-' + type).append(message);
         $('#wrapper').find('>div.container:first').prepend(alert);
     };
 

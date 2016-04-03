@@ -713,4 +713,110 @@ class User extends BaseUser {
     public function getFellowships() {
         return $this->fellowships;
     }
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $fellowship_comments;
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $fellowship_favorites;
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $fellowship_votes;
+
+    /**
+     * Add fellowshipComment
+     *
+     * @param \AppBundle\Entity\Fellowshipcomment $fellowshipComment
+     *
+     * @return User
+     */
+    public function addFellowshipComment(\AppBundle\Entity\Fellowshipcomment $fellowshipComment) {
+        $this->fellowship_comments[] = $fellowshipComment;
+
+        return $this;
+    }
+
+    /**
+     * Remove fellowshipComment
+     *
+     * @param \AppBundle\Entity\Fellowshipcomment $fellowshipComment
+     */
+    public function removeFellowshipComment(\AppBundle\Entity\Fellowshipcomment $fellowshipComment) {
+        $this->fellowship_comments->removeElement($fellowshipComment);
+    }
+
+    /**
+     * Get fellowshipComments
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getFellowshipComments() {
+        return $this->fellowship_comments;
+    }
+
+    /**
+     * Add fellowshipFavorite
+     *
+     * @param \AppBundle\Entity\Fellowship $fellowshipFavorite
+     *
+     * @return User
+     */
+    public function addFellowshipFavorite(\AppBundle\Entity\Fellowship $fellowshipFavorite) {
+        $this->fellowship_favorites[] = $fellowshipFavorite;
+
+        return $this;
+    }
+
+    /**
+     * Remove fellowshipFavorite
+     *
+     * @param \AppBundle\Entity\Fellowship $fellowshipFavorite
+     */
+    public function removeFellowshipFavorite(\AppBundle\Entity\Fellowship $fellowshipFavorite) {
+        $this->fellowship_favorites->removeElement($fellowshipFavorite);
+    }
+
+    /**
+     * Get fellowshipFavorites
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getFellowshipFavorites() {
+        return $this->fellowship_favorites;
+    }
+
+    /**
+     * Add fellowshipVote
+     *
+     * @param \AppBundle\Entity\Fellowship $fellowshipVote
+     *
+     * @return User
+     */
+    public function addFellowshipVote(\AppBundle\Entity\Fellowship $fellowshipVote) {
+        $this->fellowship_votes[] = $fellowshipVote;
+
+        return $this;
+    }
+
+    /**
+     * Remove fellowshipVote
+     *
+     * @param \AppBundle\Entity\Fellowship $fellowshipVote
+     */
+    public function removeFellowshipVote(\AppBundle\Entity\Fellowship $fellowshipVote) {
+        $this->fellowship_votes->removeElement($fellowshipVote);
+    }
+
+    /**
+     * Get fellowshipVotes
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getFellowshipVotes() {
+        return $this->fellowship_votes;
+    }
 }

@@ -26,7 +26,7 @@ AppBundle\Entity\Fellowship:
     manyToMany:
         favorites:
             targetEntity: User
-            inversedBy: favorites
+            inversedBy: fellowship_favorites
             joinTable:
                 name: fellowship_favorite
                 cascade: ["persist","remove"]
@@ -38,7 +38,7 @@ AppBundle\Entity\Fellowship:
                         referencedColumnName: id
         votes:
             targetEntity: User
-            inversedBy: votes
+            inversedBy: fellowship_votes
             joinTable:
                 name: fellowship_vote
                 cascade: ["persist","remove"]
@@ -69,10 +69,6 @@ AppBundle\Entity\Fellowship:
             type: text
             nullable: true
             column: description_html
-        isPublic:
-            type: boolean
-            nullable: false
-            column: is_public
         nbDecks:
             type: integer
             column: nb_decks
@@ -99,3 +95,11 @@ AppBundle\Entity\Fellowship:
             gedmo:
                 timestampable:
                     on: update
+        isPublic:
+            type: boolean
+            nullable: false
+            column: is_public
+        datePublish:
+            type: datetime
+            nullable: true
+            column: date_publish

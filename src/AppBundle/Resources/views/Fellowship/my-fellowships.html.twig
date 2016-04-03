@@ -33,7 +33,7 @@
                         {% set decks = fellowship.decks | merge(fellowship.decklists) %}
 
                         <tr data-id="{{ fellowship.id }}">
-                            <td class="hidden-xs"><input type="checkbox"></td>
+                            <td class="hidden-xs fellowship-checkbox"><input type="checkbox"></td>
                             <td>
                                 <div class="row">
                                     <div class="col-sm-6 col-md-7 col-lg-8">
@@ -41,23 +41,30 @@
                                     </div>
                                     <div class="col-sm-6 col-md-5 col-lg-4">
                                         <div class="fellowships-actions">
-                                            {% for i in 1..fellowship.nbDecks %}
-                                                <i class="fa fa-user"></i>
-                                            {% endfor %}
+                                            <span class="deck-count">
+                                                {% for i in 1..fellowship.nbDecks %}
+                                                    <i class="fa fa-user"></i>
+                                                {% endfor %}
+                                            </span>
 
-                                            <small class="social">{{ macros.static_fellowship_social_icons(fellowship) }}</small>
+                                            {% if fellowship.isPublic %}
+                                                <small class="social">{{ macros.static_fellowship_social_icons(fellowship) }}</small>
+                                            {% endif %}
 
                                             <a href="{{ path('fellowship_edit', { fellowship_id: fellowship.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" data-container="body" title="Edit">
                                                 <span class="fa fa-pencil fa-fw"></span>
                                             </a>
 
+
                                             {#<button class="btn btn-xs btn-default btn-log-quest" data-toggle="tooltip" data-container="body" title="Log a Quest">#}
                                                 {#<span class="fa fa-book fa-fw"></span>#}
                                             {#</button>#}
 
-                                            <a href="{{ path('fellowship_view', { fellowship_id: fellowship.id }) }}" class="btn btn-xs btn-default disabled" disabled data-toggle="tooltip" data-container="body" title="Publish">
-                                                <span class="fa fa-share fa-fw"></span>
-                                            </a>
+                                            {% if not fellowship.isPublic %}
+                                                <a href="{{ path('fellowship_view', { fellowship_id: fellowship.id }) }}" class="btn btn-xs btn-default disabled" disabled data-toggle="tooltip" data-container="body" title="Publish">
+                                                    <span class="fa fa-share fa-fw"></span>
+                                                </a>
+                                            {% endif %}
 
                                             <button class="btn btn-xs btn-default btn-delete-fellowship" data-toggle="tooltip" data-container="body" title="Delete">
                                                 <span class="fa fa-trash-o fa-fw"></span>

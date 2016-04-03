@@ -1,0 +1,136 @@
+{% extends 'AppBundle::layout.html.twig' %}
+{% import "AppBundle::macros.html.twig" as macros %}
+
+{% block javascripts %}
+    {% javascripts '@AppBundle/Resources/public/js/ui.fellowship_search.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <script type="text/javascript">
+        $(function() {
+            var type = {{ type|json_encode|raw }};
+            $('time').each(function(index, element) {
+                var datetime = moment($(element).attr('datetime'));
+                var formatted;
+                switch (type) {
+                    case 'popular':
+                    case 'recent':
+                    case 'hottopics':
+                        formatted = datetime.fromNow();
+                        break;
+
+                    case 'halloffame':
+                    case 'favorites':
+                    case 'mine':
+                    case 'search':
+                    default:
+                        formatted = datetime.format('ll');
+                        break;
+                }
+                $(element).html(formatted);
+                $(element).attr('title', datetime.format('LLLL'));
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="main white container">
+        <div class="row">
+            <div class="col-md-3">
+                <ul class="nav nav-pills nav-stacked" style="margin-bottom: 2em;">
+                    {% set linkurl = path('fellowships_list', { type:'popular' }) %}
+                    <li class="{% if url == linkurl %}active{% endif %}"><a href="{{ linkurl }}">Popular</a></li>
+                    {% set linkurl = path('fellowships_list', { type:'recent' }) %}
+                    <li class="{% if url == linkurl %}active{% endif %}"><a href="{{ linkurl }}">Recent</a></li>
+                    {% set linkurl = path('fellowships_list', { type:'hottopics' }) %}
+                    <li class="{% if url == linkurl %}active{% endif %}"><a href="{{ linkurl }}">Hot topics</a></li>
+                    {% set linkurl = path('fellowships_list', { type:'halloffame' }) %}
+                    <li class="{% if url == linkurl %}active{% endif %}"><a href="{{ linkurl }}">Hall of Fame</a></li>
+                    {% set linkurl = path('fellowships_list', { type:'favorites' }) %}
+                    <li class="{% if url == linkurl %}active{% endif %}"><a href="{{ linkurl }}">My favorites</a></li>
+                    {% set linkurl = path('fellowships_list', { type:'mine' }) %}
+                    <li class="{% if url == linkurl %}active{% endif %}"><a href="{{ linkurl }}">My fellowships</a></li>
+                    {% set linkurl = path('fellowships_searchform') %}
+                    <li class="{% if url == linkurl %}active{% endif %}"><a href="{{ linkurl }}"><span class="fa fa-search"></span> Search</a></li>
+                </ul>
+            </div>
+
+            <div class="col-md-9">
+                {{ header|raw }}
+
+                {% include 'AppBundle:Default:pagination.html.twig' %}
+
+                <table class="table list-fellowships">
+                    <tbody id="fellowships">
+                    {% for fellowship in fellowships %}
+                        {% set decks = fellowship.decklists %}
+
+                        <tr data-id="{{ fellowship.id }}">
+                            <td>
+                                <div class="row">
+                                    <div class="col-sm-6 col-md-7 col-lg-8">
+                                        <h4 class="fellowship-name"><a href="{{ path('fellowship_view', { fellowship_id: fellowship.id }) }}">{{ fellowship.name }}</a></h4>
+                                    </div>
+                                    <div class="col-sm-6 col-md-5 col-lg-4">
+                                        <div class="fellowships-actions">
+                                            <div>
+                                                {% for i in 1..fellowship.nbDecks %}
+                                                    <i class="fa fa-user"></i>
+                                                {% endfor %}
+
+                                                <span class="social" style="margin-right: 0;">{{ macros.static_fellowship_social_icons(fellowship) }}</span>
+                                            </div>
+                                            <div>
+                                                <time datetime="{{ fellowship.datePublish | date('c') }}">{{ fellowship.datePublish | date('M d') }}</time>
+
+                                                <span class="username" style="margin-left: 20px; display: inline-block;">
+                                                    <a href="{{ path('user_profile_public', {user_id: fellowship.user.id, user_name: fellowship.user.username | e('url')}) }}" class="{{ fellowship.user.color }}">{{ fellowship.user.username }}</a>
+                                                    {% if fellowship.user.donation > 0 %}<span class="fa fa-gift patron" title="RingsDB Gracious Patron"></span>{% endif %}
+                                                    <small class="reputation">{{ fellowship.user.reputation }}</small>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% for deck in decks %}
+                                            {% set decklist = deck.decklist %}
+
+                                            <div class="fellowship-heroes" data-id="{{ decklist.id }}">
+                                                {% for hero in decklist.getSlots().getHeroDeck() %}
+                                                    {% set card = hero.getCard() %}
+                                                    <div class="decklist-hero border-light-{{ card.sphere.code }}">
+                                                        <div class="hero-thumbnail card-thumbnail-4x card-thumbnail-hero" style="background-image:url('{{ asset('/bundles/cards/' ~ card.code ~ '.png') }}')"></div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+
+                                            <div class="fellowship-deck-info">
+                                                <h4 style=""><i><a href="{{ path('decklist_detail', { decklist_id: decklist.id, 'decklist_name': decklist.nameCanonical|e('url') }) }}">{{ decklist.name }}</a></i></h4>
+
+                                                <span class="small fellowship-hero-text hidden-xs">
+                                                    {% for hero in decklist.getSlots().getHeroDeck() %}
+                                                        {% set card = hero.getCard() %}
+                                                        <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" href="">
+                                                            <span class="icon-{{ card.sphere.code }}"></span> {{ card.name }} <i>({{ card.pack.code }})</i>
+                                                        </a>
+                                                    {% endfor %}
+                                                </span>
+                                            </div>
+                                            <div class="block" style="height: 15px; clear:both;"></div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% include 'AppBundle:Default:pagination.html.twig' %}
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

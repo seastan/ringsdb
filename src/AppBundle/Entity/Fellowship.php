@@ -518,4 +518,31 @@ class Fellowship {
     public function getNbDecks() {
         return $this->nbDecks;
     }
+
+    /**
+     * @var \DateTime
+     */
+    private $datePublish;
+
+    /**
+     * Set datePublish
+     *
+     * @param \DateTime $datePublish
+     *
+     * @return Fellowship
+     */
+    public function setDatePublish($datePublish) {
+        $this->datePublish = $datePublish;
+
+        return $this;
+    }
+
+    /**
+     * Get datePublish
+     *
+     * @return \DateTime
+     */
+    public function getDatePublish() {
+        return $this->datePublish;
+    }
 }

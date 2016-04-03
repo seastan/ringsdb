@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-md-12">
         {% if is_owner %}
-            <div class="btn-group" role="group" style="margin-bottom: 10px;">
+            <div class="btn-group hidden" id="user_buttons" role="group" style="margin-bottom: 10px;">
                 <a href="{{ path('fellowship_edit', { fellowship_id: fellowship.id }) }}" class="btn btn-sm btn-default">
                     <span class="fa fa-pencil text-primary"></span> Edit
                 </a>
@@ -10,9 +10,11 @@
                     {#<span class="fa fa-book text-warning"></span> Log a Quest#}
                 {#</a>#}
 
-                <a href="{{ path('fellowship_publish', { fellowship_id: fellowship.id }) }}" class="btn btn-sm btn-default disabled" disabled id="btn-publish">
-                    <span class="fa fa-share text-success"></span> Publish
-                </a>
+                {% if not is_public %}
+                    <a href="{{ path('fellowship_publish', { fellowship_id: fellowship.id }) }}" class="btn btn-sm btn-default disabled" disabled id="btn-publish">
+                        <span class="fa fa-share text-success"></span> Publish
+                    </a>
+                {% endif %}
 
                 <button type="button" id="btn-delete" class="btn btn-sm btn-default">
                     <span class="fa fa-trash-o text-danger"></span> Delete

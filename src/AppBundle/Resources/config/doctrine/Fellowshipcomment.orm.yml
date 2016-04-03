@@ -5,6 +5,7 @@ AppBundle\Entity\Fellowshipcomment:
         user:
             targetEntity: User
             nullable: false
+            inversedBy: fellowship_comments
             joinColumn:
                 name: user_id
                 referencedColumnName: id
@@ -21,6 +22,8 @@ AppBundle\Entity\Fellowshipcomment:
             id: true
             generator:
                 strategy: AUTO
+        text:
+            type: text
         dateCreation:
             type: datetime
             nullable: false
@@ -28,13 +31,7 @@ AppBundle\Entity\Fellowshipcomment:
             gedmo:
                 timestampable:
                     on: create
-        dateUpdate:
-            type: datetime
-            nullable: false
-            column: date_update
-            gedmo:
-                timestampable:
-                    on: update
-        text:
-            type: text
-            nullable: false
+        isHidden:
+            type: boolean
+            column: is_hidden
+

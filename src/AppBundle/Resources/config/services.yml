@@ -33,3 +33,12 @@ services:
     deck_validation_helper:
         class: AppBundle\Helper\DeckValidationHelper
         arguments: []
+
+    fellowship_validation_helper:
+        class: AppBundle\Helper\FellowshipValidationHelper
+        arguments: []
+
+    fellowship_manager:
+        class: AppBundle\Model\FellowshipManager
+        shared: false
+        arguments: ["@doctrine.orm.entity_manager", "@request_stack", "@router", "@logger"]

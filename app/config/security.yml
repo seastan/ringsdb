@@ -66,5 +66,7 @@ security:
         - { path: ^/decks, role: ROLE_USER }
         - { path: ^/fellowship/view/, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/fellowship/, role: ROLE_USER }
-        - { path: ^/fellowships, role: ROLE_USER }
+        - { path: ^/myfellowships, role: ROLE_USER }
+        - { path: ^/fellowships, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/decklists, role: IS_AUTHENTICATED_ANONYMOUSLY }
 

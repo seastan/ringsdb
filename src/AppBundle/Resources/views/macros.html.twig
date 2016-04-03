@@ -48,6 +48,20 @@
 	</span>
 {% endmacro %}
 
+{% macro fellowship_social_icons(fellowship) %}
+    <span class="social-icons">
+		<a id="social-icon-like" href="#" class="social-icon-like" data-toggle="tooltip" data-placement="bottom" title="Like">
+            <span class="fa fa-heart"></span> <span class="num">{{ fellowship.nbVotes }}</span>
+        </a>
+		<a id="social-icon-favorite" href="#" class="social-icon-favorite" data-toggle="tooltip" data-placement="bottom" title="Favorite">
+            <span class="fa fa-star"></span> <span class="num">{{ fellowship.nbFavorites }}</span>
+        </a>
+		<a id="social-icon-comment" href="#comment-form" class="social-icon-comment" data-toggle="tooltip" data-placement="bottom" title="Comment">
+            <span class="fa fa-comment"></span> <span class="num">{{ fellowship.nbComments }}</span>
+        </a>
+	</span>
+{% endmacro %}
+
 {% macro static_social_icons(decklist) %}
 	<span class="social-icons">
 		<span class="social-icon-like" data-toggle="tooltip" data-placement="bottom" title="Likes">

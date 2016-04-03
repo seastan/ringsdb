@@ -13,12 +13,14 @@
         Decks[3] = {{ deck3 | json_encode | raw }};
         Decks[4] = {{ deck4 | json_encode | raw }};
 
+        var Commenters = {{ commenters | json_encode | raw }};
         var Fellowship = {
             id: {{ fellowship.id }},
             name: {{ fellowship.name | json_encode | raw }}
         };
 
         app.deck_selection && app.deck_selection.init(Decks);
+        app.user.params.fellowship_id = {{ fellowship.id }};
     </script>
 {% endblock %}
 
@@ -27,9 +29,6 @@
         <div class="row">
             <div class="col-md-12">
                 <h1 style="border-bottom:1px solid lightgray">{{ fellowship.name }}</h1>
-                {#{% if fellowship.problem %}#}
-                    {#<div class="alert alert-danger" role="alert">{{ deck_validation_helper.problemLabel(deck.problem) }}</div>#}
-                {#{% endif %}#}
             </div>
         </div>
 
@@ -67,17 +66,24 @@
 
         <div id="description">
             <div class="row">
-                <div class="col-md-12">
-                    <h3 class="username">
+                <div class="col-xs-7">
+                    <h3 class="username" style="margin-top: 10px">
                         <span class="fa fa-user"></span>
                         {{ macros.username(fellowship.user) }}
                     </h3>
                 </div>
+                {% if is_public %}
+                    <div class="col-xs-5 text-right" style="margin-bottom: 5px">
+                        <div class="social">{{ macros.fellowship_social_icons(fellowship) }}</div>
+                        <span class="hidden-xs">published: </span>
+                        <time datetime="{{ fellowship.datePublish | date('c') }}">{{ fellowship.datePublish | date('M d, Y') }}</time>
+                    </div>
+                {% endif %}
             </div>
 
             <div class="row hidden-print">
                 <div class="col-md-12" id="btn-group-deck">
-                    {% include 'AppBundle:Quest:toolbar.html.twig' %}
+                    {% include 'AppBundle:Fellowship:toolbar.html.twig' %}
                 </div>
             </div>
 
@@ -97,6 +103,13 @@
                     </div>
                 </div>
             </div>
+            {% if is_public %}
+                <div class="row">
+                    <div class="col-md-12">
+                        {% include 'AppBundle:Fellowship:comments.html.twig' %}
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 

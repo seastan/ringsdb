@@ -48,6 +48,30 @@ decklist_comment_hide:
     defaults:
         _controller: AppBundle:Social:hidecomment
 
+fellowship_favorite:
+    path: /fellowship_favorite
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:Fellowship:favorite
+
+fellowship_like:
+    path: /fellowship_like
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:Fellowship:vote
+
+fellowship_comment:
+    path: /fellowship_comment
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:Fellowship:comment
+
+fellowship_comment_hide:
+    path: /fellowship_hidecomment/{comment_id}/{hidden}
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:Fellowship:hidecomment
+
 card_reviews_list_byauthor:
     path: /reviews/{user_id}/{page}
     defaults:

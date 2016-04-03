@@ -440,7 +440,7 @@ class BuilderController extends Controller {
         }
 
         if (count($deck->getFellowships())) {
-            $this->get('session')->getFlashBag()->set('danger', "You can't delete a deck that is member of a fellowship.");
+            $this->get('session')->getFlashBag()->set('error', "You can't delete a deck that is member of a fellowship.");
         } else {
             foreach ($deck->getChildren() as $decklist) {
                 $decklist->setParent(null);
