@@ -145,11 +145,12 @@ class ReviewController extends Controller {
 
             $result = $query->getResult();
             if (empty($result)) {
+                /* @var $author \AppBundle\Entity\User */
                 $author = $review->getUser();
                 $author->setReputation($author->getReputation() + 1);
 
-                $user->addReviewVote($review);
-
+                $review->addVote($user);
+                $review->setDateUpdate(new \DateTime());
                 $review->setNbVotes($review->getNbVotes() + 1);
                 $em->flush();
             }

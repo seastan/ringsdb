@@ -1115,6 +1115,7 @@ class FellowshipController extends Controller {
 
         $fellowship_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
 
+        /* @var $fellowship \AppBundle\Entity\Fellowship */
         $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
 
         if ($fellowship->getUser()->getId() != $user->getId()) {
@@ -1128,11 +1129,11 @@ class FellowshipController extends Controller {
 
             $result = $query->getResult();
             if (empty($result)) {
-                $user->addFellowshipVote($fellowship);
-
                 /* @var $author \AppBundle\Entity\User */
                 $author = $fellowship->getUser();
                 $author->setReputation($author->getReputation() + 1);
+
+                $fellowship->addVote($user);
                 $fellowship->setDateUpdate(new \DateTime());
                 $fellowship->setNbVotes($fellowship->getNbVotes() + 1);
                 $this->getDoctrine()->getManager()->flush();
