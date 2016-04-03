@@ -8,10 +8,12 @@ class FellowshipValidationHelper {
 
     public function findProblem($fellowship) {
         $heroes = [];
+        $count = 0;
 
         /* @var $fellowship_decks \AppBundle\Entity\FellowshipDeck[] */
         $fellowship_decks = $fellowship->getDecks();
         foreach ($fellowship_decks as $fellowship_deck) {
+            $count++;
             $deck = $fellowship_deck->getDeck();
 
             foreach ($deck->getSlots()->getHeroDeck() as &$hero) {
@@ -27,6 +29,7 @@ class FellowshipValidationHelper {
         /* @var $fellowship_decks \AppBundle\Entity\FellowshipDecklist[] */
         $fellowship_decklists = $fellowship->getDecklists();
         foreach ($fellowship_decklists as $fellowship_decklist) {
+            $count++;
             $deck = $fellowship_decklist->getDecklist();
 
             foreach ($deck->getSlots()->getHeroDeck() as &$hero) {
@@ -39,6 +42,10 @@ class FellowshipValidationHelper {
             }
         }
 
+        if ($count == 0) {
+            return 'too_few_decks';
+        }
+
         return null;
     }
 
@@ -47,6 +54,7 @@ class FellowshipValidationHelper {
             return '';
         }
         $labels = [
+            'too_few_decks' => "Too few decks selectsd",
             'hero_conflicts' => "MHero conflicts between selected decks",
         ];
 
