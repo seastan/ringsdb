@@ -205,7 +205,7 @@ class FellowshipController extends Controller {
         $is_public = $fellowship->getIsPublic();
 
         if (!$fellowship->getUser()->getIsShareDecks() && !$is_owner && !$is_public) {
-            throw new AccessDeniedHttpException('You are not allowed to view this fellowship. To get access, you can ask the it\'s owner to enable "Share my decks" on their account.');
+            throw new AccessDeniedHttpException('You are not allowed to view this fellowship. To get access, you can ask it\'s owner to enable "Share my decks" on their account.');
         }
 
         if ($is_public) {
