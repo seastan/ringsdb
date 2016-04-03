@@ -116,7 +116,7 @@
         $('.card-conflict, .problem').remove();
 
         var cores = 1;
-        if (app.user.data.owned_packs) {
+        if (app.user.data && app.user.data.owned_packs) {
             if (app.user.data.owned_packs.match(/1-2/)) {
                 cores++;
             }
