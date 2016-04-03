@@ -25,13 +25,13 @@ AppBundle\Entity\Review:
             inversedBy: reviewvotes
             joinTable:
                 name: reviewvote
+                cascade: ["persist","remove"]
                 joinColumns:
                     review_id:
                         referencedColumnName: id
                 inverseJoinColumns:
                     user_id:
                         referencedColumnName: id
-            cascade: ["persist"]
     fields:
         id:
             type: integer

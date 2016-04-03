@@ -687,19 +687,30 @@ class SocialController extends Controller {
 
         $decklist_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
 
+        /* @var $decklist \AppBundle\Entity\Decklist */
         $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
 
         if ($decklist->getUser()->getId() != $user->getId()) {
-            $query = $em->getRepository('AppBundle:Decklist')->createQueryBuilder('d')->innerJoin('d.votes', 'u')->where('d.id = :decklist_id')->andWhere('u.id = :user_id')->setParameter('decklist_id', $decklist_id)->setParameter('user_id', $user->getId())->getQuery();
+            $query = $em->getRepository('AppBundle:Decklist')
+                ->createQueryBuilder('d')
+                ->innerJoin('d.votes', 'u')
+                ->where('d.id = :decklist_id')
+                ->andWhere('u.id = :user_id')
+                ->setParameter('decklist_id', $decklist_id)
+                ->setParameter('user_id', $user->getId())
+                ->getQuery();
 
             $result = $query->getResult();
             if (empty($result)) {
-                $user->addVote($decklist);
                 $author = $decklist->getUser();
                 $author->setReputation($author->getReputation() + 1);
+
+                $user->addVote($decklist);
+
                 $decklist->setDateUpdate(new \DateTime());
                 $decklist->setNbVotes($decklist->getNbVotes() + 1);
-                $this->getDoctrine()->getManager()->flush();
+
+                $em->flush();
             }
         }
 

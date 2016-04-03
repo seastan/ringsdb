@@ -147,7 +147,9 @@ class ReviewController extends Controller {
             if (empty($result)) {
                 $author = $review->getUser();
                 $author->setReputation($author->getReputation() + 1);
+
                 $user->addReviewVote($review);
+
                 $review->setNbVotes($review->getNbVotes() + 1);
                 $em->flush();
             }
