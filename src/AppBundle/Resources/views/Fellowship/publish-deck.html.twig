@@ -1,0 +1,51 @@
+<div class="col-sm-8">
+    <div class="panel panel-default" style="margin-bottom: 0">
+        <div class="panel-heading">
+            <h3 class="panel-title">{% if deck is not null %}{{ deck.name }}{% else %}Deck Publishing{% endif %}</h3>
+        </div>
+        <div class="panel-body">
+            {% if deck is null %}
+                <p>No deck selected. No further actions required.</p>
+            {% elseif deck is decklist %}
+                <p>This deck is already published. No further actions required.</p>
+            {% else %}
+                {% set list = deck.children | merge(duplicates) %}
+
+                {% if list | length %}
+                    <p>This is a private version of a published deck. You can select one of the public versions or publish a new one.</p>
+                {% else %}
+                    <p>This deck is not published yet.</p>
+                {% endif %}
+
+                <table class="table table-condensed" style="margin-top: 10px; margin-bottom: 0;">
+                    <tbody>
+                        <tr>
+                            <td style="width: 25px;"><label><input type="radio" name="deck_selection_{{ deck_number }}" value="0" {% if match is null %}checked{% endif %}></label></td>
+                            <td colspan="5">Publish a new decklist using this deck's name and description.</td>
+                        </tr>
+                        {% for decklist in list %}
+                            <tr>
+                                <td style="width: 25px;"><label><input type="radio" name="deck_selection_{{ deck_number }}" value="{{ decklist.id }}" {% if match == decklist.id %}checked{% endif %}></label></td>
+                                <td class="decklist-name"><a href="{{ path('decklist_detail', { 'decklist_id': decklist.id, 'decklist_name': decklist.nameCanonical|e('url') }) }}">{{ decklist.name }}</a></td>
+                                <td style="width: 50px;"><span class="fa fa-heart social-icon-like"></span> {{ decklist.nbVotes }}</td>
+                                <td style="width: 50px;"><span class="fa fa-star social-icon-favorite"></span> {{ decklist.nbFavorites }}</td>
+                                <td style="width: 50px;"><span class="fa fa-comment social-icon-comment"></span> {{ decklist.nbComments }}</td>
+                                <td style="width: 50px;"><span class="fa fa-code-fork social-icon-version"></span> {{ decklist.version }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="col-sm-4">
+    <div class="selected-deck-placeholder {% if deck is not null %}hidden{% endif %}">
+        <span class="no-deck-selected">No deck selected</span>
+    </div>
+    <div class="small selected-deck-content {% if deck is null %}hidden{% endif %}">
+        <div id="deck{{ deck_number }}-content" class="deck-loading">
+            <i class="fa fa-spinner fa-spin fa-5x"></i>
+        </div>
+    </div>
+</div>

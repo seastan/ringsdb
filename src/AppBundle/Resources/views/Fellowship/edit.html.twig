@@ -103,5 +103,7 @@
         </form>
     </div>
 
-    {% include 'AppBundle:Modale:deck_selection.html.twig' %}
+    {% if not is_public %}
+        {% include 'AppBundle:Modale:deck_selection.html.twig' %}
+    {% endif %}
 {% endblock %}

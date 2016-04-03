@@ -11,7 +11,7 @@
                 {#</a>#}
 
                 {% if not is_public %}
-                    <a href="{{ path('fellowship_publish', { fellowship_id: fellowship.id }) }}" class="btn btn-sm btn-default disabled" disabled id="btn-publish">
+                    <a href="{{ path('fellowship_publish_form', { fellowship_id: fellowship.id }) }}" class="btn btn-sm btn-default">
                         <span class="fa fa-share text-success"></span> Publish
                     </a>
                 {% endif %}

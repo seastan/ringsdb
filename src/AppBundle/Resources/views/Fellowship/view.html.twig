@@ -73,7 +73,7 @@
                     </h3>
                 </div>
                 {% if is_public %}
-                    <div class="col-xs-5 text-right" style="margin-bottom: 5px">
+                    <div class="col-xs-5 text-right hidden-print" style="margin-bottom: 5px">
                         <div class="social">{{ macros.fellowship_social_icons(fellowship) }}</div>
                         <span class="hidden-xs">published: </span>
                         <time datetime="{{ fellowship.datePublish | date('c') }}">{{ fellowship.datePublish | date('M d, Y') }}</time>
@@ -104,7 +104,7 @@
                 </div>
             </div>
             {% if is_public %}
-                <div class="row">
+                <div class="row hidden-print">
                     <div class="col-md-12">
                         {% include 'AppBundle:Fellowship:comments.html.twig' %}
                     </div>

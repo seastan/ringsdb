@@ -55,13 +55,12 @@
                                                 <span class="fa fa-pencil fa-fw"></span>
                                             </a>
 
-
                                             {#<button class="btn btn-xs btn-default btn-log-quest" data-toggle="tooltip" data-container="body" title="Log a Quest">#}
                                                 {#<span class="fa fa-book fa-fw"></span>#}
                                             {#</button>#}
 
                                             {% if not fellowship.isPublic %}
-                                                <a href="{{ path('fellowship_view', { fellowship_id: fellowship.id }) }}" class="btn btn-xs btn-default disabled" disabled data-toggle="tooltip" data-container="body" title="Publish">
+                                                <a href="{{ path('fellowship_publish_form', { fellowship_id: fellowship.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" data-container="body" title="Publish">
                                                     <span class="fa fa-share fa-fw"></span>
                                                 </a>
                                             {% endif %}

@@ -1333,11 +1333,11 @@ footer a {
 .selected-deck-placeholder {
   border: 1px dashed #c5c5c5;
 
-  min-height: 211px;
-  line-height: 211px;
+  min-height: 201px;
+  line-height: 201px;
   text-align: center;
   margin-bottom: 20px;
-  padding: 0 10px 10px 10px;
+  padding: 10px;
 
   span.no-deck-selected {
     color: #c5c5c5;
@@ -1413,6 +1413,20 @@ footer a {
     margin-bottom: 0;
   }
 }
+
+.deck-publishing-selection {
+  margin-bottom: 20px;
+
+  .selected-deck-content {
+    margin-bottom: 0;
+  }
+
+  td {
+    border: 0 !important;
+    padding-bottom: 0 !important;
+  }
+}
+
 
 @media (max-width: 1199px) {
   .selected-deck-placeholder {

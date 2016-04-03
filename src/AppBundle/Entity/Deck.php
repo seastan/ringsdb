@@ -461,7 +461,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Get sideslots
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \AppBundle\Model\SlotCollectionInterface
      */
     public function getSideslots() {
         return new \AppBundle\Model\SlotCollectionDecorator($this->sideslots);
@@ -692,6 +692,6 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
             $childrenFellowships = array_merge($childrenFellowships, $child->getFellowships()->toArray());
         }
 
-        return array_unique($childrenFellowships);
+        return $childrenFellowships;
     }
 }

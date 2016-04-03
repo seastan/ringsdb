@@ -147,6 +147,7 @@ class FellowshipController extends Controller {
             'deck2' => $decks[1],
             'deck3' => $decks[2],
             'deck4' => $decks[3],
+            'is_public' => false
         ], $response);
     }
 
@@ -378,6 +379,99 @@ class FellowshipController extends Controller {
         ]));
     }
 
+    public function publishFormAction($fellowship_id) {
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $user \AppBundle\Entity\User */
+        $user = $this->getUser();
+        if (!$user) {
+            throw new AccessDeniedHttpException("You must be logged in for this operation.");
+        }
+
+        /* @var $fellowship \AppBundle\Entity\Fellowship */
+        $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+        if (!$fellowship || $fellowship->getUser()->getId() != $user->getId()) {
+            throw new AccessDeniedHttpException("You don't have access to this fellowship.");
+        }
+
+        $problem = $this->get('fellowship_validation_helper')->findProblem($fellowship);
+        if ($problem) {
+            $this->get('session')->getFlashBag()->set('error', "This fellowship cannot be published because it is invalid.");
+
+            return $this->redirect($this->generateUrl('fellowship_view', [ 'fellowship_id' => $fellowship->getId() ]));
+        }
+
+        $data = [
+            'pagetitle' => "Publish Fellowship",
+            'deck1' => null,
+            'deck2' => null,
+            'deck3' => null,
+            'deck4' => null,
+            'deck1_duplicates' => [],
+            'deck2_duplicates' => [],
+            'deck3_duplicates' => [],
+            'deck4_duplicates' => [],
+            'deck1_match' => null,
+            'deck2_match' => null,
+            'deck3_match' => null,
+            'deck4_match' => null,
+            'fellowship' => $fellowship,
+        ];
+
+        /* @var $fellowship_decks \AppBundle\Entity\FellowshipDeck[] */
+        $fellowship_decks = $fellowship->getDecks();
+        foreach ($fellowship_decks as &$fellowship_deck) {
+            $deck = $fellowship_deck->getDeck();
+
+            if ($deck->getMajorVersion() > 0 && $deck->getMinorVersion() == 1) {
+                // There may be a perfect copy published
+                /* @var $pub \AppBundle\Entity\Decklist */
+                $pub = $deck->getChildren()->first();
+                if ($pub) {
+                    $data['deck' . $fellowship_deck->getDeckNumber() . '_match'] = $pub->getId();
+                }
+            }
+
+            // Finding duplicates
+            $content = [
+                'main' => $deck->getSlots()->getContent(),
+                'side' => $deck->getSideslots()->getContent(),
+            ];
+
+            $this_content = json_encode($content);
+            $this_signature = md5($this_content);
+            $old_decklists = $this->getDoctrine()->getRepository('AppBundle:Decklist')->findBy([ 'signature' => $this_signature ]);
+
+            foreach ($old_decklists as $decklist) {
+                /* @var $decklist \AppBundle\Entity\Decklist */
+                if ($decklist->getParent()->getId() == $deck->getId()) {
+                    continue;
+                }
+
+                $deck_content = [
+                    'main' => $decklist->getSlots()->getContent(),
+                    'side' => $decklist->getSideslots()->getContent(),
+                ];
+
+                if (json_encode($deck_content) == $this_content) {
+                    $data['deck' . $fellowship_deck->getDeckNumber() . '_duplicates'][] = $decklist;
+                }
+            }
+
+            $data['deck' . $fellowship_deck->getDeckNumber()] = $fellowship_deck->getDeck();
+        }
+
+        /* @var $fellowship_decks \AppBundle\Entity\FellowshipDecklist[] */
+        $fellowship_decklists = $fellowship->getDecklists();
+        foreach ($fellowship_decklists as &$fellowship_decklist) {
+            $data['deck' . $fellowship_decklist->getDeckNumber()] = $fellowship_decklist->getDecklist();
+        }
+
+        return $this->render('AppBundle:Fellowship:publish.html.twig', $data);
+    }
+
+
     public function publishAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -394,14 +488,6 @@ class FellowshipController extends Controller {
         $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
         if (!$fellowship || $fellowship->getUser()->getId() != $user->getId()) {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
-        }
-
-        // Validate fellowship
-        $problem = $this->get('fellowship_validation_helper')->findProblem($fellowship);
-        if ($problem) {
-            $this->get('session')->getFlashBag()->set('error', "This fellowship cannot be published because it is invalid.");
-
-            return $this->redirect($this->generateUrl('fellowship_view', [ 'fellowship_id' => $fellowship->getId() ]));
         }
 
         $name = trim(filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
@@ -422,7 +508,36 @@ class FellowshipController extends Controller {
         $fellowship->setIsPublic(true);
         $fellowship->setDatePublish(new \DateTime());
 
-        //TODO: Convert Decks to Decklists
+        foreach ($fellowship->getDecks() as &$fellowship_deck) {
+            /* @var $deck \AppBundle\Entity\FellowshipDeck */
+            $new_id = intval(filter_var($request->request->get('deck_selection_' . $fellowship_deck->getDeckNumber()), FILTER_SANITIZE_NUMBER_INT));
+
+            if ($new_id) {
+                $decklist = $em->getRepository('AppBundle:Decklist')->find($new_id);
+
+                if (!$decklist) {
+                    throw new NotFoundHttpException("One of the selected decks does not exists.");
+                }
+            } else {
+                $decklist = $this->get('decklist_factory')->createDecklistFromDeck($deck, $deck->getName(), $deck->getDescriptionMd());
+            }
+
+            $fellowship_decklist = new FellowshipDecklist();
+            $fellowship_decklist->setDecklist($decklist);
+            $fellowship_decklist->setDeckNumber($fellowship_deck->getDeckNumber());
+            $fellowship_decklist->setFellowship($fellowship);
+
+            $fellowship->removeDeck($fellowship_deck);
+            $fellowship->addDecklist($fellowship_decklist);
+        }
+
+        // Validate fellowship
+        $problem = $this->get('fellowship_validation_helper')->findProblem($fellowship);
+        if ($problem) {
+            $this->get('session')->getFlashBag()->set('error', "This fellowship cannot be published because it is invalid.");
+
+            return $this->redirect($this->generateUrl('fellowship_view', [ 'fellowship_id' => $fellowship->getId() ]));
+        }
 
         $em->persist($fellowship);
         $em->flush();

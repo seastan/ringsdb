@@ -2,8 +2,8 @@
 {% import "AppBundle::macros.html.twig" as macros %}
 
 {% block javascripts %}
-    {% javascripts '@AppBundle/Resources/public/js/ui.fellowshipedit.js' %}
-        <script src="{{ asset_url }}"></script>
+    {% javascripts '@AppBundle/Resources/public/js/ui.fellowshippublish.js' %}
+    <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
 
     <script type="text/javascript">
@@ -19,19 +19,7 @@
 
 {% block body %}
     <div class="main white container">
-        {% if fellowship is not defined %}
-        <div class="row">
-            <div class="col-md-12">
-                <h1 style="border-bottom:1px solid lightgray">New Fellowship</h1>
-                <p class="help-block" style="margin-bottom: 30px;">
-                    A fellowship is a link between decks that work well together or are meant to be played together.
-                    You are not limited to your own decks, but unpublished decks from other players will be copied to your collection after the fellowship is saved.
-                </p>
-            </div>
-        </div>
-        {% endif %}
-
-        <form action="{{ path('fellowship_save') }}" method="post" enctype="application/x-www-form-urlencoded" onsubmit="app.deck_selection.check_problems(event)">
+        <form action="{{ path('fellowship_publish') }}" method="post" enctype="application/x-www-form-urlencoded">
             <input type="hidden" name="deck1_id" />
             <input type="hidden" name="deck2_id" />
             <input type="hidden" name="deck3_id" />
@@ -40,11 +28,11 @@
             <input type="hidden" name="deck2_is_decklist" />
             <input type="hidden" name="deck3_is_decklist" />
             <input type="hidden" name="deck4_is_decklist" />
-            <input type="hidden" name="fellowship_id" value="{% if fellowship is defined %}{{ fellowship.id }}{% endif %}"/>
+            <input type="hidden" name="fellowship_id" value="{{ fellowship.id }}"/>
 
             <fieldset id="deck-selection">
                 <legend>
-                    Deck Selection
+                    Selected Decks
                     <a class="btn btn-xs btn-default pull-right" data-action="show-cards">
                         <span class="fa fa-eye"></span> Show cards
                     </a>
@@ -52,11 +40,17 @@
                         <span class="fa fa-eye-slash"></span> Hide cards
                     </a>
                 </legend>
-                <div class="row selected-decks">
-                    {% include 'AppBundle:Fellowship:selected-deck.html.twig' with { deck: deck1, deck_number: 1 } %}
-                    {% include 'AppBundle:Fellowship:selected-deck.html.twig' with { deck: deck2, deck_number: 2 } %}
-                    {% include 'AppBundle:Fellowship:selected-deck.html.twig' with { deck: deck3, deck_number: 3 } %}
-                    {% include 'AppBundle:Fellowship:selected-deck.html.twig' with { deck: deck4, deck_number: 4 } %}
+                <div class="row selected-decks deck-publishing-selection">
+                    {% include 'AppBundle:Fellowship:publish-deck.html.twig' with { deck: deck1, deck_number: 1, duplicates: deck1_duplicates, match: deck1_match } %}
+                </div>
+                <div class="row selected-decks deck-publishing-selection">
+                    {% include 'AppBundle:Fellowship:publish-deck.html.twig' with { deck: deck2, deck_number: 2, duplicates: deck2_duplicates, match: deck2_match } %}
+                </div>
+                <div class="row selected-decks deck-publishing-selection">
+                    {% include 'AppBundle:Fellowship:publish-deck.html.twig' with { deck: deck3, deck_number: 3, duplicates: deck3_duplicates, match: deck3_match } %}
+                </div>
+                <div class="row selected-decks deck-publishing-selection">
+                    {% include 'AppBundle:Fellowship:publish-deck.html.twig' with { deck: deck4, deck_number: 4, duplicates: deck4_duplicates, match: deck4_match } %}
                 </div>
             </fieldset>
 
@@ -83,16 +77,10 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    {% if fellowship is defined %}
-                        <button type="submit" class="btn btn-success">Save</button>
-                        <a href="{{ path('fellowship_view', { fellowship_id: fellowship.id }) }}" class="btn btn-link">Cancel</a>
-                    {% else %}
-                        <button type="submit" class="btn btn-primary">Create this fellowship</button>
-                    {% endif %}
+                    <button type="submit" class="btn btn-primary"><span class="fa fa-fw fa-share"></span> Publish</button>
+                    <a href="{{ path('myfellowships_list') }}" class="btn btn-link">Cancel</a>
                 </div>
             </div>
         </form>
     </div>
-
-    {% include 'AppBundle:Modale:deck_selection.html.twig' %}
 {% endblock %}
