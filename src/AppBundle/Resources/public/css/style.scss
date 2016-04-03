@@ -213,6 +213,13 @@ div.tags span.tag {
     margin-top: 15px;
     margin-bottom: 5px;
   }
+
+  h4 {
+    a {
+      font-weight: normal;
+      font-style: italic;
+    }
+  }
 }
 
 
@@ -1515,8 +1522,9 @@ footer a {
 
 #table-fellowships {
   td:last-child {
-    width: 80px;
+    width: 200px;
     text-align: right;
+    white-space: nowrap;
   }
 
   td:first-child {

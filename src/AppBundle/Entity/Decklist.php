@@ -778,6 +778,18 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
         return $this->fellowships;
     }
 
+    /**
+     * Get allFellowships
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getAllFellowships() {
+        $allFellowships = $this->getFellowships()->toArray();
+
+        return array_filter($allFellowships, function($k) {
+            return $k->getFellowship()->getIsPublic();
+        });
+    }
 
     // Used to reduce json export data
     private $is_simple_export;

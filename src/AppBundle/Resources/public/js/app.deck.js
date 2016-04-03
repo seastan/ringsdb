@@ -8,6 +8,7 @@
     var tags;
     var unsaved;
     var user_id;
+    var is_published;
 
     var header_tpl = _.template('<h5><span class="icon icon-<%= code %>"></span> <%= name %> (<%= quantity %>)</h5>');
     var card_line_tpl = _.template('<span class="icon icon-<%= card.type_code %> fg-<%= card.sphere_code %>"></span> <a href="<%= card.url %>" class="card card-tip fg-<%= card.sphere_code %>" data-toggle="modal" data-remote="false" data-target="#cardModal" data-code="<%= card.code %>"><%= card.name %></a>');
@@ -64,6 +65,7 @@
         tags = data.tags;
         unsaved = data.unsaved;
         user_id = data.user_id;
+        is_published = data.is_published;
 
         if (app.data.isLoaded) {
             deck.set_slots(data.slots, data.sideslots);
@@ -111,6 +113,14 @@
      */
     deck.get_name = function() {
         return name;
+    };
+
+    /**
+     * @memberOf deck
+     * @returns string
+     */
+    deck.get_is_published = function() {
+        return is_published;
     };
 
     /**
@@ -331,7 +341,21 @@
 
         var title;
         if (options.special_meta) {
-            title = $('<h4 style="font-weight: bold">' + deck.get_name() + '</h4>').attr('title', deck.get_name());
+            var url;
+
+            if (deck.get_is_published()) {
+                url = Routing.generate('decklist_detail', {
+                    decklist_id: deck.get_id()
+                });
+            } else {
+                url = Routing.generate('deck_view', {
+                    deck_id: deck.get_id()
+                });
+            }
+
+            var link = $('<a target="_blank"></a>').attr('href', url).text(deck.get_name());
+
+            title = $('<h4 style="font-weight: bold"></h4>').append(link);
         } else {
             title = $('<h4 style="font-weight: bold">Main Deck</h4>');
         }

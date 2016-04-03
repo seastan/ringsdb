@@ -23,6 +23,18 @@
             {% for i in 1..fellowship.nbDecks %}
                 <i class="fa fa-user"></i>
             {% endfor %}
+
+            <span class="social-icons" style="margin-left: 10px">
+                <span class="social-icon-like" data-toggle="tooltip" data-placement="bottom" title="Likes">
+                    <span class="fa fa-heart"></span> <span class="num">{{ fellowship.nbVotes }}</span>
+                </span>
+                <span class="social-icon-favorite" data-toggle="tooltip" data-placement="bottom" title="Favorites">
+                    <span class="fa fa-star"></span> <span class="num">{{ fellowship.nbFavorites }}</span>
+                </span>
+                <span class="social-icon-comment" data-toggle="tooltip" data-placement="bottom" title="Comments">
+                    <span class="fa fa-comment"></span> <span class="num">{{ fellowship.nbComments }}</span>
+                </span>
+            </span>
         </td>
     </tr>
 {% endmacro %}
