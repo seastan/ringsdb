@@ -422,6 +422,10 @@ class FellowshipController extends Controller {
             'deck2_match' => null,
             'deck3_match' => null,
             'deck4_match' => null,
+            'deck1_signature' => null,
+            'deck2_signature' => null,
+            'deck3_signature' => null,
+            'deck4_signature' => null,
             'fellowship' => $fellowship,
         ];
 
@@ -447,6 +451,7 @@ class FellowshipController extends Controller {
 
             $this_content = json_encode($content);
             $this_signature = md5($this_content);
+
             $old_decklists = $this->getDoctrine()->getRepository('AppBundle:Decklist')->findBy([ 'signature' => $this_signature ]);
 
             foreach ($old_decklists as $decklist) {
@@ -466,6 +471,7 @@ class FellowshipController extends Controller {
             }
 
             $data['deck' . $fellowship_deck->getDeckNumber()] = $fellowship_deck->getDeck();
+            $data['deck' . $fellowship_deck->getDeckNumber() . '_signature'] = $this_signature;
         }
 
         /* @var $fellowship_decks \AppBundle\Entity\FellowshipDecklist[] */

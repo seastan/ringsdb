@@ -1,7 +1,7 @@
 <div class="col-sm-8">
     <div class="panel panel-default" style="margin-bottom: 0">
         <div class="panel-heading">
-            <h3 class="panel-title">{% if deck is not null %}{{ deck.name }}{% else %}Deck Publishing{% endif %}</h3>
+            <h3 class="panel-title">{% if deck is not null %}{{ deck.name }} {{ deck.version }}{% else %}Deck Publishing{% endif %}</h3>
         </div>
         <div class="panel-body">
             {% if deck is null %}
@@ -21,15 +21,22 @@
                     <tbody>
                         <tr>
                             <td style="width: 25px;"><label><input type="radio" name="deck_selection_{{ deck_number }}" value="0" {% if match is null %}checked{% endif %}></label></td>
-                            <td colspan="5">Publish a new decklist using this deck's name and description.</td>
+                            <td colspan="6">Publish a new decklist using this deck's name and description.</td>
                         </tr>
                         {% for decklist in list %}
                             <tr>
                                 <td style="width: 25px;"><label><input type="radio" name="deck_selection_{{ deck_number }}" value="{{ decklist.id }}" {% if match == decklist.id %}checked{% endif %}></label></td>
+                                <td style="width: 25px;">
+                                    {% if signature == decklist.signature %}
+                                        <span class="fa fa-clone" title="Exact copy" data-toggle="tooltip" data-container="body"></span>
+                                    {% else %}
+                                        <span class="fa fa-chain-broken text-danger" title="Not a perfect match" data-toggle="tooltip" data-container="body"></span>
+                                    {% endif %}
+                                </td>
                                 <td class="decklist-name"><a href="{{ path('decklist_detail', { 'decklist_id': decklist.id, 'decklist_name': decklist.nameCanonical|e('url') }) }}">{{ decklist.name }}</a></td>
-                                <td style="width: 50px;"><span class="fa fa-heart social-icon-like"></span> {{ decklist.nbVotes }}</td>
-                                <td style="width: 50px;"><span class="fa fa-star social-icon-favorite"></span> {{ decklist.nbFavorites }}</td>
-                                <td style="width: 50px;"><span class="fa fa-comment social-icon-comment"></span> {{ decklist.nbComments }}</td>
+                                <td style="width: 40px;"><span class="fa fa-heart social-icon-like"></span> {{ decklist.nbVotes }}</td>
+                                <td style="width: 40px;"><span class="fa fa-star social-icon-favorite"></span> {{ decklist.nbFavorites }}</td>
+                                <td style="width: 40px;"><span class="fa fa-comment social-icon-comment"></span> {{ decklist.nbComments }}</td>
                                 <td style="width: 50px;"><span class="fa fa-code-fork social-icon-version"></span> {{ decklist.version }}</td>
                             </tr>
                         {% endfor %}
