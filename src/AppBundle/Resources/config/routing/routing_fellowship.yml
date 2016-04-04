@@ -28,7 +28,7 @@ fellowship_edit:
         fellowship_id: \d+
 
 fellowship_view:
-    path: /view/{fellowship_id}/{fellowship_name}
+    path: /view/{fellowship_id}
     methods: [GET]
     defaults:
         _controller: AppBundle:Fellowship:view
