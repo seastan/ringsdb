@@ -1256,6 +1256,8 @@ footer a {
     -webkit-column-count: 1; /* Chrome, Safari, Opera */
     -moz-column-count: 1; /* Firefox */
     column-count: 1;
+    margin-right: -90px;
+    font-size: 85%;
   }
 }
 
