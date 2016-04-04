@@ -1143,4 +1143,7 @@ class FellowshipController extends Controller {
         return new Response($fellowship->getNbVotes());
     }
 
+    public function byauthorAction($username) {
+        return $this->redirect($this->generateUrl('fellowships_list', ['type' => 'find', 'author' => $username]));
+    }
 }

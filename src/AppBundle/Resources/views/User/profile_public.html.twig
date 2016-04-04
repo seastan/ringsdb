@@ -21,6 +21,16 @@
             </div>
 
             <div>
+                {% if user.publicFellowships | length > 1 %}
+                    <a href="{{ path('fellowship_byauthor', { username: user.username }) }}">{{ user.publicFellowships | length }} published fellowships.</a>
+                {% elseif user.decklists|length == 1 %}
+                    <a href="{{ path('fellowship_byauthor', { username: user.username }) }}">One published fellowship.</a>
+                {% else %}
+                    No published fellowship.
+                {% endif %}
+            </div>
+
+            <div>
                 {% if user.reviews|length > 1 %}
                     <a href="{{ path('card_reviews_list_byauthor', { page: 1, user_id: user.id }) }}">{{ user.reviews | length }} published reviews.</a>
                 {% elseif user.reviews|length == 1 %}

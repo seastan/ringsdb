@@ -47,6 +47,12 @@ decklist_byauthor:
     defaults:
         _controller: AppBundle:Social:byauthor
 
+fellowship_byauthor:
+    path: /f/{username}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Fellowship:byauthor
+
 index:
     path: /
     methods: [GET]

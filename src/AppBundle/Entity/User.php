@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Model\User as BaseUser;
 
 /**
@@ -713,6 +714,20 @@ class User extends BaseUser {
     public function getFellowships() {
         return $this->fellowships;
     }
+
+    public function getPublicFellowships() {
+        $publicFellowships = [];
+
+        foreach ($this->fellowships as $fellowship) {
+            /* @var $fellowship \AppBundle\Entity\Fellowship */
+            if ($fellowship->getIsPublic()) {
+                $publicFellowships[] = $fellowship;
+            }
+        }
+
+        return new ArrayCollection($publicFellowships);
+    }
+
 
     /**
      * @var \Doctrine\Common\Collections\Collection
