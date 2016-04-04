@@ -396,7 +396,13 @@
         modal.modal('hide');
 
         setTimeout(function() {
-            $('#filter-text').typeahead('val', '').focus();
+            $('#filter-text').typeahead('val', '');
+ 
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+              return;
+            }
+
+            $('#filter-text').focus();
         }, 100);
     };
 
