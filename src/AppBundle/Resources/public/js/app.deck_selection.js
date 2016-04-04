@@ -204,17 +204,18 @@
                 }
             }
 
-            var max_qty = card.quantity;
+            var max_qty = card.owned ? card.quantity : 0;
 
             if (card.pack_code == 'Core') {
                 max_qty = card.quantity * cores;
             }
 
-            if (card.owned && record.total > max_qty) {
+            if (record.total > max_qty) {
                 var span = $('.card[data-code="' + card.code + '"]').siblings('.card-count');
+                var text = 'A total of ' + record.total + ' copies of this card are being used between selected decks but you only have ' + max_qty + (max_qty == 1 ? ' copy' : ' copies') + ' in your collection.';
 
                 span.addClass('limited-pool-conflict')
-                    .attr('title', 'A total of ' + record.total + ' copies of this card are being used between selected decks but you only have ' + max_qty + (max_qty == 1 ? ' copy' : ' copies') + ' in your collection.');
+                    .attr('title', max_qty ? text : 'This card is not in my collection.');
             }
         });
     };
