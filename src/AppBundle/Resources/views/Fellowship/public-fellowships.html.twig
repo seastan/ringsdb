@@ -70,7 +70,7 @@
                             <td>
                                 <div class="row">
                                     <div class="col-sm-6 col-md-7 col-lg-8">
-                                        <h4 class="fellowship-name"><a href="{{ path('fellowship_view', { fellowship_id: fellowship.id }) }}">{{ fellowship.name }}</a></h4>
+                                        <h4 class="fellowship-name"><a href="{{ path('fellowship_view', { fellowship_id: fellowship.id, 'fellowship_name': fellowship.nameCanonical|e('url') }) }}">{{ fellowship.name }}</a></h4>
                                     </div>
                                     <div class="col-sm-6 col-md-5 col-lg-4">
                                         <div class="fellowships-actions">
