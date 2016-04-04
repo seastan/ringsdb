@@ -1251,6 +1251,14 @@ footer a {
   column-count: 3;
 }
 
+@media (max-width: 767px) {
+  #set-selection-menu {
+    -webkit-column-count: 1; /* Chrome, Safari, Opera */
+    -moz-column-count: 1; /* Firefox */
+    column-count: 1;
+  }
+}
+
 [data-unique="true"] {
   font-weight: bold;
 }
