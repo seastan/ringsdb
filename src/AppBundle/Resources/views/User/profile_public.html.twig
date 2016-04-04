@@ -23,7 +23,7 @@
             <div>
                 {% if user.publicFellowships | length > 1 %}
                     <a href="{{ path('fellowship_byauthor', { username: user.username }) }}">{{ user.publicFellowships | length }} published fellowships.</a>
-                {% elseif user.decklists|length == 1 %}
+                {% elseif user.publicFellowships | length == 1 %}
                     <a href="{{ path('fellowship_byauthor', { username: user.username }) }}">One published fellowship.</a>
                 {% else %}
                     No published fellowship.
