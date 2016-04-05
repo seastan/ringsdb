@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\VarDumper\VarDumper;
 
 class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
 
@@ -59,10 +60,10 @@ class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
         $showTexts = $input->getOption('show-texts');
 
         if (file_exists('beorn.json')) {
-            dump("Loading Local Beorn JSON");
+            VarDumper::dump("Loading Local Beorn JSON");
             $json = file_get_contents('beorn.json');
         } else {
-            dump("Loading Remote Beorn JSON");
+            VarDumper::dump("Loading Remote Beorn JSON");
             $json = file_get_contents("http://hallofbeorn.com/Export/Cards");
             file_put_contents('beorn.json', $json);
         }
@@ -74,13 +75,16 @@ class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
                 continue;
             }
 
-            dump($data->Title . " $i");
+            VarDumper::dump($data->Title . " $i");
+
+            $cardset = $data->CardSet;
+            $cardset = str_replace('The Hobbit: ', '', $cardset);
 
             /* @var $pack \AppBundle\Entity\Pack */
-            $pack = $em->getRepository('AppBundle:Pack')->findOneBy(['name' => $data->CardSet]);
+            $pack = $em->getRepository('AppBundle:Pack')->findOneBy(['name' => $cardset]);
 
             if (!$pack) {
-                dump('Could not find pack ' . $data->CardSet);
+                VarDumper::dump('Could not find pack ' . $data->CardSet);
                 continue;
             }
 
@@ -89,7 +93,7 @@ class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
 
             if (!$card) {
                 if ($data->CardType == 'Hero' || $data->CardType == 'Ally' || $data->CardType == 'Attachment' || $data->CardType == 'Event') {
-                    dump('Could not find card ' . $data->Title);
+                    VarDumper::dump('Could not find card ' . $data->Title);
                     $question = new ConfirmationQuestion("Continue?");
                     $questionHelper->ask($input, $output, $question);
                 }
@@ -97,64 +101,63 @@ class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
             }
 
             if ($card->getHasErrata() != $data->HasErrata) {
-                dump('Errata Mismatch ' . $data->Title);
-                dump($card->getHasErrata());
-                dump($data->HasErrata);
+                VarDumper::dump('Errata Mismatch ' . $data->Title);
+                VarDumper::dump($card->getHasErrata());
+                VarDumper::dump($data->HasErrata);
 
                 $question = new ConfirmationQuestion("Continue?");
                 $questionHelper->ask($input, $output, $question);
             }
 
             if (property_exists($data->Front->Stats, 'ThreatCost') && $card->getThreat() != $data->Front->Stats->ThreatCost) {
-                dump('Threat Mismatch ' . $data->Title);
-                dump($card->getThreat());
-                dump($data->Front->Stats->ThreatCost);
+                VarDumper::dump('Threat Mismatch ' . $data->Title);
+                VarDumper::dump($card->getThreat());
+                VarDumper::dump($data->Front->Stats->ThreatCost);
 
                 $question = new ConfirmationQuestion("Continue?");
                 $questionHelper->ask($input, $output, $question);
             }
 
             if (property_exists($data->Front->Stats, 'Willpower') && $card->getWillpower() != $data->Front->Stats->Willpower) {
-                dump('Willpower Mismatch ' . $data->Title);
-                dump($card->getWillpower());
-                dump($data->Front->Stats->Willpower);
+                VarDumper::dump('Willpower Mismatch ' . $data->Title);
+                VarDumper::dump($card->getWillpower());
+                VarDumper::dump($data->Front->Stats->Willpower);
 
                 $question = new ConfirmationQuestion("Continue?");
                 $questionHelper->ask($input, $output, $question);
             }
 
             if (property_exists($data->Front->Stats, 'Attack') && $card->getAttack() != $data->Front->Stats->Attack) {
-                dump('Attack Mismatch ' . $data->Title);
-                dump($card->getAttack());
-                dump($data->Front->Stats->Attack);
+                VarDumper::dump('Attack Mismatch ' . $data->Title);
+                VarDumper::dump($card->getAttack());
+                VarDumper::dump($data->Front->Stats->Attack);
 
                 $question = new ConfirmationQuestion("Continue?");
                 $questionHelper->ask($input, $output, $question);
             }
 
             if (property_exists($data->Front->Stats, 'Defense') && $card->getDefense() != $data->Front->Stats->Defense) {
-                dump('Defense Mismatch ' . $data->Title);
-                dump($card->getDefense());
-                dump($data->Front->Stats->Defense);
+                VarDumper::dump('Defense Mismatch ' . $data->Title);
+                VarDumper::dump($card->getDefense());
+                VarDumper::dump($data->Front->Stats->Defense);
 
                 $question = new ConfirmationQuestion("Continue?");
                 $questionHelper->ask($input, $output, $question);
             }
 
             if (property_exists($data->Front->Stats, 'HitPoints') && $card->getHealth() != $data->Front->Stats->HitPoints) {
-                dump('HitPoints Mismatch ' . $data->Title);
-                dump($card->getHealth());
-                dump($data->Front->Stats->HitPoints);
+                VarDumper::dump('HitPoints Mismatch ' . $data->Title);
+                VarDumper::dump($card->getHealth());
+                VarDumper::dump($data->Front->Stats->HitPoints);
 
                 $question = new ConfirmationQuestion("Continue?");
                 $questionHelper->ask($input, $output, $question);
             }
 
-            //$card->setIllustrator($data->Artist);
-            //$em->flush();
+            $card->setIllustrator($data->Artist);
         }
 
-        //$em->flush();
+        $em->flush();
         $output->writeln("Done.");
     }
 }
