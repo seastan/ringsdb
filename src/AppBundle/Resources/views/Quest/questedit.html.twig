@@ -54,9 +54,18 @@
                                     <label for="quest">Quest</label>
                                     <small class="pull-right"><strong><a href="" id="btn-randomize">Randomize</a></strong></small>
                                     <select class="form-control" name="quest" id="quest">
+                                        {% set pack = null %}
                                         {% for quest in quests %}
+                                            {% if quest.pack.cycle.name != pack %}
+                                                 {% if pack is not null %}
+                                                   </optgroup>
+                                                {% endif %}
+                                                {% set pack = quest.pack.cycle.name %}
+                                                <optgroup label="{{ pack }}">
+                                            {% endif %}
                                             <option value="{{ quest.id }}">{{ quest.name }}</option>
                                         {% endfor %}
+                                        </optgroup>
                                     </select>
                                 </div>
                             </div>
