@@ -21,9 +21,9 @@ app_fellowship:
     resource: "@AppBundle/Resources/config/routing/routing_fellowship.yml"
     prefix: /fellowship
 
-#app_questlog:
-#    resource: "@AppBundle/Resources/config/routing/routing_questlog.yml"
-#    prefix: /questlog
+app_questlog:
+    resource: "@AppBundle/Resources/config/routing/routing_questlog.yml"
+    prefix: /questlog
 
 app_review:
     resource: "@AppBundle/Resources/config/routing/routing_review.yml"
