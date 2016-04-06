@@ -21,12 +21,21 @@
         var tr = $(this).closest('tr');
         var decks = tr.find('.fellowship-heroes');
 
-        var ids = [];
+        var data = {};
+        var i = 1;
         decks.each(function() {
-            ids.push($(this).data('id'));
+            var id = $(this).data('id');
+            var pub = $(this).data('published');
+            if (id) {
+                data['deck' + i + '_id'] = id;
+                if (pub) {
+                    data['p' + i] = pub;
+                }
+            }
+            i++;
         });
 
-        location.href = Routing.generate('questlog_new', { deck1_id: ids[0], deck2_id: ids[1], deck3_id: ids[2], deck4_id: ids[3] });
+        location.href = Routing.generate('questlog_new', data);
     };
 
     ui.do_action_selection = function(event) {

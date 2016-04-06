@@ -52,6 +52,134 @@ AppBundle\Entity\Scenario:
             gedmo:
                 timestampable:
                     on: update
+        hasEasy:
+            type: boolean
+            nullable: false
+            column: has_easy
+        hasNightmare:
+            type: boolean
+            nullable: false
+            column: has_nightmare
+        easyCards:
+            type: smallint
+            nullable: false
+            column: easy_cards
+        easyEnemies:
+            type: smallint
+            nullable: false
+            column: easy_enemies
+        easyLocations:
+            type: smallint
+            nullable: false
+            column: easy_locations
+        easyTreacheries:
+            type: smallint
+            nullable: false
+            column: easy_treacheries
+        easyObjectives:
+            type: smallint
+            nullable: false
+            column: easy_objectives
+        easyObjectiveAllies:
+            type: smallint
+            nullable: false
+            column: easy_objective_allies
+        easyObjectiveLocations:
+            type: smallint
+            nullable: false
+            column: easy_objective_locations
+        easySurges:
+            type: smallint
+            nullable: false
+            column: easy_surges
+        easyShadows:
+            type: smallint
+            nullable: false
+            column: easy_shadows
+        easyEncounterSideQuests:
+            type: smallint
+            nullable: false
+            column: easy_encounter_side_quests
+        normalCards:
+            type: smallint
+            nullable: false
+            column: normal_cards
+        normalEnemies:
+            type: smallint
+            nullable: false
+            column: normal_enemies
+        normalLocations:
+            type: smallint
+            nullable: false
+            column: normal_locations
+        normalTreacheries:
+            type: smallint
+            nullable: false
+            column: normal_treacheries
+        normalObjectives:
+            type: smallint
+            nullable: false
+            column: normal_objectives
+        normalObjectiveAllies:
+            type: smallint
+            nullable: false
+            column: normal_objective_allies
+        normalObjectiveLocations:
+            type: smallint
+            nullable: false
+            column: normal_objective_locations
+        normalSurges:
+            type: smallint
+            nullable: false
+            column: normal_surges
+        normalShadows:
+            type: smallint
+            nullable: false
+            column: normal_shadows
+        normalEncounterSideQuests:
+            type: smallint
+            nullable: false
+            column: normal_encounter_side_quests
+        nightmareCards:
+            type: smallint
+            nullable: false
+            column: nightmare_cards
+        nightmareEnemies:
+            type: smallint
+            nullable: false
+            column: nightmare_enemies
+        nightmareLocations:
+            type: smallint
+            nullable: false
+            column: nightmare_locations
+        nightmareTreacheries:
+            type: smallint
+            nullable: false
+            column: nightmare_treacheries
+        nightmareObjectives:
+            type: smallint
+            nullable: false
+            column: nightmare_objectives
+        nightmareObjectiveAllies:
+            type: smallint
+            nullable: false
+            column: nightmare_objective_allies
+        nightmareObjectiveLocations:
+            type: smallint
+            nullable: false
+            column: nightmare_objective_locations
+        nightmareSurges:
+            type: smallint
+            nullable: false
+            column: nightmare_surges
+        nightmareShadows:
+            type: smallint
+            nullable: false
+            column: nightmare_shadows
+        nightmareEncounterSideQuests:
+            type: smallint
+            nullable: false
+            column: nightmare_encounter_side_quests
     uniqueConstraints:
         scenario_code_idx:
             columns: [ code ]

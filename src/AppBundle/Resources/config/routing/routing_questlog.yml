@@ -13,14 +13,6 @@ questlog_new:
         deck3_id: \d+
         deck4_id: \d+
 
-questlog_new_with_fellowship:
-    path: /new_with_fellowship/{fellowship_id}
-    methods: [GET]
-    defaults:
-        _controller: AppBundle:QuestLog:newWithFellowship
-    requirements:
-        fellowship_id: \d+
-
 questlog_save:
     path: /save
     methods: [POST]

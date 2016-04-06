@@ -2,62 +2,40 @@
 namespace AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class QuestLogController extends Controller {
 
-    public function newWithFellowshipAction($fellowship_id) {
-        /* @var $user \AppBundle\Entity\User */
-        $user = $this->getUser();
+    public function newAction($deck1_id, $deck2_id, $deck3_id, $deck4_id, Request $request) {
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
 
-        /* @var $fellowship \AppBundle\Entity\Fellowship */
-        $fellowship = $this->getDoctrine()->getRepository('AppBundle:Fellowship')->find($fellowship_id);
-
-        if (!$fellowship) {
-            throw $this->createNotFoundException("This fellowship does not exists.");
-        }
-
-        if ($fellowship->getUser()->getIsShareDecks() && $user->getId() !== $fellowship->getUser()->getId()) {
-            throw $this->createAccessDeniedException("Access denied to this object.");
-        }
-
-        $quests = $this->getDoctrine()->getRepository('AppBundle:Scenario')->findBy([], ['position' => 'ASC']);
-
-
-        /* @var $fellowship_decks \AppBundle\Entity\FellowshipDeck[] */
-        $fellowship_decks = $fellowship->getDecks();
-        $data = [
-            'deck1_id' => null,
-            'deck2_id' => null,
-            'deck3_id' => null,
-            'deck4_id' => null,
-        ];
-
-        foreach ($fellowship_decks as $fellowship_deck) {
-            $data['deck' . $fellowship_deck->getDeckNumber() . '_id'] = $fellowship_deck->getDeck()->getId();
-        }
-
-        return $this->redirect($this->generateUrl('questlog_new', $data));
-    }
-
-    public function newAction($deck1_id, $deck2_id, $deck3_id, $deck4_id) {
         $response = new Response();
 
-        $quests = $this->getDoctrine()->getRepository('AppBundle:Scenario')->findBy([], ['position' => 'ASC']);
+        /* @var $quests \AppBundle\Entity\Scenario[] */
+        $quests = $em->getRepository('AppBundle:Scenario')->findBy([], ['position' => 'ASC']);
 
         $decks = [];
         $deck_ids = func_get_args();
+
 
         for ($i = 0; $i < 4; $i++) {
             $decks[$i] = null;
 
             if ($deck_ids[$i]) {
-                $decks[$i] = $this->getDoctrine()->getManager()->getRepository('AppBundle:Deck')->find($deck_ids[$i]);
+                $public = filter_var($request->get('p'.($i + 1)), FILTER_SANITIZE_NUMBER_INT);
+
+                if ($public) {
+                    $decks[$i] = $em->getRepository('AppBundle:Decklist')->find($deck_ids[$i]);
+                } else {
+                    $decks[$i] = $em->getRepository('AppBundle:Deck')->find($deck_ids[$i]);
+                }
 
                 if ($decks[$i]) {
                     $user = $decks[$i]->getUser();
 
-                    if (!$user->getIsShareDecks() && $user->getId() != $this->getUser()->getId()) {
+                    if (!$public && !$user->getIsShareDecks() && $user->getId() != $this->getUser()->getId()) {
                         $decks[$i] = null;
                     }
                 }
