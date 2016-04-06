@@ -19,6 +19,13 @@ api_cards:
     defaults:
         _controller: AppBundle:Api:listCards
 
+
+api_cards_search:
+    path: /cards/search/{q}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Api:searchCards
+
 api_cards_pack:
     path: /cards/{pack_code}.{_format}
     methods: [GET]

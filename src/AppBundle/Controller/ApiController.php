@@ -634,4 +634,45 @@ class ApiController extends Controller {
 		return $response;
 	}
 
+    public function searchCardsAction($q, Request $request) {
+        $response = new Response();
+        $response->setPublic();
+        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->headers->add(['Access-Control-Allow-Origin' => '*']);
+
+        static $availability = [];
+
+        $cards = [];
+
+        $conditions = $this->get('cards_data')->syntax(urldecode($q));
+        $conditions = $this->get('cards_data')->validateConditions($conditions);
+
+        $query = $this->get('cards_data')->buildQueryFromConditions($conditions);
+                if ($query && $rows = $this->get('cards_data')->get_search_rows($conditions, "set")) {
+                        for ($rowindex = 0; $rowindex < count($rows); $rowindex++) {
+                                if (empty($last_modified) || $last_modified < $rows[$rowindex]->getDateUpdate()) {
+                                        $last_modified = $rows[$rowindex]->getDateUpdate();
+                                }
+                        }
+                        $response->setLastModified($last_modified);
+                        if ($response->isNotModified($request)) {
+                                return $response;
+                        }
+                        for ($rowindex = 0; $rowindex < count($rows); $rowindex++) {
+                                $card = $this->get('cards_data')->getCardInfo($rows[$rowindex], true, "en");
+                                $cards[] = $card;
+                        }
+                }
+
+                $content = json_encode($cards);
+                if (isset($jsonp)) {
+                        $content = "$jsonp($content)";
+                        $response->headers->set('Content-Type', 'application/javascript');
+                } else {
+                        $response->headers->set('Content-Type', 'application/json');
+                }
+                $response->setContent($content);
+
+                return $response;
+	}
 }
