@@ -155,12 +155,21 @@
     };
 
     ui.init_date_picker = function() {
-        $('#date')[0].valueAsDate = new Date();
-        $('#date').on('input', ui.set_questlog_name);
+        var d = $('#date');
+        if (!d.val()) {
+            d[0].valueAsDate = new Date();
+        }
+        d.on('input', ui.set_questlog_name).trigger('input');
     };
 
     ui.init_questlog_name = function() {
-        $('#name').on('input', function() {
+        var n = $('#name');
+        if (n.val()) {
+            name_changed = true;
+            return;
+        }
+
+        n.on('input', function() {
             if ($(this).val()) {
                 name_changed = true;
             } else {
@@ -230,11 +239,11 @@
      * @memberOf ui
      */
     ui.on_dom_loaded = function() {
+        ui.init_questlog_name();
         ui.init_quest_selector();
         ui.init_quest_mode_selector();
         ui.init_result_selector();
         ui.init_date_picker();
-        ui.init_questlog_name();
         ui.setup_event_handlers();
 
         app.deck_selection && app.deck_selection.init_buttons();

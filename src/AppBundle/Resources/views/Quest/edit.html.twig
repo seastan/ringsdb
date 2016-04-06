@@ -13,6 +13,8 @@
         Decks[3] = {{ deck3 | json_encode | raw }};
         Decks[4] = {{ deck4 | json_encode | raw }};
 
+        var Questlog = {{ questlog | json_encode | raw }};
+        
         app.deck_selection && app.deck_selection.init(Decks);
     </script>
 {% endblock %}
@@ -28,11 +30,11 @@
             <input type="hidden" name="deck2_is_decklist" />
             <input type="hidden" name="deck3_is_decklist" />
             <input type="hidden" name="deck4_is_decklist" />
-            <input type="hidden" name="deck1_content" />
-            <input type="hidden" name="deck2_content" />
-            <input type="hidden" name="deck3_content" />
-            <input type="hidden" name="deck4_content" />
-            <input type="hidden" name="questlog_id" value="{% if questlog is defined %}{{ questlog.id }}{% endif %}"/>
+            <input type="hidden" name="deck1_content" value="{{ deck1_content }}" />
+            <input type="hidden" name="deck2_content" value="{{ deck2_content }}" />
+            <input type="hidden" name="deck3_content" value="{{ deck3_content }}" />
+            <input type="hidden" name="deck4_content" value="{{ deck4_content }}" />
+            <input type="hidden" name="questlog_id" value="{{ questlog.id }}"/>
 
 
             <fieldset id="deck-selection">
@@ -73,7 +75,7 @@
                                                 {% set pack = quest.pack.cycle.name %}
                                                 <optgroup label="{{ pack }}">
                                             {% endif %}
-                                            <option value="{{ quest.id }}">{{ quest.name }}</option>
+                                            <option value="{{ quest.id }}" {% if questlog.scenario.id == quest.id %}selected{% endif %}>{{ quest.name }}</option>
                                         {% endfor %}
                                         </optgroup>
                                     </select>
@@ -84,7 +86,7 @@
                             <div class="col-sm-3">
                                 <div class="form-group">
                                     <label for="date">Date</label>
-                                    <div><input type="date" class="form-control" size="40" id="date" name="date" value=""></div>
+                                    <div><input type="date" class="form-control" size="40" id="date" name="date" value="{{ questlog.datePlayed ? questlog.datePlayed | date("Y-m-d") }}"></div>
                                 </div>
                             </div>
                             <div class="col-sm-3">
@@ -92,9 +94,9 @@
                                     <label for="difficulty">Quest Mode</label>
                                     <div>
                                         <select class="form-control" name="difficulty" id="difficulty">
-                                            <option value="normal">Normal</option>
-                                            <option value="easy">Easy</option>
-                                            <option value="nightmare">Nightmare</option>
+                                            <option value="normal" {% if questlog.questMode == "normal" %}selected{% endif %}>Normal</option>
+                                            <option value="easy" {% if questlog.questMode == "easy" %}selected{% endif %}>Easy</option>
+                                            <option value="nightmare" {% if questlog.questMode == "nightmare" %}selected{% endif %}>Nightmare</option>
                                         </select>
                                     </div>
                                 </div>
@@ -104,8 +106,8 @@
                                     <label for="victory">Result</label>
                                     <div>
                                         <select class="form-control" name="victory" id="victory">
-                                            <option value="yes">Success</option>
-                                            <option value="no">Failure</option>
+                                            <option value="yes" {% if questlog.success %}selected{% endif %}>Success</option>
+                                            <option value="no" {% if not questlog.success %}selected{% endif %}>Failure</option>
                                         </select>
                                     </div>
                                 </div>
@@ -113,7 +115,7 @@
                             <div class="col-sm-3">
                                 <div class="form-group">
                                     <label for="score">Score</label>
-                                    <div><input type="number" class="form-control" id="score" name="score" value="{% if questlog is defined %}{{ questlog.score }}{% endif %}"></div>
+                                    <div><input type="number" class="form-control" id="score" name="score" value="{{ questlog.score }}"></div>
                                 </div>
                             </div>
                         </div>
@@ -121,7 +123,7 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label for="descriptionMd">Quest Log Title</label>
-                                    <input class="form-control" name="name" id="name" maxlength="250" value="{% if questlog is defined %}{{ questlog.name }}{% endif %}"/>
+                                    <input class="form-control" name="name" id="name" maxlength="250" value="{{ questlog.name }}"/>
                                 </div>
                             </div>
                         </div>
@@ -129,7 +131,7 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label for="descriptionMd">Quest Notes</label>
-                                    <textarea class="form-control" autocapitalize="none" autocomplete="off" rows="8" name="descriptionMd" id="descriptionMd"></textarea>
+                                    <textarea class="form-control" autocapitalize="none" autocomplete="off" rows="8" name="descriptionMd" id="descriptionMd">{{ questlog.descriptionMd }}</textarea>
                                 </div>
                             </div>
                         </div>

@@ -47,6 +47,9 @@ class QuestLogController extends Controller {
             }
         }
 
+        $questlog = new Questlog();
+        $questlog->setSuccess(true);
+
         return $this->render('AppBundle:Quest:edit.html.twig', [
             'quests' => $quests,
             'pagetitle' => "Log a Quest",
@@ -54,6 +57,12 @@ class QuestLogController extends Controller {
             'deck2' => $decks[1],
             'deck3' => $decks[2],
             'deck4' => $decks[3],
+            'deck1_content' => null,
+            'deck2_content' => null,
+            'deck3_content' => null,
+            'deck4_content' => null,
+            'questlog' => $questlog,
+            'is_public' => false
         ], $response);
     }
 
@@ -99,7 +108,7 @@ class QuestLogController extends Controller {
         /* @var $questlog_decks \AppBundle\Entity\QuestlogDeck[] */
         $questlog_decks = $questlog->getDecks();
         foreach ($questlog_decks as $questlog_deck) {
-            $data['deck' . $questlog_deck->getDeckNumber()] = $questlog_deck->getDeck();
+            $data['deck' . $questlog_deck->getDeckNumber()] = $questlog_deck->getDeck() ?: $questlog_deck->getDecklist();
             $data['deck' . $questlog_deck->getDeckNumber() . '_content'] = $questlog_deck->getContent();
         }
 
