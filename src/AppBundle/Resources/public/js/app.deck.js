@@ -21,7 +21,7 @@
 
     layouts.type = {};
     layouts.type[1] = _.template('<div class="deck-content"><%= meta %><%= heroes %><%= allies %><%= attachments %><%= events %><%= sidequests %><%= treasures %></div>');
-    layouts.type[2] = _.template('<div class="deck-content"><div class="row"><div class="col-sm-12"><%= meta %></div></div><div class="row"><div class="col-sm-12"><%= heroes %></div></div><div class="row"><div class="col-sm-6"><%= allies %></div><div class="col-sm-6"><%= attachments %><%= events %><%= sidequests %><%= treasures %></div></div></div>');
+    layouts.type[2] = _.template('<div class="deck-content"><div class="row"><div class="col-sm-12"><%= meta %></div></div><div class="row"><div class="col-sm-12"><%= heroes %></div></div><div class="row"><div class="col-sm-6 col-print-6"><%= allies %></div><div class="col-sm-6 col-print-6"><%= attachments %><%= events %><%= sidequests %><%= treasures %></div></div></div>');
     layouts.type[3] = _.template('<div class="deck-content"><div class="row"><div class="col-sm-4"><%= meta %><%= heroes %></div><div class="col-sm-4"><%= allies %></div><div class="col-sm-4"><%= attachments %><%= events %><%= sidequests %><%= treasures %></div></div></div>');
 
     layouts.position = {};
@@ -287,6 +287,8 @@
 
         if (options.cols == 1) {
             c.find('.hero-thumbnail').removeClass('card-thumbnail-2x').addClass('card-thumbnail-3x');
+        } else if (options.cols == 2) {
+            c.find('div.col-sm-6:empty').remove();
         }
     };
 
