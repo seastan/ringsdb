@@ -60,6 +60,10 @@ AppBundle\Entity\Decklist:
             targetEntity: FellowshipDecklist
             mappedBy: decklist
             cascade: ["persist","remove"]
+        questlogs:
+            targetEntity: QuestlogDeck
+            mappedBy: decklist
+            cascade: ["persist","remove"]
     manyToMany:
         spheres:
             targetEntity: Sphere

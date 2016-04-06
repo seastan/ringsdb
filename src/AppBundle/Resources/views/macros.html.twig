@@ -8,7 +8,7 @@
 
 {% macro decklist_table_row(decklist) %}
 <tr>
-	<td class="decklist-name"><a href="{{ path('decklist_detail', { 'decklist_id': decklist.id, 'decklist_name': decklist.nameCanonical|e('url') }) }}">{{ decklist.name }}</a></td>
+	<td class="decklist-name"><a href="{{ path('decklist_detail', { 'decklist_id': decklist.id, 'decklist_name': decklist.nameCanonical | e('url') }) }}">{{ decklist.name }}</a></td>
 	<td><span class="fa fa-heart social-icon-like"></span> {{ decklist.nbVotes }}</td>
 	<td><span class="fa fa-star social-icon-favorite"></span> {{ decklist.nbFavorites }}</td>
 	<td><span class="fa fa-comment social-icon-comment"></span> {{ decklist.nbComments }}</td>
@@ -18,7 +18,7 @@
 
 {% macro fellowship_deck_table_row(fellowship) %}
     <tr>
-        <td class="fellowship-name"><a href="{{ path('fellowship_view', { 'fellowship_id': fellowship.id }) }}">{{ fellowship.name }}</a></td>
+        <td class="fellowship-name"><a href="{{ path('fellowship_view', { 'fellowship_id': fellowship.id, 'fellowship_name': fellowship.nameCanonical | e('url') }) }}">{{ fellowship.name }}</a></td>
         <td>
             {% for i in 1..fellowship.nbDecks %}
                 <i class="fa fa-user"></i>

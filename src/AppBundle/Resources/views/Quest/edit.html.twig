@@ -19,11 +19,21 @@
 
 {% block body %}
     <div class="main white container">
-        <form action="{{ path('questlog_save') }}" method="post" enctype="application/x-www-form-urlencoded">
+        <form action="{{ path('questlog_save') }}" method="POST" id="save_form" role="form" enctype="application/x-www-form-urlencoded">
             <input type="hidden" name="deck1_id" />
             <input type="hidden" name="deck2_id" />
             <input type="hidden" name="deck3_id" />
             <input type="hidden" name="deck4_id" />
+            <input type="hidden" name="deck1_is_decklist" />
+            <input type="hidden" name="deck2_is_decklist" />
+            <input type="hidden" name="deck3_is_decklist" />
+            <input type="hidden" name="deck4_is_decklist" />
+            <input type="hidden" name="deck1_content" />
+            <input type="hidden" name="deck2_content" />
+            <input type="hidden" name="deck3_content" />
+            <input type="hidden" name="deck4_content" />
+            <input type="hidden" name="questlog_id" value="{% if questlog is defined %}{{ questlog.id }}{% endif %}"/>
+
 
             <fieldset id="deck-selection">
                 <legend>
@@ -103,7 +113,15 @@
                             <div class="col-sm-3">
                                 <div class="form-group">
                                     <label for="score">Score</label>
-                                    <div><input type="number" class="form-control" id="score" name="score" value=""></div>
+                                    <div><input type="number" class="form-control" id="score" name="score" value="{% if questlog is defined %}{{ questlog.score }}{% endif %}"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="descriptionMd">Quest Log Title</label>
+                                    <input class="form-control" name="name" id="name" maxlength="250" value="{% if questlog is defined %}{{ questlog.name }}{% endif %}"/>
                                 </div>
                             </div>
                         </div>

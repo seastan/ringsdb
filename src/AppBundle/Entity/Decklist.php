@@ -803,4 +803,40 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     public function getIsSimpleExport() {
         return $this->is_simple_export;
     }
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $questlogs;
+
+    /**
+     * Add questlogs
+     *
+     * @param \AppBundle\Entity\QuestlogDeck $questlogs
+     *
+     * @return Decklist
+     */
+    public function addQuestlogs(\AppBundle\Entity\QuestlogDeck $questlogs) {
+        $this->questlogs[] = $questlogs;
+
+        return $this;
+    }
+
+    /**
+     * Remove questlogs
+     *
+     * @param \AppBundle\Entity\QuestlogDeck $questlogs
+     */
+    public function removeQuestlogs(\AppBundle\Entity\QuestlogDeck $questlogs) {
+        $this->questlogs->removeElement($questlogs);
+    }
+
+    /**
+     * Get questlogs
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getQuestlogs() {
+        return $this->questlogs;
+    }
 }

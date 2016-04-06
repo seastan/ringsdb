@@ -688,10 +688,46 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     public function getAllFellowships() {
         $childrenFellowships = $this->getFellowships()->toArray();
 
-        foreach($this->getChildren() as &$child) {
+        foreach ($this->getChildren() as &$child) {
             $childrenFellowships = array_merge($childrenFellowships, $child->getFellowships()->toArray());
         }
 
         return $childrenFellowships;
+    }
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $questlogs;
+
+    /**
+     * Add questlog
+     *
+     * @param \AppBundle\Entity\QuestlogDeck $questlog
+     *
+     * @return Deck
+     */
+    public function addQuestlog(\AppBundle\Entity\QuestlogDeck $questlog) {
+        $this->questlogs[] = $questlog;
+
+        return $this;
+    }
+
+    /**
+     * Remove questlog
+     *
+     * @param \AppBundle\Entity\QuestlogDeck $questlog
+     */
+    public function removeQuestlog(\AppBundle\Entity\QuestlogDeck $questlog) {
+        $this->questlogs->removeElement($questlog);
+    }
+
+    /**
+     * Get questlogs
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getQuestlogs() {
+        return $this->questlogs;
     }
 }

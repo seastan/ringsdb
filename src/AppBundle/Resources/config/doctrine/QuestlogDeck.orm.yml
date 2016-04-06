@@ -1,0 +1,38 @@
+AppBundle\Entity\QuestlogDeck:
+    type: entity
+    table: questlog_deck
+    manyToOne:
+        questlog:
+            targetEntity: Questlog
+            nullable: false
+            inversedBy: decks
+            joinColumn:
+                name: questlog_id
+                referencedColumnName: id
+        deck:
+            targetEntity: Deck
+            nullable: false
+            inversedBy: questlogs
+            joinColumn:
+                name: deck_id
+                referencedColumnName: id
+        decklist:
+            targetEntity: Decklist
+            nullable: false
+            inversedBy: questlogs
+            joinColumn:
+                name: decklist_id
+                referencedColumnName: id
+    fields:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+        deckNumber:
+            type: smallint
+            nullable: false
+            column: deck_number
+        content:
+            type: text
+            nullable: false

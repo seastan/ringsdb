@@ -44,6 +44,10 @@ AppBundle\Entity\Deck:
             targetEntity: FellowshipDeck
             mappedBy: deck
             cascade: ["persist","remove"]
+        questlogs:
+            targetEntity: QuestlogDeck
+            mappedBy: deck
+            cascade: ["persist","remove"]
     fields:
         id:
             type: integer

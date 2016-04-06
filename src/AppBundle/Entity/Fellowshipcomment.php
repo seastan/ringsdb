@@ -3,9 +3,9 @@
 namespace AppBundle\Entity;
 
 /**
- * Fellowshipcomment
+ * FellowshipComment
  */
-class Fellowshipcomment {
+class FellowshipComment {
     /**
      * @var integer
      */
@@ -45,7 +45,7 @@ class Fellowshipcomment {
      *
      * @param \DateTime $dateCreation
      *
-     * @return Fellowshipcomment
+     * @return FellowshipComment
      */
     public function setDateCreation($dateCreation) {
         $this->dateCreation = $dateCreation;
@@ -67,7 +67,7 @@ class Fellowshipcomment {
      *
      * @param \DateTime $dateUpdate
      *
-     * @return Fellowshipcomment
+     * @return FellowshipComment
      */
     public function setDateUpdate($dateUpdate) {
         $this->dateUpdate = $dateUpdate;
@@ -89,7 +89,7 @@ class Fellowshipcomment {
      *
      * @param string $text
      *
-     * @return Fellowshipcomment
+     * @return FellowshipComment
      */
     public function setText($text) {
         $this->text = $text;
@@ -111,7 +111,7 @@ class Fellowshipcomment {
      *
      * @param \AppBundle\Entity\User $user
      *
-     * @return Fellowshipcomment
+     * @return FellowshipComment
      */
     public function setUser(\AppBundle\Entity\User $user = null) {
         $this->user = $user;
@@ -133,7 +133,7 @@ class Fellowshipcomment {
      *
      * @param \AppBundle\Entity\Fellowship $fellowship
      *
-     * @return Fellowshipcomment
+     * @return FellowshipComment
      */
     public function setFellowship(\AppBundle\Entity\Fellowship $fellowship = null) {
         $this->fellowship = $fellowship;
@@ -160,7 +160,7 @@ class Fellowshipcomment {
      *
      * @param boolean $isHidden
      *
-     * @return Fellowshipcomment
+     * @return FellowshipComment
      */
     public function setIsHidden($isHidden) {
         $this->isHidden = $isHidden;

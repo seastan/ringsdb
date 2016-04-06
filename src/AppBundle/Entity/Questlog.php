@@ -3,9 +3,9 @@
 namespace AppBundle\Entity;
 
 /**
- * Fellowship
+ * Questlog
  */
-class Fellowship {
+class Questlog {
     /**
      * @var integer
      */
@@ -27,9 +27,25 @@ class Fellowship {
      */
     private $descriptionHtml;
     /**
+     * @var \DateTime
+     */
+    private $datePlayed;
+    /**
+     * @var string
+     */
+    private $questMode;
+    /**
      * @var boolean
      */
-    private $isPublic;
+    private $success;
+    /**
+     * @var integer
+     */
+    private $score;
+    /**
+     * @var integer
+     */
+    private $nbDecks;
     /**
      * @var integer
      */
@@ -42,6 +58,10 @@ class Fellowship {
      * @var integer
      */
     private $nbComments;
+    /**
+     * @var boolean
+     */
+    private $isPublic;
     /**
      * @var \DateTime
      */
@@ -57,15 +77,15 @@ class Fellowship {
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    private $decklists;
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     */
     private $comments;
     /**
      * @var \AppBundle\Entity\User
      */
     private $user;
+    /**
+     * @var \AppBundle\Entity\Scenario
+     */
+    private $scenario;
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
@@ -80,7 +100,6 @@ class Fellowship {
      */
     public function __construct() {
         $this->decks = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->decklists = new \Doctrine\Common\Collections\ArrayCollection();
         $this->comments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->favorites = new \Doctrine\Common\Collections\ArrayCollection();
         $this->votes = new \Doctrine\Common\Collections\ArrayCollection();
@@ -100,7 +119,7 @@ class Fellowship {
      *
      * @param string $name
      *
-     * @return Fellowship
+     * @return Questlog
      */
     public function setName($name) {
         $this->name = $name;
@@ -122,7 +141,7 @@ class Fellowship {
      *
      * @param string $nameCanonical
      *
-     * @return Fellowship
+     * @return Questlog
      */
     public function setNameCanonical($nameCanonical) {
         $this->nameCanonical = $nameCanonical;
@@ -144,7 +163,7 @@ class Fellowship {
      *
      * @param string $descriptionMd
      *
-     * @return Fellowship
+     * @return Questlog
      */
     public function setDescriptionMd($descriptionMd) {
         $this->descriptionMd = $descriptionMd;
@@ -166,7 +185,7 @@ class Fellowship {
      *
      * @param string $descriptionHtml
      *
-     * @return Fellowship
+     * @return Questlog
      */
     public function setDescriptionHtml($descriptionHtml) {
         $this->descriptionHtml = $descriptionHtml;
@@ -184,25 +203,113 @@ class Fellowship {
     }
 
     /**
-     * Set isPublic
+     * Set datePlayed
      *
-     * @param boolean $isPublic
+     * @param \DateTime $datePlayed
      *
-     * @return Fellowship
+     * @return Questlog
      */
-    public function setIsPublic($isPublic) {
-        $this->isPublic = $isPublic;
+    public function setDatePlayed($datePlayed) {
+        $this->datePlayed = $datePlayed;
 
         return $this;
     }
 
     /**
-     * Get isPublic
+     * Get datePlayed
+     *
+     * @return \DateTime
+     */
+    public function getDatePlayed() {
+        return $this->datePlayed;
+    }
+
+    /**
+     * Set questMode
+     *
+     * @param string $questMode
+     *
+     * @return Questlog
+     */
+    public function setQuestMode($questMode) {
+        $this->questMode = $questMode;
+
+        return $this;
+    }
+
+    /**
+     * Get questMode
+     *
+     * @return string
+     */
+    public function getQuestMode() {
+        return $this->questMode;
+    }
+
+    /**
+     * Set success
+     *
+     * @param boolean $success
+     *
+     * @return Questlog
+     */
+    public function setSuccess($success) {
+        $this->success = $success;
+
+        return $this;
+    }
+
+    /**
+     * Get success
      *
      * @return boolean
      */
-    public function getIsPublic() {
-        return $this->isPublic;
+    public function getSuccess() {
+        return $this->success;
+    }
+
+    /**
+     * Set score
+     *
+     * @param integer $score
+     *
+     * @return Questlog
+     */
+    public function setScore($score) {
+        $this->score = $score;
+
+        return $this;
+    }
+
+    /**
+     * Get score
+     *
+     * @return integer
+     */
+    public function getScore() {
+        return $this->score;
+    }
+
+    /**
+     * Set nbDecks
+     *
+     * @param integer $nbDecks
+     *
+     * @return Questlog
+     */
+    public function setNbDecks($nbDecks) {
+        $this->nbDecks = $nbDecks;
+
+        return $this;
+    }
+
+    /**
+     * Get nbDecks
+     *
+     * @return integer
+     */
+    public function getNbDecks() {
+        return $this->nbDecks;
     }
 
     /**
@@ -210,7 +317,7 @@ class Fellowship {
      *
      * @param integer $nbVotes
      *
-     * @return Fellowship
+     * @return Questlog
      */
     public function setNbVotes($nbVotes) {
         $this->nbVotes = $nbVotes;
@@ -232,7 +339,7 @@ class Fellowship {
      *
      * @param integer $nbFavorites
      *
-     * @return Fellowship
+     * @return Questlog
      */
     public function setNbFavorites($nbFavorites) {
         $this->nbFavorites = $nbFavorites;
@@ -254,7 +361,7 @@ class Fellowship {
      *
      * @param integer $nbComments
      *
-     * @return Fellowship
+     * @return Questlog
      */
     public function setNbComments($nbComments) {
         $this->nbComments = $nbComments;
@@ -272,11 +379,33 @@ class Fellowship {
     }
 
     /**
+     * Set isPublic
+     *
+     * @param boolean $isPublic
+     *
+     * @return Questlog
+     */
+    public function setIsPublic($isPublic) {
+        $this->isPublic = $isPublic;
+
+        return $this;
+    }
+
+    /**
+     * Get isPublic
+     *
+     * @return boolean
+     */
+    public function getIsPublic() {
+        return $this->isPublic;
+    }
+
+    /**
      * Set dateCreation
      *
      * @param \DateTime $dateCreation
      *
-     * @return Fellowship
+     * @return Questlog
      */
     public function setDateCreation($dateCreation) {
         $this->dateCreation = $dateCreation;
@@ -298,7 +427,7 @@ class Fellowship {
      *
      * @param \DateTime $dateUpdate
      *
-     * @return Fellowship
+     * @return Questlog
      */
     public function setDateUpdate($dateUpdate) {
         $this->dateUpdate = $dateUpdate;
@@ -318,11 +447,11 @@ class Fellowship {
     /**
      * Add deck
      *
-     * @param \AppBundle\Entity\FellowshipDeck $deck
+     * @param \AppBundle\Entity\QuestlogDeck $deck
      *
-     * @return Fellowship
+     * @return Questlog
      */
-    public function addDeck(\AppBundle\Entity\FellowshipDeck $deck) {
+    public function addDeck(\AppBundle\Entity\QuestlogDeck $deck) {
         $this->decks[] = $deck;
 
         return $this;
@@ -331,9 +460,9 @@ class Fellowship {
     /**
      * Remove deck
      *
-     * @param \AppBundle\Entity\FellowshipDeck $deck
+     * @param \AppBundle\Entity\QuestlogDeck $deck
      */
-    public function removeDeck(\AppBundle\Entity\FellowshipDeck $deck) {
+    public function removeDeck(\AppBundle\Entity\QuestlogDeck $deck) {
         $this->decks->removeElement($deck);
     }
 
@@ -347,44 +476,13 @@ class Fellowship {
     }
 
     /**
-     * Add decklist
-     *
-     * @param \AppBundle\Entity\FellowshipDecklist $decklist
-     *
-     * @return Fellowship
-     */
-    public function addDecklist(\AppBundle\Entity\FellowshipDecklist $decklist) {
-        $this->decklists[] = $decklist;
-
-        return $this;
-    }
-
-    /**
-     * Remove decklist
-     *
-     * @param \AppBundle\Entity\FellowshipDecklist $decklist
-     */
-    public function removeDecklist(\AppBundle\Entity\FellowshipDecklist $decklist) {
-        $this->decklists->removeElement($decklist);
-    }
-
-    /**
-     * Get decklists
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getDecklists() {
-        return $this->decklists;
-    }
-
-    /**
      * Add comment
      *
-     * @param \AppBundle\Entity\FellowshipComment $comment
+     * @param \AppBundle\Entity\QuestlogComment $comment
      *
-     * @return Fellowship
+     * @return Questlog
      */
-    public function addComment(\AppBundle\Entity\FellowshipComment $comment) {
+    public function addComment(\AppBundle\Entity\QuestlogComment $comment) {
         $this->comments[] = $comment;
 
         return $this;
@@ -393,9 +491,9 @@ class Fellowship {
     /**
      * Remove comment
      *
-     * @param \AppBundle\Entity\FellowshipComment $comment
+     * @param \AppBundle\Entity\QuestlogComment $comment
      */
-    public function removeComment(\AppBundle\Entity\FellowshipComment $comment) {
+    public function removeComment(\AppBundle\Entity\QuestlogComment $comment) {
         $this->comments->removeElement($comment);
     }
 
@@ -413,7 +511,7 @@ class Fellowship {
      *
      * @param \AppBundle\Entity\User $user
      *
-     * @return Fellowship
+     * @return Questlog
      */
     public function setUser(\AppBundle\Entity\User $user = null) {
         $this->user = $user;
@@ -431,11 +529,33 @@ class Fellowship {
     }
 
     /**
+     * Set scenario
+     *
+     * @param \AppBundle\Entity\Scenario $scenario
+     *
+     * @return Questlog
+     */
+    public function setScenario(\AppBundle\Entity\Scenario $scenario = null) {
+        $this->scenario = $scenario;
+
+        return $this;
+    }
+
+    /**
+     * Get scenario
+     *
+     * @return \AppBundle\Entity\Scenario
+     */
+    public function getScenario() {
+        return $this->scenario;
+    }
+
+    /**
      * Add favorite
      *
      * @param \AppBundle\Entity\User $favorite
      *
-     * @return Fellowship
+     * @return Questlog
      */
     public function addFavorite(\AppBundle\Entity\User $favorite) {
         $this->favorites[] = $favorite;
@@ -466,7 +586,7 @@ class Fellowship {
      *
      * @param \AppBundle\Entity\User $vote
      *
-     * @return Fellowship
+     * @return Questlog
      */
     public function addVote(\AppBundle\Entity\User $vote) {
         $this->votes[] = $vote;
@@ -493,33 +613,6 @@ class Fellowship {
     }
 
     /**
-     * @var integer
-     */
-    private $nbDecks;
-
-    /**
-     * Set nbDecks
-     *
-     * @param integer $nbDecks
-     *
-     * @return Fellowship
-     */
-    public function setNbDecks($nbDecks) {
-        $this->nbDecks = $nbDecks;
-
-        return $this;
-    }
-
-    /**
-     * Get nbDecks
-     *
-     * @return integer
-     */
-    public function getNbDecks() {
-        return $this->nbDecks;
-    }
-
-    /**
      * @var \DateTime
      */
     private $datePublish;
@@ -529,7 +622,7 @@ class Fellowship {
      *
      * @param \DateTime $datePublish
      *
-     * @return Fellowship
+     * @return Questlog
      */
     public function setDatePublish($datePublish) {
         $this->datePublish = $datePublish;

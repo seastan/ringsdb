@@ -127,7 +127,7 @@ class FellowshipManager {
     public function findFellowshipsInHotTopic() {
         $qb = $this->getQueryBuilder();
 
-        $qb->addSelect('(SELECT count(c) FROM AppBundle:Fellowshipcomment c WHERE c.fellowship=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
+        $qb->addSelect('(SELECT count(c) FROM AppBundle:FellowshipComment c WHERE c.fellowship=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
         $qb->orderBy('nbRecentComments', 'DESC');
         $qb->orderBy('d.nbComments', 'DESC');
 

@@ -1,20 +1,20 @@
-AppBundle\Entity\FellowshipComment:
+AppBundle\Entity\QuestlogComment:
     type: entity
-    table: fellowshipcomment
+    table: questlog_comment
     manyToOne:
         user:
             targetEntity: User
             nullable: false
-            inversedBy: fellowship_comments
+            inversedBy: questlog_comments
             joinColumn:
                 name: user_id
                 referencedColumnName: id
-        fellowship:
-            targetEntity: Fellowship
+        questlog:
+            targetEntity: Questlog
             nullable: false
             inversedBy: comments
             joinColumn:
-                name: fellowship_id
+                name: questlog_id
                 referencedColumnName: id
     fields:
         id:

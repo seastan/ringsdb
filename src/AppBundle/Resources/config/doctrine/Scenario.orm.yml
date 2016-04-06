@@ -20,7 +20,11 @@ AppBundle\Entity\Scenario:
                 inverseJoinColumns:
                     encounter_id:
                         referencedColumnName: id
-
+    oneToMany:
+        questlogs:
+            targetEntity: Questlog
+            mappedBy: scenario
+            cascade: ["persist","remove"]
     fields:
         id:
             type: integer

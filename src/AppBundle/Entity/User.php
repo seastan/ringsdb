@@ -728,7 +728,6 @@ class User extends BaseUser {
         return new ArrayCollection($publicFellowships);
     }
 
-
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
@@ -745,11 +744,11 @@ class User extends BaseUser {
     /**
      * Add fellowshipComment
      *
-     * @param \AppBundle\Entity\Fellowshipcomment $fellowshipComment
+     * @param \AppBundle\Entity\FellowshipComment $fellowshipComment
      *
      * @return User
      */
-    public function addFellowshipComment(\AppBundle\Entity\Fellowshipcomment $fellowshipComment) {
+    public function addFellowshipComment(\AppBundle\Entity\FellowshipComment $fellowshipComment) {
         $this->fellowship_comments[] = $fellowshipComment;
 
         return $this;
@@ -758,9 +757,9 @@ class User extends BaseUser {
     /**
      * Remove fellowshipComment
      *
-     * @param \AppBundle\Entity\Fellowshipcomment $fellowshipComment
+     * @param \AppBundle\Entity\FellowshipComment $fellowshipComment
      */
-    public function removeFellowshipComment(\AppBundle\Entity\Fellowshipcomment $fellowshipComment) {
+    public function removeFellowshipComment(\AppBundle\Entity\FellowshipComment $fellowshipComment) {
         $this->fellowship_comments->removeElement($fellowshipComment);
     }
 
@@ -833,5 +832,147 @@ class User extends BaseUser {
      */
     public function getFellowshipVotes() {
         return $this->fellowship_votes;
+    }
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $questlogs;
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $questlog_comments;
+
+    /**
+     * Add questlog
+     *
+     * @param \AppBundle\Entity\Questlog $questlog
+     *
+     * @return User
+     */
+    public function addQuestlog(\AppBundle\Entity\Questlog $questlog) {
+        $this->questlogs[] = $questlog;
+
+        return $this;
+    }
+
+    /**
+     * Remove questlog
+     *
+     * @param \AppBundle\Entity\Questlog $questlog
+     */
+    public function removeQuestlog(\AppBundle\Entity\Questlog $questlog) {
+        $this->questlogs->removeElement($questlog);
+    }
+
+    /**
+     * Get questlogs
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getQuestlogs() {
+        return $this->questlogs;
+    }
+
+    /**
+     * Add questlogComment
+     *
+     * @param \AppBundle\Entity\QuestlogComment $questlogComment
+     *
+     * @return User
+     */
+    public function addQuestlogComment(\AppBundle\Entity\QuestlogComment $questlogComment) {
+        $this->questlog_comments[] = $questlogComment;
+
+        return $this;
+    }
+
+    /**
+     * Remove questlogComment
+     *
+     * @param \AppBundle\Entity\QuestlogComment $questlogComment
+     */
+    public function removeQuestlogComment(\AppBundle\Entity\QuestlogComment $questlogComment) {
+        $this->questlog_comments->removeElement($questlogComment);
+    }
+
+    /**
+     * Get questlogComments
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getQuestlogComments() {
+        return $this->questlog_comments;
+    }
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $questlog_favorites;
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $questlog_votes;
+
+    /**
+     * Add questlogFavorite
+     *
+     * @param \AppBundle\Entity\Questlog $questlogFavorite
+     *
+     * @return User
+     */
+    public function addQuestlogFavorite(\AppBundle\Entity\Questlog $questlogFavorite) {
+        $this->questlog_favorites[] = $questlogFavorite;
+
+        return $this;
+    }
+
+    /**
+     * Remove questlogFavorite
+     *
+     * @param \AppBundle\Entity\Questlog $questlogFavorite
+     */
+    public function removeQuestlogFavorite(\AppBundle\Entity\Questlog $questlogFavorite) {
+        $this->questlog_favorites->removeElement($questlogFavorite);
+    }
+
+    /**
+     * Get questlogFavorites
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getQuestlogFavorites() {
+        return $this->questlog_favorites;
+    }
+
+    /**
+     * Add questlogVote
+     *
+     * @param \AppBundle\Entity\Questlog $questlogVote
+     *
+     * @return User
+     */
+    public function addQuestlogVote(\AppBundle\Entity\Questlog $questlogVote) {
+        $this->questlog_votes[] = $questlogVote;
+
+        return $this;
+    }
+
+    /**
+     * Remove questlogVote
+     *
+     * @param \AppBundle\Entity\Questlog $questlogVote
+     */
+    public function removeQuestlogVote(\AppBundle\Entity\Questlog $questlogVote) {
+        $this->questlog_votes->removeElement($questlogVote);
+    }
+
+    /**
+     * Get questlogVotes
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getQuestlogVotes() {
+        return $this->questlog_votes;
     }
 }

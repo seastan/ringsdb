@@ -15,12 +15,21 @@ AppBundle\Entity\User:
             orderBy: {'dateUpdate':'DESC'}
             mappedBy: user
             cascade: ["remove"]
+        questlogs:
+            targetEntity: Questlog
+            orderBy: {'dateUpdate':'DESC'}
+            mappedBy: user
+            cascade: ["remove"]
         comments:
             targetEntity: Comment
             orderBy: {'dateCreation':'DESC'}
             mappedBy: user
         fellowship_comments:
-            targetEntity: Fellowshipcomment
+            targetEntity: FellowshipComment
+            orderBy: {'dateCreation':'DESC'}
+            mappedBy: user
+        questlog_comments:
+            targetEntity: QuestlogComment
             orderBy: {'dateCreation':'DESC'}
             mappedBy: user
         reviews:
@@ -42,6 +51,14 @@ AppBundle\Entity\User:
             cascade: ["remove"]
         fellowship_votes:
             targetEntity: Fellowship
+            mappedBy: votes
+            cascade: ["remove"]
+        questlog_favorites:
+            targetEntity: Questlog
+            mappedBy: favorites
+            cascade: ["remove"]
+        questlog_votes:
+            targetEntity: Questlog
             mappedBy: votes
             cascade: ["remove"]
         reviewvotes:

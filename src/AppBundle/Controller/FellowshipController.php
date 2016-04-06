@@ -2,7 +2,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Fellowship;
-use AppBundle\Entity\Fellowshipcomment;
+use AppBundle\Entity\FellowshipComment;
 use AppBundle\Entity\FellowshipDeck;
 use AppBundle\Entity\FellowshipDecklist;
 use DateTime;
@@ -210,7 +210,7 @@ class FellowshipController extends Controller {
 
         if ($is_public) {
             $commenters = array_map(function($comment) {
-                /* @var $comment \AppBundle\Entity\Fellowshipcomment */
+                /* @var $comment \AppBundle\Entity\FellowshipComment */
                 return $comment->getUser()->getUsername();
             }, $fellowship->getComments()->getValues());
 
@@ -1011,7 +1011,7 @@ class FellowshipController extends Controller {
 
             $now = new DateTime();
 
-            $comment = new Fellowshipcomment();
+            $comment = new FellowshipComment();
             $comment->setText($comment_html);
             $comment->setDateCreation($now);
             $comment->setUser($user);
@@ -1034,7 +1034,7 @@ class FellowshipController extends Controller {
             }
 
             foreach ($fellowship->getComments() as $comment) {
-                /* @var $comment \AppBundle\Entity\Fellowshipcomment */
+                /* @var $comment \AppBundle\Entity\FellowshipComment */
                 $commenter = $comment->getUser();
                 if ($commenter && $commenter->getIsNotifCommenter()) {
                     if (!isset($spool[$commenter->getEmail()])) {
@@ -1086,7 +1086,7 @@ class FellowshipController extends Controller {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
-        $comment = $em->getRepository('AppBundle:Fellowshipcomment')->find($comment_id);
+        $comment = $em->getRepository('AppBundle:FellowshipComment')->find($comment_id);
         if (!$comment) {
             throw new BadRequestHttpException('Unable to find comment');
         }

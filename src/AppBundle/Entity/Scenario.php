@@ -1104,4 +1104,40 @@ class Scenario implements \JsonSerializable {
     public function getNightmareObjectives() {
         return $this->nightmareObjectives;
     }
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $questlogs;
+
+    /**
+     * Add questlog
+     *
+     * @param \AppBundle\Entity\Questlog $questlog
+     *
+     * @return Scenario
+     */
+    public function addQuestlog(\AppBundle\Entity\Questlog $questlog) {
+        $this->questlogs[] = $questlog;
+
+        return $this;
+    }
+
+    /**
+     * Remove questlog
+     *
+     * @param \AppBundle\Entity\Questlog $questlog
+     */
+    public function removeQuestlog(\AppBundle\Entity\Questlog $questlog) {
+        $this->questlogs->removeElement($questlog);
+    }
+
+    /**
+     * Get questlogs
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getQuestlogs() {
+        return $this->questlogs;
+    }
 }

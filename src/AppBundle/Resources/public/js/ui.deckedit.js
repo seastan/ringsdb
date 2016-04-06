@@ -271,7 +271,7 @@
      * @memberOf ui
      * @param event
      */
-    ui.on_submit_form = function on_submit_form() {
+    ui.on_submit_form = function() {
         var deck_json = app.deck.get_json();
 
         $('input[name="content"]').val(deck_json);
@@ -283,7 +283,7 @@
      * @memberOf ui
      * @param event
      */
-    ui.on_config_change = function on_config_change() {
+    ui.on_config_change = function() {
         var name = $(this).attr('name');
         var type = $(this).prop('type');
 
@@ -816,7 +816,7 @@
         ui.toggle_compact_mode();
         ui.setup_event_handlers();
         app.textcomplete && app.textcomplete.setup('#description');
-        app.markdown && app.markdown.setup('#description', '#description-preview')
+        app.markdown && app.markdown.setup('#description', '#description-preview');
         app.draw_simulator && app.draw_simulator.on_dom_loaded();
         app.card_modal && $('#filter-text').on('typeahead:selected typeahead:autocompleted', app.card_modal.typeahead);
     };

@@ -1,7 +1,9 @@
 (function(ui, $) {
 
     var scenario_data = null;
-    var difficulty = {};
+    var difficulty = 'normal';
+    var name_changed = false;
+
     ui.init_quest_selector = function() {
         var xhr;
         $('#quest').on('input', function() {
@@ -43,6 +45,8 @@
                     ui.update_scenatio_stats();
                 }
             });
+
+            ui.set_questlog_name();
         }).trigger('input');
 
         $('#btn-randomize').on('click', function(e) {
@@ -132,6 +136,7 @@
                 .addClass(difficulty);
 
             ui.update_scenatio_stats();
+            ui.set_questlog_name();
         }).trigger('input');
     };
 
@@ -144,14 +149,83 @@
             } else {
                 $('#score').prop('disabled', false);
             }
+
+            ui.set_questlog_name();
         }).trigger('input');
     };
 
     ui.init_date_picker = function() {
         $('#date')[0].valueAsDate = new Date();
+        $('#date').on('input', ui.set_questlog_name);
     };
 
-        /**
+    ui.init_questlog_name = function() {
+        $('#name').on('input', function() {
+            if ($(this).val()) {
+                name_changed = true;
+            } else {
+                name_changed = false;
+            }
+        }).on('blur', ui.set_questlog_name);
+
+        ui.set_questlog_name();
+    };
+
+    ui.set_questlog_name = function() {
+        if (name_changed) {
+            return;
+        }
+
+        var title = [];
+        title.push($('#quest').find('option:selected').html());
+
+        if (difficulty != 'normal') {
+            title.push(difficulty[0].toUpperCase() + difficulty.substring(1));
+        }
+
+        var count = 0;
+        if (Decks[0]) {
+            count++;
+        }
+        if (Decks[1]) {
+            count++;
+        }
+        if (Decks[2]) {
+            count++;
+        }
+        if (Decks[3]) {
+            count++;
+        }
+
+        title.push(count == 1 ? '1 Player' : count + ' Players');
+
+        var date = $('#date')[0].valueAsDate;
+        title.push(moment(date).format('YYYY-MM-DD'));
+
+        $('#name').val(title.join(' - '));
+    };
+
+    ui.setup_event_handlers = function() {
+        $('#save_form').on('submit', ui.on_submit_form);
+    };
+
+    /**
+     * @memberOf ui
+     * @param event
+     */
+    ui.on_submit_form = function() {
+        for (var i = 1; i <= 4; i++) {
+            if (Decks[i]) {
+                app.deck_selection.activate_deck(i);
+                $('input[name="deck' + i + '_content"]').val(app.deck.get_json());
+            } else {
+                $('input[name="deck' + i + '_content"]').val('');
+            }
+        }
+    };
+
+
+    /**
      * called when the DOM is loaded
      * @memberOf ui
      */
@@ -160,6 +234,8 @@
         ui.init_quest_mode_selector();
         ui.init_result_selector();
         ui.init_date_picker();
+        ui.init_questlog_name();
+        ui.setup_event_handlers();
 
         app.deck_selection && app.deck_selection.init_buttons();
         app.markdown && app.markdown.init_markdown('#descriptionMd');

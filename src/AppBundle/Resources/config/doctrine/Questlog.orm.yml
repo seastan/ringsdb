@@ -1,34 +1,37 @@
-AppBundle\Entity\Fellowship:
+AppBundle\Entity\Questlog:
     type: entity
-    table: fellowship
+    table: questlog
     manyToOne:
         user:
             targetEntity: User
             nullable: false
-            inversedBy: fellowships
+            inversedBy: questlogs
             joinColumn:
                 name: user_id
                 referencedColumnName: id
+        scenario:
+            targetEntity: Scenario
+            nullable: false
+            inversedBy: questlogs
+            joinColumn:
+                name: scenario_id
+                referencedColumnName: id
     oneToMany:
         decks:
-            targetEntity: FellowshipDeck
-            mappedBy: fellowship
-            cascade: ["persist","remove"]
-        decklists:
-            targetEntity: FellowshipDecklist
-            mappedBy: fellowship
+            targetEntity: QuestlogDeck
+            mappedBy: questlog
             cascade: ["persist","remove"]
         comments:
-            targetEntity: FellowshipComment
+            targetEntity: QuestlogComment
             orderBy: { 'dateCreation': 'ASC' }
-            mappedBy: fellowship
+            mappedBy: questlog
             cascade: ["persist","remove"]
     manyToMany:
         favorites:
             targetEntity: User
-            inversedBy: fellowship_favorites
+            inversedBy: questlog_favorites
             joinTable:
-                name: fellowship_favorite
+                name: questlog_favorite
                 cascade: ["persist","remove"]
                 joinColumns:
                     fellowship_id:
@@ -38,9 +41,9 @@ AppBundle\Entity\Fellowship:
                         referencedColumnName: id
         votes:
             targetEntity: User
-            inversedBy: fellowship_votes
+            inversedBy: questlog_votes
             joinTable:
-                name: fellowship_vote
+                name: questlog_vote
                 cascade: ["persist","remove"]
                 joinColumns:
                     fellowship_id:
@@ -69,6 +72,20 @@ AppBundle\Entity\Fellowship:
             type: text
             nullable: true
             column: description_html
+        datePlayed:
+            type: datetime
+            nullable: false
+            column: date_played
+        questMode:
+            type: string
+            length: 32
+            column: quest_mode
+        success:
+            type: boolean
+            nullable: false
+        score:
+            type: smallint
+            nullable: true
         nbDecks:
             type: integer
             column: nb_decks
@@ -81,6 +98,10 @@ AppBundle\Entity\Fellowship:
         nbComments:
             type: integer
             column: nb_comments
+        isPublic:
+            type: boolean
+            nullable: false
+            column: is_public
         dateCreation:
             type: datetime
             nullable: false
@@ -95,10 +116,6 @@ AppBundle\Entity\Fellowship:
             gedmo:
                 timestampable:
                     on: update
-        isPublic:
-            type: boolean
-            nullable: false
-            column: is_public
         datePublish:
             type: datetime
             nullable: true
