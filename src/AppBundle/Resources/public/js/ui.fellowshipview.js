@@ -264,18 +264,19 @@
                 event.preventDefault();
                 event.stopPropagation();
 
+
+                var data = {};
                 var ids = _.pluck(Decks, 'id');
                 var publisheds = _.pluck(Decks, 'is_published');
-                ui.log_quest({
-                    'deck1_id': ids[0],
-                    'deck2_id': ids[1],
-                    'deck3_id': ids[2],
-                    'deck4_id': ids[3],
-                    'deck1_is_decklist': publisheds[0],
-                    'deck2_is_decklist': publisheds[1],
-                    'deck3_is_decklist': publisheds[2],
-                    'deck4_is_decklist': publisheds[3]
-                });
+
+                for (var i = 0; i < ids.length; i++) {
+                    data['deck' + (i+1) + '_id'] = ids[i];
+                    if (publisheds[i]) {
+                        data['p' + (i+1)] = 1;
+                    }
+                }
+
+                ui.log_quest(data);
                 break;
         }
     };
