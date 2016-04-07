@@ -102,6 +102,8 @@
         button.attr('data-toggle', 'dropdown').next().remove();
 
         var menu = $('<ul class="dropdown-menu">').insertAfter(button).on('click', 'li', function(event) {
+            event.preventDefault();
+
             var code = $(this).data('code');
             var name = $(this).data('name');
 
@@ -128,6 +130,8 @@
         button.attr('data-toggle', 'dropdown').next().remove();
 
         var menu = $('<ul class="dropdown-menu">').insertAfter(button).on('click', 'li', function(event) {
+            event.preventDefault();
+
             var icon = $(this).data('icon');
             var chunk = '<span class="icon-' + icon + '"></span>';
 
