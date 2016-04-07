@@ -1428,26 +1428,33 @@ footer a {
   list-style: none;
   margin-left: 0;
   padding-left: 0;
-
-  .img {
-    width: 26px;
-    height: 26px;
-    background-size: 26px 26px;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    margin-right: 2px;
-    margin-bottom: 2px;
-    vertical-align: middle;
-    display: inline-block;
-  }
 }
 
 #scenario-stats {
   margin-bottom: 10px;
 }
 
-#quest-info.nightmare {
-  .img {
+span.img {
+  width: 26px;
+  height: 26px;
+  background-size: 26px 26px;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  margin-right: 2px;
+  margin-bottom: 2px;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+h1 span.img {
+  width: 36px;
+  height: 36px;
+  background-size: 36px 36px;
+  margin-right: -5px;
+}
+
+.nightmare {
+  span.img {
     border-style: solid;
     border-color: rgba(200, 0, 0, .2);
     border-width: 13px;
@@ -1457,10 +1464,14 @@ footer a {
     -o-box-sizing: border-box;
     box-sizing: border-box;
   }
-};
 
-#quest-info.easy {
-  .img {
+  &.quest-title {
+    color: #660000;
+  }
+}
+
+.easy {
+  span.img {
     border-style: solid;
     border-color: rgba(200, 200, 0, .2);
     border-width: 13px;
@@ -1470,7 +1481,44 @@ footer a {
     -o-box-sizing: border-box;
     box-sizing: border-box;
   }
-};
+
+  &.quest-title {
+    color: #CC991E;
+  }
+}
+
+h1.nightmare, h1.easy {
+  span.img {
+    border-width: 18px;
+    border-radius: 18px;
+  }
+}
+
+.quest-header {
+  margin-bottom: 15px;
+}
+
+.quest-title {
+  margin-top: 5px;
+  margin-bottom: 0;
+  font-family: 'Julius Sans One', sans-serif;
+  font-weight: bold;
+
+  padding-bottom: 5px;
+  border-bottom: 1px solid lightgray;
+}
+
+.quest-mode {
+  margin-top: 0;
+  margin-bottom: 20px;
+  line-height: 18px;
+  font-family: 'Julius Sans One', sans-serif;
+}
+
+.quest-result {
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
 
 .selected-deck-buttons {
   margin-top: -5px;

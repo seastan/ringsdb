@@ -1,0 +1,26 @@
+<!-- Modal -->
+<div class="modal fade" id="deleteListModal" tabindex="-1" role="dialog" aria-labelledby="deleteListModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h3 class="modal-title" id="deleteListModalLabel">Delete questlogs</h3>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-12">
+						<form action="{{ path('questlog_delete_list') }}" method="POST" enctype="application/x-www-form-urlencoded" id="delete-questlog-list-form">
+							<input type="hidden" name="ids" id="delete-questlog-list-id" value="">
+							<p>Are you sure that you want to delete all the selected questlogs?</p>
+							<div class="pull-right">
+								<button type="submit" class="btn btn-danger">Yes, delete</button>
+								<button type="button" class="btn btn-default" onclick="$('#deleteListModal').modal('hide')">Cancel</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->

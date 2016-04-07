@@ -149,5 +149,31 @@ class QuestlogDeck {
     public function getDecklist() {
         return $this->decklist;
     }
-}
 
+    /**
+     * @var string
+     */
+    private $player;
+
+    /**
+     * Set player
+     *
+     * @param string $player
+     *
+     * @return QuestlogDeck
+     */
+    public function setPlayer($player) {
+        $this->player = $player;
+
+        return $this;
+    }
+
+    /**
+     * Get player
+     *
+     * @return string
+     */
+    public function getPlayer() {
+        return $this->player;
+    }
+}

@@ -91,6 +91,7 @@ class UserController extends Controller {
 
         $decklist_id = $request->query->get('decklist_id');
         $fellowship_id = $request->query->get('fellowship_id');
+        $questlog_id = $request->query->get('questlog_id');
         $card_id = $request->query->get('card_id');
 
         $content = null;
@@ -174,6 +175,38 @@ class UserController extends Controller {
                     $content['is_author'] = ($user_id == $fellowship->getUser()->getId());
 
                     $content['can_delete'] = ($fellowship->getNbcomments() == 0) && ($fellowship->getNbfavorites() == 0) && ($fellowship->getNbVotes() == 0);
+                }
+            }
+
+            if (isset($questlog_id)) {
+                /* @var $em \Doctrine\ORM\EntityManager */
+                $em = $this->getDoctrine()->getManager();
+
+                /* @var $questlog \AppBundle\Entity\Questlog */
+                $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
+
+                if ($questlog) {
+                    $questlog_id = $questlog->getId();
+
+                    $dbh = $this->getDoctrine()->getConnection();
+
+                    $content['is_liked'] = (boolean)$dbh->executeQuery("SELECT
+        				count(*)
+        				FROM questlog d
+        				JOIN questlog_vote v ON v.questlog_id = d.id
+        				WHERE v.user_id = ?
+        				AND d.id = ?", [$user_id, $questlog_id])->fetch(\PDO::FETCH_NUM)[0];
+
+                    $content['is_favorite'] = (boolean)$dbh->executeQuery("SELECT
+        				count(*)
+        				FROM questlog d
+        				JOIN questlog_favorite f ON f.questlog_id = d.id
+        				WHERE f.user_id = ?
+        				AND d.id = ?", [$user_id, $questlog_id])->fetch(\PDO::FETCH_NUM)[0];
+
+                    $content['is_author'] = ($user_id == $questlog->getUser()->getId());
+
+                    $content['can_delete'] = ($questlog->getNbcomments() == 0) && ($questlog->getNbfavorites() == 0) && ($questlog->getNbVotes() == 0);
                 }
             }
 

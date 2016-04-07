@@ -4,9 +4,7 @@
         $('.social .social-icon-like').on('click', ui.send_like);
         $('.social .social-icon-favorite').on('click', ui.send_favorite);
 
-        $('#btn-group-deck').on({
-            click: ui.do_action_deck
-        }, 'button[id], a[id]');
+        $('#btn-group-deck').on('click', 'button[id], a[id]', ui.do_action_deck);
     };
 
     ui.send_like = function(event) {
@@ -19,8 +17,8 @@
 
         that.addClass('processing');
 
-        $.post(Routing.generate('fellowship_like'), {
-            id: Fellowship.id
+        $.post(Routing.generate('questlog_like'), {
+            id: QuestLog.id
         }, function(data) {
             that.find('.num').text(data);
             that.removeClass('processing');
@@ -38,8 +36,8 @@
 
         that.addClass('processing');
 
-        $.post(Routing.generate('fellowship_favorite'), {
-            id: Fellowship.id
+        $.post(Routing.generate('questlog_favorite'), {
+            id: QuestLog.id
         }, function(data) {
             that.find('.num').text(data);
 
@@ -54,7 +52,7 @@
 
     ui.setup_comment_form = function() {
         var form = $(
-            '<form method="POST" action="' + Routing.generate('fellowship_comment') + '"><input type="hidden" name="id" value="' + Fellowship.id + '"><div class="form-group">' +
+            '<form method="POST" action="' + Routing.generate('questlog_comment') + '"><input type="hidden" name="id" value="' + QuestLog.id + '"><div class="form-group">' +
             '<textarea id="comment-form-text" class="form-control" rows="4" name="comment" placeholder="Enter your comment in Markdown format. Type # to enter a card name. Type $ to enter a symbol. Type @ to enter a user name."></textarea>' +
             '</div><div class="well text-muted" id="comment-form-preview"></div><button type="submit" class="btn btn-success">Submit comment</button></form>'
         ).insertAfter('#comment-form');
@@ -62,6 +60,7 @@
         var already_submitted = false;
         form.on('submit', function(event) {
             event.preventDefault();
+            event.stopPropagation();
 
             var data = $(this).serialize();
 
@@ -71,7 +70,7 @@
 
             already_submitted = true;
 
-            $.ajax(Routing.generate('fellowship_comment'), {
+            $.ajax(Routing.generate('questlog_comment'), {
                 data: data,
                 type: 'POST',
                 success: function() {
@@ -147,7 +146,7 @@
 
     ui.hide_comment = function(element) {
         var id = element.attr('id').replace(/comment-/, '');
-        $.ajax(Routing.generate('fellowship_comment_hide', {comment_id: id, hidden: 1}), {
+        $.ajax(Routing.generate('questlog_comment_hide', {comment_id: id, hidden: 1}), {
             type: 'POST',
             dataType: 'json',
             success: function(data, textStatus, jqXHR) {
@@ -168,7 +167,7 @@
 
     ui.unhide_comment = function(element) {
         var id = element.attr('id').replace(/comment-/, '');
-        $.ajax(Routing.generate('fellowship_comment_hide', {comment_id: id, hidden: 0}), {
+        $.ajax(Routing.generate('questlog_comment_hide', {comment_id: id, hidden: 0}), {
             type: 'POST',
             dataType: 'json',
             success: function(data, textStatus, jqXHR) {
@@ -188,8 +187,8 @@
     };
 
     ui.confirm_delete = function() {
-        $('#delete-fellowship-name').text(Fellowship.name);
-        $('#delete-fellowship-id').val(Fellowship.id);
+        $('#delete-questlog-name').text(QuestLog.name);
+        $('#delete-questlog-id').val(QuestLog.id);
         $('#deleteModal').modal('show');
     };
 
@@ -252,44 +251,22 @@
 
             case 'btn-download-text':
                 event.preventDefault();
-                ui.download_text(Fellowship.id);
+                ui.download_text(QuestLog.id);
                 break;
 
             case 'btn-download-octgn':
                 event.preventDefault();
-                ui.download_octgn(Fellowship.id);
-                break;
-
-            case 'btn-log-quest':
-                event.preventDefault();
-                event.stopPropagation();
-
-                var ids = _.pluck(Decks, 'id');
-                var publisheds = _.pluck(Decks, 'is_published');
-                ui.log_quest({
-                    'deck1_id': ids[0],
-                    'deck2_id': ids[1],
-                    'deck3_id': ids[2],
-                    'deck4_id': ids[3],
-                    'deck1_is_decklist': publisheds[0],
-                    'deck2_is_decklist': publisheds[1],
-                    'deck3_is_decklist': publisheds[2],
-                    'deck4_is_decklist': publisheds[3]
-                });
+                ui.download_octgn(QuestLog.id);
                 break;
         }
     };
 
     ui.download_text = function(id) {
-        window.location = Routing.generate('fellowship_export_text', { fellowship_id: id });
+        window.location = Routing.generate('questlog_export_text', { questlog_id: id });
     };
 
     ui.download_octgn = function(id) {
-        window.location = Routing.generate('fellowship_export_octgn', { fellowship_id: id });
-    };
-
-    ui.log_quest = function(data) {
-        window.location = Routing.generate('questlog_new', data);
+        window.location = Routing.generate('questlog_export_octgn', { questlog_id: id });
     };
 
     /**

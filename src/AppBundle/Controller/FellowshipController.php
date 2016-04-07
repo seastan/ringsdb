@@ -836,7 +836,6 @@ class FellowshipController extends Controller {
         ], $response);
     }
 
-
     public function octgnexportAction($fellowship_id) {
         return $this->downloadFromSelection($fellowship_id, true);
     }
@@ -922,9 +921,6 @@ class FellowshipController extends Controller {
         return $response;
     }
 
-    /*
-     * adds a fellowship to a user's list of favorites
-     */
     public function favoriteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();

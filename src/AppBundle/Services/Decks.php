@@ -9,7 +9,7 @@ use AppBundle\Entity\Decksideslot;
 use Symfony\Bridge\Monolog\Logger;
 use AppBundle\Entity\Deckchange;
 use AppBundle\Helper\DeckValidationHelper;
-use AppBundle\Helper\AgendaHelper;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Decks {
     public function __construct(EntityManager $doctrine, DeckValidationHelper $deck_validation_helper, Diff $diff, Logger $logger) {
@@ -19,7 +19,8 @@ class Decks {
         $this->logger = $logger;
     }
 
-    public function getByUser($user, $decode_variation = false) {
+    public function getByUser($user) {
+        /* @var $user \AppBundle\Entity\User */
         $decks = $user->getDecks();
         $list = [];
 
@@ -67,7 +68,10 @@ class Decks {
 
     public function saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, $source_deck) {
         /* @var $deck \AppBundle\Entity\Deck */
+        /* @var $source_deck \AppBundle\Entity\Deck */
+
         if ($decklist_id) {
+            /* @var $decklist \AppBundle\Entity\Decklist */
             $decklist = $this->doctrine->getRepository('AppBundle:Decklist')->find($decklist_id);
             if ($decklist) {
                 $deck->setParent($decklist);
@@ -93,6 +97,7 @@ class Decks {
                 continue;
             }
 
+            /* @var $pack \AppBundle\Entity\Pack */
             $pack = $card->getPack();
             if (!$latestPack) {
                 $latestPack = $pack;
@@ -226,7 +231,85 @@ class Decks {
         return $deck->getId();
     }
 
+
+    public function setSlots(&$deck, $content) {
+        /* @var $deck \AppBundle\Entity\Deck */
+        /* @var $latestPack \AppBundle\Entity\Pack */
+
+        $cards = [];
+        $latestPack = null;
+
+        foreach ($content['main'] as $card_code => $qty) {
+            $card = $this->doctrine->getRepository('AppBundle:Card')->findOneBy([
+                "code" => $card_code
+            ]);
+
+            if (!$card) {
+                continue;
+            }
+
+            $cards[$card_code] = $card;
+
+            if ($qty > $card->getDeckLimit()) {
+                if (is_array($content['main'])) {
+                    $content['main'][$card_code] = $card->getDeckLimit();
+                } else {
+                    $content['main']->$card_code = $card->getDeckLimit();
+                }
+            }
+        }
+
+        foreach ($content['side'] as $card_code => $qty) {
+            $card = $this->doctrine->getRepository('AppBundle:Card')->findOneBy([
+                "code" => $card_code
+            ]);
+
+            if (!$card) {
+                continue;
+            }
+
+            $cards[$card_code] = $card;
+
+            if ($qty > $card->getDeckLimit()) {
+                if (is_array($content['side'])) {
+                    $content['side'][$card_code] = $card->getDeckLimit();
+                } else {
+                    $content['side']->$card_code = $card->getDeckLimit();
+                }
+            }
+        }
+
+        foreach ($deck->getSlots() as $slot) {
+            $deck->removeSlot($slot);
+            $this->doctrine->remove($slot);
+        }
+
+        foreach ($deck->getSideslots() as $slot) {
+            $deck->removeSideslot($slot);
+            $this->doctrine->remove($slot);
+        }
+
+        foreach ($content['main'] as $card_code => $qty) {
+            $card = $cards[$card_code];
+            $slot = new Deckslot();
+            $slot->setQuantity($qty);
+            $slot->setCard($card);
+            $slot->setDeck($deck);
+            $deck->addSlot($slot);
+        }
+
+        foreach ($content['side'] as $card_code => $qty) {
+            $card = $cards[$card_code];
+            $slot = new Decksideslot();
+            $slot->setQuantity($qty);
+            $slot->setCard($card);
+            $slot->setDeck($deck);
+            $deck->addSideslot($slot);
+        }
+    }
+
     public function revertDeck($deck) {
+        /* @var $deck \AppBundle\Entity\Deck */
         $changes = $this->getUnsavedChanges($deck);
 
         foreach ($changes as $change) {

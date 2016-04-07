@@ -180,6 +180,15 @@
         ui.set_questlog_name();
     };
 
+    ui.update_players = function() {
+        $('#deck1_player_name').prop('disabled', !Decks[1]);
+        $('#deck2_player_name').prop('disabled', !Decks[2]);
+        $('#deck3_player_name').prop('disabled', !Decks[3]);
+        $('#deck4_player_name').prop('disabled', !Decks[4]);
+
+        ui.set_questlog_name();
+    };
+
     ui.set_questlog_name = function() {
         if (name_changed) {
             return;
@@ -193,9 +202,6 @@
         }
 
         var count = 0;
-        if (Decks[0]) {
-            count++;
-        }
         if (Decks[1]) {
             count++;
         }
@@ -203,6 +209,9 @@
             count++;
         }
         if (Decks[3]) {
+            count++;
+        }
+        if (Decks[4]) {
             count++;
         }
 
@@ -215,6 +224,7 @@
     };
 
     ui.setup_event_handlers = function() {
+        $(document).on('deck-changed', ui.update_players);
         $('#save_form').on('submit', ui.on_submit_form);
     };
 

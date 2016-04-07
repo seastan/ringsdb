@@ -39,6 +39,28 @@
     </tr>
 {% endmacro %}
 
+{% macro questlog_deck_table_row(questlog) %}
+    <tr>
+        <td class="questlog-name"><a href="{{ path('questlog_view', { 'questlog_id': questlog.id, 'questlog_name': questlog.nameCanonical | e('url') }) }}">{{ questlog.name }}</a></td>
+        <td>
+            {% for i in 1..questlog.nbDecks %}
+                <i class="fa fa-user"></i>
+            {% endfor %}
+
+            <span class="social-icons" style="margin-left: 10px">
+                <span class="social-icon-like" data-toggle="tooltip" data-placement="bottom" title="Likes">
+                    <span class="fa fa-heart"></span> <span class="num">{{ questlog.nbVotes }}</span>
+                </span>
+                <span class="social-icon-favorite" data-toggle="tooltip" data-placement="bottom" title="Favorites">
+                    <span class="fa fa-star"></span> <span class="num">{{ questlog.nbFavorites }}</span>
+                </span>
+                <span class="social-icon-comment" data-toggle="tooltip" data-placement="bottom" title="Comments">
+                    <span class="fa fa-comment"></span> <span class="num">{{ questlog.nbComments }}</span>
+                </span>
+            </span>
+        </td>
+    </tr>
+{% endmacro %}
 
 {% macro username(user) %}
 	<a href="{{ path('user_profile_public', {user_id:user.id,user_name:user.username|e('url')}) }}" class="username fg-{{ user.color }}">{{ user.username }}</a>
@@ -70,6 +92,34 @@
         </a>
 		<a id="social-icon-comment" href="#comment-form" class="social-icon-comment" data-toggle="tooltip" data-placement="bottom" title="Comment">
             <span class="fa fa-comment"></span> <span class="num">{{ fellowship.nbComments }}</span>
+        </a>
+	</span>
+{% endmacro %}
+
+{% macro static_questlog_social_icons(questlog) %}
+    <span class="social-icons">
+		<span class="social-icon-like" data-toggle="tooltip" data-placement="bottom" title="Likes">
+			<span class="fa fa-heart"></span> <span class="num">{{ questlog.nbVotes }}</span>
+		</span>
+		<span class="social-icon-favorite" data-toggle="tooltip" data-placement="bottom" title="Favorites">
+			<span class="fa fa-star"></span> <span class="num">{{ questlog.nbFavorites }}</span>
+		</span>
+		<span class="social-icon-comment" data-toggle="tooltip" data-placement="bottom" title="Comments">
+			<span class="fa fa-comment"></span> <span class="num">{{ questlog.nbComments }}</span>
+		</span>
+	</span>
+{% endmacro %}
+
+{% macro questlog_social_icons(questlog) %}
+    <span class="social-icons">
+		<a id="social-icon-like" href="#" class="social-icon-like" data-toggle="tooltip" data-placement="bottom" title="Like">
+            <span class="fa fa-heart"></span> <span class="num">{{ questlog.nbVotes }}</span>
+        </a>
+		<a id="social-icon-favorite" href="#" class="social-icon-favorite" data-toggle="tooltip" data-placement="bottom" title="Favorite">
+            <span class="fa fa-star"></span> <span class="num">{{ questlog.nbFavorites }}</span>
+        </a>
+		<a id="social-icon-comment" href="#comment-form" class="social-icon-comment" data-toggle="tooltip" data-placement="bottom" title="Comment">
+            <span class="fa fa-comment"></span> <span class="num">{{ questlog.nbComments }}</span>
         </a>
 	</span>
 {% endmacro %}

@@ -7,103 +7,103 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
 class SearchController extends Controller {
-
-	public static $searchKeys = array(
-		''  => 'code',
-		'a' => 'attack',
-		'b' => 'threat',
-		'c' => 'cycle',
-		'd' => 'defense',
-		'e' => 'pack',
-		'f' => 'flavor',
-		'h' => 'health',
-		'i' => 'illustrator',
-		'k' => 'traits',
-		'o' => 'cost',
-		'r' => 'date_release',
-		's' => 'sphere',
-		't' => 'type',
-		'u' => 'isUnique',
-		'w' => 'willpower',
-		'x' => 'text',
-		'y' => 'quantity',
-		'z' => 'hasErrata',
-	);
-
-	public static $searchTypes = array(
-		''  => 'string',
-		'f' => 'string',
-		'i' => 'string',
-		'k' => 'string',
-		'x' => 'string',
+    public static $searchKeys = [
+        '' => 'code',
+        'a' => 'attack',
+        'b' => 'threat',
+        'c' => 'cycle',
+        'd' => 'defense',
+        'e' => 'pack',
+        'f' => 'flavor',
+        'h' => 'health',
+        'i' => 'illustrator',
+        'k' => 'traits',
+        'o' => 'cost',
+        'r' => 'date_release',
+        's' => 'sphere',
+        't' => 'type',
+        'u' => 'isUnique',
+        'w' => 'willpower',
+        'x' => 'text',
+        'y' => 'quantity',
+        'z' => 'hasErrata',
+    ];
+    public static $searchTypes = [
+        '' => 'string',
+        'f' => 'string',
+        'i' => 'string',
+        'k' => 'string',
+        'x' => 'string',
         'r' => 'date',
-		'e' => 'code',
-		's' => 'code',
-		't' => 'code',
-		'c' => 'code',
-		'a' => 'integer',
-		'b' => 'integer',
-		'd' => 'integer',
-		'h' => 'integer',
-		'o' => 'integer',
-		'w' => 'integer',
-		'y' => 'integer',
-		'u' => 'boolean',
-		'z' => 'boolean',
-	);
+        'e' => 'code',
+        's' => 'code',
+        't' => 'code',
+        'c' => 'code',
+        'a' => 'integer',
+        'b' => 'integer',
+        'd' => 'integer',
+        'h' => 'integer',
+        'o' => 'integer',
+        'w' => 'integer',
+        'y' => 'integer',
+        'u' => 'boolean',
+        'z' => 'boolean',
+    ];
 
-	public function formAction() {
-		$response = new Response();
-		$response->setPublic();
-		$response->setMaxAge($this->container->getParameter('cache_expiration'));
+    public function formAction() {
+        $response = new Response();
+        $response->setPublic();
+        $response->setMaxAge($this->container->getParameter('cache_expiration'));
 
-		$dbh = $this->getDoctrine()->getConnection();
+        $dbh = $this->getDoctrine()->getConnection();
 
-		$list_packs = $this->getDoctrine()->getRepository('AppBundle:Pack')->findBy([], ["dateRelease" => "ASC", "position" => "ASC"]);
-		$packs = [];
-		foreach ($list_packs as $pack) {
-			$packs[] = [
-				"name" => $pack->getName(),
-				"code" => $pack->getCode(),
-			];
-		}
+        $list_packs = $this->getDoctrine()->getRepository('AppBundle:Pack')->findBy([], ["dateRelease" => "ASC", "position" => "ASC"]);
+        $packs = [];
+        foreach ($list_packs as $pack) {
+            /* @var $pack \AppBundle\Entity\Pack */
+            $packs[] = [
+                "name" => $pack->getName(),
+                "code" => $pack->getCode(),
+            ];
+        }
 
-		$list_cycles = $this->getDoctrine()->getRepository('AppBundle:Cycle')->findBy([], ["position" => "ASC"]);
-		$cycles = [];
-		foreach ($list_cycles as $cycle) {
-			$cycles[] = [
-				"name" => $cycle->getName(),
-				"code" => $cycle->getCode(),
-			];
-		}
+        $list_cycles = $this->getDoctrine()->getRepository('AppBundle:Cycle')->findBy([], ["position" => "ASC"]);
+        $cycles = [];
+        foreach ($list_cycles as $cycle) {
+            /* @var $cycle \AppBundle\Entity\Cycle */
+            $cycles[] = [
+                "name" => $cycle->getName(),
+                "code" => $cycle->getCode(),
+            ];
+        }
 
-		$types = $this->getDoctrine()->getRepository('AppBundle:Type')->findBy([], ["name" => "ASC"]);
-		$spheres = $this->getDoctrine()->getRepository('AppBundle:Sphere')->findBy([], ["id" => "ASC"]);
+        $types = $this->getDoctrine()->getRepository('AppBundle:Type')->findBy([], ["name" => "ASC"]);
+        $spheres = $this->getDoctrine()->getRepository('AppBundle:Sphere')->findBy([], ["id" => "ASC"]);
 
-		$traits = $this->get('cards_data')->getDistinctTraits();
-		$traits = array_filter(array_keys($traits));
-		sort($traits);
+        $traits = $this->get('cards_data')->getDistinctTraits();
+        $traits = array_filter(array_keys($traits));
+        sort($traits);
 
-		$list_illustrators = $dbh->executeQuery("SELECT DISTINCT c.illustrator FROM card c WHERE c.illustrator != '' ORDER BY c.illustrator")->fetchAll();
-		$illustrators = array_map(function($card) {
-			return $card["illustrator"];
-		}, $list_illustrators);
+        $list_illustrators = $dbh->executeQuery("SELECT DISTINCT c.illustrator FROM card c WHERE c.illustrator != '' ORDER BY c.illustrator")->fetchAll();
+        $illustrators = array_map(function($card) {
+            return $card["illustrator"];
+        }, $list_illustrators);
 
-		return $this->render('AppBundle:Search:searchform.html.twig', [
-			"pagetitle" => "Card Search",
-			"pagedescription" => "Find all the cards of the game, easily searchable.",
-			"packs" => $packs,
-			"cycles" => $cycles,
-			"types" => $types,
-			"spheres" => $spheres,
-			"traits" => $traits,
-			"illustrators" => $illustrators,
-			"allsets" => $this->renderView('AppBundle:Default:allsets.html.twig', [
-				"data" => $this->get('cards_data')->allSetsData(),
-			]),
+        return $this->render('AppBundle:Search:searchform.html.twig', [
+            "pagetitle" => "Card Search",
+            "pagedescription" => "Find all the cards of the game, easily searchable.",
+            "packs" => $packs,
+            "cycles" => $cycles,
+            "types" => $types,
+            "spheres" => $spheres,
+            "traits" => $traits,
+            "illustrators" => $illustrators,
+            "allsets" => $this->renderView('AppBundle:Default:allsets.html.twig', [
+                "data" => $this->get('cards_data')->allSetsData(),
+            ]),
 
-		], $response);
-	}
+        ], $response);
+    }
 
     public function zoomAction($card_code, Request $request) {
         $card = $this->getDoctrine()->getRepository('AppBundle:Card')->findOneBy(["code" => $card_code]);
@@ -206,8 +206,8 @@ class SearchController extends Controller {
                         continue;
                     }
                     $params[] = $key . ":" . implode("|", array_map(function($s) {
-                        return strstr($s, " ") !== false ? "\"$s\"" : $s;
-                    }, $val));
+                            return strstr($s, " ") !== false ? "\"$s\"" : $s;
+                        }, $val));
                 } else {
                     if ($searchName == "date_release") {
                         $op = "";
@@ -261,6 +261,7 @@ class SearchController extends Controller {
 
             if ($conditions[0][0] == array_search('cycle', SearchController::$searchKeys)) {
                 $url = $this->get('router')->generate('cards_cycle', ['cycle_code' => $conditions[0][2], 'view' => $view, 'sort' => $sort, 'page' => $page]);
+
                 return $this->redirect($url);
             }
         }
@@ -274,7 +275,7 @@ class SearchController extends Controller {
         ]);
     }
 
-    public function displayAction($q, $view = 'card', $sort, $page = 1, $pagetitle = '', $meta = '', Request $request) {
+    public function displayAction($q, $view = 'card', $sort, $page = 1, $pagetitle = '', $meta = '') {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
@@ -340,7 +341,9 @@ class SearchController extends Controller {
 
             // data à passer à la view
             for ($rowindex = $first; $rowindex < $last && $rowindex < count($rows); $rowindex++) {
+                /* @var $card \AppBundle\Entity\Card */
                 $card = $rows[$rowindex];
+                /* @var $pack \AppBundle\Entity\Pack */
                 $pack = $card->getPack();
                 $cardinfo = $this->get('cards_data')->getCardInfo($card, false);
 
@@ -423,8 +426,12 @@ class SearchController extends Controller {
         ], $response);
     }
 
-    public function setnavigation($card, $q, $view, $sort) {
+    public function setnavigation($card) {
         $em = $this->getDoctrine();
+
+        /* @var $card \AppBundle\Entity\Card */
+        /* @var $prev \AppBundle\Entity\Pack */
+        /* @var $next \AppBundle\Entity\Pack */
         $prev = $em->getRepository('AppBundle:Card')->findOneBy(["pack" => $card->getPack(), "position" => $card->getPosition() - 1]);
         $next = $em->getRepository('AppBundle:Card')->findOneBy(["pack" => $card->getPack(), "position" => $card->getPosition() + 1]);
 

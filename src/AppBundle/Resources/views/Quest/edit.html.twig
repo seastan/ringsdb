@@ -36,7 +36,6 @@
             <input type="hidden" name="deck4_content" value="{{ deck4_content }}" />
             <input type="hidden" name="questlog_id" value="{{ questlog.id }}"/>
 
-
             <fieldset id="deck-selection">
                 <legend>
                     Deck Selection
@@ -69,16 +68,43 @@
                                         {% set pack = null %}
                                         {% for quest in quests %}
                                             {% if quest.pack.cycle.name != pack %}
-                                                 {% if pack is not null %}
-                                                   </optgroup>
+                                                {% if pack is not null %}
+                                                    </optgroup>
                                                 {% endif %}
+
                                                 {% set pack = quest.pack.cycle.name %}
                                                 <optgroup label="{{ pack }}">
                                             {% endif %}
-                                            <option value="{{ quest.id }}" {% if questlog.scenario.id == quest.id %}selected{% endif %}>{{ quest.name }}</option>
+                                            <option value="{{ quest.id }}" {% if questlog.scenario is not null and questlog.scenario.id == quest.id %}selected{% endif %}>{{ quest.name }}</option>
                                         {% endfor %}
                                         </optgroup>
                                     </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="deck1_player_name">Player 1</label>
+                                    <input class="form-control" name="deck1_player_name" id="deck1_player_name" maxlength="80" value="{{ deck1_player_name }}"/>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="deck2_player_name">Player 2</label>
+                                    <input class="form-control" name="deck2_player_name" id="deck2_player_name" maxlength="80" value="{{ deck2_player_name }}"/>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="deck3_player_name">Player 3</label>
+                                    <input class="form-control" name="deck3_player_name" id="deck3_player_name" maxlength="80" value="{{ deck3_player_name }}"/>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="deck4_player_name">Player 4</label>
+                                    <input class="form-control" name="deck4_player_name" id="deck4_player_name" maxlength="80" value="{{ deck4_player_name }}"/>
                                 </div>
                             </div>
                         </div>
@@ -135,15 +161,32 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="checkbox" style="margin-top: 0; margin-bottom: 15px;">
+                                    <label>
+                                        <input type="checkbox" name="public" value="1" {% if questlog.isPublic %}checked{% endif %} {% if is_locked_as_public %}disabled{% endif %}> Allow other players to see this quest log.
+                                        <br>
+                                        <small class="text-muted">
+                                            They will be able to see the cards in your unpublished decks, but not it's name or description.
+                                            Also, you won't be able to make it private again after there are likes, favorites or comments in this questlog.
+                                        </small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-3" id="quest-info"></div>
                 </div>
             </fieldset>
 
-
             <div class="row">
                 <div class="col-md-12">
-                    <button type="submit" class="btn btn-primary btn-block">Log this Quest</button>
+                    {% if questlog.id is null %}
+                        <button type="submit" class="btn btn-primary btn-block">Log this Quest</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-primary btn-block">Save changes</button>
+                    {% endif %}
                 </div>
             </div>
         </form>

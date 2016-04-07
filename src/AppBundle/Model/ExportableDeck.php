@@ -4,6 +4,7 @@ namespace AppBundle\Model;
 
 class ExportableDeck {
     public function getArrayExport($withUnsavedChanges = false) {
+        /* @var $this \AppBundle\Entity\Deck */
         $slots = $this->getSlots();
         $sideslots = $this->getSideslots();
 
@@ -24,6 +25,7 @@ class ExportableDeck {
     }
 
     public function getTextExport() {
+        /* @var $this \AppBundle\Entity\Deck */
         $slots = $this->getSlots();
         $sideslots = $this->getSideslots();
 

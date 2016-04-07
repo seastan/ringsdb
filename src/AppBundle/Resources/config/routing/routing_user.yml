@@ -72,6 +72,30 @@ fellowship_comment_hide:
     defaults:
         _controller: AppBundle:Fellowship:hidecomment
 
+questlog_favorite:
+    path: /questlog_favorite
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:QuestLog:favorite
+
+questlog_like:
+    path: /questlog_like
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:QuestLog:vote
+
+questlog_comment:
+    path: /questlog_comment
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:QuestLog:comment
+
+questlog_comment_hide:
+    path: /questlog_hidecomment/{comment_id}/{hidden}
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:QuestLog:hidecomment
+
 card_reviews_list_byauthor:
     path: /reviews/{user_id}/{page}
     defaults:

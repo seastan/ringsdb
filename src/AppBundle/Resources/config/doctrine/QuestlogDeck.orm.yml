@@ -33,6 +33,10 @@ AppBundle\Entity\QuestlogDeck:
             type: smallint
             nullable: false
             column: deck_number
+        player:
+            type: string
+            length: 80
+            nullable: true
         content:
             type: text
             nullable: false

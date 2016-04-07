@@ -34,7 +34,7 @@ AppBundle\Entity\Questlog:
                 name: questlog_favorite
                 cascade: ["persist","remove"]
                 joinColumns:
-                    fellowship_id:
+                    questlog_id:
                         referencedColumnName: id
                 inverseJoinColumns:
                     user_id:
@@ -46,7 +46,7 @@ AppBundle\Entity\Questlog:
                 name: questlog_vote
                 cascade: ["persist","remove"]
                 joinColumns:
-                    fellowship_id:
+                    questlog_id:
                         referencedColumnName: id
                 inverseJoinColumns:
                     user_id:
