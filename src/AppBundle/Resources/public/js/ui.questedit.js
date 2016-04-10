@@ -22,7 +22,7 @@
             xhr = $.ajax(Routing.generate('api_scenario', { scenario_id: scenario }), {
                 type: 'GET',
                 dataType: 'json',
-                success: function(data, textStatus, jqXHR) {
+                success: function(data) {
                     scenario_data = data;
 
                     $('<label />').text(data.name).appendTo(quest_info);
@@ -170,14 +170,24 @@
         }
 
         n.on('input', function() {
-            if ($(this).val()) {
-                name_changed = true;
-            } else {
-                name_changed = false;
-            }
+            name_changed = $(this).val() ? true : false;
         }).on('blur', ui.set_questlog_name);
 
         ui.set_questlog_name();
+    };
+
+    ui.init_players_name = function() {
+        $('.player_name').on('input', function() {
+            var t = $(this);
+
+            if (t.val()) {
+                t.attr('data-changed', true);
+            } else {
+                t.attr('data-changed', false);
+            }
+
+            $('.player_name:not(:disabled)[data-changed=false]').val(t.val());
+        }).trigger('input');
     };
 
     ui.update_players = function() {
@@ -224,7 +234,10 @@
     };
 
     ui.setup_event_handlers = function() {
-        $(document).on('deck-changed', ui.update_players);
+        $(document).on('deck-changed', function() {
+            ui.update_players();
+            $('a.btn[data-action="swap-cards"]').removeClass('hidden');
+        });
         $('#save_form').on('submit', ui.on_submit_form);
     };
 
@@ -250,6 +263,7 @@
      */
     ui.on_dom_loaded = function() {
         ui.init_questlog_name();
+        ui.init_players_name();
         ui.init_quest_selector();
         ui.init_quest_mode_selector();
         ui.init_result_selector();

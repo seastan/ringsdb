@@ -86,25 +86,25 @@
                             <div class="col-sm-3">
                                 <div class="form-group">
                                     <label for="deck1_player_name">Player 1</label>
-                                    <input class="form-control" name="deck1_player_name" id="deck1_player_name" maxlength="80" value="{{ deck1_player_name }}"/>
+                                    <input class="form-control player_name" name="deck1_player_name" id="deck1_player_name" maxlength="80" value="{{ deck1_player_name }}"/>
                                 </div>
                             </div>
                             <div class="col-sm-3">
                                 <div class="form-group">
                                     <label for="deck2_player_name">Player 2</label>
-                                    <input class="form-control" name="deck2_player_name" id="deck2_player_name" maxlength="80" value="{{ deck2_player_name }}"/>
+                                    <input class="form-control player_name" name="deck2_player_name" id="deck2_player_name" maxlength="80" value="{{ deck2_player_name }}"/>
                                 </div>
                             </div>
                             <div class="col-sm-3">
                                 <div class="form-group">
                                     <label for="deck3_player_name">Player 3</label>
-                                    <input class="form-control" name="deck3_player_name" id="deck3_player_name" maxlength="80" value="{{ deck3_player_name }}"/>
+                                    <input class="form-control player_name" name="deck3_player_name" id="deck3_player_name" maxlength="80" value="{{ deck3_player_name }}"/>
                                 </div>
                             </div>
                             <div class="col-sm-3">
                                 <div class="form-group">
                                     <label for="deck4_player_name">Player 4</label>
-                                    <input class="form-control" name="deck4_player_name" id="deck4_player_name" maxlength="80" value="{{ deck4_player_name }}"/>
+                                    <input class="form-control player_name" name="deck4_player_name" id="deck4_player_name" maxlength="80" value="{{ deck4_player_name }}"/>
                                 </div>
                             </div>
                         </div>
@@ -193,4 +193,5 @@
     </div>
 
     {% include 'AppBundle:Modale:deck_selection.html.twig' %}
+    {% include 'AppBundle:Modale:deck_edit.html.twig' %}
 {% endblock %}

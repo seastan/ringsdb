@@ -17,12 +17,12 @@
         {% if is_public is not defined or not is_public %}
             <div class="text-center">
                 <div class="btn-group btn-group-xs">
-                    <a class="btn btn-default hidden" data-action="swap-cards" data-deck="{{ deck_number }}" data-toggle="tooltip" data-container="body" title="Swap sideboard cards">
-                        <span class="fa fa-fw fa-exchange"></span> Swap cards
+                    <a class="btn btn-default hidden" data-action="swap-cards" data-deck="{{ deck_number }}">
+                        Swap cards
                     </a>
-                        <a class="btn btn-default" data-action="remove-deck" data-deck="{{ deck_number }}">
-                            Remove deck
-                        </a>
+                    <a class="btn btn-default" data-action="remove-deck" data-deck="{{ deck_number }}">
+                        Remove deck
+                    </a>
                 </div>
             </div>
         {% endif %}

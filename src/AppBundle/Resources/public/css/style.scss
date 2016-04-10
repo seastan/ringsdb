@@ -141,7 +141,8 @@ div.tags span.tag {
 }
 
 .decks-actions {
-  width: 80px;
+  //width: 80px;
+  width: 110px;
 
   .btn {
     margin-bottom: 3px;
@@ -513,7 +514,7 @@ div.tags span.tag {
     flex-direction: column;
 
     .bg-deck {
-      flex: 1;
+      flex: auto;
     }
   }
 }
@@ -1673,7 +1674,7 @@ h1.nightmare, h1.easy {
   }
 }
 
-#table-predecessor {
+#table-predecessor, #table-inspired {
   td {
     text-align: right;
   }

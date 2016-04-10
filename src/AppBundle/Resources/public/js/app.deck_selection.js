@@ -42,6 +42,13 @@
                     modal.find('label[data-action="my-decks"]').trigger('click');
                     break;
 
+                case 'swap-cards':
+                    var modal = $('#deckEditModal').modal('show');
+                    modal_deck_number = btn.data('deck');
+
+
+                    break;
+
                 case 'my-decks':
                     if (deck_list_xhr) {
                         deck_list_xhr.abort();

@@ -1,0 +1,23 @@
+<!-- Modal -->
+<div class="modal fade" id="deckEditModal" tabindex="-1" role="dialog" aria-labelledby="deckEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3 class="modal-title" id="deckEditModalLabel">Swap cards</h3>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div id="deck-modal-content"></div>
+                        <div id="deck-modal-side-content"></div>
+                    </div>
+                    <div class="col-md-6">
+                        {% include 'AppBundle:Builder:tab-pane-build.html.twig' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
