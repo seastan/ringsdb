@@ -394,7 +394,7 @@ class SocialController extends Controller {
     /*
 	 * displays the lists of decklists
 	 */
-    public function listAction($type, $sphere = null, $page = 1, Request $request, $username = null) {
+    public function listAction($type, $page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
