@@ -73,10 +73,33 @@
                             </tbody>
                         </table>
 
+                        <table class="table table-condensed" id="table-predecessor">
+                            <thead>
+                                <tr>
+                                    <th colspan="{% if deck.parent %}5{% else %}1{% endif %}">
+                                        <span class="fa fa-backward"></span> Inspired by
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% if deck.parent %}
+                                {{ macros.decklist_table_row(deck.parent) }}
+                            {% else %}
+                                <tr>
+                                    <td>None. Self-made deck here.</td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+
                         <!-- Published decklists Table -->
                         <table class="table table-condensed" id="table-predecessor">
                             <thead>
-                            <tr><th colspan="5"><span class="fa fa-share"></span> Published versions</th></tr>
+                                <tr>
+                                    <th colspan="{% if deck.children | length %}5{% else %}1{% endif %}">
+                                        <span class="fa fa-share"></span> Published versions
+                                    </th>
+                                </tr>
                             </thead>
                             <tbody>
                                 {% if deck.children | length %}
