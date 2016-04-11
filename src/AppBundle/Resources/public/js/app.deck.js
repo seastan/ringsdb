@@ -488,7 +488,7 @@
             } else {
                 var tpl = $(card_line_tpl({ card: card }));
 
-                var div = $('<div />').append(tpl).prepend(sortKey != 'type_code' || card.type_code != 'hero' ? '<span class="card-count">' +card[key] + 'x</span> ' : '').appendTo(section);
+                var div = $('<div />').append(tpl).prepend(sortKey != 'type_code' || card.type_code != 'hero' ? '<span class="card-count">' +card[key] + 'x</span> ' : '');
 
                 if (card.is_unique && card.type_code != 'hero') {
                     div.find('a').css('font-weight', 'bold');
@@ -499,13 +499,16 @@
                 }
 
                 if (!deck.i_have_this_card(card)) {
-                    //div.append('&#160;<i class="fa fa-exclamation-triangle not-in-collection" title="This card is not in my collection"></i>');
                     div.find('.card-count').addClass('limited-pool-conflict').attr('title', 'This card is not in my collection');
                 }
 
                 if (sortKey == 'pack_code') {
                     div.append(' <small class="text-muted" style="padding-left: 2px">(#' + card.position + ')</small>');
+                } else if (app.data.cards.find({ 'name': card.name }).length > 1) {
+                    div.append(' <small class="text-muted">(' + card.pack_code + ')</small>');
                 }
+
+                div.appendTo(section);
             }
         });
 
@@ -780,8 +783,10 @@
                     var line = $(line);
                     var card = app.data.cards.findById(line.find('a.card').data('code'));
 
+                    var text = line.text().replace(/\s+\([^#].*\)/, '').trim();
+
                     if (card) {
-                        lines.push($(line).text().trim() + ' (' + card.pack_name + ')');
+                        lines.push(text + ' (' + card.pack_name + ')');
                     }
                 });
                 lines.push('');
