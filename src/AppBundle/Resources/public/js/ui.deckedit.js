@@ -593,7 +593,7 @@
                     '<td><a class="card card-tip" data-code="<%= card.code %>" href="<%= url %>" data-target="#cardModal" data-remote="false" data-toggle="modal"><%= card.name %></a></td>',
                     '<td class="sphere"><span class="icon-<%= card.sphere_code %> fg-<%= card.sphere_code %>" title="<%= card.sphere_name %>"></span></td>',
                     '<td class="type"><span class="icon-<%= card.type_code %>" title="<%= card.type_name %>"></span></td>',
-                    '<td class="cost"><%= card.cost %><%= card.threat %> <% if (card.threat != undefined) { %>T<% } else {%>C<% } %></span></td>',
+                    '<td class="cost"><%= card.cost %><%= card.threat %> <span class="visible-xs-inline"><% if (card.threat != undefined) { %>T<% } else {%>C<% } %></span></td>',
                     '<td class="willpower"><% if (card.willpower != undefined) { %><%= card.willpower %> <span class="icon-willpower visible-xs-inline"></span><% } %></td>',
                     '<td class="attack"><% if (card.attack != undefined) { %><%= card.attack %> <span class="icon-attack visible-xs-inline"></span><% } %></td>',
                     '<td class="defense"><% if (card.defense != undefined) { %><%= card.defense %> <span class="icon-defense visible-xs-inline"></span><% } %></td>',
