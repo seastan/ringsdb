@@ -1388,6 +1388,14 @@ footer a {
         margin-left: 0;
         line-height: 24px;
       }
+
+      .btn:nth-child(2), .btn:nth-child(4) {
+        margin-left: -1px;
+      }
+
+      .btn:nth-child(3), .btn:nth-child(4) {
+        margin-top: -1px;
+      }
     }
 
     td:nth-child(2) {
