@@ -593,11 +593,11 @@
                     '<td><a class="card card-tip" data-code="<%= card.code %>" href="<%= url %>" data-target="#cardModal" data-remote="false" data-toggle="modal"><%= card.name %></a></td>',
                     '<td class="sphere"><span class="icon-<%= card.sphere_code %> fg-<%= card.sphere_code %>" title="<%= card.sphere_name %>"></span></td>',
                     '<td class="type"><span class="icon-<%= card.type_code %>" title="<%= card.type_name %>"></span></td>',
-                    '<td class="cost"><%= card.cost %><%= card.threat %></td>',
-                    '<td class="willpower"><%= card.willpower %></td>',
-                    '<td class="attack"><%= card.attack %></td>',
-                    '<td class="defense"><%= card.defense %></td>',
-                    '<td class="health"><%= card.health %></td>',
+                    '<td class="cost"><%= card.cost %><%= card.threat %> <% if (card.threat != undefined) { %>T<% } else {%>C<% } %></span></td>',
+                    '<td class="willpower"><% if (card.willpower != undefined) { %><%= card.willpower %> <span class="icon-willpower visible-xs-inline"></span><% } %></td>',
+                    '<td class="attack"><% if (card.attack != undefined) { %><%= card.attack %> <span class="icon-attack visible-xs-inline"></span><% } %></td>',
+                    '<td class="defense"><% if (card.defense != undefined) { %><%= card.defense %> <span class="icon-defense visible-xs-inline"></span><% } %></td>',
+                    '<td class="health"><% if (card.health != undefined) { %><%= card.health %> <span class="icon-health visible-xs-inline"></span><% } %></td>',
                     '</tr>'
                 ].join(''));
                 break;
@@ -637,16 +637,10 @@
      * @memberOf ui
      */
     ui.build_row = function(card) {
-        var radios = '', radioTpl = _.template(
-            '<label class="btn btn-xs btn-default <%= active %>"><input type="radio" name="qty-<%= card.code %>" value="<%= i %>"><%= i %></label>'
-        );
+        var radios = '';
 
         for (var i = 0; i <= card.maxqty; i++) {
-            radios += radioTpl({
-                i: i,
-                active: (i == card.indeck ? ' active' : ''),
-                card: card
-            });
+            radios += '<label class="btn btn-xs btn-default"><input type="radio" name="qty-' + card.code + '" value="' + i + '">' + i + '</label>';
         }
 
         var html = DisplayColumnsTpl({
@@ -709,16 +703,11 @@
 
             row.data("code", card.code).addClass('card-container');
 
-            row.find('input[name="qty-' + card.code + '"]').each(function(i, element) {
-                if ($(element).val() == card.indeck) {
-                    $(element).prop('checked', true).closest('label').addClass('active');
-                } else {
-                    $(element).prop('checked', false).closest('label').removeClass('active');
-                }
-            });
-
             if (unusable) {
                 row.find('label').addClass("disabled").find('input[type=radio]').attr("disabled", true);
+            } else {
+                var radio = row.find('input[name="qty-' + card.code + '"][value="' + card.indeck + '"]');
+                radio.prop('checked', true).closest('label').addClass('active');
             }
 
             if (Config['display-column'] > 1 && (counter % Config['display-column'] === 0)) {
@@ -737,7 +726,6 @@
     ui.on_deck_modified = function() {
         ui.refresh_deck();
         ui.refresh_list();
-        app.suggestions && Config['show-suggestions'] != 0 && app.suggestions.compute();
     };
 
     /**
@@ -747,11 +735,14 @@
         if (options) {
             DisplayOptions = options;
         }
+
         app.deck.display('#deck-content', DisplayOptions, false);
         app.deck.display('#sideboard-content', DisplayOptions, true);
-        app.draw_simulator && app.draw_simulator.reset();
-        app.deck_charts && app.deck_charts.setup();
-        app.suggestions && Config['show-suggestions'] != 0 && app.suggestions.compute();
+        setTimeout(function() {
+            app.draw_simulator && app.draw_simulator.reset();
+            app.deck_charts && app.deck_charts.setup();
+            app.suggestions && Config['show-suggestions'] != 0 && app.suggestions.compute();
+        }, 1);
     };
 
     /**

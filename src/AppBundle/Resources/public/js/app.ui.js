@@ -36,7 +36,43 @@
     $(document).ready(function() {
         console.log('ui.on_dom_loaded');
 
-        $('[data-toggle="tooltip"]').tooltip();
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            $.fn.tooltip = function() {
+                return this;
+            };
+
+            try { // prevent crash on browsers not supporting DOM styleSheets properly
+                for (var si in document.styleSheets) {
+                    var styleSheet = document.styleSheets[si];
+                    if (!styleSheet.rules) {
+                        continue;
+                    }
+
+                    for (var ri = styleSheet.rules.length - 1; ri >= 0; ri--) {
+                        if (!styleSheet.rules[ri].selectorText) {
+                            continue;
+                        }
+
+                        if (styleSheet.rules[ri].selectorText.match(':hover|:active')) {
+                            var texts = styleSheet.rules[ri].selectorText.split(',');
+                            var selector = [];
+                            for (var m = 0; m < texts.length; m++) {
+                                if (!texts[m].match(':hover|:active')) {
+                                    selector.push(texts[m]);
+                                }
+                            }
+                            if (selector.length) {
+                                styleSheet.rules[ri].selectorText = selector.join(', ');
+                            } else {
+                                styleSheet.deleteRule(ri);
+                            }
+                        }
+                    }
+                }
+            } catch (ex) {}
+        } else {
+            $('[data-toggle="tooltip"]').tooltip();
+        }
 
         $('time').each(function(index, element) {
             var datetime = moment($(element).attr('datetime'));
@@ -45,16 +81,17 @@
             $(element).attr('title', datetime.format('LLLL'));
         });
 
-        if (typeof ui.on_dom_loaded === 'function') {
+        if ($.isFunction(ui.on_dom_loaded)) {
             ui.on_dom_loaded();
         }
+
         dom_loaded.resolve();
     });
 
     $(document).on('data.app', function() {
         console.log('ui.on_data_loaded');
 
-        if (typeof ui.on_data_loaded === 'function') {
+        if ($.isFunction(ui.on_data_loaded)) {
             ui.on_data_loaded();
         }
 
@@ -94,7 +131,7 @@
             });
         });
 
-        if (typeof ui.on_all_loaded === 'function') {
+        if ($.isFunction(ui.on_all_loaded)) {
             ui.on_all_loaded();
         }
 

@@ -1,20 +1,20 @@
 <div class="row">
     <div class="col-md-12 text-right" style="margin-bottom: 10px">
-        <button class="btn btn-default btn-xs" type="button" id="filter-text-button">
+        <label class="btn btn-default btn-xs" type="button" id="filter-text-button">
             <span class="fa fa-question"></span> Filter help
-        </button>
+        </label>
 
         <div class="btn-group">
-            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+            <label type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
                 <span class="fa fa-check-square-o"></span> Sets <span class="caret"></span>
-            </button>
+            </label>
             <ul class="dropdown-menu pull-right" id="set-selection-menu" data-filter="pack_code" title="Shift+Click to select only one option ; Alt+Shift+Click to select all other options"></ul>
         </div>
 
         <div class="btn-group">
-            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+            <label type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
                 <span class="fa fa-gear"></span> Options <span class="caret"></span>
-            </button>
+            </label>
             <ul class="dropdown-menu pull-right" id="config-options">
                 <li><a href="#"><label><input type="checkbox" name="show-unusable"> Show unusable cards</label></a></li>
                 <li><a href="#"><label><input type="checkbox" name="show-only-deck"> Show only used cards (bypasses filters)</label></a></li>
@@ -34,9 +34,9 @@
         </div>
 
         <div class="btn-group">
-            <button type="button" class="btn btn-default btn-xs dropdown-toggle " data-toggle="dropdown">
+            <label type="button" class="btn btn-default btn-xs dropdown-toggle " data-toggle="dropdown">
                 <span class="fa fa-sort"></span> Sort <span class="caret"></span>
-            </button>
+            </label>
             <ul class="dropdown-menu pull-right" id="menu-sort">
                 <li><a href="#" id="btn-sort-type"><label>by Type</label></a></li>
                 <li><a href="#" id="btn-sort-position"><label>by Pack</label></a></li>
@@ -69,13 +69,13 @@
             <tr>
                 <th style="min-width:85px"><a href="#" data-sort="indeck">Quantity</a></th>
                 <th><a href="#" data-sort="name">Name</a></th>
-                <th class="sphere"><a href="#" data-toggle="tooltip" data-sort="sphere_code" title="Sphere">S.</a></th>
-                <th class="type"><a href="#" data-toggle="tooltip" data-sort="type_code" title="Type">T.</a></th>
-                <th class="cost"><a href="#" data-toggle="tooltip" data-sort="cost|threat" title="Cost/Threat">C.</a></th>
-                <th class="cost"><a href="#" data-toggle="tooltip" data-sort="willpower" title="Willpower"><span class="icon-willpower"></span></a></th>
-                <th class="cost"><a href="#" data-toggle="tooltip" data-sort="attack" title="Attack"><span class="icon-attack"></span></a></th>
-                <th class="cost"><a href="#" data-toggle="tooltip" data-sort="defense" title="Defense"><span class="icon-defense"></span></a></th>
-                <th class="cost"><a href="#" data-toggle="tooltip" data-sort="health" title="Hit Points"><span class="icon-health"></span></a></th>
+                <th class="sphere hidden-xs"><a href="#" data-toggle="tooltip" data-sort="sphere_code" title="Sphere">S.</a></th>
+                <th class="type hidden-xs"><a href="#" data-toggle="tooltip" data-sort="type_code" title="Type">T.</a></th>
+                <th class="cost hidden-xs"><a href="#" data-toggle="tooltip" data-sort="cost|threat" title="Cost/Threat">C.</a></th>
+                <th class="willpower hidden-xs"><a href="#" data-toggle="tooltip" data-sort="willpower" title="Willpower"><span class="icon-willpower"></span></a></th>
+                <th class="attack hidden-xs"><a href="#" data-toggle="tooltip" data-sort="attack" title="Attack"><span class="icon-attack"></span></a></th>
+                <th class="defense hidden-xs"><a href="#" data-toggle="tooltip" data-sort="defense" title="Defense"><span class="icon-defense"></span></a></th>
+                <th class="health hidden-xs"><a href="#" data-toggle="tooltip" data-sort="health" title="Hit Points"><span class="icon-health"></span></a></th>
             </tr>
             </thead>
             <tbody id="collection-table" class="collection"></tbody>

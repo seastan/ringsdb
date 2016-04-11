@@ -1,4 +1,4 @@
-#wrapper {
+td#wrapper {
   min-height: 100%;
   border-bottom: 5px solid #550000;
   padding-bottom: 80px;
@@ -1681,5 +1681,47 @@ h1.nightmare, h1.easy {
 
   td:first-child {
     text-align: left;
+  }
+}
+
+
+@media (max-width: 767px) {
+  #collection {
+    border-collapse: separate;
+
+    td:nth-child(1) {
+      width: 80px;
+
+      .btn {
+        width: 50%;
+        margin-left: 0;
+        line-height: 24px;
+      }
+    }
+
+    td:nth-child(2) {
+      padding-top: 9px;
+      display: block;
+    }
+
+    tr:first-child td {
+      border-top: 0;
+    }
+
+    td {
+      &.sphere, &.type, &.cost, &.willpower, &.attack, &.defense, &.health {
+        display: inline-block;
+        float: left;
+        border-top: 0;
+      }
+
+      &.sphere, &.type {
+        width: 30px;
+      }
+
+      &.cost, &.willpower, &.attack, &.defense, &.health {
+        white-space: nowrap;
+      }
+    }
   }
 }
