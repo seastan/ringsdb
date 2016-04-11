@@ -1364,17 +1364,69 @@ footer a {
   }
 }
 
-#collection.compact {
-  td {
-    padding: 0 !important;
-    font-size: 10px !important;
-    line-height: 16px;
+@media (min-width: 768px) {
+  #collection.compact {
+    td {
+      padding: 0 !important;
 
-    .btn-xs {
-      line-height: 1.2;
+      .btn-xs {
+        line-height: 1.2;
+      }
     }
   }
 }
+
+@media (max-width: 767px) {
+  #collection {
+    border-collapse: separate;
+
+    td:nth-child(1) {
+      width: 80px;
+
+      .btn {
+        width: 50%;
+        margin-left: 0;
+        line-height: 24px;
+      }
+    }
+
+    td:nth-child(2) {
+      padding-top: 9px;
+      display: block;
+    }
+
+    tr:first-child td {
+      border-top: 0;
+    }
+
+    td {
+      &.sphere, &.type, &.cost, &.willpower, &.attack, &.defense, &.health {
+        display: inline-block;
+        float: left;
+        border-top: 0;
+      }
+
+      &.sphere, &.type {
+        width: 30px;
+      }
+
+      &.cost, &.willpower, &.attack, &.defense, &.health {
+        white-space: nowrap;
+      }
+    }
+  }
+
+  #collection.compact {
+    td:nth-child(1) {
+      padding: 0;
+    }
+
+    td:nth-child(2) {
+      padding-top: 3px !important;
+    }
+  }
+}
+
 
 .modal-qty-container, .modal-side-qty-container, .modal-move-card-container {
   display: inline-block;
@@ -1681,47 +1733,5 @@ h1.nightmare, h1.easy {
 
   td:first-child {
     text-align: left;
-  }
-}
-
-
-@media (max-width: 767px) {
-  #collection {
-    border-collapse: separate;
-
-    td:nth-child(1) {
-      width: 80px;
-
-      .btn {
-        width: 50%;
-        margin-left: 0;
-        line-height: 24px;
-      }
-    }
-
-    td:nth-child(2) {
-      padding-top: 9px;
-      display: block;
-    }
-
-    tr:first-child td {
-      border-top: 0;
-    }
-
-    td {
-      &.sphere, &.type, &.cost, &.willpower, &.attack, &.defense, &.health {
-        display: inline-block;
-        float: left;
-        border-top: 0;
-      }
-
-      &.sphere, &.type {
-        width: 30px;
-      }
-
-      &.cost, &.willpower, &.attack, &.defense, &.health {
-        white-space: nowrap;
-      }
-    }
   }
 }
