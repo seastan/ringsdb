@@ -82,23 +82,20 @@ class QuestLogController extends Controller {
             /* @var $questlogs \AppBundle\Entity\Questlog[] */
             $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => 'DESC']);
 
-            if (count($questlogs)) {
-                return $this->render('AppBundle:Quest:my-questlogs.html.twig', [
-                    'pagetitle' => "My Quest Logs",
-                    'pagedescription' => "Log a new quest.",
-                    'quests' => $quests,
-                    'easy' => $easy,
-                    'normal' => $normal,
-                    'nightmare' => $nightmare,
-                    'beaten_easy' => $beatenEasy,
-                    'beaten_normal' => $beatenNormal,
-                    'beaten_nightmare' => $beatenNightmare,
-                    'questlogs' => $questlogs,
-                    'quest_mode' => $quest_mode,
-                    'selected_scenario' => $scenario
-                ]);
-            } else {
-            }
+            return $this->render('AppBundle:Quest:my-questlogs.html.twig', [
+                'pagetitle' => "My Quest Logs",
+                'pagedescription' => "Log a new quest.",
+                'quests' => $quests,
+                'easy' => $easy,
+                'normal' => $normal,
+                'nightmare' => $nightmare,
+                'beaten_easy' => $beatenEasy,
+                'beaten_normal' => $beatenNormal,
+                'beaten_nightmare' => $beatenNightmare,
+                'questlogs' => $questlogs,
+                'quest_mode' => $quest_mode,
+                'selected_scenario' => $scenario
+            ]);
         }
     }
 
