@@ -141,8 +141,7 @@ div.tags span.tag {
 }
 
 .decks-actions {
-  //width: 80px;
-  width: 110px;
+  width: 80px;
 
   .btn {
     margin-bottom: 3px;
@@ -1737,6 +1736,127 @@ h1.nightmare, h1.easy {
 #table-predecessor, #table-inspired {
   td {
     text-align: right;
+  }
+
+  td:first-child {
+    text-align: left;
+  }
+}
+
+
+
+/********* LIST OF QUESTLOGS ************/
+
+#scenario-list {
+  list-style: none;
+  padding-left: 0;
+
+  li {
+    display: none;
+  }
+
+  .not-beaten {
+    opacity: 0.25;
+  }
+
+  &.easy .scenario-easy, &.normal .scenario-normal, &.nightmare .scenario-nightmare {
+    display: block;
+  }
+}
+
+.list-questlogs {
+  .questlog-checkbox {
+    width: 35px;
+    line-height: 20px;
+    padding-top: 13px;
+
+    input {
+      vertical-align: middle;
+      margin: 0;
+    }
+  }
+
+  .questlog-name {
+    margin-top: 5px;
+    margin-bottom: 0;
+  }
+
+  .questlog-result {
+    margin-bottom: 10px;
+    margin-top: 5px;
+  }
+
+  .questlogs-actions {
+    margin: 4px 0;
+    text-align: right;
+
+    .block {
+      height: 10px;
+    }
+
+    .social {
+      margin-left: 20px;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .list-questlogs {
+    .questlog-name {
+      margin-bottom: px;
+    }
+
+    .questlogs-actions {
+      margin-bottom: 15px;
+    }
+  }
+}
+
+.questlog-heroes {
+  float:left;
+  white-space: nowrap;
+  font-size: 0;
+  margin-right: 10px;
+
+  .decklist-hero {
+    margin-right: 5px;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+.questlog-deck-info {
+  h4 {
+    margin-top: 0;
+    margin-bottom: 4px;
+    a {
+      font-size: 85%;
+    }
+  }
+}
+
+.questlog-hero-text {
+  a {
+    padding-right: 10px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 767px) {
+  .questlog-hero-text {
+    clear: both;
+    display: block;
+    margin-top: 15px;
+  }
+}
+
+#table-questlogs {
+  td:last-child {
+    width: 200px;
+    text-align: right;
+    white-space: nowrap;
   }
 
   td:first-child {

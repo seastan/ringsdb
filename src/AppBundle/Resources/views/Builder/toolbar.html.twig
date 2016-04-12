@@ -6,9 +6,9 @@
                     <span class="fa fa-pencil text-primary"></span> Edit
                 </a>
 
-                {#<a href="{{ path('questlog_new', { deck1_id: deck_id }) }}" class="btn btn-sm btn-default">#}
-                    {#<span class="fa fa-book text-warning"></span> Log a Quest#}
-                {#</a>#}
+                <a href="{{ path('questlog_new', { deck1_id: deck_id }) }}" class="btn btn-sm btn-default">
+                    <span class="fa fa-book text-warning"></span> Log a Quest
+                </a>
 
                 <a href="{{ path('deck_publish_form', { deck_id: deck_id }) }}" class="btn btn-sm btn-default" id="btn-publish">
                     <span class="fa fa-share text-success"></span> Publish

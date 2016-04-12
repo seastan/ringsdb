@@ -17,24 +17,88 @@ use DateTime;
 
 class QuestLogController extends Controller {
 
-    public function mylistAction() {
+    public function mylistAction($scenario_id, $quest_mode) {
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $quests \AppBundle\Entity\Scenario[] */
+        $quests = $em->getRepository('AppBundle:Scenario')->findBy([], ['position' => 'ASC']);
+
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
 
-        /* @var $questlogs \AppBundle\Entity\Questlog[] */
-        $questlogs = $user->getQuestlogs();
+        // Count scenarios
+        $easy = 0;
+        $normal = 0;
+        $nightmare = 0;
 
-        if (count($questlogs)) {
-            return $this->render('AppBundle:Quest:my-questlogs.html.twig', [
-                'pagetitle' => "My Quest Logs",
-                'pagedescription' => "Log a new quest.",
-                'questlogs' => $questlogs,
-            ]);
-        } else {
+        foreach ($quests as $quest) {
+            $normal++;
+            if ($quest->getHasEasy()) {
+                $easy++;
+            }
+            if ($quest->getHasNightmare()) {
+                $nightmare++;
+            }
+        }
+
+        // Count beaten scenarios
+        $beatenEasy = [];
+        $beatenNormal = [];
+        $beatenNightmare = [];
+
+        $dbh = $em->getConnection();
+        $beaten = $dbh->executeQuery("SELECT DISTINCT scenario_id, quest_mode FROM questlog WHERE user_id = ?", [$user->getId()])->fetchAll(\PDO::FETCH_NAMED);
+
+        foreach ($beaten as $c) {
+            if ($c['quest_mode'] == 'easy') {
+                $beatenEasy[$c['scenario_id']] = true;
+            } elseif ($c['quest_mode'] == 'normal') {
+                $beatenNormal[$c['scenario_id']] = true;
+            } elseif ($c['quest_mode'] == 'nightmare') {
+                $beatenNightmare[$c['scenario_id']] = true;
+            }
+        }
+
+        if ($beatenEasy + $beatenNormal + $beatenNightmare == 0) {
             return $this->render('AppBundle:Quest:no-questlogs.html.twig', [
                 'pagetitle' => "My Quest Logs",
                 'pagedescription' => "Log a new quest.",
             ]);
+        } else {
+            if ($scenario_id == null) {
+                $res = $dbh->executeQuery("SELECT scenario_id, quest_mode FROM questlog WHERE user_id = ? ORDER BY scenario_id LIMIT 1", [$user->getId()])->fetch(\PDO::FETCH_NUM);
+                $scenario_id = $res[0];
+                $quest_mode = $res[1];
+            }
+
+            if ($quest_mode != 'easy' && $quest_mode != 'nightmare') {
+                $quest_mode = 'normal';
+            }
+
+            /* @var $scenario \AppBundle\Entity\Scenario */
+            $scenario = $em->getRepository('AppBundle:Scenario')->find($scenario_id);
+
+            /* @var $questlogs \AppBundle\Entity\Questlog[] */
+            $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => 'DESC']);
+
+            if (count($questlogs)) {
+                return $this->render('AppBundle:Quest:my-questlogs.html.twig', [
+                    'pagetitle' => "My Quest Logs",
+                    'pagedescription' => "Log a new quest.",
+                    'quests' => $quests,
+                    'easy' => $easy,
+                    'normal' => $normal,
+                    'nightmare' => $nightmare,
+                    'beaten_easy' => $beatenEasy,
+                    'beaten_normal' => $beatenNormal,
+                    'beaten_nightmare' => $beatenNightmare,
+                    'questlogs' => $questlogs,
+                    'quest_mode' => $quest_mode,
+                    'selected_scenario' => $scenario
+                ]);
+            } else {
+            }
         }
     }
 

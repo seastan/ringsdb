@@ -1,0 +1,202 @@
+{% extends 'AppBundle::layout.html.twig' %}
+{% import "AppBundle::macros.html.twig" as macros %}
+
+{% block javascripts %}
+    {% javascripts '@AppBundle/Resources/public/js/ui.questlogs.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+    <div class="main white container">
+        <div class="row">
+            <div class="col-md-4 col-md-push-8">
+                <div class="row" style="margin-bottom: 5px">
+                    <div class="col-md-12">
+                        <a href="{{ path('questlog_new') }}" class="btn btn-default btn-sm"><span class="fa fa-plus"></span> Log a Quest</a>
+
+                        <div class="btn-group hidden-xs" id="btn-group-selection">
+                            <label type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown">
+                                <span class="fa fa-check-square-o"></span> With Selection <span class="caret"></span>
+                            </label>
+                            <ul class="dropdown-menu" role="menu">
+                                <li class="dropdown-header"><span class="fa fa-trash-o"></span> Delete</li>
+                                <li><a href="#" data-action="delete-selected"><span style="color:red" class="fa fa-exclamation-triangle"></span> Delete all selected quest logs</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="btn-group btn-group-sm" id="difficulty-selector">
+                            <label class="btn btn-default {% if quest_mode == 'easy' %}active{% endif %}" data-action="easy">
+                                Easy <small class="text-primary"><strong>({{ beaten_easy | length }}/{{ easy }})</strong></small>
+                            </label>
+                            <label class="btn btn-default {% if quest_mode == 'normal' %}active{% endif %}" data-action="normal">
+                                Normal <small class="text-primary"><strong>({{ beaten_normal | length }}/{{ normal }})</strong></small>
+                            </label>
+                            <label class="btn btn-default {% if quest_mode == 'nightmare' %}active{% endif %}" data-action="nightmare">
+                                Nightmare <small class="text-primary"><strong>({{ beaten_nightmare | length }}/{{ nightmare }})</strong></small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" style="margin-bottom: 5px">
+                    <div class="col-md-12">
+                        <ul id="scenario-list" class="{{ quest_mode }}">
+                            {% set last_cycle = null %}
+                            {% for scenario in quests %}
+                                {% if scenario.pack.cycle.code != last_cycle %}
+                                    {% set last_cycle = scenario.pack.cycle.code %}
+                                    <h5><strong>{{ scenario.pack.cycle.name }}</strong></h5>
+                                {% endif %}
+
+                                {% if scenario.hasEasy %}
+                                    {% set beaten = beaten_easy[scenario.id] is defined %}
+                                    <li class="scenario-easy {% if not beaten %}not-beaten{% endif %}">
+                                        <span class="img" style="background-image: url('{{ asset('/bundles/app/images/encounters/' ~ (scenario.name | url_encode) ~ '.png')  }}')"></span>
+                                        {% if beaten %}
+                                            <a href="{{ path('myquestlogs_list', { scenario_id: scenario.id, quest_mode: 'easy' }) }}">{{ scenario.name }}</a>
+                                        {% else %}
+                                            {{ scenario.name }}
+                                        {% endif %}
+                                    </li>
+                                {% endif %}
+
+                                {% set beaten = beaten_normal[scenario.id] is defined %}
+                                <li class="scenario-normal {% if not beaten %}not-beaten{% endif %}">
+                                    <span class="img" style="background-image: url('{{ asset('/bundles/app/images/encounters/' ~ (scenario.name | url_encode) ~ '.png')  }}')"></span>
+                                    {% if beaten %}
+                                        <a href="{{ path('myquestlogs_list', { scenario_id: scenario.id, quest_mode: 'normal' }) }}">{{ scenario.name }}</a>
+                                    {% else %}
+                                        {{ scenario.name }}
+                                    {% endif %}
+                                </li>
+
+                                {% if scenario.hasNightmare %}
+                                    {% set beaten = beaten_nightmare[scenario.id] is defined %}
+                                    <li class="scenario-nightmare {% if not beaten %}not-beaten{% endif %}">
+                                        <span class="img" style="background-image: url('{{ asset('/bundles/app/images/encounters/' ~ (scenario.name | url_encode) ~ '.png')  }}')"></span>
+                                        {% if beaten %}
+                                            <a href="{{ path('myquestlogs_list', { scenario_id: scenario.id, quest_mode: 'nightmare' }) }}">{{ scenario.name }}</a>
+                                        {% else %}
+                                            {{ scenario.name }}
+                                        {% endif %}
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8 col-md-pull-4">
+                <h1 class="quest-title {{ quest_mode }}">
+                    <span class="img" style="background-image: url('{{ asset('/bundles/app/images/encounters/' ~ (selected_scenario.name | url_encode) ~ '.png')  }}')"></span>
+                    {{ selected_scenario.name }}
+                    <small class="text-muted">{{ quest_mode | capitalize }}</small>
+                </h1>
+
+                <table class="table list-questlogs">
+                    <tbody id="questlogs">
+                    {% for questlog in questlogs %}
+                        {% set decks = questlog.decks %}
+
+                        <tr data-id="{{ questlog.id }}">
+                            <td class="hidden-xs questlog-checkbox"><input type="checkbox"></td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-sm-7 col-md-8 col-lg-9">
+                                        <h4 class="questlog-name"><a href="{{ path('questlog_view', { questlog_id: questlog.id }) }}">{{ questlog.name }}</a></h4>
+                                        <div class="questlog-result">
+                                            <strong>{{ questlog.success ? 'Victory' : 'Defeat' }}</strong>
+                                            {% if questlog.score > 0 %} with a score of {{ questlog.score }} points{% endif %} on {{ questlog.datePlayed | date('F d, Y') }}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5 col-md-4 col-lg-3">
+                                        <div class="questlogs-actions">
+                                            <span class="deck-count">
+                                                {% for i in 1..questlog.nbDecks %}
+                                                    <i class="fa fa-user"></i>
+                                                {% endfor %}
+                                            </span>
+
+                                            {% if questlog.isPublic %}
+                                                <small class="social">{{ macros.static_questlog_social_icons(questlog) }}</small>
+                                            {% endif %}
+
+                                            <div class="block"></div>
+
+                                            <a href="{{ path('questlog_edit', { questlog_id: questlog.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" data-container="body" title="Edit">
+                                                <span class="fa fa-pencil fa-fw"></span>
+                                            </a>
+
+                                            <label class="btn btn-xs btn-default" data-action="delete-questlog" data-toggle="tooltip" data-container="body" title="Delete">
+                                                <span class="fa fa-trash-o fa-fw"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% for deck in decks %}
+                                            {% if deck.decklist is not null %}
+                                                {% set decklist = deck.decklist %}
+                                                {% set social = true %}
+                                            {% else %}
+                                                {% set decklist = deck.deck %}
+                                                {% set social = false %}
+                                            {% endif %}
+
+                                            <div class="questlog-heroes" data-id="{{ decklist.id }}" data-published="{{ social }}">
+                                                {% for hero in decklist.getSlots().getHeroDeck() %}
+                                                    {% set card = hero.getCard() %}
+                                                    <div class="decklist-hero border-light-{{ card.sphere.code }}">
+                                                        <div class="hero-thumbnail card-thumbnail-5x card-thumbnail-hero" style="background-image:url('{{ asset('/bundles/cards/' ~ card.code ~ '.png') }}')"></div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+
+                                            <div class="questlog-deck-info">
+                                                {% if social %}
+                                                    <h4 style=""><i><a href="{{ path('decklist_detail', { decklist_id: decklist.id, 'decklist_name': decklist.nameCanonical|e('url') }) }}">{{ decklist.name }}</a></i></h4>
+                                                {% else %}
+                                                    <h4 style=""><i><a href="{{ path('deck_view', { deck_id: decklist.id }) }}">{{ decklist.name }}</a></i></h4>
+                                                {% endif %}
+                                                <span class="small questlog-hero-text hidden-xs">
+                                                    {% for hero in decklist.getSlots().getHeroDeck() %}
+                                                        {% set card = hero.getCard() %}
+                                                        <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" href="">
+                                                            <span class="icon-{{ card.sphere.code }}"></span> {{ card.name }} <i>({{ card.pack.code }})</i>
+                                                        </a>
+                                                    {% endfor %}
+                                                </span>
+                                            </div>
+                                            <div class="block" style="height: 15px; clear:both;"></div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- / Left-side column -->
+
+        </div>
+    </div>
+
+    {#{% include 'AppBundle:Modale:file.html.twig' %}#}
+    {% include 'AppBundle:Modale:delete_questlog.html.twig' %}
+    {% include 'AppBundle:Modale:delete_questlog_list.html.twig' %}
+    {#{% include 'AppBundle:Modale:export.html.twig' %}#}
+    {#{% include 'AppBundle:Modale:odds.html.twig' %}#}
+    {#{% include 'AppBundle:Modale:tag_add.html.twig' %}#}
+    {#{% include 'AppBundle:Modale:tag_remove.html.twig' %}#}
+    {#{% include 'AppBundle:Modale:tag_clear.html.twig' %}#}
+    {#{% include 'AppBundle:Modale:diff.html.twig' %}#}
+    {#{% include 'AppBundle:Modale:archive.html.twig' %}#}
+{% endblock %}
