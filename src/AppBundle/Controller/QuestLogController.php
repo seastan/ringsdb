@@ -264,7 +264,7 @@ class QuestLogController extends Controller {
         /* @var $questlog_decks \AppBundle\Entity\QuestlogDeck[] */
         $questlog_decks = $questlog->getDecks();
         foreach ($questlog_decks as $questlog_deck) {
-            $data['deck' . $questlog_deck->getDeckNumber()] = $questlog_deck->getDeck();
+            $data['deck' . $questlog_deck->getDeckNumber()] = $questlog_deck->getDecklist() ?: $questlog_deck->getDeck();
             $data['deck' . $questlog_deck->getDeckNumber() . '_content'] = $questlog_deck->getContent();
             $data['deck' . $questlog_deck->getDeckNumber() . '_player_name'] = $questlog_deck->getPlayer();
         }
