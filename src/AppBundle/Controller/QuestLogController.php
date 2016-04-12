@@ -60,10 +60,10 @@ class QuestLogController extends Controller {
             }
         }
 
-        if ($beatenEasy + $beatenNormal + $beatenNightmare == 0) {
+        if (count($beaten) == 0) {
             return $this->render('AppBundle:Quest:no-questlogs.html.twig', [
                 'pagetitle' => "My Quest Logs",
-                'pagedescription' => "Log a new quest.",
+                'pagedescription' => "Log a new quest."
             ]);
         } else {
             if ($scenario_id == null) {
