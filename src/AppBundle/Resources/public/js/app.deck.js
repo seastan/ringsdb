@@ -688,7 +688,7 @@
         });
 
         if (app.user.params.decklist_id) {
-            lines.push('Decklist [url='+location.href+']build and published on RingsDB[/url].');
+            lines.push('Decklist [url='+location.href+']built and published on RingsDB[/url].');
         } else {
             lines.push('Deck built on [url=http://ringsdb.com]RingsDB[/url].');
         }
@@ -748,7 +748,7 @@
         });
 
         if (app.user.params.decklist_id) {
-            lines.push('Decklist [build and published on RingsDB]('+location.href+').');
+            lines.push('Decklist [built and published on RingsDB]('+location.href+').');
         } else {
             lines.push('Deck built on [RingsDB](http://ringsdb.com).');
         }
