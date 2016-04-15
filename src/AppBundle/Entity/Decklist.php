@@ -9,6 +9,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
         $array['nb_votes'] = $this->getNbVotes();
         $array['nb_favorites'] = $this->getNbFavorites();
         $array['nb_comments'] = $this->getNbComments();
+        $array['starting_threat'] = $this->getStartingThreat();
 
         return $array;
     }
@@ -805,30 +806,56 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var integer
      */
-    private $questlogs;
+    private $startingThreat;
 
     /**
-     * Add questlogs
+     * Set startingThreat
      *
-     * @param \AppBundle\Entity\QuestlogDeck $questlogs
+     * @param integer $startingThreat
      *
      * @return Decklist
      */
-    public function addQuestlogs(\AppBundle\Entity\QuestlogDeck $questlogs) {
-        $this->questlogs[] = $questlogs;
+    public function setStartingThreat($startingThreat) {
+        $this->startingThreat = $startingThreat;
 
         return $this;
     }
 
     /**
-     * Remove questlogs
+     * Get startingThreat
      *
-     * @param \AppBundle\Entity\QuestlogDeck $questlogs
+     * @return integer
      */
-    public function removeQuestlogs(\AppBundle\Entity\QuestlogDeck $questlogs) {
-        $this->questlogs->removeElement($questlogs);
+    public function getStartingThreat() {
+        return $this->startingThreat;
+    }
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $questlogs;
+
+    /**
+     * Add questlog
+     *
+     * @param \AppBundle\Entity\QuestlogDeck $questlog
+     *
+     * @return Decklist
+     */
+    public function addQuestlog(\AppBundle\Entity\QuestlogDeck $questlog) {
+        $this->questlogs[] = $questlog;
+
+        return $this;
+    }
+
+    /**
+     * Remove questlog
+     *
+     * @param \AppBundle\Entity\QuestlogDeck $questlog
+     */
+    public function removeQuestlog(\AppBundle\Entity\QuestlogDeck $questlog) {
+        $this->questlogs->removeElement($questlog);
     }
 
     /**

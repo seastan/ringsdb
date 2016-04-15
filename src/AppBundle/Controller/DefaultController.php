@@ -14,9 +14,7 @@ class DefaultController extends Controller {
         $response->setPublic();
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
 
-        /** 
-         * @var $decklist_manager DecklistManager  
-         */
+        /* @var $decklist_manager DecklistManager */
         $decklist_manager = $this->get('decklist_manager');
         $decklist_manager->setLimit(1);
         
@@ -56,7 +54,7 @@ class DefaultController extends Controller {
                 }
                 $array['count_by_type'] = join(' &bull; ', $counts);
 
-                $array['starting_threat'] = $decklist->getSlots()->getStartingThreat();
+                $array['starting_threat'] = $decklist->getStartingThreat();
 
                 $spheres = [];
                 foreach ($heroDeck as $h) {

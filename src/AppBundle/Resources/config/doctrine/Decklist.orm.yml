@@ -150,3 +150,7 @@ AppBundle\Entity\Decklist:
         version:
             type: string
             length: 8
+        startingThreat:
+            type: smallint
+            nullable: false
+            column: starting_threat

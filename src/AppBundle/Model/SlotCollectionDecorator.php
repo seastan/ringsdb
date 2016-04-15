@@ -147,6 +147,7 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
         $mirlonde = false;
 
         foreach ($heroDeck->getSlots() as $slot) {
+            /* @var $card \AppBundle\Entity\Card */
             $card = $slot->getCard();
             $threat += $card->getThreat();
 

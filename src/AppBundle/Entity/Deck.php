@@ -84,7 +84,6 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
                 $sidepreversion[$code] = $sidepreversion[$code] + $qty;
             }
 
-
             ksort($preversion);
             ksort($sidepreversion);
         }

@@ -78,6 +78,7 @@
                                     <h4>
                                         <small class="pull-right">{{ macros.static_social_icons(decklist) }}</small>
                                         <a class="decklist-name" href="{{ path('decklist_detail', { 'decklist_id': decklist.id, 'decklist_name': decklist.nameCanonical|e('url') }) }}">{{ decklist.name }}</a>
+                                        <small class="starting-threat">{{ decklist.startingThreat }} threat</small>
                                     </h4>
                                     <h5>
                                         <time class="pull-right" datetime="{{ decklist.dateCreation|date('c') }}">{{ decklist.dateCreation|date('M d') }}</time>

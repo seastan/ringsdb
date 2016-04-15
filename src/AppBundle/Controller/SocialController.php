@@ -5,9 +5,7 @@ use AppBundle\Entity\Comment;
 use AppBundle\Entity\Deck;
 use AppBundle\Entity\Decklist;
 use AppBundle\Entity\User;
-use AppBundle\Form\DecklistType;
 use AppBundle\Model\DecklistManager;
-use AppBundle\Services\Pagination;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +21,7 @@ class SocialController extends Controller {
      * Checks to see if a deck can be published in its current saved state
      * If it is, displays the decklist edit form for initial publication of a deck
      */
-    public function publishFormAction($deck_id, Request $request) {
+    public function publishFormAction($deck_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
@@ -157,6 +155,7 @@ class SocialController extends Controller {
         $precedent = $precedent_id ? $em->getRepository('AppBundle:Decklist')->find($precedent_id) : null;
 
         try {
+            /* @var $decklist \AppBundle\Entity\Decklist */
             $decklist = $this->get('decklist_factory')->createDecklistFromDeck($deck, $name, $descriptionMd);
         } catch (\Exception $e) {
             return $this->render('AppBundle:Default:error.html.twig', [
@@ -178,7 +177,7 @@ class SocialController extends Controller {
     /**
      * Displays the decklist edit form
      */
-    public function editFormAction($decklist_id, Request $request) {
+    public function editFormAction($decklist_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
@@ -261,7 +260,7 @@ class SocialController extends Controller {
     /**
      * deletes a decklist if it has no comment, no vote, no favorite
      */
-    public function deleteAction($decklist_id, Request $request) {
+    public function deleteAction($decklist_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
@@ -308,6 +307,9 @@ class SocialController extends Controller {
         $sphere_code = filter_var($request->query->get('sphere'), FILTER_SANITIZE_STRING);
         $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
         $decklist_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
+        $starting_threat = intval(filter_var($request->query->get('threat'), FILTER_SANITIZE_NUMBER_INT));
+        $starting_threat_o = filter_var($request->query->get('threato'), FILTER_SANITIZE_STRING);
+
         $sort = $request->query->get('sort');
         $packs = $request->query->get('packs');
 
@@ -321,6 +323,7 @@ class SocialController extends Controller {
         $categories[] = ["label" => "Core / Deluxe", "packs" => []];
         $list_cycles = $this->getDoctrine()->getRepository('AppBundle:Cycle')->findBy([], ["position" => "ASC"]);
         foreach ($list_cycles as $cycle) {
+            /* @var $cycle \AppBundle\Entity\Cycle */
             $size = count($cycle->getPacks());
             if ($cycle->getPosition() == 0 || $size == 0) {
                 continue;
@@ -355,7 +358,9 @@ class SocialController extends Controller {
             'on' => $on,
             'off' => $off,
             'author' => $author_name,
-            'name' => $decklist_name
+            'name' => $decklist_name,
+            'threat' => $starting_threat,
+            'threato' => $starting_threat_o
         ];
         $params['sort_' . $sort] = ' selected="selected"';
         $params['spheres'] = $dbh->executeQuery("SELECT
@@ -387,7 +392,7 @@ class SocialController extends Controller {
         return $this->renderView('AppBundle:Search:form.html.twig', $params);
     }
 
-    public function byauthorAction($username, Request $request) {
+    public function byauthorAction($username) {
         return $this->redirect($this->generateUrl('decklists_list', ['type' => 'find', 'author' => $username]));
     }
 
@@ -475,7 +480,7 @@ class SocialController extends Controller {
     /*
 	 * displays the content of a decklist along with comments, siblings, similar, etc.
 	 */
-    public function viewAction($decklist_id, $decklist_name, Request $request) {
+    public function viewAction($decklist_id) {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
@@ -485,12 +490,13 @@ class SocialController extends Controller {
             throw $this->createNotFoundException("Decklist not found.");
         }
 
-        $duplicate = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->findOneBy(['signature' => $decklist->getSignature()], ['dateCreation' => 'ASC']);
+        $duplicate = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->findOneBy(['signature' => $decklist->getSignature()]);
         if ($duplicate->getDateCreation() >= $decklist->getDateCreation() || $duplicate->getId() === $decklist->getId()) {
             $duplicate = null;
         }
 
         $commenters = array_map(function($comment) {
+            /* @var $comment \AppBundle\Entity\Comment */
             return $comment->getUser()->getUsername();
         }, $decklist->getComments()->getValues());
 
@@ -648,7 +654,7 @@ class SocialController extends Controller {
     /*
      * hides a comment, or if $hidden is false, unhide a comment
      */
-    public function hidecommentAction($comment_id, $hidden, Request $request) {
+    public function hidecommentAction($comment_id, $hidden) {
         /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
@@ -778,7 +784,7 @@ class SocialController extends Controller {
     /*
 	 * returns a text file with the content of a decklist
 	 */
-    public function textexportAction($decklist_id, Request $request) {
+    public function textexportAction($decklist_id) {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
@@ -810,7 +816,7 @@ class SocialController extends Controller {
     /*
 	 * returns a octgn file with the content of a decklist
 	 */
-    public function octgnexportAction($decklist_id, Request $request) {
+    public function octgnexportAction($decklist_id) {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
@@ -851,7 +857,7 @@ class SocialController extends Controller {
         }
         $start = ($page - 1) * $limit;
 
-        /* @var $dbh \Doctrine\DBAL\Driver\PDOConnection */
+        /* @var $dbh \Doctrine\DBAL\Connection */
         $dbh = $this->getDoctrine()->getConnection();
 
         $comments = $dbh->executeQuery("SELECT SQL_CALC_FOUND_ROWS
@@ -918,7 +924,7 @@ class SocialController extends Controller {
         }
         $start = ($page - 1) * $limit;
 
-        /* @var $dbh \Doctrine\DBAL\Driver\PDOConnection */
+        /* @var $dbh \Doctrine\DBAL\Connection */
         $dbh = $this->getDoctrine()->getConnection();
 
         $comments = $dbh->executeQuery("SELECT SQL_CALC_FOUND_ROWS
@@ -986,7 +992,6 @@ class SocialController extends Controller {
             $owned_packs = $this->getUser()->getOwnedPacks();
         }
 
-        $packs = [];
         if ($owned_packs) {
             $packs = explode(",", $owned_packs);
         } else {
@@ -1000,6 +1005,7 @@ class SocialController extends Controller {
         $list_cycles = $this->getDoctrine()->getRepository('AppBundle:Cycle')->findBy([], ["position" => "ASC"]);
 
         foreach ($list_cycles as $cycle) {
+            /* @var $cycle \AppBundle\Entity\Cycle */
             $size = count($cycle->getPacks());
             if ($cycle->getPosition() == 0 || $size == 0) {
                 continue;
@@ -1050,6 +1056,8 @@ class SocialController extends Controller {
             'off' => $off,
             'author' => '',
             'name' => '',
+            'threat' => '',
+            'threato' => ''
         ]);
 
         return $this->render('AppBundle:Decklist:decklists.html.twig', [
@@ -1064,7 +1072,7 @@ class SocialController extends Controller {
         ], $response);
     }
 
-    public function patronsAction(Request $request) {
+    public function patronsAction() {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->container->getParameter('cache_expiration'));

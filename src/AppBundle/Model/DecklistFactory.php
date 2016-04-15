@@ -88,6 +88,7 @@ class DecklistFactory {
         }
 
         $decklist->setPredominantSphere($predominantSphere);
+        $decklist->setStartingThreat($decklist->getSlots()->getStartingThreat());
 
         foreach ($heroes as $hero) {
             $decklist->addSphere($hero->getCard()->getSphere());

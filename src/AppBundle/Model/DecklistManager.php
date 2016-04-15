@@ -165,6 +165,9 @@ class DecklistManager {
 
         $packs = $request->query->get('packs');
 
+        $threat_op = $request->query->get('threato');
+        $threat = $request->query->get('threat');
+
         $qb = $this->getQueryBuilder();
         $joinTables = [];
 
@@ -184,6 +187,17 @@ class DecklistManager {
         if (!empty($decklist_name)) {
             $qb->andWhere('d.name like :deckname');
             $qb->setParameter('deckname', "%$decklist_name%");
+        }
+
+        if (!empty($threat) && is_numeric($threat)) {
+            if ($threat_op == '>') {
+                $qb->andWhere('d.startingThreat > :threat');
+            } elseif ($threat_op == '<') {
+                $qb->andWhere('d.startingThreat < :threat');
+            } else {
+                $qb->andWhere('d.startingThreat = :threat');
+            }
+            $qb->setParameter('threat', $threat);
         }
 
         if (!empty($cards_code) || !empty($packs)) {
@@ -221,6 +235,10 @@ class DecklistManager {
 
             case 'likes':
                 $qb->orderBy('d.nbVotes', 'DESC');
+                break;
+
+            case 'threat':
+                $qb->orderBy('d.startingThreat', 'ASC');
                 break;
 
             case 'reputation':
