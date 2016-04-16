@@ -308,7 +308,7 @@ class SocialController extends Controller {
         $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
         $decklist_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
         $starting_threat = intval(filter_var($request->query->get('threat'), FILTER_SANITIZE_NUMBER_INT));
-        $starting_threat_o = filter_var($request->query->get('threato'), FILTER_SANITIZE_STRING);
+        $starting_threat_o = $request->query->get('threato');
 
         $sort = $request->query->get('sort');
         $packs = $request->query->get('packs');
