@@ -109,9 +109,10 @@ class CardsData {
 
     public function get_search_rows($conditions, $sortorder, $forceempty = false) {
         $i = 0;
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->doctrine;
 
-        // construction de la requete sql
-        $qb = $this->doctrine->getRepository('AppBundle:Card')->createQueryBuilder('c');
+        $qb = $em->getRepository('AppBundle:Card')->createQueryBuilder('c');
         $qb->leftJoin('c.pack', 'p')->leftJoin('p.cycle', 'y')->leftJoin('c.type', 't')->leftJoin('c.sphere', 's');
         $qb2 = null;
         $qb3 = null;
@@ -370,7 +371,7 @@ class CardsData {
         }
 
         if (!$i && !$forceempty) {
-            return;
+            return [];
         }
 
         switch ($sortorder) {
@@ -384,10 +385,19 @@ class CardsData {
                 $qb->orderBy('c.type')->addOrderBy('c.sphere');
                 break;
             case 'cost':
-                $qb->orderBy('c.type')->addOrderBy('c.cost')->addOrderBy('c.income');
+                $qb->orderBy('c.cost')->addOrderBy('c.threat');
                 break;
-            case 'strength':
-                $qb->orderBy('c.type')->addOrderBy('c.strength')->addOrderBy('c.initiative');
+            case 'attack':
+                $qb->orderBy('c.attack', 'DESC');
+                break;
+            case 'willpower':
+                $qb->orderBy('c.willpower', 'DESC');
+                break;
+            case 'defense':
+                $qb->orderBy('c.defense', 'DESC');
+                break;
+            case 'health':
+                $qb->orderBy('c.health', 'DESC');
                 break;
         }
         $qb->addOrderBy('c.name');
