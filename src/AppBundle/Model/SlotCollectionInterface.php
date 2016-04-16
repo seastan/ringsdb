@@ -62,4 +62,11 @@ interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \Array
      * @return array
      */
     public function getContent();
+
+    /**
+     * Get the starting threat
+     *
+     * @return int
+     */
+    public function getStartingThreat();
 }

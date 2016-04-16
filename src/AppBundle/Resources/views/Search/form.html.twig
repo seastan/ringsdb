@@ -11,6 +11,21 @@
                 </select>
             </div>
             <div class="form-group">
+                <label for="threat">Starting Threat</label>
+                <div class="row">
+                    <div class="col-xs-4">
+                        <select name="threato" id="threato" class="form-control">
+                            <option value=":" {% if threato == ':' %}selected="selected"{% endif %}>=</option>
+                            <option value="<" {% if threato == '<' %}selected="selected"{% endif %}>&lt;</option>
+                            <option value=">" {% if threato == '>' %}selected="selected"{% endif %}>&gt;</option>
+                        </select>
+                    </div>
+                    <div class="col-xs-8">
+                        <input id="threat" name="threat" value="{{ threat }}" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
                 <label for="">Cards used</label>
                 {{ cards | default('') | raw }}
                 <input type="text" class="form-control" id="card" placeholder="Enter card name">
@@ -31,6 +46,7 @@
                     <option value="date"{{ sort_date|default('') }}>by Date</option>
                     <option value="likes"{{ sort_likes|default('') }}>by Number of Likes</option>
                     <option value="reputation"{{ sort_reputation|default('') }}>by Reputation of Author</option>
+                    <option value="threat"{{ sort_threat|default('') }}>by Starting Threat</option>
                 </select>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Search</button>
