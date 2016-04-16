@@ -29,15 +29,30 @@
 
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="btn-group btn-group-sm" id="difficulty-selector">
+                        <div class="btn-group btn-group-sm hidden" id="difficulty-selector">
                             <label class="btn btn-default {% if quest_mode == 'easy' %}active{% endif %}" data-action="easy">
-                                Easy <small class="text-primary"><strong>({{ beaten_easy | length }}/{{ easy }})</strong></small>
+                                Easy <small class="text-primary"><strong></strong></small>
                             </label>
                             <label class="btn btn-default {% if quest_mode == 'normal' %}active{% endif %}" data-action="normal">
-                                Normal <small class="text-primary"><strong>({{ beaten_normal | length }}/{{ normal }})</strong></small>
+                                Normal <small class="text-primary"><strong></strong></small>
                             </label>
                             <label class="btn btn-default {% if quest_mode == 'nightmare' %}active{% endif %}" data-action="nightmare">
-                                Nightmare <small class="text-primary"><strong>({{ beaten_nightmare | length }}/{{ nightmare }})</strong></small>
+                                Nightmare <small class="text-primary"><strong></strong></small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12  hidden" id="config-options">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="owned-quests-only"> Display only quests in my collection
+                            </label>
+                        </div>
+                        <div class="checkbox" style="margin-bottom: 0">
+                            <label>
+                                <input type="checkbox" name="played-quests-only"> Display only played quests
                             </label>
                         </div>
                     </div>
@@ -45,7 +60,7 @@
 
                 <div class="row" style="margin-bottom: 5px">
                     <div class="col-md-12">
-                        <ul id="scenario-list" class="{{ quest_mode }}">
+                        <ul id="scenario-list" class="{{ quest_mode }} hidden">
                             {% set last_cycle = null %}
                             {% for scenario in quests %}
                                 {% if scenario.pack.cycle.code != last_cycle %}
@@ -55,10 +70,10 @@
 
                                 {% if scenario.hasEasy %}
                                     {% set beaten = beaten_easy[scenario.id] is defined %}
-                                    <li class="scenario-easy {% if not beaten %}not-beaten{% endif %}">
+                                    <li class="scenario-easy {% if not beaten %}not-beaten{% endif %}" data-pack="{{ scenario.pack.id }}">
                                         <span class="img" style="background-image: url('{{ asset('/bundles/app/images/encounters/' ~ (scenario.name | url_encode) ~ '.png')  }}')"></span>
                                         {% if beaten %}
-                                            <a href="{{ path('myquestlogs_list', { scenario_id: scenario.id, quest_mode: 'easy' }) }}">{{ scenario.name }}</a>
+                                            <a href="{{ path('myquestlogs_list', { scenario_name_canonical: scenario.nameCanonical, quest_mode: 'easy' }) }}">{{ scenario.name }}</a>
                                         {% else %}
                                             {{ scenario.name }}
                                         {% endif %}
@@ -66,10 +81,10 @@
                                 {% endif %}
 
                                 {% set beaten = beaten_normal[scenario.id] is defined %}
-                                <li class="scenario-normal {% if not beaten %}not-beaten{% endif %}">
+                                <li class="scenario-normal {% if not beaten %}not-beaten{% endif %}" data-pack="{{ scenario.pack.id }}">
                                     <span class="img" style="background-image: url('{{ asset('/bundles/app/images/encounters/' ~ (scenario.name | url_encode) ~ '.png')  }}')"></span>
                                     {% if beaten %}
-                                        <a href="{{ path('myquestlogs_list', { scenario_id: scenario.id, quest_mode: 'normal' }) }}">{{ scenario.name }}</a>
+                                        <a href="{{ path('myquestlogs_list', { scenario_name_canonical: scenario.nameCanonical, quest_mode: 'normal' }) }}">{{ scenario.name }}</a>
                                     {% else %}
                                         {{ scenario.name }}
                                     {% endif %}
@@ -77,10 +92,10 @@
 
                                 {% if scenario.hasNightmare %}
                                     {% set beaten = beaten_nightmare[scenario.id] is defined %}
-                                    <li class="scenario-nightmare {% if not beaten %}not-beaten{% endif %}">
+                                    <li class="scenario-nightmare {% if not beaten %}not-beaten{% endif %}" data-pack="{{ scenario.pack.id }}">
                                         <span class="img" style="background-image: url('{{ asset('/bundles/app/images/encounters/' ~ (scenario.name | url_encode) ~ '.png')  }}')"></span>
                                         {% if beaten %}
-                                            <a href="{{ path('myquestlogs_list', { scenario_id: scenario.id, quest_mode: 'nightmare' }) }}">{{ scenario.name }}</a>
+                                            <a href="{{ path('myquestlogs_list', { scenario_name_canonical: scenario.nameCanonical, quest_mode: 'nightmare' }) }}">{{ scenario.name }}</a>
                                         {% else %}
                                             {{ scenario.name }}
                                         {% endif %}

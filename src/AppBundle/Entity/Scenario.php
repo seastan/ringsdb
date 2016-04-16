@@ -1140,4 +1140,31 @@ class Scenario implements \JsonSerializable {
     public function getQuestlogs() {
         return $this->questlogs;
     }
+
+    /**
+     * @var string
+     */
+    private $nameCanonical;
+
+    /**
+     * Set nameCanonical
+     *
+     * @param string $nameCanonical
+     *
+     * @return Scenario
+     */
+    public function setNameCanonical($nameCanonical) {
+        $this->nameCanonical = $nameCanonical;
+
+        return $this;
+    }
+
+    /**
+     * Get nameCanonical
+     *
+     * @return string
+     */
+    public function getNameCanonical() {
+        return $this->nameCanonical;
+    }
 }

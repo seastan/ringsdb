@@ -89,14 +89,12 @@ myfellowships_list:
         _controller: AppBundle:Fellowship:mylist
 
 myquestlogs_list:
-    path: /myquestlogs/{scenario_id}/{quest_mode}
+    path: /myquestlogs/{scenario_name_canonical}/{quest_mode}
     methods: [GET]
     defaults:
         _controller: AppBundle:QuestLog:mylist
-        scenario_id: null
+        scenario_name_canonical: null
         quest_mode: normal
-    requirements:
-        scenario_id: \d+
 
 decklists_searchform:
     path: /decklists/search

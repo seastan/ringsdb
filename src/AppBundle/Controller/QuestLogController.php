@@ -17,7 +17,7 @@ use DateTime;
 
 class QuestLogController extends Controller {
 
-    public function mylistAction($scenario_id, $quest_mode) {
+    public function mylistAction($scenario_name_canonical, $quest_mode) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
@@ -26,21 +26,6 @@ class QuestLogController extends Controller {
 
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
-
-        // Count scenarios
-        $easy = 0;
-        $normal = 0;
-        $nightmare = 0;
-
-        foreach ($quests as $quest) {
-            $normal++;
-            if ($quest->getHasEasy()) {
-                $easy++;
-            }
-            if ($quest->getHasNightmare()) {
-                $nightmare++;
-            }
-        }
 
         // Count beaten scenarios
         $beatenEasy = [];
@@ -66,10 +51,14 @@ class QuestLogController extends Controller {
                 'pagedescription' => "Log a new quest."
             ]);
         } else {
-            if ($scenario_id == null) {
-                $res = $dbh->executeQuery("SELECT scenario_id, quest_mode FROM questlog WHERE user_id = ? ORDER BY scenario_id LIMIT 1", [$user->getId()])->fetch(\PDO::FETCH_NUM);
-                $scenario_id = $res[0];
-                $quest_mode = $res[1];
+            if ($scenario_name_canonical == null) {
+                $res = $dbh->executeQuery("SELECT q.scenario_id, s.name_canonical, q.quest_mode
+                      FROM questlog q
+                      INNER JOIN scenario s ON q.scenario_id = s.id
+                      WHERE q.user_id = ?
+                      ORDER BY q.scenario_id LIMIT 1", [$user->getId()])->fetch(\PDO::FETCH_NUM);
+                $scenario_name_canonical = $res[1];
+                $quest_mode = $res[2];
             }
 
             if ($quest_mode != 'easy' && $quest_mode != 'nightmare') {
@@ -77,7 +66,11 @@ class QuestLogController extends Controller {
             }
 
             /* @var $scenario \AppBundle\Entity\Scenario */
-            $scenario = $em->getRepository('AppBundle:Scenario')->find($scenario_id);
+            $scenario = $em->getRepository('AppBundle:Scenario')->findOneBy(['nameCanonical' => $scenario_name_canonical]);
+
+            if ($scenario == null) {
+                throw new NotFoundHttpException("This quest does not exists.");
+            }
 
             /* @var $questlogs \AppBundle\Entity\Questlog[] */
             $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => 'DESC']);
@@ -86,9 +79,6 @@ class QuestLogController extends Controller {
                 'pagetitle' => "My Quest Logs",
                 'pagedescription' => "Log a new quest.",
                 'quests' => $quests,
-                'easy' => $easy,
-                'normal' => $normal,
-                'nightmare' => $nightmare,
                 'beaten_easy' => $beatenEasy,
                 'beaten_normal' => $beatenNormal,
                 'beaten_nightmare' => $beatenNightmare,
