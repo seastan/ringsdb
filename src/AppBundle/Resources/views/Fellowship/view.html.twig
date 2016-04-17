@@ -19,7 +19,8 @@
             name: {{ fellowship.name | json_encode | raw }}
         };
 
-        app.deck_selection && app.deck_selection.init(Decks);
+        app.deck_selection.show_sideboard = true;
+        app.deck_selection.init(Decks);
         app.user.params.fellowship_id = {{ fellowship.id }};
     </script>
 {% endblock %}
@@ -38,6 +39,7 @@
                     <div id="deck1-content" class="deck-loading">
                         <i class="fa fa-spinner fa-spin fa-5x"></i>
                     </div>
+                    <div id="deck1-side-content"></div>
                 </div>
             </div>
             <div class="col-md-3 col-sm-6 deck">
@@ -45,6 +47,7 @@
                     <div id="deck2-content" class="deck-loading">
                         <i class="fa fa-spinner fa-spin fa-5x"></i>
                     </div>
+                    <div id="deck2-side-content"></div>
                 </div>
             </div>
             <div class="visible-sm-block" style="clear: both"></div>
@@ -53,6 +56,7 @@
                     <div id="deck3-content" class="deck-loading">
                         <i class="fa fa-spinner fa-spin fa-5x"></i>
                     </div>
+                    <div id="deck3-side-content"></div>
                 </div>
             </div>
             <div class="col-md-3 col-sm-6 deck">
@@ -60,6 +64,7 @@
                     <div id="deck4-content" class="deck-loading">
                         <i class="fa fa-spinner fa-spin fa-5x"></i>
                     </div>
+                    <div id="deck4-side-content"></div>
                 </div>
             </div>
         </div>

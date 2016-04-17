@@ -10,6 +10,7 @@
     deck_selection.cols = 1;
     deck_selection.headerOnly = true;
     deck_selection.options = {};
+    deck_selection.show_sideboard = false;
 
     var modal_deck_number;
     deck_selection.init_buttons = function() {
@@ -89,12 +90,20 @@
             var sort = deck_selection.options.sort || 'type';
 
             app.deck.display('#deck' + selectedDeck + '-content', { cols: cols, sort: sort, special_meta: true, header_only: deck_selection.headerOnly }, false);
+            if (deck_selection.show_sideboard) {
+                if (deck_selection.headerOnly) {
+                    $('#deck' + selectedDeck + '-side-content').empty();
+                } else {
+                    app.deck.display('#deck' + selectedDeck + '-side-content', { cols: cols, sort: sort, special_meta: true, header_only: deck_selection.headerOnly }, true);
+                }
+            }
             $('.selected-deck-placeholder').eq(selectedDeck - 1).addClass('hidden');
             $('.selected-deck-content').eq(selectedDeck - 1).removeClass('hidden');
             $('input[name="deck' + selectedDeck + '_id"]').val(Decks[selectedDeck].id);
             $('input[name="deck' + selectedDeck + '_is_decklist"]').val(Decks[selectedDeck].is_published);
         } else {
             $('#deck' + selectedDeck + '-content').empty();
+            $('#deck' + selectedDeck + '-side-content').empty();
             $('.selected-deck-placeholder').eq(selectedDeck - 1).removeClass('hidden');
             $('.selected-deck-content').eq(selectedDeck - 1).addClass('hidden');
             $('input[name="deck' + selectedDeck + '_id"]').val('');
