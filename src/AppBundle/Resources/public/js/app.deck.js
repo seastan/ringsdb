@@ -47,6 +47,7 @@
     deck.problem_labels = {
         too_many_heroes: "Contains too many heroes",
         too_few_heroes: "Contains too few heroes",
+        too_many_copies: "Contains too many copies of a card (by title)",
         invalid_for_tournament_play: "Invalid for tournament play for having less than 50 cards",
         duplicated_unique_heroes: "More than one hero with the same unique name",
         too_few_cards: "Contains too few cards",
@@ -583,6 +584,23 @@
 
     };
 
+    deck.get_copies_and_deck_limit = function() {
+        var copies_and_deck_limit = {};
+        deck.get_cards().forEach(function(card) {
+            var value = copies_and_deck_limit[card.name];
+            if (!value) {
+                copies_and_deck_limit[card.name] = {
+                    nb_copies: card.indeck,
+                    deck_limit: card.deck_limit
+                };
+            } else {
+                value.nb_copies += card.indeck;
+                value.deck_limit = Math.min(card.deck_limit, value.deck_limit);
+            }
+        });
+        return copies_and_deck_limit;
+    };
+
     /**
      * @memberOf deck
      */
@@ -611,6 +629,15 @@
         } else if (decksize < 50) {
             return 'invalid_for_tournament_play';
         }
+
+        var keys = _.findKey(deck.get_copies_and_deck_limit(), function(value) {
+            return value.nb_copies > value.deck_limit;
+        });
+
+        if (keys != null) {
+            return 'too_many_copies';
+        }
+
 
         // no invalid card
         if (deck.get_invalid_cards().length > 0) {
