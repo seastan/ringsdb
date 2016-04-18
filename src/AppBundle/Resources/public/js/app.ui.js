@@ -53,11 +53,11 @@
                             continue;
                         }
 
-                        if (styleSheet.rules[ri].selectorText.match(':hover|:active')) {
+                        if (styleSheet.rules[ri].selectorText.match('(btn-default).*(:hover|:active)')) {
                             var texts = styleSheet.rules[ri].selectorText.split(',');
                             var selector = [];
                             for (var m = 0; m < texts.length; m++) {
-                                if (!texts[m].match(':hover|:active')) {
+                                if (!texts[m].match('(btn-default).*(:hover|:active)')) {
                                     selector.push(texts[m]);
                                 }
                             }
