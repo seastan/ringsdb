@@ -1384,7 +1384,9 @@ footer a {
 
 @media (max-width: 767px) {
   #collection {
-    border-collapse: separate;
+    table {
+      border-collapse: separate;
+    }
 
     td:nth-child(1) {
       width: 80px;
