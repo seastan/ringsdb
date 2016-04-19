@@ -148,9 +148,16 @@
 
     {% include 'AppBundle:Modale:card.html.twig' %}
 
-    <script src="{{ asset('/bundles/fosjsrouting/js/router.js') }}"></script>
-    <script src="{{ path('fos_js_routing_js', { "callback": "fos.Router.setData" }) }}"></script>
-
+    {% if app.debug %}
+        <script src="{{ asset('/bundles/fosjsrouting/js/router.js') }}"></script>
+        <script src="{{ path('fos_js_routing_js', { "callback": "fos.Router.setData" }) }}"></script>
+    {% else %}
+        {% javascripts output="js/router.js"
+        '/bundles/fosjsrouting/js/router.js'
+        '@AppBundle/Resources/public/js/fos_js_routes.js' %}
+        <script src="{{ asset_url }}"></script>
+        {% endjavascripts %}
+    {% endif %}
 
     {% javascripts output="js/extra.js"
         '@AppBundle/Resources/public/cdn/js/jquery.min.js'
