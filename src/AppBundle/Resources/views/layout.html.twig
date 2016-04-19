@@ -15,22 +15,15 @@
         <meta name="description" content="{{ pagedescription }} &middot; RingsDB, a LotR LCG Deckbuilder">
     {% endif %}
 
-    {% if app.environment == 'dev' or app.environment == 'prod' %}
-        {% stylesheets filter="cssrewrite,scssphp" output="css/extra.css"
-            'bundles/app/cdn/css/font-awesome.min.css'
-            'bundles/app/cdn/css/jquery.qtip.css'
-            'bundles/app/cdn/css/bootstrap-markdown.min.css' %}
-            <link rel="stylesheet" href="{{ asset_url }}"/>
-        {% endstylesheets %}
-    {% else %}
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.1/jquery.qtip.css">
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.10.0/css/bootstrap-markdown.min.css">
-    {% endif %}
-
+    {#<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">#}
+    {#<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.1/jquery.qtip.css">#}
+    {#<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.10.0/css/bootstrap-markdown.min.css">#}
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Amiri:400,400italic,700,700italic|Julius+Sans+One|Open+Sans:400,400italic,700,700italic|Open+Sans+Condensed:300">
 
     {% stylesheets filter="cssrewrite,scssphp" output="css/app.css"
+        'bundles/app/cdn/css/font-awesome.min.css'
+        'bundles/app/cdn/css/jquery.qtip.css'
+        'bundles/app/cdn/css/bootstrap-markdown.min.css'
         'bundles/app/css/bootstrap.css'
         'bundles/app/css/style.scss'
         'bundles/app/css/icons.scss' %}
@@ -159,30 +152,30 @@
     <script src="{{ path('fos_js_routing_js', { "callback": "fos.Router.setData" }) }}"></script>
 
 
-    {% if app.environment == 'dev' or app.environment == 'prod' %}
-        {% javascripts output="js/extra.js"
-            '@AppBundle/Resources/public/cdn/js/jquery.min.js'
-            '@AppBundle/Resources/public/cdn/js/underscore-min.js'
-            '@AppBundle/Resources/public/cdn/js/jquery.qtip.js'
-            '@AppBundle/Resources/public/cdn/js/typeahead.jquery.min.js'
-            '@AppBundle/Resources/public/cdn/js/marked.min.js'
-            '@AppBundle/Resources/public/cdn/js/jquery.textcomplete.min.js'
-            '@AppBundle/Resources/public/cdn/js/moment.min.js'
-            '@AppBundle/Resources/public/cdn/js/highcharts.js'
-            '@AppBundle/Resources/public/cdn/js/bootstrap-markdown.min.js' %}
-            <script src="{{ asset_url }}"></script>
-        {% endjavascripts %}
-    {% else %}
-        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.1/jquery.qtip.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.jquery.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/0.2.2/jquery.textcomplete.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/highcharts/4.2.3/highcharts.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.10.0/js/bootstrap-markdown.min.js"></script>
-    {% endif %}
+    {% javascripts output="js/extra.js"
+        '@AppBundle/Resources/public/cdn/js/jquery.min.js'
+        '@AppBundle/Resources/public/cdn/js/underscore-min.js'
+        '@AppBundle/Resources/public/cdn/js/jquery.qtip.js'
+        '@AppBundle/Resources/public/cdn/js/typeahead.jquery.min.js'
+        '@AppBundle/Resources/public/cdn/js/marked.min.js'
+        '@AppBundle/Resources/public/cdn/js/jquery.textcomplete.min.js'
+        '@AppBundle/Resources/public/cdn/js/moment.min.js'
+        '@AppBundle/Resources/public/cdn/js/highcharts.js'
+        '@AppBundle/Resources/public/cdn/js/bootstrap.js'
+        '@AppBundle/Resources/public/cdn/js/bootstrap-markdown.min.js'
+        '@AppBundle/Resources/public/cdn/js/fdb-all.min.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    {#<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>#}
+    {#<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>#}
+    {#<script src="//cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.1/jquery.qtip.js"></script>#}
+    {#<script src="//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.jquery.min.js"></script>#}
+    {#<script src="//cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></script>#}
+    {#<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/0.2.2/jquery.textcomplete.min.js"></script>#}
+    {#<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>#}
+    {#<script src="//cdnjs.cloudflare.com/ajax/libs/highcharts/4.2.3/highcharts.js"></script>#}
+    {#<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.10.0/js/bootstrap-markdown.min.js"></script>#}
 
     <script type="text/javascript">
         var app = {};
@@ -204,8 +197,6 @@
     </script>
 
     {% javascripts filter="?jsqueeze" output="js/app.js"
-        '@AppBundle/Resources/public/js/bootstrap.js'
-        '@AppBundle/Resources/public/js/fdb-all.min.js'
         '@AppBundle/Resources/public/js/app.data.js'
         '@AppBundle/Resources/public/js/app.format.js'
         '@AppBundle/Resources/public/js/app.tip.js'
