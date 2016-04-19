@@ -19,6 +19,7 @@ tags
 /.tags_swap
 /.idea/
 /web/suggestions.json
+/src/AppBundle/Resources/public/js/fos_js_routes.js
 user-data.sql
 beorn.json
 .DS_Store
