@@ -171,13 +171,13 @@
         }
 
         if (Config['played-quests-only']) {
-            list.children('li.not-beaten').addClass('hidden');
+            list.children('li.not-played').addClass('hidden');
         }
 
         ['easy', 'normal', 'nightmare'].forEach(function(difficulty) {
             var total = list.find('li.scenario-' + difficulty + ':not(.hidden)').size();
-            var beaten = list.find('li.scenario-' + difficulty + ':not(.hidden) a').size();
-            diff_selector.find('label[data-action="' + difficulty + '"] strong').text('(' + beaten + '/' + total + ')');
+            var played = list.find('li.scenario-' + difficulty + ':not(.hidden) a').size();
+            diff_selector.find('label[data-action="' + difficulty + '"] strong').text('(' + played + '/' + total + ')');
         });
 
         list.removeClass('hidden');

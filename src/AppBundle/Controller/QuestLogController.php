@@ -27,25 +27,25 @@ class QuestLogController extends Controller {
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
 
-        // Count beaten scenarios
-        $beatenEasy = [];
-        $beatenNormal = [];
-        $beatenNightmare = [];
+        // Count played scenarios
+        $playedEasy = [];
+        $playedNormal = [];
+        $playedNightmare = [];
 
         $dbh = $em->getConnection();
-        $beaten = $dbh->executeQuery("SELECT DISTINCT scenario_id, quest_mode FROM questlog WHERE user_id = ?", [$user->getId()])->fetchAll(\PDO::FETCH_NAMED);
+        $played = $dbh->executeQuery("SELECT DISTINCT scenario_id, quest_mode, sum(success) as victory FROM questlog WHERE user_id = ? GROUP BY scenario_id, quest_mode", [$user->getId()])->fetchAll(\PDO::FETCH_NAMED);
 
-        foreach ($beaten as $c) {
+        foreach ($played as $c) {
             if ($c['quest_mode'] == 'easy') {
-                $beatenEasy[$c['scenario_id']] = true;
+                $playedEasy[$c['scenario_id']] = $c['victory'];
             } elseif ($c['quest_mode'] == 'normal') {
-                $beatenNormal[$c['scenario_id']] = true;
+                $playedNormal[$c['scenario_id']] = $c['victory'];
             } elseif ($c['quest_mode'] == 'nightmare') {
-                $beatenNightmare[$c['scenario_id']] = true;
+                $playedNightmare[$c['scenario_id']] = $c['victory'];
             }
         }
 
-        if (count($beaten) == 0) {
+        if (count($played) == 0) {
             return $this->render('AppBundle:Quest:no-questlogs.html.twig', [
                 'pagetitle' => "My Quest Logs",
                 'pagedescription' => "Log a new quest."
@@ -75,16 +75,31 @@ class QuestLogController extends Controller {
             /* @var $questlogs \AppBundle\Entity\Questlog[] */
             $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => 'DESC']);
 
+            $victories = 0;
+            $defeats = 0;
+            $total = count($questlogs);
+            foreach ($questlogs as $questlog) {
+                if ($questlog->getSuccess()) {
+                    $victories++;
+                } else {
+                    $defeats++;
+                }
+            }
+
             return $this->render('AppBundle:Quest:my-questlogs.html.twig', [
                 'pagetitle' => "My Quest Logs",
                 'pagedescription' => "Log a new quest.",
                 'quests' => $quests,
-                'beaten_easy' => $beatenEasy,
-                'beaten_normal' => $beatenNormal,
-                'beaten_nightmare' => $beatenNightmare,
+                'played_easy' => $playedEasy,
+                'played_normal' => $playedNormal,
+                'played_nightmare' => $playedNightmare,
                 'questlogs' => $questlogs,
                 'quest_mode' => $quest_mode,
-                'selected_scenario' => $scenario
+                'selected_scenario' => $scenario,
+                'victories' => $victories,
+                'defeats' => $defeats,
+                'total' => $total,
+                'ratio' => ($total ? sprintf("%.0f%%", 100 * $victories / $total) : '-')
             ]);
         }
     }
