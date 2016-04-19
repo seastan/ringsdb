@@ -249,6 +249,10 @@
                 app.deck.export_plaintext(true);
                 break;
 
+            case 'btn-export-html':
+                app.deck.export_html(true);
+                break;
+
             case 'btn-download-text':
                 event.preventDefault();
                 ui.download_text(QuestLog.id);

@@ -16,9 +16,9 @@
         var Commenters = {{ commenters | json_encode | raw }};
         var Fellowship = {
             id: {{ fellowship.id }},
-            name: {{ fellowship.name | json_encode | raw }}
+            name: {{ fellowship.name | json_encode | raw }},
+            published: {{ fellowship.isPublic | json_encode }}
         };
-
         app.deck_selection.show_sideboard = true;
         app.deck_selection.init(Decks);
         app.user.params.fellowship_id = {{ fellowship.id }};
