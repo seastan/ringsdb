@@ -60,6 +60,10 @@
             case 'btn-export-plaintext':
                 app.deck.export_plaintext();
                 break;
+
+            case 'btn-export-html':
+                app.deck.export_html();
+                break;
         }
     };
 

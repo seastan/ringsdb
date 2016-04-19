@@ -14,7 +14,7 @@
     "symfony/symfony": "^2.7",
     "symfony/css-selector": "^2.7",
     "symfony/dom-crawler": "^2.7",
-    "symfony/assetic-bundle": "~2.3",
+    "symfony/assetic-bundle": "~2.7",
     "symfony/swiftmailer-bundle": "~2.3",
     "symfony/monolog-bundle": "~2.4",
     "sensio/distribution-bundle": "~3.0,>=3.0.12",

@@ -62,7 +62,7 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
             $pack = $card->getPack();
 
             if ($pack->getDateRelease()) {
-                $pos= $pack->getDateRelease()->format('c');
+                $pos = $pack->getDateRelease()->format('c');
             } else {
                 $pos = 'U';
             }
@@ -167,6 +167,26 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
         }
 
         return $threat;
+    }
+
+    public function getCopiesAndDeckLimit() {
+        $copiesAndDeckLimit = [];
+
+        foreach ($this->slots as $slot) {
+            $cardName = $slot->getCard()->getName();
+
+            if (!key_exists($cardName, $copiesAndDeckLimit)) {
+                $copiesAndDeckLimit[$cardName] = [
+                    'copies' => $slot->getQuantity(),
+                    'deck_limit' => $slot->getCard()->getDeckLimit(),
+                ];
+            } else {
+                $copiesAndDeckLimit[$cardName]['copies'] += $slot->getQuantity();
+                $copiesAndDeckLimit[$cardName]['deck_limit'] = min($slot->getCard()->getDeckLimit(), $copiesAndDeckLimit[$cardName]['deck_limit']);
+            }
+        }
+
+        return $copiesAndDeckLimit;
     }
 
     public function getSlots() {

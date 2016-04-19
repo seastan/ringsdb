@@ -13,7 +13,8 @@
     var header_tpl = _.template('<h5><span class="icon icon-<%= code %>"></span> <%= name %> (<%= quantity %>)</h5>');
     var card_line_tpl = _.template('<span class="icon icon-<%= card.type_code %> fg-<%= card.sphere_code %>"></span> <a href="<%= card.url %>" class="card card-tip fg-<%= card.sphere_code %>" data-toggle="modal" data-remote="false" data-target="#cardModal" data-code="<%= card.code %>"><%= card.name %></a>');
     var layouts = {};
-    var displayFullPackInfo = false;
+    var display_full_pack_info = false;
+    var use_pack_code = false;
 
     /*
      * Templates for the different deck layouts, see deck.get_layout_data
@@ -39,7 +40,7 @@
     layouts.sphere = layouts.name = layouts.position;
 
     $(document).on('click', '.expand-packs', function() {
-        displayFullPackInfo = true;
+        display_full_pack_info = true;
         app.ui.refresh_deck();
     });
 
@@ -47,6 +48,7 @@
     deck.problem_labels = {
         too_many_heroes: "Contains too many heroes",
         too_few_heroes: "Contains too few heroes",
+        too_many_copies: "Contains too many copies of a card (by title)",
         invalid_for_tournament_play: "Invalid for tournament play for having less than 50 cards",
         duplicated_unique_heroes: "More than one hero with the same unique name",
         too_few_cards: "Contains too few cards",
@@ -375,7 +377,7 @@
         var packs = deck.get_included_packs();
 
         var packinfo;
-        if (displayFullPackInfo) {
+        if (display_full_pack_info) {
             packinfo = $('<div>Packs: ' + _.map(packs, function (pack) { return pack.name + (pack.quantity > 1 ? ' (' + pack.quantity + ')' : ''); }).join(', ') + '</div>');
         } else {
             packinfo = $('<div class="latestpack">Cards up to <i>' + (deck.get_lastest_pack().name || '-') + '</i></div>');
@@ -583,6 +585,23 @@
 
     };
 
+    deck.get_copies_and_deck_limit = function() {
+        var copies_and_deck_limit = {};
+        deck.get_cards().forEach(function(card) {
+            var value = copies_and_deck_limit[card.name];
+            if (!value) {
+                copies_and_deck_limit[card.name] = {
+                    nb_copies: card.indeck,
+                    deck_limit: card.deck_limit
+                };
+            } else {
+                value.nb_copies += card.indeck;
+                value.deck_limit = Math.min(card.deck_limit, value.deck_limit);
+            }
+        });
+        return copies_and_deck_limit;
+    };
+
     /**
      * @memberOf deck
      */
@@ -611,6 +630,15 @@
         } else if (decksize < 50) {
             return 'invalid_for_tournament_play';
         }
+
+        var keys = _.findKey(deck.get_copies_and_deck_limit(), function(value) {
+            return value.nb_copies > value.deck_limit;
+        });
+
+        if (keys != null) {
+            return 'too_many_copies';
+        }
+
 
         // no invalid card
         if (deck.get_invalid_cards().length > 0) {
@@ -663,7 +691,7 @@
 
                 $(this).parent().find('> div:not(.hero-deck-list), .hero-deck-list > div').each(function(j, line) {
                     var line = $(line);
-                    var qty = line.ignore('a, span, small').text().trim().replace(/x.*/, 'x');
+                    var qty = line.find('.card-count').text().trim();
                     var card = app.data.cards.findById(line.find('a.card').data('code'));
 
                     if (card) {
@@ -687,10 +715,13 @@
             lines.push('');
         });
 
-        if (app.user.params.decklist_id) {
-            lines.push('Decklist [url='+location.href+']built and published on RingsDB[/url].');
+        var type = app.user.params.decklist_id ? 'Decklist' : app.user.params.fellowship_id ? 'Fellowship' : 'Deck';
+        var social = (app.user.params.decklist_id || (app.user.params.fellowship_id && Fellowship.published));
+
+        if (social) {
+            lines.push(type + ' [url='+location.href+']built and published on RingsDB[/url].');
         } else {
-            lines.push('Deck built on [url=http://ringsdb.com]RingsDB[/url].');
+            lines.push(type + ' built on [url=http://ringsdb.com]RingsDB[/url].');
         }
 
         return lines;
@@ -723,7 +754,7 @@
 
                 $(this).parent().find('> div:not(.hero-deck-list), .hero-deck-list > div').each(function(j, line) {
                     var line = $(line);
-                    var qty = line.ignore('a, span, small').text().trim().replace(/x.*/, 'x');
+                    var qty = line.find('.card-count').text().trim();
                     var card = app.data.cards.findById(line.find('a.card').data('code'));
 
                     if (card) {
@@ -747,11 +778,15 @@
             lines.push('');
         });
 
-        if (app.user.params.decklist_id) {
-            lines.push('Decklist [built and published on RingsDB]('+location.href+').');
+        var type = app.user.params.decklist_id ? 'Decklist' : app.user.params.fellowship_id ? 'Fellowship' : 'Deck';
+        var social = (app.user.params.decklist_id || (app.user.params.fellowship_id && Fellowship.published));
+
+        if (social) {
+            lines.push(type + ' [built and published on RingsDB]('+location.href+').');
         } else {
-            lines.push('Deck built on [RingsDB](http://ringsdb.com).');
+            lines.push(type + ' built on [RingsDB](http://ringsdb.com).');
         }
+
         return lines;
     };
 
@@ -804,11 +839,121 @@
             lines.push('');
         });
 
-        if (app.user.params.decklist_id) {
-            lines.push('Decklist built and published on ' + location.href);
+        var type = app.user.params.decklist_id ? 'Decklist' : app.user.params.fellowship_id ? 'Fellowship' : 'Deck';
+        var social = (app.user.params.decklist_id || (app.user.params.fellowship_id && Fellowship.published));
+
+        if (social) {
+            lines.push(type + ' built and published on ' + location.href);
         } else {
-            lines.push('Deck built on http://ringsdb.com.');
+            lines.push(type + ' built on http://ringsdb.com.');
         }
+
         return lines;
+    };
+
+
+    deck.export_html = function(skip_title) {
+        $('#export-deck').html(deck.build_html(skip_title).join("\n"));
+        $('#exportModal').modal('show');
+    };
+
+    deck.build_html = function(skip_title) {
+        var lines = [];
+
+        if (!skip_title) {
+            lines.push('<p><strong>' + deck.get_name() + '</strong></p>');
+        }
+
+        $('.deck-content').each(function() {
+            var content = $(this);
+
+            content.find('h4:visible, h5:visible').each(function(i, type) {
+                if (type.tagName.toLowerCase() == 'h4') {
+                    lines.push('<p><strong>' + $(type).text().trim() + '</strong></p>');
+                    return;
+                } else {
+                    lines.push('<p>');
+                    lines.push('<span style="text-decoration: underline;"><strong>' + $(type).text().trim() + '</strong></span>');
+                }
+
+                $(this).parent().find('> div:not(.hero-deck-list), .hero-deck-list > div').each(function(j, line) {
+                    var line = $(line);
+                    var qty = line.find('.card-count').text().trim();
+                    var card = app.data.cards.findById(line.find('a.card').data('code'));
+
+                    if (card) {
+                        var color = '#000000';
+
+                        switch (card.sphere_code) {
+                            case 'tactics':
+                                color = '#FF0000';
+                                break;
+                            case 'spirit':
+                                color = '#00B1D4';
+                                break;
+                            case 'lore':
+                                color = '#51B848';
+                                break;
+                            case 'leadership':
+                                color = '#AD62A5';
+                                break;
+                            case 'neutral':
+                                color = '#616161';
+                                break;
+                            case 'baggins':
+                                color = '#B39E26';
+                                break;
+                            case 'fellowship':
+                                color = '#B56C0C';
+                                break;
+                        }
+
+                        lines.push('<br>');
+                        var str = qty + ' <a href="http://ringsdb.com/card/' + card.code + '" style="color: ' + color + ';" target="_blank">' + card.name + '</a> (' + (use_pack_code ? card.pack_code : card.pack_name) + ')';
+                        lines.push(str.trim());
+                    }
+                });
+
+                lines.push('</p>');
+            });
+
+            var count = content.find('.deckcardcount').text();
+            var latestpack = content.find('.latestpack').text();
+
+            if (count || latestpack) {
+                lines.push('<p>');
+            }
+
+            if (count) {
+                lines.push(count);
+            }
+
+            if (count && latestpack) {
+                lines.push('<br>');
+            }
+
+            if (latestpack) {
+                lines.push(latestpack);
+            }
+
+            if (count || latestpack) {
+                lines.push('</p>');
+            }
+        });
+
+        var type = app.user.params.decklist_id ? 'Decklist' : app.user.params.fellowship_id ? 'Fellowship' : 'Deck';
+        var social = (app.user.params.decklist_id || (app.user.params.fellowship_id && Fellowship.published));
+
+        if (social) {
+            lines.push('<p>' + type + ' <a href="' + location.href + '" target="_blank">built and published on RingsDB</a>.</p>');
+        } else {
+            lines.push('<p>' + type + ' built on <a href="http://ringsdb.com" target="_blank">RingsDB</a>.</p>');
+        }
+
+        return lines;
+    };
+    
+    deck.use_pack_code = function() {
+        use_pack_code = true;
     };
 })(app.deck = {}, jQuery);

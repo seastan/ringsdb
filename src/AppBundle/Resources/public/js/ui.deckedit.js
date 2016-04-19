@@ -162,6 +162,11 @@
             name: {
                 '$exists': true
             }
+        }, {
+            $orderBy: {
+                cycle_position: 1,
+                position: 1
+            }
         }).forEach(function(record) {
             var checked = record.owned;
 
