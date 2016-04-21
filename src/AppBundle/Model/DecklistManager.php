@@ -5,7 +5,6 @@ namespace AppBundle\Model;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
-use AppBundle\Services\DeckInterface;
 use Psr\Log\LoggerInterface;
 use AppBundle\Entity\User;
 use Doctrine\ORM\Query;
@@ -70,11 +69,6 @@ class DecklistManager {
 		return $qb;
 	}
 
-    /**
-     * creates the paginator around the query
-     *
-     * @param Query $query
-     */
     private function getPaginator(Query $query) {
         $paginator = new Paginator($query, $fetchJoinCollection = false);
         $this->maxcount = $paginator->count();
@@ -96,7 +90,7 @@ class DecklistManager {
         return $this->getPaginator($qb->getQuery());
     }
 
-    public function findDecklistsByAge($ignoreEmptyDescriptions = false) {
+    public function findDecklistsByAge() {
         $qb = $this->getQueryBuilder();
 
         $qb->orderBy('d.dateCreation', 'DESC');

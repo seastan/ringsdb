@@ -1,6 +1,9 @@
 AppBundle\Entity\Scenario:
     type: entity
     table: scenario
+    cache:
+        usage: NONSTRICT_READ_WRITE
+        region: entity_region
     manyToOne:
         pack:
             targetEntity: Pack
