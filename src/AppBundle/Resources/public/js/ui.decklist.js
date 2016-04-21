@@ -112,9 +112,8 @@
         }, function(data, textStatus, jqXHR) {
             that.find('.num').text(data);
 
-            var title = that.data('original-tooltip');
-            that.data('original-tooltip', title == "Add to favorites" ? "Remove from favorites" : "Add to favorites");
-            that.attr('title', that.data('original-tooltip'));
+            var title = that.attr('data-original-title');
+            that.attr('data-original-title', title == "Add to favorites" ? "Remove from favorites" : "Add to favorites");
             that.removeClass('processing');
         });
 
@@ -176,10 +175,10 @@
             element.replaceWith($('<span class="social-icon-favorite"></span>').html(element.html()));
         } else if (app.user.data.is_favorite) {
             var element = $('.social .social-icon-favorite');
-            element.attr('title', "Remove from favorites");
+            element.attr('data-original-title', "Remove from favorites");
         } else {
             var element = $('.social .social-icon-favorite');
-            element.attr('title', "Add to favorites");
+            element.attr('data-original-title', "Add to favorites");
         }
 
         if (!app.user.data) {
