@@ -99,10 +99,57 @@ class QuestLogController extends Controller {
                 'victories' => $victories,
                 'defeats' => $defeats,
                 'total' => $total,
-                'ratio' => ($total ? sprintf("%.0f%%", 100 * $victories / $total) : '-')
+                'ratio' => ($total ? sprintf("%.0f%%", 100 * $victories / $total) : '-'),
+                'compact' => false
             ]);
         }
     }
+
+
+    public function myCompleteListAction() {
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $quests \AppBundle\Entity\Scenario[] */
+        $quests = $em->getRepository('AppBundle:Scenario')->findBy([], ['position' => 'ASC']);
+
+        /* @var $user \AppBundle\Entity\User */
+        $user = $this->getUser();
+
+        // Count played scenarios
+        $playedEasy = [];
+        $playedNormal = [];
+        $playedNightmare = [];
+
+        $dbh = $em->getConnection();
+        $played = $dbh->executeQuery("SELECT DISTINCT scenario_id, quest_mode, sum(success) as victory FROM questlog WHERE user_id = ? GROUP BY scenario_id, quest_mode", [$user->getId()])->fetchAll(\PDO::FETCH_NAMED);
+
+        foreach ($played as $c) {
+            if ($c['quest_mode'] == 'easy') {
+                $playedEasy[$c['scenario_id']] = $c['victory'];
+            } elseif ($c['quest_mode'] == 'normal') {
+                $playedNormal[$c['scenario_id']] = $c['victory'];
+            } elseif ($c['quest_mode'] == 'nightmare') {
+                $playedNightmare[$c['scenario_id']] = $c['victory'];
+            }
+        }
+
+        /* @var $questlogs \AppBundle\Entity\Questlog[] */
+        $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user], ['dateCreation' => 'DESC']);
+
+        return $this->render('AppBundle:Quest:my-questlogs.html.twig', [
+            'pagetitle' => "My Quest Logs",
+            'pagedescription' => "Log a new quest.",
+            'quests' => $quests,
+            'played_easy' => $playedEasy,
+            'played_normal' => $playedNormal,
+            'played_nightmare' => $playedNightmare,
+            'questlogs' => $questlogs,
+            'quest_mode' => 'normal',
+            'compact' => true
+        ]);
+    }
+
 
     public function newAction($deck1_id, $deck2_id, $deck3_id, $deck4_id, Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
