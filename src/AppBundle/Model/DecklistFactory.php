@@ -18,8 +18,9 @@ class DecklistFactory {
     }
 
     public function createDecklistFromDeck(Deck $deck, $name = null, $descriptionMd = null) {
+        /* @var $lastPack \AppBundle\Entity\Pack */
         $lastPack = $deck->getLastPack();
-        if(!$lastPack->getReleased() || $lastPack->getReleased() > new \DateTime()) {
+        if (!$lastPack->getDateRelease() || $lastPack->getDateRelease() > new \DateTime()) {
             throw new \Exception("You cannot publish this deck yet, because it has unreleased cards.");
         }
 
