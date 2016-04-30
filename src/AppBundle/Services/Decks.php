@@ -102,12 +102,16 @@ class Decks {
             if (!$latestPack) {
                 $latestPack = $pack;
             } else {
-                if ($latestPack->getCycle()->getPosition() < $pack->getCycle()->getPosition()) {
-                    $latestPack = $pack;
-                } else {
-                    if ($latestPack->getCycle()->getPosition() == $pack->getCycle()->getPosition() && $latestPack->getPosition() < $pack->getPosition()) {
+                if (!$latestPack->getDateRelease() && !$pack->getDateRelease()) {
+                    if ($latestPack->getCycle()->getPosition() < $pack->getCycle()->getPosition()) {
                         $latestPack = $pack;
+                    } else {
+                        if ($latestPack->getCycle()->getPosition() == $pack->getCycle()->getPosition() && $latestPack->getPosition() < $pack->getPosition()) {
+                            $latestPack = $pack;
+                        }
                     }
+                } else if (!$pack->getDateRelease() || $latestPack->getDateRelease() < !$pack->getDateRelease()) {
+                    $latestPack = $pack;
                 }
             }
 

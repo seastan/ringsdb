@@ -557,7 +557,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      *
      * @return Deck
      */
-    public function setLastPack(\AppBundle\Entity\Pack $lastPack = null) {
+    public function setLastPack(Pack $lastPack = null) {
         $this->lastPack = $lastPack;
 
         return $this;

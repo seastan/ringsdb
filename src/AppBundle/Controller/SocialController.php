@@ -5,6 +5,7 @@ use AppBundle\Entity\Comment;
 use AppBundle\Entity\Deck;
 use AppBundle\Entity\Decklist;
 use AppBundle\Entity\User;
+use AppBundle\Entity\Pack;
 use AppBundle\Model\DecklistManager;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
