@@ -110,7 +110,7 @@ class Decks {
                             $latestPack = $pack;
                         }
                     }
-                } else if (!$pack->getDateRelease() || $latestPack->getDateRelease() < !$pack->getDateRelease()) {
+                } else if (!$pack->getDateRelease() || $latestPack->getDateRelease() < $pack->getDateRelease()) {
                     $latestPack = $pack;
                 }
             }
