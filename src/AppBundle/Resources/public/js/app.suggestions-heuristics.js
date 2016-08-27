@@ -68,7 +68,7 @@
             var isDeckMonoSphere = _.unique(_.pluck(suggestions.heroesInDeck, 'sphere')).length == 1;
             var isDeckTriSphere = _.unique(_.pluck(suggestions.heroesInDeck, 'sphere')).length >= 3;
             //var deckMonoTraits = _.intersection.apply(_, _.map(_.pluck(suggestions.heroesInDeck, 's_traits'), function(h) { return h.split(/[\. ]+/) }));
-            var isDeckSecrecy = suggestions.heroesInDeck.length == 3 && app.deck.get_starting_threat() <= 20;
+            var isDeckSecrecy = suggestions.heroesInDeck.length <= 3 && app.deck.get_starting_threat() <= 20;
 
             _.each(suggestions.cards, function(card) {
                 if (card.indeck > 0) {
