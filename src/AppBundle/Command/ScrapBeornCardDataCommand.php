@@ -10,6 +10,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\VarDumper\VarDumper;
+
 
 class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
@@ -118,11 +120,11 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
             }
 
             $beornset = str_replace([' '], ['%20'], $set);
-            $html = file_get_contents("http://hallofbeorn.com/Cards/Search?CardSet=$beornset");
+            $html = file_get_contents("http://hallofbeorn.com/LotR?Sort=Set_Number&CardSet=$beornset");
 
             $crawler = new Crawler($html);
 
-            $cardsUrls = $crawler->filter('a[href^="/Cards/Details"][style]')->extract('href');
+            $cardsUrls = $crawler->filter('a[href^="/LotR/Details"][style]')->extract('href');
 
             $i = 0;
 
@@ -155,7 +157,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                 $isUnique = $c->filter('img[src="/Images/unique-card.png"]')->count() > 0;
 
                 $output->writeln("\n\n\n\n\n\n\n\n");
-                dump("Importing card number $i: $name");
+                VarDumper::dump("Importing card number $i: $name");
 
                 // Set, Number and Quantity
                 $c = $cardCrawler->filter('div.titleNameBox > div')->last();
@@ -216,7 +218,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                 //$octgn = substr($cardCrawler->filter('img[title^="OCTGN"]')->attr('title'), -36);
 
                 $card = $em->getRepository('AppBundle:Card')->findOneBy(['name' => $name, 'pack' => $pack]);
-                if ($card && !$forceData) {
+                if ($card && !$forceData && !$forceImage) {
                     // shortcut: we already know this card
                     continue;
                 }
@@ -264,7 +266,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
                 if ($text && $showTexts) {
                     $output->writeln("Card text:");
-                    dump($text);
+                    VarDumper::dump($text);
                 }
 
                 $flavor = str_replace(['<br />', '<br>'], ["\n", "\n"], $flavor);
@@ -276,7 +278,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
                 if ($flavor && $showTexts) {
                     $output->writeln("Card flavor:");
-                    dump($flavor);
+                    VarDumper::dump($flavor);
                 }
 
                 $question = new ConfirmationQuestion("Shall I import this card?");
@@ -323,6 +325,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
                 $card->setQuantity($quantity);
                 $card->setDeckLimit($limit);
+                $card->setHasErrata(false);
 
                 //$card->setIllustrator(trim($data['illustrator']));
 
@@ -336,6 +339,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                 $outputfile = $dirname . DIRECTORY_SEPARATOR . $card_code . ".png";
 
                 if (!file_exists($outputfile) || $forceImage) {
+                    $imageurl = preg_replace('/û/', '%C3%BB', $imageurl);
                     $u = dirname($imageurl) . '/' . urlencode(basename($imageurl, '.jpg')) . '.jpg';
 
                     $image = file_get_contents($u);
