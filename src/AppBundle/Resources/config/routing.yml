@@ -96,6 +96,12 @@ myquestlogs_list:
         scenario_name_canonical: null
         quest_mode: normal
 
+allquestlogs:
+    path: /all_questlogs
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:QuestLog:myCompleteList
+
 decklists_searchform:
     path: /decklists/search
     methods: [GET]
