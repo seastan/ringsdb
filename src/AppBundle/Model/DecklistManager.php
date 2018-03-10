@@ -145,6 +145,10 @@ class DecklistManager {
         if (!is_array($cards_code)) {
             $cards_code = [];
         }
+	$cards_to_exclude = $request->query->get('cards_to_exclude');
+        if (!is_array($cards_to_exclude)) {
+            $cards_to_exclude = [];
+        }
 
         $sphere_code = filter_var($request->query->get('sphere'), FILTER_SANITIZE_STRING);
         if ($sphere_code) {
@@ -202,11 +206,9 @@ class DecklistManager {
                     if (!$card) {
                         continue;
                     }
-
                     $qb->innerJoin('d.slots', "s$i");
                     $qb->andWhere("s$i.card = :card$i");
                     $qb->setParameter("card$i", $card);
-
                     $packs[] = $card->getPack()->getId();
                 }
             }
@@ -217,9 +219,18 @@ class DecklistManager {
                 $sub->innerJoin('AppBundle:Decklistslot', 's', 'WITH', 's.card = c');
                 $sub->where('s.decklist = d');
                 $sub->andWhere($sub->expr()->notIn('c.pack', $packs));
-
                 $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
             }
+            if (!empty($cards_to_exclude)) {
+                $sub = $this->doctrine->createQueryBuilder();
+                $sub->select("c");
+                $sub->from("AppBundle:Card", "c");
+                $sub->innerJoin('AppBundle:Decklistslot', 's', 'WITH', 's.card = c');
+                $sub->where('s.decklist = d');
+                $sub->andWhere($sub->expr()->in('c.code', $cards_to_exclude));
+                $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
+            }
+
         }
 
         switch ($sort) {

@@ -30,6 +30,13 @@
                 {{ cards | default('') | raw }}
                 <input type="text" class="form-control" id="card" placeholder="Enter card name">
             </div>
+	    <!-- Not Working right at the moment -->
+            <div class="form-group">
+                <label for="">Cards not used</label>
+                {{ cards_to_exclude | default('') | raw }}
+                <input type="text" class="form-control" id="card_to_exclude" placeholder="Enter card name">
+            </div>
+
         </div>
         <div class="col-sm-4">
             <div class="form-group">
