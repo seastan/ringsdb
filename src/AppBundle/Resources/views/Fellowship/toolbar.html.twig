@@ -6,9 +6,6 @@
                     <span class="fa fa-pencil text-primary"></span> Edit
                 </a>
 
-                {#<a href="#" id="btn-log-quest" class="btn btn-sm btn-default">#}
-                    {#<span class="fa fa-book text-warning"></span> Log a Quest#}
-                {#</a>#}
 
                 {% if not is_public %}
                     <a href="{{ path('fellowship_publish_form', { fellowship_id: fellowship.id }) }}" class="btn btn-sm btn-default">
@@ -36,6 +33,9 @@
                     <li><a href="#" id="btn-download-octgn">Octgn file</a></li>
                 </ul>
             </div>
+            <a href="{{ path('questlog_new', { deck1_id: deck1.id, deck2_id: deck2.id, deck3_id: deck3.id, deck4_id: deck4.id }) }}" class="btn btn-sm btn-default">
+              <span class="fa fa-book text-warning"></span> Log a Quest
+            </a>
 
             <div class="btn-group">
                 <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">

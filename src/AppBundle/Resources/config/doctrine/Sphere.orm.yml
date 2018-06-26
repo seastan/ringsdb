@@ -1,6 +1,9 @@
 AppBundle\Entity\Sphere:
     type: entity
     table: sphere
+    cache:
+        usage: NONSTRICT_READ_WRITE
+        region: entity_region
     oneToMany:
         cards:
             targetEntity: Card

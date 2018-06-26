@@ -1,6 +1,9 @@
 AppBundle\Entity\Type:
     type: entity
     table: type
+    cache:
+        usage: NONSTRICT_READ_WRITE
+        region: entity_region
     oneToMany:
         cards:
             targetEntity: Card

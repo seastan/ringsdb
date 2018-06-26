@@ -1,0 +1,133 @@
+{% extends 'AppBundle::layout.html.twig' %}
+{% import "AppBundle::macros.html.twig" as macros %}
+
+{% block javascripts %}
+    {% javascripts '@AppBundle/Resources/public/js/ui.questlogs.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+    <div class="main white container">
+        <div class="row">
+            <div class="col-md-4 col-md-push-8">
+                <div class="row" style="margin-bottom: 5px">
+                    <div class="col-md-12">
+                        <a href="{{ path('questlog_new') }}" class="btn btn-default btn-sm"><span class="fa fa-plus"></span> Log a Quest</a>
+
+
+                        <a href="{{ path('allquestlogs') }}" class="btn btn-default btn-sm"><span class="fa fa-list-ul"></span> Show All</a>
+                    </div>
+                </div>
+                <div class="row" style="margin-bottom: 5px">
+                    <div class="col-md-12">
+                        <div class="btn-group hidden-xs" id="btn-group-selection">
+                            <label type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown">
+                                <span class="fa fa-check-square-o"></span> With Selection <span class="caret"></span>
+                            </label>
+
+                            <ul class="dropdown-menu" role="menu">
+                                <li class="dropdown-header"><span class="fa fa-trash-o"></span> Delete</li>
+                                <li><a href="#" data-action="delete-selected"><span style="color:red" class="fa fa-exclamation-triangle"></span> Delete all selected quest logs</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="btn-group btn-group-sm hidden" id="difficulty-selector">
+                            <label class="btn btn-default {% if quest_mode == 'easy' %}active{% endif %}" data-action="easy">
+                                Easy <small class="text-primary"><strong></strong></small>
+                            </label>
+                            <label class="btn btn-default {% if quest_mode == 'normal' %}active{% endif %}" data-action="normal">
+                                Normal <small class="text-primary"><strong></strong></small>
+                            </label>
+                            <label class="btn btn-default {% if quest_mode == 'nightmare' %}active{% endif %}" data-action="nightmare">
+                                Nightmare <small class="text-primary"><strong></strong></small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12  hidden" id="config-options">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="owned-quests-only"> Display only quests in my collection
+                            </label>
+                        </div>
+                        <div class="checkbox" style="margin-bottom: 0">
+                            <label>
+                                <input type="checkbox" name="played-quests-only"> Display only played quests
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" style="margin-bottom: 5px">
+                    <div class="col-md-12">
+                        <ul id="scenario-list" class="{{ quest_mode }} hidden">
+                            {% set last_cycle = null %}
+                            {% for scenario in quests %}
+                                {% if scenario.pack.cycle.code != last_cycle %}
+                                    {% set last_cycle = scenario.pack.cycle.code %}
+                                    <h5><strong>{{ scenario.pack.cycle.name }}</strong></h5>
+                                {% endif %}
+
+                                {% if scenario.hasEasy %}
+                                    {% set played = played_easy[scenario.id] is defined %}
+                                    <li class="scenario-easy {% if not played %}not-played{% endif %}" data-pack="{{ scenario.pack.id }}">
+                                        <span class="img" style="background-image: url('{{ asset('/bundles/app/images/encounters/' ~ (scenario.name | url_encode) ~ '.png')  }}')"></span>
+                                        {% if played %}
+                                            <a href="{{ path('myquestlogs_list', { scenario_name_canonical: scenario.nameCanonical, quest_mode: 'easy' }) }}">{{ scenario.name }}</a>
+                                            {% if played_easy[scenario.id] > 0 %}<span class="fa fa-fw fa-trophy" title="We have victory!" data-toggle="tooltip" data-container="body"></span>{% endif %}
+                                        {% else %}
+                                            {{ scenario.name }}
+                                        {% endif %}
+                                    </li>
+                                {% endif %}
+
+                                {% set played = played_normal[scenario.id] is defined %}
+                                <li class="scenario-normal {% if not played %}not-played{% endif %}" data-pack="{{ scenario.pack.id }}">
+                                    <span class="img" style="background-image: url('{{ asset('/bundles/app/images/encounters/' ~ (scenario.name | url_encode) ~ '.png')  }}')"></span>
+                                    {% if played %}
+                                        <a href="{{ path('myquestlogs_list', { scenario_name_canonical: scenario.nameCanonical, quest_mode: 'normal' }) }}">{{ scenario.name }}</a>
+                                        {% if played_normal[scenario.id] > 0 %}<span class="fa fa-fw fa-trophy" title="We have victory!" data-toggle="tooltip" data-container="body"></span>{% endif %}
+                                    {% else %}
+                                        {{ scenario.name }}
+                                    {% endif %}
+                                </li>
+
+                                {% if scenario.hasNightmare %}
+                                    {% set played = played_nightmare[scenario.id] is defined %}
+                                    <li class="scenario-nightmare {% if not played %}not-played{% endif %}" data-pack="{{ scenario.pack.id }}">
+                                        <span class="img" style="background-image: url('{{ asset('/bundles/app/images/encounters/' ~ (scenario.name | url_encode) ~ '.png')  }}')"></span>
+                                        {% if played %}
+                                            <a href="{{ path('myquestlogs_list', { scenario_name_canonical: scenario.nameCanonical, quest_mode: 'nightmare' }) }}">{{ scenario.name }}</a>
+                                            {% if played_nightmare[scenario.id] > 0 %}<span class="fa fa-fw fa-trophy" title="We have victory!" data-toggle="tooltip" data-container="body"></span>{% endif %}
+                                        {% else %}
+                                            {{ scenario.name }}
+                                        {% endif %}
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8 col-md-pull-4">
+                {% if not compact %}
+                    {% include 'AppBundle:Quest:questlist.html.twig' %}
+                {% else %}
+                    {% include 'AppBundle:Quest:questlist-compact.html.twig' %}
+                {% endif %}
+            </div>
+            <!-- / Left-side column -->
+
+        </div>
+    </div>
+
+    {% include 'AppBundle:Modale:delete_questlog.html.twig' %}
+    {% include 'AppBundle:Modale:delete_questlog_list.html.twig' %}
+{% endblock %}

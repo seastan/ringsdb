@@ -17,26 +17,139 @@ use DateTime;
 
 class QuestLogController extends Controller {
 
-    public function mylistAction() {
+    public function mylistAction($scenario_name_canonical, $quest_mode) {
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $quests \AppBundle\Entity\Scenario[] */
+        $quests = $em->getRepository('AppBundle:Scenario')->findBy([], ['position' => 'ASC']);
+
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
 
-        /* @var $questlogs \AppBundle\Entity\Questlog[] */
-        $questlogs = $user->getQuestlogs();
+        // Count played scenarios
+        $playedEasy = [];
+        $playedNormal = [];
+        $playedNightmare = [];
 
-        if (count($questlogs)) {
+        $dbh = $em->getConnection();
+        $played = $dbh->executeQuery("SELECT DISTINCT scenario_id, quest_mode, sum(success) as victory FROM questlog WHERE user_id = ? GROUP BY scenario_id, quest_mode", [$user->getId()])->fetchAll(\PDO::FETCH_NAMED);
+
+        foreach ($played as $c) {
+            if ($c['quest_mode'] == 'easy') {
+                $playedEasy[$c['scenario_id']] = $c['victory'];
+            } elseif ($c['quest_mode'] == 'normal') {
+                $playedNormal[$c['scenario_id']] = $c['victory'];
+            } elseif ($c['quest_mode'] == 'nightmare') {
+                $playedNightmare[$c['scenario_id']] = $c['victory'];
+            }
+        }
+
+        if (count($played) == 0) {
+            return $this->render('AppBundle:Quest:no-questlogs.html.twig', [
+                'pagetitle' => "My Quest Logs",
+                'pagedescription' => "Log a new quest."
+            ]);
+        } else {
+            if ($scenario_name_canonical == null) {
+                $res = $dbh->executeQuery("SELECT q.scenario_id, s.name_canonical, q.quest_mode
+                      FROM questlog q
+                      INNER JOIN scenario s ON q.scenario_id = s.id
+                      WHERE q.user_id = ?
+                      ORDER BY q.scenario_id LIMIT 1", [$user->getId()])->fetch(\PDO::FETCH_NUM);
+                $scenario_name_canonical = $res[1];
+                $quest_mode = $res[2];
+            }
+
+            if ($quest_mode != 'easy' && $quest_mode != 'nightmare') {
+                $quest_mode = 'normal';
+            }
+
+            /* @var $scenario \AppBundle\Entity\Scenario */
+            $scenario = $em->getRepository('AppBundle:Scenario')->findOneBy(['nameCanonical' => $scenario_name_canonical]);
+
+            if ($scenario == null) {
+                throw new NotFoundHttpException("This quest does not exists.");
+            }
+
+            /* @var $questlogs \AppBundle\Entity\Questlog[] */
+            $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => 'DESC']);
+
+            $victories = 0;
+            $defeats = 0;
+            $total = count($questlogs);
+            foreach ($questlogs as $questlog) {
+                if ($questlog->getSuccess()) {
+                    $victories++;
+                } else {
+                    $defeats++;
+                }
+            }
+
             return $this->render('AppBundle:Quest:my-questlogs.html.twig', [
                 'pagetitle' => "My Quest Logs",
                 'pagedescription' => "Log a new quest.",
+                'quests' => $quests,
+                'played_easy' => $playedEasy,
+                'played_normal' => $playedNormal,
+                'played_nightmare' => $playedNightmare,
                 'questlogs' => $questlogs,
-            ]);
-        } else {
-            return $this->render('AppBundle:Quest:no-questlogs.html.twig', [
-                'pagetitle' => "My Quest Logs",
-                'pagedescription' => "Log a new quest.",
+                'quest_mode' => $quest_mode,
+                'selected_scenario' => $scenario,
+                'victories' => $victories,
+                'defeats' => $defeats,
+                'total' => $total,
+                'ratio' => ($total ? sprintf("%.0f%%", 100 * $victories / $total) : '-'),
+                'compact' => false
             ]);
         }
     }
+
+
+    public function myCompleteListAction() {
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $quests \AppBundle\Entity\Scenario[] */
+        $quests = $em->getRepository('AppBundle:Scenario')->findBy([], ['position' => 'ASC']);
+
+        /* @var $user \AppBundle\Entity\User */
+        $user = $this->getUser();
+
+        // Count played scenarios
+        $playedEasy = [];
+        $playedNormal = [];
+        $playedNightmare = [];
+
+        $dbh = $em->getConnection();
+        $played = $dbh->executeQuery("SELECT DISTINCT scenario_id, quest_mode, sum(success) as victory FROM questlog WHERE user_id = ? GROUP BY scenario_id, quest_mode", [$user->getId()])->fetchAll(\PDO::FETCH_NAMED);
+
+        foreach ($played as $c) {
+            if ($c['quest_mode'] == 'easy') {
+                $playedEasy[$c['scenario_id']] = $c['victory'];
+            } elseif ($c['quest_mode'] == 'normal') {
+                $playedNormal[$c['scenario_id']] = $c['victory'];
+            } elseif ($c['quest_mode'] == 'nightmare') {
+                $playedNightmare[$c['scenario_id']] = $c['victory'];
+            }
+        }
+
+        /* @var $questlogs \AppBundle\Entity\Questlog[] */
+        $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user], ['dateCreation' => 'DESC']);
+
+        return $this->render('AppBundle:Quest:my-questlogs.html.twig', [
+            'pagetitle' => "My Quest Logs",
+            'pagedescription' => "Log a new quest.",
+            'quests' => $quests,
+            'played_easy' => $playedEasy,
+            'played_normal' => $playedNormal,
+            'played_nightmare' => $playedNightmare,
+            'questlogs' => $questlogs,
+            'quest_mode' => 'normal',
+            'compact' => true
+        ]);
+    }
+
 
     public function newAction($deck1_id, $deck2_id, $deck3_id, $deck4_id, Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
@@ -200,7 +313,7 @@ class QuestLogController extends Controller {
         /* @var $questlog_decks \AppBundle\Entity\QuestlogDeck[] */
         $questlog_decks = $questlog->getDecks();
         foreach ($questlog_decks as $questlog_deck) {
-            $data['deck' . $questlog_deck->getDeckNumber()] = $questlog_deck->getDeck();
+            $data['deck' . $questlog_deck->getDeckNumber()] = $questlog_deck->getDecklist() ?: $questlog_deck->getDeck();
             $data['deck' . $questlog_deck->getDeckNumber() . '_content'] = $questlog_deck->getContent();
             $data['deck' . $questlog_deck->getDeckNumber() . '_player_name'] = $questlog_deck->getPlayer();
         }

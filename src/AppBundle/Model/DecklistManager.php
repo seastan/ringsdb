@@ -5,7 +5,6 @@ namespace AppBundle\Model;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
-use AppBundle\Services\DeckInterface;
 use Psr\Log\LoggerInterface;
 use AppBundle\Entity\User;
 use Doctrine\ORM\Query;
@@ -70,11 +69,6 @@ class DecklistManager {
 		return $qb;
 	}
 
-    /**
-     * creates the paginator around the query
-     *
-     * @param Query $query
-     */
     private function getPaginator(Query $query) {
         $paginator = new Paginator($query, $fetchJoinCollection = false);
         $this->maxcount = $paginator->count();
@@ -96,7 +90,7 @@ class DecklistManager {
         return $this->getPaginator($qb->getQuery());
     }
 
-    public function findDecklistsByAge($ignoreEmptyDescriptions = false) {
+    public function findDecklistsByAge() {
         $qb = $this->getQueryBuilder();
 
         $qb->orderBy('d.dateCreation', 'DESC');
@@ -150,6 +144,10 @@ class DecklistManager {
         $cards_code = $request->query->get('cards');
         if (!is_array($cards_code)) {
             $cards_code = [];
+        }
+	$cards_to_exclude = $request->query->get('cards_to_exclude');
+        if (!is_array($cards_to_exclude)) {
+            $cards_to_exclude = [];
         }
 
         $sphere_code = filter_var($request->query->get('sphere'), FILTER_SANITIZE_STRING);
@@ -208,11 +206,9 @@ class DecklistManager {
                     if (!$card) {
                         continue;
                     }
-
                     $qb->innerJoin('d.slots', "s$i");
                     $qb->andWhere("s$i.card = :card$i");
                     $qb->setParameter("card$i", $card);
-
                     $packs[] = $card->getPack()->getId();
                 }
             }
@@ -223,9 +219,18 @@ class DecklistManager {
                 $sub->innerJoin('AppBundle:Decklistslot', 's', 'WITH', 's.card = c');
                 $sub->where('s.decklist = d');
                 $sub->andWhere($sub->expr()->notIn('c.pack', $packs));
-
                 $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
             }
+            if (!empty($cards_to_exclude)) {
+                $sub = $this->doctrine->createQueryBuilder();
+                $sub->select("c");
+                $sub->from("AppBundle:Card", "c");
+                $sub->innerJoin('AppBundle:Decklistslot', 's', 'WITH', 's.card = c');
+                $sub->where('s.decklist = d');
+                $sub->andWhere($sub->expr()->in('c.code', $cards_to_exclude));
+                $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
+            }
+
         }
 
         switch ($sort) {

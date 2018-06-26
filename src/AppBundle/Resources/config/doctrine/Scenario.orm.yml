@@ -1,6 +1,9 @@
 AppBundle\Entity\Scenario:
     type: entity
     table: scenario
+    cache:
+        usage: NONSTRICT_READ_WRITE
+        region: entity_region
     manyToOne:
         pack:
             targetEntity: Pack
@@ -40,8 +43,12 @@ AppBundle\Entity\Scenario:
             nullable: false
         name:
             type: string
-            length: 1024
+            length: 255
             nullable: false
+        nameCanonical:
+            type: string
+            length: 255
+            column: name_canonical
         dateCreation:
             type: datetime
             nullable: false
@@ -187,3 +194,5 @@ AppBundle\Entity\Scenario:
     uniqueConstraints:
         scenario_code_idx:
             columns: [ code ]
+        scenario_name_canonical_idx:
+                    columns: [ name_canonical ]

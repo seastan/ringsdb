@@ -20,6 +20,7 @@ class AppKernel extends Kernel {
             new Nelmio\ApiDocBundle\NelmioApiDocBundle(),
             new FOS\OAuthServerBundle\FOSOAuthServerBundle(),
             new AppBundle\AppBundle(),
+            new Snc\RedisBundle\SncRedisBundle()
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'])) {

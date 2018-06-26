@@ -12,7 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 class FixCanonicalNamesCommand extends ContainerAwareCommand {
     protected function configure() {
         $this->setName('app:fix-canonical-names')
-             ->setDescription('Fix canonical names for decklists');
+             ->setDescription('Fix canonical names for scenarios');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
@@ -21,17 +21,17 @@ class FixCanonicalNamesCommand extends ContainerAwareCommand {
         $texts = $this->getContainer()->get('texts');
         $count = 0;
 
-        $decklists = $em->getRepository('AppBundle:Decklist')->findAll();
-        foreach ($decklists as $decklist) {
-            $nameCanonical = $texts->slugify($decklist->getName()) . '-' . $decklist->getVersion();
+        $scenarios = $em->getRepository('AppBundle:Scenario')->findAll();
+        foreach ($scenarios as $scenario) {
+            $nameCanonical = $texts->slugify($scenario->getName());
 
-            if ($nameCanonical !== $decklist->getNameCanonical()) {
-                $decklist->setNameCanonical($nameCanonical);
+            if ($nameCanonical !== $scenario->getNameCanonical()) {
+                $scenario->setNameCanonical($nameCanonical);
                 $count++;
             }
         }
 
         $em->flush();
-        $output->writeln(date('c') . " Fixed $count decklist canonical names.");
+        $output->writeln(date('c') . " Fixed $count scenario canonical names.");
     }
 }
