@@ -223,11 +223,11 @@ class DecklistManager {
             }
             if (!empty($cards_to_exclude)) {
                 $sub = $this->doctrine->createQueryBuilder();
-                $sub->select("c");
-                $sub->from("AppBundle:Card", "c");
-                $sub->innerJoin('AppBundle:Decklistslot', 's', 'WITH', 's.card = c');
-                $sub->where('s.decklist = d');
-                $sub->andWhere($sub->expr()->in('c.code', $cards_to_exclude));
+                $sub->select("k");
+                $sub->from("AppBundle:Card", "k");
+                $sub->innerJoin('AppBundle:Decklistslot', 't', 'WITH', 't.card = k');
+                $sub->where('t.decklist = d');
+                $sub->andWhere($sub->expr()->in('k.code', $cards_to_exclude));
                 $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
             }
 

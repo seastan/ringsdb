@@ -400,15 +400,15 @@ class SocialController extends Controller {
         }
         if (!empty($cards_to_exclude) && is_array($cards_to_exclude)) {
             $cards_to_exclude = $dbh->executeQuery("SELECT
-    				c.name,
-    				c.code,
+    				k.name,
+    				k.code,
                     s.code AS sphere_code,
                     p.name AS pack_name
-    				FROM card c
-                    INNER JOIN sphere s ON s.id = c.sphere_id
-                    INNER JOIN pack p ON p.id = c.pack_id
-                    WHERE c.code IN (?)
-    				ORDER BY c.code DESC", [$cards_to_exclude], [\Doctrine\DBAL\Connection::PARAM_INT_ARRAY])->fetchAll();
+    				FROM card k
+                    INNER JOIN sphere s ON s.id = k.sphere_id
+                    INNER JOIN pack p ON p.id = k.pack_id
+                    WHERE k.code IN (?)
+    				ORDER BY k.code DESC", [$cards_to_exclude], [\Doctrine\DBAL\Connection::PARAM_INT_ARRAY])->fetchAll();
 
             $params['cards_to_exclude'] = '';
 
