@@ -1,5 +1,5 @@
 questlog_new:
-    path: /new/{deck1_id}/{deck2_id}/{deck3_id}/{deck4_id}
+    path: /new/{public}/{deck1_id}/{deck2_id}/{deck3_id}/{deck4_id}
     methods: [GET]
     defaults:
         _controller: AppBundle:QuestLog:new

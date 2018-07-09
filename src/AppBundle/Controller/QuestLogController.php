@@ -151,7 +151,7 @@ class QuestLogController extends Controller {
     }
 
 
-    public function newAction($deck1_id, $deck2_id, $deck3_id, $deck4_id, Request $request) {
+    public function newAction($deck1_id, $deck2_id, $deck3_id, $deck4_id, $public) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
@@ -166,16 +166,15 @@ class QuestLogController extends Controller {
 
         for ($i = 0; $i < 4; $i++) {
             $decks[$i] = null;
-
+            
             if ($deck_ids[$i]) {
-                $public = filter_var($request->get('p'.($i + 1)), FILTER_SANITIZE_NUMBER_INT);
-
+                /* $public = filter_var($request->get('p'.($i + 1)), FILTER_SANITIZE_NUMBER_INT); */
                 if ($public) {
                     $decks[$i] = $em->getRepository('AppBundle:Decklist')->find($deck_ids[$i]);
-                } else {
+                 } else {
                     $decks[$i] = $em->getRepository('AppBundle:Deck')->find($deck_ids[$i]);
                 }
-
+ 
                 if ($decks[$i]) {
                     $user = $decks[$i]->getUser();
 
