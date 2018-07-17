@@ -175,6 +175,10 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
         foreach ($this->slots as $slot) {
             $cardName = $slot->getCard()->getName();
 
+            if ($slot->getCard()->getType() == 'Hero') {
+                $cardName = $cardName . 'Hero';
+            }
+
             if (!key_exists($cardName, $copiesAndDeckLimit)) {
                 $copiesAndDeckLimit[$cardName] = [
                     'copies' => $slot->getQuantity(),
