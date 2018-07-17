@@ -7,6 +7,7 @@ questlog_new:
         deck2_id: null
         deck3_id: null
         deck4_id: null
+        public: null
     requirements:
         deck1_id: \d+
         deck2_id: \d+
