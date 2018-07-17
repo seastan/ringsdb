@@ -171,9 +171,12 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
 
     public function getCopiesAndDeckLimit() {
         $copiesAndDeckLimit = [];
-
         foreach ($this->slots as $slot) {
             $cardName = $slot->getCard()->getName();
+            
+            if ($slot->getCard()->getType()->getCode() === 'hero') {
+                $cardName = $cardName . 'Hero';
+            }
 
             if (!key_exists($cardName, $copiesAndDeckLimit)) {
                 $copiesAndDeckLimit[$cardName] = [
