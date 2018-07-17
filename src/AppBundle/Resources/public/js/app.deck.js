@@ -588,9 +588,13 @@
     deck.get_copies_and_deck_limit = function() {
         var copies_and_deck_limit = {};
         deck.get_cards().forEach(function(card) {
-            var value = copies_and_deck_limit[card.name];
+            var cardname = card.name;
+            if (card.type_code == 'hero') {
+                cardname = cardname + 'Hero';
+            }
+            var value = copies_and_deck_limit[cardname];
             if (!value) {
-                copies_and_deck_limit[card.name] = {
+                copies_and_deck_limit[cardname] = {
                     nb_copies: card.indeck,
                     deck_limit: card.deck_limit
                 };
