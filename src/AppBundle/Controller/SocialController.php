@@ -1088,7 +1088,7 @@ class SocialController extends Controller {
             'name' => '',
             'threat' => '',
             'threato' => '',
-            'require_description' => 1
+            'require_description' => 0
         ]);
 
         return $this->render('AppBundle:Decklist:decklists.html.twig', [
