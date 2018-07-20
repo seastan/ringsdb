@@ -25,17 +25,20 @@ class DefaultController extends Controller {
         
         $decklists_by_sphere = [];
         $spheres = $this->getDoctrine()->getRepository('AppBundle:Sphere')->findBy(['is_primary' => true], ['code' => 'ASC']);
+        $paginator = $decklist_manager->findDecklistsByPopularity();
+        $decklists_trending = iterator_to_array($paginator->getIterator());
         
-        foreach($spheres as $sphere) {
+
+        foreach($decklists_trending as $key => $decklist) {
             $array = [];
             $array['sphere'] = $sphere;
 
-        	$decklist_manager->setPredominantSphere($sphere);
-        	$paginator = $decklist_manager->findDecklistsByPopularity();
+
+        	//$decklist_manager->setPredominantSphere($sphere);
         	/**
         	 * @var $decklist Decklist
         	 */
-            $decklist = $paginator->getIterator()->current();
+
 
             if ($decklist) {
                 $array['decklist'] = $decklist;
