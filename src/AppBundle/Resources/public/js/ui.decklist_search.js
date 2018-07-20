@@ -51,6 +51,40 @@
             line.insertBefore($('#card'));
             $(event.target).typeahead('val', '');
         });
+
+
+
+        $('#card_to_exclude').typeahead({
+            hint: true,
+            highlight: true,
+            minLength: 2
+        }, {
+            name: 'cardnames',
+            displayKey: 'name',
+            source: findMatches,
+            templates: {
+                suggestion: function(card) {
+                    return $('<div class="fg-' + card.sphere_code + '"><span class="icon-fw icon-' + card.sphere_code + '"></span> <strong>' + card.name + '</strong> <small><i>' + card.pack_name + '</i></small></div>');
+                }
+            }
+        });
+        $('#card_to_exclude').on('typeahead:selected typeahead:autocompleted', function(event, data) {
+            var card = app.data.cards.find({
+                code: data.code
+            })[0];
+
+            var line = $('<p class="fg-' + card.sphere_code + '" style="padding: 3px 5px; border-radius: 3px; border: 1px solid silver"><button type="button" class="close" aria-hidden="true">&times;</button><input type="hidden" name="cards_to_exclude[]" value="' + card.code + '">' + card.name + ' <small><i>' + card.pack_name + '</i></small></p>');
+            line.on({
+                click: function(event) {
+                    line.remove();
+                }
+            });
+            line.insertBefore($('#card_to_exclude'));
+            $(event.target).typeahead('val', '');
+        });
+
+
+
     };
 
     /**

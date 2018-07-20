@@ -313,11 +313,13 @@ class SocialController extends Controller {
         $dbh = $this->getDoctrine()->getConnection();
 
         $cards_code = $request->query->get('cards');
+        $cards_to_exclude = $request->query->get('cards_to_exclude');
         $sphere_code = filter_var($request->query->get('sphere'), FILTER_SANITIZE_STRING);
         $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
         $decklist_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
         $starting_threat = intval(filter_var($request->query->get('threat'), FILTER_SANITIZE_NUMBER_INT));
         $starting_threat_o = $request->query->get('threato');
+        $require_description = $request->query->get('require_description');
 
         $sort = $request->query->get('sort');
         $packs = $request->query->get('packs');
@@ -369,7 +371,8 @@ class SocialController extends Controller {
             'author' => $author_name,
             'name' => $decklist_name,
             'threat' => $starting_threat,
-            'threato' => $starting_threat_o
+            'threato' => $starting_threat_o,
+            'require_description' => $require_description
         ];
         $params['sort_' . $sort] = ' selected="selected"';
         $params['spheres'] = $dbh->executeQuery("SELECT
@@ -385,7 +388,7 @@ class SocialController extends Controller {
     				c.code,
                     s.code AS sphere_code,
                     p.name AS pack_name
-    				FROM card c
+    				FROM card cxs
                     INNER JOIN sphere s ON s.id = c.sphere_id
                     INNER JOIN pack p ON p.id = c.pack_id
                     WHERE c.code IN (?)
@@ -395,6 +398,24 @@ class SocialController extends Controller {
 
             foreach ($cards as $card) {
                 $params['cards'] .= $this->renderView('AppBundle:Search:card.html.twig', $card);
+            }
+        }
+        if (!empty($cards_to_exclude) && is_array($cards_to_exclude)) {
+            $cards_to_exclude = $dbh->executeQuery("SELECT
+    				k.name,
+    				k.code,
+                    s.code AS sphere_code,
+                    p.name AS pack_name
+    				FROM card k
+                    INNER JOIN sphere s ON s.id = k.sphere_id
+                    INNER JOIN pack p ON p.id = k.pack_id
+                    WHERE k.code IN (?)
+    				ORDER BY k.code DESC", [$cards_to_exclude], [\Doctrine\DBAL\Connection::PARAM_INT_ARRAY])->fetchAll();
+
+            $params['cards_to_exclude'] = '';
+
+            foreach ($cards_to_exclude as $card_to_exclude) {
+                $params['cards_to_exclude'] .= $this->renderView('AppBundle:Search:card.html.twig', $card_to_exclude);
             }
         }
 
@@ -1066,7 +1087,8 @@ class SocialController extends Controller {
             'author' => '',
             'name' => '',
             'threat' => '',
-            'threato' => ''
+            'threato' => '',
+            'require_description' => 0
         ]);
 
         return $this->render('AppBundle:Decklist:decklists.html.twig', [
