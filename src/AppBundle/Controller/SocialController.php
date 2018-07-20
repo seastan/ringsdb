@@ -388,7 +388,7 @@ class SocialController extends Controller {
     				c.code,
                     s.code AS sphere_code,
                     p.name AS pack_name
-    				FROM card cxs
+    				FROM card c
                     INNER JOIN sphere s ON s.id = c.sphere_id
                     INNER JOIN pack p ON p.id = c.pack_id
                     WHERE c.code IN (?)
