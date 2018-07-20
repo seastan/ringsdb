@@ -65,7 +65,7 @@ class UserController extends Controller {
             $user->setEmail($email);
         }
 
-        $resume = filter_var($request->get('resume'), FILTER_SANITIZE_STRING);
+        $resume = filter_var($request->get('resume'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
         $sphere_code = filter_var($request->get('user_sphere_code'), FILTER_SANITIZE_STRING);
         $notifAuthor = $request->get('notif_author') ? true : false;
         $notifCommenter = $request->get('notif_commenter') ? true : false;

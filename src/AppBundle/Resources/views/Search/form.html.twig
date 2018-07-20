@@ -56,6 +56,13 @@
                     <option value="threat"{{ sort_threat|default('') }}>by Starting Threat</option>
                 </select>
             </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" id="require_description" name="require_description" {% if require_description %}checked{% endif %}>
+                    Require a deck description
+                </label>
+            </div>
+            <br>
             <button type="submit" class="btn btn-primary btn-block">Search</button>
         </div>
         <div class="col-sm-4">
