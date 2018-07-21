@@ -415,7 +415,7 @@ class SocialController extends Controller {
             $params['cards_to_exclude'] = '';
 
             foreach ($cards_to_exclude as $card_to_exclude) {
-                $params['cards_to_exclude'] .= $this->renderView('AppBundle:Search:card.html.twig', $card_to_exclude);
+                $params['cards_to_exclude'] .= $this->renderView('AppBundle:Search:card-to-exclude.html.twig', $card_to_exclude);
             }
         }
 
