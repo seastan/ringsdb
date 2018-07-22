@@ -98,6 +98,14 @@ class DecklistManager {
         return $this->getPaginator($qb->getQuery());
     }
 
+    public function findDecklistsByRecentDiscussion() {
+        $qb = $this->getQueryBuilder();
+
+        $qb->orderBy('d.dateLastComment', 'DESC');
+
+        return $this->getPaginator($qb->getQuery());
+    }
+
     public function findDecklistsByFavorite(User $user) {
         $qb = $this->getQueryBuilder();
 

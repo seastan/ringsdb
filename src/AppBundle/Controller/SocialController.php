@@ -631,6 +631,7 @@ class SocialController extends Controller {
 
             $this->getDoctrine()->getManager()->persist($comment);
             $decklist->setDateUpdate($now);
+            $decklist->setDateLastComment($now);
             $decklist->setNbcomments($decklist->getNbcomments() + 1);
 
             $this->getDoctrine()->getManager()->flush();

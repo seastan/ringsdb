@@ -19,6 +19,10 @@ class Review {
      */
     private $dateUpdate;
     /**
+     * @var \DateTime
+     */
+    private $dateLastComment;
+    /**
      * @var string
      */
     private $textMd;
@@ -106,6 +110,28 @@ class Review {
      */
     public function getDateUpdate() {
         return $this->dateUpdate;
+    }
+
+    /**
+     * Set dateLastComment
+     *
+     * @param \DateTime $dateLastComment
+     *
+     * @return Review
+     */
+    public function setDateLastComment($dateLastComment) {
+        $this->dateLastComment = $dateLastComment;
+
+        return $this;
+    }
+
+    /**
+     * Get dateLastComment
+     *
+     * @return \DateTime
+     */
+    public function getDateLastComment() {
+        return $this->dateLastComment;
     }
 
     /**
