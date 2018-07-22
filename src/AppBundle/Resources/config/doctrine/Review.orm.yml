@@ -52,6 +52,13 @@ AppBundle\Entity\Review:
             gedmo:
                 timestampable:
                     on: update
+        dateLastComment:
+            type: datetime
+            nullable: true
+            column: date_last_comment
+            gedmo:
+                timestampable:
+                    on: update
         textMd:
             type: text
             nullable: false

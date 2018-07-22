@@ -7,50 +7,282 @@
         <h1 class="site-title">RingsDB</h1>
         <div class="site-rule hidden-xs"><span class="icon-rule"></span></div>
         <div class="site-slogan hidden-xs">Deckbuilder for The Lord of the Rings LCG</div>
+    </div>  
+
+    <div class="main white container">
+    <h2>Trending</h2>
+    <div class="row">
+    <table class="table">
+    <thead></thead>
+    <tbody>
+    {% for decklist in decklists_trending %}
+        <tr>
+            <td class="decklist-hero-image hidden-xs">
+                {% for hero in decklist.getSlots().getHeroDeck() %}
+                    {% set card = hero.getCard() %}
+                    <div class="decklist-hero border-light-{{ card.sphere.code }}">
+                        <div class="hero-thumbnail card-thumbnail-4x card-thumbnail-hero card card-tip" style="background-image:url('{{ asset('/bundles/cards/' ~ card.code ~ '.png') }}')" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false"></div>
+                    </div>
+                {% endfor %}
+            </td>
+            <td>
+                <article>
+                    <h4>
+                        <small class="pull-right">{{ macros.static_social_icons(decklist) }}</small>
+                        <a class="decklist-name" href="{{ path('decklist_detail', { 'decklist_id': decklist.id, 'decklist_name': decklist.nameCanonical|e('url') }) }}">{{ decklist.name }}</a>
+                        <small class="starting-threat">{{ decklist.startingThreat }} threat</small>
+                    </h4>
+                    <h5>
+                        <time class="pull-right" datetime="{{ decklist.dateCreation|date('c') }}">{{ decklist.dateCreation|date('M d') }}</time>
+                        <span class="username">
+                            <a href="{{ path('user_profile_public', {user_id:decklist.user.id,user_name:decklist.user.username|e('url')}) }}" class="{{ decklist.user.color }}">{{ decklist.user.username }}</a>
+                            {% if decklist.user.donation > 0 %}<span class="fa fa-gift patron" title="RingsDB Gracious Patron"></span>{% endif %}
+                            <small class="reputation">{{ decklist.user.reputation }}</small>
+                        </span>
+                        <span class="small decklist-hero-text">
+                            {% for hero in decklist.getSlots().getHeroDeck() %}
+                                {% set card = hero.getCard() %}
+                                <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" href="">
+                                    <span class="icon-{{ card.sphere.code }}"></span> {{ card.name }} <i>({{ card.pack.code }})</i>
+                                </a>
+                            {% endfor %}
+                        </span>
+                    </h5>
+                </article>
+            </td>
+        </tr>
+    {% endfor %}
+
+    </tbody>
+    </table>
     </div>
 
-    <div class="main container">
-        <div class="row index-decklist-row">
-            {% for data in decklists_by_sphere %}
-                <div class="col-md-6" style="margin-bottom:30px">
-                    <div class="bg-sphere bg-sphere-index bg-{{ data.sphere.code }}" style="padding: 10px 10px 8px 10px">
-                        <div class="media">
-                            <div class="media-left" style="font-size: 30px">
-                                <span class="icon icon-{{ data.sphere.code }}"></span>
-                            </div>
-                            <div class="media-body">
-                                <h4 class="media-heading" style="white-space:nowrap"><a href="{{ path('decklist_detail', { decklist_id: data.decklist.id, decklist_name: data.decklist.nameCanonical }) }}">{{ data.decklist.name }}</a></h4>
+    <div class="row">
+    <table class="table">
+    <thead></thead>
+    <tbody>
+    {% for fellowship in fellowships_trending %}
+        {% set decks = fellowship.decklists %}
+        <tr>
+            <td>
+                <div class="row">
+                    <div class="col-sm-6 col-md-7 col-lg-8">
+                        <h4 class="fellowship-name"><a href="{{ path('fellowship_view', { fellowship_id: fellowship.id, 'fellowship_name': fellowship.nameCanonical|e('url') }) }}">{{ fellowship.name }}</a></h4>
+                    </div>
+                    <div class="col-sm-6 col-md-5 col-lg-4">
+                        <div class="fellowships-actions pull-right">
+                            <div>
+                                {% for i in 1..fellowship.nbDecks %}
+                                    <i class="fa fa-user"></i>
+                                {% endfor %}
 
-                                <span class="small">by <span class="username">{{ macros.username(data.decklist.user) }}</span> &middot;
-                                    <time datetime="{{ data.decklist.dateCreation|date('c') }}">{{ data.decklist.dateCreation|date('M d, Y') }}</time>
+                                <span class="social" style="margin-right: 0;">{{ macros.static_fellowship_social_icons(fellowship) }}</span>
+                            </div>
+                            <div>
+                                <time datetime="{{ fellowship.datePublish | date('c') }}">{{ fellowship.datePublish | date('M d') }}</time>
+
+                                <span class="username" style="margin-left: 20px; display: inline-block;">
+                                    <a href="{{ path('user_profile_public', {user_id: fellowship.user.id, user_name: fellowship.user.username | e('url')}) }}" class="{{ fellowship.user.color }}">{{ fellowship.user.username }}</a>
+                                    {% if fellowship.user.donation > 0 %}<span class="fa fa-gift patron" title="RingsDB Gracious Patron"></span>{% endif %}
+                                    <small class="reputation">{{ fellowship.user.reputation }}</small>
                                 </span>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-deck border-{{ data.sphere.code }}">
-                        <div class="small pull-right">{{ macros.static_social_icons(data.decklist) }}</div>
-                        <div>{{ data.sphere_names }}</div>
-                        <div class="text-center small hero-card-list">
-                            {% for hero in data.hero_deck %}
-                                {% set card = hero.getCard() %}
-                                <div class="index-hero">
-                                    <div class="hero-thumbnail card-thumbnail-2x card-thumbnail-hero" style="background-image:url('{{ asset('/bundles/cards/' ~ card.code ~ '.png') }}')"></div>
-                                    <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" href="">
-                                        <span class="icon-{{ card.sphere.code }}"></span> {{ card.name }} <i>({{ card.pack.code }})</i>
-                                    </a>
-                                </div>
-                            {% endfor %}
-                        </div>
-                        <p class="text-center">{{ data.starting_threat | raw }} Threat &middot; {{ data.count_by_type | raw }}</p>
-                        <div class="text-center small"><a href="{{ path('decklists_list', { type:'find', sphere: data.sphere.code }) }}">More using this sphere</a></div>
-                        <div style="clear:both"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        {% for deck in decks %}
+                            {% set decklist = deck.decklist %}
+
+                            <div class="fellowship-heroes" data-id="{{ decklist.id }}">
+                                {% for hero in decklist.getSlots().getHeroDeck() %}
+                                    {% set card = hero.getCard() %}
+                                    <div class="decklist-hero border-light-{{ card.sphere.code }}">
+                                        <div class="hero-thumbnail card-thumbnail-4x card-thumbnail-hero" style="background-image:url('{{ asset('/bundles/cards/' ~ card.code ~ '.png') }}')"></div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="fellowship-deck-info">
+                                <h4 style="">
+                                    <i><a href="{{ path('decklist_detail', { decklist_id: decklist.id, 'decklist_name': decklist.nameCanonical|e('url') }) }}">{{ decklist.name }}</a></i>
+                                    <small class="starting-threat">{{ decklist.startingThreat }} threat</small>
+                                </h4>
+
+                                <span class="small fellowship-hero-text hidden-xs">
+                                    {% for hero in decklist.getSlots().getHeroDeck() %}
+                                        {% set card = hero.getCard() %}
+                                        <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" href="">
+                                            <span class="icon-{{ card.sphere.code }}"></span> {{ card.name }} <i>({{ card.pack.code }})</i>
+                                        </a>
+                                    {% endfor %}
+                                </span>
+                            </div>
+                            <div class="block" style="height: 15px; clear:both;"></div>
+                        {% endfor %}
                     </div>
                 </div>
-
-                {% if loop.index == 2 %}</div><div class="row index-decklist-row">{% endif %}
-            {% endfor %}
-        </div>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
     </div>
+    </div>
+
+
+    
+
+    <div class="main white container">
+    <h2>New</h2>
+    <div class="row">
+    <table class="table">
+    <thead></thead>
+    <tbody>
+    {% for decklist in decklists_new %}
+        <tr>
+            <td class="decklist-hero-image hidden-xs">
+                {% for hero in decklist.getSlots().getHeroDeck() %}
+                    {% set card = hero.getCard() %}
+                    <div class="decklist-hero border-light-{{ card.sphere.code }}">
+                        <div class="hero-thumbnail card-thumbnail-4x card-thumbnail-hero card card-tip" style="background-image:url('{{ asset('/bundles/cards/' ~ card.code ~ '.png') }}')" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false"></div>
+                    </div>
+                {% endfor %}
+            </td>
+            <td>
+                <article>
+                    <h4>
+                        <small class="pull-right">{{ macros.static_social_icons(decklist) }}</small>
+                        <a class="decklist-name" href="{{ path('decklist_detail', { 'decklist_id': decklist.id, 'decklist_name': decklist.nameCanonical|e('url') }) }}">{{ decklist.name }}</a>
+                        <small class="starting-threat">{{ decklist.startingThreat }} threat</small>
+                    </h4>
+                    <h5>
+                        <time class="pull-right" datetime="{{ decklist.dateCreation|date('c') }}">{{ decklist.dateCreation|date('M d') }}</time>
+                        <span class="username">
+                            <a href="{{ path('user_profile_public', {user_id:decklist.user.id,user_name:decklist.user.username|e('url')}) }}" class="{{ decklist.user.color }}">{{ decklist.user.username }}</a>
+                            {% if decklist.user.donation > 0 %}<span class="fa fa-gift patron" title="RingsDB Gracious Patron"></span>{% endif %}
+                            <small class="reputation">{{ decklist.user.reputation }}</small>
+                        </span>
+                        <span class="small decklist-hero-text">
+                            {% for hero in decklist.getSlots().getHeroDeck() %}
+                                {% set card = hero.getCard() %}
+                                <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" href="">
+                                    <span class="icon-{{ card.sphere.code }}"></span> {{ card.name }} <i>({{ card.pack.code }})</i>
+                                </a>
+                            {% endfor %}
+                        </span>
+                    </h5>
+                </article>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+    </div>
+
+    <div class="row">
+    <table class="table">
+    <thead></thead>
+    <tbody>
+    {% for fellowship in fellowships_new %}
+        {% set decks = fellowship.decklists %}
+        <tr>
+            <td>
+                <div class="row">
+                    <div class="col-sm-6 col-md-7 col-lg-8">
+                        <h4 class="fellowship-name"><a href="{{ path('fellowship_view', { fellowship_id: fellowship.id, 'fellowship_name': fellowship.nameCanonical|e('url') }) }}">{{ fellowship.name }}</a></h4>
+                    </div>
+                    <div class="col-sm-6 col-md-5 col-lg-4">
+                        <div class="fellowships-actions pull-right">
+                            <div>
+                                {% for i in 1..fellowship.nbDecks %}
+                                    <i class="fa fa-user"></i>
+                                {% endfor %}
+
+                                <span class="social" style="margin-right: 0;">{{ macros.static_fellowship_social_icons(fellowship) }}</span>
+                            </div>
+                            <div>
+                                <time datetime="{{ fellowship.datePublish | date('c') }}">{{ fellowship.datePublish | date('M d') }}</time>
+
+                                <span class="username" style="margin-left: 20px; display: inline-block;">
+                                    <a href="{{ path('user_profile_public', {user_id: fellowship.user.id, user_name: fellowship.user.username | e('url')}) }}" class="{{ fellowship.user.color }}">{{ fellowship.user.username }}</a>
+                                    {% if fellowship.user.donation > 0 %}<span class="fa fa-gift patron" title="RingsDB Gracious Patron"></span>{% endif %}
+                                    <small class="reputation">{{ fellowship.user.reputation }}</small>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        {% for deck in decks %}
+                            {% set decklist = deck.decklist %}
+
+                            <div class="fellowship-heroes" data-id="{{ decklist.id }}">
+                                {% for hero in decklist.getSlots().getHeroDeck() %}
+                                    {% set card = hero.getCard() %}
+                                    <div class="decklist-hero border-light-{{ card.sphere.code }}">
+                                        <div class="hero-thumbnail card-thumbnail-4x card-thumbnail-hero" style="background-image:url('{{ asset('/bundles/cards/' ~ card.code ~ '.png') }}')"></div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="fellowship-deck-info">
+                                <h4 style="">
+                                    <i><a href="{{ path('decklist_detail', { decklist_id: decklist.id, 'decklist_name': decklist.nameCanonical|e('url') }) }}">{{ decklist.name }}</a></i>
+                                    <small class="starting-threat">{{ decklist.startingThreat }} threat</small>
+                                </h4>
+
+                                <span class="small fellowship-hero-text hidden-xs">
+                                    {% for hero in decklist.getSlots().getHeroDeck() %}
+                                        {% set card = hero.getCard() %}
+                                        <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" href="">
+                                            <span class="icon-{{ card.sphere.code }}"></span> {{ card.name }} <i>({{ card.pack.code }})</i>
+                                        </a>
+                                    {% endfor %}
+                                </span>
+                            </div>
+                            <div class="block" style="height: 15px; clear:both;"></div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+    </div>
+
+
+    </div>
+
+    <div class="main white container">
+    <h2>Recent Comments</h2>
+    <table class="table">
+    <tbody>
+    {% for comment in all_comments %}
+        <tr>
+            <td>
+                <div class="collapse in">
+                    <h4>
+                        {% if comment.type == 'decklist' %}<a href="{{ path('decklist_detail', { 'decklist_id': comment.decklist.id, 'decklist_name': comment.decklist.nameCanonical|e('url') }) }}">{{ comment.decklist.name }}</a>{% endif %}
+                        {% if comment.type == 'fellowship' %}<a href="{{ path('fellowship_view', { 'fellowship_id': comment.fellowship.id, 'fellowship_name': comment.fellowship.nameCanonical|e('url') }) }}">{{ comment.fellowship.name }}</a>{% endif %}
+                        {% if comment.type == 'review' %}<a href="/card/{{comment.review.card.code}}">{{ comment.review.card.name }}</a>{% endif %}
+                        {% if comment.type == 'reviewcomment' %}<a href="/card/{{comment.review.card.code}}">{{ comment.review.card.name }}</a>{% endif %}
+                    </h4>
+                    <div class="comment-text">{{ comment.text|raw }}</div>
+                    <h4 class="comment-header">
+                        <span class="comment-date pull-right" title="{{ comment.dateCreation|date('r') }}">{{ comment.dateCreation|date('M d, Y') }}</span>
+                        <span class="comment-author">{{ macros.username(comment.user) }}</span>
+                    </h4>
+                </div>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+
 
 {% endblock %}
 
