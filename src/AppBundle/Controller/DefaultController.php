@@ -62,7 +62,7 @@ class DefaultController extends Controller {
 
         // New Fellowships
         $num_new_fellowships = 1;
-        $fellowship_manager->setLimit($num_new_fellowships);
+        $fellowship_manager->setLimit($num_new_fellowships+$num_trending_fellowships);
         $paginator = $fellowship_manager->findFellowshipsByAge();
         $fellowships_new_temp = iterator_to_array($paginator->getIterator());
         $fellowships_new = [];
