@@ -4,7 +4,7 @@
 
     var configuration = {
         b: [add_integer_sf, 'threat', "Threat"],
-        o: [add_integer_sf, 'cost', "Cost"],
+        o: [add_string_sf,  'cost', "Cost"],
         a: [add_integer_sf, 'attack', "Attack"],
         d: [add_integer_sf, 'defense', "Defense"],
         w: [add_integer_sf, 'willpower', "Willpower"],

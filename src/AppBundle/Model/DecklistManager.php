@@ -98,6 +98,14 @@ class DecklistManager {
         return $this->getPaginator($qb->getQuery());
     }
 
+    public function findDecklistsByRecentDiscussion() {
+        $qb = $this->getQueryBuilder();
+
+        $qb->orderBy('d.dateLastComment', 'DESC');
+
+        return $this->getPaginator($qb->getQuery());
+    }
+
     public function findDecklistsByFavorite(User $user) {
         $qb = $this->getQueryBuilder();
 
@@ -166,6 +174,8 @@ class DecklistManager {
         $threat_op = $request->query->get('threato');
         $threat = $request->query->get('threat');
 
+        $require_description = $request->query->get('require_description');
+
         $qb = $this->getQueryBuilder();
         $joinTables = [];
 
@@ -196,6 +206,10 @@ class DecklistManager {
                 $qb->andWhere('d.startingThreat = :threat');
             }
             $qb->setParameter('threat', $threat);
+        }
+
+        if ($require_description) {
+            $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'),0));
         }
 
         if (!empty($cards_code) || !empty($packs)) {

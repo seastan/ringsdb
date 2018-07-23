@@ -30,7 +30,6 @@
                 {{ cards | default('') | raw }}
                 <input type="text" class="form-control" id="card" placeholder="Enter card name">
             </div>
-	    <!-- Not Working right at the moment -->
             <div class="form-group">
                 <label for="">Cards not used</label>
                 {{ cards_to_exclude | default('') | raw }}
@@ -56,6 +55,13 @@
                     <option value="threat"{{ sort_threat|default('') }}>by Starting Threat</option>
                 </select>
             </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" id="require_description" name="require_description" {% if require_description %}checked{% endif %}>
+                    Require a deck description
+                </label>
+            </div>
+            <br>
             <button type="submit" class="btn btn-primary btn-block">Search</button>
         </div>
         <div class="col-sm-4">

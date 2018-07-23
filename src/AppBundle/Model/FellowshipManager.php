@@ -94,6 +94,14 @@ class FellowshipManager {
         return $this->getPaginator($qb->getQuery());
     }
 
+    public function findFellowshipsByRecentDiscussion($ignoreEmptyDescriptions = false) {
+        $qb = $this->getQueryBuilder();
+
+        $qb->orderBy('d.dateLastComment', 'DESC');
+
+        return $this->getPaginator($qb->getQuery());
+    }
+
     public function findFellowshipsByFavorite(User $user) {
         $qb = $this->getQueryBuilder();
 

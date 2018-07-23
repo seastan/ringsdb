@@ -108,7 +108,13 @@
      * @memberOf ui
      */
     ui.on_all_loaded = function on_all_loaded() {
-        app.markdown && app.markdown.update(app.deck.get_description_md() || '*No description.*', '#description');
+        var description = app.deck.get_description_md() || '*No description.*'; 
+        var SCRIPT_REGEX = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+        while (SCRIPT_REGEX.test(description)) {
+            description = description.replace(SCRIPT_REGEX, '');
+        }
+
+        app.markdown && app.markdown.update(description, '#description');
         ui.refresh_deck();
     };
 

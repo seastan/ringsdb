@@ -51,6 +51,10 @@ class Fellowship {
      */
     private $dateUpdate;
     /**
+    * @var \DateTime
+    */
+    private $dateLastComment;
+    /**
      * @var \Doctrine\Common\Collections\Collection
      */
     private $decks;
@@ -313,6 +317,28 @@ class Fellowship {
      */
     public function getDateUpdate() {
         return $this->dateUpdate;
+    }
+
+    /**
+     * Set dateLastComment
+     *
+     * @param \DateTime $dateLastComment
+     *
+     * @return Fellowship
+     */
+    public function setDateLastComment($dateLastComment) {
+        $this->dateLastComment = $dateLastComment;
+
+        return $this;
+    }
+
+    /**
+     * Get dateLastComment
+     *
+     * @return \DateTime
+     */
+    public function getDateLastComment() {
+        return $this->dateLastComment;
     }
 
     /**
