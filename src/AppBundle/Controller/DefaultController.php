@@ -86,7 +86,7 @@ class DefaultController extends Controller {
         }
 
         // New Fellowships
-        $num_new_fellowships = 3;
+        $num_new_fellowships = 1;
         $qb = $em->createQueryBuilder();
 		$qb->select('d');
 		$qb->from('AppBundle:Fellowship', 'd');
