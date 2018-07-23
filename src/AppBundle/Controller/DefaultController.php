@@ -7,6 +7,8 @@ use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Model\DecklistManager;
 use AppBundle\Model\FellowshipManager;
 use AppBundle\Entity\Decklist;
+use Doctrine\ORM\Query;
+
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 
@@ -33,23 +35,46 @@ class DefaultController extends Controller {
 
         // Trending Decks
         $num_trending = 3;
-        $decklist_manager->setLimit($num_trending);
-        $paginator = $decklist_manager->findDecklistsByPopularity();
+        $qb = $em->createQueryBuilder();
+		$qb->select('d');
+		$qb->from('AppBundle:Decklist', 'd');
+		$qb->setMaxResults($num_trending);
+		$qb->distinct();
+        $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
+        $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'),0));
+        $qb->orderBy('popularity', 'DESC');
+        $paginator = new Paginator($qb->getQuery(), $fetchJoinCollection = false);
         $decklists_trending = iterator_to_array($paginator->getIterator());
 
         // Trending Fellowships
         $num_trending_fellowships = 1;
-        $fellowship_manager->setLimit($num_trending_fellowships);
-        $paginator = $fellowship_manager->findFellowshipsByPopularity();
+        $qb = $em->createQueryBuilder();
+		$qb->select('d');
+		$qb->from('AppBundle:Fellowship', 'd');
+		$qb->setMaxResults($num_trending_fellowships);
+		$qb->distinct();
+        $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
+        $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'),0));
+        $qb->andWhere('d.isPublic = TRUE');
+        $qb->orderBy('popularity', 'DESC');
+        $paginator = new Paginator($qb->getQuery(), $fetchJoinCollection = false);
         $fellowships_trending = iterator_to_array($paginator->getIterator());
+
 
         // New Decks
         $num_new = 3;
         // We want to be able to skip new decks that are trending, 
         // so we grab $num_new+$num_trending recent decklists
-        $decklist_manager->setLimit($num_new+$num_trending);
-        $paginator = $decklist_manager->findDecklistsByAge();
-        $decklists_new_temp = iterator_to_array($paginator->getIterator()); // More than we need
+        $num_trending = 3;
+        $qb = $em->createQueryBuilder();
+		$qb->select('d');
+		$qb->from('AppBundle:Decklist', 'd');
+		$qb->setMaxResults($num_new+$num_trending);
+		$qb->distinct();
+        $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'),0));
+        $qb->orderBy('d.dateCreation', 'DESC');
+        $paginator = new Paginator($qb->getQuery(), $fetchJoinCollection = false);
+        $decklists_new_temp = iterator_to_array($paginator->getIterator());
         $decklists_new = [];
         for ($i = 0; $i < min($num_new+$num_trending,count($decklists_new_temp)); $i++) {
             $decklist = $decklists_new_temp[$i];
@@ -61,9 +86,16 @@ class DefaultController extends Controller {
         }
 
         // New Fellowships
-        $num_new_fellowships = 1;
-        $fellowship_manager->setLimit($num_new_fellowships+$num_trending_fellowships);
-        $paginator = $fellowship_manager->findFellowshipsByAge();
+        $num_new_fellowships = 3;
+        $qb = $em->createQueryBuilder();
+		$qb->select('d');
+		$qb->from('AppBundle:Fellowship', 'd');
+		$qb->setMaxResults($num_new_fellowships+$num_trending_fellowships);
+		$qb->distinct();
+        $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'),0));
+        $qb->andWhere('d.isPublic = TRUE');
+        $qb->orderBy('d.dateCreation', 'DESC');
+        $paginator = new Paginator($qb->getQuery(), $fetchJoinCollection = false);
         $fellowships_new_temp = iterator_to_array($paginator->getIterator());
         $fellowships_new = [];
         for ($i = 0; $i < min($num_new_fellowships+$num_trending_fellowships,count($fellowships_new_temp)); $i++) {
