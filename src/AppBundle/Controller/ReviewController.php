@@ -359,6 +359,9 @@ class ReviewController extends Controller {
         $comment->setUser($user);
         $comment->setText($comment_text);
 
+        $now = new DateTime();
+        $review->setDateLastComment($now);
+
         $em->persist($comment);
 
         $em->flush();
