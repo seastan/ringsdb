@@ -110,8 +110,19 @@ class DefaultController extends Controller {
         // This will contain all the comments - a combination of decklist comments, fellowship comments, 
         // reviews, review comments, etc.
         $all_comments = [];
+
         // Number of recent comments to show on the front page
-        $num_comments = 8;
+        // BUG: It seems like the setDateLastComment I added to Decklists, Fellowships, and Reviews somehow
+        // gets called spontaneuosly on decks without recent comments, even though the only place 
+        // setDateLastComment appears is in the commentAction in the SocialController, FellowshipController,
+        // and ReviewController. This results in decks with no recent comments being returned by
+        // find___ByRecentDiscussion(). When these get compared to the dateCreation of recent Reviews,
+        // which works properly, naturally the reviews win out, and the resulting top $num_comments end up
+        // being mostly reviews. One current workaround I have is to make $num_comments very large so that even
+        // with some old decklists finding there way in, there will be enough deckslists with real recent
+        // comments that it wont matter. Then, after sorting $all_comments by date, we trim down to the
+        // number we actually want.
+        $num_comments = 50;
 
         // Recent decklist comments
         $decklist_manager->setLimit($num_comments);
@@ -198,8 +209,9 @@ class DefaultController extends Controller {
 
         // Sort all comments by date
         usort($all_comments, array($this, "orderNew"));
+        $num_comments_displayed = 8;
         // Limit number to $num_comments
-        $all_comments = array_slice($all_comments,0,$num_comments);
+        $all_comments = array_slice($all_comments,0,$num_comments_displayed);
         // Limit number of words in a comment
         for ($i = 0; $i < count($all_comments); $i++) {
             $comment = $all_comments[$i];
