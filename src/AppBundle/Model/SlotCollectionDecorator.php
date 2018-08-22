@@ -145,6 +145,7 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
         $heroDeck = $this->getHeroDeck();
         $threat = 0;
         $mirlonde = false;
+        $folco = false;
 
         foreach ($heroDeck->getSlots() as $slot) {
             /* @var $card \AppBundle\Entity\Card */
@@ -154,6 +155,9 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
             if ($card->getName() == 'Mirlonde' && $card->getPack()->getCode() == 'TDF') {
                 $mirlonde = true;
             }
+            if ($card->getName() == 'Folco Boffin' && $card->getPack()->getCode() == 'DoCG') {
+                $folco = true;
+            }            
         }
 
         if ($mirlonde) {
@@ -165,7 +169,15 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
                 }
             }
         }
+        if ($folco) {
+            foreach ($heroDeck->getSlots() as $slot) {
+                $card = $slot->getCard();
 
+                if (strpos($card->getTraits(), 'Hobbit') !== false) {
+                    $threat--;
+                }
+            }
+        }
         return $threat;
     }
 
