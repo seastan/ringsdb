@@ -4,4 +4,14 @@
     <span class="fa fa-user"></span>
     {{ macros.username(decklist.user) }}
 </h3>
+{% if decklist.successors|length %}
+    {% for successor in decklist.successors %}
+        {% if decklist.user==successor.user %}
+            <div>
+                <span class="fa fa-forward"></span> {{ decklist.user.username }} has updated this deck: <a class="decklist-name" href="{{ path('decklist_detail', { 'decklist_id': successor.id, 'decklist_name': successor.nameCanonical|e('url') }) }}">{{ successor.name }}</a>
+            </div>
+            <br>
+        {% endif %}
+    {% endfor %}
+{% endif %}
 <div id="deck-description">{{ decklist.descriptionHtml|raw }}</div>

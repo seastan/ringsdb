@@ -60,8 +60,7 @@ class DecklistManager {
         if ($this->predominantSphere) {
             $qb->where('d.predominantSphere = :predominantSphere');
             $qb->setParameter('predominantSphere', $this->predominantSphere);
-		}
-
+        }
 		$qb->setFirstResult($this->start);
 		$qb->setMaxResults($this->limit);
 		$qb->distinct();
@@ -95,6 +94,14 @@ class DecklistManager {
 
         $qb->orderBy('d.dateCreation', 'DESC');
 
+        return $this->getPaginator($qb->getQuery());
+    }
+
+    public function findDecklistsByRecentDiscussion() {
+        $qb = $this->getQueryBuilder();
+
+        $qb->andWhere('d.nbComments > 0');
+        $qb->orderBy('d.dateLastComment', 'DESC');
         return $this->getPaginator($qb->getQuery());
     }
 

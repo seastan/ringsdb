@@ -1017,6 +1017,7 @@ class FellowshipController extends Controller {
             $em->persist($comment);
 
             $fellowship->setDateUpdate($now);
+            $fellowship->setDateLastComment($comment->getDateCreation());
             $fellowship->setNbcomments($fellowship->getNbcomments() + 1);
 
             $em->flush();

@@ -229,7 +229,15 @@
                 }
             });
         }
-
+        // Reduce threat for Folco
+        var folco = _.find(hero_deck, { name: 'Folco Boffin', pack_code: 'DoCG' });
+        if (folco) {
+            _.each(hero_deck, function(hero) {
+                if (hero.traits.includes('Hobbit')) {
+                    total--;
+                }
+            });
+        }
         return total;
     };
 

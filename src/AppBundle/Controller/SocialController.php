@@ -388,7 +388,7 @@ class SocialController extends Controller {
     				c.code,
                     s.code AS sphere_code,
                     p.name AS pack_name
-    				FROM card cxs
+    				FROM card c
                     INNER JOIN sphere s ON s.id = c.sphere_id
                     INNER JOIN pack p ON p.id = c.pack_id
                     WHERE c.code IN (?)
@@ -415,7 +415,7 @@ class SocialController extends Controller {
             $params['cards_to_exclude'] = '';
 
             foreach ($cards_to_exclude as $card_to_exclude) {
-                $params['cards_to_exclude'] .= $this->renderView('AppBundle:Search:card.html.twig', $card_to_exclude);
+                $params['cards_to_exclude'] .= $this->renderView('AppBundle:Search:card-to-exclude.html.twig', $card_to_exclude);
             }
         }
 
@@ -631,6 +631,7 @@ class SocialController extends Controller {
 
             $this->getDoctrine()->getManager()->persist($comment);
             $decklist->setDateUpdate($now);
+            $decklist->setDateLastComment($comment->getDateCreation());
             $decklist->setNbcomments($decklist->getNbcomments() + 1);
 
             $this->getDoctrine()->getManager()->flush();
