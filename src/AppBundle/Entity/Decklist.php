@@ -35,6 +35,10 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      */
     private $dateUpdate;
     /**
+     * @var \DateTime
+     */
+    private $dateLastComment;
+    /**
      * @var string
      */
     private $descriptionMd;
@@ -217,6 +221,28 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      */
     public function getDateUpdate() {
         return $this->dateUpdate;
+    }
+
+     /**
+     * Set dateLastComment
+     *
+     * @param \DateTime $dateLastComment
+     *
+     * @return Decklist
+     */
+    public function setDateLastComment($dateLastComment) {
+        $this->dateLastComment = $dateLastComment;
+
+        return $this;
+    }
+
+    /**
+     * Get dateLastComment
+     *
+     * @return \DateTime
+     */
+    public function getDateLastComment() {
+        return $this->dateLastComment;
     }
 
     /**
