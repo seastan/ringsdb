@@ -19,6 +19,7 @@ class ExportableDeck {
             'slots' => $slots->getContent(),
             'sideslots' => $sideslots->getContent(),
             'version' => $this->getVersion(),
+            'freeze_comments' => $this->getFreezeComments(),
         ];
 
         return $array;

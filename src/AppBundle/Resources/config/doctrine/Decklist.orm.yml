@@ -154,6 +154,9 @@ AppBundle\Entity\Decklist:
         nbComments:
             type: integer
             column: nb_comments
+        freezeComments:
+            type: boolean
+            column: freeze_comments
         version:
             type: string
             length: 8
