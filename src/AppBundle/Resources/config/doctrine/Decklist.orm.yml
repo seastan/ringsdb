@@ -157,6 +157,7 @@ AppBundle\Entity\Decklist:
         freezeComments:
             type: boolean
             column: freeze_comments
+            nullable: true
         version:
             type: string
             length: 8
