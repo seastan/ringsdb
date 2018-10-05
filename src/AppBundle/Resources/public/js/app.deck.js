@@ -9,6 +9,7 @@
     var unsaved;
     var user_id;
     var is_published;
+    var freeze_comments;
 
     var header_tpl = _.template('<h5><span class="icon icon-<%= code %>"></span> <%= name %> (<%= quantity %>)</h5>');
     var card_line_tpl = _.template('<span class="icon icon-<%= card.type_code %> fg-<%= card.sphere_code %>"></span> <a href="<%= card.url %>" class="card card-tip fg-<%= card.sphere_code %>" data-toggle="modal" data-remote="false" data-target="#cardModal" data-code="<%= card.code %>"><%= card.name %></a>');
@@ -68,6 +69,7 @@
         unsaved = data.unsaved;
         user_id = data.user_id;
         is_published = data.is_published;
+        freeze_comments = data.freeze_comments;
 
         if (app.data.isLoaded) {
             deck.set_slots(data.slots, data.sideslots);
@@ -131,6 +133,14 @@
      */
     deck.get_description_md = function() {
         return description_md;
+    };
+
+    /**
+     * @memberOf deck
+     * @returns boolean
+     */
+    deck.get_freeze_comments = function() {
+        return freeze_comments;
     };
 
     /**
@@ -229,7 +239,15 @@
                 }
             });
         }
-
+        // Reduce threat for Folco
+        var folco = _.find(hero_deck, { name: 'Folco Boffin', pack_code: 'DoCG' });
+        if (folco) {
+            _.each(hero_deck, function(hero) {
+                if (hero.traits.includes('Hobbit')) {
+                    total--;
+                }
+            });
+        }
         return total;
     };
 

@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Controller;
 
+use DateTime;
 use AppBundle\Entity\Card;
 use AppBundle\Entity\Review;
 use AppBundle\Entity\Reviewcomment;
@@ -358,6 +359,9 @@ class ReviewController extends Controller {
         $comment->setReview($review);
         $comment->setUser($user);
         $comment->setText($comment_text);
+
+        $now = new DateTime();
+        $review->setDateLastComment($now);
 
         $em->persist($comment);
 
