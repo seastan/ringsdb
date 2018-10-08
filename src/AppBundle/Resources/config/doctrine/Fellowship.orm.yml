@@ -95,6 +95,13 @@ AppBundle\Entity\Fellowship:
             gedmo:
                 timestampable:
                     on: update
+        dateLastComment:
+            type: datetime
+            nullable: true
+            column: date_last_comment
+            gedmo:
+                timestampable:
+                    on: update
         isPublic:
             type: boolean
             nullable: false

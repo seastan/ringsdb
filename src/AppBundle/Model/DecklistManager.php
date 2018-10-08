@@ -60,8 +60,7 @@ class DecklistManager {
         if ($this->predominantSphere) {
             $qb->where('d.predominantSphere = :predominantSphere');
             $qb->setParameter('predominantSphere', $this->predominantSphere);
-		}
-
+        }
 		$qb->setFirstResult($this->start);
 		$qb->setMaxResults($this->limit);
 		$qb->distinct();
@@ -95,6 +94,14 @@ class DecklistManager {
 
         $qb->orderBy('d.dateCreation', 'DESC');
 
+        return $this->getPaginator($qb->getQuery());
+    }
+
+    public function findDecklistsByRecentDiscussion() {
+        $qb = $this->getQueryBuilder();
+
+        $qb->andWhere('d.nbComments > 0');
+        $qb->orderBy('d.dateLastComment', 'DESC');
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -145,7 +152,7 @@ class DecklistManager {
         if (!is_array($cards_code)) {
             $cards_code = [];
         }
-	$cards_to_exclude = $request->query->get('cards_to_exclude');
+	    $cards_to_exclude = $request->query->get('cards_to_exclude');
         if (!is_array($cards_to_exclude)) {
             $cards_to_exclude = [];
         }
@@ -165,6 +172,8 @@ class DecklistManager {
 
         $threat_op = $request->query->get('threato');
         $threat = $request->query->get('threat');
+
+        $require_description = $request->query->get('require_description');
 
         $qb = $this->getQueryBuilder();
         $joinTables = [];
@@ -196,6 +205,10 @@ class DecklistManager {
                 $qb->andWhere('d.startingThreat = :threat');
             }
             $qb->setParameter('threat', $threat);
+        }
+
+        if ($require_description) {
+            $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'),0));
         }
 
         if (!empty($cards_code) || !empty($packs)) {

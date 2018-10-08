@@ -319,6 +319,7 @@ class SocialController extends Controller {
         $decklist_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
         $starting_threat = intval(filter_var($request->query->get('threat'), FILTER_SANITIZE_NUMBER_INT));
         $starting_threat_o = $request->query->get('threato');
+        $require_description = $request->query->get('require_description');
 
         $sort = $request->query->get('sort');
         $packs = $request->query->get('packs');
@@ -370,7 +371,8 @@ class SocialController extends Controller {
             'author' => $author_name,
             'name' => $decklist_name,
             'threat' => $starting_threat,
-            'threato' => $starting_threat_o
+            'threato' => $starting_threat_o,
+            'require_description' => $require_description
         ];
         $params['sort_' . $sort] = ' selected="selected"';
         $params['spheres'] = $dbh->executeQuery("SELECT
@@ -413,7 +415,7 @@ class SocialController extends Controller {
             $params['cards_to_exclude'] = '';
 
             foreach ($cards_to_exclude as $card_to_exclude) {
-                $params['cards_to_exclude'] .= $this->renderView('AppBundle:Search:card.html.twig', $card_to_exclude);
+                $params['cards_to_exclude'] .= $this->renderView('AppBundle:Search:card-to-exclude.html.twig', $card_to_exclude);
             }
         }
 
@@ -629,6 +631,7 @@ class SocialController extends Controller {
 
             $this->getDoctrine()->getManager()->persist($comment);
             $decklist->setDateUpdate($now);
+            $decklist->setDateLastComment($comment->getDateCreation());
             $decklist->setNbcomments($decklist->getNbcomments() + 1);
 
             $this->getDoctrine()->getManager()->flush();
@@ -1085,7 +1088,8 @@ class SocialController extends Controller {
             'author' => '',
             'name' => '',
             'threat' => '',
-            'threato' => ''
+            'threato' => '',
+            'require_description' => 0
         ]);
 
         return $this->render('AppBundle:Decklist:decklists.html.twig', [

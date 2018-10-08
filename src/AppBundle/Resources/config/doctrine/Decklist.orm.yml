@@ -127,6 +127,13 @@ AppBundle\Entity\Decklist:
             gedmo:
                 timestampable:
                     on: update
+        dateLastComment:
+            type: datetime
+            nullable: true
+            column: date_last_comment
+            gedmo:
+                timestampable:
+                    on: update
         descriptionMd:
             type: text
             nullable: true
