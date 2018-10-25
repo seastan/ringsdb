@@ -63,6 +63,10 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      */
     private $nbComments;
     /**
+     * @var bool
+     */
+    private $freezeComments;
+    /**
      * @var integer
      */
     private $version;
@@ -375,6 +379,28 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      */
     public function getNbComments() {
         return $this->nbComments;
+    }
+
+    /**
+     * Set freezeComments
+     *
+     * @param integer $freezeComments
+     *
+     * @return Decklist
+     */
+    public function setFreezeComments($freezeComments) {
+        $this->freezeComments = $freezeComments;
+
+        return $this;
+    }
+
+    /**
+     * Get freezeComments
+     *
+     * @return integer
+     */
+    public function getFreezeComments() {
+        return $this->freezeComments;
     }
 
     /**
