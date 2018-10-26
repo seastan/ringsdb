@@ -152,7 +152,7 @@ class DecklistManager {
         if (!is_array($cards_code)) {
             $cards_code = [];
         }
-	$cards_to_exclude = $request->query->get('cards_to_exclude');
+	    $cards_to_exclude = $request->query->get('cards_to_exclude');
         if (!is_array($cards_to_exclude)) {
             $cards_to_exclude = [];
         }
