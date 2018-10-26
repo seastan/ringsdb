@@ -44,6 +44,12 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                  null,
                  InputOption::VALUE_NONE,
                  'Show card text and flavor'
+	     )
+             ->addOption(
+                 'skip-data',
+                 null,
+                 InputOption::VALUE_NONE,
+                 'Skip data import'
              );
     }
 
@@ -63,6 +69,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
         $forceData = $input->getOption('force-data');
         $forceImage = $input->getOption('force-image');
         $showTexts = $input->getOption('show-texts');
+        $skipData = $input->getOption('skip-data');
 
         $sets = [];
         if ($setname) {
@@ -119,11 +126,12 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
             $beornset = str_replace([' '], ['%20'], $set);
             $html = file_get_contents("http://hallofbeorn.com/Cards/Search?CardSet=$beornset");
+	    //$json = json_decode(file_get_contents("http://hallofbeorn.com/Export/Search?CardSet=$beornset&Limit=2000")); // All cards from the specified set
 
             $crawler = new Crawler($html);
 
-            $cardsUrls = $crawler->filter('a[href^="/Cards/Details"][style]')->extract('href');
-
+            $cardsUrls = $crawler->filter('a[href^="/LotR/Details"][style]')->extract('href');
+	    print_r($cardsUrls);
             $i = 0;
 
             $question = new ConfirmationQuestion("Shall I import the cards from the set =< $set >= ?");
@@ -144,7 +152,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                 $sphere = null;
 
                 if ($c->filter('img')->count() > 0) {
-                    $sphere = basename($c->filter('img')->attr('src'), '.png');
+                    $sphere = basename($c->filter('img')->attr('src'), '-med.png');
                 } else {
                     $sphere = 'Neutral';
                 }
@@ -155,7 +163,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                 $isUnique = $c->filter('img[src="/Images/unique-card.png"]')->count() > 0;
 
                 $output->writeln("\n\n\n\n\n\n\n\n");
-                dump("Importing card number $i: $name");
+                print_r("Importing card number $i: $name\n");
 
                 // Set, Number and Quantity
                 $c = $cardCrawler->filter('div.titleNameBox > div')->last();
@@ -172,7 +180,8 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                 $c = $cardCrawler->filter('div.statValueBox')->first();
 
                 $cost = $threat = $c->filter('span')->eq(1)->text();
-                $limit = ($type == 'Hero') ? 1 : 3;
+		$limit = null;
+//                $limit = ($type == 'Hero') ? 1 : 3;
                 $willpower = null;
                 $attack = null;
                 $defense = null;
@@ -180,15 +189,15 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                 $victory = null;
                 $quest = null;
 
-                if ($type == 'Hero' || $type == 'Ally') {
-                    $willpower = $c->filter('img[src="/Images/willpower.gif"]')->previousAll()->last()->text();
-                    $attack = $c->filter('img[src="/Images/attack.gif"]')->previousAll()->last()->text();
-                    $defense = $c->filter('img[src="/Images/defense.gif"]')->previousAll()->last()->text();
-                    $health = $c->filter('img[src="/Images/heart.png"]')->previousAll()->last()->text();
-                } else if ($type == 'Player-Side-Quest') {
-                    $type = 'Player Side Quest';
-                    $quest = $c->filter('span')->eq(4)->text();
-                }
+                // if ($type == 'Hero' || $type == 'Ally') {
+                //     $willpower = $c->filter('img[src="/Images/willpower-small.png"]')->previousAll()->last()->text();
+                //     $attack = $c->filter('img[src="/Images/attack-small.png"]')->previousAll()->last()->text();
+                //     $defense = $c->filter('img[src="/Images/defense-small.png"]')->previousAll()->last()->text();
+                //     $health = $c->filter('img[src="/Images/heart-small.png"]')->previousAll()->last()->text();
+                // } else if ($type == 'Player-Side-Quest') {
+                //     $type = 'Player Side Quest';
+                //     $quest = $c->filter('span')->eq(4)->text();
+                // }
 
                 // Traits, text and flavor
                 $c = $cardCrawler->filter('div.statTextBox')->first();
@@ -215,15 +224,46 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                 // OCTGN
                 //$octgn = substr($cardCrawler->filter('img[title^="OCTGN"]')->attr('title'), -36);
 
+		// Get matching RingsDB card
                 $card = $em->getRepository('AppBundle:Card')->findOneBy(['name' => $name, 'pack' => $pack]);
-                if ($card && !$forceData) {
-                    // shortcut: we already know this card
-                    continue;
+
+                // Update image file
+		$question = new ConfirmationQuestion("Shall I import the IMAGE for =< $name >= from the set =< $setname >= ?");
+		if ($questionHelper->ask($input, $output, $question)) {
+                  $card_code = $card->getCode();
+                  $asseturl = $assets_helper->getUrl('bundles/cards/' . $card_code . '.png');
+                  $imagepath = $rootDir . '/../web' . preg_replace('/\?.*/', '', $asseturl);
+                  $dirname = dirname($imagepath);
+                  $outputfile = $dirname . DIRECTORY_SEPARATOR . $card_code . ".png";
+
+                  if (file_exists($outputfile) && !$forceImage) {
+		    $output->writeln("<error>Card image exists and --force-image not set.</error>");
+		  } else {
+                    $u = dirname($imageurl) . '/' . urlencode(basename($imageurl, '.jpg')) . '.jpg';
+
+                    $image = file_get_contents($u);
+
+                    if (!$image) {
+                        $output->writeln("<error>Cannot download image for this card</error>");
+                        die();
+                    }
+
+                    file_put_contents($outputfile, $image);
+                  }
+   		}
+		// Update card data
+		if ($skipData) {
+		   continue;
+		}
+		$question = new ConfirmationQuestion("Shall I import the DATA for =< $name >= from the set =< $setname >= ?");
+		if (!$questionHelper->ask($input, $output, $question)) {
+                   continue;
                 }
 
-                //if (!$dialog->askConfirmation($output, "<question>Shall I import the card =< $name >= from the set =< $setname >= ?</question> ", true)) {
-                //	break;
-                //}
+                if ($card && !$forceData) {
+		   $output->writeln("<error>Card already known and --force-data not set.</error>");
+                   continue;
+                }
 
                 $objSphere = null;
                 foreach ($allSpheres as $oneSphere) {
@@ -328,25 +368,6 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
                 $em->persist($card);
 
-                // trying to download image file
-                $card_code = $card->getCode();
-                $asseturl = $assets_helper->getUrl('bundles/cards/' . $card_code . '.png');
-                $imagepath = $rootDir . '/../web' . preg_replace('/\?.*/', '', $asseturl);
-                $dirname = dirname($imagepath);
-                $outputfile = $dirname . DIRECTORY_SEPARATOR . $card_code . ".png";
-
-                if (!file_exists($outputfile) || $forceImage) {
-                    $u = dirname($imageurl) . '/' . urlencode(basename($imageurl, '.jpg')) . '.jpg';
-
-                    $image = file_get_contents($u);
-
-                    if (!$image) {
-                        $output->writeln("<error>Cannot download image for this card</error>");
-                        die();
-                    }
-
-                    file_put_contents($outputfile, $image);
-                }
                 $em->flush();
             }
         }
