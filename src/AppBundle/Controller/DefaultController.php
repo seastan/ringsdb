@@ -134,6 +134,9 @@ class DefaultController extends Controller {
             if ($decklist) {
                 $lastcomment = $decklist->getComments()->last();
                 if ($lastcomment) {
+                    if ($lastcomment->getIsHidden()) {
+                        continue;
+                    }
                     $comment['type'] = 'decklist';
                     $comment['decklist'] = $decklist;
                     $comment['user'] = $lastcomment->getUser();
