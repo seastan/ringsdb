@@ -199,7 +199,7 @@ class QuestLogController extends Controller {
             'deck2_content' => null,
             'deck3_content' => null,
             'deck4_content' => null,
-            'deck1_player_name' => null,
+            'deck1_player_name' => 'Seastan',
             'deck2_player_name' => null,
             'deck3_player_name' => null,
             'deck4_player_name' => null,
