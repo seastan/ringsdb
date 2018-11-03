@@ -122,47 +122,51 @@
     };
 
     ui.setup_comment_form = function() {
-        var form = $(
-            '<form method="POST" action="' + Routing.generate('decklist_comment') + '"><input type="hidden" name="id" value="' + app.deck.get_id() + '"><div class="form-group">' +
-            '<textarea id="comment-form-text" class="form-control" rows="4" name="comment" placeholder="Enter your comment in Markdown format. Type # to enter a card name. Type $ to enter a symbol. Type @ to enter a user name."></textarea>' +
-            '</div><div class="well text-muted" id="comment-form-preview"></div><button type="submit" class="btn btn-success">Submit comment</button></form>'
-        ).insertAfter('#comment-form');
+        if (app.deck.get_freeze_comments()) {
+            $('<p>Commenting on this decklist is temporarily disabled.</p>').insertAfter('#comment-form');
+        } else {
+            var form = $(
+                '<form method="POST" action="' + Routing.generate('decklist_comment') + '"><input type="hidden" name="id" value="' + app.deck.get_id() + '"><div class="form-group">' +
+                '<textarea id="comment-form-text" class="form-control" rows="4" name="comment" placeholder="Enter a comment in Markdown format. Type # to enter a card name. Type $ to enter a symbol. Type @ to enter a user name."></textarea>' +
+                '</div><div class="well text-muted" id="comment-form-preview"></div><button type="submit" class="btn btn-success">Submit comment</button></form>'
+            ).insertAfter('#comment-form');
+        
+            var already_submitted = false;
+            form.on('submit', function(event) {
+                event.preventDefault();
 
-        var already_submitted = false;
-        form.on('submit', function(event) {
-            event.preventDefault();
+                var data = $(this).serialize();
 
-            var data = $(this).serialize();
-
-            if (already_submitted) {
-                return;
-            }
-
-            already_submitted = true;
-
-            $.ajax(Routing.generate('decklist_comment'), {
-                data: data,
-                type: 'POST',
-                success: function(data, textStatus, jqXHR) {
-                    form.replaceWith('<div class="alert alert-success" role="alert">Your comment has been posted. It will appear on the site in a few minutes.</div>');
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.log('[' + moment().format('YYYY-MM-DD HH:mm:ss') + '] Error on ' + this.url, textStatus, errorThrown);
-                    form.replaceWith('<div class="alert alert-danger" role="alert">An error occured while posting your comment (' + jqXHR.statusText + '). Reload the page and try again.</div>');
+                if (already_submitted) {
+                    return;
                 }
+
+                already_submitted = true;
+
+                $.ajax(Routing.generate('decklist_comment'), {
+                    data: data,
+                    type: 'POST',
+                    success: function(data, textStatus, jqXHR) {
+                        form.replaceWith('<div class="alert alert-success" role="alert">Your comment has been posted. It will appear on the site in a few minutes.</div>');
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log('[' + moment().format('YYYY-MM-DD HH:mm:ss') + '] Error on ' + this.url, textStatus, errorThrown);
+                        form.replaceWith('<div class="alert alert-danger" role="alert">An error occured while posting your comment (' + jqXHR.statusText + '). Reload the page and try again.</div>');
+                    }
+                });
             });
-        });
 
-        $('.social .social-icon-comment').on('click', function() {
-            $('#comment-form-text').trigger('focus');
-        });
+            $('.social .social-icon-comment').on('click', function() {
+                $('#comment-form-text').trigger('focus');
+            });
 
-        app.markdown.setup('#comment-form-text', '#comment-form-preview');
-        app.textcomplete.setup('#comment-form-text', {
-            cards: true,
-            icons: true,
-            users: Commenters
-        });
+            app.markdown.setup('#comment-form-text', '#comment-form-preview');
+            app.textcomplete.setup('#comment-form-text', {
+                cards: true,
+                icons: true,
+                users: Commenters
+            });
+        }
     };
 
     ui.setup_social_icons = function() {
