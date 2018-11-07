@@ -56,7 +56,7 @@ security:
         - { path: ^/api/public, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/oauth2, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/private, role: ROLE_USER }
-        - { path: ^/$, role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: http }
+        - { path: ^/$, role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
         - { path: ^/js/, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/user/, role: ROLE_USER }
         - { path: ^/collection/, role: ROLE_USER }
