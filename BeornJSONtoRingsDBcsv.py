@@ -206,4 +206,6 @@ for i,c in enumerate(beornJSON):
         
 # Close file
 ringsdbCSV.close()
+print("RinsDB csv written")
 octgnCSV.close()
+print("OCTGN csv written")
