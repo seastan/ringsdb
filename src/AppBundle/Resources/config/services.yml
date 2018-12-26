@@ -48,3 +48,8 @@ services:
         class: AppBundle\Model\FellowshipManager
         shared: false
         arguments: ["@doctrine.orm.entity_manager", "@request_stack", "@router", "@logger"]
+
+    questlog_manager:
+        class: AppBundle\Model\QuestLogManager
+        shared: false
+        arguments: ["@doctrine.orm.entity_manager", "@request_stack", "@router", "@logger"]
