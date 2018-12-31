@@ -696,7 +696,7 @@ class QuestLogController extends Controller {
 
         $owned_packs = '';
         if ($this->getUser()) {
-            $owned_packs = $this->getUser()->getOwnedPacks();
+            $owned_packs = $this->getUser()->getOwnedPacksk();
         }
 
         if ($owned_packs) {

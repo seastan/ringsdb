@@ -1,0 +1,133 @@
+{% extends 'AppBundle::layout.html.twig' %}
+{% import "AppBundle::macros.html.twig" as macros %}
+
+{% block javascripts %}
+    {% javascripts '@AppBundle/Resources/public/js/ui.questlogview.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <script type="text/javascript">
+        var Decks = {};
+        Decks[1] = {{ deck1 | json_encode | raw }};
+        Decks[2] = {{ deck2 | json_encode | raw }};
+        Decks[3] = {{ deck3 | json_encode | raw }};
+        Decks[4] = {{ deck4 | json_encode | raw }};
+
+        var Commenters = {{ commenters | json_encode | raw }};
+        var QuestLog = {
+            id: {{ questlog.id }},
+            name: {{ questlog.name | json_encode | raw }}
+        };
+
+        app.deck_selection && app.deck_selection.init(Decks);
+        app.user.params.questlog_id = {{ questlog.id }};
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="main white container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="quest-title {{ questlog.questMode }}">
+                    <span class="img" style="background-image: url('/bundles/app/images/encounters/{{ questlog.scenario.name | url_encode }}.png')"></span>
+                    {{ questlog.scenario.name }}
+                    <small class="text-muted">{{ questlog.questMode | capitalize }}</small>
+                </h1>
+            </div>
+        </div>
+
+        <div class="row selected-decks hidden">
+            <div class="col-md-3 col-sm-6 deck">
+                <div class="selected-deck-content small view">
+                    <div id="deck1-content" class="deck-loading">
+                        <i class="fa fa-spinner fa-spin fa-5x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 deck">
+                <div class="selected-deck-content small view">
+                    <div id="deck2-content" class="deck-loading">
+                        <i class="fa fa-spinner fa-spin fa-5x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="visible-sm-block" style="clear: both"></div>
+            <div class="col-md-3 col-sm-6 deck">
+                <div class="selected-deck-content small view">
+                    <div id="deck3-content" class="deck-loading">
+                        <i class="fa fa-spinner fa-spin fa-5x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 deck">
+                <div class="selected-deck-content small view">
+                    <div id="deck4-content" class="deck-loading">
+                        <i class="fa fa-spinner fa-spin fa-5x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="description">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="quest-result">
+                        <strong>{{ questlog.success ? 'Victory' : 'Defeat' }}</strong>
+                        {% if questlog.score > 0 %} with a score of {{ questlog.score }} points{% endif %} on {{ questlog.datePlayed | date('F d, Y') }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-7">
+                    <h3 class="username" style="margin-top: 10px">
+                        <span class="fa fa-user"></span>
+                        {{ macros.username(questlog.user) }}
+                    </h3>
+                </div>
+                {% if is_public %}
+                    <div class="col-xs-5 text-right hidden-print" style="margin-bottom: 5px">
+                        <div class="social">{{ macros.questlog_social_icons(questlog) }}</div>
+                        <span class="hidden-xs">published: </span>
+                        <time datetime="{{ questlog.datePublish | date('c') }}">{{ questlog.datePublish | date('M d, Y') }}</time>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="row hidden-print">
+                <div class="col-md-12" id="btn-group-deck">
+                    {% include 'AppBundle:QuestLog:toolbar.html.twig' %}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default" style="margin-bottom: 0">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Quest Notes</h3>
+                        </div>
+                        <div class="panel-body" id="questlog-description">
+                            {% if questlog.descriptionHtml is empty  %}
+                                <i>No description.</i>
+                            {% else %}
+                                {{ questlog.descriptionHtml | raw }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if is_public %}
+                <div class="row hidden-print">
+                    <div class="col-md-12">
+                        {% include 'AppBundle:QuestLog:comments.html.twig' %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% include 'AppBundle:Modale:delete_questlog.html.twig' %}
+    {% include 'AppBundle:Modale:export.html.twig' %}
+
+{% endblock %}
