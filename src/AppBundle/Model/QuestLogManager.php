@@ -136,7 +136,7 @@ class QuestLogManager {
     public function findQuestLogsInHotTopic() {
         $qb = $this->getQueryBuilder();
 
-        $qb->addSelect('(SELECT count(c) FROM AppBundle:QuestLogComment c WHERE c.questlog=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
+        $qb->addSelect('(SELECT count(c) FROM AppBundle:QuestlogComment c WHERE c.questlog=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
         $qb->orderBy('nbRecentComments', 'DESC');
         $qb->orderBy('d.nbComments', 'DESC');
 
