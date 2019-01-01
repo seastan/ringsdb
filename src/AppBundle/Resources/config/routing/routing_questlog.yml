@@ -3,14 +3,13 @@ questlog_new:
     methods: [GET]
     defaults:
         _controller: AppBundle:QuestLog:new
-        public: false
+        public: 0
         deck1_id: null
         deck2_id: null
         deck3_id: null
         deck4_id: null
-        public: 0
     requirements:
-        public: true || false
+        public: \d+
         deck1_id: \d+
         deck2_id: \d+
         deck3_id: \d+
