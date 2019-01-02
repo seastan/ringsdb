@@ -2,7 +2,7 @@
 {% import "AppBundle::macros.html.twig" as macros %}
 
 {% block javascripts %}
-    {% javascripts '@AppBundle/Resources/public/js/ui.fellowshipview.js' %}
+    {% javascripts '@AppBundle/Resources/public/js/ui.questlogview.js' %}
         <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
 
@@ -14,15 +14,13 @@
         Decks[4] = {{ deck4 | json_encode | raw }};
 
         var Commenters = {{ commenters | json_encode | raw }};
-        var Fellowship = {
-            id: {{ fellowship.id }},
-            name: {{ fellowship.name | json_encode | raw }},
-            published: {{ fellowship.isPublic | json_encode }}
+        var QuestLog = {
+            id: {{ questlog.id }},
+            name: {{ questlog.name | json_encode | raw }}
         };
-        app.deck_selection.show_sideboard = true;
-        app.deck_selection.init(Decks);
-        app.user.params.fellowship_id = {{ fellowship.id }};
 
+        app.deck_selection && app.deck_selection.init(Decks);
+        app.user.params.questlog_id = {{ questlog.id }};
     </script>
 {% endblock %}
 
@@ -30,7 +28,11 @@
     <div class="main white container">
         <div class="row">
             <div class="col-md-12">
-                <h1 style="border-bottom:1px solid lightgray">{{ fellowship.name }}</h1>
+                <h1 class="quest-title {{ questlog.questMode }}">
+                    <span class="img" style="background-image: url('/bundles/app/images/encounters/{{ questlog.scenario.name | url_encode }}.png')"></span>
+                    {{ questlog.scenario.name }}
+                    <small class="text-muted">{{ questlog.questMode | capitalize }}</small>
+                </h1>
             </div>
         </div>
 
@@ -40,7 +42,6 @@
                     <div id="deck1-content" class="deck-loading">
                         <i class="fa fa-spinner fa-spin fa-5x"></i>
                     </div>
-                    <div id="deck1-side-content"></div>
                 </div>
             </div>
             <div class="col-md-3 col-sm-6 deck">
@@ -48,7 +49,6 @@
                     <div id="deck2-content" class="deck-loading">
                         <i class="fa fa-spinner fa-spin fa-5x"></i>
                     </div>
-                    <div id="deck2-side-content"></div>
                 </div>
             </div>
             <div class="visible-sm-block" style="clear: both"></div>
@@ -57,7 +57,6 @@
                     <div id="deck3-content" class="deck-loading">
                         <i class="fa fa-spinner fa-spin fa-5x"></i>
                     </div>
-                    <div id="deck3-side-content"></div>
                 </div>
             </div>
             <div class="col-md-3 col-sm-6 deck">
@@ -65,31 +64,39 @@
                     <div id="deck4-content" class="deck-loading">
                         <i class="fa fa-spinner fa-spin fa-5x"></i>
                     </div>
-                    <div id="deck4-side-content"></div>
                 </div>
             </div>
         </div>
 
         <div id="description">
             <div class="row">
+                <div class="col-md-12">
+                    <div class="quest-result">
+                        <strong>{{ questlog.success ? 'Victory' : 'Defeat' }}</strong>
+                        {% if questlog.score > 0 %} with a score of {{ questlog.score }} points{% endif %} on {{ questlog.datePlayed | date('F d, Y') }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
                 <div class="col-xs-7">
                     <h3 class="username" style="margin-top: 10px">
                         <span class="fa fa-user"></span>
-                        {{ macros.username(fellowship.user) }}
+                        {{ macros.username(questlog.user) }}
                     </h3>
                 </div>
                 {% if is_public %}
                     <div class="col-xs-5 text-right hidden-print" style="margin-bottom: 5px">
-                        <div class="social">{{ macros.fellowship_social_icons(fellowship) }}</div>
+                        <div class="social">{{ macros.questlog_social_icons(questlog) }}</div>
                         <span class="hidden-xs">published: </span>
-                        <time datetime="{{ fellowship.datePublish | date('c') }}">{{ fellowship.datePublish | date('M d, Y') }}</time>
+                        <time datetime="{{ questlog.datePublish | date('c') }}">{{ questlog.datePublish | date('M d, Y') }}</time>
                     </div>
                 {% endif %}
             </div>
 
             <div class="row hidden-print">
                 <div class="col-md-12" id="btn-group-deck">
-                    {% include 'AppBundle:Fellowship:toolbar.html.twig' %}
+                    {% include 'AppBundle:QuestLog:toolbar.html.twig' %}
                 </div>
             </div>
 
@@ -97,29 +104,30 @@
                 <div class="col-md-12">
                     <div class="panel panel-default" style="margin-bottom: 0">
                         <div class="panel-heading">
-                            <h3 class="panel-title">Description</h3>
+                            <h3 class="panel-title">Quest Notes</h3>
                         </div>
-                        <div class="panel-body" id="fellowship-description">
-                            {% if fellowship.descriptionHtml is empty  %}
+                        <div class="panel-body" id="questlog-description">
+                            {% if questlog.descriptionHtml is empty  %}
                                 <i>No description.</i>
                             {% else %}
-                                {{ fellowship.descriptionHtml | raw }}
+                                {{ questlog.descriptionHtml | raw }}
                             {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
+
             {% if is_public %}
                 <div class="row hidden-print">
                     <div class="col-md-12">
-                        {% include 'AppBundle:Fellowship:comments.html.twig' %}
+                        {% include 'AppBundle:QuestLog:comments.html.twig' %}
                     </div>
                 </div>
             {% endif %}
         </div>
     </div>
 
-    {% include 'AppBundle:Modale:delete_fellowship.html.twig' %}
+    {% include 'AppBundle:Modale:delete_questlog.html.twig' %}
     {% include 'AppBundle:Modale:export.html.twig' %}
 
 {% endblock %}

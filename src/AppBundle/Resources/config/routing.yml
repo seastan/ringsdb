@@ -21,9 +21,9 @@ app_fellowship:
     resource: "@AppBundle/Resources/config/routing/routing_fellowship.yml"
     prefix: /fellowship
 
-#app_questlog:
-#    resource: "@AppBundle/Resources/config/routing/routing_questlog.yml"
-#    prefix: /questlog
+app_questlog:
+    resource: "@AppBundle/Resources/config/routing/routing_questlog.yml"
+    prefix: /questlog
 
 app_review:
     resource: "@AppBundle/Resources/config/routing/routing_review.yml"
@@ -41,6 +41,23 @@ app_collection:
     resource: "@AppBundle/Resources/config/routing/routing_collection.yml"
     prefix: /collection
 
+index:
+    path: /
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Default:index
+
+patrons:
+    path: /patrons
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Social:patrons
+
+about:
+    path: /about
+    defaults:
+        _controller: AppBundle:Default:about
+
 decklist_byauthor:
     path: /d/{username}
     methods: [GET]
@@ -53,17 +70,11 @@ fellowship_byauthor:
     defaults:
         _controller: AppBundle:Fellowship:byauthor
 
-index:
-    path: /
+questlogs_byauthor:
+    path: /q/{username}
     methods: [GET]
     defaults:
-        _controller: AppBundle:Default:index
-
-patrons:
-    path: /patrons
-    methods: [GET]
-    defaults:
-        _controller: AppBundle:Social:patrons
+        _controller: AppBundle:QuestLog:byauthor
 
 decks_list:
     path: /decks
@@ -77,11 +88,29 @@ myfellowships_list:
     defaults:
         _controller: AppBundle:Fellowship:mylist
 
-decklist_byauthor:
-    path: /d/{username}
+myquestlogs_list:
+    path: /myquestlogs/{scenario_name_canonical}/{quest_mode}
     methods: [GET]
     defaults:
-        _controller: AppBundle:Social:byauthor
+        _controller: AppBundle:QuestLog:mylist
+        scenario_name_canonical: null
+        quest_mode: normal
+
+questlogs_list:
+    path: /questlogs/{type}/{page}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:QuestLog:list
+        type: popular
+        page: 1
+    requirements:
+        page: \d+
+
+questlogs_searchform:
+    path: /questlogs/search
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:QuestLog:search
 
 decklists_searchform:
     path: /decklists/search
@@ -123,17 +152,3 @@ card_reviews_list:
     requirements:
         page: \d+
 
-about:
-    path: /about
-    defaults:
-        _controller: AppBundle:Default:about
-
-rules:
-    path: /rules
-    defaults:
-        _controller: AppBundle:Default:rules
-
-ffg:
-    path: /ffg
-    defaults:
-        _controller: AppBundle:Default:ffg

@@ -1,34 +1,18 @@
-{% if is_owner %}
-    <div class="row" style="margin-bottom: 10px;">
-        <div class="col-md-12">
-            <div class="pull-right btn-group" role="group">
-                <a href="{{ path('deck_edit', { deck_id: deck_id }) }}" class="btn btn-sm btn-default">
+<div class="row">
+    <div class="col-md-12">
+        {% if is_owner %}
+            <div class="btn-group hidden" id="user_buttons" role="group" style="margin-bottom: 10px;">
+                <a href="{{ path('questlog_edit', { questlog_id: questlog.id }) }}" class="btn btn-sm btn-default">
                     <span class="fa fa-pencil text-primary"></span> Edit
-                </a>
-
-                <a href="{{ path('questlog_new', { public: 0, deck1_id: deck_id }) }}" class="btn btn-sm btn-default">
-                    <span class="fa fa-book text-warning"></span> Log a Quest
-                </a>
-
-                <a href="{{ path('deck_publish_form', { deck_id: deck_id }) }}" class="btn btn-sm btn-default" id="btn-publish">
-                    <span class="fa fa-share text-success"></span> Publish
                 </a>
 
                 <button type="button" id="btn-delete" class="btn btn-sm btn-default">
                     <span class="fa fa-trash-o text-danger"></span> Delete
                 </button>
             </div>
-        </div>
-    </div>
-{% endif %}
+        {% endif %}
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="pull-right btn-group" role="group">
-            <a href="{{ path('deck_clone', { deck_id: deck_id }) }}" id="btn-clone" class="btn btn-sm btn-default">
-                <span class="fa fa-clone text-default"></span> <span class="hidden-xs">Clone</span>
-            </a>
-
+        <div class="btn-group pull-right" role="group" style="margin-bottom: 10px;">
             <button type="button" id="btn-print" class="btn btn-sm btn-default">
                 <span class="fa fa-print text-default"></span> <span class="hidden-xs">Print</span>
             </button>
@@ -38,13 +22,13 @@
                     <span class="fa fa-download"></span> Download <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a href="{{ path('deck_export_text', { deck_id: deck_id }) }}">Text file</a></li>
-                    <li><a href="{{ path('deck_export_octgn', { deck_id: deck_id }) }}">Octgn file</a></li>
+                    <li><a href="#" id="btn-download-text">Text file</a></li>
+                    <li><a href="#" id="btn-download-octgn">Octgn file</a></li>
                 </ul>
             </div>
 
             <div class="btn-group">
-                <button type="button" class="btn btn-sm btn-default dropdown-toggle " data-toggle="dropdown">
+                <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
                     <span class="fa fa-clipboard"></span> Export <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu">
@@ -54,8 +38,9 @@
                     <li><a href="#" id="btn-export-html">HTML (WordPress)</a></li>
                 </ul>
             </div>
+
             <div class="btn-group">
-                <button type="button" class="btn btn-sm btn-default dropdown-toggle " data-toggle="dropdown">
+                <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
                     <span class="fa fa-sort"></span> Sort <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu" id="menu-sort">

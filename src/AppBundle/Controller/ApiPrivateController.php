@@ -61,7 +61,7 @@ class ApiPrivateController extends Controller {
         if (!$user) {
             $content = json_encode([
                 'success' => false,
-                'error' => 'This user does not exists.'
+                'error' => 'This user does not exist.'
             ]);
 
             $response->headers->set('Content-Type', 'application/json');
@@ -70,7 +70,7 @@ class ApiPrivateController extends Controller {
             return $response;
         }
 
-        $show_private_decks = $user->getIsShareDecks() || $user->getId() == $this->getUser()->getId();
+        $show_private_decks = /*$user->getIsShareDecks() ||*/ $user->getId() == $this->getUser()->getId();
 
         /* @var $decklists \AppBundle\Entity\Decklist[] */
         $decklists = $em->getRepository('AppBundle:Decklist')->findBy(['user' => $user], ['dateCreation' => 'DESC']);

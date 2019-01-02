@@ -1,0 +1,154 @@
+{% extends 'AppBundle::layout.html.twig' %}
+{% import "AppBundle::macros.html.twig" as macros %}
+
+{% block javascripts %}
+    {% javascripts '@AppBundle/Resources/public/js/ui.questlog_search.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <script type="text/javascript">
+        $(function() {
+            var type = {{ type|json_encode|raw }};
+            $('time').each(function(index, element) {
+                var datetime = moment($(element).attr('datetime'));
+                var formatted;
+                switch (type) {
+                    case 'popular':
+                    case 'recent':
+                    case 'hottopics':
+                        formatted = datetime.fromNow();
+                        break;
+
+                    case 'halloffame':
+                    case 'favorites':
+                    case 'mine':
+                    case 'search':
+                    default:
+                        formatted = datetime.format('ll');
+                        break;
+                }
+                $(element).html(formatted);
+                $(element).attr('title', datetime.format('LLLL'));
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="main white container">
+        <div class="row">
+            <div class="col-md-3">
+                <ul class="nav nav-pills nav-stacked" style="margin-bottom: 2em;">
+                    {% set linkurl = path('questlogs_list', { type:'popular' }) %}
+                    <li class="{% if url == linkurl %}active{% endif %}"><a href="{{ linkurl }}">Popular</a></li>
+                    {% set linkurl = path('questlogs_list', { type:'recent' }) %}
+                    <li class="{% if url == linkurl %}active{% endif %}"><a href="{{ linkurl }}">Recent</a></li>
+                    {% set linkurl = path('questlogs_list', { type:'hottopics' }) %}
+                    <li class="{% if url == linkurl %}active{% endif %}"><a href="{{ linkurl }}">Hot topics</a></li>
+                    {% set linkurl = path('questlogs_list', { type:'halloffame' }) %}
+                    <li class="{% if url == linkurl %}active{% endif %}"><a href="{{ linkurl }}">Hall of Fame</a></li>
+                    {% set linkurl = path('questlogs_list', { type:'favorites' }) %}
+                    <li class="{% if url == linkurl %}active{% endif %}"><a href="{{ linkurl }}">My favorites</a></li>
+                    {% set linkurl = path('questlogs_list', { type:'mine' }) %}
+                    <li class="{% if url == linkurl %}active{% endif %}"><a href="{{ linkurl }}">My quest logs</a></li>
+                    <!--{% set linkurl = path('questlogs_searchform') %}
+                    <li class="{% if url == linkurl %}active{% endif %}"><a href="{{ linkurl }}"><span class="fa fa-search"></span> Search</a></li>
+                    -->
+                </ul>
+            </div>
+
+            <div class="col-md-9">
+                {{ header|raw }}
+
+                {% include 'AppBundle:Default:pagination.html.twig' %}
+
+                <table class="table list-questlogs">
+                    <tbody id="questlogs">
+                    {% for questlog in questlogs %}
+                        {% set decks = questlog.decks %}
+
+                        <tr data-id="{{ questlog.id }}">
+                            <td class="hidden-xs questlog-checkbox"><input type="checkbox"></td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-sm-7 col-md-8 col-lg-9">
+                                        <h4 class="questlog-name"><a href="{{ path('questlog_view', { questlog_id: questlog.id }) }}">{{ questlog.name }}</a></h4>
+                                        <div class="questlog-result">
+                                            <strong>{{ questlog.success ? 'Victory' : 'Defeat' }}</strong>
+                                            {% if questlog.score > 0 %} with a score of {{ questlog.score }} points{% endif %} on {{ questlog.datePlayed | date('F d, Y') }}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5 col-md-4 col-lg-3">
+                                        <div class="questlogs-actions">
+                                            <span class="deck-count">
+                                                {% for i in 1..questlog.nbDecks %}
+                                                    <i class="fa fa-user"></i>
+                                                {% endfor %}
+                                            </span>
+
+                                            {% if questlog.isPublic %}
+                                                <small class="social">{{ macros.static_questlog_social_icons(questlog) }}</small>
+                                            {% endif %}
+
+                                            <div class="block"></div>
+
+                                            <a href="{{ path('questlog_edit', { questlog_id: questlog.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" data-container="body" title="Edit">
+                                                <span class="fa fa-pencil fa-fw"></span>
+                                            </a>
+
+                                            <label class="btn btn-xs btn-default" data-action="delete-questlog" data-toggle="tooltip" data-container="body" title="Delete">
+                                                <span class="fa fa-trash-o fa-fw"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% for deck in decks %}
+                                            {% if deck.decklist is not null %}
+                                                {% set decklist = deck.decklist %}
+                                                {% set social = true %}
+                                            {% else %}
+                                                {% set decklist = deck.deck %}
+                                                {% set social = false %}
+                                            {% endif %}
+
+                                            <div class="questlog-heroes" data-id="{{ decklist.id }}" data-published="{{ social }}">
+                                                {% for hero in decklist.getSlots().getHeroDeck() %}
+                                                    {% set card = hero.getCard() %}
+                                                    <div class="decklist-hero border-light-{{ card.sphere.code }}">
+                                                        <div class="hero-thumbnail card-thumbnail-5x card-thumbnail-hero" style="background-image:url('{{ asset('/bundles/cards/' ~ card.code ~ '.png') }}')"></div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+
+                                            <div class="questlog-deck-info">
+                                                {% if social %}
+                                                    <h4 style=""><i><a href="{{ path('decklist_detail', { decklist_id: decklist.id, 'decklist_name': decklist.nameCanonical|e('url') }) }}">{{ decklist.name }}</a></i></h4>
+                                                {% else %}
+                                                    <h4 style=""><i><a href="{{ path('deck_view', { deck_id: decklist.id }) }}">{{ decklist.name }}</a></i></h4>
+                                                {% endif %}
+                                                <span class="small questlog-hero-text hidden-xs">
+                                                    {% for hero in decklist.getSlots().getHeroDeck() %}
+                                                        {% set card = hero.getCard() %}
+                                                        <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" href="">
+                                                            <span class="icon-{{ card.sphere.code }}"></span> {{ card.name }} <i>({{ card.pack.code }})</i>
+                                                        </a>
+                                                    {% endfor %}
+                                                </span>
+                                            </div>
+                                            <div class="block" style="height: 15px; clear:both;"></div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% include 'AppBundle:Default:pagination.html.twig' %}
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
