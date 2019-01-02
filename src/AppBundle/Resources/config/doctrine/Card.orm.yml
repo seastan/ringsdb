@@ -1,6 +1,9 @@
 AppBundle\Entity\Card:
     type: entity
     table: card
+    cache:
+        usage: NONSTRICT_READ_WRITE
+        region: entity_region
     manyToOne:
         pack:
             targetEntity: Pack
@@ -20,20 +23,6 @@ AppBundle\Entity\Card:
             joinColumn:
                 name: sphere_id
                 referencedColumnName: id
-        #encounter:
-        #    targetEntity: Encounter
-        #    inversedBy: cards
-        #    nullable: true
-        #    joinColumn:
-        #        name: encounter_id
-        #        referencedColumnName: id
-        #decktype:
-        #    targetEntity: Decktype
-        #    inversedBy: cards
-        #    nullable: true
-        #    joinColumn:
-        #        name: decktype_id
-        #        referencedColumnName: id
     oneToMany:
         reviews:
             targetEntity: Review

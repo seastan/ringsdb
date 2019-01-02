@@ -6,7 +6,7 @@
 
     ui.init_quest_selector = function() {
         var xhr;
-        $('#quest').on('input', function() {
+        $('#quest').on('change', function() {
             if (xhr) {
                 xhr.abort();
             }
@@ -47,7 +47,7 @@
             });
 
             ui.set_questlog_name();
-        }).trigger('input');
+        }).trigger('change');
 
         $('#btn-randomize').on('click', function(e) {
             e.preventDefault();
@@ -57,7 +57,7 @@
             var random = ~~(Math.random() * options.length);
 
             options.eq(random).prop('selected', true);
-            select.trigger('input');
+            select.trigger('change');
         });
     };
 

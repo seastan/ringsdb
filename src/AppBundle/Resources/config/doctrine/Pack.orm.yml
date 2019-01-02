@@ -1,6 +1,9 @@
 AppBundle\Entity\Pack:
     type: entity
     table: pack
+    cache:
+        usage: NONSTRICT_READ_WRITE
+        region: entity_region
     manyToOne:
         cycle:
             targetEntity: Cycle

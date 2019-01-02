@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ pagetitle | default('Deckbuilder') }} &middot; RingsDB</title>
+    <title>{{ pagetitle | default('Deckbuilder') }} &middot; TestDB</title>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -63,16 +63,25 @@
                                 <ul class="dropdown-menu" role="menu">
                                     <li><a href="{{ path('decks_list') }}">Decks</a></li>
                                     <li><a href="{{ path('myfellowships_list') }}">Fellowships</a></li>
+                                    <li><a href="{{ path('myquestlogs_list') }}">Quest Logs</a></li>
                                     <li><a href="{{ path('collection_packs') }}">Adventure Packs</a></li>
                                 </ul>
                             </li>
                             <li><a href="{{ path('decks_list') }}" class="visible-xs-block">My Decks</a></li>
                             <li><a href="{{ path('myfellowships_list') }}" class="visible-xs-block">My Fellowships</a></li>
+                            <li><a href="{{ path('myquestlogs_list') }}" class="visible-xs-block">My Quest Logs</a></li>
                             <li><a href="{{ path('collection_packs') }}" class="visible-xs-block">My Adventure Packs</a></li>
                             <li><a href="{{ path('decklists_list') }}">Decklists</a></li>
                             <li><a href="{{ path('fellowships_list') }}">Fellowships</a></li>
-                            <li><a href="{{ path('cards_search') }}">Cards</a></li>
-                            <li class="hidden-sm"><a href="{{ path('card_reviews_list') }}">Reviews</a></li>
+                            <li><a href="{{ path('questlogs_list') }}">Quest Logs</a></li>
+                            <li class="dropdown hidden-xs">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Cards <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="{{ path('cards_search') }}">Search</a></li>
+                                    <li><a href="{{ path('card_reviews_list') }}">Reviews</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="{{ path('cards_search') }}" class="visible-xs-block">Cards</a></li>
                         </ul>
 
                         <ul class="nav navbar-nav navbar-right">
@@ -97,7 +106,7 @@
                 {% endblock %}
             </div>
         </nav>
-
+	Some features of RingsDB are under maintenence.
         {% block body %}{% endblock %}
         <div id="push"></div>
     </div>
@@ -123,7 +132,7 @@
 
                         <p>RingsDB card images and data kindly supplied by <a href="http://hallofbeorn.com" target="_blank">Hall of Beorn</a>.</p> 
 
-                        <p>Please post bug reports and feature requests on <a href="https://github.com/Sydtrack/ringsdb/issues" target="_blank">GitHub</a>.</p>
+                        <p>Please post bug reports and feature requests on <a href="https://github.com/Seastan/ringsdb/issues" target="_blank">GitHub</a>.</p>
 
                         <p>
                             <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">

@@ -11,7 +11,6 @@
         <div class="row">
             <!-- Right-side column -->
             <div class="col-md-4 col-md-push-8">
-
                 <div class="row" style="margin-bottom: 5px">
                     <div class="col-md-12">
                         <a href="{{ path('deck_buildform') }}" class="btn btn-default btn-sm"{% if cannotcreate %} disabled="disabled"{% endif %} style="margin-bottom: 5px;"><span class="fa fa-plus"></span> New Deck</a>
@@ -32,9 +31,9 @@
                                 <span class="fa fa-check-square-o"></span> With Selection <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu" role="menu">
-                                <li class="dropdown-header"><span class="fa fa-book"></span> Questing</li>
+                                <li class="dropdown-header"><span class="fa fa-book"></span> questting</li>
                                 <li><a href="#" id="btn-fellowship">Create a Fellowship</a></li>
-                                {#<li><a href="#" id="btn-quest">Log a Quest</a></li>#}
+                                <li><a href="#" id="btn-quest">Log a Quest</a></li>
                                 <li class="dropdown-header"><span class="fa fa-exchange"></span> Compare</li>
                                 <li><a href="#" id="btn-compare">Compare two decks</a></li>
                                 <li class="dropdown-header"><span class="fa fa-tag"></span> Tags</li>
@@ -50,7 +49,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row" style="margin-bottom:10px">
+                <div class="row" style="margin-bottom: 10px">
                     <div class="col-md-12" id="tag_toggles" data-toggle="tooltip" title="Click to switch to this tag. Shift-click to toggle this tag."></div>
                 </div>
             </div>
@@ -89,7 +88,7 @@
                             </td>
                             <td class="decks-actions text-right">
                                 <a href="{{ path('deck_edit', { deck_id: deck.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" title="Edit"><span class="fa fa-pencil fa-fw"></span></a>
-                                {#<a href="{{ path('questlog_new', { deck1_id: deck.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" title="Log a Quest"><span class="fa fa-book fa-fw"></span></a>#}
+                                <a href="{{ path('questlog_new', { public: 0, deck1_id: deck.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" title="Log a Quest"><span class="fa fa-book fa-fw"></span></a>
                                 <a href="{{ path('deck_publish_form', { deck_id:deck.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" title="Publish"><span class="fa fa-share fa-fw"></span></a>
                                 <button class="btn btn-xs btn-default btn-delete-deck" data-toggle="tooltip" title="Delete"><span class="fa fa-trash-o fa-fw"></span></button>
                             </td>

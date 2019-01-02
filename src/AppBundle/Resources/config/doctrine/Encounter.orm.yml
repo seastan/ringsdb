@@ -1,6 +1,9 @@
 AppBundle\Entity\Encounter:
     type: entity
     table: encounter
+    cache:
+        usage: NONSTRICT_READ_WRITE
+        region: entity_region
     manyToOne:
         pack:
             targetEntity: Pack
