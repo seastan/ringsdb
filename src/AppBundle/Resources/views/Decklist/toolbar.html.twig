@@ -16,6 +16,11 @@
         <li><a href="#" id="btn-download-octgn">Octgn file</a></li>
     </ul>
 </div>
+
+<a href="{{ path('questlog_new', { public: 1, deck1_id: decklist.id }) }}" class="btn btn-sm btn-default">
+  <span class="fa fa-book text-warning"></span> Log a Quest
+</a>
+
 <div class="btn-group">
     <button type="button" class="btn btn-sm btn-default dropdown-toggle " data-toggle="dropdown">
         <span class="fa fa-clipboard"></span> <span class="hidden-xs">Export</span> <span class="caret"></span>

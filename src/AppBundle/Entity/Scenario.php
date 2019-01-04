@@ -14,6 +14,7 @@ class Scenario implements \JsonSerializable {
             'id' => $this->getId(),
             'code' => $this->getCode(),
             'name' => $this->getName(),
+            'nameCanonical' => $this->getNameCanonical(),
             'pack' => $pack ? $pack->getName() : '',
             'date_creation' => $this->getDateCreation()->format('c'),
             'date_update' => $this->getDateUpdate()->format('c'),
@@ -29,8 +30,8 @@ class Scenario implements \JsonSerializable {
             'easy_objective_allies' => $this->getEasyObjectiveAllies(),
             'easy_objective_locations' => $this->getEasyObjectiveLocations(),
             'easy_surges' => $this->getEasySurges(),
-            'easy_encounter_side_quests' => $this->getEasyEncounterSideQuests(), 
-            
+            'easy_encounter_side_quests' => $this->getEasyEncounterSideQuests(),
+
             'normal_cards' => $this->getNormalCards(),
             'normal_enemies' => $this->getNormalEnemies(),
             'normal_locations' => $this->getNormalLocations(),
@@ -41,7 +42,7 @@ class Scenario implements \JsonSerializable {
             'normal_objective_locations' => $this->getNormalObjectiveLocations(),
             'normal_surges' => $this->getNormalSurges(),
             'normal_encounter_side_quests' => $this->getNormalEncounterSideQuests(),
-            
+
             'nightmare_cards' => $this->getNightmareCards(),
             'nightmare_enemies' => $this->getNightmareEnemies(),
             'nightmare_locations' => $this->getNightmareLocations(),
@@ -1139,5 +1140,32 @@ class Scenario implements \JsonSerializable {
      */
     public function getQuestlogs() {
         return $this->questlogs;
+    }
+
+    /**
+     * @var string
+     */
+    private $nameCanonical;
+
+    /**
+     * Set nameCanonical
+     *
+     * @param string $nameCanonical
+     *
+     * @return Scenario
+     */
+    public function setNameCanonical($nameCanonical) {
+        $this->nameCanonical = $nameCanonical;
+
+        return $this;
+    }
+
+    /**
+     * Get nameCanonical
+     *
+     * @return string
+     */
+    public function getNameCanonical() {
+        return $this->nameCanonical;
     }
 }
