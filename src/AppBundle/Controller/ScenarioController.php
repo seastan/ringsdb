@@ -37,8 +37,8 @@ class ScenarioController extends Controller {
         $form->bind($request);
 
         if ($form->isValid()) {
-            $texts = $this->getContainer()->get('texts');
-            $entity->setCanonicalName($texts->slugify($entity->getName()));
+#            $texts = $this->getContainer()->get('texts');
+#            $entity->setCanonicalName($texts->slugify($entity->getName()));
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
@@ -129,8 +129,8 @@ class ScenarioController extends Controller {
         $editForm->bind($request);
 
         if ($editForm->isValid()) {
-            $texts = $this->getContainer()->get('texts');
-            $entity->setCanonicalName($texts->slugify($entity->getName()));
+#            $texts = $this->getContainer()->get('texts');
+#            $entity->setCanonicalName($texts->slugify($entity->getName()));
 
             $em->persist($entity);
             $em->flush();

@@ -194,5 +194,3 @@ AppBundle\Entity\Scenario:
     uniqueConstraints:
         scenario_code_idx:
             columns: [ code ]
-        scenario_name_canonical_idx:
-            columns: [ name_canonical ]
