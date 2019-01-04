@@ -1,3 +1,5 @@
+{% import "AppBundle::macros.html.twig" as macros %}
+
 <h1 class="quest-title {{ quest_mode }}" style="border-bottom: 0">
     <span class="img" style="background-image: url('{{ asset('/bundles/app/images/encounters/' ~ (selected_scenario.name | url_encode) ~ '.png')  }}')"></span>
     {{ selected_scenario.name }}

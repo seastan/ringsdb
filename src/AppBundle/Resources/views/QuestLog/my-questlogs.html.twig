@@ -9,6 +9,7 @@
 
 {% block body %}
     <div class="main white container">
+    	<center>Quest logging is currently in beta (you may lose quest log data). <p>Please report bugs on <a href="https://github.com/Seastan/ringsdb/issues" target="_blank">GitHub</a>.</center><br>
         <div class="row">
             <div class="col-md-4 col-md-push-8">
                 <div class="row" style="margin-bottom: 5px">
@@ -16,7 +17,7 @@
                         <a href="{{ path('questlog_new') }}" class="btn btn-default btn-sm"><span class="fa fa-plus"></span> Log a Quest</a>
 
 
-                        <a href="{{ path('allquestlogs') }}" class="btn btn-default btn-sm"><span class="fa fa-list-ul"></span> Show All</a>
+                        <a href="{{ path('questlogs_list') }}" class="btn btn-default btn-sm"><span class="fa fa-list-ul"></span> Show All</a>
                     </div>
                 </div>
                 <div class="row" style="margin-bottom: 5px">
@@ -118,9 +119,9 @@
 
             <div class="col-md-8 col-md-pull-4">
                 {% if not compact %}
-                    {% include 'AppBundle:Quest:questlist.html.twig' %}
+                    {% include 'AppBundle:QuestLog:questlist.html.twig' %}
                 {% else %}
-                    {% include 'AppBundle:Quest:questlist-compact.html.twig' %}
+                    {% include 'AppBundle:QuestLog:questlist-compact.html.twig' %}
                 {% endif %}
             </div>
             <!-- / Left-side column -->

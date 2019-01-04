@@ -46,6 +46,12 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                  null,
                  InputOption::VALUE_NONE,
                  'Show card text and flavor'
+	     )
+             ->addOption(
+                 'skip-data',
+                 null,
+                 InputOption::VALUE_NONE,
+                 'Skip data import'
              );
     }
 
@@ -65,6 +71,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
         $forceData = $input->getOption('force-data');
         $forceImage = $input->getOption('force-image');
         $showTexts = $input->getOption('show-texts');
+        $skipData = $input->getOption('skip-data');
 
         $sets = [];
         if ($setname) {
@@ -252,6 +259,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                 // OCTGN
                 //$octgn = substr($cardCrawler->filter('img[title^="OCTGN"]')->attr('title'), -36);
 
+		// Get matching RingsDB card
                 $card = $em->getRepository('AppBundle:Card')->findOneBy(['name' => $name, 'pack' => $pack]);
                 if ($card && !$forceData && !$forceImage) {
                     // shortcut: we already know this card
@@ -259,9 +267,10 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                 }
 		$output->writeln("16");
 
-                //if (!$dialog->askConfirmation($output, "<question>Shall I import the card =< $name >= from the set =< $setname >= ?</question> ", true)) {
-                //	break;
-                //}
+                if ($card && !$forceData) {
+		   $output->writeln("<error>Card already known and --force-data not set.</error>");
+                   continue;
+                }
 
                 $objSphere = null;
                 foreach ($allSpheres as $oneSphere) {

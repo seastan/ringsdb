@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <title>{{ pagetitle | default('Deckbuilder') }} &middot; RingsDB</title>
@@ -63,7 +63,7 @@
                                 <ul class="dropdown-menu" role="menu">
                                     <li><a href="{{ path('decks_list') }}">Decks</a></li>
                                     <li><a href="{{ path('myfellowships_list') }}">Fellowships</a></li>
-                                    <li><a href="{{ path('allquestlogs') }}">Quest Logs</a></li>
+                                    <li><a href="{{ path('myquestlogs_list') }}">Quest Logs</a></li>
                                     <li><a href="{{ path('collection_packs') }}">Adventure Packs</a></li>
                                 </ul>
                             </li>
@@ -73,7 +73,7 @@
                             <li><a href="{{ path('collection_packs') }}" class="visible-xs-block">My Adventure Packs</a></li>
                             <li><a href="{{ path('decklists_list') }}">Decklists</a></li>
                             <li><a href="{{ path('fellowships_list') }}">Fellowships</a></li>
-                            <li><a href="{{ path('allquestlogs') }}">Quest Logs</a></li>
+                            <li><a href="{{ path('questlogs_list') }}">Quest Logs</a></li>
                             <li class="dropdown hidden-xs">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Cards <span class="caret"></span></a>
                                 <ul class="dropdown-menu" role="menu">
@@ -106,7 +106,7 @@
                 {% endblock %}
             </div>
         </nav>
-
+	Some features of RingsDB are under maintenence.
         {% block body %}{% endblock %}
         <div id="push"></div>
     </div>
@@ -132,7 +132,7 @@
 
                         <p>RingsDB card images and data kindly supplied by <a href="http://hallofbeorn.com" target="_blank">Hall of Beorn</a>.</p> 
 
-                        <p>Please post bug reports and feature requests on <a href="https://github.com/Sydtrack/ringsdb/issues" target="_blank">GitHub</a>.</p>
+                        <p>Please post bug reports and feature requests on <a href="https://github.com/Seastan/ringsdb/issues" target="_blank">GitHub</a>.</p>
 
                         <p>
                             <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
@@ -158,13 +158,7 @@
     {% include 'AppBundle:Modale:card.html.twig' %}
 
     <script src="{{ asset('/bundles/fosjsrouting/js/router.js') }}"></script>
-    {% if app.debug %}
-        <script src="{{ path('fos_js_routing_js', { "callback": "fos.Router.setData" }) }}"></script>
-    {% else %}
-        {% javascripts '@AppBundle/Resources/public/js/fos_js_routes.js' %}
-            <script src="{{ asset_url }}"></script>
-        {% endjavascripts %}
-    {% endif %}
+    <script src="{{ path('fos_js_routing_js', { "callback": "fos.Router.setData" }) }}"></script>
 
     {% javascripts output="js/extra.js"
         '@AppBundle/Resources/public/cdn/js/jquery.min.js'
