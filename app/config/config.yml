@@ -28,7 +28,7 @@ framework:
     trusted_proxies: ~
     session:
         # handler_id set to null will use default session handler from php.ini
-        handler_id:      ~
+        handler_id:      snc_redis.session.handler
         cookie_lifetime: 604800
     fragments:            ~
     http_method_override: true
@@ -69,8 +69,25 @@ doctrine:
 
     orm:
         auto_generate_proxy_classes: "%kernel.debug%"
-        naming_strategy:             doctrine.orm.naming_strategy.underscore
-        auto_mapping:                true
+        naming_strategy: doctrine.orm.naming_strategy.underscore
+        auto_mapping: true
+        metadata_cache_driver:
+            type: service
+            id: snc_redis.doctrine
+        query_cache_driver:
+            type: service
+            id: snc_redis.doctrine
+        result_cache_driver:
+            type: service
+            id: snc_redis.doctrine
+        second_level_cache:
+            enabled: true
+            log_enabled: "%kernel.debug%"
+            region_cache_driver:
+                 type: service
+                 id: snc_redis.doctrine
+            region_lock_lifetime: 60
+            region_lifetime: 300
         dql:
             numeric_functions:
                 power: AppBundle\DQL\PowerFunction
@@ -116,3 +133,34 @@ fos_oauth_server:
 services:
     fos_user.doctrine_registry:
         alias: doctrine
+
+snc_redis:
+    clients:
+        default:
+            type: predis
+            alias: default
+            dsn: redis://localhost
+        doctrine:
+            type: predis
+            alias: doctrine
+            dsn: redis://localhost
+        session:
+            type: predis
+            alias: session
+            dsn: redis://localhost
+    session:
+        client: session
+        prefix: ringsdb
+    doctrine:
+        metadata_cache:
+             client: doctrine
+             entity_manager: default
+        result_cache:
+             client: doctrine
+             entity_manager: default
+        query_cache:
+             client: doctrine
+             entity_manager: default
+        second_level_cache:
+             client: doctrine
+             entity_manager: default
