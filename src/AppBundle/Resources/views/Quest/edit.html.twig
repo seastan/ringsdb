@@ -1,0 +1,197 @@
+{% extends 'AppBundle::layout.html.twig' %}
+{% import "AppBundle::macros.html.twig" as macros %}
+
+{% block javascripts %}
+    {% javascripts '@AppBundle/Resources/public/js/ui.questedit.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <script type="text/javascript">
+        var Decks = {};
+        Decks[1] = {{ deck1 | json_encode | raw }};
+        Decks[2] = {{ deck2 | json_encode | raw }};
+        Decks[3] = {{ deck3 | json_encode | raw }};
+        Decks[4] = {{ deck4 | json_encode | raw }};
+
+        var Questlog = {{ questlog | json_encode | raw }};
+        
+        app.deck_selection && app.deck_selection.init(Decks);
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="main white container">
+        <form action="{{ path('questlog_save') }}" method="POST" id="save_form" role="form" enctype="application/x-www-form-urlencoded">
+            <input type="hidden" name="deck1_id" />
+            <input type="hidden" name="deck2_id" />
+            <input type="hidden" name="deck3_id" />
+            <input type="hidden" name="deck4_id" />
+            <input type="hidden" name="deck1_is_decklist" />
+            <input type="hidden" name="deck2_is_decklist" />
+            <input type="hidden" name="deck3_is_decklist" />
+            <input type="hidden" name="deck4_is_decklist" />
+            <input type="hidden" name="deck1_content" value="{{ deck1_content }}" />
+            <input type="hidden" name="deck2_content" value="{{ deck2_content }}" />
+            <input type="hidden" name="deck3_content" value="{{ deck3_content }}" />
+            <input type="hidden" name="deck4_content" value="{{ deck4_content }}" />
+            <input type="hidden" name="questlog_id" value="{{ questlog.id }}"/>
+
+            <fieldset id="deck-selection">
+                <legend>
+                    Deck Selection
+                    <a class="btn btn-xs btn-default pull-right" data-action="show-cards">
+                        <span class="fa fa-eye"></span> Show cards
+                    </a>
+                    <a class="btn btn-xs btn-default pull-right hidden" data-action="hide-cards">
+                        <span class="fa fa-eye-slash"></span> Hide cards
+                    </a>
+                </legend>
+                <div class="row selected-decks">
+                    {% include 'AppBundle:Fellowship:selected-deck.html.twig' with { deck: deck1, deck_number: 1 } %}
+                    {% include 'AppBundle:Fellowship:selected-deck.html.twig' with { deck: deck2, deck_number: 2 } %}
+                    {% include 'AppBundle:Fellowship:selected-deck.html.twig' with { deck: deck3, deck_number: 3 } %}
+                    {% include 'AppBundle:Fellowship:selected-deck.html.twig' with { deck: deck4, deck_number: 4 } %}
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Quest Details</legend>
+
+                <div class="row">
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="quest">Quest</label>
+                                    <small class="pull-right"><strong><a href="" id="btn-randomize">Randomize</a></strong></small>
+                                    <select class="form-control" name="quest" id="quest">
+                                        {% set pack = null %}
+                                        {% for quest in quests %}
+                                            {% if quest.pack.cycle.name != pack %}
+                                                {% if pack is not null %}
+                                                    </optgroup>
+                                                {% endif %}
+
+                                                {% set pack = quest.pack.cycle.name %}
+                                                <optgroup label="{{ pack }}">
+                                            {% endif %}
+                                            <option value="{{ quest.id }}" {% if questlog.scenario is not null and questlog.scenario.id == quest.id %}selected{% endif %}>{{ quest.name }}</option>
+                                        {% endfor %}
+                                        </optgroup>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="deck1_player_name">Player 1</label>
+                                    <input class="form-control player_name" name="deck1_player_name" id="deck1_player_name" maxlength="80" value="{{ deck1_player_name }}"/>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="deck2_player_name">Player 2</label>
+                                    <input class="form-control player_name" name="deck2_player_name" id="deck2_player_name" maxlength="80" value="{{ deck2_player_name }}"/>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="deck3_player_name">Player 3</label>
+                                    <input class="form-control player_name" name="deck3_player_name" id="deck3_player_name" maxlength="80" value="{{ deck3_player_name }}"/>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="deck4_player_name">Player 4</label>
+                                    <input class="form-control player_name" name="deck4_player_name" id="deck4_player_name" maxlength="80" value="{{ deck4_player_name }}"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="date">Date</label>
+                                    <div><input type="date" class="form-control" size="40" id="date" name="date" value="{{ questlog.datePlayed ? questlog.datePlayed | date("Y-m-d") }}"></div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="difficulty">Quest Mode</label>
+                                    <div>
+                                        <select class="form-control" name="difficulty" id="difficulty">
+                                            <option value="normal" {% if questlog.questMode == "normal" %}selected{% endif %}>Normal</option>
+                                            <option value="easy" {% if questlog.questMode == "easy" %}selected{% endif %}>Easy</option>
+                                            <option value="nightmare" {% if questlog.questMode == "nightmare" %}selected{% endif %}>Nightmare</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="victory">Result</label>
+                                    <div>
+                                        <select class="form-control" name="victory" id="victory">
+                                            <option value="yes" {% if questlog.success %}selected{% endif %}>Success</option>
+                                            <option value="no" {% if not questlog.success %}selected{% endif %}>Failure</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="score">Score</label>
+                                    <div><input type="number" class="form-control" id="score" name="score" value="{{ questlog.score }}"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="descriptionMd">Quest Log Title</label>
+                                    <input class="form-control" name="name" id="name" maxlength="250" value="{{ questlog.name }}"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="descriptionMd">Quest Notes</label>
+                                    <textarea class="form-control" autocapitalize="none" autocomplete="off" rows="8" name="descriptionMd" id="descriptionMd">{{ questlog.descriptionMd }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="checkbox" style="margin-top: 0; margin-bottom: 15px;">
+                                    <label>
+                                        <input type="checkbox" name="public" value="1" {% if questlog.isPublic %}checked{% endif %} {% if is_locked_as_public %}disabled{% endif %}> Allow other players to see this quest log.
+                                        <br>
+                                        <small class="text-muted">
+                                            They will be able to see the cards in your unpublished decks, but not it's name or description.
+                                            Also, you won't be able to make it private again after there are likes, favorites or comments in this questlog.
+                                        </small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3" id="quest-info"></div>
+                </div>
+            </fieldset>
+
+            <div class="row">
+                <div class="col-md-12">
+                    {% if questlog.id is null %}
+                        <button type="submit" class="btn btn-primary btn-block">Log this Quest</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-primary btn-block">Save changes</button>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% include 'AppBundle:Modale:deck_selection.html.twig' %}
+    {% include 'AppBundle:Modale:deck_edit.html.twig' %}
+{% endblock %}

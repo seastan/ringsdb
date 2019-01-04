@@ -34,9 +34,7 @@
     "friendsofsymfony/oauth-server-bundle": "^1.4",
     "phpunit/phpunit": "4.8.*",
     "nelmio/api-doc-bundle": "^2.9",
-    "erusev/parsedown": "^1.6",
-    "snc/redis-bundle": "2.*",
-    "predis/predis": "^1.0"
+    "erusev/parsedown": "^1.6"
   },
   "require-dev": {
     "sensio/generator-bundle": "~2.3"
@@ -50,7 +48,6 @@
       "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
       "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
       "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
-      "php app/console fos:js-routing:dump --target=src/AppBundle/Resources/public/js/fos_js_routes.js",
       "php app/console assetic:dump",
       "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
       "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::removeSymfonyStandardFiles",
@@ -61,7 +58,6 @@
       "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
       "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
       "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
-      "php app/console fos:js-routing:dump --target=src/AppBundle/Resources/public/js/fos_js_routes.js",
       "php app/console assetic:dump",
       "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
       "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::removeSymfonyStandardFiles",
