@@ -26,6 +26,10 @@ class QuestLogController extends Controller {
 
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
+        $user = $this->getUser();
+        if (!$user) {
+            throw new AccessDeniedHttpException("You must be logged in for this operation.");
+        }
 
         // Count played scenarios
         $playedEasy = [];
@@ -1055,7 +1059,7 @@ class QuestLogController extends Controller {
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
         if (!$user) {
-            throw new AccessDeniedHttpException('You must be logged in to comment.');
+            throw $this->createAccessDeniedException("You are not logged in.");
         }
 
         /* @var $em \Doctrine\ORM\EntityManager */
