@@ -15,6 +15,7 @@ class ScenarioType extends AbstractType {
         $builder
             ->add('code')
             ->add('name')
+            ->add('position')
             ->add('pack', 'entity', array('class' => 'AppBundle:Pack', 'property' => 'name'))
             ->add('encounters', 'entity', array('class' => 'AppBundle:Encounter', 'property' => 'name', 'expanded' => true, 'multiple' => true));
     }

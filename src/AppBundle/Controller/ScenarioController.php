@@ -39,7 +39,6 @@ class ScenarioController extends Controller {
         if ($form->isValid()) {
 #            $texts = $this->getContainer()->get('texts');
 #            $entity->setCanonicalName($texts->slugify($entity->getName()));
-<<<<<<< HEAD
             # Set defaults
             $entity->setPosition(0);
             $entity->setNameCanonical('');
@@ -78,9 +77,7 @@ class ScenarioController extends Controller {
 			$entity->setNightmareObjectiveLocations(0);
 			$entity->setNightmareSurges(0);
 			$entity->setNightmareEncounterSideQuests(0);
-=======
->>>>>>> 9f4136b5f6d07da761fb9cea7e1d3c3dc94e5b10
-
+ 
             $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
             $em->flush();
