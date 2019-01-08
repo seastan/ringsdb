@@ -81,6 +81,8 @@
     };
 
     deck.set_slots = function(slots, sideslots) {
+        console.log(slots);
+        console.log(sideslots);
         app.data.cards.update({}, {
             indeck: 0,
             insideboard: 0
@@ -374,9 +376,11 @@
                     deck_id: deck.get_id()
                 });
             }
-
-            var link = $('<a target="_blank"></a>').attr('href', url).text(deck.get_name());
-
+            if (is_published) {
+                var link = $('<a target="_blank"></a>').attr('href', url).text(deck.get_name());
+            } else {
+                var link = deck.get_name()+' <small>(unpublished)</small>';
+            }
             title = $('<h4 style="font-weight: bold"></h4>').append(link);
         } else {
             title = $('<h4 style="font-weight: bold">Main Deck</h4>');

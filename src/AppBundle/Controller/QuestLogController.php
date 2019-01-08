@@ -322,14 +322,14 @@ class QuestLogController extends Controller {
             'deck2' => null,
             'deck3' => null,
             'deck4' => null,
-            'deck1_content' => null,
-            'deck2_content' => null,
-            'deck3_content' => null,
-            'deck4_content' => null,
-            'deck1_player_name' => null,
-            'deck2_player_name' => null,
-            'deck3_player_name' => null,
-            'deck4_player_name' => null,
+            'questlogdeck1_content' => null,
+            'questlogdeck2_content' => null,
+            'questlogdeck3_content' => null,
+            'questlogdeck4_content' => null,
+            'questlogdeck1_player_name' => null,
+            'questlogdeck2_player_name' => null,
+            'questlogdeck3_player_name' => null,
+            'questlogdeck4_player_name' => null,
             'questlog' => $questlog,
             'is_locked_as_public' => $is_locked_as_public
         ];
@@ -377,14 +377,14 @@ class QuestLogController extends Controller {
             'deck2' => null,
             'deck3' => null,
             'deck4' => null,
-            'deck1_content' => null,
-            'deck2_content' => null,
-            'deck3_content' => null,
-            'deck4_content' => null,
-            'deck1_player_name' => null,
-            'deck2_player_name' => null,
-            'deck3_player_name' => null,
-            'deck4_player_name' => null,
+            'questlogdeck1_content' => null,
+            'questlogdeck2_content' => null,
+            'questlogdeck3_content' => null,
+            'questlogdeck4_content' => null,
+            'questlogdeck1_player_name' => null,
+            'questlogdeck2_player_name' => null,
+            'questlogdeck3_player_name' => null,
+            'questlogdeck4_player_name' => null,
             'questlog' => $questlog,
             'is_owner' => $is_owner,
             'is_public' => $is_public,
@@ -395,8 +395,9 @@ class QuestLogController extends Controller {
         $questlog_decks = $questlog->getDecks();
         foreach ($questlog_decks as $questlog_deck) {
             $data['deck' . $questlog_deck->getDeckNumber()] = $questlog_deck->getDecklist() ?: $questlog_deck->getDeck();
-            $data['deck' . $questlog_deck->getDeckNumber() . '_content'] = $questlog_deck->getContent();
-            $data['deck' . $questlog_deck->getDeckNumber() . '_player_name'] = $questlog_deck->getPlayer();
+            $data['questlogdeck' . $questlog_deck->getDeckNumber()] = $questlog_deck;
+            $data['questlogdeck' . $questlog_deck->getDeckNumber() . '_content'] = $questlog_deck->getContent();
+            $data['questlogdeck' . $questlog_deck->getDeckNumber() . '_player_name'] = $questlog_deck->getPlayer();
         }
 
         return $this->render('AppBundle:QuestLog:view.html.twig', $data);
@@ -416,7 +417,7 @@ class QuestLogController extends Controller {
             $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
 
             if (!$questlog) {
-                throw new NotFoundHttpException("This questlog does not exists.");
+                throw new NotFoundHttpException("This questlog does not exist.");
             }
 
             if ($user->getId() !== $questlog->getUser()->getId()) {
@@ -496,7 +497,7 @@ class QuestLogController extends Controller {
                         $deck = $em->getRepository('AppBundle:Deck')->find($deck_id);
 
                         if (!$deck) {
-                            throw new NotFoundHttpException("One of the selected decks does not exists.");
+                            throw new NotFoundHttpException("One of the selected decks does not exist.");
                         }
 
                         $deck_user = $deck->getUser();
@@ -511,7 +512,7 @@ class QuestLogController extends Controller {
 
                         $content = (array) json_decode($request->get("deck".$i."_content"));
 
-                        if (!isset($content['main']) || !count($content['main'])) {
+                        if (!isset($content['main']) || empty($content['main'])) {
                             return new Response('Cannot save a questlog with an empty deck');
                         }
 
@@ -528,12 +529,12 @@ class QuestLogController extends Controller {
                         $decklist = $em->getRepository('AppBundle:Decklist')->find($deck_id);
 
                         if (!$decklist) {
-                            throw new NotFoundHttpException("One of the selected decks does not exists.");
+                            throw new NotFoundHttpException("One of the selected decks does not exist.");
                         }
 
                         $content = (array) json_decode($request->get("deck".$i."_content"));
 
-                        if (!isset($content['main']) || !count($content['main'])) {
+                        if (!isset($content['main']) || empty($content['main'])) {
                             return new Response('Cannot save a questlog with an empty deck');
                         }
 
