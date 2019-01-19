@@ -379,7 +379,7 @@
             } else {
                 var link = '<i>'+deck.get_name()+'</i> <small>(unpublished)</small>';
             }
-            title = $('<h4></h4>').append(link);
+            title = $('<h4 style="height: 38px"></h4>').append(link);
         } else {
             title = $('<h4 style="font-weight: bold">Main Deck</h4>');
         }
