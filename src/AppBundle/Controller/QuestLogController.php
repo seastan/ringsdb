@@ -272,9 +272,11 @@ class QuestLogController extends Controller {
         /* @var $decks \AppBundle\Entity\Deck[] */
         $decks = [];
         $deck_ids = func_get_args();
+        $author_names = [];
 
         for ($i = 0; $i < 4; $i++) {
             $decks[$i] = null;
+            $author_names[$i] = null;
             
             if ($deck_ids[$i]) {
                 /* $public = filter_var($request->get('p'.($i + 1)), FILTER_SANITIZE_NUMBER_INT); */
@@ -286,7 +288,7 @@ class QuestLogController extends Controller {
  
                 if ($decks[$i]) {
                     $user = $decks[$i]->getUser();
-
+                    $author_names[$i] = $user->getUsername();
                     if (!$public && !$user->getIsShareDecks() && $user->getId() != $this->getUser()->getId()) {
                         $decks[$i] = null;
                     }
@@ -308,10 +310,10 @@ class QuestLogController extends Controller {
             'questlogdeck2_content' => null,
             'questlogdeck3_content' => null,
             'questlogdeck4_content' => null,
-            'questlogdeck1_player_name' => 'Seastan',
-            'questlogdeck2_player_name' => null,
-            'questlogdeck3_player_name' => null,
-            'questlogdeck4_player_name' => null,
+            'questlogdeck1_player_name' => $author_names[0],
+            'questlogdeck2_player_name' => $author_names[1],
+            'questlogdeck3_player_name' => $author_names[2],
+            'questlogdeck4_player_name' => $author_names[3],
             'questlog' => $questlog,
             'is_locked_as_public' => false,
             'nbDecks' => 0
@@ -509,7 +511,7 @@ class QuestLogController extends Controller {
             if ($public) {
                 $questlog->setDatePublish(new \DateTime());
             }
-
+            $questlogdecks = $questlog->getDecks();
             foreach ($questlog->getDecks() as $deck) {
                 $questlog->removeDeck($deck);
                 $em->remove($deck);
@@ -520,7 +522,8 @@ class QuestLogController extends Controller {
             for ($i = 1; $i <= 4; $i++) {
                 $deck_id = intval(filter_var($request->request->get("deck".$i."_id"), FILTER_SANITIZE_NUMBER_INT));
                 $is_decklist = filter_var($request->get("deck".$i."_is_decklist"), FILTER_SANITIZE_STRING) == 'true';
-                $player = trim(filter_var($request->get("deck".$i."_player_name"), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+                $player = trim(filter_var($request->get("questlogdeck".$i."_player_name"), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+                $content = (array) json_decode($request->get("questlogdeck".$i."_content"));
 
                 if ($deck_id) {
                     if (!$is_decklist) {
@@ -541,7 +544,7 @@ class QuestLogController extends Controller {
                             $deck = $this->get('decks')->cloneDeck($deck, $user);
                         }
 
-                        $content = (array) json_decode($request->get("deck".$i."_content"));
+                        //$content = (array) json_decode($request->get("deck".$i."_content"));
 
                         if (!isset($content['main']) || empty($content['main'])) {
                             return new Response('Cannot save a questlog with an empty deck');
@@ -563,7 +566,7 @@ class QuestLogController extends Controller {
                             throw new NotFoundHttpException("One of the selected decks does not exist.");
                         }
 
-                        $content = (array) json_decode($request->get("deck".$i."_content"));
+                        //$content = (array) json_decode($request->get("deck".$i."_content"));
 
                         if (!isset($content['main']) || empty($content['main'])) {
                             return new Response('Cannot save a questlog with an empty deck');
@@ -579,6 +582,27 @@ class QuestLogController extends Controller {
 
                         $questlog->addDeck($questlog_decklist);
                     }
+                    $nb_decks++;
+                } elseif ($deck_id == 0) {
+                    // deck_id == 0 occurs if:
+                    // 1. the deck slot in the builder is empty
+                    // 2. the deck being referenced was deleted
+                    $content = (array) json_decode($request->get("deck".$i."_content"));
+
+                    if (!isset($content['main']) || empty($content['main'])) {
+                        // Deck slot was empty
+                        $skip++;
+                        continue;
+                    }
+
+                    // Reference deck was deleted
+                    $questlog_deck = new QuestlogDeck();
+                    $questlog_deck->setContent(json_encode($content));
+                    $questlog_deck->setDeckNumber($i - $skip);
+                    $questlog_deck->setQuestlog($questlog);
+                    $questlog_deck->setPlayer($player);
+
+                    $questlog->addDeck($questlog_deck);
                     $nb_decks++;
                 } else {
                     $skip++;

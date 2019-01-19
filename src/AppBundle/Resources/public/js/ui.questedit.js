@@ -191,10 +191,10 @@
     };
 
     ui.update_players = function() {
-        $('#deck1_player_name').prop('disabled', !Decks[1]);
-        $('#deck2_player_name').prop('disabled', !Decks[2]);
-        $('#deck3_player_name').prop('disabled', !Decks[3]);
-        $('#deck4_player_name').prop('disabled', !Decks[4]);
+        $('#questlogdeck1_player_name').prop('disabled', !Decks[1]);
+        $('#questlogdeck2_player_name').prop('disabled', !Decks[2]);
+        $('#questlogdeck3_player_name').prop('disabled', !Decks[3]);
+        $('#questlogdeck4_player_name').prop('disabled', !Decks[4]);
 
         ui.set_questlog_name();
     };
@@ -249,9 +249,9 @@
         for (var i = 1; i <= 4; i++) {
             if (Decks[i]) {
                 app.deck_selection.activate_deck(i);
-                $('input[name="deck' + i + '_content"]').val(app.deck.get_json());
+                $('input[name="questlogdeck' + i + '_content"]').val(app.deck.get_json());
             } else {
-                $('input[name="deck' + i + '_content"]').val('');
+                $('input[name="questlogdeck' + i + '_content"]').val('');
             }
         }
     };
