@@ -28,10 +28,9 @@
                         <div class="questlogs-actions">
                             <span class="deck-count">
                                 {% for i in 1..questlog.nbDecks %}
-                                    <i class="fa fa-user"></i>
+                                     <i class="fa fa-user"></i>
                                 {% endfor %}
                             </span>
-
                             {% if questlog.isPublic %}
                                 <small class="social">{{ macros.static_questlog_social_icons(questlog) }}</small>
                             {% endif %}
@@ -71,8 +70,10 @@
                             <div class="questlog-deck-info">
                                 {% if social %}
                                     <h4 style=""><i><a href="{{ path('decklist_detail', { decklist_id: decklist.id, 'decklist_name': decklist.nameCanonical|e('url') }) }}">{{ decklist.name }}</a></i></h4>
+                                {% elseif decklist.id != 0 %}
+                                    <h4 style=""><i><a href="{{ path('deck_view', { deck_id: decklist.id }) }}">{{ decklist.name }}</a></i> <small>(snapshot)</small></h4>
                                 {% else %}
-                                    <h4 style=""><i><a href="{{ path('deck_view', { deck_id: decklist.id }) }}">{{ decklist.name }}</a></i></h4>
+                                    <h4 style=""><small><i>{{ decklist.name }}</i> (snapshot)</small></h4>
                                 {% endif %}
                                 <span class="small questlog-hero-text hidden-xs">
                                     {% for hero in decklist.getSlots().getHeroDeck() %}

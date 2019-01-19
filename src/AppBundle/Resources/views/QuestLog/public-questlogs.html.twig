@@ -126,7 +126,7 @@
                                                 {% if social %}
                                                     <h4 style=""><i><a href="{{ path('decklist_detail', { decklist_id: decklist.id, 'decklist_name': decklist.nameCanonical|e('url') }) }}">{{ decklist.name }}</a></i></h4>
                                                 {% else %}
-                                                    <h4 style=""><i><a href="{{ path('deck_view', { deck_id: decklist.id }) }}">{{ decklist.name }}</a></i></h4>
+                                                    <h4 style=""><small><i>{{ decklist.name }}</i>  (unpublished)</small></h4>
                                                 {% endif %}
                                                 <span class="small questlog-hero-text hidden-xs">
                                                     {% for hero in decklist.getSlots().getHeroDeck() %}

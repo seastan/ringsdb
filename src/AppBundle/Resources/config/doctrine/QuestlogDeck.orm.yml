@@ -11,11 +11,12 @@ AppBundle\Entity\QuestlogDeck:
                 referencedColumnName: id
         deck:
             targetEntity: Deck
-            nullable: false
+            nullable: true
             inversedBy: questlogs
             joinColumn:
                 name: deck_id
                 referencedColumnName: id
+                onDelete: "SET NULL"
         decklist:
             targetEntity: Decklist
             nullable: false

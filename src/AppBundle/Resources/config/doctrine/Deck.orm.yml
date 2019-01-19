@@ -47,7 +47,7 @@ AppBundle\Entity\Deck:
         questlogs:
             targetEntity: QuestlogDeck
             mappedBy: deck
-            cascade: ["persist","remove"]
+            cascade: ["persist"]
     fields:
         id:
             type: integer

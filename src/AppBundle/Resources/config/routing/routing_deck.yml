@@ -23,6 +23,7 @@ deck_view:
     methods: [GET]
     defaults:
         _controller: AppBundle:Builder:view
+        deck_id: 0
     requirements:
         deck_id: \d+
 

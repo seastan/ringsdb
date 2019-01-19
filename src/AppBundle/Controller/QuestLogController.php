@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\Controller;
 
+use AppBundle\Services\Decks;
+use AppBundle\Entity\Deck;
 use AppBundle\Entity\Questlog;
 use AppBundle\Entity\QuestlogComment;
 use AppBundle\Entity\QuestlogDeck;
@@ -16,6 +18,27 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use DateTime;
 
 class QuestLogController extends Controller {
+
+    // Set the deck content to the QuestlogDeck snapshot
+    public function setSnapshot($questlog) {
+        $questlog_decks = $questlog->getDecks();
+        $decks_service = $this->get('decks');
+        foreach($questlog_decks as $questlog_deck) {
+            $deck = $questlog_deck->getDeck();
+            if (!$deck) {
+                $deck = new Deck();
+                $deck->setName("[deleted]");
+                $questlog_deck->setDeck($deck);
+            }
+            $questlogdeck_content = (array) json_decode($questlog_deck->getContent());
+            $decks_service->setSlots($deck,$questlogdeck_content);
+        }
+    }
+    public function setSnapshots($questlogs) {
+        foreach ($questlogs as $questlog) {
+            $this->setSnapshot($questlog);
+        }
+    }
 
     public function mylistAction($scenario_name_canonical, $quest_mode) {
         /* @var $em \Doctrine\ORM\EntityManager */
@@ -78,11 +101,13 @@ class QuestLogController extends Controller {
 
             /* @var $questlogs \AppBundle\Entity\Questlog[] */
             $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => 'DESC']);
+            $this->setSnapshots($questlogs);
 
             $victories = 0;
             $defeats = 0;
             $total = count($questlogs);
             foreach ($questlogs as $questlog) {
+                // Count victories/defeats
                 if ($questlog->getSuccess()) {
                     $victories++;
                 } else {
@@ -140,6 +165,7 @@ class QuestLogController extends Controller {
 
         /* @var $questlogs \AppBundle\Entity\Questlog[] */
         $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user], ['dateCreation' => 'DESC']);
+        $this->setSnapshots($questlogs);
 
         return $this->render('AppBundle:QuestLog:my-questlogs.html.twig', [
             'pagetitle' => "My Quest Logs",
@@ -219,6 +245,7 @@ class QuestLogController extends Controller {
                 $pagetitle = "Popular Quest Logs";
                 break;
         }
+        $this->setSnapshots($paginator);
 
         return $this->render('AppBundle:QuestLog:public-questlogs.html.twig', [
             'pagetitle' => $pagetitle,
@@ -277,16 +304,17 @@ class QuestLogController extends Controller {
             'deck2' => $decks[1],
             'deck3' => $decks[2],
             'deck4' => $decks[3],
-            'deck1_content' => null,
-            'deck2_content' => null,
-            'deck3_content' => null,
-            'deck4_content' => null,
-            'deck1_player_name' => 'Seastan',
-            'deck2_player_name' => null,
-            'deck3_player_name' => null,
-            'deck4_player_name' => null,
+            'questlogdeck1_content' => null,
+            'questlogdeck2_content' => null,
+            'questlogdeck3_content' => null,
+            'questlogdeck4_content' => null,
+            'questlogdeck1_player_name' => 'Seastan',
+            'questlogdeck2_player_name' => null,
+            'questlogdeck3_player_name' => null,
+            'questlogdeck4_player_name' => null,
             'questlog' => $questlog,
-            'is_locked_as_public' => false
+            'is_locked_as_public' => false,
+            'nbDecks' => 0
         ], $response);
     }
 
@@ -331,23 +359,25 @@ class QuestLogController extends Controller {
             'questlogdeck3_player_name' => null,
             'questlogdeck4_player_name' => null,
             'questlog' => $questlog,
-            'is_locked_as_public' => $is_locked_as_public
+            'is_locked_as_public' => $is_locked_as_public,
+            'nbDecks' => $questlog->getNbDecks()
         ];
 
         /* @var $questlog_decks \AppBundle\Entity\QuestlogDeck[] */
         $questlog_decks = $questlog->getDecks();
         foreach ($questlog_decks as $questlog_deck) {
             $data['deck' . $questlog_deck->getDeckNumber()] = $questlog_deck->getDecklist() ?: $questlog_deck->getDeck();
-            $data['deck' . $questlog_deck->getDeckNumber() . '_content'] = $questlog_deck->getContent();
-            $data['deck' . $questlog_deck->getDeckNumber() . '_player_name'] = $questlog_deck->getPlayer();
+            $data['questlogdeck' . $questlog_deck->getDeckNumber() . '_content'] = $questlog_deck->getContent();
+            $data['questlogdeck' . $questlog_deck->getDeckNumber() . '_player_name'] = $questlog_deck->getPlayer();
         }
-
+        
         return $this->render('AppBundle:QuestLog:edit.html.twig', $data, $response);
     }
 
     public function viewAction($questlog_id) {
         /* @var $questlog \AppBundle\Entity\Questlog */
         $questlog = $this->getDoctrine()->getManager()->getRepository('AppBundle:Questlog')->find($questlog_id);
+        //$this->setSnapshot($questlog);
 
         if (!$questlog) {
             throw new NotFoundHttpException("This questlog does not exists.");
@@ -388,7 +418,8 @@ class QuestLogController extends Controller {
             'questlog' => $questlog,
             'is_owner' => $is_owner,
             'is_public' => $is_public,
-            'commenters' => $commenters
+            'commenters' => $commenters,
+            'nbDecks' => $questlog->getNbDecks()
         ];
 
         /* @var $questlog_decks \AppBundle\Entity\QuestlogDeck[] */
