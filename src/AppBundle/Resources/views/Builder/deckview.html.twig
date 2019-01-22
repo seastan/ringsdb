@@ -49,11 +49,28 @@
                             <div class="panel-body" id="description"></div>
                         </div>
                         <!-- Description -->
+                        
+                        <!-- Questlogs Table -->
+                        <table class="table table-condensed" id="table-questlogs">
+                            <thead>
+                            <tr>
+                                <th colspan="2"><span class="fa fa-trophy"></span> Questlogs using this deck</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% set questlogs = deck.allQuestlogs %}
 
-                        {% include 'AppBundle:Builder:deck-charts.html.twig' %}
-
-                        {% include 'AppBundle:Builder:draw-simulator.html.twig' %}
-
+                            {% if questlogs | length %}
+                                {% for questlog in questlogs %}
+                                    {{ macros.questlog_deck_table_row(questlog.questlog) }}
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td>None.</td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
 
                         <!-- Fellowships Table -->
                         <table class="table table-condensed" id="table-fellowships">
@@ -111,6 +128,10 @@
                                 {% endif %}
                             </tbody>
                         </table>
+
+                        {% include 'AppBundle:Builder:deck-charts.html.twig' %}
+
+                        {% include 'AppBundle:Builder:draw-simulator.html.twig' %}
                     </div>
                 </div>
             </div>

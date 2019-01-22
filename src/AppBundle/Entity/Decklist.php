@@ -918,4 +918,17 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     public function getQuestlogs() {
         return $this->questlogs;
     }
+
+    /**
+     * Get allQuestlogs
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getAllQuestlogs() {
+        $allQuestlogs = $this->getQuestlogs()->toArray();
+
+        return array_filter($allQuestlogs, function($k) {
+            return $k->getQuestlog()->getIsPublic();
+        });
+    }
 }
