@@ -737,9 +737,11 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      */
     public function getAllQuestlogs() {
         $allQuestlogs = $this->getQuestlogs()->toArray();
-
+        return $allQuestlogs;
+    /*
         return array_filter($allQuestlogs, function($k) {
             return $k->getQuestlog()->getIsPublic();
         });
+    */
     }
 }
