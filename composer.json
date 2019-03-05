@@ -65,7 +65,10 @@
     ]
   },
   "config": {
-    "bin-dir": "bin"
+    "bin-dir": "bin",
+    "platform": {
+	"php": "5.6"
+    }
   },
   "extra": {
     "symfony-app-dir": "app",
