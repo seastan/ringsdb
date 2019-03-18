@@ -49,7 +49,6 @@ class QuestLogController extends Controller {
 
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
-        $user = $this->getUser();
         if (!$user) {
             throw new AccessDeniedHttpException("You must be logged in for this operation.");
         }
