@@ -78,33 +78,6 @@ class QuestLogController extends Controller {
                 'pagedescription' => "Log a new quest."
             ]);
         } else {
-/*             $searchterms['user'] = $user;
-            $scenario = 'null';
-            if ($scenario_name_canonical != 'all') {
-                $scenario = $em->getRepository('AppBundle:Scenario')->findOneBy(['nameCanonical' => $scenario_name_canonical]);
-                if ($scenario == null) {
-                    throw new NotFoundHttpException("This quest does not exist.");
-                } else {
-                    $searchterms['scenario'] = $scenario;
-                }
-            }
-            if ($quest_mode != 'all') {
-                if ($quest_mode != 'easy' && $quest_mode != 'normal' && $quest_mode != 'nightmare') {
-                    throw new NotFoundHttpException("Invalid quest difficulty.");
-                } else {
-                    $searchterms['questMode'] = $quest_mode;
-                }
-            } */
-/* 
-            if ($scenario_name_canonical == null) {
-                 $res = $dbh->executeQuery("SELECT q.scenario_id, s.name_canonical, q.quest_mode
-                      FROM questlog q
-                      INNER JOIN scenario s ON q.scenario_id = s.id
-                      WHERE q.user_id = ?
-                      ORDER BY q.scenario_id LIMIT 1", [$user->getId()])->fetch(\PDO::FETCH_NUM);
-                $scenario_name_canonical = $res[1];
-                $quest_mode = $res[2]; 
-            }   */
             $show_all = false;
             $scenario = null;
             if ($scenario_name_canonical == null) {

@@ -374,17 +374,23 @@
                     deck_id: deck.get_id()
                 });
             }
+            // If published or is_author, generate url to deck.
             if (is_published) {
+                var link = $('<a target="_blank"></a>').attr('href', url).text(deck.get_name());
+            } else if (app.user.data && app.user.data.is_author) {
                 var link = $('<a target="_blank"></a>').attr('href', url).text(deck.get_name());
             } else {
                 var link = '<i>'+deck.get_name()+'</i> <small>(unpublished)</small>';
             }
+/*             if (is_published) {
+                var link = $('<a target="_blank"></a>').attr('href', url).text(deck.get_name());
+            } else {
+                var link = '<i>'+deck.get_name()+'</i> <small>(unpublished)</small>';
+            } */
             title = $('<h4 style="height: 38px"></h4>').append(link);
         } else {
             title = $('<h4 style="font-weight: bold">Main Deck</h4>');
         }
-
-
         var threat = $('<div>Starting Threat: <b>' + deck.get_starting_threat() + '</b></div>')
 
         var text = [herocount, herocount == 1 ? ' Hero, ': ' Heroes, ', drawcount, drawcount == 1 ? ' Card': ' Cards' ].join(' ');
@@ -408,6 +414,7 @@
         }
 
         deck.update_layout_section(data, 'meta', title);
+        //deck.update_layout_section(data, 'meta', $('<br>'));
         deck.update_layout_section(data, 'meta', threat);
         deck.update_layout_section(data, 'meta', sizeinfo);
 
