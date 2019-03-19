@@ -7,6 +7,11 @@
 <a href="{{ path('deck_copy', { decklist_id:decklist.id }) }}" class="btn btn-sm btn-default">
     <span class="fa fa-save"></span> <span class="hidden-xs">Copy</span>
 </a>
+
+<a href="{{ path('questlog_new', { public: 1, deck1_id: decklist.id }) }}" class="btn btn-sm btn-default">
+  <span class="fa fa-book text-warning"></span> Log a Quest
+</a>
+
 <div class="btn-group">
     <button type="button" class="btn btn-sm btn-default dropdown-toggle " data-toggle="dropdown">
         <span class="fa fa-download"></span> <span class="hidden-xs">Download</span> <span class="caret"></span>
@@ -16,10 +21,6 @@
         <li><a href="#" id="btn-download-octgn">Octgn file</a></li>
     </ul>
 </div>
-
-<a href="{{ path('questlog_new', { public: 1, deck1_id: decklist.id }) }}" class="btn btn-sm btn-default">
-  <span class="fa fa-book text-warning"></span> Log a Quest
-</a>
 
 <div class="btn-group">
     <button type="button" class="btn btn-sm btn-default dropdown-toggle " data-toggle="dropdown">

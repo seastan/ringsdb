@@ -404,7 +404,7 @@ class BuilderController extends Controller {
         }
 
         $content = (array) json_decode($request->get('content'));
-        if (!isset($content['main']) || !count($content['main'])) {
+        if (!isset($content['main']) || empty($content['main'])) {
             return new Response('Cannot import an empty deck');
         }
 

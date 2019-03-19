@@ -7,34 +7,11 @@
     {% endjavascripts %}
 
     <script type="text/javascript">
-        // These are the "current versions" of the decks/decklists in the database
-        // If they've been edited, they may no longer correspond to the decklist used in the log
-         
-
         var Decks = {};
         Decks[1] = {{ deck1 | json_encode | raw }};
         Decks[2] = {{ deck2 | json_encode | raw }};
         Decks[3] = {{ deck3 | json_encode | raw }};
         Decks[4] = {{ deck4 | json_encode | raw }};
-        
-        // These are the contents of the decks at the time the log was made
-        var DeckContents = {};
-        DeckContents[1] = {{ questlogdeck1_content | json_encode | raw }};
-        DeckContents[2] = {{ questlogdeck2_content | json_encode | raw }};
-        DeckContents[3] = {{ questlogdeck3_content | json_encode | raw }};
-        DeckContents[4] = {{ questlogdeck4_content | json_encode | raw }};
-
-        // We replace the content in the current version with the contents at the time the log was made
-        var nbDecks = {{ nbDecks }};
-        for (var key=1; key<= nbDecks; key++) {
-            if (!Decks[key]) { // Deck was deleted
-                Decks[key] = {};
-                Decks[key].name = '[deleted]';
-            }
-            deck_content = JSON.parse(DeckContents[key]);
-            Decks[key].slots = deck_content['main'];
-            Decks[key].sideslots = deck_content['side'];
-        }
 
         var Commenters = {{ commenters | json_encode | raw }};
         var QuestLog = {
@@ -119,7 +96,7 @@
 
             <div class="row hidden-print">
                 <div class="col-md-12" id="btn-group-deck">
-                    {% include 'AppBundle:QuestLog:toolbar.html.twig' %}
+                    {% include 'AppBundle:Quest:toolbar.html.twig' %}
                 </div>
             </div>
 
@@ -143,7 +120,7 @@
             {% if is_public %}
                 <div class="row hidden-print">
                     <div class="col-md-12">
-                        {% include 'AppBundle:QuestLog:comments.html.twig' %}
+                        {% include 'AppBundle:Quest:comments.html.twig' %}
                     </div>
                 </div>
             {% endif %}

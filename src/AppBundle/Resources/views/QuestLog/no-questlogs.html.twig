@@ -1,0 +1,22 @@
+{% extends 'AppBundle::layout.html.twig' %}
+
+{% block body %}
+
+    <div class="jumbotron" id="no-questlog-available">
+        <div class="container">
+            <h1>What, no quest logs?</h1>
+            <p>
+                A quest log is a way to record the events and outcome of a game session. By default they are kept private, but you may make them public for others to discuss.
+            </p>
+            <p>
+                You can create quest logs with one to four decks, and you are not limited to just your own: you can include other players' decks in your questlog, provided
+                those decks are published on RingsDB. If you choose to make the quest log visible to others, it will appear under the "Quest Logs" tab at the top of the page,
+                as well as directly underneath the decklist itself, so others can see which quests a deck has beaten.
+            </p>
+        </div>
+    </div>
+    <div style="text-align:center">
+        <a href="{{ path('questlog_new') }}" class="btn btn-default btn-lg"><span class="fa fa-plus"></span> Create a Quest Log</a>
+    </div>
+
+{% endblock %}

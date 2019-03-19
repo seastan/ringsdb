@@ -1,12 +1,18 @@
 {% import "AppBundle::macros.html.twig" as macros %}
 
+{% if selected_scenario %}
 <h1 class="quest-title {{ quest_mode }}" style="border-bottom: 0">
     <span class="img" style="background-image: url('{{ asset('/bundles/app/images/encounters/' ~ (selected_scenario.name | url_encode) ~ '.png')  }}')"></span>
     {{ selected_scenario.name }}
     <small class="text-muted">{{ quest_mode | capitalize }}</small>
 </h1>
+{% else %}
+<h1 class="quest-title normal" style="border-bottom: 0">
+    My Quest Logs
+</h1>
+{% endif %}
 
-<div class="small text-center" style="margin-bottom: 10px;">Times logged: {{ total }} &middot; Victories: {{ victories }} &middot; Defeats: {{ defeats }}  &middot; Victory ratio: {{ ratio }}</div>
+<div class="small" style="margin-bottom: 10px;">Times logged: {{ total }} &middot; Victories: {{ victories }} &middot; Defeats: {{ defeats }}  &middot; Victory ratio: {{ ratio }}</div>
 
 <table class="table list-questlogs">
     <tbody id="questlogs">
@@ -28,10 +34,9 @@
                         <div class="questlogs-actions">
                             <span class="deck-count">
                                 {% for i in 1..questlog.nbDecks %}
-                                    <i class="fa fa-user"></i>
+                                     <i class="fa fa-user"></i>
                                 {% endfor %}
                             </span>
-
                             {% if questlog.isPublic %}
                                 <small class="social">{{ macros.static_questlog_social_icons(questlog) }}</small>
                             {% endif %}
@@ -71,8 +76,10 @@
                             <div class="questlog-deck-info">
                                 {% if social %}
                                     <h4 style=""><i><a href="{{ path('decklist_detail', { decklist_id: decklist.id, 'decklist_name': decklist.nameCanonical|e('url') }) }}">{{ decklist.name }}</a></i></h4>
+                                {% elseif decklist.id != 0 %}
+                                    <h4 style=""><i><a href="{{ path('deck_view', { deck_id: decklist.id }) }}">{{ decklist.name }}</a></i> <small>(snapshot)</small></h4>
                                 {% else %}
-                                    <h4 style=""><i><a href="{{ path('deck_view', { deck_id: decklist.id }) }}">{{ decklist.name }}</a></i></h4>
+                                    <h4 style=""><small><i>{{ decklist.name }}</i> (snapshot)</small></h4>
                                 {% endif %}
                                 <span class="small questlog-hero-text hidden-xs">
                                     {% for hero in decklist.getSlots().getHeroDeck() %}

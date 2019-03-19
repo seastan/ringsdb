@@ -90,15 +90,15 @@
                                                 <small class="social">{{ macros.static_questlog_social_icons(questlog) }}</small>
                                             {% endif %}
 
-                                            <div class="block"></div>
+                                            <div>
+                                                <time datetime="{{ questlog.datePublish | date('c') }}">{{ questlog.datePublish | date('M d') }}</time>
+                                                <span class="username" style="margin-left: 5px; display: inline-block;">
+                                                    <a href="{{ path('user_profile_public', {user_id: questlog.user.id, user_name: questlog.user.username | e('url')}) }}" class="{{ questlog.user.color }}">{{ questlog.user.username }}</a>
+                                                    {% if questlog.user.donation > 0 %}<span class="fa fa-gift patron" title="RingsDB Gracious Patron"></span>{% endif %}
+                                                    <small class="reputation">{{ questlog.user.reputation }}</small>
+                                                </span>
+                                            </div>
 
-                                            <a href="{{ path('questlog_edit', { questlog_id: questlog.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" data-container="body" title="Edit">
-                                                <span class="fa fa-pencil fa-fw"></span>
-                                            </a>
-
-                                            <label class="btn btn-xs btn-default" data-action="delete-questlog" data-toggle="tooltip" data-container="body" title="Delete">
-                                                <span class="fa fa-trash-o fa-fw"></span>
-                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -126,7 +126,10 @@
                                                 {% if social %}
                                                     <h4 style=""><i><a href="{{ path('decklist_detail', { decklist_id: decklist.id, 'decklist_name': decklist.nameCanonical|e('url') }) }}">{{ decklist.name }}</a></i></h4>
                                                 {% else %}
-                                                    <h4 style=""><i><a href="{{ path('deck_view', { deck_id: decklist.id }) }}">{{ decklist.name }}</a></i></h4>
+                                                    <h4 style=""><small><i>{{ decklist.name }}</i>  (unpublished)</small></h4>
+                                                {% endif %}
+                                                {% if deck.player %}
+                                                <div class="small">Played by {{deck.player}}</div>
                                                 {% endif %}
                                                 <span class="small questlog-hero-text hidden-xs">
                                                     {% for hero in decklist.getSlots().getHeroDeck() %}

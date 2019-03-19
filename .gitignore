@@ -23,6 +23,3 @@ tags
 user-data.sql
 beorn.json
 .DS_Store
-.vs/RingsDB_QuestLog/v15/.suo
-*.phpproj
-*.sln

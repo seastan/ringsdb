@@ -13,26 +13,7 @@
         Decks[3] = {{ deck3 | json_encode | raw }};
         Decks[4] = {{ deck4 | json_encode | raw }};
 
-        // These are the contents of the decks at the time the log was made
-        var DeckContents = {};
-        DeckContents[1] = {{ questlogdeck1_content | json_encode | raw }};
-        DeckContents[2] = {{ questlogdeck2_content | json_encode | raw }};
-        DeckContents[3] = {{ questlogdeck3_content | json_encode | raw }};
-        DeckContents[4] = {{ questlogdeck4_content | json_encode | raw }};
-
-        // We replace the content in the current version with the contents at the time the log was made
-        var nbDecks = {{ nbDecks }};
-        for (var key=1; key<= nbDecks; key++) {
-            if (!Decks[key]) { // Deck was deleted
-                Decks[key] = {};
-                Decks[key].name = '[deleted]';
-            }
-            deck_content = JSON.parse(DeckContents[key]);
-            Decks[key].slots = deck_content['main'];
-            Decks[key].sideslots = deck_content['side'];
-        }
-
-        var QuestLog = {{ questlog | json_encode | raw }};
+        var Questlog = {{ questlog | json_encode | raw }};
         
         app.deck_selection && app.deck_selection.init(Decks);
     </script>

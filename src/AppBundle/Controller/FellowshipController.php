@@ -365,7 +365,7 @@ class FellowshipController extends Controller {
             $fellowship->setNbDecks($nb_decks);
         }
 
-        if ($auto_publish && !count($fellowship->getDecks())) {
+        if ($auto_publish && empty($fellowship->getDecks())) {
             $fellowship->setIsPublic(true);
             $fellowship->setDatePublish(new \DateTime());
         }

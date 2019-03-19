@@ -8,7 +8,7 @@
     {% for successor in decklist.successors %}
         {% if decklist.user==successor.user %}
             <div>
-                <span class="fa fa-forward"></span> {{ decklist.user.username }} has updated this deck: <a class="decklist-name" href="{{ path('decklist_detail', { 'decklist_id': successor.id, 'decklist_name': successor.nameCanonical|e('url') }) }}">{{ successor.name }}</a>
+                <span class="fa fa-forward"></span> <i>{{ decklist.user.username }} has a newer deck inspired by this one: <a class="decklist-name" href="{{ path('decklist_detail', { 'decklist_id': successor.id, 'decklist_name': successor.nameCanonical|e('url') }) }}">{{ successor.name }}</i></a>
             </div>
             <br>
         {% endif %}

@@ -92,7 +92,7 @@ class Texts {
      * @return string
      */
     public function slugify($filename) {
-        $filename = mb_ereg_replace('[^\w\-]', '-', $filename);
+        $filename = preg_replace('[^\w\-]', '-', $filename);
         try {
             $filename = iconv('utf-8', 'us-ascii//TRANSLIT', $filename);
         } catch (ContextErrorException $e)  {

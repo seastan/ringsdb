@@ -1,0 +1,23 @@
+{% import 'AppBundle::macros.html.twig' as macros %}   
+
+<!-- Questlogs Table -->
+<table class="table table-condensed" id="table-questlogs">
+    <thead>
+    <tr>
+        <th colspan="2"><span class="fa fa-trophy"></span> Questlogs using this decklist</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% set questlogs = decklist.allQuestlogs %}
+
+    {% if questlogs | length %}
+        {% for questlog in questlogs %}
+            {{ macros.questlog_deck_table_row(questlog.questlog) }}
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td>None.</td>
+        </tr>
+    {% endif %}
+    </tbody>
+</table>

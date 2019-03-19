@@ -63,7 +63,7 @@ AppBundle\Entity\Decklist:
         questlogs:
             targetEntity: QuestlogDeck
             mappedBy: decklist
-            cascade: ["persist","remove"]
+            cascade: ["persist"]
     manyToMany:
         spheres:
             targetEntity: Sphere

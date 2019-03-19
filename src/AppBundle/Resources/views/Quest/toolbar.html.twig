@@ -1,0 +1,55 @@
+<div class="row">
+    <div class="col-md-12">
+        {% if is_owner %}
+            <div class="btn-group hidden" id="user_buttons" role="group" style="margin-bottom: 10px;">
+                <a href="{{ path('questlog_edit', { questlog_id: questlog.id }) }}" class="btn btn-sm btn-default">
+                    <span class="fa fa-pencil text-primary"></span> Edit
+                </a>
+
+                <button type="button" id="btn-delete" class="btn btn-sm btn-default">
+                    <span class="fa fa-trash-o text-danger"></span> Delete
+                </button>
+            </div>
+        {% endif %}
+
+        <div class="btn-group pull-right" role="group" style="margin-bottom: 10px;">
+            <button type="button" id="btn-print" class="btn btn-sm btn-default">
+                <span class="fa fa-print text-default"></span> <span class="hidden-xs">Print</span>
+            </button>
+
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
+                    <span class="fa fa-download"></span> Download <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="#" id="btn-download-text">Text file</a></li>
+                    <li><a href="#" id="btn-download-octgn">Octgn file</a></li>
+                </ul>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
+                    <span class="fa fa-clipboard"></span> Export <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="#" id="btn-export-bbcode">bbCode</a></li>
+                    <li><a href="#" id="btn-export-markdown">Markdown (Reddit)</a></li>
+                    <li><a href="#" id="btn-export-plaintext">plain text</a></li>
+                    <li><a href="#" id="btn-export-html">HTML (WordPress)</a></li>
+                </ul>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
+                    <span class="fa fa-sort"></span> Sort <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu" id="menu-sort">
+                    <li><a href="#" id="btn-sort-type">by Type</a></li>
+                    <li><a href="#" id="btn-sort-position">by Pack</a></li>
+                    <li><a href="#" id="btn-sort-sphere">by Sphere</a></li>
+                    <li><a href="#" id="btn-sort-name">by Name</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

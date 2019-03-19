@@ -1745,6 +1745,18 @@ h1.nightmare, h1.easy {
   }
 }
 
+#table-questlogs {
+  td:last-child {
+    width: 200px;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  td:first-child {
+    text-align: left;
+  }
+}
+
 #table-predecessor, #table-inspired {
   td {
     text-align: right;
