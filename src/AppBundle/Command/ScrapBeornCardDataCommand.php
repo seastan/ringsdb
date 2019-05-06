@@ -190,7 +190,6 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                 $isUnique = $c->filter('img[src="/Images/unique-card.png"]')->count() > 0;
 		$output->writeln("4");
 
-                $output->writeln("\n\n\n\n\n\n\n\n");
                 VarDumper::dump("Importing card number $i: $name");
 		$output->writeln("5");
 
@@ -279,131 +278,135 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
 		// Get matching RingsDB card
                 $card = $em->getRepository('AppBundle:Card')->findOneBy(['name' => $name, 'pack' => $pack]);
+                if (!$card) {
+		   $output->writeln("Card not found in RingsDB database.");
+		   continue;
+		}
+		$output->writeln("15b");		
                 if ($card && !$forceData && !$forceImage) {
                     // shortcut: we already know this card
                     continue;
                 }
 		$output->writeln("16");
 
-                if ($card && !$forceData) {
-		   $output->writeln("<error>Card already known and --force-data not set.</error>");
-                   continue;
-                }
+                if ($card && $forceData) {
 
-                $objSphere = null;
-                foreach ($allSpheres as $oneSphere) {
-                    if ($sphere === $oneSphere->getName()) {
-                        $objSphere = $oneSphere;
+                    $objSphere = null;
+                    foreach ($allSpheres as $oneSphere) {
+                        if ($sphere === $oneSphere->getName()) {
+                            $objSphere = $oneSphere;
+                        }
                     }
-                }
-		$output->writeln("17");
+		    $output->writeln("17");
 
-                if (!$objSphere) {
-                    $output->writeln("<error>Cannot find sphere [$sphere] for this card</error>");
-                    die();
-                }
-		$output->writeln("18");
-
-                $objType = null;
-                foreach ($allTypes as $oneType) {
-                    if ($type === $oneType->getName()) {
-                        $objType = $oneType;
+                    if (!$objSphere) {
+                        $output->writeln("<error>Cannot find sphere [$sphere] for this card</error>");
+                        die();
                     }
-                }
-		$output->writeln("19");
+		    $output->writeln("18");
 
-                if (!$objType) {
-                    $output->writeln("<error>Cannot find type [$type] for this card</error>");
-                    die();
-                }
-		$output->writeln("20");
-
-                $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', '\'', '\''], $text);
-                $text = preg_replace('/<a title="Search:.*?>(.*?)<\/a>/', '\\1', $text);
-                $text = preg_replace('/<a title="Keyword:.*?>(.*?)<\/a>/', '\\1', $text);
-                $text = preg_replace_callback('/<img .*?src="\/Images\/(.*?)\..*?>/', function($m) {
-                    return strtolower("[$m[1]]");
-                }, $text);
-                $text = str_replace(['<br />', '<br>'], ["\n", "\n"], $text);
-                $text = str_replace("</b><b>", " ", $text);
-                $text = str_replace("</b>: ", ":</b> ", $text);
-                $text = preg_replace("/ +/", " ", $text);
-                $text = preg_replace("/\n+/", "\n", $text);
-                $text = trim($text);
-		$output->writeln("21");
-
-                if ($text && $showTexts) {
-                    $output->writeln("Card text:");
-                    VarDumper::dump($text);
-                }
-		$output->writeln("22");
-
-                $flavor = str_replace(['<br />', '<br>'], ["\n", "\n"], $flavor);
-                $flavor = preg_replace('/([a-z])–/s', '\\1-', $flavor);
-                $flavor = preg_replace('/–(.*)$/s', '<cite>\\1</cite>', $flavor);
-                $flavor = preg_replace("/ +/", " ", $flavor);
-                $flavor = preg_replace("/\n+/", "\n", $flavor);
-		$output->writeln("23");
-
-
-                if ($flavor && $showTexts) {
-                    $output->writeln("Card flavor:");
-                    VarDumper::dump($flavor);
-                }
-		$output->writeln("24");
-
-                $question = new ConfirmationQuestion("Shall I import this card?");
-                if (!$questionHelper->ask($input, $output, $question)) {
-                    continue;
-                }
-		$output->writeln("25");
-
-                if (!$card) {
-                    $card = new Card();
-                }
-		$output->writeln("26");
-
-                $card->setPosition($position);
-                if ($pack->getCycle()->getIsSaga()) {
-                    $card->setCode(sprintf("%02d%d%03d", $pack->getCycle()->getPosition(), $pack->getPosition(), $position));
-                } else {
-                    $card->setCode(sprintf("%02d%03d", $pack->getCycle()->getPosition(), $position));
-                }
-		$output->writeln("27");
-
-
-                $card->setType($objType);
-                $card->setSphere($objSphere);
-                $card->setPack($pack);
-
-                $card->setName($name);
-                $card->setTraits($traits);
-                $card->setText($text);
-                $card->setFlavor($flavor);
-                $card->setIsUnique($isUnique);
-		$output->writeln("28");
-
-                if ($type === 'Hero') {
-                    $cost = null;
-                } else {
-                    $threat = null;
-                }
-
-		$output->writeln("29");
-                $card->setCost($cost !== '' ? $cost : null);
-                $card->setThreat($threat !== '' ? $threat : null);
-                $card->setWillpower($willpower !== '' ? $willpower : null);
-                $card->setAttack($attack !== '' ? $attack : null);
-                $card->setDefense($defense !== '' ? $defense : null);
-                $card->setHealth($health !== '' ? $health : null);
-                $card->setVictory($victory !== '' ? $victory : null);
-                $card->setQuest($quest !== '' ? $quest : null);
-
-                $card->setQuantity($quantity);
-                $card->setDeckLimit($limit);
-                $card->setHasErrata(false);
-
-                //$card->setIllustrator(trim($data['illustrator']));
+                    $objType = null;
+                    foreach ($allTypes as $oneType) {
+                        if ($type === $oneType->getName()) {
+                            $objType = $oneType;
+                        }
+                    }
+    		$output->writeln("19");
+    
+                    if (!$objType) {
+                        $output->writeln("<error>Cannot find type [$type] for this card</error>");
+                        die();
+                    }
+    		$output->writeln("20");
+    
+                    $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', '\'', '\''], $text);
+                    $text = preg_replace('/<a title="Search:.*?>(.*?)<\/a>/', '\\1', $text);
+                    $text = preg_replace('/<a title="Keyword:.*?>(.*?)<\/a>/', '\\1', $text);
+                    $text = preg_replace_callback('/<img .*?src="\/Images\/(.*?)\..*?>/', function($m) {
+                        return strtolower("[$m[1]]");
+                    }, $text);
+                    $text = str_replace(['<br />', '<br>'], ["\n", "\n"], $text);
+                    $text = str_replace("</b><b>", " ", $text);
+                    $text = str_replace("</b>: ", ":</b> ", $text);
+                    $text = preg_replace("/ +/", " ", $text);
+                    $text = preg_replace("/\n+/", "\n", $text);
+                    $text = trim($text);
+    		$output->writeln("21");
+    
+                    if ($text && $showTexts) {
+                        $output->writeln("Card text:");
+                        VarDumper::dump($text);
+                    }
+    		$output->writeln("22");
+    
+                    $flavor = str_replace(['<br />', '<br>'], ["\n", "\n"], $flavor);
+                    $flavor = preg_replace('/([a-z])–/s', '\\1-', $flavor);
+                    $flavor = preg_replace('/–(.*)$/s', '<cite>\\1</cite>', $flavor);
+                    $flavor = preg_replace("/ +/", " ", $flavor);
+                    $flavor = preg_replace("/\n+/", "\n", $flavor);
+    		$output->writeln("23");
+    
+    
+                    if ($flavor && $showTexts) {
+                        $output->writeln("Card flavor:");
+                        VarDumper::dump($flavor);
+                    }
+    		$output->writeln("24");
+    
+                    $question = new ConfirmationQuestion("Shall I import this card?");
+                    if (!$questionHelper->ask($input, $output, $question)) {
+                        continue;
+                    }
+    		$output->writeln("25");
+    
+                    if (!$card) {
+                        $card = new Card();
+                    }
+    		$output->writeln("26");
+    
+                    $card->setPosition($position);
+                    if ($pack->getCycle()->getIsSaga()) {
+                        $card->setCode(sprintf("%02d%d%03d", $pack->getCycle()->getPosition(), $pack->getPosition(), $position));
+                    } else {
+                        $card->setCode(sprintf("%02d%03d", $pack->getCycle()->getPosition(), $position));
+                    }
+    		$output->writeln("27");
+    
+    
+                    $card->setType($objType);
+                    $card->setSphere($objSphere);
+                    $card->setPack($pack);
+    
+                    $card->setName($name);
+                    $card->setTraits($traits);
+                    $card->setText($text);
+                    $card->setFlavor($flavor);
+                    $card->setIsUnique($isUnique);
+    		$output->writeln("28");
+    
+                    if ($type === 'Hero') {
+                        $cost = null;
+                    } else {
+                        $threat = null;
+                    }
+    
+    		$output->writeln("29");
+                    $card->setCost($cost !== '' ? $cost : null);
+                    $card->setThreat($threat !== '' ? $threat : null);
+                    $card->setWillpower($willpower !== '' ? $willpower : null);
+                    $card->setAttack($attack !== '' ? $attack : null);
+                    $card->setDefense($defense !== '' ? $defense : null);
+                    $card->setHealth($health !== '' ? $health : null);
+                    $card->setVictory($victory !== '' ? $victory : null);
+                    $card->setQuest($quest !== '' ? $quest : null);
+    
+                    $card->setQuantity($quantity);
+                    $card->setDeckLimit($limit);
+                    $card->setHasErrata(false);
+    
+                    //$card->setIllustrator(trim($data['illustrator']));
+    
+		} // end of force-data
 
 		$output->writeln("30");
                 $em->persist($card);
