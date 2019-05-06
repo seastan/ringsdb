@@ -33,6 +33,9 @@ class DefaultController extends Controller {
         	$typeNames[$type->getCode()] = $type->getName();
         }
 
+        // Daily Challenge
+        $daily_challenge = 'test test test';
+
         // Trending Decks
         $num_trending = 3;
         $qb = $em->createQueryBuilder();
@@ -250,7 +253,8 @@ class DefaultController extends Controller {
             'fellowships_trending' => $fellowships_trending,
             'decklists_new' => $decklists_new,
             'fellowships_new' => $fellowships_new,
-            'all_comments' => $all_comments
+            'all_comments' => $all_comments,
+            'daily_challenge' => $daily_challenge
         ], $response);
     }
 
