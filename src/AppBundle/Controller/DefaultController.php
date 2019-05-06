@@ -33,6 +33,60 @@ class DefaultController extends Controller {
         	$typeNames[$type->getCode()] = $type->getName();
         }
 
+	// Daily Challenge
+        $timesec = time(); // Curent time in seconds
+        $timebiday = intdiv($timesec, 24*60*60); // This value will increase by 1 every day
+        srand($timebiday);
+        $quests = $em->getRepository('AppBundle:Scenario')->findBy([], ['position' => 'ASC']);
+	$numquests = count($quests);
+	$randquest = $quests[array_rand($quests)];
+	$challenges = array('a mono-Leadership deck',
+		      	    'a mono-Lore deck',
+			    'a mono-Spirit deck',
+			    'a mono-Tactics deck',
+		      	    'a Hobbit deck',
+			    'a Rohan deck',
+			    'a Gondor deck',
+		      	    'an Ent deck',
+			    'a Scout deck',
+			    'a Dwarf deck',
+		      	    'a Dúnedain deck',
+			    'a Noldor deck',
+			    'a Harad deck',
+			    'an Eagle deck',
+			    'a Dale deck',
+			    'a Trap deck',
+			    'a deck with Fastred',
+			    'a deck with Rossiel',
+			    'a deck with Bombur',
+			    'a deck with Elladan and Elrohir',
+			    'a deck with Na\'asiyah',
+			    'a deck with Fatty Bolger',
+			    'a deck with Tom Cotton',
+			    'a deck with hero Quickbeam',
+			    'a deck with Spirit Pippin',
+			    'a secrecy deck',
+			    'a deck with Argalad',
+			    'a deck where every card costs 2',
+			    'a deck where every card costs 3',
+			    'a deck that starts at 38 threat or more',
+			    'the first deck you ever published',
+			    'a side quest deck',
+			    'a two-hero deck',
+			    'a deck with no additional resource generation',
+			    'a deck where every hero has 1 printed willpower',
+			    'a deck where each hero starts with the letter B',
+			    'a deck where every card starts with the letter G',
+			    'a deck with no allies',
+			    'a deck with only allies',
+			    'a deck where every hero has 3 printed attack',
+			    'a deck with hero Elfhelm and a minimum of 12 Mount cards',
+			    'a deck with Vilya, Narya, and Nenya',
+			    'a deck that features the Palantir'
+			     );
+	$randchallenge = $challenges[array_rand($challenges)];
+        $daily_challenge = 'Daily Challenge: Play ' . $randquest->getName() . ' using ' . $randchallenge . '.';
+
         // Trending Decks
         $num_trending = 3;
         $qb = $em->createQueryBuilder();
@@ -250,7 +304,8 @@ class DefaultController extends Controller {
             'fellowships_trending' => $fellowships_trending,
             'decklists_new' => $decklists_new,
             'fellowships_new' => $fellowships_new,
-            'all_comments' => $all_comments
+            'all_comments' => $all_comments,
+            'daily_challenge' => $daily_challenge
         ], $response);
     }
 
