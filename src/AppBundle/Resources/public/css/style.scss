@@ -777,7 +777,6 @@ h1.site-title {
 @media (max-width: 767px) {
   h1.site-title {
     font-size: 50px;
-    margin-bottom: -20px;
   }
 }
 
@@ -793,6 +792,13 @@ div.site-slogan {
   font-size: 40px;
   text-align: center;
 }
+
+div.site-news {
+  position: relative;
+  text-align: center;
+  padding-top: 50px;
+}
+
 
 
 /************* DECKLIST *********************/
