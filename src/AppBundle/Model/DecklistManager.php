@@ -224,7 +224,8 @@ class DecklistManager {
                     $qb->innerJoin('d.slots', "s$i");
                     $qb->andWhere("s$i.card = :card$i");
                     $qb->setParameter("card$i", $card);
-                    $packs[] = $card->getPack()->getId();
+                    // Add packs containing requested cards
+                    // $packs[] = $card->getPack()->getId(); 
                 }
             }
             if (!empty($packs)) {
@@ -246,13 +247,14 @@ class DecklistManager {
                 $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
             }
 
+            // Num cores
             $sub = $this->doctrine->createQueryBuilder();
             $sub->select("j");
             $sub->from("AppBundle:Card", "j");
             $sub->innerJoin('AppBundle:Decklistslot', 'v', 'WITH', 'v.card = j');
             $sub->where('v.decklist = d');
-            $sub->andWhere('j.type <> 1'); # Don't match heroes
-            $sub->andWhere('j.pack = 1'); # Match Core Set
+            $sub->andWhere('j.type <> 1'); // Don't match heroes
+            $sub->andWhere('j.pack = 1'); // Match Core Set
             $sub->andWhere('v.quantity > j.quantity * :numcores');
             $qb->setParameter('numcores', $numcores);
             $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
