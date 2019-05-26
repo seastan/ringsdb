@@ -322,6 +322,7 @@ class SocialController extends Controller {
         $decklist_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
         $starting_threat = intval(filter_var($request->query->get('threat'), FILTER_SANITIZE_NUMBER_INT));
         $starting_threat_o = $request->query->get('threato');
+        $numcores = $request->query->get('numcores');
         $require_description = $request->query->get('require_description');
 
         $sort = $request->query->get('sort');
@@ -375,6 +376,7 @@ class SocialController extends Controller {
             'name' => $decklist_name,
             'threat' => $starting_threat,
             'threato' => $starting_threat_o,
+            'numcores' => $numcores,
             'require_description' => $require_description
         ];
         $params['sort_' . $sort] = ' selected="selected"';
@@ -1092,6 +1094,7 @@ class SocialController extends Controller {
             'name' => '',
             'threat' => '',
             'threato' => '',
+            'numcores' => '3',
             'require_description' => 0
         ]);
 

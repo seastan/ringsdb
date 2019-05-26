@@ -11,6 +11,14 @@
                 </select>
             </div>
             <div class="form-group">
+                <label for="">Number of Core Sets</label>
+                <select name="numcores" id="numcores" class="form-control">
+                    <option value="3" {% if numcores == '3' %}selected="selected"{% endif %}>3</option>
+                    <option value="2" {% if numcores == '2' %}selected="selected"{% endif %}>2</option>
+                    <option value="1" {% if numcores == '1' %}selected="selected"{% endif %}>1</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="threat">Starting Threat</label>
                 <div class="row">
                     <div class="col-xs-4">

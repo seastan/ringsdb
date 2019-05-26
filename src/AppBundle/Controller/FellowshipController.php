@@ -669,6 +669,8 @@ class FellowshipController extends Controller {
         $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
         $fellowship_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
         $nb_decks = intval(filter_var($request->query->get('nb_decks'), FILTER_SANITIZE_NUMBER_INT));
+        $numcores = $request->query->get('numcores');
+        $numplaysets = $request->query->get('numplaysets');
 
         $sort = $request->query->get('sort');
         $packs = $request->query->get('packs');
@@ -718,7 +720,9 @@ class FellowshipController extends Controller {
             'on' => $on,
             'off' => $off,
             'author' => $author_name,
-            'name' => $fellowship_name
+            'name' => $fellowship_name,
+            'numcores' => $numcores,
+            'numplaysets' => $numplaysets
         ];
         $params['sort_' . $sort] = ' selected="selected"';
         $params['nb_decks_selected'] = $nb_decks;
@@ -822,6 +826,8 @@ class FellowshipController extends Controller {
             'off' => $off,
             'author' => '',
             'name' => '',
+            'numcores' => '12',
+            'numplaysets' => '4'
         ]);
 
         return $this->render('AppBundle:Fellowship:public-fellowships.html.twig', [

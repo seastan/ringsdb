@@ -11,6 +11,34 @@
                 </select>
             </div>
             <div class="form-group">
+                <label for="">Max Number of Core Sets</label>
+                <i class="fa fa-question-circle" title="Select fellowships that can be built with this many Core Sets. For example, setting this to 12 will match all fellowships, even ones that require 12 Unexpected Courages (a 1x Core Set card)."></i>
+                <select name="numcores" id="numcores" class="form-control">
+                    <option value="12" {% if numcores == '12' %}selected="selected"{% endif %}>12</option>
+                    <option value="11" {% if numcores == '11' %}selected="selected"{% endif %}>11</option>
+                    <option value="10" {% if numcores == '10' %}selected="selected"{% endif %}>10</option>
+                    <option value="9" {% if numcores == '9' %}selected="selected"{% endif %}>9</option>
+                    <option value="8" {% if numcores == '8' %}selected="selected"{% endif %}>8</option>
+                    <option value="7" {% if numcores == '7' %}selected="selected"{% endif %}>7</option>
+                    <option value="6" {% if numcores == '6' %}selected="selected"{% endif %}>6</option>
+                    <option value="5" {% if numcores == '5' %}selected="selected"{% endif %}>5</option>
+                    <option value="4" {% if numcores == '4' %}selected="selected"{% endif %}>4</option>
+                    <option value="3" {% if numcores == '3' %}selected="selected"{% endif %}>3</option>
+                    <option value="2" {% if numcores == '2' %}selected="selected"{% endif %}>2</option>
+                    <option value="1" {% if numcores == '1' %}selected="selected"{% endif %}>1</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">Max Number of Non-Core Playsets</label>
+                <i class="fa fa-question-circle" title="Select fellowships that can be built with this many playsets. For example, setting this to 2 indicates that you have 2 copies of all the packs that have been selected on the right (other than Core Sets, which is set above). So it would match fellowships that use up to 6 copies of a non-Core card like Daeron's Runes, but no more."></i>
+                <select name="numplaysets" id="numplaysets" class="form-control">
+                    <option value="4" {% if numplaysets == '4' %}selected="selected"{% endif %}>4</option>
+                    <option value="3" {% if numplaysets == '3' %}selected="selected"{% endif %}>3</option>
+                    <option value="2" {% if numplaysets == '2' %}selected="selected"{% endif %}>2</option>
+                    <option value="1" {% if numplaysets == '1' %}selected="selected"{% endif %}>1</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="">Cards used</label>
                 {{ cards | default('') | raw }}
                 <input type="text" class="form-control" id="card" placeholder="Enter card name">
