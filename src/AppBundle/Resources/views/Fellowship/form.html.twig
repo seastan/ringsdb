@@ -12,7 +12,7 @@
             </div>
             <div class="form-group">
                 <label for="">Max Number of Core Sets</label>
-                <span class="card-count limited-pool-conflict" title="Select fellowships that can be built with this many Core Sets. For example, setting this to 12 will match all fellowships, even ones that require 12 Unexpected Courages (a 1x Core Set card).">?</span>
+                <i class="fa fa-question-circle" title="Select fellowships that can be built with this many Core Sets. For example, setting this to 12 will match all fellowships, even ones that require 12 Unexpected Courages (a 1x Core Set card)."></i>
                 <select name="numcores" id="numcores" class="form-control">
                     <option value="12" {% if numcores == '12' %}selected="selected"{% endif %}>12</option>
                     <option value="11" {% if numcores == '11' %}selected="selected"{% endif %}>11</option>
@@ -30,7 +30,7 @@
             </div>
             <div class="form-group">
                 <label for="">Max Number of Non-Core Playsets</label>
-                <span class="card-count limited-pool-conflict" title="Select fellowships that can be built with this many playsets. For example, setting this to 2 indicates that you have 2 copies of all the packs that have been selected on the right (other than Core, which is set above). So if Foundations of Stone is selected, it would match fellowships that use up to 6 copies of Daeron's Runes, but no more.">?</span>
+                <i class="fa fa-question-circle" title="Select fellowships that can be built with this many playsets. For example, setting this to 2 indicates that you have 2 copies of all the packs that have been selected on the right (other than Core Sets, which is set above). So it would match fellowships that use up to 6 copies of a non-Core card like Daeron's Runes, but no more."></i>
                 <select name="numplaysets" id="numplaysets" class="form-control">
                     <option value="4" {% if numplaysets == '4' %}selected="selected"{% endif %}>4</option>
                     <option value="3" {% if numplaysets == '3' %}selected="selected"{% endif %}>3</option>
