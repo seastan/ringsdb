@@ -1,6 +1,7 @@
 (function ui_decks(ui, $) {
 
     ui.decks = [];
+    ui.cards = [];
 
     ui.confirm_delete = function confirm_delete(event) {
         var tr = $(this).closest('tr');
@@ -111,19 +112,48 @@
     ui.filter_decks = function filter_decks() {
         var buttons = $('#tag_toggles button.active');
         var tags = [];
+        var deckmatches = [];
         buttons.each(function(index, button) {
             tags.push($(button).data('tag'));
         });
+        var requiredmatches = tags.length + ui.cards.length;
+        $('#decks tr').hide();
         if (tags.length) {
-            $('#decks tr').hide();
             tags.forEach(function(tag) {
                 $('#decks span[data-tag="' + tag + '"]').each(function(index, elt) {
-                    $(elt).closest('tr').show();
+                    deckid = $(elt).closest('tr')[0].getAttribute('data-id');
+                    if (deckid in deckmatches) {
+                        deckmatches[deckid] = deckmatches[deckid] + 1;
+                    } else {
+                        deckmatches[deckid] = 1;
+                    }
                 });
             });
-        } else {
-            $('#decks tr').show();
         }
+        if (ui.cards.length) {
+            $('#decks tr').hide();
+            ui.cards.forEach(function(card) {
+                 $('#decks span[data-code="' + card.code + '"]').each(function(index, elt) {
+                    deckid = $(elt).closest('tr')[0].getAttribute('data-id');
+                    if (deckid in deckmatches) {
+                        deckmatches[deckid] = deckmatches[deckid] + 1;
+                    } else {
+                        deckmatches[deckid] = 1;
+                    }
+                }); 
+            });
+        }
+        $('#decks tr').each(function(index, elt) {
+            deckid = elt.getAttribute('data-id');
+            if (deckid in deckmatches){
+                if (deckmatches[deckid] == requiredmatches) {
+                    $(elt).show();
+                }
+            } else if (requiredmatches == 0) {
+                $(elt).show();
+            }
+        });
+
     };
 
     ui.do_diff = function(ids) {
@@ -246,6 +276,62 @@
      * @memberOf ui
      */
     ui.on_all_loaded = function on_all_loaded() {
+        ui.setup_typeahead();
+    };
+
+
+    ui.setup_typeahead = function() {
+        function findMatches(q, cb) {
+            if (q.match(/^\w:/)) {
+                return;
+            }
+
+            var name = app.data.get_searchable_string(q);
+            var regexp1 = new RegExp('^' + name, 'i');
+            var regexp2 = new RegExp('.+' + name, 'i');
+            var startsWith = app.data.cards.find({ s_name: regexp1 });
+            var contains = app.data.cards.find({ s_name: regexp2 });
+            cb(startsWith.concat(contains));
+        }
+
+        $('#card').typeahead({
+            hint: true,
+            highlight: true,
+            minLength: 2
+        }, {
+            name: 'cardnames',
+            displayKey: 'name',
+            source: findMatches,
+            templates: {
+                suggestion: function(card) {
+                    return $('<div class="fg-' + card.sphere_code + '"><span class="icon-fw icon-' + card.sphere_code + '"></span> <strong>' + card.name + '</strong> <small><i>' + card.pack_name + '</i></small></div>');
+                }
+            }
+        });
+
+
+        $('#card').on('typeahead:selected typeahead:autocompleted', function(event, data) {
+            var card = app.data.cards.find({
+                code: data.code
+            })[0];
+            ui.cards.push(card);
+
+            var line = $('<p class="fg-' + card.sphere_code + '" style="padding: 3px 5px; border-radius: 3px; border: 1px solid silver"><button type="button" class="close" aria-hidden="true">&times;</button><input type="hidden" name="cards[]" value="' + card.code + '">' + card.name + ' <small><i>' + card.pack_name + '</i></small></p>');
+            line.on({
+                click: function(event) {
+                    // Remove the line in the html 
+                    line.remove();
+                    // Find and remove the cards from the global variable
+                    var index = ui.cards.indexOf(card);
+                    if (index !== -1) ui.cards.splice(index, 1);
+                    // Reset filter
+                    setTimeout(ui.filter_decks, 0);
+                }
+            });
+            line.insertBefore($('#card'));
+            $(event.target).typeahead('val', '');
+            setTimeout(ui.filter_decks, 0);
+        });
     };
 
 

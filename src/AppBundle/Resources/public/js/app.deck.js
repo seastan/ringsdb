@@ -70,6 +70,7 @@
         user_id = data.user_id;
         is_published = data.is_published;
         freeze_comments = data.freeze_comments;
+        console.log(data);
 
         if (app.data.isLoaded) {
             deck.set_slots(data.slots, data.sideslots);
