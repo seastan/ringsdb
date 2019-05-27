@@ -52,6 +52,16 @@
                 <div class="row" style="margin-bottom: 10px">
                     <div class="col-md-12" id="tag_toggles" data-toggle="tooltip" title="Click to switch to this tag. Shift-click to toggle this tag."></div>
                 </div>
+                <div class="form-group">
+                    <label for="">Cards used</label>
+                    {{ cards_used | default('') | raw }}
+                    <input type="text" class="form-control" id="card_used" placeholder="Enter card name">
+                </div>                
+                <div class="form-group">
+                    <label for="">Cards not used</label>
+                    {{ cards_not_used | default('') | raw }}
+                    <input type="text" class="form-control" id="card_not_used" placeholder="Enter card name">
+                </div>
             </div>
             <!-- / Right-side column -->
 
@@ -83,6 +93,11 @@
                                 <div class="tags">
                                     {% for tag in deck.tags|split(' ') %}
                                         <span class="tag" data-tag="{{ tag }}">{{ tag }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="tags">
+                                    {% for code,qty in deck.slots %}
+                                        <span class="tag" data-code="{{ code }}" style="display:none">{{ code }}</span>
                                     {% endfor %}
                                 </div>
                             </td>
