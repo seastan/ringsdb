@@ -54,8 +54,13 @@
                 </div>
                 <div class="form-group">
                     <label for="">Cards used</label>
-                    {{ cards | default('') | raw }}
-                    <input type="text" class="form-control" id="card" placeholder="Enter card name">
+                    {{ cards_used | default('') | raw }}
+                    <input type="text" class="form-control" id="card_used" placeholder="Enter card name">
+                </div>                
+                <div class="form-group">
+                    <label for="">Cards not used</label>
+                    {{ cards_not_used | default('') | raw }}
+                    <input type="text" class="form-control" id="card_not_used" placeholder="Enter card name">
                 </div>
             </div>
             <!-- / Right-side column -->

@@ -1,7 +1,8 @@
 (function ui_decks(ui, $) {
 
     ui.decks = [];
-    ui.cards = [];
+    ui.cards_used = [];
+    ui.cards_not_used = [];
 
     ui.confirm_delete = function confirm_delete(event) {
         var tr = $(this).closest('tr');
@@ -110,18 +111,26 @@
     };
 
     ui.filter_decks = function filter_decks() {
+        // Get current tags
         var buttons = $('#tag_toggles button.active');
         var tags = [];
-        var deckmatches = [];
         buttons.each(function(index, button) {
             tags.push($(button).data('tag'));
         });
-        var requiredmatches = tags.length + ui.cards.length;
+        // Start empty array of deckmatches. key = deckid, value = number of matches assigned to that deck id.
+        var deckmatches = [];
+        // We require the number of matches for a given deckid to be equal to the number of tags+cards_used. So it must match everything.
+        var requiredmatches = tags.length + ui.cards_used.length;
+        // Hide all rows
         $('#decks tr').hide();
+        // Loop over tags
         if (tags.length) {
             tags.forEach(function(tag) {
+                // Get all rows with matching tag
                 $('#decks span[data-tag="' + tag + '"]').each(function(index, elt) {
+                    // Get deckid
                     deckid = $(elt).closest('tr')[0].getAttribute('data-id');
+                    // Either add or increment the number of matches for this deckid
                     if (deckid in deckmatches) {
                         deckmatches[deckid] = deckmatches[deckid] + 1;
                     } else {
@@ -130,11 +139,14 @@
                 });
             });
         }
-        if (ui.cards.length) {
-            $('#decks tr').hide();
-            ui.cards.forEach(function(card) {
+        // Loop over cards_used
+        if (ui.cards_used.length) {
+            ui.cards_used.forEach(function(card) {
+                // Get all rows with matching card code
                  $('#decks span[data-code="' + card.code + '"]').each(function(index, elt) {
+                    // Get deckid
                     deckid = $(elt).closest('tr')[0].getAttribute('data-id');
+                    // Either add or increment the number of matches for this deckid
                     if (deckid in deckmatches) {
                         deckmatches[deckid] = deckmatches[deckid] + 1;
                     } else {
@@ -143,8 +155,11 @@
                 }); 
             });
         }
+        // Loop over all rows
         $('#decks tr').each(function(index, elt) {
+            // Get deckid for this row
             deckid = elt.getAttribute('data-id');
+            // Check to see if this deckid got the required number of matches. If it did, make its row visible.
             if (deckid in deckmatches){
                 if (deckmatches[deckid] == requiredmatches) {
                     $(elt).show();
@@ -153,7 +168,16 @@
                 $(elt).show();
             }
         });
-
+        // Loop over cards_not_used
+        if (ui.cards_not_used.length) {
+            ui.cards_not_used.forEach(function(card) {
+                // Get all rows with matching card code
+                 $('#decks span[data-code="' + card.code + '"]').each(function(index, elt) {
+                    // Hide the row
+                    $(elt).closest('tr').hide();
+                }); 
+            });
+        }
     };
 
     ui.do_diff = function(ids) {
@@ -294,7 +318,7 @@
             cb(startsWith.concat(contains));
         }
 
-        $('#card').typeahead({
+        $('#card_used').typeahead({
             hint: true,
             highlight: true,
             minLength: 2
@@ -310,25 +334,64 @@
         });
 
 
-        $('#card').on('typeahead:selected typeahead:autocompleted', function(event, data) {
+        $('#card_used').on('typeahead:selected typeahead:autocompleted', function(event, data) {
             var card = app.data.cards.find({
                 code: data.code
             })[0];
-            ui.cards.push(card);
+            ui.cards_used.push(card);
 
-            var line = $('<p class="fg-' + card.sphere_code + '" style="padding: 3px 5px; border-radius: 3px; border: 1px solid silver"><button type="button" class="close" aria-hidden="true">&times;</button><input type="hidden" name="cards[]" value="' + card.code + '">' + card.name + ' <small><i>' + card.pack_name + '</i></small></p>');
+            var line = $('<p class="fg-' + card.sphere_code + '" style="padding: 3px 5px; border-radius: 3px; border: 1px solid silver"><button type="button" class="close" aria-hidden="true">&times;</button><input type="hidden" name="cards_used[]" value="' + card.code + '">' + card.name + ' <small><i>' + card.pack_name + '</i></small></p>');
             line.on({
                 click: function(event) {
                     // Remove the line in the html 
                     line.remove();
                     // Find and remove the cards from the global variable
-                    var index = ui.cards.indexOf(card);
-                    if (index !== -1) ui.cards.splice(index, 1);
+                    var index = ui.cards_used.indexOf(card);
+                    if (index !== -1) ui.cards_used.splice(index, 1);
                     // Reset filter
                     setTimeout(ui.filter_decks, 0);
                 }
             });
-            line.insertBefore($('#card'));
+            line.insertBefore($('#card_used'));
+            $(event.target).typeahead('val', '');
+            setTimeout(ui.filter_decks, 0);
+        });
+
+        $('#card_not_used').typeahead({
+            hint: true,
+            highlight: true,
+            minLength: 2
+        }, {
+            name: 'cardnames',
+            displayKey: 'name',
+            source: findMatches,
+            templates: {
+                suggestion: function(card) {
+                    return $('<div class="fg-' + card.sphere_code + '"><span class="icon-fw icon-' + card.sphere_code + '"></span> <strong>' + card.name + '</strong> <small><i>' + card.pack_name + '</i></small></div>');
+                }
+            }
+        });
+
+
+        $('#card_not_used').on('typeahead:selected typeahead:autocompleted', function(event, data) {
+            var card = app.data.cards.find({
+                code: data.code
+            })[0];
+            ui.cards_not_used.push(card);
+
+            var line = $('<p class="fg-' + card.sphere_code + '" style="padding: 3px 5px; border-radius: 3px; border: 1px solid silver"><button type="button" class="close" aria-hidden="true">&times;</button><input type="hidden" name="cards_not_used[]" value="' + card.code + '">' + card.name + ' <small><i>' + card.pack_name + '</i></small></p>');
+            line.on({
+                click: function(event) {
+                    // Remove the line in the html 
+                    line.remove();
+                    // Find and remove the cards from the global variable
+                    var index = ui.cards_not_used.indexOf(card);
+                    if (index !== -1) ui.cards_not_used.splice(index, 1);
+                    // Reset filter
+                    setTimeout(ui.filter_decks, 0);
+                }
+            });
+            line.insertBefore($('#card_not_used'));
             $(event.target).typeahead('val', '');
             setTimeout(ui.filter_decks, 0);
         });
