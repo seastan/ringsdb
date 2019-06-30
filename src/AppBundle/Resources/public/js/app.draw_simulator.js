@@ -1,6 +1,7 @@
 (function app_draw_simulator(draw_simulator, $) {
 
     var deck = null;
+    var hand = [];
     var initial_size = 0;
     var draw_count = 0;
     var container = null;
@@ -8,12 +9,54 @@
     /**
      * @memberOf draw_simulator
      */
+    draw_simulator.render = function () {
+        $(container).empty();
+        $('[data-command=clear],[data-command=reshuffle],[data-command=discard]').prop('disabled', true);
+        hand.forEach(function (card, i) {
+            $('[data-command=clear]').prop('disabled', false);
+            var card_element;
+            if (card.data.imagesrc) {
+                card_element = $('<img src="' + card.data.imagesrc + '">');
+            } else {
+                card_element = $('<div class="card-proxy"><div>' + card.data.name + '</div></div>');
+            }
+            card_element.attr('data-hand-id', i);
+            if (card.selected) {
+                card_element.css('opacity', 0.6);
+                $('[data-command=reshuffle],[data-command=discard]').prop('disabled', false);
+            }
+            container.append(card_element);
+        });
+        draw_simulator.update_odds();
+    }
+    /**
+     * @memberOf draw_simulator
+     */
     draw_simulator.reset = function reset() {
         $(container).empty();
         draw_simulator.on_data_loaded();
         draw_count = 0;
-        draw_simulator.update_odds();
-        $('#draw-simulator-clear').prop('disabled', true);
+        hand = [];
+        draw_simulator.render();
+    };
+
+    /**
+     * @memberOf draw_simulator
+     */
+    draw_simulator.discard = function (reshuffle) {
+        for (var i = hand.length - 1; i >= 0; i--) {
+            var card = hand[i];
+            if (card.selected) {
+                card.selected = false;
+                hand.splice(i, 1);
+                if (reshuffle) {
+                    deck.push(card);
+                }
+                draw_count--;
+            }
+        }
+
+        draw_simulator.render();
     };
 
     /**
@@ -22,13 +65,24 @@
     draw_simulator.on_dom_loaded = function() {
         $('#table-draw-simulator')
             .on('click', 'button.btn', draw_simulator.handle_click)
-            .on('click', 'img, div.card-proxy', draw_simulator.toggle_opacity);
+            .on('click', 'img, div.card-proxy', draw_simulator.select_card);
         container = $('#table-draw-simulator-content');
 
 
         $('#oddsModal').on('input', 'input', draw_simulator.compute_odds);
         draw_simulator.compute_odds();
     };
+
+    /**
+     * @memberOf draw_simulator
+     */
+    draw_simulator.select_card = function select_card(event) {
+        var index = $(this).attr('data-hand-id');
+        if (hand[index]) {
+            hand[index].selected = !hand[index].selected;
+        }
+        draw_simulator.render();
+    }
 
     /**
      * @memberOf draw_simulator
@@ -50,7 +104,7 @@
         var cards = app.deck.get_draw_deck();
         cards.forEach(function(card) {
             for (var ex = 0; ex < card.indeck; ex++) {
-                deck.push(card);
+                deck.push({ data: card });
             }
         });
         initial_size = deck.length;
@@ -75,18 +129,10 @@
             var rand = Math.floor(Math.random() * deck.length);
             var spliced = deck.splice(rand, 1);
             var card = spliced[0];
-            var card_element;
-
-            if (card.imagesrc) {
-                card_element = $('<img src="' + card.imagesrc + '">');
-            } else {
-                card_element = $('<div class="card-proxy"><div>' + card.name + '</div></div>');
-            }
-
-            container.append(card_element);
+            hand.push(card);
             draw_count++;
         }
-        draw_simulator.update_odds();
+        draw_simulator.render();
     };
 
     /**
@@ -96,8 +142,13 @@
         event.preventDefault();
 
         var command = $(this).data('command');
-        $('[data-command=clear]').prop('disabled', false);
-        if (command === 'clear') {
+        if (command === 'reshuffle') {
+            draw_simulator.discard(true);
+            return;
+        } else if (command === 'discard') {
+            draw_simulator.discard(false);
+            return;
+        } else if (command === 'clear') {
             draw_simulator.reset();
             return;
         }
@@ -115,12 +166,5 @@
 
         if (isNaN(draw)) return;
         draw_simulator.do_draw(draw);
-    };
-
-    /**
-     * @memberOf draw_simulator
-     */
-    draw_simulator.toggle_opacity = function toggle_opacity(event) {
-        $(this).css('opacity', 1.5 - parseFloat($(this).css('opacity')));
     };
 })(app.draw_simulator = {}, jQuery);
