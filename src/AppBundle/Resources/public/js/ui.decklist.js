@@ -301,6 +301,11 @@
             ui.setup_comment_form();
             ui.add_author_actions();
             ui.setup_comment_hide();
+            console.log(app.user);
+            console.log(app.user.data);
+            console.log(app.user.data.donation);
+            app.play_simulator && app.play_simulator.on_dom_loaded();
+            app.play_simulator && app.play_simulator.reset();
         }).fail(function() {
             $('<p>You must be logged in to post comments.</p>').insertAfter('#comment-form');
         }).always(function() {
