@@ -216,71 +216,68 @@
 
     };
 
-    var card_html_a = `
-    <table style="width:100%">
-    <tr>
-    <td>`
-    var card_html_b = `
-        <tr>
-        <td>
-        <table class="tab-tokens" style="display:none">
-            <tr>
-            <td>
-            <div class="container-value container-resources">
-                <div class="btn-lab btn-lab-up fa fa-angle-up"></div>
-                <div class="btn-lab btn-lab-dn fa fa-angle-down"></div>
-                <div class="btn-value btn-value-up"></div>
-                <div class="btn-value btn-value-dn"></div>
-            <div class="lab-value">0</div>
-            </div>
-            </td>
-            <td>
-            <div class="container-value container-damage">
-                <div class="btn-lab btn-lab-up fa fa-angle-up"></div>
-                <div class="btn-lab btn-lab-dn fa fa-angle-down"></div>
-                <div class="btn-value btn-value-up"></div>
-                <div class="btn-value btn-value-dn"></div>
-            <div class="lab-value">0</div>
-            </div>
-            </td>
-            </tr>
-        </table>
-        </td>
-        <td>`
+    var card_html_a = '<table style="width:100%">' +
+    '<tr>' +
+    '<td>'
+    var card_html_b = '<tr>' +
+        '<td>' +
+        '<table class="tab-tokens" style="display:none">' +
+            '<tr>' +
+            '<td>' +
+            '<div class="container-value container-resources">' +
+                '<div class="btn-lab btn-lab-up fa fa-angle-up"></div>' +
+                '<div class="btn-lab btn-lab-dn fa fa-angle-down"></div>' +
+                '<div class="btn-value btn-value-up"></div>' +
+                '<div class="btn-value btn-value-dn"></div>' +
+            '<div class="lab-value">0</div>' +
+            '</div>' +
+            '</td>' +
+            '<td>' +
+            '<div class="container-value container-damage">' +
+                '<div class="btn-lab btn-lab-up fa fa-angle-up"></div>' +
+                '<div class="btn-lab btn-lab-dn fa fa-angle-down"></div>' +
+                '<div class="btn-value btn-value-up"></div>' +
+                '<div class="btn-value btn-value-dn"></div>' +
+            '<div class="lab-value">0</div>' +
+            '</div>' +
+            '</td>' +
+            '</tr>' +
+        '</table>' +
+        '</td>' +
+        '<td>'
     // Card data  
-    var card_html_c = `
-        </td>
-        <td align="right">
-        <table class="tab-card-buttons">
-            <tr>
-            <td><button class="btn-simu btn-play">Play</button></td>
-            <td>
-                <button class="btn-simu btn-exhaust">Exhaust</button>
-                <button class="btn-simu btn-ready" style="display:none;">Ready</button>
-            </td>
-            <td><button class="btn-simu btn-move-up fa fa-angle-up"></button></td>
-            </tr>
-            <tr>
-            <td><button class="btn-simu btn-disc">Discard</button></td>
-            <td>
-            <select class="btn-simu sel-simu sel-moveto">
-            <option value="" selected disabled hidden>Move to...</option>
-            <option value="hand">Hand</option>
-            <option value="top">Top of deck</option>
-            <option value="middle">Shuffle into deck</option>
-            <option value="bottom">Bottom of deck</option>
-            </select>
-            </td>
-            <td><button class="btn-simu btn-move-dn fa fa-angle-down"></button></td>
-            </tr>
-        </table>
-        </td>
-        </tr>
-        </table>
-    </td>
-    </tr>
-    </table>
-    </li>`
+    var card_html_c = '</td>' +
+        '<td align="right">' +
+        '<table class="tab-card-buttons">' +
+            '<tr>' +
+            '<td><button class="btn-simu btn-play">Play</button></td>' +
+            '<td>' +
+                '<button class="btn-simu btn-exhaust">Exhaust</button>' +
+                '<button class="btn-simu btn-ready" style="display:none;">Ready</button>' +
+            '</td>' +
+            '<td><button class="btn-simu btn-move-up fa fa-angle-up"></button></td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td><button class="btn-simu btn-disc">Discard</button></td>' +
+            '<td>' +
+            '<select class="btn-simu sel-simu sel-moveto">' +
+            '<option value="" selected disabled hidden>Move to...</option>' +
+            '<option value="hand">Hand</option>' +
+            '<option value="top">Top of deck</option>' +
+            '<option value="middle">Shuffle into deck</option>' +
+            '<option value="bottom">Bottom of deck</option>' +
+            '</select>' +
+            '</td>' +
+            '<td><button class="btn-simu btn-move-dn fa fa-angle-down"></button></td>' +
+            '</tr>' +
+        '</table>' +
+        '</td>' +
+        '</tr>' +
+        '</table>' +
+    '</td>' +
+    '</tr>' +
+    '</table>' +
+    '</li>'
 
     $.fn.moveUp = function() {
         before = $(this).prev();
