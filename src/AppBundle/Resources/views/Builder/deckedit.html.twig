@@ -54,6 +54,7 @@
                         <li role="presentation" class="active"><a href="#tab-pane-build" aria-controls="tab-pane-build" role="tab" data-toggle="tab"><span class="fa fa-puzzle-piece"></span> Build</a></li>
                         <li role="presentation"><a href="#tab-pane-infos" aria-controls="tab-pane-infos" role="tab" data-toggle="tab"><span class="fa fa-pencil-square-o"></span> Notes</a></li>
                         <li role="presentation"><a href="#tab-pane-draw" aria-controls="tab-pane-draw" role="tab" data-toggle="tab"><span class="fa fa-repeat"></span> <span class="hidden-xs">Test</span></a></li>
+                        <li role="presentation"><a href="#tab-pane-play" aria-controls="tab-pane-play" role="tab" data-toggle="tab"><span class="fa fa-play"></span> <span class="hidden-xs">Play</span></a></li>
                         <li role="presentation"><a href="#tab-pane-charts" aria-controls="tab-pane-charts" role="tab" data-toggle="tab"><span class="fa fa-bar-chart"></span> <span class="hidden-xs">Charts</span></a></li>
                         <li role="presentation"><a href="#tab-pane-history" aria-controls="tab-pane-history" role="tab" data-toggle="tab" id="tab-header-history"><span class="fa fa-history"></span> <span class="hidden-xs">History</span></a></li>
                     </ul>
@@ -63,6 +64,9 @@
                         </div>
                         <div role="tabpanel" class="tab-pane" id="tab-pane-draw">
                             {% include 'AppBundle:Builder:tab-pane-draw.html.twig' %}
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="tab-pane-play">
+                            {% include 'AppBundle:Builder:tab-pane-play.html.twig' %}
                         </div>
                         <div role="tabpanel" class="tab-pane" id="tab-pane-charts">
                             {% include 'AppBundle:Builder:tab-pane-charts.html.twig' %}

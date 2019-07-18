@@ -745,6 +745,7 @@
         app.deck.display('#sideboard-content', DisplayOptions, true);
         setTimeout(function() {
             app.draw_simulator && app.draw_simulator.reset();
+            app.play_simulator && app.play_simulator.reset();
             app.deck_charts && app.deck_charts.setup();
             app.suggestions && Config['show-suggestions'] != 0 && app.suggestions.compute();
         }, 1);
@@ -824,6 +825,7 @@
         app.textcomplete && app.textcomplete.setup('#description');
         app.markdown && app.markdown.setup('#description', '#description-preview');
         app.draw_simulator && app.draw_simulator.on_dom_loaded();
+        app.play_simulator && app.play_simulator.on_dom_loaded();
         app.card_modal && $('#filter-text').on('typeahead:selected typeahead:autocompleted', app.card_modal.typeahead);
     };
 
@@ -834,6 +836,7 @@
     ui.on_data_loaded = function() {
         ui.set_max_qty();
         app.draw_simulator && app.draw_simulator.on_data_loaded();
+        app.play_simulator && app.play_simulator.on_data_loaded();
     };
 
     /**
