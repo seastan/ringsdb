@@ -2252,14 +2252,14 @@ h1.nightmare, h1.easy {
 .btn-simu {
   background-color: transparent;
   border: 1px solid grey;
-  width: 62px;
+  width: 80px;
   border-radius: 5px;
   font-size: 12px;
   height: 20px;
 }
 
 .btn-simu-header {
-  width: 92px;
+  width: 100px;
 }
 
 .btn-show {
@@ -2300,4 +2300,10 @@ h1.nightmare, h1.easy {
 
 .card-tip-facedown {
   display: none;
+}
+
+.fa-drag-handle:before {
+  content: "\f142 \f142";
+  letter-spacing: 2px;
+  padding: 3px;
 }
