@@ -119,6 +119,22 @@
             play_simulator.reset();
         });
 
+        $('.btn-header-value-up').click(function() {
+            var card = $(this).parents('.container-value');
+            var tok = card.find('.lab-value');
+            var newval = parseInt(tok.text()) + 1;
+            if (newval < 0) newval = 0;
+            tok.text(newval);
+        });
+        
+        $('.btn-header-value-dn').click(function() {
+            var card = $(this).parents('.container-value');
+            var tok = card.find('.lab-value');
+            var newval = parseInt(tok.text()) - 1;
+            if (newval < 0) newval = 0;
+            tok.text(newval);
+        });
+
     };
 
     play_simulator.define_card_buttons = function define_card_buttons() {
