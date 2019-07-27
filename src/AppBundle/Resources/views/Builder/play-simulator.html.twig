@@ -1,0 +1,112 @@
+
+<div id="span-patreon-simu"><span>
+	The gameplay simulator is an experimental feature and is currently only available for those that support RingsDB development on <a href="https://www.patreon.com/Seastan" target="_blank">Patreon</a>.  
+</span>
+</div>
+<div id="container-simu" class="table table-condensed">
+	<div id="overlay-simu" class="table table-condensed" onclick="window.open('https://www.patreon.com/Seastan');">
+		
+	</div>
+	<div id="base-simu" class="table table-condensed base-simu-unsupported">
+
+<table class="table table-condensed" id="table-play-simulator">
+<thead>
+	<tr>
+		<th colspan="1"><span class="fa fa-play"></span> Gameplay simulator</th>
+	</tr>
+	<tr>
+		<th>
+			<table class="tab-simu-header">
+				<tr>
+					<button id="btn-refresh" class='btn-simu btn-simu-header'>Refresh</button>
+					<button id="btn-new-round" class='btn-simu btn-simu-header'>New Round</button>
+					<button id="btn-reset-game" class='btn-simu btn-simu-header'>Reset Game</button>
+				</tr>
+				<tr>
+					<td style="align:center;">
+					<div id="div-rounds" style="padding-right:20px;">
+						Round
+						<div class="container-value container-resources">
+							<div class="btn-lab btn-lab-up fa fa-angle-up"></div>
+							<div class="btn-lab btn-lab-dn fa fa-angle-down"></div>
+							<div class="btn-value btn-header-value-up"></div>
+							<div class="btn-value btn-header-value-dn"></div>
+							<div class="lab-value">0</div>
+						</div>
+					</div>
+					</td>
+					<td>
+					<div id="div-threat" style="padding-right:20px;">
+						Threat
+						<div class="container-value container-resources">
+							<div class="btn-lab btn-lab-up fa fa-angle-up"></div>
+							<div class="btn-lab btn-lab-dn fa fa-angle-down"></div>
+							<div class="btn-value btn-header-value-up"></div>
+							<div class="btn-value btn-header-value-dn"></div>
+							<div class="lab-value">0</div>
+						</div>
+					</div>
+					</td>
+				</tr>
+			</table>
+		</th>
+	</tr>
+</thead>
+
+<tbody>
+    <tr>
+		<td id="td-inhand" class="td-list">
+			<button class='btn-simu btn-hide fa fa-angle-down'></button>
+			<button class='btn-simu btn-show fa fa-angle-right' style='display:none;'></button>
+			Hand
+			<button id="btn-draw" class='btn-simu'>
+			Draw
+			</button>
+			<ul id="list-inhand" class="list-group">
+			</ul>
+		</td>
+	</tr>
+	<tr>
+		<td id="td-inplay" class="td-list">
+			<button class='btn-simu btn-hide fa fa-angle-down'></button>
+			<button class='btn-simu btn-show fa fa-angle-right' style='display:none;'></button>
+			In Play
+			<ul id="list-inplay" class="list-group">
+			</ul>
+		</td>
+    </tr>
+    <tr>
+		<td id="td-indeck" class="td-list">
+			<button class='btn-simu btn-hide fa fa-angle-down' style='display:none;'></button>
+			<button class='btn-simu btn-show fa fa-angle-right'></button>
+			Deck
+			<button id="btn-shuffle-deck" class='btn-simu'>
+				Shuffle
+			</button>
+			<select id="sel-reveal" class="btn-simu sel-simu">
+				<option value="" selected disabled hidden>Reveal...</option>
+				<option value="0">None</option>
+				<option value="1">Top 1</option>
+				<option value="5">Top 5</option>
+				<option value="10">Top 10</option>
+				<option value="99999">All</option>
+			</select>
+			<ul id="list-indeck" class="list-group list-group-hidden">
+			</ul>
+		</td>
+	</tr>
+	<tr>
+		<td id="td-indisc" class="td-list">
+			<button class='btn-simu btn-hide fa fa-angle-down' style='display:none;'></button>
+			<button class='btn-simu btn-show fa fa-angle-right'></button>
+			Discard Pile
+			<ul id="list-indisc" class="list-group list-group-hidden">
+			</ul>
+		</td>
+    </tr>
+</tbody>
+</table>
+
+
+	</div>
+</div>

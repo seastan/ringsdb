@@ -84,6 +84,7 @@
         app.deck.display('#deck-content', options, false);
         app.deck.display('#sideboard-content', options, true);
         app.draw_simulator && app.draw_simulator.reset();
+        app.play_simulator && app.play_simulator.reset();
         app.deck_charts && app.deck_charts.setup();
     };
 
@@ -94,6 +95,7 @@
     ui.on_dom_loaded = function on_dom_loaded() {
         ui.setup_event_handlers();
         app.draw_simulator && app.draw_simulator.on_dom_loaded();
+        app.play_simulator && app.play_simulator.on_dom_loaded();
     };
 
     /**
