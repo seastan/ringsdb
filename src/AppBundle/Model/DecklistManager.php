@@ -175,6 +175,9 @@ class DecklistManager {
         $threat_op = $request->query->get('threato');
         $threat = $request->query->get('threat');
 
+        $reputation_op = $request->query->get('reputationo');
+        $reputation = $request->query->get('reputation');
+
         $require_description = $request->query->get('require_description');
 
         $qb = $this->getQueryBuilder();
@@ -207,6 +210,18 @@ class DecklistManager {
                 $qb->andWhere('d.startingThreat = :threat');
             }
             $qb->setParameter('threat', $threat);
+        }
+
+        if (!empty($reputation) && is_numeric($reputation)) {
+            $qb->innerJoin('d.user', 'u');
+            if ($reputation_op == '>') {
+                $qb->andWhere('u.reputation > :reputation');
+            } elseif ($reputation_op == '<') {
+                $qb->andWhere('u.reputation < :reputation');
+            } else {
+                $qb->andWhere('u.reputation = :reputation');
+            }
+            $qb->setParameter('reputation', $reputation);
         }
 
         if ($require_description) {

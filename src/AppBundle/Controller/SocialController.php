@@ -322,6 +322,8 @@ class SocialController extends Controller {
         $decklist_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
         $starting_threat = intval(filter_var($request->query->get('threat'), FILTER_SANITIZE_NUMBER_INT));
         $starting_threat_o = $request->query->get('threato');
+        $author_reputation = intval(filter_var($request->query->get('reputation'), FILTER_SANITIZE_NUMBER_INT));
+        $author_reputation_o = $request->query->get('reputationo');
         $numcores = $request->query->get('numcores');
         $require_description = $request->query->get('require_description');
 
@@ -376,6 +378,8 @@ class SocialController extends Controller {
             'name' => $decklist_name,
             'threat' => $starting_threat,
             'threato' => $starting_threat_o,
+            'reputation' => $author_reputation,
+            'reputationo' => $author_reputation_o,
             'numcores' => $numcores,
             'require_description' => $require_description
         ];
@@ -1094,6 +1098,8 @@ class SocialController extends Controller {
             'name' => '',
             'threat' => '',
             'threato' => '',
+            'reputation' => '',
+            'reputationo' => '>',
             'numcores' => '3',
             'require_description' => 0
         ]);

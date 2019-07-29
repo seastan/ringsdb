@@ -34,6 +34,21 @@
                 </div>
             </div>
             <div class="form-group">
+                <label for="threat">Author Reputation</label>
+                <div class="row">
+                    <div class="col-xs-4">
+                        <select name="reputationo" id="reputationo" class="form-control">
+                            <option value=":" {% if reputationo == ':' %}selected="selected"{% endif %}>=</option>
+                            <option value="<" {% if reputationo == '<' %}selected="selected"{% endif %}>&lt;</option>
+                            <option value=">" {% if reputationo == '>' %}selected="selected"{% endif %}>&gt;</option>
+                        </select>
+                    </div>
+                    <div class="col-xs-8">
+                        <input id="reputation" name="reputation" value="{{ reputation }}" class="form-control">
+                    </div>
+                </div>
+            </div>            
+            <div class="form-group">
                 <label for="">Cards used</label>
                 {{ cards | default('') | raw }}
                 <input type="text" class="form-control" id="card" placeholder="Enter card name">
