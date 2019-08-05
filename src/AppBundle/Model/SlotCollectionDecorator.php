@@ -87,7 +87,7 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
     }
 
     public function getSlotsByType() {
-        $slotsByType = ['hero' => [], 'ally' => [], 'attachment' => [], 'event' => [], 'player-side-quest' => [], 'treasure' => []];
+        $slotsByType = ['hero' => [], 'ally' => [], 'attachment' => [], 'event' => [], 'player-side-quest' => [], 'contract' => [], 'treasure' => []];
         foreach ($this->slots as $slot) {
             if (array_key_exists($slot->getCard()->getType()->getCode(), $slotsByType)) {
                 $slotsByType[$slot->getCard()->getType()->getCode()][] = $slot;
@@ -98,7 +98,7 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
     }
 
     public function getCountByType() {
-        $countByType = ['hero' => 0, 'ally' => 0, 'attachment' => 0, 'event' => 0, 'player-side-quest' => 0, 'treasure' => 0];
+        $countByType = ['hero' => 0, 'ally' => 0, 'attachment' => 0, 'event' => 0, 'player-side-quest' => 0, 'contract' => [], 'treasure' => 0];
         foreach ($this->slots as $slot) {
             if (array_key_exists($slot->getCard()->getType()->getCode(), $countByType)) {
                 $countByType[$slot->getCard()->getType()->getCode()] += $slot->getQuantity();
@@ -133,7 +133,7 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
     public function getDrawDeck() {
         $drawDeck = [];
         foreach ($this->slots as $slot) {
-            if (in_array($slot->getCard()->getType()->getCode(), ['ally', 'attachment', 'event', 'player-side-quest', 'treasure'])) {
+            if (in_array($slot->getCard()->getType()->getCode(), ['ally', 'attachment', 'event', 'player-side-quest', 'contract', 'treasure'])) {
                 $drawDeck[] = $slot;
             }
         }

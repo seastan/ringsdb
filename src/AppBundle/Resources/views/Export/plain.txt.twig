@@ -55,6 +55,15 @@ Treasures ({{ treasures | length }})
 {% endfor %}
 
 {% endif %}
+{% set contract = deck.slots_by_type['contract'] %}
+{% if contract | length %}
+Contract ({{ contract | length }})
+
+{% for slot in contract %}
+{{ slot.quantity }}x {{ slot.card.name }} ({{ slot.card.pack.name }})
+{% endfor %}
+
+{% endif %}
 {% if deck.has_sideboard %}
 
 Sideboard

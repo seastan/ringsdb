@@ -1,6 +1,6 @@
 (function app_textcomplete(textcomplete, $) {
 
-    var icons = 'spirit tactics lore leadership neutral baggins fellowship unique threat willpower attack defense health hero ally attachment event player-side-quest treasure'.split(' ');
+    var icons = 'spirit tactics lore leadership neutral baggins fellowship unique threat willpower attack defense health hero ally attachment event player-side-quest contract treasure'.split(' ');
 
     /**
      * options: cards, icons, users

@@ -4,7 +4,7 @@
     Threat: {{ macros.integer_or_x(card.threat) }}.
 {% endif %}
 
-{% if card.type_code == 'ally' or card.type_code == 'attachment' or card.type_code == 'event' or card.type_code == 'player-side-quest' or card.type_code == 'treasure' %}
+{% if card.type_code == 'ally' or card.type_code == 'attachment' or card.type_code == 'event' or card.type_code == 'player-side-quest' or card.type_code == 'contract' or card.type_code == 'treasure' %}
     Cost: {{ macros.integer_or_x(card.cost) }}.
 {% endif %}
 

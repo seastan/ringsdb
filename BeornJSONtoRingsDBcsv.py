@@ -19,7 +19,7 @@ traitlist = ['Ally','Angmar','Archer','Armor','Armory','Armour','Arnor','Artifac
 nounlist = ['hero','character','ally','attachment','card','enemy','location']
 
 # RingsDB card types
-playercardtypes = ['Hero','Ally','Attachment','Event','Player Side Quest','Treasure','Boon']
+playercardtypes = ['Hero','Ally','Attachment','Event','Player Side Quest','Contract','Treasure','Boon']
 
 # Make "Action" and "Response" etc bold.
 def boldActions(text):

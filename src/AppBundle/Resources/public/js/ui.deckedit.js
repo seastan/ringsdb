@@ -132,9 +132,9 @@
     ui.build_type_selector = function() {
         var filter = $('[data-filter="type_code"]').empty();
 
-        var type_codes = app.data.cards.distinct('type_code').sort();
-        type_codes.splice(type_codes.indexOf('hero'), 1);
-        type_codes.unshift('hero');
+        var type_codes = app.data.cards.distinct('type_code');
+/*         type_codes.splice(type_codes.indexOf('hero'), 1);
+        type_codes.unshift('hero'); */
 
         type_codes.forEach(function(type_code) {
             var example = app.data.cards.find({ 'type_code': type_code })[0];

@@ -30,6 +30,7 @@
 			case 'event':
 			case 'ally':
 			case 'player-side-quest':
+			case 'contract':
 			case 'treasure':
 				return 'Cost: ' + (card.cost != null ? card.cost : 'X') + '. ';
 
