@@ -926,7 +926,8 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      */
     public function getAllQuestlogs() {
         $theseLogs = $this->getQuestlogs()->toArray();
-        $parentLogs = $this->getParent()->getQuestlogs()->toArray();
+        $parentLogs = [];
+        if ($this->getParent()) $parentlogs = $this->getParent()->getQuestlogs()->toArray();
         $allQuestlogs = array_unique(array_merge($theseLogs, $parentLogs), SORT_REGULAR);
         return array_filter($allQuestlogs, function($k) {
             return $k->getQuestlog()->getIsPublic();

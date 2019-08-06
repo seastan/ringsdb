@@ -140,7 +140,7 @@
             button.off('click');
         });
 
-        var icons = 'spirit tactics lore leadership neutral baggins fellowship unique threat willpower attack defense health hero ally attachment event player-side-quest treasure'.split(' ');
+        var icons = 'spirit tactics lore leadership neutral baggins fellowship unique threat willpower attack defense health hero ally attachment event player-side-quest contract treasure'.split(' ');
         icons.forEach(function(icon) {
             menu.append('<li data-icon="' + icon + '"><a href="#"><span style="display: inline-block; width: 2em; text-align: center;" class="icon-' + icon + '"></span> ' + icon + '</a></li>');
         });

@@ -111,6 +111,7 @@
             'Attachment': '<span class="icon icon-attachment"></span>',
             'Event': '<span class="icon icon-event"></span>',
             'Player Side Quest': '<span class="icon icon-player-side-quest"></span>',
+            'Contract': '<span class="icon icon-contract"></span>',
             'Treasure': '<span class="icon icon-treasure"></span>'
         };
 
@@ -119,7 +120,8 @@
             'attachment': { i: 1, name: 'Attachment' },
             'event': { i: 2, name: 'Event' },
             'player-side-quest': { i: 3, name: 'Player Side Quest' },
-            'treasure': { i: 4, name: 'Treasure' }
+            'contract': { i: 4, name: 'Contract' },
+            'treasure': { i: 5, name: 'Treasure' }
         };
 
         var validTypes = {};
