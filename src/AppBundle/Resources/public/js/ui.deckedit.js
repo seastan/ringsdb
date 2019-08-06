@@ -133,8 +133,20 @@
         var filter = $('[data-filter="type_code"]').empty();
 
         var type_codes = app.data.cards.distinct('type_code');
-/*         type_codes.splice(type_codes.indexOf('hero'), 1);
-        type_codes.unshift('hero'); */
+        type_codes.splice(type_codes.indexOf('contract'), 1);
+        type_codes.unshift('contract');
+        type_codes.splice(type_codes.indexOf('treasure'), 1);
+        type_codes.unshift('treasure');
+        type_codes.splice(type_codes.indexOf('player-side-quest'), 1);
+        type_codes.unshift('player-side-quest');
+        type_codes.splice(type_codes.indexOf('event'), 1);
+        type_codes.unshift('event');
+        type_codes.splice(type_codes.indexOf('attachment'), 1);
+        type_codes.unshift('attachment');
+        type_codes.splice(type_codes.indexOf('ally'), 1);
+        type_codes.unshift('ally');
+        type_codes.splice(type_codes.indexOf('hero'), 1);
+        type_codes.unshift('hero');
 
         type_codes.forEach(function(type_code) {
             var example = app.data.cards.find({ 'type_code': type_code })[0];
