@@ -98,6 +98,26 @@
             this.value = "";
         });
 
+        $('#sel-hand-other').change(function() {
+            var list_inhand = $('#list-inhand').find('.list-group-item');
+            var hand_size = list_inhand.length;
+            var option = this.value;
+            if (option == 'discardRandom') {
+                var r = Math.floor(Math.random() * hand_size);
+                var card = $(list_inhand.get(r));
+                card.discard();
+            }
+            if (option == 'shuffleRedraw') {
+                list_inhand.each(function(i, html_card) {
+                    var card = $(html_card);
+                    card.shuffleIntoDeck();
+                });
+                $('#list-indeck').randomize('li');
+                for (var i = 0; i < hand_size; i++) play_simulator.draw_card();
+            }
+            this.value = "";
+        });
+
         $('#btn-refresh').click(function() {
             $('.list-group-item').readyCard();
             var labelThreat = $('#div-threat').find('.lab-value');
@@ -151,9 +171,7 @@
 
         $('.btn-disc').click(function() {
             var card = $(this).parents('.list-group-item');
-            card.leavePlay();
-            card.prependTo('#list-indisc');
-            card.makeFaceup();
+            card.discard();
         });
 
         $('.sel-moveto').change(function() {
@@ -166,9 +184,7 @@
                 card.makeFacedown();
                 card.prependTo('#list-indeck');
             } else if (this.value == "middle") {
-                card.makeFacedown();
-                card.prependTo('#list-indeck');
-                $('#list-indeck').randomize('li');
+                card.shuffleIntoDeck();
             } else if (this.value == "bottom") {
                 card.makeFacedown();
                 card.appendTo('#list-indeck');
@@ -274,7 +290,7 @@
                 '<button class="btn-simu btn-exhaust">Exhaust</button>' +
                 '<button class="btn-simu btn-ready" style="display:none;">Ready</button>' +
             '</td>' +
-            '<td><button class="btn-simu btn-move-up fa fa-angle-up"></button></td>' +
+            '<td><button class="btn-simu btn-move-up fa fa-angle-up" style="width:40px;"></button></td>' +
             '<td rowspan="2"><div class="fa fa-drag-handle"</div></td>' +
             '</tr>' +
             '<tr>' +
@@ -288,7 +304,7 @@
             '<option value="bottom">Bottom of deck</option>' +
             '</select>' +
             '</td>' +
-            '<td><button class="btn-simu btn-move-dn fa fa-angle-down"></button></td>' +
+            '<td><button class="btn-simu btn-move-dn fa fa-angle-down" style="width:40px;"></button></td>' +
             '</tr>' +
         '</table>' +
         '</td>' +
@@ -298,6 +314,18 @@
     '</tr>' +
     '</table>' +
     '</li>'
+
+    $.fn.discard = function() {
+        $(this).leavePlay();
+        $(this).prependTo('#list-indisc');
+        $(this).makeFaceup();
+    }    
+    
+    $.fn.shuffleIntoDeck = function() {
+        $(this).makeFacedown();
+        $(this).prependTo('#list-indeck');
+        $('#list-indeck').randomize('li');
+    }
 
     $.fn.moveUp = function() {
         before = $(this).prev();
