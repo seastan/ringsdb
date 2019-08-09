@@ -29,6 +29,7 @@
             name: 'cardnames',
             displayKey: 'name',
             source: findMatches,
+            limit: 10,
             templates: {
                 suggestion: function(card) {
                     return $('<div class="fg-' + card.sphere_code + '"><span class="icon-fw icon-' + card.sphere_code + '"></span> <strong>' + card.name + '</strong> <small><i>' + card.pack_name + '</i></small></div>');

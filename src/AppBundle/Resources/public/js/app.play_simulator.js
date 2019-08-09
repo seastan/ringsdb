@@ -176,6 +176,15 @@
             this.value = "";
         });
 
+        $('.btn-move-up').click(function() {
+            var card = $(this).parents('.list-group-item');
+            card.moveUp();
+        });
+
+        $('.btn-move-dn').click(function() {
+            var card = $(this).parents('.list-group-item');
+            card.moveDown();
+        });
 
 
         $('.btn-exhaust').click(function() {
@@ -265,6 +274,7 @@
                 '<button class="btn-simu btn-exhaust">Exhaust</button>' +
                 '<button class="btn-simu btn-ready" style="display:none;">Ready</button>' +
             '</td>' +
+            '<td><button class="btn-simu btn-move-up fa fa-angle-up"></button></td>' +
             '<td rowspan="2"><div class="fa fa-drag-handle"</div></td>' +
             '</tr>' +
             '<tr>' +
@@ -278,6 +288,7 @@
             '<option value="bottom">Bottom of deck</option>' +
             '</select>' +
             '</td>' +
+            '<td><button class="btn-simu btn-move-dn fa fa-angle-down"></button></td>' +
             '</tr>' +
         '</table>' +
         '</td>' +
