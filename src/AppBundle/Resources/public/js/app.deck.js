@@ -256,7 +256,6 @@
             cards = is_sideboard ? deck.get_side_cards() : deck.get_cards();
         }
         // Remove contracts from card count
-        console.log(cards);
         var num_contracts = 0;
         _.each(cards, function(card) {
             if (card.type_code == 'contract') num_contracts += card.indeck;
