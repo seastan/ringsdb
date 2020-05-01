@@ -234,7 +234,7 @@
         var mirlonde = _.find(hero_deck, { name: 'Mirlonde', pack_code: 'TDF' });
         if (mirlonde) {
             _.each(hero_deck, function(hero) {
-                if (hero.sphere_code == 'lore') {
+                if (hero.sphere_code == 'lore' && !hero.name.includes('MotK')) {
                     total--;
                 }
             });
@@ -243,7 +243,7 @@
         var folco = _.find(hero_deck, { name: 'Folco Boffin', pack_code: 'DoCG' });
         if (folco) {
             _.each(hero_deck, function(hero) {
-                if (hero.traits.includes('Hobbit')) {
+                if (hero.traits.includes('Hobbit') && !hero.name.includes('MotK')) {
                     total--;
                 }
             });
