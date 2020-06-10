@@ -667,6 +667,7 @@ class QuestLogController extends Controller {
 
         $cards_code = $request->query->get('cards');
         $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
+        $questlog_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
         $scenario = filter_var($request->query->get('scenario'), FILTER_SANITIZE_STRING);
         $nb_decks = intval(filter_var($request->query->get('nb_decks'), FILTER_SANITIZE_NUMBER_INT));
 
@@ -714,6 +715,7 @@ class QuestLogController extends Controller {
         }
 
         $params = [
+            'name' => $questlog_name,
             'allowed' => $categories,
             'on' => $on,
             'off' => $off,
@@ -755,7 +757,7 @@ class QuestLogController extends Controller {
 
         $owned_packs = '';
         if ($this->getUser()) {
-            $owned_packs = $this->getUser()->getOwnedPacksk();
+            $owned_packs = $this->getUser()->getOwnedPacks();
         }
 
         if ($owned_packs) {
@@ -816,6 +818,7 @@ class QuestLogController extends Controller {
         }
 
         $searchForm = $this->renderView('AppBundle:QuestLog:form.html.twig', [
+            'name' => '',
             'spheres' => $spheres,
             'allowed' => $categories,
             'on' => $on,
