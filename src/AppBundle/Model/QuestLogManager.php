@@ -169,8 +169,8 @@ class QuestLogManager {
         }
 
         if (!empty($questlog_name)) {
-            $qb->andWhere('d.name like :fellowname');
-            $qb->setParameter('fellowname', "%$questlog_name%");
+            $qb->andWhere('d.name like :logname');
+            $qb->setParameter('logname', "%$questlog_name%");
         }
 
         if ($nb_decks) {
@@ -179,8 +179,8 @@ class QuestLogManager {
         }
 
         if (!empty($cards_code) || !empty($packs)) {
-            $qb->innerJoin('d.decklists', "l");
-            $qb->innerJoin('l.decklist', "ld");
+            $qb->innerJoin('d.decks', "l");
+            $qb->innerJoin('l.deck', "ld");
 
             if (!empty($cards_code)) {
                 foreach ($cards_code as $i => $card_code) {

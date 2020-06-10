@@ -51,9 +51,8 @@
                     <li class="{% if url == linkurl %}active{% endif %}"><a href="{{ linkurl }}">My favorites</a></li>
                     {% set linkurl = path('questlogs_list', { type:'mine' }) %}
                     <li class="{% if url == linkurl %}active{% endif %}"><a href="{{ linkurl }}">My quest logs</a></li>
-                    <!--{% set linkurl = path('questlogs_searchform') %}
+                    {% set linkurl = path('questlogs_searchform') %}
                     <li class="{% if url == linkurl %}active{% endif %}"><a href="{{ linkurl }}"><span class="fa fa-search"></span> Search</a></li>
-                    -->
                 </ul>
             </div>
 
