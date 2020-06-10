@@ -194,15 +194,15 @@ class QuestLogManager {
                     $qb->andWhere("s$i.card = :card$i");
                     $qb->setParameter("card$i", $card);
 
-                    $packs[] = $card->getPack()->getId();
+                    //$packs[] = $card->getPack()->getId();
                 }
             }
             if (!empty($packs)) {
                 $sub = $this->doctrine->createQueryBuilder();
                 $sub->select("c");
                 $sub->from("AppBundle:Card", "c");
-                $sub->innerJoin('AppBundle:Decklistslot', 's', 'WITH', 's.card = c');
-                $sub->where('s.decklist = ld');
+                $sub->innerJoin('AppBundle:Deckslot', 's', 'WITH', 's.card = c');
+                $sub->where('s.deck = ld');
                 $sub->andWhere($sub->expr()->notIn('c.pack', $packs));
 
                 $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
