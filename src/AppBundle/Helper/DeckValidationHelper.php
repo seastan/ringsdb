@@ -29,9 +29,10 @@ class DeckValidationHelper {
         $heroDeck = $deck->getSlots()->getHeroDeck();
         $heroDeckSize = $heroDeck->countCards();
 
-        if ($heroDeckSize > 3) {
-            return 'too_many_heroes';
-        }
+        // Removed check due to Bond of Friendship Contract
+        // if ($heroDeckSize > 3) {
+        //     return 'too_many_heroes';
+        // }
 
         if ($heroDeckSize < 1) {
             return 'too_few_heroes';

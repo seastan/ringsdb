@@ -62,6 +62,7 @@ security:
         - { path: ^/collection/, role: ROLE_USER }
         - { path: ^/questlog/, role: ROLE_USER }
         - { path: ^/deck/view/, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/deck/export/, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/deck/, role: ROLE_USER }
         - { path: ^/decks, role: ROLE_USER }
         - { path: ^/fellowship/view/, role: IS_AUTHENTICATED_ANONYMOUSLY }
