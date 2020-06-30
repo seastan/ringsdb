@@ -647,9 +647,11 @@
     deck.get_problem = function() {
         // exactly 7 plots
         var herocount = deck.get_hero_deck_size(true);
-        if (herocount > 3) {
-            return 'too_many_heroes';
-        }
+
+        // Removed check due to Bond of Friendship Contract
+        // if (herocount > 3) {
+        //     return 'too_many_heroes';
+        // }
 
         if (herocount < 1) {
             return 'too_few_heroes';

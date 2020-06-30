@@ -23,10 +23,10 @@ security:
                 login_path: oauth_server_auth_login
             anonymous: true
 
-        api_oauth2:
-            pattern:    ^/api/oauth2
-            fos_oauth:  true
-            stateless:  true
+        # api_oauth2:
+        #     pattern:    ^/api/oauth2
+        #     fos_oauth:  true
+        #     stateless:  true
 
         dev:
             pattern:    ^/(_(profiler|wdt|error)|css|images|js)/
@@ -54,7 +54,7 @@ security:
         - { path: ^/remind, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: ROLE_ADMIN }
         - { path: ^/api/public, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api/oauth2, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/oauth2, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/private, role: ROLE_USER }
         - { path: ^/$, role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
         - { path: ^/js/, role: IS_AUTHENTICATED_ANONYMOUSLY }
