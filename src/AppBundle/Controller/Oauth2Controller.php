@@ -68,14 +68,38 @@ class Oauth2Controller extends Controller {
 		/* @var $deck \AppBundle\Entity\Deck */
 		$deck = $this->getDoctrine()->getRepository('AppBundle:Deck')->find($id);
 
-		if ($deck->getUser()->getId() !== $this->getUser()->getId()) {
-			throw $this->createAccessDeniedException("Access denied to this object.");
+		// if ($deck->getUser()->getId() !== $this->getUser()->getId()) {
+		// 	throw $this->createAccessDeniedException("Access denied to this object.");
+		// }
+
+		// $response->setLastModified($deck->getDateUpdate());
+		// if ($response->isNotModified($request)) {
+		// 	return $response;
+		// }
+
+		if (!$deck) {
+		   $content = json_encode([
+                   	      'success' => false,
+                	      'error' => 'Deck not found.'
+			    ]);
+            	   $response->headers->set('Content-Type', 'application/json');
+		   $response->setContent($content);
+
+            	   return $response;				   
 		}
 
-		$response->setLastModified($deck->getDateUpdate());
-		if ($response->isNotModified($request)) {
-			return $response;
+		$user = $deck->getUser();
+		if (!$user->getIsShareDecks()) {
+		   $content = json_encode([
+                   	      'success' => false,
+                	      'error' => 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.'
+			    ]);
+		   $response->headers->set('Content-Type', 'application/json');
+            	   $response->setContent($content);
+
+            	   return $response;
 		}
+
 
 		$content = json_encode($deck);
 
@@ -195,42 +219,6 @@ class Oauth2Controller extends Controller {
 	 * @param Request $request
 	 */
 	public function publishDeckAction($id, Request $request) {
-		/* @var $deck \AppBundle\Entity\Deck */
-		$deck = $this->getDoctrine()->getRepository('AppBundle:Deck')->find($id);
-		if ($this->getUser()->getId() !== $deck->getUser()->getId()) {
-			throw $this->createAccessDeniedException("Access denied to this object.");
-		}
-
-		$name = filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
-		$descriptionMd = trim($request->request->get('description_md'));
-
-		$precedent_id = trim($request->request->get('precedent'));
-		if (!preg_match('/^\d+$/', $precedent_id)) {
-			// route decklist_detail hard-coded
-			if (preg_match('/view\/(\d+)/', $precedent_id, $matches)) {
-				$precedent_id = $matches[1];
-			} else {
-				$precedent_id = null;
-			}
-		}
-		$precedent = $precedent_id ? $em->getRepository('AppBundle:Decklist')->find($precedent_id) : null;
-
-		try {
-			$decklist = $this->get('decklist_factory')->createDecklistFromDeck($deck, $name, $descriptionMd);
-		} catch (\Exception $e) {
-			return new JsonResponse([
-				'success' => false,
-				'msg' => $e->getMessage()
-			]);
-		}
-
-		$decklist->setPrecedent($precedent);
-		$this->getDoctrine()->getManager()->persist($decklist);
-		$this->getDoctrine()->getManager()->flush();
-
-		return new JsonResponse([
-			'success' => true,
-			'msg' => $decklist->getId()
-		]);
+		throw $this->createAccessDeniedException("Publishing via API has been disabled.");		
 	}
 }
