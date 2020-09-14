@@ -116,3 +116,5 @@ fos_oauth_server:
 services:
     fos_user.doctrine_registry:
         alias: doctrine
+
+gregwar_captcha: ~
