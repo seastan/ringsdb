@@ -1,0 +1,6 @@
+parameters:
+    phpexcel.class:  Liuggio\ExcelBundle\Factory
+
+services:
+    phpexcel:
+      class: '%phpexcel.class%'

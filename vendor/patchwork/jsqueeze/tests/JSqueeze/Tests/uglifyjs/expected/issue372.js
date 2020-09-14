@@ -1,0 +1,1 @@
+'use strict';'use strict';function a(){void'a';function o(){'use strict';void'b';function o(){'use strict';void'c'};function i(){'salmon';void'd'}};function i(){'salmon';void'e';function i(){'use strict';'salmon';void'f';for(var i=0;i<10;i++)var o=function(){'use strict';'salmon';void'g'}()}}};

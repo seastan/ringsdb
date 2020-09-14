@@ -1,0 +1,15 @@
+<!-- phpunit.xml.dist -->
+<phpunit
+    bootstrap="Tests/bootstrap.php"
+    colors="true"
+>
+    <testsuites>
+        <testsuite name="ExcelBundle Test Suite">
+            <directory>./Tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <server name="KERNEL_DIR" value="Tests/app" />
+    </php>
+</phpunit>
