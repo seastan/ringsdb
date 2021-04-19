@@ -1,0 +1,14 @@
+<form action="{{ path('csv_upload_process') }}" method="post" enctype="multipart/form-data">
+    <p>
+	    <input type="file" name="upfile">
+    </p>
+    <p>
+    	Code: <input type="text" name="code" value="">
+    </p>
+    <p>
+    	Name: <input type="text" name="name" value="">
+    </p>
+    <p>
+    	<input type="submit" value="Submit">
+    </p>
+</form>
