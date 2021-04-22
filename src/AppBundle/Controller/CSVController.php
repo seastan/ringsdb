@@ -6,7 +6,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+
 use AppBundle\Entity\Card;
+use AppBundle\Entity\Cycle;
+use AppBundle\Entity\Pack;
 
 class CSVController extends Controller {
 	public function uploadFormAction() {
@@ -15,24 +18,59 @@ class CSVController extends Controller {
 
 	public function uploadProcessAction(Request $request) {
 		/* @var $uploadedFile \Symfony\Component\HttpFoundation\File\UploadedFile */
-		$uploadedFile = $request->files->get('upfile');
-		$inputFileName = $uploadedFile->getPathname();
-		$content = str_getcsv(file_get_contents($inputFileName));
 		$inputCode = $request->request->get('code');
 		$inputName = $request->request->get('name');
+		$inputFileName = $request->files->get('upfile')->getPathname();
+		$content = file_get_contents($inputFileName);
+		$content = str_replace("\r", "\n", str_replace("\n", "<br/>", str_replace("\r\n", "\r", str_replace("\xEF\xBB\xBF", '', trim($content)))));
+		$content_array = explode("\n", $content);
 
-		$this->get('logger')->info("code: " . $inputCode);
-		$this->get('logger')->info("name: " . $inputName);
-//		$this->get('logger')->info("content: ", $content[0]);
-		return new Response(json_encode($content));
+		if (count($content_array) < 2) {
+			return new Response('No cards found in the CSV file');
+		}
 
-		$inputFileType = \PHPExcel_IOFactory::identify($inputFileName);
-		$objReader = \PHPExcel_IOFactory::createReader($inputFileType);
-		$objReader->setReadDataOnly(true);
-		$objPHPExcel = $objReader->load($inputFileName);
-		$objWorksheet = $objPHPExcel->getActiveSheet();
+		$columns = str_getcsv(array_shift($content_array));
+		$cards = [];
+		$new_ids = [];
+		foreach ($content_array as $row) {
+			$card = [];
+			$row = str_getcsv($row);
+			for ($i = 0; $i < count($row); $i++) {
+				$card[$columns[$i]] = str_replace("<br/>", "\n", $row[$i]);
+			}
+			$new_ids[$card['octgnid']] = 1;
+			array_push($cards, $card);
+		}
 
-		$enableCardCreation = $request->request->has('create');
+		$em = $this->getDoctrine()->getManager();
+		$packRepo = $em->getRepository('AppBundle:Pack');
+		$pack = $packRepo->findOneBy(['code' => $inputCode]);
+		if (!$pack) {
+			$cycleRepo = $em->getRepository('AppBundle:Cycle');
+			$cycle = $cycleRepo->findOneBy(['name' => 'ALeP']);
+
+			$pack = new Pack();
+			$pack->setCode($inputCode);
+			$pack->setName($inputName);
+			$pack->setPosition(0);
+			$pack->setSize(0);
+			$pack->setCycle($cycle);
+			$em->persist($pack);
+		}
+		elseif ($pack->getName() != $inputName) {
+			$pack->setName($inputName);
+			$em->persist($pack);
+		}
+
+		$oldCards = $pack->getCards();
+		foreach ($oldCards as $card) {
+			if (!array_key_exists($card->getOctgnid(), $new_ids)) {
+				$card->setName('[deleted]' . $card->getName());
+			}
+		}
+
+		$em->flush();
+		return new Response('Done');
 
 		// analysis of first row
 		$colNames = [];
