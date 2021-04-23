@@ -118,6 +118,3 @@ AppBundle\Entity\Card:
             column: has_errata
             options:
               default: false
-    uniqueConstraints:
-        card_code_idx:
-            columns: [ code ]

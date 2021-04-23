@@ -37,7 +37,7 @@ class CSVController extends Controller {
 			for ($i = 0; $i < count($row); $i++) {
 				$card[$columns[$i]] = str_replace('<br/>', "\n", $row[$i]);
 			}
-			$new_ids[$card['code']] = 1;
+			$new_ids[$card['octgnid']] = 1;
 			array_push($cards, $card);
 		}
 
@@ -67,9 +67,10 @@ class CSVController extends Controller {
 		$oldCards = $pack->getCards();
 
 		foreach ($oldCards as $card) {
-			if ((!array_key_exists($card->getCode(), $new_ids)) &&
+			if ((!array_key_exists($card->getOctgnid(), $new_ids)) &&
 				(strpos($card->getName(), '[deleted]') === false)) {
 				$card->setName('[deleted] ' . $card->getName());
+				$card->setCode($card->getCode() . '_' . uniqid());
 			}
 		}
 
@@ -80,7 +81,7 @@ class CSVController extends Controller {
 
 		foreach ($cards as $card) {
 			$changed = false;
-			$entity = $cardRepo->findOneBy(['code' => $card['code']]);
+			$entity = $cardRepo->findOneBy(['octgnid' => $card['octgnid']]);
 
 			if (!$entity) {
 				$entity = new Card();
