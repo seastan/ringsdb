@@ -29,15 +29,17 @@ class CSVController extends Controller {
 
 		$columns = str_getcsv(array_shift($content_array));
 		$cards = [];
-		$new_ids = [];
+		$newIds = [];
 
 		foreach ($content_array as $row) {
 			$card = [];
 			$row = str_getcsv($row);
+
 			for ($i = 0; $i < count($row); $i++) {
 				$card[$columns[$i]] = str_replace('<br/>', "\n", $row[$i]);
 			}
-			$new_ids[$card['octgnid']] = 1;
+
+			$newIds[$card['octgnid']] = 1;
 			array_push($cards, $card);
 		}
 
@@ -65,9 +67,22 @@ class CSVController extends Controller {
 		}
 
 		$oldCards = $pack->getCards();
+		$oldIds = [];
+		$motkPack = $packRepo->findOneBy(['code' => 'MotKA']);
+		$oldMotkCards = $motkPack->getCards();
 
 		foreach ($oldCards as $card) {
-			if ((!array_key_exists($card->getOctgnid(), $new_ids)) &&
+			$oldIds[$card->getOctgnid()] = 1;
+
+			if (!array_key_exists($card->getOctgnid(), $newIds) &&
+				(strpos($card->getName(), '[deleted]') === false)) {
+				$card->setName('[deleted] ' . $card->getName());
+				$card->setCode($card->getCode() . '_' . uniqid());
+			}
+		}
+
+		foreach ($oldMotkCards as $card) {
+			if (array_key_exists($card->getOctgnid(), $oldIds) &&
 				(strpos($card->getName(), '[deleted]') === false)) {
 				$card->setName('[deleted] ' . $card->getName());
 				$card->setCode($card->getCode() . '_' . uniqid());
@@ -81,7 +96,22 @@ class CSVController extends Controller {
 
 		foreach ($cards as $card) {
 			$changed = false;
-			$entity = $cardRepo->findOneBy(['octgnid' => $card['octgnid']]);
+			$entities = $cardRepo->findBy(['octgnid' => $card['octgnid']]);
+			$entity = null;
+			if ($entities) {
+				foreach ($entities as $candidate) {
+					if (($card['pack'] == 'Messenger of the King Allies') &&
+						($candidate->getPack()->getName() == 'Messenger of the King Allies')) {
+						$entity = $candidate;
+						break;
+					}
+					elseif (($card['pack'] != 'Messenger of the King Allies') &&
+						($candidate->getPack()->getName() != 'Messenger of the King Allies')) {
+						$entity = $candidate;
+						break;
+					}
+				}
+			}
 
 			if (!$entity) {
 				$entity = new Card();
