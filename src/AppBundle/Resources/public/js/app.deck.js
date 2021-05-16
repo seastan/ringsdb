@@ -430,6 +430,10 @@
             if (problem) {
                 var probleminfo = $('<div class="text-danger small"><span class="fa fa-exclamation-triangle"></span> ' + deck.problem_labels[problem] + '</div>');
                 deck.update_layout_section(data, 'meta', probleminfo);
+            }            
+            if (problem) {
+                var probleminfo = $('<div class="text-info small"><span class="fa fa-exclamation-triangle"></span> ' + deck.problem_labels[problem] + '</div>');
+                deck.update_layout_section(data, 'meta', probleminfo);
             }
         }
 

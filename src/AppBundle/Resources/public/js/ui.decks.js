@@ -195,13 +195,20 @@
 
         location.href = Routing.generate('fellowship_new', { deck1_id: ids[0], deck2_id: ids[1], deck3_id: ids[2], deck4_id: ids[3] });
     };
-
+    
     ui.create_quest = function(ids) {
         if (ids.length < 1 || ids.length > 4) {
             return false;
         }
 
         location.href = Routing.generate('questlog_new', { deck1_id: ids[0], deck2_id: ids[1], deck3_id: ids[2], deck4_id: ids[3] });
+    };
+    
+    ui.play_on_dragncards = function(ids) {
+        if (ids.length < 1 || ids.length > 4) {
+            return false;
+        }
+        window.open("https://www.dragncards.com/newroom/ringsdb/deck/"+ids[0]);
     };
 
     ui.download_text_selection = function(ids) {
@@ -229,6 +236,9 @@
                 break;
             case 'btn-quest':
                 ui.create_quest(ids);
+                break;
+            case 'btn-dragn':
+                ui.play_on_dragncards(ids);
                 break;
             case 'btn-compare':
                 ui.do_diff(ids);
