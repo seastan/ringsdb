@@ -34,37 +34,16 @@
                 </ul>
             </div>
 
-            {% if not is_public %}
-                {% set count = 0 %}
-                {% for d in fellowship.decks %}
-                    {% set count = count + 1 %}
-                {% endfor %}
-                {% if count == 4 %}
-                    <a href="https://www.dragncards.com/newroom/ringsdb/deck/{{fellowship.decks[0].deck.id}}/{{fellowship.decks[1].deck.id}}/{{fellowship.decks[2].deck.id}}/{{fellowship.decks[3].deck.id}}" target="_blank" class="btn btn-sm btn-default">
-                {% elseif count == 3 %}
-                    <a href="https://www.dragncards.com/newroom/ringsdb/deck/{{fellowship.decks[0].deck.id}}/{{fellowship.decks[1].deck.id}}/{{fellowship.decks[2].deck.id}}" target="_blank" class="btn btn-sm btn-default">
-                {% elseif count == 2 %}
-                    <a href="https://www.dragncards.com/newroom/ringsdb/deck/{{fellowship.decks[0].deck.id}}/{{fellowship.decks[1].deck.id}}" target="_blank" class="btn btn-sm btn-default">
-                {% else %}
-                    <a href="https://www.dragncards.com/newroom/ringsdb/deck/{{fellowship.decks[0].deck.id}}" target="_blank" class="btn btn-sm btn-default">
-                {% endif %}
-            {% else %}
-                {% set count = 0 %}
-                {% for d in fellowship.decklists %}
-                    {% set count = count + 1 %}
-                {% endfor %}
-                {% if count == 4 %}
-                    <a href="https://www.dragncards.com/newroom/ringsdb/decklist/{{fellowship.decklists[0].decklist.id}}/{{fellowship.decklists[1].decklist.id}}/{{fellowship.decklists[2].decklist.id}}/{{fellowship.decklists[3].decklist.id}}" target="_blank" class="btn btn-sm btn-default">
-                {% elseif count == 3 %}
-                    <a href="https://www.dragncards.com/newroom/ringsdb/decklist/{{fellowship.decklists[0].decklist.id}}/{{fellowship.decklists[1].decklist.id}}/{{fellowship.decklists[2].decklist.id}}" target="_blank" class="btn btn-sm btn-default">
-                {% elseif count == 2 %}
-                    <a href="https://www.dragncards.com/newroom/ringsdb/decklist/{{fellowship.decklists[0].decklist.id}}/{{fellowship.decklists[1].decklist.id}}" target="_blank" class="btn btn-sm btn-default">
-                {% else %}
-                    <a href="https://www.dragncards.com/newroom/ringsdb/decklist/{{fellowship.decklists[0].decklist.id}}" target="_blank" class="btn btn-sm btn-default">
-                {% endif %}
-            {% endif %}
-                    <span class="fa fa-play-circle"></span> Play on DragnCards
-                </a>
+            {% set url = "https://www.dragncards.com/newroom/ringsdb" %}
+            {% for d in fellowship.decks %}
+                {% set url = url ~ "/deck/" ~ d.deck.id %}
+            {% endfor %}
+            {% for d in fellowship.decklists %}
+                {% set url = url ~ "/decklist/" ~ d.decklist.id %}
+            {% endfor %}
+            <a href="{{url}}" target="_blank" class="btn btn-sm btn-default">
+                <span class="fa fa-play-circle"></span> Play on DragnCards
+            </a>
 {#            <a href="{{ path('questlog_new', { deck1_id: deck1.id, deck2_id: deck2.id, deck3_id: deck3.id, deck4_id: deck4.id }) }}" class="btn btn-sm btn-default">
               <span class="fa fa-book text-warning"></span> Log a Quest
             </a>
