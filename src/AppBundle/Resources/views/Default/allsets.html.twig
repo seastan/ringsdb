@@ -6,10 +6,11 @@
       {% if (cycle.packs|length > 1) or ((cycle.packs|length == 1) and (cycle.packs[0].label != cycle.label)) %}
         <ol>
           {% for pack in cycle.packs %}
-            <li>
-              <a href="{{ pack.url }}">{{ pack.label }}</a>
-            </li>
-
+            {% if pack.total > 0 %}
+              <li>
+                <a href="{{ pack.url }}">{{ pack.label }}</a>
+              </li>
+            {% endif %}
           {% endfor %}
         </ol>
       {% endif %}
