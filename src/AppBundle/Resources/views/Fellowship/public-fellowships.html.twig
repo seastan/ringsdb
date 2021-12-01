@@ -110,7 +110,7 @@
                                             <div class="fellowship-deck-info">
                                                 <h4 style="">
                                                     <i><a href="{{ path('decklist_detail', { decklist_id: decklist.id, 'decklist_name': decklist.nameCanonical|e('url') }) }}">{{ decklist.name }}</a></i>
-                                                    <small class="starting-threat">{{ decklist.startingThreat }} threat</small>
+                                                    <small class="starting-threat">{{ decklist.startingThreat }} threat, cards up to <i>{{ decklist.lastPack.name }}</i></small>
                                                 </h4>
 
                                                 <span class="small fellowship-hero-text hidden-xs">
