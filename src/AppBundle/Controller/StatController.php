@@ -15,6 +15,13 @@ class StatController extends Controller {
 
         /* @var $dbh \Doctrine\DBAL\Connection */
         $dbh = $this->getDoctrine()->getConnection();
+
+		$query = "SELECT name, date_release
+FROM pack
+WHERE date_release IS NOT NULL
+ORDER BY date_release";
+		$packs = $dbh->executeQuery($query, [])->fetchAll(\PDO::FETCH_ASSOC);
+
 		$query = "SELECT '" . $month . "' AS month,
   c.cycle,
   IFNULL(d.number, 0) AS number_decks,
@@ -297,7 +304,20 @@ LEFT JOIN (
 ON c.cycle = u.cycle";
 		$res_quests_played = $dbh->executeQuery($query, [])->fetchAll(\PDO::FETCH_ASSOC);
 
-		$res = ['decks_created' => $res_decks_created,
+		$pack_rules = ['Shadows of Mirkwood' => ['2000-01-01', '2012-01-06'],
+						'Dwarrowdelf' => ['2012-01-06', '2012-11-26'],
+						'Against the Shadow' => ['2012-11-26', '2014-02-21'],
+						'The Ring-maker' => ['2014-02-21', '2015-04-03'],
+						'Angmar Awakened' => ['2015-04-03', '2016-02-11'],
+						'Dream-chaser' => ['2016-02-11', '2016-11-23'],
+						'Haradrim' => ['2016-11-23', '2018-06-14'],
+						'Ered Mithrin' => ['2018-06-14', '2019-08-02'],
+						'Vengeance of Mordor' => ['2019-08-02', '2021-03-21'],
+						'ALeP - Oaths of the Rohirrim' => ['2021-03-21', '2099-12-31']];
+
+		$res = ['packs' => $packs,
+				'pack_rules' => $pack_rules,
+				'decks_created' => $res_decks_created,
 				'decks_played' => $res_decks_played,
 				'quests_played' => $res_quests_played];
 		$response = new Response(json_encode($res));
