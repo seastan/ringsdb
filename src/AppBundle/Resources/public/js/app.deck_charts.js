@@ -111,8 +111,8 @@
             'Attachment': '<span class="icon icon-attachment"></span>',
             'Event': '<span class="icon icon-event"></span>',
             'Player Side Quest': '<span class="icon icon-player-side-quest"></span>',
-            'Contract': '<span class="icon icon-contract"></span>',
-            'Treasure': '<span class="icon icon-treasure"></span>'
+            'Other': '<span class="icon icon-contract"></span>',
+            'Campaign': '<span class="icon icon-treasure"></span>'
         };
 
         var iData = {
@@ -120,8 +120,8 @@
             'attachment': { i: 1, name: 'Attachment' },
             'event': { i: 2, name: 'Event' },
             'player-side-quest': { i: 3, name: 'Player Side Quest' },
-            'contract': { i: 4, name: 'Contract' },
-            'treasure': { i: 5, name: 'Treasure' }
+            'contract': { i: 4, name: 'Other' },
+            'treasure': { i: 5, name: 'Campaign' }
         };
 
         var validTypes = {};
