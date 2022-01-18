@@ -46,20 +46,20 @@ Player Side Quests ({{ sidequests | length }})
 {% endfor %}
 
 {% endif %}
-{% set treasures = deck.slots_by_type['treasure'] %}
-{% if treasures | length %}
-Treasures ({{ treasures | length }})
-
-{% for slot in treasures %}
-{{ slot.quantity }}x {{ slot.card.name }} ({{ slot.card.pack.name }})
-{% endfor %}
-
-{% endif %}
 {% set contract = deck.slots_by_type['contract'] %}
 {% if contract | length %}
 Contract ({{ contract | length }})
 
 {% for slot in contract %}
+{{ slot.quantity }}x {{ slot.card.name }} ({{ slot.card.pack.name }})
+{% endfor %}
+
+{% endif %}
+{% set treasures = deck.slots_by_type['treasure'] %}
+{% if treasures | length %}
+Campaign ({{ treasures | length }})
+
+{% for slot in treasures %}
 {{ slot.quantity }}x {{ slot.card.name }} ({{ slot.card.pack.name }})
 {% endfor %}
 

@@ -100,13 +100,13 @@ class CSVController extends Controller {
 			$entity = null;
 			if ($entities) {
 				foreach ($entities as $candidate) {
-					if (($card['pack'] == 'Messenger of the King Allies') &&
-						($candidate->getPack()->getName() == 'Messenger of the King Allies')) {
+					if (($card['pack'] == 'ALeP - Messenger of the King Allies') &&
+						($candidate->getPack()->getName() == 'ALeP - Messenger of the King Allies')) {
 						$entity = $candidate;
 						break;
 					}
-					elseif (($card['pack'] != 'Messenger of the King Allies') &&
-						($candidate->getPack()->getName() != 'Messenger of the King Allies')) {
+					elseif (($card['pack'] != 'ALeP - Messenger of the King Allies') &&
+						($candidate->getPack()->getName() != 'ALeP - Messenger of the King Allies')) {
 						$entity = $candidate;
 						break;
 					}

@@ -34,6 +34,12 @@ AppBundle_csv:
     resource: "@AppBundle/Resources/config/routing/admin/routing_admin_csv.yml"
     prefix: /csv
 
+AppBundle_stat:
+    path: /stat
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Stat:getStat
+
 admin:
     path: /
     methods: [GET]

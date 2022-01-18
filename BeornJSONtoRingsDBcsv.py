@@ -19,7 +19,7 @@ traitlist = ['Ally','Angmar','Archer','Armor','Armory','Armour','Arnor','Artifac
 nounlist = ['hero','character','ally','attachment','card','enemy','location']
 
 # RingsDB card types
-playercardtypes = ['Hero','Ally','Attachment','Event','Player Side Quest','Contract','Treasure','Boon']
+playercardtypes = ['Hero','Ally','Attachment','Event','Player Side Quest','Contract','Treasure','Player Objective']
 
 # Make "Action" and "Response" etc bold.
 def boldActions(text):
@@ -91,10 +91,6 @@ ringsdbwriter.writerow(header)
 # Loop over the cards in the JSON file
 for i,c in enumerate(beornJSON):
 
-        # Get the card type
-        cardtype = c['CardType']
-        if cardtype == 'Player_Side_Quest': cardtype = 'Player Side Quest'
-
         # Traits
         traits = ''
         for trait in c['Front']['Traits']:
@@ -135,8 +131,13 @@ for i,c in enumerate(beornJSON):
 
         # Sphere
         sphere = c['Sphere']
-        if not sphere and cardtype in playercardtypes:
+        if not sphere and c['CardType'] in playercardtypes:
                 sphere = 'Neutral'
+
+        # Card type
+        card_type = c['CardType']
+        if card_type == 'Treasure':
+                card_type = 'Campaign'
 
         # Stats
         cost = ''
@@ -172,7 +173,7 @@ for i,c in enumerate(beornJSON):
                 haserrata = '1'
                 
         # Construct row to write to ringsdb csv file
-        ringsdbrow = [c['CardSet'],c['CardType'],sphere,c['Number'],'',c['Title'],traits,ringsdbtext,flavor,isunique,cost,threatcost,willpower,attack,defense,health,victory,quest,c['Quantity'],limit,c['Artist'],'',haserrata]
+        ringsdbrow = [c['CardSet'],card_type,sphere,c['Number'],'',c['Title'],traits,ringsdbtext,flavor,isunique,cost,threatcost,willpower,attack,defense,health,victory,quest,c['Quantity'],limit,c['Artist'],'',haserrata]
 
         # Additional considerations for Octgn
         uniquesymbol = ''
