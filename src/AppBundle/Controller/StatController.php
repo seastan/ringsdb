@@ -62,13 +62,11 @@ LEFT JOIN (
     END AS cycle,
     COUNT(*) AS number
   FROM (
-    SELECT last_pack_id,
-      date_creation
+    SELECT last_pack_id
     FROM decklist
     WHERE date_creation LIKE '" . $month . "-%'
     UNION
-    SELECT d.last_pack_id,
-      d.date_creation
+    SELECT d.last_pack_id
     FROM deck d
     LEFT JOIN decklist dl
     ON d.id = dl.parent_deck_id
@@ -101,13 +99,11 @@ LEFT JOIN (
       d.user_id    
     FROM (
       SELECT last_pack_id,
-        date_creation,
         user_id
       FROM decklist
       WHERE date_creation LIKE '" . $month . "-%'
       UNION
       SELECT d.last_pack_id,
-        d.date_creation,
         d.user_id
       FROM deck d
       LEFT JOIN decklist dl
@@ -166,8 +162,7 @@ LEFT JOIN (
     END AS cycle,
     COUNT(*) AS number
   FROM (
-    SELECT dl.last_pack_id,
-      q.date_played AS date_creation
+    SELECT dl.last_pack_id
     FROM questlog q
     JOIN questlog_deck qd
     ON q.id = qd.questlog_id
@@ -199,7 +194,6 @@ LEFT JOIN (
       d.user_id    
     FROM (
       SELECT dl.last_pack_id,
-        q.date_played AS date_creation,
         q.user_id
       FROM questlog q
       JOIN questlog_deck qd
@@ -257,8 +251,7 @@ LEFT JOIN (
     END AS cycle,
     COUNT(*) AS number
   FROM (
-    SELECT s.pack_id AS last_pack_id,
-      q.date_played AS date_creation
+    SELECT s.pack_id AS last_pack_id
     FROM questlog q
     JOIN scenario s
     ON q.scenario_id = s.id
@@ -288,7 +281,6 @@ LEFT JOIN (
       d.user_id    
     FROM (
       SELECT s.pack_id AS last_pack_id,
-        q.date_played AS date_creation,
         q.user_id
       FROM questlog q
       JOIN scenario s
