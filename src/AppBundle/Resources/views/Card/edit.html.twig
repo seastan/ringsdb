@@ -17,4 +17,9 @@
         {{ form_widget(delete_form) }}
         <button type="submit" class="btn btn-danger">Delete</button>
     </form>
+    <form action="{{ path('admin_card_force_delete', { 'id': entity.id }) }}" method="post" style="display:inline-block">
+        <input type="hidden" name="_method" value="DELETE"/>
+        {{ form_widget(force_delete_form) }}
+        <button type="submit" class="btn btn-danger">Force Delete</button>
+    </form>
 {% endblock %}
