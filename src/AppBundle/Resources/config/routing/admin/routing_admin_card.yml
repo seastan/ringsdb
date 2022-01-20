@@ -28,3 +28,8 @@ admin_card_delete:
     path:  /{id}/delete
     defaults: { _controller: "AppBundle:Card:delete" }
     methods: [ post, delete ]
+
+admin_card_force_delete:
+    path:  /{id}/force_delete
+    defaults: { _controller: "AppBundle:Card:forceDelete" }
+    methods: [ post, delete ]

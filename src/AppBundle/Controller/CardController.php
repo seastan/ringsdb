@@ -100,11 +100,13 @@ class CardController extends Controller {
 
         $editForm = $this->createForm(new CardType(), $entity);
         $deleteForm = $this->createDeleteForm($id);
+        $forceDeleteForm = $this->createForceDeleteForm($id);
 
         return $this->render('AppBundle:Card:edit.html.twig', [
             'entity' => $entity,
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
+            'force_delete_form' => $forceDeleteForm->createView(),
         ]);
     }
 
@@ -122,6 +124,7 @@ class CardController extends Controller {
         }
 
         $deleteForm = $this->createDeleteForm($id);
+        $forceDeleteForm = $this->createForceDeleteForm($id);
         $editForm = $this->createForm(new CardType(), $entity);
         $editForm->bind($request);
 
@@ -145,6 +148,7 @@ class CardController extends Controller {
             'entity' => $entity,
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
+            'force_delete_form' => $forceDeleteForm->createView(),
         ]);
     }
 
@@ -172,6 +176,40 @@ class CardController extends Controller {
     }
 
     /**
+     * Forcibly deletes a Card entity.
+     *
+     */
+    public function forceDeleteAction(Request $request, $id) {
+        $form = $this->createForceDeleteForm($id);
+        $form->bind($request);
+
+        if ($form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $entity = $em->getRepository('AppBundle:Card')->find($id);
+
+            if (!$entity) {
+                throw $this->createNotFoundException('Unable to find Card entity.');
+            }
+
+            /* @var $dbh \Doctrine\DBAL\Connection */
+            $dbh = $this->getDoctrine()->getConnection();
+            $query = "DELETE FROM deckslot WHERE card_id = " . $id;
+            $dbh->executeQuery($query, []);
+            $query = "DELETE FROM decksideslot WHERE card_id = " . $id;
+            $dbh->executeQuery($query, []);
+            $query = "DELETE FROM decklistslot WHERE card_id = " . $id;
+            $dbh->executeQuery($query, []);
+            $query = "DELETE FROM decklistsideslot WHERE card_id = " . $id;
+            $dbh->executeQuery($query, []);
+
+            $em->remove($entity);
+            $em->flush();
+        }
+
+        return $this->redirect($this->generateUrl('admin_card'));
+    }
+
+    /**
      * Creates a form to delete a Card entity by id.
      *
      * @param mixed $id The entity id
@@ -179,6 +217,17 @@ class CardController extends Controller {
      * @return \Symfony\Component\Form\Form The form
      */
     private function createDeleteForm($id) {
+        return $this->createFormBuilder(['id' => $id])->add('id', 'hidden')->getForm();
+    }
+
+    /**
+     * Creates a form to forcibly delete a Card entity by id.
+     *
+     * @param mixed $id The entity id
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createForceDeleteForm($id) {
         return $this->createFormBuilder(['id' => $id])->add('id', 'hidden')->getForm();
     }
 }
