@@ -65,7 +65,7 @@ LEFT JOIN (
     SELECT last_pack_id
     FROM decklist
     WHERE date_creation LIKE '" . $month . "-%'
-    UNION
+    UNION ALL
     SELECT d.last_pack_id
     FROM deck d
     LEFT JOIN decklist dl
@@ -102,7 +102,7 @@ LEFT JOIN (
         user_id
       FROM decklist
       WHERE date_creation LIKE '" . $month . "-%'
-      UNION
+      UNION ALL
       SELECT d.last_pack_id,
         d.user_id
       FROM deck d
