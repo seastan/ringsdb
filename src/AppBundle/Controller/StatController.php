@@ -27,6 +27,8 @@ ORDER BY date_release";
   IFNULL(d.number, 0) AS number_decks,
   IFNULL(u.number, 0) AS number_users
 FROM (
+  SELECT 'Core Set' AS cycle
+  UNION
   SELECT 'Shadows of Mirkwood' AS cycle
   UNION
   SELECT 'Dwarrowdelf' AS cycle
@@ -49,7 +51,8 @@ FROM (
 ) c
 LEFT JOIN (
   SELECT CASE
-      WHEN p.date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
+      WHEN p.date_release < '2011-07-21' THEN 'Core Set'
+      WHEN p.date_release >= '2011-07-21' and p.date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
       WHEN p.date_release >= '2012-01-06' and p.date_release < '2012-11-26' THEN 'Dwarrowdelf'
       WHEN p.date_release >= '2012-11-26' and p.date_release < '2014-02-21' THEN 'Against the Shadow'
       WHEN p.date_release >= '2014-02-21' and p.date_release < '2015-04-03' THEN 'The Ring-maker'
@@ -82,7 +85,8 @@ LEFT JOIN (
 ON c.cycle = d.cycle
 LEFT JOIN (
   SELECT CASE
-      WHEN date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
+      WHEN date_release < '2011-07-21' THEN 'Core Set'
+      WHEN date_release >= '2011-07-21' and date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
       WHEN date_release >= '2012-01-06' and date_release < '2012-11-26' THEN 'Dwarrowdelf'
       WHEN date_release >= '2012-11-26' and date_release < '2014-02-21' THEN 'Against the Shadow'
       WHEN date_release >= '2014-02-21' and date_release < '2015-04-03' THEN 'The Ring-maker'
@@ -127,6 +131,8 @@ ON c.cycle = u.cycle";
   IFNULL(d.number, 0) AS number_decks,
   IFNULL(u.number, 0) AS number_users
 FROM (
+  SELECT 'Core Set' AS cycle
+  UNION
   SELECT 'Shadows of Mirkwood' AS cycle
   UNION
   SELECT 'Dwarrowdelf' AS cycle
@@ -149,7 +155,8 @@ FROM (
 ) c
 LEFT JOIN (
   SELECT CASE
-      WHEN p.date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
+      WHEN p.date_release < '2011-07-21' THEN 'Core Set'
+      WHEN p.date_release >= '2011-07-21' and p.date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
       WHEN p.date_release >= '2012-01-06' and p.date_release < '2012-11-26' THEN 'Dwarrowdelf'
       WHEN p.date_release >= '2012-11-26' and p.date_release < '2014-02-21' THEN 'Against the Shadow'
       WHEN p.date_release >= '2014-02-21' and p.date_release < '2015-04-03' THEN 'The Ring-maker'
@@ -177,7 +184,8 @@ LEFT JOIN (
 ON c.cycle = d.cycle
 LEFT JOIN (
   SELECT CASE
-      WHEN date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
+      WHEN date_release < '2011-07-21' THEN 'Core Set'
+      WHEN date_release >= '2011-07-21' and date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
       WHEN date_release >= '2012-01-06' and date_release < '2012-11-26' THEN 'Dwarrowdelf'
       WHEN date_release >= '2012-11-26' and date_release < '2014-02-21' THEN 'Against the Shadow'
       WHEN date_release >= '2014-02-21' and date_release < '2015-04-03' THEN 'The Ring-maker'
@@ -216,6 +224,8 @@ ON c.cycle = u.cycle";
   IFNULL(d.number, 0) AS number_quests,
   IFNULL(u.number, 0) AS number_users
 FROM (
+  SELECT 'Core Set' AS cycle
+  UNION
   SELECT 'Shadows of Mirkwood' AS cycle
   UNION
   SELECT 'Dwarrowdelf' AS cycle
@@ -238,7 +248,8 @@ FROM (
 ) c
 LEFT JOIN (
   SELECT CASE
-      WHEN p.date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
+      WHEN p.date_release < '2011-07-21' THEN 'Core Set'
+      WHEN p.date_release >= '2011-07-21' and p.date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
       WHEN p.date_release >= '2012-01-06' and p.date_release < '2012-11-26' THEN 'Dwarrowdelf'
       WHEN p.date_release >= '2012-11-26' and p.date_release < '2014-02-21' THEN 'Against the Shadow'
       WHEN p.date_release >= '2014-02-21' and p.date_release < '2015-04-03' THEN 'The Ring-maker'
@@ -264,7 +275,8 @@ LEFT JOIN (
 ON c.cycle = d.cycle
 LEFT JOIN (
   SELECT CASE
-      WHEN date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
+      WHEN date_release < '2011-07-21' THEN 'Core Set'
+      WHEN date_release >= '2011-07-21' and date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
       WHEN date_release >= '2012-01-06' and date_release < '2012-11-26' THEN 'Dwarrowdelf'
       WHEN date_release >= '2012-11-26' and date_release < '2014-02-21' THEN 'Against the Shadow'
       WHEN date_release >= '2014-02-21' and date_release < '2015-04-03' THEN 'The Ring-maker'
@@ -296,7 +308,8 @@ LEFT JOIN (
 ON c.cycle = u.cycle";
 		$res_quests_played = $dbh->executeQuery($query, [])->fetchAll(\PDO::FETCH_ASSOC);
 
-		$pack_rules = ['Shadows of Mirkwood' => ['2000-01-01', '2012-01-06'],
+		$pack_rules = ['Core Set' => ['2000-01-01', '2011-07-21'],
+						'Shadows of Mirkwood' => ['2011-07-21', '2012-01-06'],
 						'Dwarrowdelf' => ['2012-01-06', '2012-11-26'],
 						'Against the Shadow' => ['2012-11-26', '2014-02-21'],
 						'The Ring-maker' => ['2014-02-21', '2015-04-03'],

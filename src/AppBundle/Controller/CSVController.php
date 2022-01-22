@@ -54,7 +54,7 @@ class CSVController extends Controller {
 			$pack = new Pack();
 			$pack->setCode($inputCode);
 			$pack->setName($inputName);
-			$pack->setPosition(0);
+			$pack->setPosition(1);
 			$pack->setSize(1);
 			$pack->setDateRelease(date_create('2030-02-01'));
 			$pack->setCycle($cycle);

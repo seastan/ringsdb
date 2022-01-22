@@ -8,6 +8,10 @@
     Cost: {{ macros.integer_or_x(card.cost) }}.
 {% endif %}
 
+{% if card.type_code == 'player-side-quest' %}
+    Quest Points: {{ macros.integer_or_x(card.quest) }}.
+{% endif %}
+
 <span class="pull-right">
     {%  if card.victory %}
         Victory {{  card.victory }}.
