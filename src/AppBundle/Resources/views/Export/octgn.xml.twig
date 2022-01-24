@@ -2,7 +2,9 @@
 <deck game="a21af4e8-be4b-4cda-a6b6-534f9717391f">
   <section name="Hero" shared="False">
 {% for slot in deck.slots_by_type.contract %}
+{% if slot.card.cost == '' %}
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+{% endif %}
 {% endfor %}
 {% for slot in deck.slots_by_type.hero %}
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
@@ -17,13 +19,25 @@
 {% for slot in deck.slots_by_type.attachment %}
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
 {% endfor %}
-{% for slot in deck.slots_by_type.treasure %}
+{% for slot in deck.slots_by_type.contract %}
+{% if slot.card.cost != '' %}
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+{% endif %}
+{% endfor %}
+{% for slot in deck.slots_by_type.treasure %}
+{% if slot.card.cost != '' and slot.card.name != 'Brace of Coneys' and slot.card.name != 'Ho! Tom Bombadil!' and slot.card.name != 'Mendor\'s Support' and slot.card.name != 'Mendor’s Support' and slot.card.name != '"No Time to Waste!"' and slot.card.name != 'Ranger Sense' %}
+    <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+{% endif %}
 {% endfor %}
   </section>
   <section name="Event" shared="False">
 {% for slot in deck.slots_by_type.event %}
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+{% endfor %}
+{% for slot in deck.slots_by_type.treasure %}
+{% if slot.card.name == 'Brace of Coneys' or slot.card.name == 'Ho! Tom Bombadil!' or slot.card.name == 'Mendor\'s Support' or slot.card.name == 'Mendor’s Support' or slot.card.name == '"No Time to Waste!"' or slot.card.name == 'Ranger Sense' %}
+    <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+{% endif %}
 {% endfor %}
   </section>
   <section name="Side Quest" shared="False">
@@ -36,6 +50,11 @@
 {% for slot in group %}
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
 {% endfor %}
+{% endfor %}
+{% for slot in deck.slots_by_type.treasure %}
+{% if slot.card.cost == '' %}
+    <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+{% endif %}
 {% endfor %}
   </section>
   <section name="Quest" shared="True" />

@@ -610,11 +610,11 @@
                     '<td><a class="card card-tip" data-code="<%= card.code %>" href="<%= url %>" data-target="#cardModal" data-remote="false" data-toggle="modal"><%= card.name %></a> <small class="text-muted">(<%= card.pack_code %>)</small></td>',
                     '<td class="sphere"><span class="icon-<%= card.sphere_code %> fg-<%= card.sphere_code %>" title="<%= card.sphere_name %>"></span></td>',
                     '<td class="type"><span class="icon-<%= card.type_code %>" title="<%= card.type_name %>"></span></td>',
-                    '<td class="cost"><%= card.cost %><%= card.threat %> <span class="visible-xs-inline"><% if (card.threat != undefined) { %>T<% } else {%>C<% } %></span></td>',
-                    '<td class="willpower"><% if (card.willpower != undefined) { %><%= card.willpower %> <span class="icon-willpower visible-xs-inline"></span><% } %></td>',
-                    '<td class="attack"><% if (card.attack != undefined) { %><%= card.attack %> <span class="icon-attack visible-xs-inline"></span><% } %></td>',
-                    '<td class="defense"><% if (card.defense != undefined) { %><%= card.defense %> <span class="icon-defense visible-xs-inline"></span><% } %></td>',
-                    '<td class="health"><% if (card.health != undefined) { %><%= card.health %> <span class="icon-health visible-xs-inline"></span><% } %></td>',
+                    '<td class="cost"><% if (card.type_code == "hero") { %><%= card.threat %> <span class="visible-xs-inline">T</span><% } else { if ((card.type_code == "ally") || (card.type_code == "attachment") || (card.type_code == "event") || (card.type_code == "player-side-quest") || ((card.type_code == "contract") && (card.cost != undefined)) || ((card.type_code == "treasure") && (card.cost != undefined))) { if (card.cost != undefined) { %><%= card.cost %><% } else { %>X<% } %> <span class="visible-xs-inline">C</span><% } } %></td>',
+                    '<td class="willpower"><% if ((card.type_code == "hero") || (card.type_code == "ally") || ((card.type_code == "treasure") && (card.health != undefined))) { if (card.willpower != undefined) { %><%= card.willpower %><% } else { %>X<% } %> <span class="icon-willpower visible-xs-inline"></span><% } %></td>',
+                    '<td class="attack"><% if ((card.type_code == "hero") || (card.type_code == "ally") || ((card.type_code == "treasure") && (card.health != undefined))) { if (card.attack != undefined) { %><%= card.attack %><% } else { %>X<% } %> <span class="icon-attack visible-xs-inline"></span><% } %></td>',
+                    '<td class="defense"><% if ((card.type_code == "hero") || (card.type_code == "ally") || ((card.type_code == "treasure") && (card.health != undefined))) { if (card.defense != undefined) { %><%= card.defense %><% } else { %>X<% } %> <span class="icon-defense visible-xs-inline"></span><% } %></td>',
+                    '<td class="health"><% if ((card.type_code == "hero") || (card.type_code == "ally") || ((card.type_code == "treasure") && (card.health != undefined))) { if (card.health != undefined) { %><%= card.health %><% } else { %>X<% } %> <span class="icon-health visible-xs-inline"></span><% } %></td>',
                     '</tr>'
                 ].join(''));
                 break;
