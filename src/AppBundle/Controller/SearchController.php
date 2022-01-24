@@ -246,6 +246,8 @@ class SearchController extends Controller {
      */
     public function findAction(Request $request) {
         $q = $request->query->get('q');
+        $q = str_replace('t:campaign', 't:treasure', $q);
+        $q = str_replace('t:other', 't:contract', $q);
         $page = $request->query->get('page') ?: 1;
         $view = $request->query->get('view') ?: 'list';
         $sort = $request->query->get('sort') ?: 'name';

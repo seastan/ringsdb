@@ -88,7 +88,7 @@
 
     function add_string_sf(key, operator, values) {
         for (var j = 0; j < values.length; j++) {
-            values[j] = new RegExp(app.data.get_searchable_string(values[j]), 'i');
+            values[j] = new RegExp('^' + app.data.get_searchable_string(values[j]), 'i');
         }
         switch (operator) {
             case ":":
@@ -125,6 +125,8 @@
         // les suivants sont les arguments, en OR
 
         query = query.replace(/^\s*(.*?)\s*$/, "$1").replace('/\s+/', ' ');
+        query = query.replace('t:campaign', 't:treasure');
+        query = query.replace('t:other', 't:contract');
 
         var list = [];
         var cond = null;

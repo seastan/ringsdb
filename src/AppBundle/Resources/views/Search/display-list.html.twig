@@ -1,4 +1,5 @@
 {% extends 'AppBundle:Search:display.html.twig' %}
+{% import "AppBundle::macros.html.twig" as macros %}
 
 {% block main %}
 
@@ -27,11 +28,11 @@
                 </td>
                 <td><span class="icon icon-{{ card.sphere_code }} fg-{{ card.sphere_code }}"></span> <span class="hidden-xs">{{ card.sphere_name }}</span></td>
                 <td><span class="icon icon-{{ card.type_code }} fg-{{ card.sphere_code }}"></span> <span class="hidden-xs">{{ card.type_name }}</span></td>
-                <td class="hidden-xs cost">{% if card.type_name == 'Hero' %}{{ card.threat }}{% else %}{{ card.cost }}{% endif %}</td>
-                <td class="hidden-xs willpower">{{ card.willpower }}</td>
-                <td class="hidden-xs attack">{{ card.attack }}</td>
-                <td class="hidden-xs defense">{{ card.defense }}</td>
-                <td class="hidden-xs health">{{ card.health }}</td>
+                <td class="hidden-xs cost">{% if card.type_name == 'Hero' %}{{ macros.integer_or_x(card.threat) }}{% else %}{% if card.type_code == 'ally' or card.type_code == 'attachment' or card.type_code == 'event' or card.type_code == 'player-side-quest' or (card.type_code == 'contract' and card.cost != null ) or (card.type_code == 'treasure' and card.cost != null ) %}{{ macros.integer_or_x(card.cost) }}{% endif %}{% endif %}</td>
+                <td class="hidden-xs willpower">{% if card.type_code == 'hero' or card.type_code == 'ally' or (card.type_code == 'treasure' and card.health != null) %}{{ macros.integer_or_x(card.willpower) }}{% endif %}</td>
+                <td class="hidden-xs attack">{% if card.type_code == 'hero' or card.type_code == 'ally' or (card.type_code == 'treasure' and card.health != null) %}{{ macros.integer_or_x(card.attack) }}{% endif %}</td>
+                <td class="hidden-xs defense">{% if card.type_code == 'hero' or card.type_code == 'ally' or (card.type_code == 'treasure' and card.health != null) %}{{ macros.integer_or_x(card.defense) }}{% endif %}</td>
+                <td class="hidden-xs health">{% if card.type_code == 'hero' or card.type_code == 'ally' or (card.type_code == 'treasure' and card.health != null) %}{{ macros.integer_or_x(card.health) }}{% endif %}</td>
                 <td>{{ card.traits }}</td>
                 <td>{{ card.pack_name }} {{ card.position }}</td>
             </tr>

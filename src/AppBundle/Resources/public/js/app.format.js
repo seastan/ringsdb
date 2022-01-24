@@ -24,15 +24,22 @@
 		return card.pack_name + ' #' + card.position + '. ' + card.sphere_name + '. ';
 	};
 
-	format.cost = function info(card) {
+	format.cost = function cost(card) {
 		switch (card.type_code) {
 			case 'attachment':
 			case 'event':
 			case 'ally':
 			case 'player-side-quest':
+				return 'Cost: ' + (card.cost != null ? card.cost : 'X') + '. ';
+
 			case 'contract':
 			case 'treasure':
-				return 'Cost: ' + (card.cost != null ? card.cost : 'X') + '. ';
+				if (card.cost != null) {
+					return 'Cost: ' + card.cost + '. ';
+				}
+				else {
+					return '';
+				}
 
 			case 'hero':
 				return 'Threat: ' + (card.threat != null ? card.threat : 'X') + '. ';
@@ -41,11 +48,19 @@
 		return '';
 	};
 
-	format.type_cost = function type_cost(card) {
-		return '<span class="card-type">' + format.type(card) + '</span>' + format.cost(card);
+	format.quest = function quest(card) {
+		if (card.type_code == 'player-side-quest') {
+			return '<br>Quest Points: ' + (card.quest != null ? card.quest : 'X') + '. ';
+		}
+
+		return '';
 	};
 
-	format.stats = function info(card) {
+	format.type_cost = function type_cost(card) {
+		return '<span class="card-type">' + format.type(card) + '</span>' + format.cost(card) + format.quest(card);
+	};
+
+	format.stats = function stats(card) {
 		var text = '';
 
 		if (card.victory) {
@@ -60,6 +75,13 @@
 				text += (card.defense != null ? card.defense : 'X') + ' <span class="icon icon-defense" title="Defense"></span>&#160; ';
 				text += (card.health != null ? card.health : 'X') + ' <span class="icon icon-health" title="Hit Points"></span>&#160; ';
 				break;
+			case 'treasure':
+				if (card.health != null) {
+					text += (card.willpower != null ? card.willpower : 'X') + ' <span class="icon icon-willpower" title="Willpower"></span>&#160; ';
+					text += (card.attack != null ? card.attack : 'X') + ' <span class="icon icon-attack" title="Attack"></span>&#160; ';
+					text += (card.defense != null ? card.defense : 'X') + ' <span class="icon icon-defense" title="Defense"></span>&#160; ';
+					text += card.health + ' <span class="icon icon-health" title="Hit Points"></span>&#160; ';
+				}
 		}
 		return text;
 	};

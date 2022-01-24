@@ -131,7 +131,16 @@ class CSVController extends Controller {
 					$associationEntity = $associationRepository->findOneBy(['name' => $value]);
 
 					if (!$associationEntity) {
-						throw new \Exception("cannot find entity [$colName] of name [$value]");
+						if (($colName == 'type') && ($value == 'Other')) {
+							$value = 'Contract';
+							$associationEntity = $associationRepository->findOneBy(['name' => $value]);
+							if (!$associationEntity) {
+								throw new \Exception("cannot find entity [$colName] of name [$value]");
+							}
+						}
+						else {
+							throw new \Exception("cannot find entity [$colName] of name [$value]");
+						}
 					}
 
 					if (!$entity->$getter() || $entity->$getter()->getId() !== $associationEntity->getId()) {
@@ -149,8 +158,14 @@ class CSVController extends Controller {
 						elseif (($type === 'smallint') && ($value == '')) {
 							$value = null;
 						}
+						elseif (($type === 'smallint') && ($value == 'X')) {
+							$value = null;
+						}
+						elseif (($colName == 'cost') && ($value == '')) {
+							$value = null;
+						}
 
-						if ($entity->$getter() != $value || ($entity->$getter() === null && $entity->$getter() !== $value)) {
+						if ($entity->$getter() !== $value) {
 							$changed = true;
 							$entity->$setter($value);
 						}

@@ -13,3 +13,8 @@ This guide assumes you know how to use the command-line and that your machine ha
 - run `php app/console doctrine:schema:create`
 - import data into mysql
 - run `php app/console server:run`
+
+To update all JavaScript and CSS assets, run:
+
+- `php app/console cache:clear`
+- `php app/console assetic:dump`

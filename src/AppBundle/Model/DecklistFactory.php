@@ -20,10 +20,6 @@ class DecklistFactory {
     public function createDecklistFromDeck(Deck $deck, $name = null, $descriptionMd = null) {
         /* @var $lastPack \AppBundle\Entity\Pack */
         $lastPack = $deck->getLastPack();
-        if (!$lastPack->getDateRelease() || $lastPack->getDateRelease() > new \DateTime()) {
-            throw new \Exception("You cannot publish this deck yet, because it has unreleased cards.");
-        }
-
         $problem = $this->deckValidationHelper->findProblem($deck, true);
         if ($problem) {
             throw new \Exception('This deck cannot be published  because it is invalid: "' . $this->deckValidationHelper->getProblemLabel($problem) . '".');
