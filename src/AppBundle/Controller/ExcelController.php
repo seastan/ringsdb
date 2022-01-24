@@ -47,7 +47,7 @@ class ExcelController extends Controller {
 		$phpExcelObject = $this->get('phpexcel')->createPHPExcelObject();
 		$phpExcelObject->getProperties()->setCreator("Sydtrack")->setLastModifiedBy($lastModified->format('Y-m-d'))->setTitle($pack_name);
 		$phpActiveSheet = $phpExcelObject->setActiveSheetIndex(0);
-		$phpActiveSheet->setTitle($pack_name);
+		$phpActiveSheet->setTitle(mb_substr($pack_name, 0, 31));
 
 		$col_index = 0;
 		foreach ($associationMappings as $fieldName => $associationMapping) {
