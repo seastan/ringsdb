@@ -75,7 +75,6 @@
                                     <h5><strong>{{ scenario.pack.cycle.name }}</strong></h5>
                                 {% endif %}
 
-                                {% if scenario.hasEasy %}
                                     {% set played = played_easy[scenario.id] is defined %}
                                     <li class="scenario-easy {% if not played %}not-played{% endif %}" data-pack="{{ scenario.pack.id }}">
                                         <span class="img" style="background-image: url('{{ asset('/bundles/app/images/encounters/' ~ (scenario.name | url_encode) ~ '.png')  }}')"></span>
@@ -86,7 +85,6 @@
                                             {{ scenario.name }}
                                         {% endif %}
                                     </li>
-                                {% endif %}
 
                                 {% set played = played_normal[scenario.id] is defined %}
                                 <li class="scenario-normal {% if not played %}not-played{% endif %}" data-pack="{{ scenario.pack.id }}">
