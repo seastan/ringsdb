@@ -25,7 +25,7 @@
 {% endif %}
 {% endfor %}
 {% for slot in deck.slots_by_type.treasure %}
-{% if slot.card.cost != '' and slot.card.name != 'Brace of Coneys' and slot.card.name != 'Ho! Tom Bombadil!' and slot.card.name != 'Mendor\'s Support' and slot.card.name != 'Mendor’s Support' and slot.card.name != '"No Time to Waste!"' and slot.card.name != 'Ranger Sense' %}
+{% if slot.card.cost != '' and slot.card.name != 'Brace of Coneys' and slot.card.name != 'Ho! Tom Bombadil!' and slot.card.name != 'Mendor\'s Support' and slot.card.name != '"No Time to Waste!"' and slot.card.name != 'Ranger Sense' %}
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
 {% endif %}
 {% endfor %}
@@ -35,7 +35,7 @@
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
 {% endfor %}
 {% for slot in deck.slots_by_type.treasure %}
-{% if slot.card.name == 'Brace of Coneys' or slot.card.name == 'Ho! Tom Bombadil!' or slot.card.name == 'Mendor\'s Support' or slot.card.name == 'Mendor’s Support' or slot.card.name == '"No Time to Waste!"' or slot.card.name == 'Ranger Sense' %}
+{% if slot.card.name == 'Brace of Coneys' or slot.card.name == 'Ho! Tom Bombadil!' or slot.card.name == 'Mendor\'s Support' or slot.card.name == '"No Time to Waste!"' or slot.card.name == 'Ranger Sense' %}
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
 {% endif %}
 {% endfor %}

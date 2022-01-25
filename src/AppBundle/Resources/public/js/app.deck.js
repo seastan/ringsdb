@@ -258,7 +258,7 @@
         // Remove contracts from card count
         var num_contracts = 0;
         _.each(cards, function(card) {
-            if ((card.type_code == 'contract') && (card.cost == null)) num_contracts += card.indeck;
+            if ((card.cost == '-') || (((card.type_code == 'contract') || (card.type_code == 'treasure')) && (card.cost == null))) num_contracts += card.indeck;
         })
         var quantities = _.pluck(cards, is_sideboard ? 'insideboard' : 'indeck');
         return _.reduce(quantities, function(memo, num) { return memo + num; }, 0) - num_contracts;
@@ -429,10 +429,6 @@
 
             if (problem) {
                 var probleminfo = $('<div class="text-danger small"><span class="fa fa-exclamation-triangle"></span> ' + deck.problem_labels[problem] + '</div>');
-                deck.update_layout_section(data, 'meta', probleminfo);
-            }
-            if (problem) {
-                var probleminfo = $('<div class="text-info small"><span class="fa fa-exclamation-triangle"></span> ' + deck.problem_labels[problem] + '</div>');
                 deck.update_layout_section(data, 'meta', probleminfo);
             }
         }
