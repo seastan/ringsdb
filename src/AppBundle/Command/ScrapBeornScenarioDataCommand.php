@@ -40,19 +40,21 @@ class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
                 continue;
             }
 
-            VarDumper::dump($scenario->getName() . " $i");
+            // VarDumper::dump($scenario->getName() . " $i");
 
-            $beornscenario = str_replace([' ', 'ú', 'î', 'û', ','], ['-', '%C3%BA', '%C3%AE', '%C3%BB', ''], $scenario->getName());
+            $beornscenario = str_replace('ALeP - ', '', $scenario->getName());
+            $beornscenario = str_replace([' ', 'ú', 'î', 'û', ','], ['-', '%C3%BA', '%C3%AE', '%C3%BB', ''], $beornscenario);
+            VarDumper::dump($beornscenario);
             $json = file_get_contents("http://hallofbeorn.com/Cards/ScenarioDetails/".$beornscenario);
 
-            if (!$json) {
+            if (!$json || $json == '{}') {
                 VarDumper::dump('Could not find scenario ' . $scenario->getName());
                 continue;
             }
             $beorn = json_decode($json);
 
-            dump($beorn);
-            dump($beorn->title);
+            // VarDumper::dump($beorn);
+            // VarDumper::dump($beorn->title);
 
             $scenario->setHasEasy($beorn->HasEasy);
             $scenario->setHasNightmare($beorn->HasNightmare);
@@ -77,7 +79,6 @@ class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
             $scenario->setNormalObjectiveLocations($beorn->NormalObjectiveLocations);
             $scenario->setNormalSurges($beorn->NormalSurges);
             $scenario->setNormalEncounterSideQuests($beorn->NormalEncounterSideQuests);
-
 
             $scenario->setNightmareCards($beorn->NightmareCards);
             $scenario->setNightmareEnemies($beorn->NightmareEnemies);
