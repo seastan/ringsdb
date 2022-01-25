@@ -18,3 +18,7 @@ To update all JavaScript and CSS assets, run:
 
 - `php app/console cache:clear`
 - `php app/console assetic:dump`
+
+To run a command:
+
+- `php app/console app:beorn:scenario`

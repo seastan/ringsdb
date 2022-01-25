@@ -40,7 +40,6 @@ class ScenarioController extends Controller {
 #            $texts = $this->getContainer()->get('texts');
 #            $entity->setCanonicalName($texts->slugify($entity->getName()));
             # Set defaults
-            $entity->setPosition(0);
             $entity->setNameCanonical('');
             $entity->setHasEasy(1);
             $entity->setHasNightmare(0);
