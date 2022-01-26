@@ -41,7 +41,7 @@ class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
         $skip = $input->getOption('skip') ?: 0;
         $url = $input->getOption('url') ?: 'http://hallofbeorn.com';
         if ($url[-1] != '/') $url = $url.'/';
-        $url = $url.'/Cards/ScenarioDetails/';
+        $url = $url.'Cards/ScenarioDetails/';
 
         $i = 0;
         foreach ($allScenarios as $scenario) {
