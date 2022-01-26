@@ -21,6 +21,12 @@ class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Number of cards to skip'
+            )
+            ->addOption(
+                'url',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Custom Hall of Beorn URL'
             );
     }
 
@@ -33,6 +39,9 @@ class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
         /* @var $allScenarios \AppBundle\Entity\Scenario[] */
         $allScenarios = $em->getRepository('AppBundle:Scenario')->findAll();
         $skip = $input->getOption('skip') ?: 0;
+        $url = $input->getOption('url') ?: 'http://hallofbeorn.com';
+        if ($url[-1] != '/') $url = $url.'/';
+        $url = $url.'/Cards/ScenarioDetails/';
 
         $i = 0;
         foreach ($allScenarios as $scenario) {
@@ -45,7 +54,7 @@ class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
             $beornscenario = str_replace('ALeP - ', '', $scenario->getName());
             $beornscenario = str_replace([' ', 'ú', 'î', 'û', ','], ['-', '%C3%BA', '%C3%AE', '%C3%BB', ''], $beornscenario);
             VarDumper::dump($beornscenario);
-            $json = file_get_contents("http://hallofbeorn.com/Cards/ScenarioDetails/".$beornscenario);
+            $json = file_get_contents($url.$beornscenario);
 
             if (!$json || $json == '{}') {
                 VarDumper::dump('Could not find scenario ' . $scenario->getName());
