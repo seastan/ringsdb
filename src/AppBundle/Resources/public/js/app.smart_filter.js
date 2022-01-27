@@ -14,11 +14,11 @@
         t: [add_string_sf,  'type_code', "Type"],
         s: [add_string_sf,  'sphere_code', "Sphere"],
         u: [add_boolean_sf, 'is_unique', "Uniqueness"],
-        k: [add_string_sf,  's_traits', "Traits"],
-        x: [add_string_sf,  's_text', "Text"],
+        k: [add_text_sf,    's_traits', "Traits"],
+        x: [add_text_sf,    's_text', "Text"],
         y: [add_integer_sf, 'quantity', "Quantity in pack"],
-        f: [add_string_sf,  's_flavor', "Flavor text"],
-        i: [add_string_sf,  'illustrator', "Illustrator"],
+        f: [add_text_sf,    's_flavor', "Flavor text"],
+        i: [add_text_sf,    'illustrator', "Illustrator"],
         z: [add_boolean_sf, 'has_errata', "Errata'd"]
     };
 
@@ -88,7 +88,25 @@
 
     function add_string_sf(key, operator, values) {
         for (var j = 0; j < values.length; j++) {
-            values[j] = new RegExp('^' + app.data.get_searchable_string(values[j]), 'i');
+            values[j] = new RegExp('(?<=^|-| )' + app.data.get_searchable_string(values[j]), 'i');
+        }
+        switch (operator) {
+            case ":":
+                SmartFilterQuery[key] = {
+                    '$in': values
+                };
+                break;
+            case "!":
+                SmartFilterQuery[key] = {
+                    '$nin': values
+                };
+                break;
+        }
+    }
+
+    function add_text_sf(key, operator, values) {
+        for (var j = 0; j < values.length; j++) {
+            values[j] = new RegExp(app.data.get_searchable_string(values[j]), 'i');
         }
         switch (operator) {
             case ":":
