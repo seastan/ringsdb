@@ -76,7 +76,10 @@ LEFT JOIN (
     WHERE dl.parent_deck_id IS NULL
       AND d.last_pack_id IS NOT NULL
       AND d.problem IS NULL
-      AND d.date_creation LIKE '" . $month . "-%'
+      AND (('" . $month . "' < '2021-04' AND d.date_update LIKE '" . $month . "-%') OR
+           ('" . $month . "' >= '2021-04' AND '" . $month . "' < '2022-02' AND
+            (d.date_creation LIKE '" . $month . "-%' OR (d.date_update LIKE '" . $month . "-%' AND d.date_creation < '2021-04-01'))) OR
+           ('" . $month . "' >= '2022-02' AND d.date_creation LIKE '" . $month . "-%'))
   ) d
   JOIN pack p
   ON d.last_pack_id = p.id
@@ -100,7 +103,7 @@ LEFT JOIN (
     COUNT(*) AS number
   FROM (
     SELECT MAX(p.date_release) AS date_release,
-      d.user_id    
+      d.user_id
     FROM (
       SELECT last_pack_id,
         user_id
@@ -115,7 +118,10 @@ LEFT JOIN (
       WHERE dl.parent_deck_id IS NULL
         AND d.last_pack_id IS NOT NULL
         AND d.problem IS NULL
-        AND d.date_creation LIKE '" . $month . "-%'
+        AND (('" . $month . "' < '2021-04' AND d.date_update LIKE '" . $month . "-%') OR
+             ('" . $month . "' >= '2021-04' AND '" . $month . "' < '2022-02' AND
+              (d.date_creation LIKE '" . $month . "-%' OR (d.date_update LIKE '" . $month . "-%' AND d.date_creation < '2021-04-01'))) OR
+             ('" . $month . "' >= '2022-02' AND d.date_creation LIKE '" . $month . "-%'))
     ) d
     JOIN pack p
     ON d.last_pack_id = p.id
@@ -199,7 +205,7 @@ LEFT JOIN (
     COUNT(*) AS number
   FROM (
     SELECT MAX(p.date_release) AS date_release,
-      d.user_id    
+      d.user_id
     FROM (
       SELECT dl.last_pack_id,
         q.user_id
@@ -290,7 +296,7 @@ LEFT JOIN (
     COUNT(*) AS number
   FROM (
     SELECT MAX(p.date_release) AS date_release,
-      d.user_id    
+      d.user_id
     FROM (
       SELECT s.pack_id AS last_pack_id,
         q.user_id
@@ -320,11 +326,11 @@ ON c.cycle = u.cycle";
 						'Vengeance of Mordor' => ['2019-08-02', '2021-03-21'],
 						'ALeP - Oaths of the Rohirrim' => ['2021-03-21', '2099-12-31']];
 
-		$res = ['packs' => $packs,
-				'pack_rules' => $pack_rules,
-				'decks_created' => $res_decks_created,
+		$res = ['decks_created' => $res_decks_created,
 				'decks_played' => $res_decks_played,
-				'quests_played' => $res_quests_played];
+				'quests_played' => $res_quests_played,
+				'packs' => $packs,
+				'pack_rules' => $pack_rules];
 		$response = new Response(json_encode($res));
 		$response->headers->set('Content-Type', 'application/json');
 		return $response;
