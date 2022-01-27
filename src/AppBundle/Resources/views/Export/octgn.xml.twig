@@ -12,12 +12,16 @@
   </section>
   <section name="Ally" shared="False">
 {% for slot in deck.slots_by_type.ally %}
+{% if slot.card.cost != '-' %}
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+{% endif %}
 {% endfor %}
   </section>
   <section name="Attachment" shared="False">
 {% for slot in deck.slots_by_type.attachment %}
+{% if slot.card.cost != '-' %}
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+{% endif %}
 {% endfor %}
 {% for slot in deck.slots_by_type.contract %}
 {% if slot.card.cost != '' %}
@@ -32,7 +36,9 @@
   </section>
   <section name="Event" shared="False">
 {% for slot in deck.slots_by_type.event %}
+{% if slot.card.cost != '-' %}
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+{% endif %}
 {% endfor %}
 {% for slot in deck.slots_by_type.treasure %}
 {% if slot.card.name == 'Brace of Coneys' or slot.card.name == 'Ho! Tom Bombadil!' or slot.card.name == 'Mendor\'s Support' or slot.card.name == '"No Time to Waste!"' or slot.card.name == 'Ranger Sense' %}
@@ -42,7 +48,9 @@
   </section>
   <section name="Side Quest" shared="False">
 {% for slot in deck.slots_by_type['player-side-quest'] %}
+{% if slot.card.cost != '-' %}
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+{% endif %}
 {% endfor %}
   </section>
   <section name="Sideboard" shared="False">
@@ -50,6 +58,26 @@
 {% for slot in group %}
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
 {% endfor %}
+{% endfor %}
+{% for slot in deck.slots_by_type.ally %}
+{% if slot.card.cost == '-' %}
+    <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+{% endif %}
+{% endfor %}
+{% for slot in deck.slots_by_type.attachment %}
+{% if slot.card.cost == '-' %}
+    <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+{% endif %}
+{% endfor %}
+{% for slot in deck.slots_by_type.event %}
+{% if slot.card.cost == '-' %}
+    <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+{% endif %}
+{% endfor %}
+{% for slot in deck.slots_by_type['player-side-quest'] %}
+{% if slot.card.cost == '-' %}
+    <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+{% endif %}
 {% endfor %}
 {% for slot in deck.slots_by_type.treasure %}
 {% if slot.card.cost == '' %}
