@@ -1,0 +1,20 @@
+<form action="{{ path('command_run') }}" method="post" enctype="multipart/form-data">
+    <p>
+    	Command: <select name="command">
+    	    <option value="scenario">scenario</option>
+    	</select>
+    </p>
+    <p>
+    	Scenario: <select name="scenario">
+    	    {% for entity in entities %}
+    	    <option value="{{ entity.name }}">{{ entity.name }}</option>
+    	    {% endfor %}
+    	</select>
+    </p>
+    <p>
+    	Hall of Beorn URL: <input type="text" name="url" value="">
+    </p>
+    <p>
+    	<input type="submit" value="Submit">
+    </p>
+</form>
