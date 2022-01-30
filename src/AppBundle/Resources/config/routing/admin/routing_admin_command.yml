@@ -1,0 +1,11 @@
+command_form:
+    path: /
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Command:form
+
+command_run:
+    path: /
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:Command:run
