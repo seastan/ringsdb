@@ -101,6 +101,19 @@
                                         <span class="tag" data-code="{{ code }}" style="display:none">{{ code }}</span>
                                     {% endfor %}
                                 </div>
+                                {% if deck.last_pack is not null %}
+                                    <div class="small">cards up to <i>{{ deck.last_pack.name }}</i></div>
+                                {% endif %}
+                                <div class="small decklist-hero-text">
+                                    {% for hero in deck.heroes %}
+                                        <a class="card card-tip fg-{{ hero.sphere.code }}" data-code="{{ hero.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" href="">
+                                            <span class="icon-{{ hero.sphere.code }}"></span> {{ hero.name }} <i>({{ hero.pack.code }})</i>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                                <div>
+                                    <time class="pull-right" datetime="{{ deck.date_creation|date('c') }}">{{ deck.date_creation|date('M d') }}</time>
+                                </div>
                             </td>
                             <td class="decks-actions text-right">
                                 <a href="{{ path('deck_edit', { deck_id: deck.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" title="Edit"><span class="fa fa-pencil fa-fw"></span></a>
