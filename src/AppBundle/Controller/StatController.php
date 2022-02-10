@@ -182,6 +182,15 @@ LEFT JOIN (
     JOIN decklist dl
     ON qd.decklist_id = dl.id
     WHERE q.date_played LIKE '" . $month . "-%'
+    UNION ALL
+    SELECT d.last_pack_id
+    FROM questlog q
+    JOIN questlog_deck qd
+    ON q.id = qd.questlog_id
+    JOIN deck d
+    ON qd.deck_id = d.id
+    WHERE qd.decklist_id IS NULL
+      AND q.date_played LIKE '" . $month . "-%'
   ) d
   JOIN pack p
   ON d.last_pack_id = p.id
@@ -215,6 +224,16 @@ LEFT JOIN (
       JOIN decklist dl
       ON qd.decklist_id = dl.id
       WHERE q.date_played LIKE '" . $month . "-%'
+      UNION ALL
+      SELECT d.last_pack_id,
+        q.user_id
+      FROM questlog q
+      JOIN questlog_deck qd
+      ON q.id = qd.questlog_id
+      JOIN deck d
+      ON qd.deck_id = d.id
+      WHERE qd.decklist_id IS NULL
+        AND q.date_played LIKE '" . $month . "-%'
     ) d
     JOIN pack p
     ON d.last_pack_id = p.id
