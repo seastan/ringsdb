@@ -34,7 +34,7 @@
                 <td class="hidden-xs defense">{% if card.type_code == 'hero' or card.type_code == 'ally' or (card.type_code == 'treasure' and card.health != null) %}{{ macros.integer_or_x(card.defense) }}{% endif %}</td>
                 <td class="hidden-xs health">{% if card.type_code == 'hero' or card.type_code == 'ally' or (card.type_code == 'treasure' and card.health != null) %}{{ macros.integer_or_x(card.health) }}{% endif %}</td>
                 <td>{{ card.traits }}</td>
-                <td>{{ card.pack_name }} {{ card.position }}</td>
+                <td>{{ card.pack_name | replace({'ALeP ': '<a href="https://alongextendedparty.com/" target="_blank">ALeP</a> '}) | raw }} {{ card.position }}</td>
             </tr>
         {% endfor %}
     </table>
