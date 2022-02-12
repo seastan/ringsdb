@@ -53,8 +53,8 @@ LEFT JOIN (
   SELECT CASE
       WHEN p.date_release < '2011-07-21' THEN 'Core Set'
       WHEN p.date_release >= '2011-07-21' and p.date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
-      WHEN p.date_release >= '2012-01-06' and p.date_release < '2012-11-26' THEN 'Dwarrowdelf'
-      WHEN p.date_release >= '2012-11-26' and p.date_release < '2014-02-21' THEN 'Against the Shadow'
+      WHEN p.date_release >= '2012-01-06' and p.date_release < '2012-08-17' THEN 'Dwarrowdelf'
+      WHEN p.date_release >= '2012-08-17' and p.date_release < '2014-02-21' THEN 'Against the Shadow'
       WHEN p.date_release >= '2014-02-21' and p.date_release < '2015-04-03' THEN 'The Ring-maker'
       WHEN p.date_release >= '2015-04-03' and p.date_release < '2016-02-11' THEN 'Angmar Awakened'
       WHEN p.date_release >= '2016-02-11' and p.date_release < '2016-11-23' THEN 'Dream-chaser'
@@ -90,8 +90,8 @@ LEFT JOIN (
   SELECT CASE
       WHEN date_release < '2011-07-21' THEN 'Core Set'
       WHEN date_release >= '2011-07-21' and date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
-      WHEN date_release >= '2012-01-06' and date_release < '2012-11-26' THEN 'Dwarrowdelf'
-      WHEN date_release >= '2012-11-26' and date_release < '2014-02-21' THEN 'Against the Shadow'
+      WHEN date_release >= '2012-01-06' and date_release < '2012-08-17' THEN 'Dwarrowdelf'
+      WHEN date_release >= '2012-08-17' and date_release < '2014-02-21' THEN 'Against the Shadow'
       WHEN date_release >= '2014-02-21' and date_release < '2015-04-03' THEN 'The Ring-maker'
       WHEN date_release >= '2015-04-03' and date_release < '2016-02-11' THEN 'Angmar Awakened'
       WHEN date_release >= '2016-02-11' and date_release < '2016-11-23' THEN 'Dream-chaser'
@@ -163,8 +163,8 @@ LEFT JOIN (
   SELECT CASE
       WHEN p.date_release < '2011-07-21' THEN 'Core Set'
       WHEN p.date_release >= '2011-07-21' and p.date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
-      WHEN p.date_release >= '2012-01-06' and p.date_release < '2012-11-26' THEN 'Dwarrowdelf'
-      WHEN p.date_release >= '2012-11-26' and p.date_release < '2014-02-21' THEN 'Against the Shadow'
+      WHEN p.date_release >= '2012-01-06' and p.date_release < '2012-08-17' THEN 'Dwarrowdelf'
+      WHEN p.date_release >= '2012-08-17' and p.date_release < '2014-02-21' THEN 'Against the Shadow'
       WHEN p.date_release >= '2014-02-21' and p.date_release < '2015-04-03' THEN 'The Ring-maker'
       WHEN p.date_release >= '2015-04-03' and p.date_release < '2016-02-11' THEN 'Angmar Awakened'
       WHEN p.date_release >= '2016-02-11' and p.date_release < '2016-11-23' THEN 'Dream-chaser'
@@ -201,8 +201,8 @@ LEFT JOIN (
   SELECT CASE
       WHEN date_release < '2011-07-21' THEN 'Core Set'
       WHEN date_release >= '2011-07-21' and date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
-      WHEN date_release >= '2012-01-06' and date_release < '2012-11-26' THEN 'Dwarrowdelf'
-      WHEN date_release >= '2012-11-26' and date_release < '2014-02-21' THEN 'Against the Shadow'
+      WHEN date_release >= '2012-01-06' and date_release < '2012-08-17' THEN 'Dwarrowdelf'
+      WHEN date_release >= '2012-08-17' and date_release < '2014-02-21' THEN 'Against the Shadow'
       WHEN date_release >= '2014-02-21' and date_release < '2015-04-03' THEN 'The Ring-maker'
       WHEN date_release >= '2015-04-03' and date_release < '2016-02-11' THEN 'Angmar Awakened'
       WHEN date_release >= '2016-02-11' and date_release < '2016-11-23' THEN 'Dream-chaser'
@@ -275,8 +275,8 @@ LEFT JOIN (
   SELECT CASE
       WHEN p.date_release < '2011-07-21' THEN 'Core Set'
       WHEN p.date_release >= '2011-07-21' and p.date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
-      WHEN p.date_release >= '2012-01-06' and p.date_release < '2012-11-26' THEN 'Dwarrowdelf'
-      WHEN p.date_release >= '2012-11-26' and p.date_release < '2014-02-21' THEN 'Against the Shadow'
+      WHEN p.date_release >= '2012-01-06' and p.date_release < '2012-08-17' THEN 'Dwarrowdelf'
+      WHEN p.date_release >= '2012-08-17' and p.date_release < '2014-02-21' THEN 'Against the Shadow'
       WHEN p.date_release >= '2014-02-21' and p.date_release < '2015-04-03' THEN 'The Ring-maker'
       WHEN p.date_release >= '2015-04-03' and p.date_release < '2016-02-11' THEN 'Angmar Awakened'
       WHEN p.date_release >= '2016-02-11' and p.date_release < '2016-11-23' THEN 'Dream-chaser'
@@ -302,8 +302,8 @@ LEFT JOIN (
   SELECT CASE
       WHEN date_release < '2011-07-21' THEN 'Core Set'
       WHEN date_release >= '2011-07-21' and date_release < '2012-01-06' THEN 'Shadows of Mirkwood'
-      WHEN date_release >= '2012-01-06' and date_release < '2012-11-26' THEN 'Dwarrowdelf'
-      WHEN date_release >= '2012-11-26' and date_release < '2014-02-21' THEN 'Against the Shadow'
+      WHEN date_release >= '2012-01-06' and date_release < '2012-08-17' THEN 'Dwarrowdelf'
+      WHEN date_release >= '2012-08-17' and date_release < '2014-02-21' THEN 'Against the Shadow'
       WHEN date_release >= '2014-02-21' and date_release < '2015-04-03' THEN 'The Ring-maker'
       WHEN date_release >= '2015-04-03' and date_release < '2016-02-11' THEN 'Angmar Awakened'
       WHEN date_release >= '2016-02-11' and date_release < '2016-11-23' THEN 'Dream-chaser'
@@ -335,8 +335,8 @@ ON c.cycle = u.cycle";
 
 		$pack_rules = ['Core Set' => ['2000-01-01', '2011-07-21'],
 						'Shadows of Mirkwood' => ['2011-07-21', '2012-01-06'],
-						'Dwarrowdelf' => ['2012-01-06', '2012-11-26'],
-						'Against the Shadow' => ['2012-11-26', '2014-02-21'],
+						'Dwarrowdelf' => ['2012-01-06', '2012-08-17'],
+						'Against the Shadow' => ['2012-08-17', '2014-02-21'],
 						'The Ring-maker' => ['2014-02-21', '2015-04-03'],
 						'Angmar Awakened' => ['2015-04-03', '2016-02-11'],
 						'Dream-chaser' => ['2016-02-11', '2016-11-23'],
