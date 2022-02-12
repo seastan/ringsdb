@@ -1,1 +1,1 @@
-<span class="card-pack pull-right">{{ card.pack_name }} #{{ card.position }}.</span>
+<span class="card-pack pull-right">{{ card.pack_name | replace({'ALeP ': '<a href="https://alongextendedparty.com/" target="_blank">ALeP</a> '}) | raw }} #{{ card.position }}.</span>
