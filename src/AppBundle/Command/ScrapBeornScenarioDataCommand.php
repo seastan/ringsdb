@@ -54,7 +54,7 @@ class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
 		$skip = $skip ?: 0;
 		$url = $url ?: 'http://hallofbeorn.com';
 		if ($url[-1] != '/') $url = $url.'/';
-		$url = $url.'Cards/ScenarioDetails/';
+		$url = $url.'LotR/ScenarioDetails/';
 
 		if ($name) {
 			/* @var $allScenarios \AppBundle\Entity\Scenario[] */
