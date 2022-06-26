@@ -29,32 +29,30 @@ class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
                 'Name of the particular scenario'
             )
             ->addOption(
-                'url',
+                'customjson',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Custom Hall of Beorn URL'
+                'Custom Hall of Beorn JSON'
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
         $name = $input->getOption('name');
         $skip = $input->getOption('skip');
-        $url = $input->getOption('url');
+        $customjson = $input->getOption('customjson');
 
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getContainer()->get('doctrine')->getManager();
 
-        $this->command($em, $name, $skip, $url);
+        $this->command($em, $name, $skip, $customjson);
         $output->writeln("Done.");
     }
 
-	function command($em, $name, $skip, $url) {
+	function command($em, $name, $skip, $customjson) {
 		$res = '';
 		$name = $name ?: null;
 		$skip = $skip ?: 0;
-		$url = $url ?: 'http://hallofbeorn.com';
-		if ($url[-1] != '/') $url = $url.'/';
-		$url = $url.'LotR/ScenarioDetails/';
+		$customjson = $customjson ?: null;
 
 		if ($name) {
 			/* @var $allScenarios \AppBundle\Entity\Scenario[] */
@@ -76,7 +74,13 @@ class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
 			$output_line = $beornscenario;
 			VarDumper::dump($output_line);
 			$res .= $output_line . "\n<br>";
-			$json = file_get_contents($url.$beornscenario);
+			$url = 'http://hallofbeorn.com/LotR/ScenarioDetails/';
+			if ($customjson) {
+				$json = $customjson;
+			}
+			else {
+				$json = file_get_contents($url.$beornscenario);
+			}
 
 			if (!$json || $json == '{}') {
 				$output_line = 'Could not find scenario ' . $scenario->getName();

@@ -25,10 +25,10 @@ class CommandController extends Controller {
 	public function runAction(Request $request) {
 		$command = $request->request->get('command');
 		$scenario = $request->request->get('scenario');
-		$url = $request->request->get('url');
+		$customjson = $request->request->get('customjson');
 		$em = $this->getDoctrine()->getManager();
 		if ($command == 'scenario') {
-			$res = ScrapBeornScenarioDataCommand::command($em, $scenario, 0, $url);
+			$res = ScrapBeornScenarioDataCommand::command($em, $scenario, 0, $customjson);
 		}
 		else {
 			$res = '';
