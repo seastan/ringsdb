@@ -49,7 +49,7 @@ class CSVController extends Controller {
 
 		if (!$pack) {
 			$cycleRepo = $em->getRepository('AppBundle:Cycle');
-			$cycle = $cycleRepo->findOneBy(['name' => 'ALeP']);
+			$cycle = $cycleRepo->findOneBy(['code' => 'ALeP']);
 
 			$pack = new Pack();
 			$pack->setCode($inputCode);
