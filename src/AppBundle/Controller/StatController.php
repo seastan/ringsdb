@@ -736,10 +736,58 @@ WHERE t.name != 'Campaign'
                      'Dwarves of Durin', 'Elves of Lórien', 'Defenders of Gondor', 'Riders of Rohan')
   AND CAST(p.date_release AS CHAR) <= '" . $month . "-31'
 GROUP BY c.code
-ORDER BY CAST(c.code AS UNSIGNED)";
-		$res_cards = $dbh->executeQuery($query, [])->fetchAll(\PDO::FETCH_ASSOC);
+ORDER BY encounter, full_decks DESC, limited_decks DESC, sides DESC, CAST(c.code AS UNSIGNED) DESC";
+		$cards = $dbh->executeQuery($query, [])->fetchAll(\PDO::FETCH_ASSOC);
 
-		$res = ['cards' => $res_cards,
+		$query = "SELECT full_decks,
+  limited_decks,
+  full_decks + limited_decks AS sides
+FROM (
+  SELECT (SELECT COUNT(*)
+    FROM decklist dl
+    JOIN pack p
+    ON dl.last_pack_id = p.id
+    WHERE dl.date_creation LIKE '" . $month . "-%' -- month
+      AND p.date_release >= '2019-08-02'
+    ) + (
+    SELECT COUNT(*)
+    FROM deck d
+    LEFT JOIN decklist dl
+    ON d.id = dl.parent_deck_id
+    JOIN pack p
+    ON d.last_pack_id = p.id
+    WHERE dl.parent_deck_id IS NULL
+      AND d.last_pack_id IS NOT NULL
+      AND d.problem IS NULL
+      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR -- month
+           ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%')) -- month
+      AND p.date_release >= '2019-08-02'
+    ) AS full_decks,
+    (SELECT COUNT(*)
+    FROM decklist dl
+    JOIN pack p
+    ON dl.last_pack_id = p.id
+    WHERE dl.date_creation LIKE '" . $month . "-%' -- month
+      AND p.date_release < '2019-08-02'
+    ) + (
+    SELECT COUNT(*)
+    FROM deck d
+    LEFT JOIN decklist dl
+    ON d.id = dl.parent_deck_id
+    JOIN pack p
+    ON d.last_pack_id = p.id
+    WHERE dl.parent_deck_id IS NULL
+      AND d.last_pack_id IS NOT NULL
+      AND d.problem IS NULL
+      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR -- month
+           ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%')) -- month
+      AND p.date_release < '2019-08-02'
+    ) AS limited_decks
+  ) t";
+		$total = $dbh->executeQuery($query, [])->fetchAll(\PDO::FETCH_ASSOC);
+
+		$res = ['cards' => $cards,
+				'total' => $total[0],
 				'packs' => $packs,
 				'pack_rules' => $pack_rules,
 				'mapping' => $mapping];
