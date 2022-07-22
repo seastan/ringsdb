@@ -44,6 +44,18 @@ AppBundle_stat:
     defaults:
         _controller: AppBundle:Stat:getStat
 
+AppBundle_stat_packs:
+    path: /stat_packs
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Stat:getStatPacks
+
+AppBundle_stat_cards:
+    path: /stat_cards
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Stat:getStatCards
+
 admin:
     path: /
     methods: [GET]
