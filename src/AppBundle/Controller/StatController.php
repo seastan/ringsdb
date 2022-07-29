@@ -355,6 +355,74 @@ ON c.cycle = u.cycle";
         $dbh = $this->getDoctrine()->getConnection();
 
 		if ($step == '1') {
+			$query = "CREATE TEMPORARY TABLE decklist_filtered
+SELECT CASE WHEN CAST(c.code AS UNSIGNED) > 1000000 THEN SUBSTRING(c.code, 3) ELSE source_code(c.code, cp.name) END AS code,
+  dls.quantity,
+  dl.id,
+  CAST(c.code AS UNSIGNED) > 1000000 AS is_motka
+FROM decklist dl
+JOIN pack p
+ON dl.last_pack_id = p.id
+JOIN decklistslot dls
+ON dl.id = dls.decklist_id
+JOIN card c
+ON dls.card_id = c.id
+JOIN pack cp
+ON c.pack_id = cp.id
+WHERE dl.date_creation LIKE '" . $month . "-%'
+  AND p.date_release >= '2019-08-02'
+  AND (c.cost IS NULL OR c.cost != '-')";
+			$dbh->executeQuery($query, []);
+
+			$query = "CREATE TEMPORARY TABLE decklist_motka
+SELECT DISTINCT id
+  FROM decklist_filtered
+  WHERE is_motka";
+			$dbh->executeQuery($query, []);
+
+			$query = "CREATE TEMPORARY TABLE decklist_contract
+SELECT DISTINCT id
+  FROM decklist_filtered
+  WHERE code = '22134'";
+			$dbh->executeQuery($query, []);
+
+			$query = "CREATE TEMPORARY TABLE deck_filtered
+SELECT CASE WHEN CAST(c.code AS UNSIGNED) > 1000000 THEN SUBSTRING(c.code, 3) ELSE source_code(c.code, cp.name) END AS code,
+  ds.quantity,
+  d.id,
+  CAST(c.code AS UNSIGNED) > 1000000 AS is_motka
+FROM deck d
+LEFT JOIN decklist dl
+ON d.id = dl.parent_deck_id
+JOIN pack p
+ON d.last_pack_id = p.id
+JOIN deckslot ds
+ON d.id = ds.deck_id
+JOIN card c
+ON ds.card_id = c.id
+JOIN pack cp
+ON c.pack_id = cp.id
+WHERE dl.parent_deck_id IS NULL
+  AND d.last_pack_id IS NOT NULL
+  AND d.problem IS NULL
+  AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
+       ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
+  AND p.date_release >= '2019-08-02'
+  AND (c.cost IS NULL OR c.cost != '-')";
+			$dbh->executeQuery($query, []);
+
+			$query = "CREATE TEMPORARY TABLE deck_motka
+SELECT DISTINCT id
+  FROM deck_filtered
+  WHERE is_motka";
+			$dbh->executeQuery($query, []);
+
+			$query = "CREATE TEMPORARY TABLE deck_contract
+SELECT DISTINCT id
+  FROM deck_filtered
+  WHERE code = '22134'";
+			$dbh->executeQuery($query, []);
+
 			$query1 = "SELECT c.code,
   c.octgnid,
   c.name,
@@ -363,7 +431,7 @@ ON c.cycle = u.cycle";
   p.name AS pack,
   p.date_release AS released,
   CASE WHEN c.cost = '-' THEN 'Encounter' ELSE '' END AS encounter,
-  COUNT(sl.new_code) AS full_decks,
+  COUNT(sl.code) AS full_decks,
   ROUND(COALESCE(AVG(sl.quantity), 0), 2) AS full_deck_copies
 FROM card c
 JOIN pack p
@@ -373,125 +441,37 @@ ON c.type_id = t.id
 JOIN sphere s
 ON c.sphere_id = s.id
 LEFT JOIN (
-  SELECT CASE WHEN CAST(c.code AS UNSIGNED) > 1000000 THEN SUBSTRING(c.code, 3) ELSE source_code(c.code, cp.name) END AS new_code,
-    LEAST(SUM(dls.quantity), 3) AS quantity
-  FROM decklist dl
-  JOIN pack p
-  ON dl.last_pack_id = p.id
-  JOIN decklistslot dls
-  ON dl.id = dls.decklist_id
-  JOIN card c
-  ON dls.card_id = c.id
-  JOIN pack cp
-  ON c.pack_id = cp.id
-  WHERE dl.date_creation LIKE '" . $month . "-%'
-    AND p.date_release >= '2019-08-02'
-    AND (c.cost IS NULL OR c.cost != '-')
-  GROUP BY dl.id, new_code
+  SELECT code,
+    LEAST(SUM(quantity), 3) AS quantity
+  FROM decklist_filtered
+  GROUP BY id, code
 
   UNION ALL
 
-  SELECT '22134' AS new_code,
+  SELECT '22134' AS code,
     1 AS quantity
-  FROM (
-    SELECT DISTINCT dl.id
-    FROM decklist dl
-    JOIN pack p
-    ON dl.last_pack_id = p.id
-    JOIN decklistslot dls
-    ON dl.id = dls.decklist_id
-    JOIN card c
-    ON dls.card_id = c.id
-    WHERE dl.date_creation LIKE '" . $month . "-%'
-      AND p.date_release >= '2019-08-02'
-      AND CAST(c.code AS UNSIGNED) > 1000000
-  ) t1
-  LEFT JOIN (
-    SELECT DISTINCT dl.id
-    FROM decklist dl
-    JOIN pack p
-    ON dl.last_pack_id = p.id
-    JOIN decklistslot dls
-    ON dl.id = dls.decklist_id
-    JOIN card c
-    ON dls.card_id = c.id
-    WHERE dl.date_creation LIKE '" . $month . "-%'
-      AND p.date_release >= '2019-08-02'
-      AND c.code = '22134'
-  ) t2
-  ON t1.id = t2.id
-  WHERE t2.id IS NULL
+  FROM decklist_motka dm
+  LEFT JOIN decklist_contract dc
+  ON dm.id = dc.id
+  WHERE dc.id IS NULL
 
   UNION ALL
 
-  SELECT CASE WHEN CAST(c.code AS UNSIGNED) > 1000000 THEN SUBSTRING(c.code, 3) ELSE source_code(c.code, cp.name) END AS new_code,
-    LEAST(SUM(ds.quantity), 3) AS quantity
-  FROM deck d
-  LEFT JOIN decklist dl
-  ON d.id = dl.parent_deck_id
-  JOIN pack p
-  ON d.last_pack_id = p.id
-  JOIN deckslot ds
-  ON d.id = ds.deck_id
-  JOIN card c
-  ON ds.card_id = c.id
-  JOIN pack cp
-  ON c.pack_id = cp.id
-  WHERE dl.parent_deck_id IS NULL
-    AND d.last_pack_id IS NOT NULL
-    AND d.problem IS NULL
-    AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
-         ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
-    AND p.date_release >= '2019-08-02'
-    AND (c.cost IS NULL OR c.cost != '-')
-  GROUP BY d.id, new_code
+  SELECT code,
+    LEAST(SUM(quantity), 3) AS quantity
+  FROM deck_filtered
+  GROUP BY id, code
 
   UNION ALL
 
-  SELECT '22134' AS new_code,
+  SELECT '22134' AS code,
     1 AS quantity
-  FROM (
-    SELECT DISTINCT d.id
-    FROM deck d
-    LEFT JOIN decklist dl
-    ON d.id = dl.parent_deck_id
-    JOIN pack p
-    ON d.last_pack_id = p.id
-    JOIN deckslot ds
-    ON d.id = ds.deck_id
-    JOIN card c
-    ON ds.card_id = c.id
-    WHERE dl.parent_deck_id IS NULL
-      AND d.last_pack_id IS NOT NULL
-      AND d.problem IS NULL
-      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
-           ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
-      AND p.date_release >= '2019-08-02'
-      AND CAST(c.code AS UNSIGNED) > 1000000
-  ) t1
-  LEFT JOIN (
-    SELECT DISTINCT d.id
-    FROM deck d
-    LEFT JOIN decklist dl
-    ON d.id = dl.parent_deck_id
-    JOIN pack p
-    ON d.last_pack_id = p.id
-    JOIN deckslot ds
-    ON d.id = ds.deck_id
-    JOIN card c
-    ON ds.card_id = c.id
-    WHERE dl.parent_deck_id IS NULL
-      AND d.last_pack_id IS NOT NULL
-      AND d.problem IS NULL
-      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
-           ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
-      AND p.date_release >= '2019-08-02'
-      AND c.code = '22134'
-  ) t2
-  ON t1.id = t2.id
-  WHERE t2.id IS NULL
+  FROM deck_motka dm
+  LEFT JOIN deck_contract dc
+  ON dm.id = dc.id
+  WHERE dc.id IS NULL
 ) sl
-ON c.code = sl.new_code
+ON c.code = sl.code
 WHERE t.name != 'Campaign'
   AND s.name NOT IN ('Baggins', 'Fellowship')
   AND p.name NOT IN ('Messenger of the King Allies', 'ALeP - Messenger of the King Allies', 'Two-Player Limited Edition Starter',
@@ -508,142 +488,123 @@ ORDER BY encounter, full_decks DESC, CAST(c.code AS UNSIGNED) DESC";
 		}
 
 		if ($step == '2') {
+			$query = "CREATE TEMPORARY TABLE decklist_filtered2
+SELECT CASE WHEN CAST(c.code AS UNSIGNED) > 1000000 THEN SUBSTRING(c.code, 3) ELSE source_code(c.code, cp.name) END AS code,
+  dls.quantity,
+  dl.id,
+  CAST(c.code AS UNSIGNED) > 1000000 AS is_motka
+FROM decklist dl
+JOIN pack p
+ON dl.last_pack_id = p.id
+JOIN decklistslot dls
+ON dl.id = dls.decklist_id
+JOIN card c
+ON dls.card_id = c.id
+JOIN pack cp
+ON c.pack_id = cp.id
+WHERE dl.date_creation LIKE '" . $month . "-%'
+  AND p.date_release < '2019-08-02'
+  AND (c.cost IS NULL OR c.cost != '-')";
+			$dbh->executeQuery($query, []);
+
+			$query = "CREATE TEMPORARY TABLE decklist_motka2
+SELECT DISTINCT id
+  FROM decklist_filtered2
+  WHERE is_motka";
+			$dbh->executeQuery($query, []);
+
+			$query = "CREATE TEMPORARY TABLE decklist_contract2
+SELECT DISTINCT id
+  FROM decklist_filtered2
+  WHERE code = '22134'";
+			$dbh->executeQuery($query, []);
+
+			$query = "CREATE TEMPORARY TABLE deck_filtered2
+SELECT CASE WHEN CAST(c.code AS UNSIGNED) > 1000000 THEN SUBSTRING(c.code, 3) ELSE source_code(c.code, cp.name) END AS code,
+  ds.quantity,
+  d.id,
+  CAST(c.code AS UNSIGNED) > 1000000 AS is_motka
+FROM deck d
+LEFT JOIN decklist dl
+ON d.id = dl.parent_deck_id
+JOIN pack p
+ON d.last_pack_id = p.id
+JOIN deckslot ds
+ON d.id = ds.deck_id
+JOIN card c
+ON ds.card_id = c.id
+JOIN pack cp
+ON c.pack_id = cp.id
+WHERE dl.parent_deck_id IS NULL
+  AND d.last_pack_id IS NOT NULL
+  AND d.problem IS NULL
+  AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
+       ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
+  AND p.date_release < '2019-08-02'
+  AND (c.cost IS NULL OR c.cost != '-')";
+			$dbh->executeQuery($query, []);
+
+			$query = "CREATE TEMPORARY TABLE deck_motka2
+SELECT DISTINCT id
+  FROM deck_filtered2
+  WHERE is_motka";
+			$dbh->executeQuery($query, []);
+
+			$query = "CREATE TEMPORARY TABLE deck_contract2
+SELECT DISTINCT id
+  FROM deck_filtered2
+  WHERE code = '22134'";
+			$dbh->executeQuery($query, []);
+
 			$query2 = "SELECT c.code,
-    COUNT(sl.new_code) AS limited_decks,
+    COUNT(sl.code) AS limited_decks,
     ROUND(COALESCE(AVG(sl.quantity), 0), 2) AS limited_deck_copies
-  FROM card c
-  JOIN pack p
-  ON c.pack_id = p.id
-  JOIN type t
-  ON c.type_id = t.id
-  JOIN sphere s
-  ON c.sphere_id = s.id
-  LEFT JOIN (
-    SELECT CASE WHEN CAST(c.code AS UNSIGNED) > 1000000 THEN SUBSTRING(c.code, 3) ELSE source_code(c.code, cp.name) END AS new_code,
-      LEAST(SUM(dls.quantity), 3) AS quantity
-    FROM decklist dl
-    JOIN pack p
-    ON dl.last_pack_id = p.id
-    JOIN decklistslot dls
-    ON dl.id = dls.decklist_id
-    JOIN card c
-    ON dls.card_id = c.id
-    JOIN pack cp
-    ON c.pack_id = cp.id
-    WHERE dl.date_creation LIKE '" . $month . "-%'
-      AND p.date_release < '2019-08-02'
-      AND (c.cost IS NULL OR c.cost != '-')
-    GROUP BY dl.id, new_code
+FROM card c
+JOIN pack p
+ON c.pack_id = p.id
+JOIN type t
+ON c.type_id = t.id
+JOIN sphere s
+ON c.sphere_id = s.id
+LEFT JOIN (
+  SELECT code,
+    LEAST(SUM(quantity), 3) AS quantity
+  FROM decklist_filtered2
+  GROUP BY id, code
 
-    UNION ALL
+  UNION ALL
 
-    SELECT '22134' AS new_code,
-      1 AS quantity
-    FROM (
-      SELECT DISTINCT dl.id
-      FROM decklist dl
-      JOIN pack p
-      ON dl.last_pack_id = p.id
-      JOIN decklistslot dls
-      ON dl.id = dls.decklist_id
-      JOIN card c
-      ON dls.card_id = c.id
-      WHERE dl.date_creation LIKE '" . $month . "-%'
-        AND p.date_release < '2019-08-02'
-        AND CAST(c.code AS UNSIGNED) > 1000000
-    ) t1
-    LEFT JOIN (
-      SELECT DISTINCT dl.id
-      FROM decklist dl
-      JOIN pack p
-      ON dl.last_pack_id = p.id
-      JOIN decklistslot dls
-      ON dl.id = dls.decklist_id
-      JOIN card c
-      ON dls.card_id = c.id
-      WHERE dl.date_creation LIKE '" . $month . "-%'
-        AND p.date_release < '2019-08-02'
-        AND c.code = '22134'
-    ) t2
-    ON t1.id = t2.id
-    WHERE t2.id IS NULL
+  SELECT '22134' AS code,
+    1 AS quantity
+  FROM decklist_motka2 dm
+  LEFT JOIN decklist_contract2 dc
+  ON dm.id = dc.id
+  WHERE dc.id IS NULL
 
-    UNION ALL
+  UNION ALL
 
-    SELECT CASE WHEN CAST(c.code AS UNSIGNED) > 1000000 THEN SUBSTRING(c.code, 3) ELSE source_code(c.code, cp.name) END AS new_code,
-      LEAST(SUM(ds.quantity), 3) AS quantity
-    FROM deck d
-    LEFT JOIN decklist dl
-    ON d.id = dl.parent_deck_id
-    JOIN pack p
-    ON d.last_pack_id = p.id
-    JOIN deckslot ds
-    ON d.id = ds.deck_id
-    JOIN card c
-    ON ds.card_id = c.id
-    JOIN pack cp
-    ON c.pack_id = cp.id
-    WHERE dl.parent_deck_id IS NULL
-      AND d.last_pack_id IS NOT NULL
-      AND d.problem IS NULL
-      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
-           ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
-      AND p.date_release < '2019-08-02'
-      AND (c.cost IS NULL OR c.cost != '-')
-    GROUP BY d.id, new_code
+  SELECT code,
+    LEAST(SUM(quantity), 3) AS quantity
+  FROM deck_filtered2
+  GROUP BY id, code
 
-    UNION ALL
+  UNION ALL
 
-    SELECT '22134' AS new_code,
-      1 AS quantity
-    FROM (
-      SELECT DISTINCT d.id
-      FROM deck d
-      LEFT JOIN decklist dl
-      ON d.id = dl.parent_deck_id
-      JOIN pack p
-      ON d.last_pack_id = p.id
-      JOIN deckslot ds
-      ON d.id = ds.deck_id
-      JOIN card c
-      ON ds.card_id = c.id
-      WHERE dl.parent_deck_id IS NULL
-        AND d.last_pack_id IS NOT NULL
-        AND d.problem IS NULL
-        AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
-             ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
-        AND p.date_release < '2019-08-02'
-        AND CAST(c.code AS UNSIGNED) > 1000000
-    ) t1
-    LEFT JOIN (
-      SELECT DISTINCT d.id
-      FROM deck d
-      LEFT JOIN decklist dl
-      ON d.id = dl.parent_deck_id
-      JOIN pack p
-      ON d.last_pack_id = p.id
-      JOIN deckslot ds
-      ON d.id = ds.deck_id
-      JOIN card c
-      ON ds.card_id = c.id
-      WHERE dl.parent_deck_id IS NULL
-        AND d.last_pack_id IS NOT NULL
-        AND d.problem IS NULL
-        AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
-             ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
-        AND p.date_release < '2019-08-02'
-        AND c.code = '22134'
-    ) t2
-    ON t1.id = t2.id
-    WHERE t2.id IS NULL
-  ) sl
-  ON c.code = sl.new_code
-  WHERE t.name != 'Campaign'
-    AND s.name NOT IN ('Baggins', 'Fellowship')
-    AND p.name NOT IN ('Messenger of the King Allies', 'ALeP - Messenger of the King Allies', 'Two-Player Limited Edition Starter',
-                       'Dwarves of Durin', 'Elves of Lórien', 'Defenders of Gondor', 'Riders of Rohan')
-    AND CAST(p.date_release AS CHAR) <= '" . $month . "-31'
-  GROUP BY c.code";
+  SELECT '22134' AS code,
+    1 AS quantity
+  FROM deck_motka2 dm
+  LEFT JOIN deck_contract2 dc
+  ON dm.id = dc.id
+  WHERE dc.id IS NULL
+) sl
+ON c.code = sl.code
+WHERE t.name != 'Campaign'
+  AND s.name NOT IN ('Baggins', 'Fellowship')
+  AND p.name NOT IN ('Messenger of the King Allies', 'ALeP - Messenger of the King Allies', 'Two-Player Limited Edition Starter',
+                     'Dwarves of Durin', 'Elves of Lórien', 'Defenders of Gondor', 'Riders of Rohan')
+  AND CAST(p.date_release AS CHAR) <= '" . $month . "-31'
+GROUP BY c.code
+ORDER BY c.code";
 			$cards = $dbh->executeQuery($query2, [])->fetchAll(\PDO::FETCH_ASSOC);
 
 			$res = ['cards' => $cards];
@@ -680,7 +641,9 @@ ORDER BY encounter, full_decks DESC, CAST(c.code AS UNSIGNED) DESC";
     JOIN pack cp
     ON c.pack_id = cp.id
     WHERE dl.date_creation LIKE '" . $month . "-%'
+
     UNION ALL
+
     SELECT c.code,
       dls.quantity,
       dl.id
@@ -720,7 +683,9 @@ ORDER BY encounter, full_decks DESC, CAST(c.code AS UNSIGNED) DESC";
       AND d.problem IS NULL
       AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
            ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
+
     UNION ALL
+
     SELECT c.code,
       ds.quantity,
       d.id
@@ -747,7 +712,9 @@ ORDER BY encounter, full_decks DESC, CAST(c.code AS UNSIGNED) DESC";
     AND s.name NOT IN ('Baggins', 'Fellowship')
     AND p.name NOT IN ('Messenger of the King Allies', 'ALeP - Messenger of the King Allies', 'Two-Player Limited Edition Starter',
                        'Dwarves of Durin', 'Elves of Lórien', 'Defenders of Gondor', 'Riders of Rohan')
-  GROUP BY c.code";
+    AND CAST(p.date_release AS CHAR) <= '" . $month . "-31'
+  GROUP BY c.code
+  ORDER BY c.code";
 			$cards = $dbh->executeQuery($query3, [])->fetchAll(\PDO::FETCH_ASSOC);
 
 			$query_total = "SELECT full_decks,
@@ -758,7 +725,7 @@ FROM (
     FROM decklist dl
     JOIN pack p
     ON dl.last_pack_id = p.id
-    WHERE dl.date_creation LIKE '" . $month . "-%' -- month
+    WHERE dl.date_creation LIKE '" . $month . "-%'
       AND p.date_release >= '2019-08-02'
     ) + (
     SELECT COUNT(*)
@@ -770,15 +737,15 @@ FROM (
     WHERE dl.parent_deck_id IS NULL
       AND d.last_pack_id IS NOT NULL
       AND d.problem IS NULL
-      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR -- month
-           ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%')) -- month
+      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
+           ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
       AND p.date_release >= '2019-08-02'
     ) AS full_decks,
     (SELECT COUNT(*)
     FROM decklist dl
     JOIN pack p
     ON dl.last_pack_id = p.id
-    WHERE dl.date_creation LIKE '" . $month . "-%' -- month
+    WHERE dl.date_creation LIKE '" . $month . "-%'
       AND p.date_release < '2019-08-02'
     ) + (
     SELECT COUNT(*)
@@ -790,8 +757,8 @@ FROM (
     WHERE dl.parent_deck_id IS NULL
       AND d.last_pack_id IS NOT NULL
       AND d.problem IS NULL
-      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR -- month
-           ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%')) -- month
+      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
+           ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
       AND p.date_release < '2019-08-02'
     ) AS limited_decks
   ) t";
@@ -810,392 +777,6 @@ FROM (
 			$response->headers->set('Content-Type', 'application/json');
 			return $response;
 		}
-/*
-		$query = "SELECT c.octgnid,
-  c.name,
-  t.name AS type,
-  s.name AS sphere,
-  p.name AS pack,
-  p.date_release AS released,
-  CASE WHEN c.cost = '-' THEN 'Encounter' ELSE '' END AS encounter,
-  COUNT(sl.new_code) AS full_decks,
-  ROUND(COALESCE(AVG(sl.quantity), 0), 2) AS full_deck_copies,
-  ld.limited_decks,
-  ld.limited_deck_copies,
-  sd.sides,
-  sd.side_copies
-FROM card c
-JOIN pack p
-ON c.pack_id = p.id
-JOIN type t
-ON c.type_id = t.id
-JOIN sphere s
-ON c.sphere_id = s.id
-LEFT JOIN (
-  SELECT CASE WHEN CAST(c.code AS UNSIGNED) > 1000000 THEN SUBSTRING(c.code, 3) ELSE source_code(c.code, cp.name) END AS new_code,
-    LEAST(SUM(dls.quantity), 3) AS quantity
-  FROM decklist dl
-  JOIN pack p
-  ON dl.last_pack_id = p.id
-  JOIN decklistslot dls
-  ON dl.id = dls.decklist_id
-  JOIN card c
-  ON dls.card_id = c.id
-  JOIN pack cp
-  ON c.pack_id = cp.id
-  WHERE dl.date_creation LIKE '" . $month . "-%'
-    AND p.date_release >= '2019-08-02'
-    AND (c.cost IS NULL OR c.cost != '-')
-  GROUP BY dl.id, new_code
-
-  UNION ALL
-
-  SELECT '22134' AS new_code,
-    1 AS quantity
-  FROM (
-    SELECT DISTINCT dl.id
-    FROM decklist dl
-    JOIN pack p
-    ON dl.last_pack_id = p.id
-    JOIN decklistslot dls
-    ON dl.id = dls.decklist_id
-    JOIN card c
-    ON dls.card_id = c.id
-    WHERE dl.date_creation LIKE '" . $month . "-%'
-      AND p.date_release >= '2019-08-02'
-      AND CAST(c.code AS UNSIGNED) > 1000000
-  ) t1
-  LEFT JOIN (
-    SELECT DISTINCT dl.id
-    FROM decklist dl
-    JOIN pack p
-    ON dl.last_pack_id = p.id
-    JOIN decklistslot dls
-    ON dl.id = dls.decklist_id
-    JOIN card c
-    ON dls.card_id = c.id
-    WHERE dl.date_creation LIKE '" . $month . "-%'
-      AND p.date_release >= '2019-08-02'
-      AND c.code = '22134'
-  ) t2
-  ON t1.id = t2.id
-  WHERE t2.id IS NULL
-
-  UNION ALL
-
-  SELECT CASE WHEN CAST(c.code AS UNSIGNED) > 1000000 THEN SUBSTRING(c.code, 3) ELSE source_code(c.code, cp.name) END AS new_code,
-    LEAST(SUM(ds.quantity), 3) AS quantity
-  FROM deck d
-  LEFT JOIN decklist dl
-  ON d.id = dl.parent_deck_id
-  JOIN pack p
-  ON d.last_pack_id = p.id
-  JOIN deckslot ds
-  ON d.id = ds.deck_id
-  JOIN card c
-  ON ds.card_id = c.id
-  JOIN pack cp
-  ON c.pack_id = cp.id
-  WHERE dl.parent_deck_id IS NULL
-    AND d.last_pack_id IS NOT NULL
-    AND d.problem IS NULL
-    AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
-         ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
-    AND p.date_release >= '2019-08-02'
-    AND (c.cost IS NULL OR c.cost != '-')
-  GROUP BY d.id, new_code
-
-  UNION ALL
-
-  SELECT '22134' AS new_code,
-    1 AS quantity
-  FROM (
-    SELECT DISTINCT d.id
-    FROM deck d
-    LEFT JOIN decklist dl
-    ON d.id = dl.parent_deck_id
-    JOIN pack p
-    ON d.last_pack_id = p.id
-    JOIN deckslot ds
-    ON d.id = ds.deck_id
-    JOIN card c
-    ON ds.card_id = c.id
-    WHERE dl.parent_deck_id IS NULL
-      AND d.last_pack_id IS NOT NULL
-      AND d.problem IS NULL
-      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
-           ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
-      AND p.date_release >= '2019-08-02'
-      AND CAST(c.code AS UNSIGNED) > 1000000
-  ) t1
-  LEFT JOIN (
-    SELECT DISTINCT d.id
-    FROM deck d
-    LEFT JOIN decklist dl
-    ON d.id = dl.parent_deck_id
-    JOIN pack p
-    ON d.last_pack_id = p.id
-    JOIN deckslot ds
-    ON d.id = ds.deck_id
-    JOIN card c
-    ON ds.card_id = c.id
-    WHERE dl.parent_deck_id IS NULL
-      AND d.last_pack_id IS NOT NULL
-      AND d.problem IS NULL
-      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
-           ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
-      AND p.date_release >= '2019-08-02'
-      AND c.code = '22134'
-  ) t2
-  ON t1.id = t2.id
-  WHERE t2.id IS NULL
-) sl
-ON c.code = sl.new_code
-JOIN (
-  SELECT c.code,
-    COUNT(sl.new_code) AS limited_decks,
-    ROUND(COALESCE(AVG(sl.quantity), 0), 2) AS limited_deck_copies
-  FROM card c
-  JOIN pack p
-  ON c.pack_id = p.id
-  JOIN type t
-  ON c.type_id = t.id
-  JOIN sphere s
-  ON c.sphere_id = s.id
-  LEFT JOIN (
-    SELECT CASE WHEN CAST(c.code AS UNSIGNED) > 1000000 THEN SUBSTRING(c.code, 3) ELSE source_code(c.code, cp.name) END AS new_code,
-      LEAST(SUM(dls.quantity), 3) AS quantity
-    FROM decklist dl
-    JOIN pack p
-    ON dl.last_pack_id = p.id
-    JOIN decklistslot dls
-    ON dl.id = dls.decklist_id
-    JOIN card c
-    ON dls.card_id = c.id
-    JOIN pack cp
-    ON c.pack_id = cp.id
-    WHERE dl.date_creation LIKE '" . $month . "-%'
-      AND p.date_release < '2019-08-02'
-      AND (c.cost IS NULL OR c.cost != '-')
-    GROUP BY dl.id, new_code
-
-    UNION ALL
-
-    SELECT '22134' AS new_code,
-      1 AS quantity
-    FROM (
-      SELECT DISTINCT dl.id
-      FROM decklist dl
-      JOIN pack p
-      ON dl.last_pack_id = p.id
-      JOIN decklistslot dls
-      ON dl.id = dls.decklist_id
-      JOIN card c
-      ON dls.card_id = c.id
-      WHERE dl.date_creation LIKE '" . $month . "-%'
-        AND p.date_release < '2019-08-02'
-        AND CAST(c.code AS UNSIGNED) > 1000000
-    ) t1
-    LEFT JOIN (
-      SELECT DISTINCT dl.id
-      FROM decklist dl
-      JOIN pack p
-      ON dl.last_pack_id = p.id
-      JOIN decklistslot dls
-      ON dl.id = dls.decklist_id
-      JOIN card c
-      ON dls.card_id = c.id
-      WHERE dl.date_creation LIKE '" . $month . "-%'
-        AND p.date_release < '2019-08-02'
-        AND c.code = '22134'
-    ) t2
-    ON t1.id = t2.id
-    WHERE t2.id IS NULL
-
-    UNION ALL
-
-    SELECT CASE WHEN CAST(c.code AS UNSIGNED) > 1000000 THEN SUBSTRING(c.code, 3) ELSE source_code(c.code, cp.name) END AS new_code,
-      LEAST(SUM(ds.quantity), 3) AS quantity
-    FROM deck d
-    LEFT JOIN decklist dl
-    ON d.id = dl.parent_deck_id
-    JOIN pack p
-    ON d.last_pack_id = p.id
-    JOIN deckslot ds
-    ON d.id = ds.deck_id
-    JOIN card c
-    ON ds.card_id = c.id
-    JOIN pack cp
-    ON c.pack_id = cp.id
-    WHERE dl.parent_deck_id IS NULL
-      AND d.last_pack_id IS NOT NULL
-      AND d.problem IS NULL
-      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
-           ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
-      AND p.date_release < '2019-08-02'
-      AND (c.cost IS NULL OR c.cost != '-')
-    GROUP BY d.id, new_code
-
-    UNION ALL
-
-    SELECT '22134' AS new_code,
-      1 AS quantity
-    FROM (
-      SELECT DISTINCT d.id
-      FROM deck d
-      LEFT JOIN decklist dl
-      ON d.id = dl.parent_deck_id
-      JOIN pack p
-      ON d.last_pack_id = p.id
-      JOIN deckslot ds
-      ON d.id = ds.deck_id
-      JOIN card c
-      ON ds.card_id = c.id
-      WHERE dl.parent_deck_id IS NULL
-        AND d.last_pack_id IS NOT NULL
-        AND d.problem IS NULL
-        AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
-             ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
-        AND p.date_release < '2019-08-02'
-        AND CAST(c.code AS UNSIGNED) > 1000000
-    ) t1
-    LEFT JOIN (
-      SELECT DISTINCT d.id
-      FROM deck d
-      LEFT JOIN decklist dl
-      ON d.id = dl.parent_deck_id
-      JOIN pack p
-      ON d.last_pack_id = p.id
-      JOIN deckslot ds
-      ON d.id = ds.deck_id
-      JOIN card c
-      ON ds.card_id = c.id
-      WHERE dl.parent_deck_id IS NULL
-        AND d.last_pack_id IS NOT NULL
-        AND d.problem IS NULL
-        AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
-             ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
-        AND p.date_release < '2019-08-02'
-        AND c.code = '22134'
-    ) t2
-    ON t1.id = t2.id
-    WHERE t2.id IS NULL
-  ) sl
-  ON c.code = sl.new_code
-  WHERE t.name != 'Campaign'
-    AND s.name NOT IN ('Baggins', 'Fellowship')
-    AND p.name NOT IN ('Messenger of the King Allies', 'ALeP - Messenger of the King Allies', 'Two-Player Limited Edition Starter',
-                       'Dwarves of Durin', 'Elves of Lórien', 'Defenders of Gondor', 'Riders of Rohan')
-    AND CAST(p.date_release AS CHAR) <= '" . $month . "-31'
-  GROUP BY c.code
-) ld
-ON c.code = ld.code
-JOIN (
-  SELECT c.code,
-    COUNT(sl.new_code) AS sides,
-    ROUND(COALESCE(AVG(sl.quantity), 0), 2) AS side_copies
-  FROM card c
-  JOIN pack p
-  ON c.pack_id = p.id
-  JOIN type t
-  ON c.type_id = t.id
-  JOIN sphere s
-  ON c.sphere_id = s.id
-  LEFT JOIN (
-    SELECT code AS new_code,
-      LEAST(SUM(quantity), 3) AS quantity
-    FROM (
-    SELECT source_code(c.code, cp.name) AS code,
-      dls.quantity,
-      dl.id
-    FROM decklist dl
-    JOIN pack p
-    ON dl.last_pack_id = p.id
-    JOIN decklistsideslot dls
-    ON dl.id = dls.decklist_id
-    JOIN card c
-    ON dls.card_id = c.id
-    JOIN pack cp
-    ON c.pack_id = cp.id
-    WHERE dl.date_creation LIKE '" . $month . "-%'
-    UNION ALL
-    SELECT c.code,
-      dls.quantity,
-      dl.id
-    FROM decklist dl
-    JOIN pack p
-    ON dl.last_pack_id = p.id
-    JOIN decklistslot dls
-    ON dl.id = dls.decklist_id
-    JOIN card c
-    ON dls.card_id = c.id
-    WHERE dl.date_creation LIKE '" . $month . "-%'
-      AND c.cost = '-'
-    ) t
-    GROUP BY id, code
-
-    UNION ALL
-
-    SELECT code AS new_code,
-      LEAST(SUM(quantity), 3) AS quantity
-    FROM (
-    SELECT source_code(c.code, cp.name) AS code,
-      ds.quantity,
-      d.id
-    FROM deck d
-    LEFT JOIN decklist dl
-    ON d.id = dl.parent_deck_id
-    JOIN pack p
-    ON d.last_pack_id = p.id
-    JOIN decksideslot ds
-    ON d.id = ds.deck_id
-    JOIN card c
-    ON ds.card_id = c.id
-    JOIN pack cp
-    ON c.pack_id = cp.id
-    WHERE dl.parent_deck_id IS NULL
-      AND d.last_pack_id IS NOT NULL
-      AND d.problem IS NULL
-      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
-           ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
-    UNION ALL
-    SELECT c.code,
-      ds.quantity,
-      d.id
-    FROM deck d
-    LEFT JOIN decklist dl
-    ON d.id = dl.parent_deck_id
-    JOIN pack p
-    ON d.last_pack_id = p.id
-    JOIN deckslot ds
-    ON d.id = ds.deck_id
-    JOIN card c
-    ON ds.card_id = c.id
-    WHERE dl.parent_deck_id IS NULL
-      AND d.last_pack_id IS NOT NULL
-      AND d.problem IS NULL
-      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
-           ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
-      AND c.cost = '-'
-    ) t
-    GROUP BY id, code
-  ) sl
-  ON c.code = sl.new_code
-  WHERE t.name != 'Campaign'
-    AND s.name NOT IN ('Baggins', 'Fellowship')
-    AND p.name NOT IN ('Messenger of the King Allies', 'ALeP - Messenger of the King Allies', 'Two-Player Limited Edition Starter',
-                       'Dwarves of Durin', 'Elves of Lórien', 'Defenders of Gondor', 'Riders of Rohan')
-  GROUP BY c.code
-) sd
-ON c.code = sd.code
-WHERE t.name != 'Campaign'
-  AND s.name NOT IN ('Baggins', 'Fellowship')
-  AND p.name NOT IN ('Messenger of the King Allies', 'ALeP - Messenger of the King Allies', 'Two-Player Limited Edition Starter',
-                     'Dwarves of Durin', 'Elves of Lórien', 'Defenders of Gondor', 'Riders of Rohan')
-  AND CAST(p.date_release AS CHAR) <= '" . $month . "-31'
-GROUP BY c.code
-ORDER BY encounter, full_decks DESC, limited_decks DESC, sides DESC, CAST(c.code AS UNSIGNED) DESC";
-*/
 	}
 
 	public function getStatPacksAction(Request $request) {
