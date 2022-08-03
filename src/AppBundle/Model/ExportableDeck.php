@@ -7,6 +7,10 @@ class ExportableDeck {
         /* @var $this \AppBundle\Entity\Deck */
         $slots = $this->getSlots();
         $sideslots = $this->getSideslots();
+        $last_pack = '';
+        if ($this->getLastPack()) {
+            $last_pack = $this->getLastPack()->getName();
+        }
 
         $array = [
             'id' => $this->getId(),
@@ -19,7 +23,7 @@ class ExportableDeck {
             'slots' => $slots->getContent(),
             'sideslots' => $sideslots->getContent(),
             'version' => $this->getVersion(),
-            'last_pack' => $this->getLastPack()->getName()
+            'last_pack' => $last_pack
         ];
         if (method_exists($this,'getFreezeComments')) {
             $array['freeze_comments'] = $this->getFreezeComments();
