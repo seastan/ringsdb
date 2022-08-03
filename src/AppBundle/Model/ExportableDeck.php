@@ -19,6 +19,7 @@ class ExportableDeck {
             'slots' => $slots->getContent(),
             'sideslots' => $sideslots->getContent(),
             'version' => $this->getVersion(),
+            'last_pack' => $this->getLastPack()->getName()
         ];
         if (method_exists($this,'getFreezeComments')) {
             $array['freeze_comments'] = $this->getFreezeComments();

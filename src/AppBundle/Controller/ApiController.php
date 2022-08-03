@@ -413,33 +413,30 @@ class ApiController extends Controller {
             return $response;
         }
 
-        $start = \DateTime::createFromFormat('Y-m-d', $date);
-        $start->setTime(0, 0, 0);
-        $end = clone $start;
-        $end->add(new \DateInterval("P1D"));
-
-        $expr = Criteria::expr();
-        $criteria = Criteria::create();
-        $criteria->where($expr->gte('dateCreation', $start));
-        $criteria->andWhere($expr->lt('dateCreation', $end));
-
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
+        $qb = $em->getRepository('AppBundle:Decklist')->createQueryBuilder('d');
+        $qb->andWhere("d.dateCreation LIKE '$date%'");
+        $decklists = $qb->getQuery()->getResult();
 
-        /* @var $decklists \Doctrine\Common\Collections\ArrayCollection */
-        $decklists = $em->getRepository('AppBundle:Decklist')->matching($criteria);
         if (!$decklists) {
             die();
         }
 
-        $dateUpdates = $decklists->map(function($decklist) {
-            /* @var $decklist \AppBundle\Entity\Decklist */
-            return $decklist->getDateUpdate();
-        })->toArray();
+        $cardRepo = $em->getRepository('AppBundle:Card');
 
-        $response->setLastModified(max($dateUpdates));
-        if ($response->isNotModified($request)) {
-            return $response;
+        $decklists = json_decode(json_encode($decklists), true);
+        foreach ($decklists as &$decklist) {
+            $decklist['heroes_details'] = [];
+            $codes = array_keys($decklist['heroes']);
+            foreach ($codes as $code) {
+                $card = $cardRepo->findOneBy(['code' => $code]);
+                $decklist['heroes_details'][] = [
+                    'name' => $card->getName(),
+                    'sphere' => $card->getSphere()->getName(),
+                    'pack' => $card->getPack()->getName()
+                ];
+            }
         }
 
         $content = json_encode($decklists);

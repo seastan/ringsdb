@@ -73,7 +73,7 @@ LEFT JOIN (
     WHERE dl.parent_deck_id IS NULL
       AND d.last_pack_id IS NOT NULL
       AND d.problem IS NULL
-      AND (('" . $month . "' < '2021-04' AND d.date_update LIKE '" . $month . "-%') OR
+      AND (('" . $month . "' < '2021-04' AND (d.date_update LIKE '" . $month . "-%' OR (d.date_creation LIKE '" . $month . "-%' AND d.date_update >= '2022-02-01'))) OR
            ('" . $month . "' >= '2021-04' AND '" . $month . "' < '2022-02' AND
             (d.date_creation LIKE '" . $month . "-%' OR (d.date_update LIKE '" . $month . "-%' AND d.date_creation < '2021-04-01'))) OR
            ('" . $month . "' >= '2022-02' AND d.date_creation LIKE '" . $month . "-%'))
@@ -115,7 +115,7 @@ LEFT JOIN (
       WHERE dl.parent_deck_id IS NULL
         AND d.last_pack_id IS NOT NULL
         AND d.problem IS NULL
-        AND (('" . $month . "' < '2021-04' AND d.date_update LIKE '" . $month . "-%') OR
+        AND (('" . $month . "' < '2021-04' AND (d.date_update LIKE '" . $month . "-%' OR (d.date_creation LIKE '" . $month . "-%' AND d.date_update >= '2022-02-01'))) OR
              ('" . $month . "' >= '2021-04' AND '" . $month . "' < '2022-02' AND
               (d.date_creation LIKE '" . $month . "-%' OR (d.date_update LIKE '" . $month . "-%' AND d.date_creation < '2021-04-01'))) OR
              ('" . $month . "' >= '2022-02' AND d.date_creation LIKE '" . $month . "-%'))
@@ -405,7 +405,9 @@ ON c.pack_id = cp.id
 WHERE dl.parent_deck_id IS NULL
   AND d.last_pack_id IS NOT NULL
   AND d.problem IS NULL
-  AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
+  AND (('" . $month . "' < '2022-07' AND (d.date_update LIKE '" . $month . "-%' OR (d.date_creation LIKE '" . $month . "-%' AND d.date_update >= '2022-08-01'))) OR
+       ('" . $month . "' = '2022-07' AND
+        (d.date_creation LIKE '" . $month . "-%' OR d.date_update LIKE '" . $month . "-%')) OR
        ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
   AND p.date_release >= '2019-08-02'
   AND (c.cost IS NULL OR c.cost != '-')";
@@ -538,7 +540,9 @@ ON c.pack_id = cp.id
 WHERE dl.parent_deck_id IS NULL
   AND d.last_pack_id IS NOT NULL
   AND d.problem IS NULL
-  AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
+  AND (('" . $month . "' < '2022-07' AND (d.date_update LIKE '" . $month . "-%' OR (d.date_creation LIKE '" . $month . "-%' AND d.date_update >= '2022-08-01'))) OR
+       ('" . $month . "' = '2022-07' AND
+        (d.date_creation LIKE '" . $month . "-%' OR d.date_update LIKE '" . $month . "-%')) OR
        ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
   AND p.date_release < '2019-08-02'
   AND (c.cost IS NULL OR c.cost != '-')";
@@ -681,7 +685,9 @@ ORDER BY c.code";
     WHERE dl.parent_deck_id IS NULL
       AND d.last_pack_id IS NOT NULL
       AND d.problem IS NULL
-      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
+      AND (('" . $month . "' < '2022-07' AND (d.date_update LIKE '" . $month . "-%' OR (d.date_creation LIKE '" . $month . "-%' AND d.date_update >= '2022-08-01'))) OR
+           ('" . $month . "' = '2022-07' AND
+            (d.date_creation LIKE '" . $month . "-%' OR d.date_update LIKE '" . $month . "-%')) OR
            ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
 
     UNION ALL
@@ -701,7 +707,9 @@ ORDER BY c.code";
     WHERE dl.parent_deck_id IS NULL
       AND d.last_pack_id IS NOT NULL
       AND d.problem IS NULL
-      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
+      AND (('" . $month . "' < '2022-07' AND (d.date_update LIKE '" . $month . "-%' OR (d.date_creation LIKE '" . $month . "-%' AND d.date_update >= '2022-08-01'))) OR
+           ('" . $month . "' = '2022-07' AND
+            (d.date_creation LIKE '" . $month . "-%' OR d.date_update LIKE '" . $month . "-%')) OR
            ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
       AND c.cost = '-'
     ) t
@@ -737,7 +745,9 @@ FROM (
     WHERE dl.parent_deck_id IS NULL
       AND d.last_pack_id IS NOT NULL
       AND d.problem IS NULL
-      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
+      AND (('" . $month . "' < '2022-07' AND (d.date_update LIKE '" . $month . "-%' OR (d.date_creation LIKE '" . $month . "-%' AND d.date_update >= '2022-08-01'))) OR
+           ('" . $month . "' = '2022-07' AND
+            (d.date_creation LIKE '" . $month . "-%' OR d.date_update LIKE '" . $month . "-%')) OR
            ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
       AND p.date_release >= '2019-08-02'
     ) AS full_decks,
@@ -757,7 +767,9 @@ FROM (
     WHERE dl.parent_deck_id IS NULL
       AND d.last_pack_id IS NOT NULL
       AND d.problem IS NULL
-      AND (('" . $month . "' < '2022-08' AND d.date_update LIKE '" . $month . "-%') OR
+      AND (('" . $month . "' < '2022-07' AND (d.date_update LIKE '" . $month . "-%' OR (d.date_creation LIKE '" . $month . "-%' AND d.date_update >= '2022-08-01'))) OR
+           ('" . $month . "' = '2022-07' AND
+            (d.date_creation LIKE '" . $month . "-%' OR d.date_update LIKE '" . $month . "-%')) OR
            ('" . $month . "' >= '2022-08' AND d.date_creation LIKE '" . $month . "-%'))
       AND p.date_release < '2019-08-02'
     ) AS limited_decks
