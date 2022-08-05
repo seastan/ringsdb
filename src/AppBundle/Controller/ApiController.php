@@ -424,10 +424,17 @@ class ApiController extends Controller {
         }
 
         $cardRepo = $em->getRepository('AppBundle:Card');
+        $userRepo = $em->getRepository('AppBundle:User');
 
         $decklists = json_decode(json_encode($decklists), true);
         foreach ($decklists as &$decklist) {
             $decklist['heroes_details'] = [];
+            $username = '';
+            $user = $userRepo->findOneBy(['id' => $decklist['user_id']]);
+            if ($user) {
+                $username = $user->getUsername();
+            }
+            $decklist['username'] = $username;
             $codes = array_keys($decklist['heroes']);
             foreach ($codes as $code) {
                 $card = $cardRepo->findOneBy(['code' => $code]);
