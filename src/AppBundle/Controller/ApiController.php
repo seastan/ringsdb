@@ -419,10 +419,6 @@ class ApiController extends Controller {
         $qb->andWhere("d.dateCreation LIKE '$date%'");
         $decklists = $qb->getQuery()->getResult();
 
-        if (!$decklists) {
-            die();
-        }
-
         $cardRepo = $em->getRepository('AppBundle:Card');
         $userRepo = $em->getRepository('AppBundle:User');
 
