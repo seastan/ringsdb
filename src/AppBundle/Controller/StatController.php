@@ -341,6 +341,7 @@ ON c.cycle = u.cycle";
 	}
 
 	public function getStatCardsAction(Request $request) {
+		set_time_limit(120);
 		$month = $request->query->get('month');
 		if (!$month) {
 			$month = date('Y-m', strtotime('first day of last month'));
