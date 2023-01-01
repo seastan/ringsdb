@@ -17,6 +17,7 @@ class CSVController extends Controller {
 
 	public function uploadProcessAction(Request $request) {
 		$inputCode = $request->request->get('code');
+		$inputOldCode = $request->request->get('old_code');
 		$inputName = $request->request->get('name');
 		$inputFileName = $request->files->get('upfile')->getPathname();
 		$content = str_replace("\xEF\xBB\xBF", '', trim(file_get_contents($inputFileName)));
@@ -46,8 +47,9 @@ class CSVController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		$packRepo = $em->getRepository('AppBundle:Pack');
 		$pack = $packRepo->findOneBy(['code' => $inputCode]);
+		$oldPack = $packRepo->findOneBy(['code' => $inputOldCode]);
 
-		if (!$pack) {
+		if (!$pack && !$oldPack) {
 			$cycleRepo = $em->getRepository('AppBundle:Cycle');
 			$cycle = $cycleRepo->findOneBy(['code' => 'ALeP']);
 
@@ -61,7 +63,14 @@ class CSVController extends Controller {
 			$em->persist($pack);
 			$em->flush();
 		}
-		elseif ($pack->getName() != $inputName) {
+		elseif (!$pack && $oldPack) {
+			$pack = $oldPack;
+			$pack->setCode($inputCode);
+			$em->persist($pack);
+			$em->flush();
+		}
+
+		if ($pack->getName() != $inputName) {
 			$pack->setName($inputName);
 			$em->persist($pack);
 			$em->flush();
