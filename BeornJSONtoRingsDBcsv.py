@@ -136,8 +136,8 @@ for i,c in enumerate(beornJSON):
 
         # Card type
         card_type = c['CardType']
-        if card_type in ('Contract', 'Player Objective'):
-                card_type = 'Other'
+        if card_type == 'Player Objective':
+                card_type = 'Attachment'
         elif card_type == 'Treasure':
                 card_type = 'Campaign'
 

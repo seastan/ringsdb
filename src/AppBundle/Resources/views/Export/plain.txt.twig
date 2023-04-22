@@ -48,7 +48,7 @@ Player Side Quests ({{ sidequests | length }})
 {% endif %}
 {% set contract = deck.slots_by_type['contract'] %}
 {% if contract | length %}
-Other ({{ contract | length }})
+Contract ({{ contract | length }})
 
 {% for slot in contract %}
 {{ slot.quantity }}x {{ slot.card.name }} ({{ slot.card.pack.name }})
