@@ -16,6 +16,11 @@
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
 {% endif %}
 {% endfor %}
+{% for slot in deck.slots_by_type.treasure %}
+{% if slot.card.name == 'Berelind' or slot.card.name == 'Coruhaer' or slot.card.name == 'Laermuin' or slot.card.name == 'Elrond\'s Champion' or slot.card.name == 'Rivendell Skirmishers' %}
+    <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
+{% endif %}
+{% endfor %}
   </section>
   <section name="Attachment" shared="False">
 {% for slot in deck.slots_by_type.attachment %}
@@ -29,7 +34,7 @@
 {% endif %}
 {% endfor %}
 {% for slot in deck.slots_by_type.treasure %}
-{% if slot.card.cost != '' and slot.card.name != 'Brace of Coneys' and slot.card.name != 'Ho! Tom Bombadil!' and slot.card.name != 'Mendor\'s Support' and slot.card.name != '"No Time to Waste!"' and slot.card.name != 'Ranger Sense' %}
+{% if slot.card.cost != '' and slot.card.name != 'Brace of Coneys' and slot.card.name != 'Ho! Tom Bombadil!' and slot.card.name != 'Mendor\'s Support' and slot.card.name != '"No Time to Waste!"' and slot.card.name != 'Ranger Sense' and slot.card.name != 'Determination' and slot.card.name != 'Lore of Ancient Arnor' and slot.card.name != 'Berelind' and slot.card.name != 'Coruhaer' and slot.card.name != 'Laermuin' and slot.card.name != 'Elrond\'s Champion' and slot.card.name != 'Rivendell Skirmishers' %}
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
 {% endif %}
 {% endfor %}
@@ -41,7 +46,7 @@
 {% endif %}
 {% endfor %}
 {% for slot in deck.slots_by_type.treasure %}
-{% if slot.card.name == 'Brace of Coneys' or slot.card.name == 'Ho! Tom Bombadil!' or slot.card.name == 'Mendor\'s Support' or slot.card.name == '"No Time to Waste!"' or slot.card.name == 'Ranger Sense' %}
+{% if slot.card.name == 'Brace of Coneys' or slot.card.name == 'Ho! Tom Bombadil!' or slot.card.name == 'Mendor\'s Support' or slot.card.name == '"No Time to Waste!"' or slot.card.name == 'Ranger Sense' or slot.card.name == 'Determination' or slot.card.name == 'Lore of Ancient Arnor' %}
     <card qty="{{ slot.quantity }}" id="{{ slot.card.octgnid }}">{{ slot.card.name }}</card>
 {% endif %}
 {% endfor %}

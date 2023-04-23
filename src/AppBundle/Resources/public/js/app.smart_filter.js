@@ -144,7 +144,6 @@
 
         query = query.replace(/^\s*(.*?)\s*$/, "$1").replace('/\s+/', ' ');
         query = query.replace('t:campaign', 't:treasure').replace('t:campaig', 't:treasure').replace('t:campai', 't:treasure').replace('t:campa', 't:treasure').replace('t:camp', 't:treasure').replace('t:cam', 't:treasure').replace('t:ca', 't:treasure');
-        query = query.replace('t:other', 't:contract').replace('t:othe', 't:contract').replace('t:oth', 't:contract').replace('t:ot', 't:contract').replace('t:o', 't:contract');
 
         var list = [];
         var cond = null;

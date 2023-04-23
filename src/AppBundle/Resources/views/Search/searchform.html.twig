@@ -97,7 +97,7 @@
                                         <select class="form-control" name="t" id="t">
                                             <option value="">any</option>
                                             {% for type in types %}
-                                                <option value="{{ type.code|replace({'treasure': 'campaign'}) }}">{{ type.name }}</option>{# Contract: 'contract': 'other' #}
+                                                <option value="{{ type.code|replace({'treasure': 'campaign'}) }}">{{ type.name }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
