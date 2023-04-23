@@ -140,7 +140,7 @@ class CSVController extends Controller {
 					$associationEntity = $associationRepository->findOneBy(['name' => $value]);
 
 					if (!$associationEntity) {
-						if (($colName == 'type') && ($value == 'Other')) {
+						if (($colName == 'type') && ($value == 'Other')) { // legacy code
 							$value = 'Contract';
 							$associationEntity = $associationRepository->findOneBy(['name' => $value]);
 							if (!$associationEntity) {
