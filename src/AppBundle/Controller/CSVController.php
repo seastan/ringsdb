@@ -78,7 +78,7 @@ class CSVController extends Controller {
 
 		$oldCards = $pack->getCards();
 		$oldIds = [];
-		$motkPack = $packRepo->findOneBy(['code' => 'MotKA']);
+		$motkPack = $packRepo->findOneBy(['code' => 'ALePMotKA']);
 		$oldMotkCards = $motkPack->getCards();
 
 		foreach ($oldCards as $card) {
