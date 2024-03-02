@@ -16,9 +16,6 @@ when running an install or an update:
 
 * Updated the requirements file;
 
-* Install the Acme Demo bundle by setting the ``SENSIOLABS_FORCE_ACME_DEMO``
-  environment variable to ``true`` (and only when creating a new project);
-
 * Switch to the Symfony 3.0 directory structure by setting the
   ``SENSIOLABS_ENABLE_NEW_DIRECTORY_STRUCTURE`` environment variable to
   ``true`` (and only when creating a new project).
@@ -37,4 +34,20 @@ application, the check is available:
 
 .. code-block:: bash
 
+    // In Symfony 2.x
     $ ./app/console security:check
+
+    // As of Symfony 2.8 and 3.x
+    $ ./bin/console security:check
+
+Contributing
+------------
+
+To contribute to this bundle, you just need a GitHub account.
+If you need some help to start, you can check the `Symfony guidelines`_ and `code style conventions`_.
+Bug fixes should be submitted against the 4.0 branch when possible, and new features are accepted on master only.
+
+Pull requests are welcome!
+
+.. _Symfony guidelines: https://symfony.com/doc/current/contributing/code/patches.html
+.. _code style conventions: https://symfony.com/doc/current/contributing/code/standards.html

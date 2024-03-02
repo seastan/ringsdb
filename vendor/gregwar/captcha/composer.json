@@ -18,16 +18,11 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "ext-gd": "*",
-        "ext-mbstring": "*",
-        "symfony/finder": "*"
+        "ext-gd": "*"
     },
     "autoload": {
         "psr-4": {
-            "Gregwar\\": "src/Gregwar"
+            "Gregwar\\Captcha\\": "/"
         }
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^6.4"
     }
 }

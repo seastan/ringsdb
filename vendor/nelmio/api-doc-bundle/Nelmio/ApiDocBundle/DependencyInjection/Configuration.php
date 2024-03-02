@@ -18,9 +18,16 @@ class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $treeBuilder
-            ->root('nelmio_api_doc')
+        $treeBuilder = new TreeBuilder('nelmio_api_doc');
+
+        if (method_exists($treeBuilder, 'getRootNode')) {
+            $rootNode = $treeBuilder->getRootNode();
+        } else {
+            // symfony < 4.2 support
+            $rootNode = $treeBuilder->root('nelmio_api_doc');
+        }
+
+        $rootNode
             ->children()
                 ->scalarNode('name')->defaultValue('API documentation')->end()
                 ->arrayNode('exclude_sections')
@@ -31,7 +38,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('motd')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('template')->defaultValue('NelmioApiDocBundle::Components/motd.html.twig')->end()
+                        ->scalarNode('template')->defaultValue('@NelmioApiDoc/Components/motd.html.twig')->end()
                     ->end()
                 ->end()
                 ->arrayNode('request_listener')

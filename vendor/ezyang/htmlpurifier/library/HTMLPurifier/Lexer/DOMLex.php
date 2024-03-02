@@ -68,8 +68,18 @@ class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
         $doc = new DOMDocument();
         $doc->encoding = 'UTF-8'; // theoretically, the above has this covered
 
+        $options = 0;
+        if ($config->get('Core.AllowParseManyTags') && defined('LIBXML_PARSEHUGE')) {
+            $options |= LIBXML_PARSEHUGE;
+        }
+
         set_error_handler(array($this, 'muteErrorHandler'));
-        $doc->loadHTML($html);
+        // loadHTML() fails on PHP 5.3 when second parameter is given
+        if ($options) {
+            $doc->loadHTML($html, $options);
+        } else {
+            $doc->loadHTML($html);
+        }
         restore_error_handler();
 
         $body = $doc->getElementsByTagName('html')->item(0)-> // <html>
@@ -94,7 +104,6 @@ class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
      * To iterate is human, to recurse divine - L. Peter Deutsch
      * @param DOMNode $node DOMNode to be tokenized.
      * @param HTMLPurifier_Token[] $tokens   Array-list of already tokenized tokens.
-     * @return HTMLPurifier_Token of node appended to previously passed tokens.
      */
     protected function tokenizeDOM($node, &$tokens, $config)
     {
@@ -133,11 +142,11 @@ class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
      */
     protected function getTagName($node)
     {
-        if (property_exists($node, 'tagName')) {
+        if (isset($node->tagName)) {
             return $node->tagName;
-        } else if (property_exists($node, 'nodeName')) {
+        } else if (isset($node->nodeName)) {
             return $node->nodeName;
-        } else if (property_exists($node, 'localName')) {
+        } else if (isset($node->localName)) {
             return $node->localName;
         }
         return null;
@@ -150,11 +159,11 @@ class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
      */
     protected function getData($node)
     {
-        if (property_exists($node, 'data')) {
+        if (isset($node->data)) {
             return $node->data;
-        } else if (property_exists($node, 'nodeValue')) {
+        } else if (isset($node->nodeValue)) {
             return $node->nodeValue;
-        } else if (property_exists($node, 'textContent')) {
+        } else if (isset($node->textContent)) {
             return $node->textContent;
         }
         return null;

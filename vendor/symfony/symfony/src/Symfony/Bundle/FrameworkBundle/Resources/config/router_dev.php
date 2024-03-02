@@ -26,6 +26,7 @@ if (ini_get('auto_prepend_file') && !in_array(realpath(ini_get('auto_prepend_fil
     require ini_get('auto_prepend_file');
 }
 
+
 if (is_file($_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$_SERVER['SCRIPT_NAME'])) {
     return false;
 }

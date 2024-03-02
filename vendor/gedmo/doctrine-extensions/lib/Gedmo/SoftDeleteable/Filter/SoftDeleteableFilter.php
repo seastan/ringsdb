@@ -60,8 +60,7 @@ class SoftDeleteableFilter extends SQLFilter
 
         $addCondSql = $platform->getIsNullExpression($targetTableAlias.'.'.$column);
         if (isset($config['timeAware']) && $config['timeAware']) {
-            $now = $conn->quote(date($platform->getDateTimeFormatString())); // should use UTC in database and PHP
-            $addCondSql = "({$addCondSql} OR {$targetTableAlias}.{$column} > {$now})";
+            $addCondSql = "({$addCondSql} OR {$targetTableAlias}.{$column} > {$platform->getCurrentTimestampSQL()})";
         }
 
         return $addCondSql;
@@ -73,6 +72,8 @@ class SoftDeleteableFilter extends SQLFilter
     public function disableForEntity($class)
     {
         $this->disabled[$class] = true;
+        // Make sure the hash (@see SQLFilter::__toString()) for this filter will be changed to invalidate the query cache.
+        $this->setParameter(sprintf('disabled_%s', $class), true);
     }
 
     /**
@@ -81,6 +82,8 @@ class SoftDeleteableFilter extends SQLFilter
     public function enableForEntity($class)
     {
         $this->disabled[$class] = false;
+        // Make sure the hash (@see SQLFilter::__toString()) for this filter will be changed to invalidate the query cache.
+        $this->setParameter(sprintf('disabled_%s', $class), false);
     }
 
     /**

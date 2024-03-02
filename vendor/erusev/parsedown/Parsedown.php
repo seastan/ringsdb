@@ -17,7 +17,7 @@ class Parsedown
 {
     # ~
 
-    const version = '1.7.1';
+    const version = '1.6.0';
 
     # ~
 
@@ -420,7 +420,7 @@ class Parsedown
 
     protected function blockFencedCode($Line)
     {
-        if (preg_match('/^['.$Line['text'][0].']{3,}[ ]*([^`]+)?[ ]*$/', $Line['text'], $matches))
+        if (preg_match('/^['.$Line['text'][0].']{3,}[ ]*([\w-]+)?[ ]*$/', $Line['text'], $matches))
         {
             $Element = array(
                 'name' => 'code',
@@ -569,8 +569,6 @@ class Parsedown
             {
                 $Block['li']['text'] []= '';
 
-                $Block['loose'] = true;
-
                 unset($Block['interrupted']);
             }
 
@@ -617,22 +615,6 @@ class Parsedown
 
             return $Block;
         }
-    }
-
-    protected function blockListComplete(array $Block)
-    {
-        if (isset($Block['loose']))
-        {
-            foreach ($Block['element']['text'] as &$li)
-            {
-                if (end($li['text']) !== '')
-                {
-                    $li['text'] []= '';
-                }
-            }
-        }
-
-        return $Block;
     }
 
     #
@@ -1037,7 +1019,7 @@ class Parsedown
     # ~
     #
 
-    public function line($text, $nonNestables=array())
+    public function line($text)
     {
         $markup = '';
 
@@ -1053,13 +1035,6 @@ class Parsedown
 
             foreach ($this->InlineTypes[$marker] as $inlineType)
             {
-                # check to see if the current inline type is nestable in the current context
-
-                if ( ! empty($nonNestables) and in_array($inlineType, $nonNestables))
-                {
-                    continue;
-                }
-
                 $Inline = $this->{'inline'.$inlineType}($Excerpt);
 
                 if ( ! isset($Inline))
@@ -1079,13 +1054,6 @@ class Parsedown
                 if ( ! isset($Inline['position']))
                 {
                     $Inline['position'] = $markerPosition;
-                }
-
-                # cause the new element to 'inherit' our non nestables
-
-                foreach ($nonNestables as $non_nestable)
-                {
-                    $Inline['element']['nonNestables'][] = $non_nestable;
                 }
 
                 # the text that comes before the inline
@@ -1246,7 +1214,6 @@ class Parsedown
         $Element = array(
             'name' => 'a',
             'handler' => 'line',
-            'nonNestables' => array('Url', 'Link'),
             'text' => null,
             'attributes' => array(
                 'href' => null,
@@ -1479,14 +1446,9 @@ class Parsedown
         {
             $markup .= '>';
 
-            if (!isset($Element['nonNestables'])) 
-            {
-                $Element['nonNestables'] = array();
-            }
-
             if (isset($Element['handler']))
             {
-                $markup .= $this->{$Element['handler']}($Element['text'], $Element['nonNestables']);
+                $markup .= $this->{$Element['handler']}($Element['text']);
             }
             else
             {
