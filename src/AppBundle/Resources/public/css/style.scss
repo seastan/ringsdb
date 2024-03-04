@@ -1237,7 +1237,7 @@ div.site-news {
   }
 
   .fg-#{$name} {
-    &.icon-hero, &.icon-ally, &.icon-attachment, &.icon-event, &.icon-player-side-quest, &.icon-contract, &.icon-treasure {
+    &.icon-hero, &.icon-ally, &.icon-attachment, &.icon-event, &.icon-player-side-quest,&.icon-player-objective, &.icon-contract, &.icon-treasure {
       &:before {
         opacity: .1;
       }
