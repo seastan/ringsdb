@@ -22,9 +22,9 @@
      */
 
     layouts.type = {};
-    layouts.type[1] = _.template('<div class="deck-content"><%= meta %><%= heroes %><%= contract %><%= allies %><%= attachments %><%= events %><%= sidequests %><%= treasures %></div>');
-    layouts.type[2] = _.template('<div class="deck-content"><div class="row"><div class="col-sm-12"><%= meta %></div></div><div class="row"><div class="col-sm-12"><%= heroes %></div></div><div class="row"><div class="col-sm-6 col-print-6"><%= contract %><%= allies %></div><div class="col-sm-6 col-print-6"><%= attachments %><%= events %><%= sidequests %><%= treasures %></div></div></div>');
-    layouts.type[3] = _.template('<div class="deck-content"><div class="row"><div class="col-sm-4"><%= meta %><%= heroes %></div><div class="col-sm-4"><%= contract %><%= allies %></div><div class="col-sm-4"><%= attachments %><%= events %><%= sidequests %><%= treasures %></div></div></div>');
+    layouts.type[1] = _.template('<div class="deck-content"><%= meta %><%= heroes %><%= contract %><%= objective %><%= allies %><%= attachments %><%= events %><%= sidequests %><%= treasures %></div>');
+    layouts.type[2] = _.template('<div class="deck-content"><div class="row"><div class="col-sm-12"><%= meta %></div></div><div class="row"><div class="col-sm-12"><%= heroes %></div></div><div class="row"><div class="col-sm-6 col-print-6"><%= contract %><%= objective %><%= allies %></div><div class="col-sm-6 col-print-6"><%= attachments %><%= events %><%= sidequests %><%= treasures %></div></div></div>');
+    layouts.type[3] = _.template('<div class="deck-content"><div class="row"><div class="col-sm-4"><%= meta %><%= heroes %></div><div class="col-sm-4"><%= objective %><%= contract %><%= allies %></div><div class="col-sm-4"><%= attachments %><%= events %><%= sidequests %><%= treasures %></div></div></div>');
 
     layouts.position = {};
     layouts.position[1] =  function(data) {
@@ -255,10 +255,10 @@
         if (!cards) {
             cards = is_sideboard ? deck.get_side_cards() : deck.get_cards();
         }
-        // Remove contracts from card count
+        // Remove contracts, treasures and player objectives from card count
         var num_contracts = 0;
         _.each(cards, function(card) {
-            if ((card.cost == '-') || (((card.type_code == 'contract') || (card.type_code == 'treasure')) && (card.cost == null))) num_contracts += card.indeck;
+            if ((card.cost == '-') || (((card.type_code == 'contract') || (card.type_code == 'player-objective') || (card.type_code == 'treasure')) && (card.cost == null))) num_contracts += card.indeck;
         })
         var quantities = _.pluck(cards, is_sideboard ? 'insideboard' : 'indeck');
         return _.reduce(quantities, function(memo, num) { return memo + num; }, 0) - num_contracts;
@@ -336,6 +336,7 @@
             deck.update_layout_section(data, 'attachments', deck.get_layout_data_one_section('type_code', 'attachment', 'type_name', true));
             deck.update_layout_section(data, 'events', deck.get_layout_data_one_section('type_code', 'event', 'type_name', true));
             deck.update_layout_section(data, 'sidequests', deck.get_layout_data_one_section('type_code', 'player-side-quest', 'type_name', true));
+            deck.update_layout_section(data, 'objective', deck.get_layout_data_one_section('type_code', 'player-objective', 'type_name', true));
             deck.update_layout_section(data, 'contract', deck.get_layout_data_one_section('type_code', 'contract', 'type_name', true));
             deck.update_layout_section(data, 'treasures', deck.get_layout_data_one_section('type_code', 'treasure', 'type_name', true));
         }
@@ -441,6 +442,7 @@
                 deck.update_layout_section(data, 'attachments', deck.get_layout_data_one_section('type_code', 'attachment', 'type_name'));
                 deck.update_layout_section(data, 'events', deck.get_layout_data_one_section('type_code', 'event', 'type_name'));
                 deck.update_layout_section(data, 'sidequests', deck.get_layout_data_one_section('type_code', 'player-side-quest', 'type_name'));
+                deck.update_layout_section(data, 'objective', deck.get_layout_data_one_section('type_code', 'player-objective', 'type_name'));
                 deck.update_layout_section(data, 'contract', deck.get_layout_data_one_section('type_code', 'contract', 'type_name'));
                 deck.update_layout_section(data, 'treasures', deck.get_layout_data_one_section('type_code', 'treasure', 'type_name'));
             } else {
@@ -448,6 +450,7 @@
                 deck.update_layout_section(data, 'attachments', '');
                 deck.update_layout_section(data, 'events', '');
                 deck.update_layout_section(data, 'sidequests', '');
+                deck.update_layout_section(data, 'objective', '');
                 deck.update_layout_section(data, 'contract', '');
                 deck.update_layout_section(data, 'treasures', '');
             }

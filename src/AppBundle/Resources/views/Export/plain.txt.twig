@@ -46,6 +46,16 @@ Player Side Quests ({{ sidequests | length }})
 {% endfor %}
 
 {% endif %}
+{% set objective = deck.slots_by_type['player-objective'] %}
+{% if objective | length %}
+Player Objective ({{ objective | length }})
+
+{% for slot in objective %}
+{{ slot.quantity }}x {{ slot.card.name }} ({{ slot.card.pack.name }})
+{% endfor %}
+
+{% endif %}
+
 {% set contract = deck.slots_by_type['contract'] %}
 {% if contract | length %}
 Contract ({{ contract | length }})
