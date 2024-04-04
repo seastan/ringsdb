@@ -929,6 +929,26 @@ div.tags span.tag {
   background-position: -5px -10px
 }
 
+.card-thumbnail-1x.card-thumbnail-player-objective {
+  background-position: -50px 0px;
+}
+
+.card-thumbnail-2x.card-thumbnail-player-objective {
+  background-position: -25px 0px;
+}
+
+.card-thumbnail-3x.card-thumbnail-player-objective {
+  background-position: -17px 0px;
+}
+
+.card-thumbnail-4x.card-thumbnail-player-objective {
+  background-position: -13px 0px;
+}
+
+.card-thumbnail-5x.card-thumbnail-player-objective {
+  background-position: -10px 0px;
+}
+
 .card-thumbnail-1x.card-thumbnail-contract {
   background-position: -50px 0px;
 }
@@ -1237,7 +1257,7 @@ div.site-news {
   }
 
   .fg-#{$name} {
-    &.icon-hero, &.icon-ally, &.icon-attachment, &.icon-event, &.icon-player-side-quest, &.icon-contract, &.icon-treasure {
+    &.icon-hero, &.icon-ally, &.icon-attachment, &.icon-event, &.icon-player-side-quest, &.icon-player-objective, &.icon-contract, &.icon-treasure {
       &:before {
         opacity: .1;
       }

@@ -111,6 +111,7 @@
             'Attachment': '<span class="icon icon-attachment"></span>',
             'Event': '<span class="icon icon-event"></span>',
             'Player Side Quest': '<span class="icon icon-player-side-quest"></span>',
+            'Player Objective': '<span class="icon icon-player-objective"></span>',
             'Contract': '<span class="icon icon-contract"></span>',
             'Campaign': '<span class="icon icon-treasure"></span>'
         };
@@ -120,8 +121,9 @@
             'attachment': { i: 1, name: 'Attachment' },
             'event': { i: 2, name: 'Event' },
             'player-side-quest': { i: 3, name: 'Player Side Quest' },
-            'contract': { i: 4, name: 'Contract' },
-            'treasure': { i: 5, name: 'Campaign' }
+            'player-objective': { i: 4, name: 'Player Objective' },
+            'contract': { i: 5, name: 'Contract' },
+            'treasure': { i: 6, name: 'Campaign' }
         };
 
         var validTypes = {};

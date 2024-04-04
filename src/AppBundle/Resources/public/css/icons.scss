@@ -1,6 +1,5 @@
 @font-face {
   font-family: 'ringsdb';
-  src: url('../fonts/ringsdb.eot?h6hjpma');
   src: url('../fonts/ringsdb.eot?h6hjpma#iefix') format('embedded-opentype'),
   url('../fonts/ringsdb.ttf?h6hjpma') format('truetype'),
   url('../fonts/ringsdb.woff?h6hjpma') format('woff'),
@@ -51,6 +50,7 @@
 @include icon(attachment, "\e624", "\e61d");
 @include icon(event, "\e625", "\e61e");
 @include icon(player-side-quest, "\e626", "\e61f");
+@include icon(player-objective, "\e629", "\e629");
 @include icon(contract, "\e621", "\e628");
 @include icon(treasure, "\e627", "\e620");
 

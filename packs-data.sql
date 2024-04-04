@@ -51,7 +51,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `type` WRITE;
 /*!40000 ALTER TABLE `type` DISABLE KEYS */;
-INSERT INTO `type` (`id`, `code`, `name`) VALUES (1,'hero','Hero'),(2,'ally','Ally'),(3,'attachment','Attachment'),(4,'event','Event'),(5,'treasure','Campaign'),(6,'player-side-quest','Player Side Quest'),(7,'contract','Contract');
+INSERT INTO `type` (`id`, `code`, `name`) VALUES (1,'hero','Hero'),(2,'ally','Ally'),(3,'attachment','Attachment'),(4,'event','Event'),(5,'treasure','Campaign'),(6,'player-side-quest','Player Side Quest'),(7,'contract','Contract'), (8,'player-objective','Player Objective');
 /*!40000 ALTER TABLE `type` ENABLE KEYS */;
 UNLOCK TABLES;
 
