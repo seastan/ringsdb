@@ -19,6 +19,12 @@ To update all JavaScript and CSS assets, run:
 - `php app/console cache:clear`
 - `php app/console assetic:dump`
 
+To update the fonts, some SCSS assets, run:
+
+- `rm -rf web/bundles`
+- `php app/console assets:install`
+
+
 To run a command:
 
 - `php app/console app:beorn:scenario`
