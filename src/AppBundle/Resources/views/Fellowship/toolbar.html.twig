@@ -34,7 +34,7 @@
                 </ul>
             </div>
 
-            {% set url = "https://www.dragncards.com/newroom/ringsdb" %}
+            {% set url = "https://dragncards.com/plugin/1/external/ringsdb/" %}
             {% for d in fellowship.decks %}
                 {% set url = url ~ "/deck/" ~ d.deck.id %}
             {% endfor %}

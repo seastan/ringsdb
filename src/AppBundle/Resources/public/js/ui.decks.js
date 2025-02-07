@@ -208,7 +208,7 @@
         if (ids.length < 1 || ids.length > 4) {
             return false;
         }
-        window.open("https://www.dragncards.com/newroom/ringsdb/deck/"+ids[0]);
+        window.open("https://beta.dragncards.com/plugin/1/external/ringsdb/deck/"+ids[0]);
     };
 
     ui.download_text_selection = function(ids) {
