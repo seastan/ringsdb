@@ -1,4 +1,22 @@
-# www.robotstxt.org/
-# www.google.com/support/webmasters/bin/answer.py?hl=en&answer=156449
-
 User-agent: *
+Disallow: /decklists/find
+Disallow: /decklists/popular
+Disallow: /deck/copy
+Disallow: /decklist/edit
+Disallow: /questlog/
+Disallow: /user/profile
+Crawl-delay: 10
+
+# Optional: explicit blocks
+User-agent: AhrefsBot
+Disallow: /
+User-agent: SemrushBot
+Disallow: /
+User-agent: Barkrowler
+Disallow: /
+User-agent: BLEXBot
+Disallow: /
+User-agent: ClaudeBot
+Disallow: /
+User-agent: GPTBot
+Disallow: /
