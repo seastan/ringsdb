@@ -107,7 +107,7 @@ class CardsData {
 		return $spheres;
 	}
 
-    public function get_search_rows($conditions, $sortorder, $forceempty = false) {
+    public function get_search_rows($conditions, $sortorder, $forceempty = false, $ownedPacks = null) {
         $i = 0;
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->doctrine;
@@ -368,6 +368,15 @@ class CardsData {
                     break;
                 }
             }
+        }
+
+        if ($ownedPacks !== null && count($ownedPacks) > 0) {
+            $packOr = [];
+            foreach ($ownedPacks as $packId) {
+                $packOr[] = "(p.id = ?$i)";
+                $qb->setParameter($i++, $packId);
+            }
+            $qb->andWhere(implode(" or ", $packOr));
         }
 
         if (!$i && !$forceempty) {

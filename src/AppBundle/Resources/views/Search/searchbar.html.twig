@@ -9,5 +9,12 @@
             </div><!-- /input-group -->
         </div>
         {% include 'AppBundle:Search:searchoptions.html.twig' %}
+        {% if is_authenticated|default(false) %}
+        <div class="col-sm-4" style="margin-bottom:.5em">
+            <label class="btn btn-default{% if collection|default(0) %} active{% endif %}" style="margin-top:1px">
+                <input type="checkbox" name="collection" value="1" autocomplete="off"{% if collection|default(0) %} checked{% endif %}> My Collection Only
+            </label>
+        </div>
+        {% endif %}
     </form>
 </div>
