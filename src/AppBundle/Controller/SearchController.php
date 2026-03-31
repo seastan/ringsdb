@@ -248,6 +248,7 @@ class SearchController extends Controller {
         $page = $request->query->get('page') ?: 1;
         $view = $request->query->get('view') ?: 'list';
         $sort = $request->query->get('sort') ?: 'name';
+        $collection = $request->query->get('collection') ?: 0;
 
         // we may be able to redirect to a better url if the search is on a single set
         $conditions = $this->get('cards_data')->syntax($q);
@@ -270,11 +271,12 @@ class SearchController extends Controller {
             'view' => $view,
             'sort' => $sort,
             'page' => $page,
+            'collection' => $collection,
             '_route' => $request->get('_route')
         ]);
     }
 
-    public function displayAction($q, $view = 'card', $sort, $page = 1, $pagetitle = '', $meta = '') {
+    public function displayAction($q, $view = 'card', $sort, $page = 1, $pagetitle = '', $meta = '', $collection = 0) {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
@@ -299,11 +301,20 @@ class SearchController extends Controller {
             $view = 'list';
         }
 
+        // Get owned packs if collection filter is active
+        $ownedPacks = null;
+        if ($collection && $this->getUser()) {
+            $ownedPacksStr = $this->getUser()->getOwnedPacks();
+            if ($ownedPacksStr) {
+                $ownedPacks = explode(',', $ownedPacksStr);
+            }
+        }
+
         $conditions = $this->get('cards_data')->syntax($q);
         $conditions = $this->get('cards_data')->validateConditions($conditions);
 
         $q = $this->get('cards_data')->buildQueryFromConditions($conditions);
-        if ($q && $rows = $this->get('cards_data')->get_search_rows($conditions, $sort)) {
+        if ($q && $rows = $this->get('cards_data')->get_search_rows($conditions, $sort, false, $ownedPacks)) {
             if (count($rows) == 1) {
                 $view = 'card';
                 $includeReviews = true;
@@ -367,7 +378,7 @@ class SearchController extends Controller {
                 if (count($rows) == 1) {
                     $pagination = $this->setnavigation($card, $q, $view, $sort);
                 } else {
-                    $pagination = $this->pagination($nb_per_page, count($rows), $first, $q, $view, $sort);
+                    $pagination = $this->pagination($nb_per_page, count($rows), $first, $q, $view, $sort, $collection);
                 }
             }
 
@@ -404,6 +415,8 @@ class SearchController extends Controller {
             'q' => $q,
             'view' => $view,
             'sort' => $sort,
+            'collection' => $collection,
+            'is_authenticated' => $this->getUser() !== null,
         ]);
 
         if (empty($pagetitle)) {
@@ -444,9 +457,13 @@ class SearchController extends Controller {
         ]);
     }
 
-    public function paginationItem($q = null, $v, $s, $ps, $pi, $total) {
+    public function paginationItem($q = null, $v, $s, $ps, $pi, $total, $collection = 0) {
+        $params = ['q' => $q, 'view' => $v, 'sort' => $s, 'page' => $pi];
+        if ($collection) {
+            $params['collection'] = 1;
+        }
         return $this->renderView('AppBundle:Search:paginationitem.html.twig', [
-            "href" => $q == null ? "" : $this->get('router')->generate('cards_find', ['q' => $q, 'view' => $v, 'sort' => $s, 'page' => $pi]),
+            "href" => $q == null ? "" : $this->get('router')->generate('cards_find', $params),
             "ps" => $ps,
             "pi" => $pi,
             "s" => $ps * ($pi - 1) + 1,
@@ -454,7 +471,7 @@ class SearchController extends Controller {
         ]);
     }
 
-    public function pagination($pagesize, $total, $current, $q, $view, $sort) {
+    public function pagination($pagesize, $total, $current, $q, $view, $sort, $collection = 0) {
         if ($total < $pagesize) {
             $pagesize = $total;
         }
@@ -464,24 +481,24 @@ class SearchController extends Controller {
 
         $first = "";
         if ($pageindex > 2) {
-            $first = $this->paginationItem($q, $view, $sort, $pagesize, 1, $total);
+            $first = $this->paginationItem($q, $view, $sort, $pagesize, 1, $total, $collection);
         }
 
         $prev = "";
         if ($pageindex > 1) {
-            $prev = $this->paginationItem($q, $view, $sort, $pagesize, $pageindex - 1, $total);
+            $prev = $this->paginationItem($q, $view, $sort, $pagesize, $pageindex - 1, $total, $collection);
         }
 
         $current = $this->paginationItem(null, $view, $sort, $pagesize, $pageindex, $total);
 
         $next = "";
         if ($pageindex < $pagecount) {
-            $next = $this->paginationItem($q, $view, $sort, $pagesize, $pageindex + 1, $total);
+            $next = $this->paginationItem($q, $view, $sort, $pagesize, $pageindex + 1, $total, $collection);
         }
 
         $last = "";
         if ($pageindex < $pagecount - 1) {
-            $last = $this->paginationItem($q, $view, $sort, $pagesize, $pagecount, $total);
+            $last = $this->paginationItem($q, $view, $sort, $pagesize, $pagecount, $total, $collection);
         }
 
         return $this->renderView('AppBundle:Search:pagination.html.twig', [
