@@ -244,6 +244,33 @@ $dark-link-hover: #9cc6ee;
 
   /********* APP SPECIFICS ************/
 
+  .container.main {
+    &.white {
+      background-color: $dark-surface;
+    }
+
+    &.admin {
+      background-color: $dark-surface;
+    }
+  }
+
+  /* Typeahead (card search autocomplete) */
+  .twitter-typeahead {
+    background-color: $dark-surface-2;
+
+    .tt-hint {
+      color: $dark-text-muted;
+    }
+  }
+
+  .tt-menu,
+  .tt-dropdown-menu {
+    background-color: $dark-surface;
+    border-color: $dark-border;
+    border-color: rgba(255, 255, 255, .15);
+    color: $dark-text;
+  }
+
   .card-text {
     border-left-color: $dark-border;
   }
