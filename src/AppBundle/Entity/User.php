@@ -62,6 +62,10 @@ class User extends BaseUser {
      */
     private $isShareDecks = false;
     /**
+     * @var boolean
+     */
+    private $darkMode = false;
+    /**
      * @var \Doctrine\Common\Collections\Collection
      */
     private $decks;
@@ -359,6 +363,28 @@ class User extends BaseUser {
      */
     public function getIsShareDecks() {
         return $this->isShareDecks;
+    }
+
+    /**
+     * Set darkMode
+     *
+     * @param boolean $darkMode
+     *
+     * @return User
+     */
+    public function setDarkMode($darkMode) {
+        $this->darkMode = $darkMode;
+
+        return $this;
+    }
+
+    /**
+     * Get darkMode
+     *
+     * @return boolean
+     */
+    public function getDarkMode() {
+        return $this->darkMode;
     }
 
     /**

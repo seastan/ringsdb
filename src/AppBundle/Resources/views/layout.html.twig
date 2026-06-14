@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <script type="text/javascript">
+        // Apply the dark theme as early as possible to avoid a flash of the light theme.
+        // The preference is stored in a cookie (mirrored from the user's account) so it
+        // works even though pages are publicly cached.
+        (function() {
+            if (/(?:^|;\s*)dark_mode=1(?:;|$)/.test(document.cookie)) {
+                document.documentElement.className += ' dark-mode';
+            }
+        })();
+    </script>
     <title>{{ pagetitle | default('Deckbuilder') }} &middot; RingsDB</title>
 
     <meta charset="utf-8">
@@ -26,7 +36,8 @@
         'bundles/app/cdn/css/bootstrap-markdown.min.css'
         'bundles/app/css/bootstrap.css'
         'bundles/app/css/style.scss'
-        'bundles/app/css/icons.scss' %}
+        'bundles/app/css/icons.scss'
+        'bundles/app/css/dark.scss' %}
         <link rel="stylesheet" href="{{ asset_url }}"/>
     {% endstylesheets %}
 

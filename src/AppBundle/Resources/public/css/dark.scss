@@ -1,0 +1,297 @@
+/*
+ * Dark mode theme.
+ *
+ * Activated by the `dark-mode` class on the <html> element (set from the user's
+ * account preference via a cookie + the user-info JSON; see layout.html.twig and
+ * app.user.js). Everything here is scoped under `.dark-mode` so the default light
+ * theme is untouched. We only override surfaces, borders and text colors -- card
+ * images and sphere colors are intentionally left alone.
+ */
+
+$dark-bg: #1a1a1d;
+$dark-surface: #242428;
+$dark-surface-2: #2e2e33;
+$dark-surface-3: #38383f;
+$dark-border: #3d3d44;
+$dark-text: #d6d6d6;
+$dark-text-muted: #9a9a9a;
+$dark-link: #6ea8e0;
+$dark-link-hover: #9cc6ee;
+
+.dark-mode {
+  background-color: $dark-bg;
+
+  body {
+    background-color: $dark-bg;
+    color: $dark-text;
+  }
+
+  a {
+    color: $dark-link;
+
+    &:hover,
+    &:focus {
+      color: $dark-link-hover;
+    }
+  }
+
+  hr {
+    border-top-color: $dark-border;
+  }
+
+  .text-muted,
+  .help-block,
+  .text-faded {
+    color: $dark-text-muted;
+  }
+
+  /********* NAVBAR ************/
+
+  .navbar-default {
+    background-color: $dark-surface;
+    border-color: $dark-border;
+
+    .navbar-brand,
+    .navbar-text {
+      color: $dark-text;
+    }
+
+    .navbar-nav > li > a {
+      color: $dark-text;
+
+      &:hover,
+      &:focus {
+        color: $dark-link-hover;
+      }
+    }
+
+    .navbar-nav > .active > a,
+    .navbar-nav > .open > a {
+      color: $dark-link-hover;
+      background-color: $dark-surface-2;
+    }
+
+    .navbar-toggle {
+      border-color: $dark-border;
+
+      .icon-bar {
+        background-color: $dark-text;
+      }
+
+      &:hover,
+      &:focus {
+        background-color: $dark-surface-2;
+      }
+    }
+  }
+
+  /********* PANELS / WELLS ************/
+
+  .panel {
+    background-color: $dark-surface;
+    border-color: $dark-border;
+  }
+
+  .panel-default > .panel-heading {
+    background-color: $dark-surface-2;
+    border-color: $dark-border;
+    color: $dark-text;
+  }
+
+  .panel-footer {
+    background-color: $dark-surface-2;
+    border-color: $dark-border;
+  }
+
+  .well {
+    background-color: $dark-surface;
+    border-color: $dark-border;
+  }
+
+  /********* TABLES ************/
+
+  .table {
+    color: $dark-text;
+
+    > thead > tr > th,
+    > tbody > tr > th,
+    > tfoot > tr > th,
+    > thead > tr > td,
+    > tbody > tr > td,
+    > tfoot > tr > td {
+      border-color: $dark-border;
+    }
+
+    > thead > tr > th {
+      border-bottom-color: $dark-border;
+    }
+  }
+
+  .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: $dark-surface-2;
+  }
+
+  .table-hover > tbody > tr:hover {
+    background-color: $dark-surface-3;
+  }
+
+  .table-bordered,
+  .table-bordered > thead > tr > th,
+  .table-bordered > tbody > tr > td {
+    border-color: $dark-border;
+  }
+
+  /********* FORMS ************/
+
+  .form-control {
+    background-color: $dark-surface-2;
+    border-color: $dark-border;
+    color: $dark-text;
+
+    &:focus {
+      border-color: $dark-link;
+    }
+  }
+
+  .form-control[disabled],
+  .form-control[readonly],
+  fieldset[disabled] .form-control {
+    background-color: $dark-surface;
+  }
+
+  ::-webkit-input-placeholder { color: $dark-text-muted; }
+  :-moz-placeholder { color: $dark-text-muted; }
+  ::-moz-placeholder { color: $dark-text-muted; }
+  :-ms-input-placeholder { color: $dark-text-muted; }
+
+  .input-group-addon {
+    background-color: $dark-surface-3;
+    border-color: $dark-border;
+    color: $dark-text;
+  }
+
+  /********* BUTTONS ************/
+
+  .btn-default {
+    background-color: $dark-surface-3;
+    border-color: $dark-border;
+    color: $dark-text;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background-color: $dark-surface-2;
+      border-color: $dark-border;
+      color: $dark-text;
+    }
+  }
+
+  /********* DROPDOWNS ************/
+
+  .dropdown-menu {
+    background-color: $dark-surface;
+    border-color: $dark-border;
+
+    > li > a {
+      color: $dark-text;
+
+      &:hover,
+      &:focus {
+        background-color: $dark-surface-2;
+        color: $dark-link-hover;
+      }
+    }
+
+    .divider {
+      background-color: $dark-border;
+    }
+  }
+
+  /********* LIST GROUPS ************/
+
+  .list-group-item {
+    background-color: $dark-surface;
+    border-color: $dark-border;
+    color: $dark-text;
+  }
+
+  a.list-group-item:hover,
+  a.list-group-item:focus {
+    background-color: $dark-surface-2;
+    color: $dark-link-hover;
+  }
+
+  /********* MODALS ************/
+
+  .modal-content {
+    background-color: $dark-surface;
+    border-color: $dark-border;
+  }
+
+  .modal-header,
+  .modal-footer {
+    border-color: $dark-border;
+  }
+
+  /********* CODE ************/
+
+  code,
+  pre {
+    background-color: $dark-surface-2;
+    border-color: $dark-border;
+    color: $dark-text;
+  }
+
+  /********* APP SPECIFICS ************/
+
+  .card-text {
+    border-left-color: $dark-border;
+  }
+
+  .nav-tabs {
+    border-bottom-color: $dark-border;
+
+    > li > a:hover {
+      border-color: $dark-border $dark-border $dark-border;
+      background-color: $dark-surface-2;
+    }
+
+    > li.active > a,
+    > li.active > a:hover,
+    > li.active > a:focus {
+      background-color: $dark-surface;
+      border-color: $dark-border;
+      border-bottom-color: transparent;
+      color: $dark-text;
+    }
+  }
+
+  .pagination {
+    > li > a,
+    > li > span {
+      background-color: $dark-surface;
+      border-color: $dark-border;
+      color: $dark-link;
+    }
+
+    > li > a:hover,
+    > li > span:hover {
+      background-color: $dark-surface-2;
+    }
+
+    > .disabled > a,
+    > .disabled > span {
+      background-color: $dark-surface;
+      border-color: $dark-border;
+      color: $dark-text-muted;
+    }
+  }
+
+  footer {
+    color: $dark-text-muted;
+
+    a {
+      color: $dark-link;
+    }
+  }
+}

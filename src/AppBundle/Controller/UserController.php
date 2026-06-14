@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -71,6 +72,7 @@ class UserController extends Controller {
         $notifCommenter = $request->get('notif_commenter') ? true : false;
         $notifMention = $request->get('notif_mention') ? true : false;
         $shareDecks = $request->get('share_decks') ? true : false;
+        $darkMode = $request->get('dark_mode') ? true : false;
 
         $user->setColor($sphere_code);
         $user->setResume($resume);
@@ -78,12 +80,20 @@ class UserController extends Controller {
         $user->setIsNotifCommenter($notifCommenter);
         $user->setIsNotifMention($notifMention);
         $user->setIsShareDecks($shareDecks);
+        $user->setDarkMode($darkMode);
 
         $this->getDoctrine()->getManager()->flush();
 
         $this->get('session')->getFlashBag()->set('notice', 'Successfully saved your profile.');
 
-        return $this->redirect($this->generateUrl('user_profile_edit'));
+        $response = $this->redirect($this->generateUrl('user_profile_edit'));
+
+        // Persist the preference in a long-lived cookie so the theme can be applied
+        // immediately (without a flash of the wrong theme) on this device, even though
+        // pages are publicly cached and the canonical preference lives in the database.
+        $response->headers->setCookie(new Cookie('dark_mode', $darkMode ? '1' : '0', strtotime('+1 year'), '/', null, false, false));
+
+        return $response;
     }
 
     public function infoAction(Request $request) {
@@ -112,7 +122,8 @@ class UserController extends Controller {
                 'name' => $user->getUsername(),
                 'sphere' => $user->getColor(),
                 'donation' => $user->getDonation(),
-                'owned_packs' => $user->getOwnedPacks()
+                'owned_packs' => $user->getOwnedPacks(),
+                'dark_mode' => $user->getDarkMode()
             ];
 
             if (isset($decklist_id)) {
