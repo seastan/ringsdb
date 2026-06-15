@@ -271,6 +271,10 @@ $dark-link-hover: #9cc6ee;
     color: $dark-text;
   }
 
+  .row.title {
+    background-color: $dark-surface-2;
+  }
+
   .card-text {
     border-left-color: $dark-border;
   }
