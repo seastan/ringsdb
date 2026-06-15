@@ -275,6 +275,24 @@ $dark-link-hover: #9cc6ee;
     background-color: $dark-surface-2;
   }
 
+  /* Play simulator: darker, hue-preserving versions of the sphere-colored
+     draggable card rows, which are light pastels by default. */
+  .tab-card-leadership  { background-color: #4a2f4d; }
+  .tab-card-lore        { background-color: #2d4628; }
+  .tab-card-spirit      { background-color: #1f4250; }
+  .tab-card-tactics     { background-color: #4d2526; }
+  .tab-card-baggins     { background-color: #4a3f1c; }
+  .tab-card-fellowship  { background-color: #4a3214; }
+  .tab-card-neutral     { background-color: #3a3a40; }
+
+  .card-title {
+    color: $dark-text;
+  }
+
+  .tab-card-border-facedown {
+    background-color: $dark-surface-3;
+  }
+
   .card-text {
     border-left-color: $dark-border;
   }
