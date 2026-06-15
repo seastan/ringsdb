@@ -92,6 +92,10 @@ class Card {
      */
     private $reviews;
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $printings;
+    /**
      * @var \AppBundle\Entity\Pack
      */
     private $pack;
@@ -109,6 +113,38 @@ class Card {
      */
     public function __construct() {
         $this->reviews = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->printings = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add printing
+     *
+     * @param \AppBundle\Entity\CardPrinting $printing
+     *
+     * @return Card
+     */
+    public function addPrinting(\AppBundle\Entity\CardPrinting $printing) {
+        $this->printings[] = $printing;
+
+        return $this;
+    }
+
+    /**
+     * Remove printing
+     *
+     * @param \AppBundle\Entity\CardPrinting $printing
+     */
+    public function removePrinting(\AppBundle\Entity\CardPrinting $printing) {
+        $this->printings->removeElement($printing);
+    }
+
+    /**
+     * Get printings
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getPrintings() {
+        return $this->printings;
     }
 
     /**
