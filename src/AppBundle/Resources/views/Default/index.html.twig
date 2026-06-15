@@ -7,6 +7,12 @@
         <h1 class="site-title"><img src="https://i.imgur.com/8jg53Dt.png" alt="RingsDB" width="500"></h1>
         <div class="site-slogan hidden-xs">Deckbuilder for The Lord of the Rings (<b>Physical</b> / <a href="https://digital.ringsdb.com">Digital</a>) LCG</div>
 
+        <div id="dark-mode-promo" class="alert alert-info alert-dismissible text-center" style="display: none;">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <span class="fa fa-moon-o"></span>
+            Try out the new <strong>Dark Mode</strong>! Enable it on your <a href="{{ path('user_profile_edit') }}">account page</a>.
+        </div>
+
 	{# <center>You can contribute to the continued development of RingsDB on <a href="https://www.patreon.com/Seastan" target="_blank">Patreon</a>.</center> #}
 	<div style="position:relative; text-align: center; padding-top: 10px;">{{ daily_challenge }}</div>
 
@@ -290,6 +296,16 @@
 {% endblock %}
 
 {% block javascripts %}
+    <script type="text/javascript">
+        // Show the dark mode promo only to logged-in users who haven't enabled it.
+        // Login state is loaded client-side (see app.user.js) since the page is cached.
+        app.user.loaded.done(function() {
+            if (app.user.data && !app.user.data.dark_mode) {
+                $('#dark-mode-promo').show();
+            }
+        });
+    </script>
+
     <script type="application/ld+json">
         {
            "@context": "http://schema.org",
