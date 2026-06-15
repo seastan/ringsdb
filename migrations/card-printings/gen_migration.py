@@ -15,30 +15,43 @@ from collections import defaultdict
 DUMP = sys.argv[1] if len(sys.argv) > 1 else 'ringsdb_daily.sql'
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-REPACK_PACKS = {61, 85, 98, 99, 100, 101}
+# Repackaged products, keyed by stable pack CODE (pack ids drift like card ids did:
+# the old hardcoded {61,85,98,99,100,101} pointed at an ALeP expansion (85=MotR)
+# and non-existent packs in the current DB). Resolved to ids at runtime in main().
+#   Starter = Two-Player Limited Edition Starter   RevCore = Revised Core (Campaign Only)
+#   TSoE = The Stone of Erech   TRoB = The Ruins of Belegost   (the four "starter decks")
+REPACK_PACK_CODES = {'Starter', 'RevCore', 'TSoE', 'TRoB'}
+REPACK_PACKS = set()  # resolved from REPACK_PACK_CODES against the dump in main()
 
-# When a repackaged card's normalized key matches >1 original, force the canonical:
-#   keyed by normalized name -> canonical card id
+# Disambiguation for repackaged cards whose normalized key matches >1 original.
+# Default policy (see main()): merge to the EARLIEST printing (lowest card id =
+# the original release). This dict only lists genuine exceptions where the
+# earliest printing is NOT the intended canonical. Keyed by normalized name.
+# (Gandalf's earliest IS Core id73, so this is belt-and-suspenders; left explicit
+# so the intent is obvious and a future id shuffle can't silently change it.)
 REPACK_OVERRIDES = {
-    'gandalf': 73,     # Core ally, not Over Hill (id459)
-    'galadriel': 340,  # Celebrimbor's Secret hero, not ALeP Mirror (id1631)
+    'gandalf': 73,     # Core ally, not Over Hill (id459) or any later reprint
 }
 
-# Cross-original merges (losing card id -> canonical id), maintainer-adjudicated.
-CROSS_ORIGINAL = {
-    1460: 104,  # Brand son of Bain (ALeP alt-art) -> Hills of Emyn Muil
-    1461: 104,  # Brand son of Bain (ALeP rebalanced) -> Hills of Emyn Muil
-    1457: 177,  # Glorfindel (ALeP) -> Foundations of Stone
-    1631: 340,  # Galadriel (ALeP Mirror) -> Celebrimbor's Secret
-    1583: 454,  # Beorn (ALeP) -> Over Hill and Under Hill
-    1632: 549,  # Denethor (ALeP) -> Flight of the Stormcaller
-    1459: 907,  # Dain Ironfoot (ALeP) -> Ghost of Framsburg
-    1458: 938,  # Frodo Baggins leadership (ALeP) -> A Shadow in the East
+# Cross-original merges, maintainer-adjudicated. Keyed by stable card CODE, not
+# id: the DB's card ids are NOT frozen (new reprints shift the id space), so the
+# original id-keyed map silently rotted. Codes are printed on the card and stable.
+#   loser CODE -> canonical CODE
+# Re-derived (2026-06) against the live test DB for the maintainer's original 8.
+CROSS_ORIGINAL_BY_CODE = {
+    '502992': '02072',  # Brand son of Bain (ALeP TSoEr alt-art)   -> Hills of Emyn Muil
+    '502993': '02072',  # Brand son of Bain (ALeP TSoEr rebalanced)-> Hills of Emyn Muil
+    '501993': '04101',  # Glorfindel (ALeP TNaA)                   -> Foundations of Stone
+    '505993': '08112',  # Galadriel (ALeP TMoG "Mirror")           -> Celebrimbor's Secret
+    '503991': '131005', # Beorn (ALeP THo)                         -> Over Hill and Under Hill
+    '505994': '12001',  # Denethor (ALeP TMoG)                     -> Flight of the Stormcaller
+    '502991': '19084',  # Dain Ironfoot (ALeP TSoEr)               -> Ghost of Framsburg
+    '500987': '21002',  # Frodo Baggins leadership (ALeP TSotS)    -> A Shadow in the East
 }
 
 # Losing cards whose differing text/traits/stats must be preserved as printing
-# overrides (rebalanced variants, not mere alt-art).
-REBALANCED_LOSERS = {1461}
+# overrides (rebalanced variants, not mere alt-art). Keyed by stable CODE.
+REBALANCED_LOSER_CODES = {'502993'}  # the rebalanced ALeP Brand
 
 
 def norm(s):
@@ -88,8 +101,22 @@ def load_table(name):
 
 
 def main():
+    # Resolve repackaged packs from stable codes (pack col order: id,cycle_id,code,name,...).
+    global REPACK_PACKS
+    packs = load_table('pack')
+    code_to_pack = {p[2]: int(p[0]) for p in packs if len(p) > 2}
+    REPACK_PACKS = {code_to_pack[c] for c in REPACK_PACK_CODES if c in code_to_pack}
+    missing = sorted(REPACK_PACK_CODES - set(code_to_pack))
+    print("repackaged packs resolved: %s%s" % (
+        sorted(REPACK_PACKS),
+        ("  (codes not present in dump: %s)" % missing) if missing else ""))
+
     cards = load_table('card')          # id,pack_id,type_id,sphere_id,position,code,name,traits,text,...,quantity(19),...
     byid = {int(r[0]): r for r in cards if len(r) >= 20}
+    bycode = defaultdict(list)
+    for r in cards:
+        if len(r) >= 20:
+            bycode[r[5]].append(int(r[0]))
 
     # canonical lookup from NON-repackaged cards
     canon = defaultdict(list)
@@ -100,8 +127,9 @@ def main():
             continue
         canon[(norm(r[6]), r[2], r[3])].append(int(r[0]))
 
-    merge = {}   # loser_id -> canonical_id
-    new_cards = []  # repackaged cards with no canonical (stay as own canonical)
+    merge = {}          # loser_id -> canonical_id
+    new_cards = []      # repackaged cards with no canonical (stay as own canonical)
+    auto_earliest = []  # ambiguous repackaged cards resolved by earliest-printing
 
     for r in cards:
         if len(r) < 20:
@@ -116,12 +144,32 @@ def main():
             merge[cid] = matches[0]
         else:
             ov = REPACK_OVERRIDES.get(norm(r[6]))
-            assert ov is not None, "Unhandled ambiguity for %r (matches %s)" % (r[6], matches)
-            merge[cid] = ov
+            if ov is not None:
+                assert ov in matches, "override %d for %r not among matches %s" % (ov, r[6], matches)
+                merge[cid] = ov
+            else:
+                # default: earliest printing (lowest id) = the original release
+                chosen = min(matches)
+                merge[cid] = chosen
+                auto_earliest.append((cid, r[6], int(r[1]), chosen, sorted(matches)))
 
-    # explicit cross-original merges
-    for lo, ca in CROSS_ORIGINAL.items():
+    # explicit cross-original merges, resolved from stable CODES against this dump.
+    rebalanced_losers = set()
+    for lo_code, ca_code in CROSS_ORIGINAL_BY_CODE.items():
+        lo_ids, ca_ids = bycode.get(lo_code, []), bycode.get(ca_code, [])
+        assert len(lo_ids) == 1, "cross-original loser code %s -> %s (expected exactly 1)" % (lo_code, lo_ids)
+        assert len(ca_ids) == 1, "cross-original canonical code %s -> %s (expected exactly 1)" % (ca_code, ca_ids)
+        lo, ca = lo_ids[0], ca_ids[0]
+        # safety: a cross-original merge must join two printings of the SAME card,
+        # and the loser must live outside the repackaged packs. These asserts are
+        # what would have screamed when the old id-keyed map pointed at Bifur etc.
+        assert norm(byid[lo][6]) == norm(byid[ca][6]), \
+            "cross-original NAME MISMATCH: %r (code %s) != %r (code %s)" % (byid[lo][6], lo_code, byid[ca][6], ca_code)
+        assert int(byid[lo][1]) not in REPACK_PACKS, "cross-original loser %d in a repackaged pack" % lo
+        assert lo != ca, "cross-original loser == canonical for code %s" % lo_code
         merge[lo] = ca
+        if lo_code in REBALANCED_LOSER_CODES:
+            rebalanced_losers.add(lo)
 
     # ---- invariants ----
     assert all(ca not in merge for ca in merge.values()), "a canonical is itself a loser (chain)"
@@ -131,6 +179,15 @@ def main():
     print("merge entries (losers): %d" % len(merge))
     print("repackaged 'new' cards (kept canonical): %d -> %s" % (
         len(new_cards), sorted(new_cards)))
+    print("ambiguous repackaged cards auto-resolved to earliest printing: %d" % len(auto_earliest))
+    for cid, name, pk, chosen, matches in auto_earliest:
+        print("    id%d %r [pack %d] -> id%d  (candidates %s)" % (cid, name, pk, chosen, matches))
+    print("cross-original merges (re-keyed by code): %d" % len(CROSS_ORIGINAL_BY_CODE))
+    for lo_code, ca_code in CROSS_ORIGINAL_BY_CODE.items():
+        lo, ca = bycode[lo_code][0], bycode[ca_code][0]
+        print("    code %s id%d %r -> code %s id%d %r%s" % (
+            lo_code, lo, byid[lo][6], ca_code, ca, byid[ca][6],
+            "  [REBALANCED: text preserved]" if lo_code in REBALANCED_LOSER_CODES else ""))
 
     # ---- exposure: how many slots / changes reference losers ----
     losers = set(merge)
@@ -172,15 +229,15 @@ def main():
         print("  %s id%d [pack %s] -> %s id%d" % (
             byid[lo][6], lo, byid[lo][1], byid[ca][5], ca))
 
-    emit_sql(merge, byid)
+    emit_sql(merge, byid, rebalanced_losers)
     print("\nwrote %s" % os.path.join(HERE, '02_migrate.sql'))
 
 
-def emit_sql(merge, byid):
+def emit_sql(merge, byid, rebalanced_losers):
     packs = ','.join(str(p) for p in sorted(REPACK_PACKS))
     canon_ids = ','.join(str(c) for c in sorted(set(merge.values())))
     map_values = ',\n  '.join('(%d,%d)' % (lo, ca) for lo, ca in sorted(merge.items()))
-    reb = ','.join(str(l) for l in sorted(REBALANCED_LOSERS))
+    reb = ','.join(str(l) for l in sorted(rebalanced_losers))
 
     lines = []
     w = lines.append
