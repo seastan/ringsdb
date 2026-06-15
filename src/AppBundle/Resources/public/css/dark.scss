@@ -293,6 +293,16 @@ $dark-link-hover: #9cc6ee;
     background-color: $dark-surface-3;
   }
 
+  /* Brighten the resource/damage counter numbers so they stay legible on
+     the darkened rows (defaults are dark blue / dark red). */
+  .container-resources {
+    color: rgb(120, 150, 255);
+  }
+
+  .container-damage {
+    color: rgb(255, 110, 110);
+  }
+
   .card-text {
     border-left-color: $dark-border;
   }
