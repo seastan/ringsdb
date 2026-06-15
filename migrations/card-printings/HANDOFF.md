@@ -25,11 +25,21 @@ until phase 3). The app should otherwise run normally. This is expected.
 
 ## 0. Branch & snapshot
 
+The test server tracks `ringsdb_test`, which has been brought up to date with
+`master`. The refactor lives on `feature/card-printings` (master-based, +2
+commits). Bring it into the working tree without leaving `ringsdb_test`:
+
 ```
-git fetch && git checkout feature/card-printings
-# Take a restorable snapshot of the TEST database first:
+git fetch origin
+git merge --no-edit origin/feature/card-printings   # clean: just adds the refactor commits
+# (or `git checkout feature/card-printings` if you prefer to test off the branch directly)
+
+# Take a restorable snapshot of the TEST database FIRST:
 mysqldump <testdb> > /tmp/ringsdb_test_backup.sql
 ```
+
+After merging, run `composer install` only if dependencies changed (they did not)
+and `php app/console cache:clear` so Doctrine sees the new entity.
 
 ## 1. Apply schema (`card_printing` table + `pack.is_repackaged`)
 
