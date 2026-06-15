@@ -998,6 +998,11 @@ h1.site-title {
   font-size: 116px;
   text-align: center;
   margin-top: 0;
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
 }
 
 @media (max-width: 767px) {

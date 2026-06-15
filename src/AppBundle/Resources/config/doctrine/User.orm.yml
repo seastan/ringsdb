@@ -148,6 +148,12 @@ AppBundle\Entity\User:
             column: is_share_decks
             options:
                 default: false
+        darkMode:
+            type: boolean
+            nullable: false
+            column: dark_mode
+            options:
+                default: false
         ownedPacks:
             type: string
             length: 512

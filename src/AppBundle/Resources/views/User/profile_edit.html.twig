@@ -72,6 +72,16 @@
                                 </p>
                             </div>
 
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="dark_mode" value="1" {% if user.darkMode %}checked{% endif %}>
+                                    Dark mode
+                                </label>
+                                <p class="help-block">
+                                    Use a dark color theme across the site. The setting follows your account, so it will apply on any device where you are logged in.
+                                </p>
+                            </div>
+
                             <div class="form-group">
                                 <label for="color">Select a sphere color for your username</label>
                                 {% for sphere in spheres %}
