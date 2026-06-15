@@ -275,6 +275,27 @@ $dark-link-hover: #9cc6ee;
     background-color: $dark-surface-2;
   }
 
+  /* The index-page title logo is a black PNG (transparent background), which is
+     invisible on a dark background. Recolor it to gold by using the image as a
+     mask and painting gold behind it. The source is 1440x528, so the box keeps
+     that aspect ratio while staying responsive (max 500px wide, same as the img). */
+  h1.site-title {
+    img {
+      display: none;
+    }
+
+    &::after {
+      content: "";
+      display: inline-block;
+      width: 500px;
+      max-width: 100%;
+      aspect-ratio: 1440 / 528;
+      background-color: #d4af37;
+      -webkit-mask: url(https://i.imgur.com/8jg53Dt.png) center / contain no-repeat;
+      mask: url(https://i.imgur.com/8jg53Dt.png) center / contain no-repeat;
+    }
+  }
+
   /* Play simulator: darker, hue-preserving versions of the sphere-colored
      draggable card rows, which are light pastels by default. */
   .tab-card-leadership  { background-color: #4a2f4d; }
