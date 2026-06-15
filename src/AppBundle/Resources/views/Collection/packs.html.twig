@@ -30,7 +30,7 @@
 
                         <div class="btn-group btn-group-vertical btn-block" class="packs">
                             {% for pack in category.packs %}
-                                <label type="button" class="btn btn-default {% if pack.checked %}active{% endif %}" data-id="{{ pack.id }}">{{  pack.label }}</label>
+                                <label type="button" class="btn btn-default{% if pack.checked %} active{% endif %}" data-id="{{ pack.id }}">{{  pack.label }}</label>
                             {% endfor %}
                         </div>
                         <div class="text-right" style="margin-bottom: 10px;"><small class="pack-count"></small></div>

@@ -40,6 +40,8 @@ twig:
     globals:
         cards_data:             "@cards_data"
         deck_validation_helper: "@deck_validation_helper"
+        dragncards_room:        "%dragncards_room%"
+        noindex:                "%noindex%"
     form_themes:
         - 'bootstrap_3_layout.html.twig'
 
@@ -72,6 +74,8 @@ doctrine:
         naming_strategy:             doctrine.orm.naming_strategy.underscore
         auto_mapping:                true
         dql:
+            string_functions:
+                binary: AppBundle\DQL\BinaryFunction
             numeric_functions:
                 power: AppBundle\DQL\PowerFunction
 

@@ -184,6 +184,15 @@ $dark-link-hover: #9cc6ee;
       border-color: $dark-border;
       color: $dark-text;
     }
+
+    &.active,
+    &.active:hover,
+    &.active:focus {
+      background-color: #2a4060;
+      border-color: $dark-link;
+      color: #ffffff;
+      box-shadow: none;
+    }
   }
 
   /********* DROPDOWNS ************/

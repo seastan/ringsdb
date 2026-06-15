@@ -31,3 +31,9 @@ parameters:
     google_analytics_tracking_code: UA-00000000-1
     google_adsense_client: ca-pub-000000000000000
     google_adsense_slot: 0000000000
+
+    # DragnCards integration — room name in the plugin URL
+    dragncards_room: ringsdb
+
+    # Set to true to add <meta name="robots" content="noindex"> (use on non-production sites)
+    noindex: false

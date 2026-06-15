@@ -16,6 +16,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
+    {% if noindex %}<meta name="robots" content="noindex">{% endif %}
 
     <link rel="icon" sizes="192x192" href="/icon-192.png"/>
     <link rel="apple-touch-icon" sizes="120x120" href="/icon-120.png"/>
@@ -191,6 +192,7 @@
 
     <script type="text/javascript">
         var app = {};
+        app.dragncards_room = {{ dragncards_room | json_encode | raw }};
         moment.locale('en-US');
 
         $(function() {
