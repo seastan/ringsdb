@@ -75,14 +75,30 @@
      */
     user.anonymous = function anonymous() {
         user.wipe();
+        user.apply_dark_mode();
         user.dropdown('<ul class="dropdown-menu"><li><a href="' + Routing.generate('fos_user_security_login') + '">Login or Register</a></li></ul>');
     };
 
     /**
      * @memberOf user
      */
+    /**
+     * Apply the dark mode preference coming from the user's account, keeping the
+     * <html> class and the cookie in sync. The cookie lets the inline script in the
+     * page <head> apply the theme before paint on the next load (no flash).
+     * @memberOf user
+     */
+    user.apply_dark_mode = function apply_dark_mode() {
+        var enabled = !!(user.data && user.data.dark_mode);
+        $('html').toggleClass('dark-mode', enabled);
+        var expires = new Date();
+        expires.setFullYear(expires.getFullYear() + 1);
+        document.cookie = 'dark_mode=' + (enabled ? '1' : '0') + '; expires=' + expires.toUTCString() + '; path=/';
+    };
+
     user.update = function update() {
         user.store();
+        user.apply_dark_mode();
         user.dropdown('<ul class="dropdown-menu">' +
             '<li><a href="' + Routing.generate('user_profile_edit') + '">Edit account</a></li>' +
             '<li><a href="' + user.data.public_profile_url + '">Public profile</a></li>' +

@@ -32,6 +32,42 @@
         return format.substring(0, format.length - value.length) + value;
     };
 
+    // When dark mode is on, theme the charts to match (background + text colors).
+    // Highcharts 4.x renders these as inline SVG styles, so CSS alone can't override
+    // them reliably -- setOptions applies to every chart created afterwards. Palette
+    // mirrors dark.scss.
+    if (typeof Highcharts !== 'undefined' && $('html').hasClass('dark-mode')) {
+        Highcharts.setOptions({
+            chart: { backgroundColor: '#242428' },
+            title: { style: { color: '#d6d6d6' } },
+            subtitle: { style: { color: '#9a9a9a' } },
+            xAxis: {
+                lineColor: '#3d3d44',
+                tickColor: '#3d3d44',
+                gridLineColor: '#3d3d44',
+                labels: { style: { color: '#d6d6d6' } },
+                title: { style: { color: '#9a9a9a' } }
+            },
+            yAxis: {
+                lineColor: '#3d3d44',
+                tickColor: '#3d3d44',
+                gridLineColor: '#3d3d44',
+                labels: { style: { color: '#d6d6d6' } },
+                title: { style: { color: '#9a9a9a' } }
+            },
+            legend: {
+                itemStyle: { color: '#d6d6d6' },
+                itemHoverStyle: { color: '#ffffff' }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                style: { color: '#d6d6d6' }
+            },
+            plotOptions: { series: { dataLabels: { color: '#d6d6d6' } } },
+            labels: { style: { color: '#d6d6d6' } }
+        });
+    }
+
 
     deck_charts.chart_sphere = function chart_sphere() {
         var spheres = {};
