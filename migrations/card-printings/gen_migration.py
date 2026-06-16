@@ -3,10 +3,15 @@
 Generate (and dry-run validate) the card-printings data migration from a
 mysqldump. Usage:  python3 gen_migration.py ringsdb_daily.sql
 
-- Computes the loser->canonical merge map (normalized name+type+sphere for the
-  6 repackaged packs + explicit overrides + cross-original ALeP merges).
-- Reports invariants and how many deck/decklist slots & deckchanges reference
-  losing cards (exposure of the destructive step).
+- Computes a FULL dedup merge map: every (accent-normalized name, type, sphere)
+  group collapses onto its earliest printing (lowest id = original release).
+  The card table holds only player cards (no encounter cards), so a shared
+  name+type+sphere means the same logical card reprinted. Each loser printing
+  keeps any text/trait/stat differences as overrides, so rebalanced and errata
+  variants are preserved rather than lost.
+- Reports invariants, the losers whose rules differ from their canonical (kept
+  as overrides -- worth a maintainer eyeball), and how many deck/decklist slots
+  & deckchanges reference losing cards (exposure of the destructive step).
 - Emits 02_migrate.sql next to this script.
 """
 import sys, os, re, unicodedata
@@ -23,21 +28,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPACK_PACK_CODES = {'Starter', 'RevCore', 'TSoE', 'TRoB'}
 REPACK_PACKS = set()  # resolved from REPACK_PACK_CODES against the dump in main()
 
-# Disambiguation for repackaged cards whose normalized key matches >1 original.
-# Default policy (see main()): merge to the EARLIEST printing (lowest card id =
-# the original release). This dict only lists genuine exceptions where the
-# earliest printing is NOT the intended canonical. Keyed by normalized name.
-# (Gandalf's earliest IS Core id73, so this is belt-and-suspenders; left explicit
-# so the intent is obvious and a future id shuffle can't silently change it.)
-REPACK_OVERRIDES = {
-    'gandalf': 73,     # Core ally, not Over Hill (id459) or any later reprint
-}
-
-# Cross-original merges, maintainer-adjudicated. Keyed by stable card CODE, not
-# id: the DB's card ids are NOT frozen (new reprints shift the id space), so the
-# original id-keyed map silently rotted. Codes are printed on the card and stable.
-#   loser CODE -> canonical CODE
-# Re-derived (2026-06) against the live test DB for the maintainer's original 8.
+# Regression anchors: the global earliest-id rule must still reproduce these
+# maintainer-adjudicated phase-1-2 merges (keyed by stable card CODE -> canonical
+# CODE). main() asserts each still holds, so a future data shift that would change
+# one of these careful choices fails loudly instead of silently. Earliest-id
+# already lands on each of these canonicals; they're here as a tripwire.
 CROSS_ORIGINAL_BY_CODE = {
     '502992': '02072',  # Brand son of Bain (ALeP TSoEr alt-art)   -> Hills of Emyn Muil
     '502993': '02072',  # Brand son of Bain (ALeP TSoEr rebalanced)-> Hills of Emyn Muil
@@ -48,10 +43,6 @@ CROSS_ORIGINAL_BY_CODE = {
     '502991': '19084',  # Dain Ironfoot (ALeP TSoEr)               -> Ghost of Framsburg
     '500987': '21002',  # Frodo Baggins leadership (ALeP TSotS)    -> A Shadow in the East
 }
-
-# Losing cards whose differing text/traits/stats must be preserved as printing
-# overrides (rebalanced variants, not mere alt-art). Keyed by stable CODE.
-REBALANCED_LOSER_CODES = {'502993'}  # the rebalanced ALeP Brand
 
 
 def norm(s):
@@ -118,76 +109,72 @@ def main():
         if len(r) >= 20:
             bycode[r[5]].append(int(r[0]))
 
-    # canonical lookup from NON-repackaged cards
-    canon = defaultdict(list)
+    # ---- FULL DEDUP ----------------------------------------------------------
+    # Group every card by (normalized name, type, sphere); each group with >1
+    # printing collapses onto its earliest printing (lowest id = original).
+    T_TRAITS, T_TEXT, T_COST = 7, 8, 11   # card column indices, for flagging only
+    groups = defaultdict(list)
     for r in cards:
         if len(r) < 20:
             continue
-        if int(r[1]) in REPACK_PACKS:
-            continue
-        canon[(norm(r[6]), r[2], r[3])].append(int(r[0]))
+        groups[(norm(r[6]), r[2], r[3])].append(int(r[0]))
 
-    merge = {}          # loser_id -> canonical_id
-    new_cards = []      # repackaged cards with no canonical (stay as own canonical)
-    auto_earliest = []  # ambiguous repackaged cards resolved by earliest-printing
+    # Classes that share name+type+sphere but are GENUINELY DIFFERENT cards, so
+    # they must NOT be auto-merged (maintainer-adjudicated):
+    #   - sphere 7 (Fellowship): Saga-campaign Ring-bearers / control heroes
+    #     (Frodo x5, Aragorn x3) -- each printing is a distinct ability.
+    #   - "(MotK)" Messenger-of-the-King variants: excluded by choice. They keep
+    #     the "(MotK)" prefix so they only group among themselves (a few correct
+    #     reprints left un-merged); safe to fold in later if wanted.
+    SAGA_SPHERE = '7'
+    def excluded(key):
+        return key[2] == SAGA_SPHERE or key[0].startswith('(motk)')
 
-    for r in cards:
-        if len(r) < 20:
+    merge = {}      # loser_id -> canonical_id (earliest printing)
+    flagged = []    # (loser, canonical, name): rules differ -> kept as override, review
+    excluded_groups = []
+    for key, ids in groups.items():
+        if len(ids) < 2:
             continue
-        cid = int(r[0])
-        if int(r[1]) not in REPACK_PACKS:
+        if excluded(key):
+            excluded_groups.append((key, sorted(ids)))
             continue
-        matches = canon.get((norm(r[6]), r[2], r[3]), [])
-        if len(matches) == 0:
-            new_cards.append(cid)
-        elif len(matches) == 1:
-            merge[cid] = matches[0]
-        else:
-            ov = REPACK_OVERRIDES.get(norm(r[6]))
-            if ov is not None:
-                assert ov in matches, "override %d for %r not among matches %s" % (ov, r[6], matches)
-                merge[cid] = ov
-            else:
-                # default: earliest printing (lowest id) = the original release
-                chosen = min(matches)
-                merge[cid] = chosen
-                auto_earliest.append((cid, r[6], int(r[1]), chosen, sorted(matches)))
-
-    # explicit cross-original merges, resolved from stable CODES against this dump.
-    rebalanced_losers = set()
-    for lo_code, ca_code in CROSS_ORIGINAL_BY_CODE.items():
-        lo_ids, ca_ids = bycode.get(lo_code, []), bycode.get(ca_code, [])
-        assert len(lo_ids) == 1, "cross-original loser code %s -> %s (expected exactly 1)" % (lo_code, lo_ids)
-        assert len(ca_ids) == 1, "cross-original canonical code %s -> %s (expected exactly 1)" % (ca_code, ca_ids)
-        lo, ca = lo_ids[0], ca_ids[0]
-        # safety: a cross-original merge must join two printings of the SAME card,
-        # and the loser must live outside the repackaged packs. These asserts are
-        # what would have screamed when the old id-keyed map pointed at Bifur etc.
-        assert norm(byid[lo][6]) == norm(byid[ca][6]), \
-            "cross-original NAME MISMATCH: %r (code %s) != %r (code %s)" % (byid[lo][6], lo_code, byid[ca][6], ca_code)
-        assert int(byid[lo][1]) not in REPACK_PACKS, "cross-original loser %d in a repackaged pack" % lo
-        assert lo != ca, "cross-original loser == canonical for code %s" % lo_code
-        merge[lo] = ca
-        if lo_code in REBALANCED_LOSER_CODES:
-            rebalanced_losers.add(lo)
+        canonical = min(ids)
+        for lo in sorted(ids):
+            if lo == canonical:
+                continue
+            merge[lo] = canonical
+            l, c = byid[lo], byid[canonical]
+            if l[T_TEXT] != c[T_TEXT] or l[T_TRAITS] != c[T_TRAITS] or l[T_COST] != c[T_COST]:
+                flagged.append((lo, canonical, byid[lo][6]))
 
     # ---- invariants ----
     assert all(ca not in merge for ca in merge.values()), "a canonical is itself a loser (chain)"
     for ca in set(merge.values()):
         assert ca in byid, "canonical %d not found" % ca
 
-    print("merge entries (losers): %d" % len(merge))
-    print("repackaged 'new' cards (kept canonical): %d -> %s" % (
-        len(new_cards), sorted(new_cards)))
-    print("ambiguous repackaged cards auto-resolved to earliest printing: %d" % len(auto_earliest))
-    for cid, name, pk, chosen, matches in auto_earliest:
-        print("    id%d %r [pack %d] -> id%d  (candidates %s)" % (cid, name, pk, chosen, matches))
-    print("cross-original merges (re-keyed by code): %d" % len(CROSS_ORIGINAL_BY_CODE))
+    # regression tripwire: earliest-id must still reproduce the phase-1-2 hand
+    # adjudications (Gandalf -> Core 73 and the 8 cross-original ALeP merges).
+    assert merge.get(73) is None, "Gandalf Core id73 should be a canonical, not a loser"
     for lo_code, ca_code in CROSS_ORIGINAL_BY_CODE.items():
-        lo, ca = bycode[lo_code][0], bycode[ca_code][0]
-        print("    code %s id%d %r -> code %s id%d %r%s" % (
-            lo_code, lo, byid[lo][6], ca_code, ca, byid[ca][6],
-            "  [REBALANCED: text preserved]" if lo_code in REBALANCED_LOSER_CODES else ""))
+        lo_ids, ca_ids = bycode.get(lo_code, []), bycode.get(ca_code, [])
+        assert len(lo_ids) == 1 and len(ca_ids) == 1, \
+            "cross-original code %s/%s not uniquely present" % (lo_code, ca_code)
+        assert merge.get(lo_ids[0]) == ca_ids[0], \
+            "regression: code %s should still merge to %s" % (lo_code, ca_code)
+
+    print("merge entries (losers): %d  ->  %d cards remain" % (len(merge), len(byid) - len(merge)))
+    print("canonical cards gaining extra printings: %d" % len(set(merge.values())))
+    print("losers whose rules differ from canonical (kept as printing overrides): %d" % len(flagged))
+    for lo, ca, name in sorted(flagged)[:40]:
+        print("    id%d %r [pack %s, code %s] -> canonical id%d" % (
+            lo, name, byid[lo][1], byid[lo][5], ca))
+    if len(flagged) > 40:
+        print("    ... and %d more (full list via the override step)" % (len(flagged) - 40))
+    print("EXCLUDED groups kept separate (Saga sphere-7 / MotK distinct cards): %d" % len(excluded_groups))
+    for key, ids in sorted(excluded_groups):
+        print("    %r (type %s, sphere %s): kept %d separate -> ids %s" % (
+            byid[ids[0]][6], key[1], key[2], len(ids), ids))
 
     # ---- exposure: how many slots / changes reference losers ----
     losers = set(merge)
@@ -229,19 +216,18 @@ def main():
         print("  %s id%d [pack %s] -> %s id%d" % (
             byid[lo][6], lo, byid[lo][1], byid[ca][5], ca))
 
-    emit_sql(merge, byid, rebalanced_losers)
+    emit_sql(merge, byid)
     print("\nwrote %s" % os.path.join(HERE, '02_migrate.sql'))
 
 
-def emit_sql(merge, byid, rebalanced_losers):
+def emit_sql(merge, byid):
     packs = ','.join(str(p) for p in sorted(REPACK_PACKS))
     canon_ids = ','.join(str(c) for c in sorted(set(merge.values())))
     map_values = ',\n  '.join('(%d,%d)' % (lo, ca) for lo, ca in sorted(merge.items()))
-    reb = ','.join(str(l) for l in sorted(rebalanced_losers))
 
     lines = []
     w = lines.append
-    w("-- Phase 2: data migration for the canonical-Card + CardPrinting refactor.")
+    w("-- Data migration for the canonical-Card + CardPrinting refactor (FULL DEDUP).")
     w("-- GENERATED by gen_migration.py from a prod dump. Run AFTER 01_schema.sql,")
     w("-- on a DB snapshot first. Transaction-wrapped; safe to re-run on the same DB.")
     w("")
@@ -254,35 +240,53 @@ def emit_sql(merge, byid, rebalanced_losers):
     w("  FROM card c")
     w("  WHERE NOT EXISTS (SELECT 1 FROM card_printing cp WHERE cp.card_id = c.id AND cp.pack_id = c.pack_id);")
     w("")
-    w("-- 2) Merge map: losing card id -> canonical card id.")
+    w("-- 2) Merge map: losing card id -> canonical (earliest) card id.")
     w("CREATE TEMPORARY TABLE _merge_map (loser_id INT PRIMARY KEY, canonical_id INT NOT NULL);")
     w("INSERT INTO _merge_map (loser_id, canonical_id) VALUES")
     w("  " + map_values + ";")
     w("")
-    w("-- 3) Preserve rebalanced losers' distinct rules as printing overrides (pre-repoint).")
-    if reb:
-        w("UPDATE card_printing cp JOIN card c ON cp.card_id = c.id")
-        w("  SET cp.text = c.text, cp.traits = c.traits, cp.cost = c.cost, cp.threat = c.threat,")
-        w("      cp.willpower = c.willpower, cp.attack = c.attack, cp.defense = c.defense,")
-        w("      cp.health = c.health, cp.victory = c.victory, cp.quest = c.quest")
-        w("  WHERE c.id IN (%s);" % reb)
+    w("-- 3) Preserve each loser printing's own rules as overrides wherever they")
+    w("--    differ from the canonical card (lossless: rebalanced/errata variants keep")
+    w("--    their text/stats; NULL override = use the canonical's value). Pre-repoint,")
+    w("--    so cp.card_id still identifies the loser. (<=> is the null-safe equality.)")
+    w("UPDATE card_printing cp")
+    w("  JOIN _merge_map m ON cp.card_id = m.loser_id")
+    w("  JOIN card lo ON lo.id = m.loser_id")
+    w("  JOIN card ca ON ca.id = m.canonical_id")
+    w("  SET cp.traits    = IF(lo.traits    <=> ca.traits,    cp.traits,    lo.traits),")
+    w("      cp.text      = IF(lo.text      <=> ca.text,      cp.text,      lo.text),")
+    w("      cp.cost      = IF(lo.cost      <=> ca.cost,      cp.cost,      lo.cost),")
+    w("      cp.threat    = IF(lo.threat    <=> ca.threat,    cp.threat,    lo.threat),")
+    w("      cp.willpower = IF(lo.willpower <=> ca.willpower, cp.willpower, lo.willpower),")
+    w("      cp.attack    = IF(lo.attack    <=> ca.attack,    cp.attack,    lo.attack),")
+    w("      cp.defense   = IF(lo.defense   <=> ca.defense,   cp.defense,   lo.defense),")
+    w("      cp.health    = IF(lo.health    <=> ca.health,    cp.health,    lo.health),")
+    w("      cp.victory   = IF(lo.victory   <=> ca.victory,   cp.victory,   lo.victory),")
+    w("      cp.quest     = IF(lo.quest     <=> ca.quest,     cp.quest,     lo.quest);")
     w("")
     w("-- 4) Repoint the losers' printings onto the canonical card.")
     w("UPDATE card_printing cp JOIN _merge_map m ON cp.card_id = m.loser_id SET cp.card_id = m.canonical_id;")
     w("")
-    w("-- 5) Repoint every saved reference (FKs to card.id). Most are 0 rows; harmless.")
+    w("-- 5) Repoint every saved reference (FKs to card.id).")
     for tbl in ('deckslot', 'decklistslot', 'decksideslot', 'decklistsideslot', 'review'):
         w("UPDATE %s s JOIN _merge_map m ON s.card_id = m.loser_id SET s.card_id = m.canonical_id;" % tbl)
     w("")
-    w("-- 6) Collapse identical-art duplicate printings within a repackaged pack")
-    w("--    (only case: Gandalf x2 in pack 61 -> one printing, quantity summed).")
+    w("-- NOTE: deck-edit history (deckchange.variation) stores card CODES in JSON and")
+    w("--   is intentionally NOT rewritten here -- the loser codes it references become")
+    w("--   unresolved in the history view only (deck CONTENTS via *_slot are repointed")
+    w("--   above and stay correct). Rewriting needs widening variation past varchar(1024)")
+    w("--   first; left to a follow-up so this migration stays scoped to the card data.")
+    w("")
+    w("-- 6) Collapse duplicate printings now sharing the same canonical card AND pack")
+    w("--    (two same-named cards in one pack, or Gandalf x2 in the Starter): keep one,")
+    w("--    sum quantity. Scans all packs since dedup can surface within-pack dupes anywhere.")
     w("UPDATE card_printing cp JOIN (")
     w("    SELECT MIN(id) keep_id, SUM(quantity) tq FROM card_printing")
-    w("    WHERE pack_id IN (%s) GROUP BY card_id, pack_id HAVING COUNT(*) > 1" % packs)
+    w("    GROUP BY card_id, pack_id HAVING COUNT(*) > 1")
     w("  ) d ON cp.id = d.keep_id SET cp.quantity = d.tq;")
     w("DELETE cp FROM card_printing cp JOIN (")
     w("    SELECT card_id, pack_id, MIN(id) keep_id FROM card_printing")
-    w("    WHERE pack_id IN (%s) GROUP BY card_id, pack_id HAVING COUNT(*) > 1" % packs)
+    w("    GROUP BY card_id, pack_id HAVING COUNT(*) > 1")
     w("  ) d ON cp.card_id = d.card_id AND cp.pack_id = d.pack_id AND cp.id <> d.keep_id;")
     w("")
     w("-- 7) Dedup any slot that now has two rows for the same canonical card (sum qty).")
