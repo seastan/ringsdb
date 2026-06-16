@@ -136,5 +136,33 @@ open an existing saved deck and confirm it loads unchanged (decks resolve by car
 
 Reply with: the `doctrine:schema:update --dump-sql` output, whether you
 regenerated `02_migrate.sql`, the result of each verification query, any errors,
-and the app smoke-test result. Do **not** touch production. The dev-side Claude
-will use this to proceed with phases 3–9.
+and the app smoke-test result. Do **not** touch production.
+
+## 6. Backend reads + API (phases 3–4) — after the migration verifies
+
+These phases make the app READ through printings (no schema change). After
+`git pull` + `php app/console cache:clear --env=prod` (and `dev`):
+
+1. **Lint the changed PHP** (no local PHP on the dev box, so please confirm):
+   ```
+   php -l src/AppBundle/Services/CardsData.php
+   php -l src/AppBundle/Controller/ApiController.php
+   ```
+2. **API shape** — each card keeps `pack_code`/`pack_name` and gains a `packs[]`
+   array. A reprinted card should list several packs; check Aragorn (code 01001):
+   ```
+   curl -s 'http://<host>/api/public/cards/' | python3 -c 'import sys,json; \
+     c=[x for x in json.load(sys.stdin) if x["code"]=="01001"][0]; \
+     print(c["pack_code"]); print([p["pack_code"] for p in c["packs"]])'
+   ```
+   Expect `Core` as pack_code and multiple entries in packs[] (Core + the
+   repackaged packs that reprinted Aragorn).
+3. **Pack-scoped API** — a repackaged pack now returns the canonical cards it
+   reprints (driven by the search change), e.g. `GET /api/public/cards/Starter.json`
+   should return ~65 cards (Two-Player Starter), not 0.
+4. **Search availability** — on the cards search page, `e:Starter` (or the
+   Two-Player Starter pack code) should now return the Core/other cards reprinted
+   there, and each appears once (no duplicates). `c:<repackaged cycle>` likewise.
+5. Report any `php -l` errors, the curl output, and whether search/deckbuilder
+   list look right. (Browser cache-busting for the new packs[] data ships with the
+   frontend phase; for raw API testing add `?cachebust=1` or check via curl.)

@@ -156,7 +156,7 @@ class ApiController extends Controller {
      * @ApiDoc(
      *  section="Card",
      *  resource=true,
-     *  description="All the Cards",
+     *  description="All the Cards. Each card keeps pack_code/pack_name (its primary printing) plus a packs[] array listing every pack it appears in (pack_code, pack_name, position, quantity, image_code, illustrator, octgnid, imagesrc).",
      *  parameters={
      *      {"name"="jsonp", "dataType"="string", "required"=false, "description"="JSONP callback"}
      *  },
@@ -176,14 +176,31 @@ class ApiController extends Controller {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $list_cards \AppBundle\Entity\Card[] */
-        $list_cards = $em->getRepository('AppBundle:Card')->findBy([], ["code" => "ASC"]);
+        // Eager-load printings (+ their packs) and the card's pack/type/sphere so
+        // getCardInfo doesn't issue N+1 queries while building packs[] for every card.
+        $list_cards = $em->getRepository('AppBundle:Card')->createQueryBuilder('c')
+            ->leftJoin('c.printings', 'cp')->addSelect('cp')
+            ->leftJoin('cp.pack', 'cpp')->addSelect('cpp')
+            ->leftJoin('c.pack', 'p')->addSelect('p')
+            ->leftJoin('c.type', 't')->addSelect('t')
+            ->leftJoin('c.sphere', 's')->addSelect('s')
+            ->orderBy('c.code', 'ASC')
+            ->getQuery()->getResult();
 
-        // check the last-modified-since header
+        // check the last-modified-since header (cards AND their printings, so a new
+        // printing or repointed art invalidates the cached card list)
         $lastModified = null;
         /* @var $card \AppBundle\Entity\Card */
         foreach ($list_cards as $card) {
             if (!$lastModified || $lastModified < $card->getDateUpdate()) {
                 $lastModified = $card->getDateUpdate();
+            }
+        }
+        $printingMax = $em->createQuery('SELECT MAX(cp.dateUpdate) FROM AppBundle:CardPrinting cp')->getSingleScalarResult();
+        if ($printingMax) {
+            $printingMax = new \DateTime($printingMax);
+            if (!$lastModified || $lastModified < $printingMax) {
+                $lastModified = $printingMax;
             }
         }
 
