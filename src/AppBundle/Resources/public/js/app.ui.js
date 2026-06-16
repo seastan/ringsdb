@@ -102,33 +102,52 @@
         console.log('ui.on_all_loaded');
 
         app.user.loaded.always(function() {
-            app.data.packs.update({}, {
-                owned: true
-            });
-
-            if (app.user.data && app.user.data.owned_packs) {
-                var packs = app.user.data.owned_packs.split(',');
-                var nPacks = [];
-                _.forEach(packs, function(str) {
-                    nPacks.push(parseInt(str, 10));
-                });
-
-                app.data.packs.update({
-                    'id': {
-                        '$nin': nPacks
+            // Parse owned_packs into a per-pack-id owned COUNT. Tokens are
+            // "id", "id:count", or legacy core "1-2"/"1-3" (each = +1 copy).
+            var ownedCountById = {};
+            var hasCollection = !!(app.user.data && app.user.data.owned_packs);
+            if (hasCollection) {
+                _.forEach(app.user.data.owned_packs.split(','), function(token) {
+                    var t = ('' + token).trim(), m;
+                    if ((m = t.match(/^(\d+):(\d+)$/))) {
+                        ownedCountById[m[1]] = (ownedCountById[m[1]] || 0) + parseInt(m[2], 10);
+                    } else if ((m = t.match(/^(\d+)(?:-\d+)?$/))) {
+                        ownedCountById[m[1]] = (ownedCountById[m[1]] || 0) + 1;
                     }
-                }, {
-                    owned: false
                 });
             }
 
-            app.data.packs.find().forEach(function(pack) {
-                app.data.cards.update({
-                    'pack_code': pack.code
-                }, {
-                    owned: pack.owned
+            if (!hasCollection) {
+                // No collection set => treat the user as owning everything abundantly.
+                app.data.packs.update({}, { owned: true });
+                app.data.cards.update({}, { owned: true, owned_copies: 999 });
+            } else {
+                // Map owned counts onto pack codes and flag packs owned.
+                var ownedCountByCode = {};
+                app.data.packs.find().forEach(function(pack) {
+                    var count = ownedCountById[pack.id] || 0;
+                    ownedCountByCode[pack.code] = count;
+                    app.data.packs.updateById(pack.code, { owned: count > 0 });
                 });
-            });
+
+                // Per card: owned_copies = sum over its printings of
+                // (count owned of that pack * copies of the card in that pack).
+                app.data.cards.find().forEach(function(card) {
+                    var ownedCopies = 0;
+                    _.forEach(card.packs || [], function(pr) {
+                        ownedCopies += (ownedCountByCode[pr.pack_code] || 0) * (pr.quantity || 0);
+                    });
+                    app.data.cards.updateById(card.code, {
+                        owned_copies: ownedCopies,
+                        owned: ownedCopies > 0
+                    });
+                });
+            }
+
+            // Deckbuilder per-card max quantities depend on ownership.
+            if (app.ui && $.isFunction(app.ui.set_max_qty)) {
+                app.ui.set_max_qty();
+            }
         });
 
         if ($.isFunction(ui.on_all_loaded)) {
