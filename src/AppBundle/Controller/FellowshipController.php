@@ -763,7 +763,16 @@ class FellowshipController extends Controller {
         }
 
         if ($owned_packs) {
-            $packs = explode(",", $owned_packs);
+            // owned_packs is a per-pack count map ("id" / "id:count", legacy "id-2");
+            // keep the ids whose count is > 0.
+            $packs = [];
+            foreach (explode(",", $owned_packs) as $token) {
+                if (preg_match('/^(\d+)(?:[:-](\d+))?$/', trim($token), $m)) {
+                    if (!isset($m[2]) || (int)$m[2] > 0) {
+                        $packs[] = (int)$m[1];
+                    }
+                }
+            }
         } else {
             $packs = $dbh->executeQuery("SELECT id FROM pack WHERE date_release IS NOT NULL")->fetchAll(\PDO::FETCH_COLUMN);
         }
