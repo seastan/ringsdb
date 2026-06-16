@@ -41,6 +41,18 @@ mysqldump <testdb> > /tmp/ringsdb_test_backup.sql
 After merging, run `composer install` only if dependencies changed (they did not)
 and `php app/console cache:clear` so Doctrine sees the new entity.
 
+> **Merge rule (current):** hybrid of "known reprints" + rules-equivalence.
+> Cards in the repackaged cycles (Starter / RevCore / StarterDecks) merge onto
+> the matching original; among other cards, only those with IDENTICAL rules
+> merge. Genuinely-different same-named cards (Gandalf Core vs Over Hill, the
+> saga Treasure cards, the rebalanced ALeP Brand, saga Ring-bearers) STAY
+> SEPARATE. This supersedes the earlier "full dedup" approach.
+>
+> **If you already applied a previous `02_migrate.sql`** (it deletes rows, so it
+> is not re-runnable over itself): restore the DB from your pre-migration
+> snapshot first, then re-run from a fresh regenerate (section 2) so the new
+> rule applies cleanly.
+
 ## 1. Apply schema (`card_printing` table + `pack.is_repackaged`)
 
 The entities/ORM are committed, so Doctrine can also generate this. Preview what
@@ -79,37 +91,44 @@ php app/console cache:clear --env=prod
 It is transaction-wrapped. If it errors, the transaction rolls back; capture the
 exact error and report it.
 
-## 4. Verify (expected values from the dev dump — adjust if you regenerated)
+## 4. Verify
+
+Card ids drift between DBs, so verify by stable CODE. The generator's stdout is
+the source of truth for counts (it prints "N cards remain", the repackaged packs,
+and the names kept separate) — compare the queries below against that.
 
 ```sql
--- Gandalf (canonical id 73) now spans Core + the repackaged packs; pack 61 = qty 4
-SELECT cp.pack_id, p.code, cp.quantity, cp.image_code
-FROM card_printing cp JOIN pack p ON p.id = cp.pack_id
-WHERE cp.card_id = 73 ORDER BY cp.pack_id;
---   expect packs 1, 61(qty 4), 98, 99, 100, 101
+-- Core Gandalf (code 01073) gained the repackaged reprints as extra printings
+-- (Core + Two-Player Starter + the starter decks it appears in); Starter qty summed.
+SELECT p.code, cp.quantity, cp.image_code
+FROM card c JOIN card_printing cp ON cp.card_id = c.id JOIN pack p ON p.id = cp.pack_id
+WHERE c.code = '01073' ORDER BY p.code;
 
--- Every card has at least one printing (expect 0 rows)
+-- ...but Over Hill Gandalf (code 131010) is a DIFFERENT card and must STILL EXIST
+-- as its own row (different ability -> not merged). Expect exactly 1 row.
+SELECT id, code, name FROM card WHERE code = '131010';
+
+-- Every card has >=1 printing (expect 0 rows)
 SELECT c.id, c.name FROM card c
 LEFT JOIN card_printing cp ON cp.card_id = c.id WHERE cp.id IS NULL;
 
--- No printing or slot points at a deleted card (all expect 0)
+-- Nothing points at a deleted card (all expect 0)
 SELECT COUNT(*) FROM card_printing cp LEFT JOIN card c ON c.id=cp.card_id WHERE c.id IS NULL;
 SELECT COUNT(*) FROM decklistsideslot s LEFT JOIN card c ON c.id=s.card_id WHERE c.id IS NULL;
 SELECT COUNT(*) FROM deckslot s LEFT JOIN card c ON c.id=s.card_id WHERE c.id IS NULL;
 
--- Repackaged packs flagged (expect 6 rows: 61,85,98,99,100,101)
-SELECT id, code, name, is_repackaged FROM pack WHERE is_repackaged = 1;
+-- Repackaged packs flagged: the 6 packs in cycles Starter/RevCore/StarterDecks
+SELECT pk.id, pk.code, pk.name FROM pack pk WHERE pk.is_repackaged = 1;
 
--- Card count dropped by the number of merged duplicates (dev dump: 1515 -> 1314)
+-- No remaining DUPLICATE codes (each logical card is one row). Expect 0.
+SELECT code, COUNT(*) FROM card GROUP BY code HAVING COUNT(*) > 1;
+
+-- Card count after merge — compare to the generator's "cards remain" line.
 SELECT COUNT(*) FROM card;
-
--- Brand son of Bain (canonical 104) keeps TWO printings in pack 107
--- (alt-art + rebalanced); the rebalanced one has override text populated
-SELECT id, pack_id, image_code, (text IS NOT NULL) AS has_text_override
-FROM card_printing WHERE card_id = 104 ORDER BY pack_id, id;
 ```
 
-Also smoke-test the app: load the deckbuilder and confirm each card appears once;
+Also smoke-test the app: load the deckbuilder and confirm each card appears once
+(e.g. one "Gandalf" neutral ally entry for Core, a separate one for Over Hill);
 open an existing saved deck and confirm it loads unchanged (decks resolve by card
 `code`, which the canonical cards retain).
 
