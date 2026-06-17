@@ -109,4 +109,38 @@ class CollectionController extends Controller {
             'reloaduser' => true
         ]);
     }
+
+    /**
+     * Save the user's preferred art (printing) for a card.
+     * POST card_code + pack_code; pack_code empty/"default" clears the preference.
+     */
+    public function saveArtPreferenceAction(Request $request) {
+        $user = $this->getUser();
+        if (!$user) {
+            return new Response(json_encode(['success' => false, 'error' => 'not logged in']), 403, ['Content-Type' => 'application/json']);
+        }
+
+        $cardCode = preg_replace('/[^0-9]/', '', $request->get('card_code'));
+        $packCode = preg_replace('/[^A-Za-z0-9_-]/', '', $request->get('pack_code'));
+        if (!$cardCode) {
+            return new Response(json_encode(['success' => false, 'error' => 'missing card_code']), 400, ['Content-Type' => 'application/json']);
+        }
+
+        $prefs = json_decode($user->getArtPreferences() ?: '{}', true);
+        if (!is_array($prefs)) {
+            $prefs = [];
+        }
+        if ($packCode === '' || $packCode === 'default') {
+            unset($prefs[$cardCode]);
+        } else {
+            $prefs[$cardCode] = $packCode;
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $user->setArtPreferences(empty($prefs) ? null : json_encode($prefs));
+        $em->persist($user);
+        $em->flush();
+
+        return new Response(json_encode(['success' => true]), 200, ['Content-Type' => 'application/json']);
+    }
 }

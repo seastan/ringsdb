@@ -10,3 +10,11 @@ collection_save_packs:
     methods: [POST]
     defaults:
         _controller: AppBundle:Collection:savePacks
+
+collection_save_art:
+    path: /art/save
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:Collection:saveArtPreference
+    options:
+        expose: true

@@ -43,6 +43,7 @@
             '<div><small>' + app.format.pack_sphere(card) + '</small></div>' +
             '<div class="card-text"><small>' + app.format.text(card) + '</small></div>'
         );
+        card_modal.build_art_selector(card, modal);
 
         if (!app.ui.deckedit) {
             return;
@@ -91,6 +92,66 @@
             label.appendTo(qtyelt);
         }
     }
+
+    /**
+     * Builds the art / printing selector under the modal image when a card has
+     * more than one distinct printing art. Each option shows how many copies of
+     * THAT art the user owns. Selecting one persists the preference.
+     * @memberOf card_modal
+     */
+    card_modal.build_art_selector = function(card, modal) {
+        // distinct printings that have art, keyed by image_code
+        var seen = {}, arts = [];
+        _.forEach(card.packs || [], function(p) {
+            if (p.imagesrc && !seen[p.image_code]) {
+                seen[p.image_code] = 1;
+                arts.push(p);
+            }
+        });
+
+        if (arts.length < 2 || !(app.user.data && app.user.data.id)) {
+            return;
+        }
+
+        var prefs = app.data.art_preferences || {};
+        var current = prefs[card.code]; // preferred pack_code, or undefined => canonical
+        var counts = app.data.owned_pack_counts || {};
+
+        var container = $('<div class="modal-art-selector" style="margin-top:8px"></div>');
+        $('<small class="text-muted">Art / printing (copies you own):</small>').appendTo(container);
+        var group = $('<div style="margin-top:4px"></div>').appendTo(container);
+
+        arts.forEach(function(p) {
+            var isCanonical = (p.image_code === card.code);
+            var selected = current ? (current === p.pack_code) : isCanonical;
+            var owned = (counts[p.pack_code] || 0) * (p.quantity || 0);
+            var label = $('<label class="btn btn-xs btn-default' + (selected ? ' active' : '') + '" style="margin:2px" title="' + p.pack_name + '">'
+                + p.pack_code + ' <span class="text-muted">(' + owned + ')</span></label>');
+            label.on('click', function() {
+                card_modal.set_art(card.code, isCanonical ? '' : p.pack_code, p.imagesrc);
+            });
+            label.appendTo(group);
+        });
+
+        container.appendTo(modal.find('.modal-image'));
+    };
+
+    /**
+     * Persists and applies an art preference, then refreshes the modal.
+     * @memberOf card_modal
+     */
+    card_modal.set_art = function(code, packCode, imagesrc) {
+        $.post(Routing.generate('collection_save_art'), { card_code: code, pack_code: packCode || 'default' });
+
+        var prefs = app.data.art_preferences || (app.data.art_preferences = {});
+        if (packCode) {
+            prefs[code] = packCode;
+        } else {
+            delete prefs[code];
+        }
+        app.data.cards.updateById(code, { imagesrc: imagesrc });
+        card_modal.updateModal();
+    };
 
     $(document).ready(function () {
         $('body').on({

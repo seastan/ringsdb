@@ -123,7 +123,8 @@ class UserController extends Controller {
                 'sphere' => $user->getColor(),
                 'donation' => $user->getDonation(),
                 'owned_packs' => $user->getOwnedPacks(),
-                'dark_mode' => $user->getDarkMode()
+                'dark_mode' => $user->getDarkMode(),
+                'art_preferences' => $user->getArtPreferences()
             ];
 
             if (isset($decklist_id)) {

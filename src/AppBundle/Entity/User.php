@@ -706,6 +706,33 @@ class User extends BaseUser {
     }
 
     /**
+     * @var string
+     */
+    private $artPreferences;
+
+    /**
+     * Set artPreferences (JSON map of card code => preferred pack code)
+     *
+     * @param string $artPreferences
+     *
+     * @return User
+     */
+    public function setArtPreferences($artPreferences) {
+        $this->artPreferences = $artPreferences;
+
+        return $this;
+    }
+
+    /**
+     * Get artPreferences
+     *
+     * @return string
+     */
+    public function getArtPreferences() {
+        return $this->artPreferences;
+    }
+
+    /**
      * @var \Doctrine\Common\Collections\Collection
      */
     private $fellowships;
