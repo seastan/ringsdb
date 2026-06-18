@@ -548,8 +548,6 @@
 
                 if (sortKey == 'pack_code') {
                     div.append(' <small class="text-muted" style="padding-left: 2px">(#' + card.position + ')</small>');
-                } else if (app.data.cards.find({ 'name': card.name }).length > 1) {
-                    div.append(' <small class="text-muted">(' + card.pack_code + ')</small>');
                 }
 
                 div.appendTo(section);

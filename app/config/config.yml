@@ -44,6 +44,7 @@ twig:
         noindex:                "%noindex%"
     form_themes:
         - 'bootstrap_3_layout.html.twig'
+        - 'AppBundle::form_widgets.html.twig'
 
 # Assetic Configuration
 assetic:

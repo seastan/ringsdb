@@ -15,7 +15,7 @@
             <th class="hidden-xs defense"><span class="icon-defense"></span></th>
             <th class="hidden-xs health"><span class="icon-health"></span></th>
             <th>Traits</th>
-            <th>Set</th>
+            <th>Sets</th>
         </tr>
         </thead>
 
@@ -34,7 +34,7 @@
                 <td class="hidden-xs defense">{% if card.type_code == 'hero' or card.type_code == 'ally' or (card.type_code == 'treasure' and card.health != null) %}{{ macros.integer_or_x(card.defense) }}{% endif %}</td>
                 <td class="hidden-xs health">{% if card.type_code == 'hero' or card.type_code == 'ally' or (card.type_code == 'treasure' and card.health != null) %}{{ macros.integer_or_x(card.health) }}{% endif %}</td>
                 <td>{{ card.traits }}</td>
-                <td>{{ card.pack_name | replace({'ALeP ': '<a href="https://alongextendedparty.com/" target="_blank">ALeP</a> '}) | raw }} {{ card.position }}</td>
+                <td style="white-space:nowrap">{% for printing in card.packs %}<a href="{{ path('cards_list', {'pack_code': printing.pack_code}) }}" title="{{ printing.pack_name }}">{{ printing.pack_code }}</a>{% if not loop.last %}&nbsp;·&nbsp;{% endif %}{% endfor %}</td>
             </tr>
         {% endfor %}
     </table>
