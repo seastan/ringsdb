@@ -283,5 +283,16 @@ DELETE c FROM card c JOIN _merge_map m ON c.id = m.loser_id;
 -- 8) Flag the repackaged products (collection page groups them separately).
 UPDATE pack SET is_repackaged = 1 WHERE id IN (61,85,98,99,100,101);
 
+-- 9) Correct the placeholder release dates on the repackaged packs.
+--    The original data had fake 2011 dates; actual release dates are:
+--    Two-Player Limited Edition Starter: July 2017
+--    Revised Core Campaign-Only + 4 Starter Decks: November 2022
+UPDATE pack SET date_release = '2017-07-06' WHERE id = 61;
+UPDATE pack SET date_release = '2022-11-04' WHERE id = 85;
+UPDATE pack SET date_release = '2022-11-04' WHERE id = 98;
+UPDATE pack SET date_release = '2022-11-04' WHERE id = 99;
+UPDATE pack SET date_release = '2022-11-04' WHERE id = 100;
+UPDATE pack SET date_release = '2022-11-04' WHERE id = 101;
+
 DROP TEMPORARY TABLE _merge_map;
 COMMIT;
