@@ -472,18 +472,26 @@ class CardsData {
 
 			$prImageUrl = $this->assets_helper->getUrl('bundles/cards/' . $printing->getImageCode() . '.png');
 			$prImagePath = $this->rootDir . '/../web' . preg_replace('/\?.*/', '', $prImageUrl);
+			$dateRelease = $pack->getDateRelease();
 
 			$cardinfo['packs'][] = [
-				'pack_code'   => $pack->getCode(),
-				'pack_name'   => $pack->getName(),
-				'position'    => $printing->getPosition(),
-				'quantity'    => intval($printing->getQuantity()),
-				'image_code'  => $printing->getImageCode(),
-				'illustrator' => $printing->getIllustrator(),
-				'octgnid'     => $printing->getOctgnid(),
-				'imagesrc'    => file_exists($prImagePath) ? $prImageUrl : null,
+				'pack_code'    => $pack->getCode(),
+				'pack_name'    => $pack->getName(),
+				'position'     => $printing->getPosition(),
+				'quantity'     => intval($printing->getQuantity()),
+				'image_code'   => $printing->getImageCode(),
+				'illustrator'  => $printing->getIllustrator(),
+				'octgnid'      => $printing->getOctgnid(),
+				'imagesrc'     => file_exists($prImagePath) ? $prImageUrl : null,
+				'date_release' => $dateRelease ? $dateRelease->format('Y-m-d') : null,
 			];
 		}
+		usort($cardinfo['packs'], function($a, $b) {
+			if ($a['date_release'] === null && $b['date_release'] === null) return 0;
+			if ($a['date_release'] === null) return 1;
+			if ($b['date_release'] === null) return -1;
+			return strcmp($a['date_release'], $b['date_release']);
+		});
 
 		if ($api) {
 			unset($cardinfo['id']);
