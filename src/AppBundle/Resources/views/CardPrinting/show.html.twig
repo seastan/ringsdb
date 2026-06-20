@@ -1,0 +1,38 @@
+{% extends 'AppBundle:Admin:base.html.twig' %}
+
+{% block content %}
+<h1>Card Printing</h1>
+
+<table class="table">
+    <tbody>
+        <tr><th>Id</th><td>{{ entity.id }}</td></tr>
+        <tr><th>Card</th><td><a href="{{ path('admin_card_edit', {'id': entity.card.id}) }}">{{ entity.card.name }}</a></td></tr>
+        <tr><th>Pack</th><td><a href="{{ path('admin_pack_show', {'id': entity.pack.id}) }}">{{ entity.pack.name }}</a></td></tr>
+        <tr><th>Position</th><td>{{ entity.position }}</td></tr>
+        <tr><th>Quantity</th><td>{{ entity.quantity }}</td></tr>
+        <tr><th>Image code</th><td>{{ entity.imageCode }}</td></tr>
+        <tr><th>Illustrator</th><td>{{ entity.illustrator }}</td></tr>
+        <tr><th>OCTGN ID</th><td>{{ entity.octgnid }}</td></tr>
+        <tr><th>Traits override</th><td>{{ entity.traits }}</td></tr>
+        <tr><th>Text override</th><td>{{ entity.text }}</td></tr>
+        <tr><th>Cost override</th><td>{{ entity.cost }}</td></tr>
+        <tr><th>Threat override</th><td>{{ entity.threat }}</td></tr>
+        <tr><th>Willpower override</th><td>{{ entity.willpower }}</td></tr>
+        <tr><th>Attack override</th><td>{{ entity.attack }}</td></tr>
+        <tr><th>Defense override</th><td>{{ entity.defense }}</td></tr>
+        <tr><th>Health override</th><td>{{ entity.health }}</td></tr>
+        <tr><th>Victory override</th><td>{{ entity.victory }}</td></tr>
+        <tr><th>Quest override</th><td>{{ entity.quest }}</td></tr>
+        <tr><th>Created</th><td>{% if entity.dateCreation %}{{ entity.dateCreation|date('Y-m-d H:i:s') }}{% endif %}</td></tr>
+        <tr><th>Updated</th><td>{% if entity.dateUpdate %}{{ entity.dateUpdate|date('Y-m-d H:i:s') }}{% endif %}</td></tr>
+    </tbody>
+</table>
+
+<a href="{{ path('admin_card_printing') }}" class="btn btn-default">Back to the list</a>
+<a href="{{ path('admin_card_printing_edit', {'id': entity.id}) }}" class="btn btn-default">Edit</a>
+<form action="{{ path('admin_card_printing_delete', {'id': entity.id}) }}" method="post" style="display:inline-block">
+    <input type="hidden" name="_method" value="DELETE" />
+    {{ form_widget(delete_form) }}
+    <button type="submit" class="btn btn-danger">Delete</button>
+</form>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'AppBundle:Admin:base.html.twig' %}
+
+{% block content %}
+<h1>Edit Card Printing — {{ entity.card.name }} / {{ entity.pack.name }}</h1>
+
+<form action="{{ path('admin_card_printing_update', {'id': entity.id}) }}" method="post" {{ form_enctype(edit_form) }}>
+    <input type="hidden" name="_method" value="PUT" />
+    {{ form_widget(edit_form) }}
+    <button type="submit" class="btn btn-success">Save</button>
+</form>
+<br>
+<a href="{{ path('admin_card_printing_show', {'id': entity.id}) }}" class="btn btn-default">Back to detail</a>
+<a href="{{ path('admin_card_printing') }}" class="btn btn-default">Back to list</a>
+<form action="{{ path('admin_card_printing_delete', {'id': entity.id}) }}" method="post" style="display:inline-block">
+    <input type="hidden" name="_method" value="DELETE" />
+    {{ form_widget(delete_form) }}
+    <button type="submit" class="btn btn-danger">Delete</button>
+</form>
+{% endblock %}

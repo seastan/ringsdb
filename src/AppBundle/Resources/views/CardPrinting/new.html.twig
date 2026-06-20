@@ -1,0 +1,12 @@
+{% extends 'AppBundle:Admin:base.html.twig' %}
+
+{% block content %}
+<h1>New Card Printing</h1>
+
+<form action="{{ path('admin_card_printing_create') }}" method="post" {{ form_enctype(form) }}>
+    {{ form_widget(form) }}
+    <button type="submit" class="btn btn-success">Create</button>
+</form>
+
+<a href="{{ path('admin_card_printing') }}" class="btn btn-default">Back to the list</a>
+{% endblock %}

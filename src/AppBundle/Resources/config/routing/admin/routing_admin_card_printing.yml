@@ -1,0 +1,30 @@
+admin_card_printing:
+    path:  /
+    defaults: { _controller: "AppBundle:CardPrinting:index" }
+
+admin_card_printing_show:
+    path:  /{id}/show
+    defaults: { _controller: "AppBundle:CardPrinting:show" }
+
+admin_card_printing_new:
+    path:  /new
+    defaults: { _controller: "AppBundle:CardPrinting:new" }
+
+admin_card_printing_create:
+    path:  /create
+    defaults: { _controller: "AppBundle:CardPrinting:create" }
+    methods: [ post ]
+
+admin_card_printing_edit:
+    path:  /{id}/edit
+    defaults: { _controller: "AppBundle:CardPrinting:edit" }
+
+admin_card_printing_update:
+    path:  /{id}/update
+    defaults: { _controller: "AppBundle:CardPrinting:update" }
+    methods: [ post, put ]
+
+admin_card_printing_delete:
+    path:  /{id}/delete
+    defaults: { _controller: "AppBundle:CardPrinting:delete" }
+    methods: [ post, delete ]
