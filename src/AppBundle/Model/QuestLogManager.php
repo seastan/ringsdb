@@ -203,9 +203,11 @@ class QuestLogManager {
                 $sub->from("AppBundle:Card", "c");
                 $sub->innerJoin('AppBundle:Deckslot', 's', 'WITH', 's.card = c');
                 $sub->where('s.deck = ld');
-                $sub->andWhere($sub->expr()->notIn('c.pack', $packs));
+                $sub->andWhere("NOT EXISTS (SELECT cpqlm.id FROM AppBundle:CardPrinting cpqlm WHERE cpqlm.card = c AND cpqlm.pack IN (:qlm_packs))");
+                $sub->setParameter('qlm_packs', $packs);
 
                 $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
+                $qb->setParameter('qlm_packs', $packs);
             }
         }
 

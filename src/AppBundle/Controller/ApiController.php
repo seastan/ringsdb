@@ -181,7 +181,6 @@ class ApiController extends Controller {
         $list_cards = $em->getRepository('AppBundle:Card')->createQueryBuilder('c')
             ->leftJoin('c.printings', 'cp')->addSelect('cp')
             ->leftJoin('cp.pack', 'cpp')->addSelect('cpp')
-            ->leftJoin('c.pack', 'p')->addSelect('p')
             ->leftJoin('c.type', 't')->addSelect('t')
             ->leftJoin('c.sphere', 's')->addSelect('s')
             ->orderBy('c.code', 'ASC')

@@ -115,7 +115,7 @@ class CardsData {
         $em = $this->doctrine;
 
         $qb = $em->getRepository('AppBundle:Card')->createQueryBuilder('c');
-        $qb->leftJoin('c.pack', 'p')->leftJoin('p.cycle', 'y')->leftJoin('c.type', 't')->leftJoin('c.sphere', 's');
+        $qb->leftJoin('c.type', 't')->leftJoin('c.sphere', 's');
         $qb2 = null;
         $qb3 = null;
 
@@ -377,7 +377,7 @@ class CardsData {
 
         switch ($sortorder) {
             case 'set':
-                $qb->orderBy('y.position')->addOrderBy('p.position')->addOrderBy('c.position');
+                $qb->orderBy('c.code');
                 break;
             case 'sphere':
                 $qb->orderBy('c.sphere')->addOrderBy('c.type');

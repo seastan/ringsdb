@@ -213,7 +213,7 @@ class DefaultController extends Controller {
             $all_comments[] = $comment;
         }
         // Get recent card reviews
-        $dql = "SELECT r FROM AppBundle:Review r JOIN r.card c JOIN c.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC";
+        $dql = "SELECT DISTINCT r FROM AppBundle:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC";
         $query = $em->createQuery($dql)->setMaxResults($num_comments);
         $paginator = new Paginator($query, false);
         $reviews_recent = iterator_to_array($paginator->getIterator());
@@ -231,7 +231,7 @@ class DefaultController extends Controller {
         }
         // Recent review comments
         $em = $this->getDoctrine()->getManager();
-        $dql = "SELECT r FROM AppBundle:Review r JOIN r.card c JOIN c.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateLastComment DESC";
+        $dql = "SELECT DISTINCT r FROM AppBundle:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateLastComment DESC";
         $query = $em->createQuery($dql)->setMaxResults($num_comments);
         $paginator = new Paginator($query, false);
         $reviews_recent_discussion = iterator_to_array($paginator->getIterator());
