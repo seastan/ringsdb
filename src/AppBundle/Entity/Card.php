@@ -222,6 +222,13 @@ class Card {
         return $this->name;
     }
 
+    public function getAdminLabel() {
+        $parts = [];
+        if ($this->sphere) $parts[] = $this->sphere->getName();
+        if ($this->type)   $parts[] = $this->type->getName();
+        return $this->name . ($parts ? ' (' . implode(', ', $parts) . ')' : '');
+    }
+
     /**
      * Set traits
      *

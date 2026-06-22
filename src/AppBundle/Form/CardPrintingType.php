@@ -2,14 +2,32 @@
 
 namespace AppBundle\Form;
 
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class CardPrintingType extends AbstractType {
     public function buildForm(FormBuilderInterface $builder, array $options) {
+        $filterPack = $options['filter_pack'];
+
         $builder
-            ->add('card', 'entity', array('class' => 'AppBundle:Card', 'property' => 'name'))
+            ->add('card', 'entity', array(
+                'class'         => 'AppBundle:Card',
+                'property'      => 'adminLabel',
+                'query_builder' => function(EntityRepository $er) use ($filterPack) {
+                    $qb = $er->createQueryBuilder('c')
+                        ->join('c.sphere', 's')
+                        ->join('c.type', 't')
+                        ->orderBy('c.name');
+                    if ($filterPack) {
+                        $qb->join('c.printings', 'cp')
+                            ->andWhere('cp.pack = :pack')
+                            ->setParameter('pack', $filterPack);
+                    }
+                    return $qb;
+                },
+            ))
             ->add('pack', 'entity', array('class' => 'AppBundle:Pack', 'property' => 'name'))
             ->add('position')
             ->add('quantity')
@@ -30,7 +48,8 @@ class CardPrintingType extends AbstractType {
 
     public function setDefaultOptions(OptionsResolverInterface $resolver) {
         $resolver->setDefaults([
-            'data_class' => 'AppBundle\Entity\CardPrinting'
+            'data_class'  => 'AppBundle\Entity\CardPrinting',
+            'filter_pack' => null,
         ]);
     }
 

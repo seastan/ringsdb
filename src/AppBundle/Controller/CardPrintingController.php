@@ -13,7 +13,7 @@ class CardPrintingController extends Controller {
     public function indexAction(Request $request) {
         $em = $this->getDoctrine()->getManager();
 
-        $packId = $request->query->get('pack');
+        $packId   = $request->query->get('pack');
         $cardName = $request->query->get('card');
 
         $qb = $em->createQueryBuilder()
@@ -33,18 +33,18 @@ class CardPrintingController extends Controller {
         }
 
         $entities = $qb->getQuery()->getResult();
-        $packs = $em->getRepository('AppBundle:Pack')->findBy([], ['name' => 'ASC']);
+        $packs    = $em->getRepository('AppBundle:Pack')->findBy([], ['name' => 'ASC']);
 
         return $this->render('AppBundle:CardPrinting:index.html.twig', [
-            'entities'     => $entities,
-            'packs'        => $packs,
-            'pack_filter'  => $packId,
-            'card_filter'  => $cardName,
+            'entities'    => $entities,
+            'packs'       => $packs,
+            'pack_filter' => $packId,
+            'card_filter' => $cardName,
         ]);
     }
 
     public function showAction($id) {
-        $em = $this->getDoctrine()->getManager();
+        $em     = $this->getDoctrine()->getManager();
         $entity = $em->getRepository('AppBundle:CardPrinting')->find($id);
 
         if (!$entity) {
@@ -59,23 +59,28 @@ class CardPrintingController extends Controller {
         ]);
     }
 
-    public function newAction() {
-        $entity = new CardPrinting();
-        $form = $this->createForm(new CardPrintingType(), $entity);
+    public function newAction(Request $request) {
+        $em         = $this->getDoctrine()->getManager();
+        $filterPack = $this->resolveFilterPack($request, $em);
+        $entity     = new CardPrinting();
+        $form       = $this->createForm(new CardPrintingType(), $entity, ['filter_pack' => $filterPack]);
 
         return $this->render('AppBundle:CardPrinting:new.html.twig', [
-            'entity' => $entity,
-            'form'   => $form->createView(),
+            'entity'      => $entity,
+            'form'        => $form->createView(),
+            'packs'       => $em->getRepository('AppBundle:Pack')->findBy([], ['name' => 'ASC']),
+            'filter_pack' => $filterPack ? $filterPack->getId() : null,
         ]);
     }
 
     public function createAction(Request $request) {
-        $entity = new CardPrinting();
-        $form = $this->createForm(new CardPrintingType(), $entity);
+        $em         = $this->getDoctrine()->getManager();
+        $filterPack = $this->resolveFilterPack($request, $em);
+        $entity     = new CardPrinting();
+        $form       = $this->createForm(new CardPrintingType(), $entity, ['filter_pack' => $filterPack]);
         $form->bind($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
             $em->flush();
 
@@ -83,39 +88,45 @@ class CardPrintingController extends Controller {
         }
 
         return $this->render('AppBundle:CardPrinting:new.html.twig', [
-            'entity' => $entity,
-            'form'   => $form->createView(),
+            'entity'      => $entity,
+            'form'        => $form->createView(),
+            'packs'       => $em->getRepository('AppBundle:Pack')->findBy([], ['name' => 'ASC']),
+            'filter_pack' => $filterPack ? $filterPack->getId() : null,
         ]);
     }
 
-    public function editAction($id) {
-        $em = $this->getDoctrine()->getManager();
-        $entity = $em->getRepository('AppBundle:CardPrinting')->find($id);
+    public function editAction(Request $request, $id) {
+        $em         = $this->getDoctrine()->getManager();
+        $entity     = $em->getRepository('AppBundle:CardPrinting')->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find CardPrinting entity.');
         }
 
-        $editForm   = $this->createForm(new CardPrintingType(), $entity);
+        $filterPack = $this->resolveFilterPack($request, $em);
+        $editForm   = $this->createForm(new CardPrintingType(), $entity, ['filter_pack' => $filterPack]);
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('AppBundle:CardPrinting:edit.html.twig', [
             'entity'      => $entity,
             'edit_form'   => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
+            'packs'       => $em->getRepository('AppBundle:Pack')->findBy([], ['name' => 'ASC']),
+            'filter_pack' => $filterPack ? $filterPack->getId() : null,
         ]);
     }
 
     public function updateAction(Request $request, $id) {
-        $em = $this->getDoctrine()->getManager();
+        $em     = $this->getDoctrine()->getManager();
         $entity = $em->getRepository('AppBundle:CardPrinting')->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find CardPrinting entity.');
         }
 
+        $filterPack = $this->resolveFilterPack($request, $em);
         $deleteForm = $this->createDeleteForm($id);
-        $editForm   = $this->createForm(new CardPrintingType(), $entity);
+        $editForm   = $this->createForm(new CardPrintingType(), $entity, ['filter_pack' => $filterPack]);
         $editForm->bind($request);
 
         if ($editForm->isValid()) {
@@ -129,6 +140,8 @@ class CardPrintingController extends Controller {
             'entity'      => $entity,
             'edit_form'   => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
+            'packs'       => $em->getRepository('AppBundle:Pack')->findBy([], ['name' => 'ASC']),
+            'filter_pack' => $filterPack ? $filterPack->getId() : null,
         ]);
     }
 
@@ -137,7 +150,7 @@ class CardPrintingController extends Controller {
         $form->bind($request);
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em     = $this->getDoctrine()->getManager();
             $entity = $em->getRepository('AppBundle:CardPrinting')->find($id);
 
             if (!$entity) {
@@ -149,6 +162,14 @@ class CardPrintingController extends Controller {
         }
 
         return $this->redirect($this->generateUrl('admin_card_printing'));
+    }
+
+    private function resolveFilterPack(Request $request, $em) {
+        $id = $request->query->get('filter_pack');
+        if (!$id) {
+            return null;
+        }
+        return $em->getRepository('AppBundle:Pack')->find($id);
     }
 
     private function createDeleteForm($id) {
