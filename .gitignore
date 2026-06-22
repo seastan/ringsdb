@@ -27,3 +27,11 @@ beorn.json
 # Local prod dump used only for migration dev (do not commit, ~700MB)
 ringsdb_daily.sql
 __pycache__/
+
+# Local dev docker stack (not for the shared branch)
+/docker/
+/docker-compose.yml
+/web/app_local.php
+
+# Local card images pulled from server (large)
+/web/bundles/cards/

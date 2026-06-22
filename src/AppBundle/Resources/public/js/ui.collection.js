@@ -29,10 +29,10 @@
         var cycle = $(el);
         var owned = 0;
         var total = 0;
-        cycle.find('.pack-qty').each(function() {
-            if ((parseInt($(this).val(), 10) || 0) > 0) {
-                owned++;
-            }
+        cycle.find('.pack-row').each(function() {
+            var qty = (parseInt($(this).find('.pack-qty').val(), 10) || 0);
+            $(this).toggleClass('pack-row-owned', qty > 0);
+            if (qty > 0) { owned++; }
             total++;
         });
 

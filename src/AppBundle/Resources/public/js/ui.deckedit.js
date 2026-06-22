@@ -570,7 +570,7 @@
                 DisplayColumnsTpl = _.template([
                     '<tr>',
                     '<td><div class="btn-group" data-toggle="buttons"><%= radios %></div></td>',
-                    '<td><a class="card card-tip" data-code="<%= card.code %>" href="<%= url %>" data-target="#cardModal" data-remote="false" data-toggle="modal"><%= card.name %></a> <small class="text-muted">(<%= card.pack_code %>)</small></td>',
+                    '<td><a class="card card-tip" data-code="<%= card.code %>" href="<%= url %>" data-target="#cardModal" data-remote="false" data-toggle="modal"><%= card.name %></a></td>',
                     '<td class="sphere"><span class="icon-<%= card.sphere_code %> fg-<%= card.sphere_code %>" title="<%= card.sphere_name %>"></span></td>',
                     '<td class="type"><span class="icon-<%= card.type_code %>" title="<%= card.type_name %>"></span></td>',
                     '<td class="cost"><% if (card.type_code == "hero") { %><%= card.threat %> <span class="visible-xs-inline">T</span><% } else { if ((card.type_code == "ally") || (card.type_code == "attachment") || (card.type_code == "event") || (card.type_code == "player-side-quest") || ((card.type_code == "contract") && (card.cost != undefined)) || ((card.type_code == "treasure") && (card.cost != undefined))) { if (card.cost != undefined) { %><%= card.cost %><% } else { %>X<% } %> <span class="visible-xs-inline">C</span><% } } %></td>',
@@ -754,7 +754,7 @@
             limit: 10,
             templates: {
                 suggestion: function(card) {
-                    return $('<div class="fg-' + card.sphere_code + '"><span class="icon-fw icon-' + card.sphere_code + '"></span> <strong>' + card.name + '</strong> <small><i>' + card.pack_name + '</i></small></div>');
+                    return $('<div class="fg-' + card.sphere_code + '"><span class="icon-fw icon-' + card.sphere_code + '"></span> <strong>' + card.name + '</strong> <small><i>' + card.type_name + '</i></small></div>');
                 }
             }
         });

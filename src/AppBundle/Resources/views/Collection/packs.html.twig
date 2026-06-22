@@ -13,6 +13,15 @@
 {% endblock %}
 
 {% block body %}
+<style>
+/* hide number-input spin arrows */
+input[type=number].pack-qty::-webkit-inner-spin-button,
+input[type=number].pack-qty::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number].pack-qty { -moz-appearance: textfield; text-align: center; }
+
+.pack-row { padding: 2px 4px; border-radius: 3px; transition: background 0.1s; }
+.pack-row-owned { background-color: #d9edf7; }
+</style>
 
     <div class="main white container" id="owned_packs" style="display: none">
         <form action="{{ path('collection_save_packs') }}" method="POST" enctype="application/x-www-form-urlencoded" onsubmit="app.ui.update_selected_packs()">

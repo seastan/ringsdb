@@ -117,20 +117,24 @@
         var current = prefs[card.code]; // preferred pack_code, or undefined => canonical
         var counts = app.data.owned_pack_counts || {};
 
-        var container = $('<div class="modal-art-selector" style="margin-top:8px"></div>');
-        $('<small class="text-muted">Art / printing (copies you own):</small>').appendTo(container);
-        var group = $('<div style="margin-top:4px"></div>').appendTo(container);
+        var container = $('<div class="modal-art-selector" style="margin-top:10px"></div>');
+        var table = $('<table class="table table-condensed table-hover" style="margin-bottom:0;cursor:pointer"><thead><tr><th>Set</th><th style="text-align:center">Owned</th></tr></thead></table>').appendTo(container);
+        var tbody = $('<tbody></tbody>').appendTo(table);
 
         arts.forEach(function(p) {
             var isCanonical = (p.image_code === card.code);
             var selected = current ? (current === p.pack_code) : isCanonical;
             var owned = (counts[p.pack_code] || 0) * (p.quantity || 0);
-            var label = $('<label class="btn btn-xs btn-default' + (selected ? ' active' : '') + '" style="margin:2px" title="' + p.pack_name + '">'
-                + p.pack_code + ' <span class="text-muted">(' + owned + ')</span></label>');
-            label.on('click', function() {
+            var row = $('<tr class="' + (selected ? 'info' : '') + '">'
+                + '<td>' + p.pack_name + '</td>'
+                + '<td style="text-align:center">' + owned + '</td>'
+                + '</tr>');
+            row.on('click', function() {
+                tbody.find('tr').removeClass('info');
+                row.addClass('info');
                 card_modal.set_art(card.code, isCanonical ? '' : p.pack_code, p.imagesrc);
             });
-            label.appendTo(group);
+            row.appendTo(tbody);
         });
 
         container.appendTo(modal.find('.modal-image'));

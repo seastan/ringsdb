@@ -286,13 +286,24 @@ UPDATE pack SET is_repackaged = 1 WHERE id IN (61,85,98,99,100,101);
 -- 9) Correct the placeholder release dates on the repackaged packs.
 --    The original data had fake 2011 dates; actual release dates are:
 --    Two-Player Limited Edition Starter: July 2017
---    Revised Core Campaign-Only + 4 Starter Decks: November 2022
+--    Revised Core Set + 4 Starter Decks: November 2022
 UPDATE pack SET date_release = '2017-07-06' WHERE id = 61;
 UPDATE pack SET date_release = '2022-11-04' WHERE id = 85;
 UPDATE pack SET date_release = '2022-11-04' WHERE id = 98;
 UPDATE pack SET date_release = '2022-11-04' WHERE id = 99;
 UPDATE pack SET date_release = '2022-11-04' WHERE id = 100;
 UPDATE pack SET date_release = '2022-11-04' WHERE id = 101;
+
+-- 10) Expand "Revised Core Set (Campaign Only)" into the full Revised Core Set.
+--     The Revised Core Set contains all 73 Core Set cards at 3 copies each, plus
+--     the 7 campaign-only cards (already present from step 1). Rename the pack,
+--     update its size, and insert printings for all Core Set cards at qty=3.
+UPDATE pack SET name = 'Revised Core Set', size = 80 WHERE id = 85;
+
+INSERT INTO card_printing (card_id, pack_id, position, quantity, illustrator, image_code, date_creation, date_update)
+SELECT cp.card_id, 85, cp.position, 3, cp.illustrator, cp.image_code, NOW(), NOW()
+FROM card_printing cp
+WHERE cp.pack_id = 1;
 
 DROP TEMPORARY TABLE _merge_map;
 COMMIT;

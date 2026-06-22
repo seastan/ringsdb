@@ -155,8 +155,7 @@ AppBundle\Entity\User:
             options:
                 default: false
         ownedPacks:
-            type: string
-            length: 512
+            type: text
             nullable: true
         artPreferences:
             type: text
