@@ -358,6 +358,16 @@ class SearchController extends Controller {
 
                 $cardinfo['available'] = $availability[$pack->getCode()];
                 $cardinfo['selected_pack_code'] = $selected_pack_code;
+
+                if ($selected_pack_code) {
+                    foreach ($cardinfo['packs'] as $p) {
+                        if ($p['pack_code'] === $selected_pack_code && !empty($p['imagesrc'])) {
+                            $cardinfo['imagesrc'] = $p['imagesrc'];
+                            break;
+                        }
+                    }
+                }
+
                 if ($includeReviews) {
                     $cardinfo['reviews'] = $this->get('cards_data')->get_reviews($card);
                 }

@@ -5,12 +5,6 @@ AppBundle\Entity\Card:
         usage: NONSTRICT_READ_WRITE
         region: entity_region
     manyToOne:
-        pack:
-            targetEntity: Pack
-            inversedBy: cards
-            joinColumn:
-                name: pack_id
-                referencedColumnName: id
         type:
             targetEntity: Type
             inversedBy: cards
@@ -88,20 +82,10 @@ AppBundle\Entity\Card:
         quest:
             type: smallint
             nullable: true
-        quantity:
-            type: smallint
-            nullable: false
         deckLimit:
             type: smallint
             nullable: true
             column: deck_limit
-        illustrator:
-            type: string
-            length: 255
-            nullable: true
-        octgnid:
-            type: string
-            nullable: true
         dateCreation:
             type: datetime
             nullable: false

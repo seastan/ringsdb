@@ -12,10 +12,6 @@ AppBundle\Entity\Pack:
                 name: cycle_id
                 referencedColumnName: id
     oneToMany:
-        cards:
-            targetEntity: Card
-            orderBy: {'position':'ASC'}
-            mappedBy: pack
         printings:
             targetEntity: CardPrinting
             orderBy: {'position':'ASC'}

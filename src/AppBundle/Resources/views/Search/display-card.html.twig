@@ -8,6 +8,10 @@
 
     <script type="text/javascript">
         app.user.params.card_id = {{ cards ? cards[0].id : null }};
+        {% if cards %}
+        window._cardCode  = {{ cards[0].code | json_encode | raw }};
+        window._cardPacks = {{ cards[0].packs | json_encode | raw }};
+        {% endif %}
     </script>
 {% endblock %}
 
@@ -36,12 +40,13 @@
                     <div class="col-sm-4" style="margin-bottom:2em">
                         <div>
                             {% if card.imagesrc %}
-                                <img src="{{ card.imagesrc }}" alt="{{ card.name }}" class="img-responsive card-full-image" style="margin:auto">
+                                <img src="{{ card.imagesrc }}" alt="{{ card.name }}" id="card-full-image" class="img-responsive card-full-image" style="margin:auto">
                             {% else %}
                                 <div class="no-image" style="margin:auto">
                                     <div class="no-image-text">No image</div>
                                 </div>
                             {% endif %}
+                            <div id="card-art-selector"></div>
                         </div>
                     </div>
 

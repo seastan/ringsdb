@@ -66,19 +66,7 @@ class Card {
     /**
      * @var integer
      */
-    private $quantity;
-    /**
-     * @var integer
-     */
     private $deckLimit;
-    /**
-     * @var string
-     */
-    private $illustrator;
-    /**
-     * @var string
-     */
-    private $octgnid;
     /**
      * @var \DateTime
      */
@@ -95,10 +83,6 @@ class Card {
      * @var \Doctrine\Common\Collections\Collection
      */
     private $printings;
-    /**
-     * @var \AppBundle\Entity\Pack
-     */
-    private $pack;
     /**
      * @var \AppBundle\Entity\Type
      */
@@ -145,6 +129,13 @@ class Card {
      */
     public function getPrintings() {
         return $this->printings;
+    }
+
+    public function getPrimaryPrinting() {
+        foreach ($this->printings as $p) {
+            return $p;
+        }
+        return null;
     }
 
     /**
@@ -471,26 +462,9 @@ class Card {
         return $this->victory;
     }
 
-    /**
-     * Set quantity
-     *
-     * @param integer $quantity
-     *
-     * @return Card
-     */
-    public function setQuantity($quantity) {
-        $this->quantity = $quantity;
-
-        return $this;
-    }
-
-    /**
-     * Get quantity
-     *
-     * @return integer
-     */
     public function getQuantity() {
-        return $this->quantity;
+        $p = $this->getPrimaryPrinting();
+        return $p ? $p->getQuantity() : null;
     }
 
     /**
@@ -515,48 +489,14 @@ class Card {
         return $this->deckLimit;
     }
 
-    /**
-     * Set illustrator
-     *
-     * @param string $illustrator
-     *
-     * @return Card
-     */
-    public function setIllustrator($illustrator) {
-        $this->illustrator = $illustrator;
-
-        return $this;
-    }
-
-    /**
-     * Get illustrator
-     *
-     * @return string
-     */
     public function getIllustrator() {
-        return $this->illustrator;
+        $p = $this->getPrimaryPrinting();
+        return $p ? $p->getIllustrator() : null;
     }
 
-    /**
-     * Set octgnid
-     *
-     * @param string $octgnid
-     *
-     * @return Card
-     */
-    public function setOctgnid($octgnid) {
-        $this->octgnid = $octgnid;
-
-        return $this;
-    }
-
-    /**
-     * Get octgnid
-     *
-     * @return string
-     */
     public function getOctgnid() {
-        return $this->octgnid;
+        $p = $this->getPrimaryPrinting();
+        return $p ? $p->getOctgnid() : null;
     }
 
     /**
@@ -634,26 +574,9 @@ class Card {
         return $this->reviews;
     }
 
-    /**
-     * Set pack
-     *
-     * @param \AppBundle\Entity\Pack $pack
-     *
-     * @return Card
-     */
-    public function setPack(\AppBundle\Entity\Pack $pack = null) {
-        $this->pack = $pack;
-
-        return $this;
-    }
-
-    /**
-     * Get pack
-     *
-     * @return \AppBundle\Entity\Pack
-     */
     public function getPack() {
-        return $this->pack;
+        $p = $this->getPrimaryPrinting();
+        return $p ? $p->getPack() : null;
     }
 
     /**

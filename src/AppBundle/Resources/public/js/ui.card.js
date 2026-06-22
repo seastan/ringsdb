@@ -129,6 +129,58 @@
         });
     };
 
+    ui.setup_art_selector = function() {
+        if (typeof window._cardPacks === 'undefined' || !window._cardCode) return;
+        if (!(app.user.data && app.user.data.id)) return;
+
+        var seen = {};
+        var arts = [];
+        window._cardPacks.forEach(function(p) {
+            if (p.imagesrc && !seen[p.image_code]) {
+                seen[p.image_code] = true;
+                arts.push(p);
+            }
+        });
+        if (arts.length < 2) return;
+
+        var prefs  = app.data.art_preferences || {};
+        var counts = app.data.owned_pack_counts || {};
+        var current = prefs[window._cardCode] || null;
+
+        // Apply saved preference to the page image on load.
+        if (current) {
+            arts.forEach(function(p) {
+                if (p.pack_code === current && p.imagesrc) {
+                    $('#card-full-image').attr('src', p.imagesrc);
+                }
+            });
+        }
+
+        var container = $('<div style="margin-top:10px"></div>');
+        $('<small class="text-muted">Art / printing:</small>').appendTo(container);
+        var table = $('<table class="table table-condensed table-hover" style="margin-bottom:0;cursor:pointer;margin-top:4px"><thead><tr><th>Set</th><th style="text-align:center">Owned</th></tr></thead></table>').appendTo(container);
+        var tbody = $('<tbody></tbody>').appendTo(table);
+
+        arts.forEach(function(p) {
+            var isCanonical = (p.image_code === window._cardCode);
+            var selected = current ? (current === p.pack_code) : isCanonical;
+            var owned = (counts[p.pack_code] || 0) * (p.quantity || 0);
+            var row = $('<tr class="' + (selected ? 'info' : '') + '">'
+                + '<td>' + p.pack_name + '</td>'
+                + '<td style="text-align:center">' + owned + '</td>'
+                + '</tr>');
+            row.on('click', function() {
+                tbody.find('tr').removeClass('info');
+                row.addClass('info');
+                $('#card-full-image').attr('src', p.imagesrc || '');
+                card_modal.set_art(window._cardCode, isCanonical ? '' : p.pack_code, p.imagesrc);
+            });
+            row.appendTo(tbody);
+        });
+
+        $('#card-art-selector').append(container);
+    };
+
     /**
      * called when the DOM is loaded
      * @memberOf ui
@@ -140,6 +192,7 @@
             } else {
                 ui.setup_write();
             }
+            ui.setup_art_selector();
         });
 
         $(window.document).on('click', '.btn-write-comment', ui.write_comment);
