@@ -82,7 +82,10 @@ class ScrapCardDataCommand extends ContainerAwareCommand {
           	continue;
           }
           
-          $card = $em->getRepository('AppBundle:Card')->findOneBy(array('name' => $name, 'pack' => $pack));
+          $existingPrinting = $em->getRepository('AppBundle:CardPrinting')->createQueryBuilder('cp')
+              ->join('cp.card', 'c')->where('c.name = :n')->andWhere('cp.pack = :p')
+              ->setParameter('n', $name)->setParameter('p', $pack)->setMaxResults(1)->getQuery()->getOneOrNullResult();
+          $card = $existingPrinting ? $existingPrinting->getCard() : null;
           if ($card) {
             // shortcut: we already know this card
             continue;

@@ -73,7 +73,10 @@ class ScrapOctgnCardDataCommand extends ContainerAwareCommand {
                 $name = $domElement->getAttribute('name');
 
                 /* @var $card \AppBundle\Entity\Card */
-                $card = $em->getRepository('AppBundle:Card')->findOneBy(['name' => $name, 'pack' => $pack]);
+                $soPrinting = $em->getRepository('AppBundle:CardPrinting')->createQueryBuilder('cp')
+                    ->join('cp.card', 'c')->where('c.name = :n')->andWhere('cp.pack = :p')
+                    ->setParameter('n', $name)->setParameter('p', $pack)->setMaxResults(1)->getQuery()->getOneOrNullResult();
+                $card = $soPrinting ? $soPrinting->getCard() : null;
                 if ($card) {
                     $card->setOctgnid($octgnid);
 

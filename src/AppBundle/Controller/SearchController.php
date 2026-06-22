@@ -461,9 +461,18 @@ class SearchController extends Controller {
                 $next = null;
             }
         } else {
-            $selectedPack = $card->getPack();
-            $prev = $em->getRepository('AppBundle:Card')->findOneBy(['pack' => $selectedPack, 'position' => $card->getPosition() - 1]);
-            $next = $em->getRepository('AppBundle:Card')->findOneBy(['pack' => $selectedPack, 'position' => $card->getPosition() + 1]);
+            $primaryPrinting = $card->getPrimaryPrinting();
+            $selectedPack    = $primaryPrinting ? $primaryPrinting->getPack() : null;
+            if ($primaryPrinting && $selectedPack) {
+                $pos  = $primaryPrinting->getPosition();
+                $prevP = $em->getRepository('AppBundle:CardPrinting')->findOneBy(['pack' => $selectedPack, 'position' => $pos - 1]);
+                $nextP = $em->getRepository('AppBundle:CardPrinting')->findOneBy(['pack' => $selectedPack, 'position' => $pos + 1]);
+                $prev  = $prevP ? $prevP->getCard() : null;
+                $next  = $nextP ? $nextP->getCard() : null;
+            } else {
+                $prev = null;
+                $next = null;
+            }
         }
 
         $packParam = $selectedPackCode ? ['pack' => $selectedPackCode] : [];
