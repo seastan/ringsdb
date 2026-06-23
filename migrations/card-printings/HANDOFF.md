@@ -1,168 +1,198 @@
-# Handoff — apply & verify the card-printings migration (server side)
+# Handoff — deploy the card-printings refactor to the server
 
 You are a Claude running on a RingsDB **server with a live MySQL DB and the PHP
-app** (Symfony 2.7). A teammate developed the canonical-`Card` + `card_printing`
-refactor on a machine with no DB; your job is to **apply the schema + data
-migration on a snapshot, verify it, and report back**. Do **not** run it against
-production until the test snapshot checks out.
+app** (Symfony 2.7). The card-printings refactor is fully developed and merged
+to `master`. Your job is to **apply the DB migrations on a snapshot, verify,
+and then apply to production**.
 
-## What this branch delivers so far (phases 1–2 only)
+## What this refactor does
 
-- New `CardPrinting` entity/table linking a card to a pack (per-pack `quantity`,
-  `image_code`, nullable text/traits/stat overrides). `Card` keeps its old
-  `pack` association **for now**; printing-level columns on `card` are dropped
-  only in a later cleanup phase.
-- `migrations/card-printings/01_schema.sql` — additive DDL.
-- `migrations/card-printings/02_migrate.sql` — data migration (generated).
-- `gen_migration.py` — regenerates/validates `02_migrate.sql` from a dump.
+Replaces the old model (each `Card` belongs to exactly one `Pack`) with a
+`CardPrinting` join entity so one canonical `Card` can appear in many packs.
+This fixes: deckbuilder duplicates from repackaged products, collection-page
+inability to own the Revised Core Set / starter decks, and deck-search
+wrongly excluding decks when the used card is available in an allowed pack.
 
-**Not yet implemented (phases 3–9):** backend reads via printings, API `packs[]`,
-frontend dedup/ownership, collection UX, quantity-aware search, art toggle. So
-after migrating, expect: deckbuilder duplicates are **gone**, but the 6
-repackaged packs will look **empty** in the app (their cards were merged into the
-canonical cards in the original packs, and the app still reads `card.pack_id`
-until phase 3). The app should otherwise run normally. This is expected.
+New features: per-pack quantity inputs on the collection page, quantity-aware
+deck search, alt-art selector on card pages and the modal, Gandalf ally
+disambiguated as `Gandalf (Core)` / `Gandalf (OHaUH)` in typeaheads.
 
-## 0. Branch & snapshot
+## Migration files (run in order)
 
-The test server tracks `ringsdb_test`, which has been brought up to date with
-`master`. The refactor lives on `feature/card-printings` (master-based, +2
-commits). Bring it into the working tree without leaving `ringsdb_test`:
+All four are in `migrations/card-printings/`:
 
-```
-git fetch origin
-git merge --no-edit origin/feature/card-printings   # clean: just adds the refactor commits
-# (or `git checkout feature/card-printings` if you prefer to test off the branch directly)
+| File | What it does |
+|------|-------------|
+| `01_schema.sql` | Creates `card_printing` table; adds `is_repackaged` + `date_release` to `pack` |
+| `02_migrate.sql` | Backfills one printing per existing card; merges repackaged-pack duplicates onto canonical cards; repoints deck/decklist slots; deletes duplicate card rows; flags the 6 repackaged packs |
+| `03_user_art_preferences.sql` | Adds `art_preferences` TEXT column to `user` table |
+| `04_cleanup.sql` | Drops `card.pack_id` FK, `card.quantity`, `card.illustrator`, `card.octgnid` columns (the app no longer reads them) |
 
-# Take a restorable snapshot of the TEST database FIRST:
-mysqldump <testdb> > /tmp/ringsdb_test_backup.sql
-```
+**`04_cleanup.sql` is the only irreversible step.** Run 01–03 first, verify,
+then run 04.
 
-After merging, run `composer install` only if dependencies changed (they did not)
-and `php app/console cache:clear` so Doctrine sees the new entity.
+---
 
-> **Merge rule (current):** hybrid of "known reprints" + rules-equivalence.
-> Cards in the repackaged cycles (Starter / RevCore / StarterDecks) merge onto
-> the matching original; among other cards, only those with IDENTICAL rules
-> merge. Genuinely-different same-named cards (Gandalf Core vs Over Hill, the
-> saga Treasure cards, the rebalanced ALeP Brand, saga Ring-bearers) STAY
-> SEPARATE. This supersedes the earlier "full dedup" approach.
->
-> **If you already applied a previous `02_migrate.sql`** (it deletes rows, so it
-> is not re-runnable over itself): restore the DB from your pre-migration
-> snapshot first, then re-run from a fresh regenerate (section 2) so the new
-> rule applies cleanly.
+## Step 0 — Pull and snapshot
 
-## 1. Apply schema (`card_printing` table + `pack.is_repackaged`)
+```bash
+cd /var/www/html          # or wherever the app lives
+git pull origin master
 
-The entities/ORM are committed, so Doctrine can also generate this. Preview what
-Doctrine expects and confirm it matches `01_schema.sql`:
-
-```
-php app/console doctrine:schema:update --dump-sql        # should show the new table + column
+# Snapshot the DB before touching it
+mysqldump <db_name> > /tmp/ringsdb_before_migration.sql
 ```
 
-Then apply EITHER (pick one):
-- `mysql <testdb> < migrations/card-printings/01_schema.sql`, or
-- `php app/console doctrine:schema:update --force`
+No `composer install` needed (no dependency changes).
 
-Afterward clear caches: `php app/console cache:clear --env=prod` (and `dev`).
+---
 
-## 2. (Optional) Regenerate the data migration from the CURRENT db
+## Step 1 — Apply schema (01_schema.sql)
 
-`02_migrate.sql` was generated from a dump dated when development started. If the
-card data changed since, regenerate so the merge map uses current card ids:
-
+```bash
+mysql <db_name> < migrations/card-printings/01_schema.sql
+php app/console doctrine:schema:update --dump-sql   # should show "Nothing to update"
+php app/console cache:clear --env=prod --no-debug
+chown -R www-data:www-data app/cache app/logs
 ```
-mysqldump <testdb> > /tmp/current.sql
+
+If `doctrine:schema:update --dump-sql` shows remaining diffs, apply them with
+`--force` so Doctrine and the DB are in sync before proceeding.
+
+---
+
+## Step 2 — (Recommended) Regenerate the data migration
+
+`02_migrate.sql` was generated from a dump taken during development. If card
+data has changed since, regenerate it so the merge map uses current card IDs:
+
+```bash
+mysqldump <db_name> > /tmp/current.sql
 python3 migrations/card-printings/gen_migration.py /tmp/current.sql
 ```
 
-It prints invariants + exposure and rewrites `02_migrate.sql`. If card ids are
-unchanged, the file will be identical and you can skip this.
+The script prints invariants (card counts, packs flagged, names kept separate)
+and rewrites `02_migrate.sql`. If nothing changed the output file will be
+identical. Run this step; it is safe.
 
-## 3. Apply the data migration
+---
 
+## Step 3 — Apply data migration (02_migrate.sql)
+
+```bash
+mysql <db_name> < migrations/card-printings/02_migrate.sql
 ```
-mysql <testdb> < migrations/card-printings/02_migrate.sql
-php app/console cache:clear --env=prod
-```
 
-It is transaction-wrapped. If it errors, the transaction rolls back; capture the
-exact error and report it.
+The file is transaction-wrapped. If it errors, the transaction rolls back.
+Capture the full error and stop — do not proceed to step 4.
 
-## 4. Verify
+---
 
-Card ids drift between DBs, so verify by stable CODE. The generator's stdout is
-the source of truth for counts (it prints "N cards remain", the repackaged packs,
-and the names kept separate) — compare the queries below against that.
+## Step 4 — Verify data
+
+Run these SQL queries. Expected results are in the comments.
 
 ```sql
--- Core Gandalf (code 01073) gained the repackaged reprints as extra printings
--- (Core + Two-Player Starter + the starter decks it appears in); Starter qty summed.
+-- 1. Core Gandalf (code 01073) has multiple printings (Core + repackaged packs)
 SELECT p.code, cp.quantity, cp.image_code
-FROM card c JOIN card_printing cp ON cp.card_id = c.id JOIN pack p ON p.id = cp.pack_id
-WHERE c.code = '01073' ORDER BY p.code;
+FROM card c
+JOIN card_printing cp ON cp.card_id = c.id
+JOIN pack p ON p.id = cp.pack_id
+WHERE c.code = '01073'
+ORDER BY p.code;
+-- Expect several rows: Core plus any repackaged packs that include Gandalf.
 
--- ...but Over Hill Gandalf (code 131010) is a DIFFERENT card and must STILL EXIST
--- as its own row (different ability -> not merged). Expect exactly 1 row.
+-- 2. Over Hill Gandalf MUST still exist as its own canonical card
 SELECT id, code, name FROM card WHERE code = '131010';
+-- Expect exactly 1 row (different ability, kept separate).
 
--- Every card has >=1 printing (expect 0 rows)
-SELECT c.id, c.name FROM card c
-LEFT JOIN card_printing cp ON cp.card_id = c.id WHERE cp.id IS NULL;
+-- 3. Every card has at least one printing (expect 0 rows)
+SELECT c.id, c.code, c.name
+FROM card c
+LEFT JOIN card_printing cp ON cp.card_id = c.id
+WHERE cp.id IS NULL;
 
--- Nothing points at a deleted card (all expect 0)
-SELECT COUNT(*) FROM card_printing cp LEFT JOIN card c ON c.id=cp.card_id WHERE c.id IS NULL;
-SELECT COUNT(*) FROM decklistsideslot s LEFT JOIN card c ON c.id=s.card_id WHERE c.id IS NULL;
-SELECT COUNT(*) FROM deckslot s LEFT JOIN card c ON c.id=s.card_id WHERE c.id IS NULL;
+-- 4. No orphaned foreign keys anywhere (all expect 0)
+SELECT COUNT(*) FROM card_printing cp LEFT JOIN card c ON c.id = cp.card_id WHERE c.id IS NULL;
+SELECT COUNT(*) FROM deckslot s LEFT JOIN card c ON c.id = s.card_id WHERE c.id IS NULL;
+SELECT COUNT(*) FROM decklistslot s LEFT JOIN card c ON c.id = s.card_id WHERE c.id IS NULL;
+SELECT COUNT(*) FROM decklistsideslot s LEFT JOIN card c ON c.id = s.card_id WHERE c.id IS NULL;
 
--- Repackaged packs flagged: the 6 packs in cycles Starter/RevCore/StarterDecks
-SELECT pk.id, pk.code, pk.name FROM pack pk WHERE pk.is_repackaged = 1;
+-- 5. The 6 repackaged packs are flagged
+SELECT id, code, name FROM pack WHERE is_repackaged = 1;
+-- Expect: Two-Player Starter (61), Revised Core Set (85), and the 4 starter
+-- decks (98-101) — exact IDs may differ; names are the key check.
 
--- No remaining DUPLICATE codes (each logical card is one row). Expect 0.
-SELECT code, COUNT(*) FROM card GROUP BY code HAVING COUNT(*) > 1;
+-- 6. No duplicate card codes (each logical card is one row, expect 0)
+SELECT code, COUNT(*) n FROM card GROUP BY code HAVING n > 1;
 
--- Card count after merge — compare to the generator's "cards remain" line.
+-- 7. Card count — compare to gen_migration.py's "cards remain" output
 SELECT COUNT(*) FROM card;
 ```
 
-Also smoke-test the app: load the deckbuilder and confirm each card appears once
-(e.g. one "Gandalf" neutral ally entry for Core, a separate one for Over Hill);
-open an existing saved deck and confirm it loads unchanged (decks resolve by card
-`code`, which the canonical cards retain).
+If any check fails, restore from `/tmp/ringsdb_before_migration.sql` and report.
 
-## 5. Report back
+---
 
-Reply with: the `doctrine:schema:update --dump-sql` output, whether you
-regenerated `02_migrate.sql`, the result of each verification query, any errors,
-and the app smoke-test result. Do **not** touch production.
+## Step 5 — Apply art preferences migration (03_user_art_preferences.sql)
 
-## 6. Backend reads + API (phases 3–4) — after the migration verifies
+```bash
+mysql <db_name> < migrations/card-printings/03_user_art_preferences.sql
+```
 
-These phases make the app READ through printings (no schema change). After
-`git pull` + `php app/console cache:clear --env=prod` (and `dev`):
+Adds `art_preferences` TEXT column to `user`. Safe to run even if the column
+already exists (it checks first).
 
-1. **Lint the changed PHP** (no local PHP on the dev box, so please confirm):
-   ```
-   php -l src/AppBundle/Services/CardsData.php
-   php -l src/AppBundle/Controller/ApiController.php
-   ```
-2. **API shape** — each card keeps `pack_code`/`pack_name` and gains a `packs[]`
-   array. A reprinted card should list several packs; check Aragorn (code 01001):
-   ```
-   curl -s 'http://<host>/api/public/cards/' | python3 -c 'import sys,json; \
-     c=[x for x in json.load(sys.stdin) if x["code"]=="01001"][0]; \
-     print(c["pack_code"]); print([p["pack_code"] for p in c["packs"]])'
-   ```
-   Expect `Core` as pack_code and multiple entries in packs[] (Core + the
-   repackaged packs that reprinted Aragorn).
-3. **Pack-scoped API** — a repackaged pack now returns the canonical cards it
-   reprints (driven by the search change), e.g. `GET /api/public/cards/Starter.json`
-   should return ~65 cards (Two-Player Starter), not 0.
-4. **Search availability** — on the cards search page, `e:Starter` (or the
-   Two-Player Starter pack code) should now return the Core/other cards reprinted
-   there, and each appears once (no duplicates). `c:<repackaged cycle>` likewise.
-5. Report any `php -l` errors, the curl output, and whether search/deckbuilder
-   list look right. (Browser cache-busting for the new packs[] data ships with the
-   frontend phase; for raw API testing add `?cachebust=1` or check via curl.)
+---
+
+## Step 6 — Apply cleanup (04_cleanup.sql)
+
+**Only run this after steps 1–5 all pass.**
+
+```bash
+mysql <db_name> < migrations/card-printings/04_cleanup.sql
+```
+
+This dynamically finds and drops the `card.pack_id` foreign key, then drops
+`card.pack_id`, `card.quantity`, `card.illustrator`, `card.octgnid`. The app
+no longer reads these columns. After this step there is no clean rollback
+short of restoring the full snapshot.
+
+```bash
+php app/console cache:clear --env=prod --no-debug
+chown -R www-data:www-data app/cache app/logs
+```
+
+---
+
+## Step 7 — App smoke test
+
+Check these in a browser (or curl) after clearing cache:
+
+1. **Deckbuilder** — each logical card appears once. Search for "Gandalf"; expect
+   two neutral ally entries: `Gandalf (Core)` and `Gandalf (OHaUH)`.
+2. **Collection page** — shows a "Repackaged" section with the 6 repackaged
+   products; each pack has a numeric count input (not a checkbox).
+3. **API** — `GET /api/public/cards/` — Aragorn (code `01001`) should have
+   `pack_code: "Core"` plus a `packs[]` array listing Core and any repackaged
+   packs that include him.
+4. **Card page** — visit any card. If logged in with owned packs, expect a
+   "Printing (owned)" section showing owned-copy counts. For Two-Player Starter
+   cards with unique art, expect "Art / printing (owned)" with a clickable
+   art-switcher.
+5. **Deck search** — search for decklists with "Allowed packs" = Revised Core
+   Set; expect to find decklists that use Core Set versions of the same cards.
+6. **Quest log page** — `/myquestlogs` should load without error.
+7. **Card tooltip** (hover over a card in the deckbuilder) — should show card
+   name, type, text, sphere — no "undefined" set label.
+
+---
+
+## What to report back
+
+- Output of `doctrine:schema:update --dump-sql` after step 1
+- Whether you regenerated `02_migrate.sql` and any diff summary from the script
+- Results of each verification query in step 4
+- Any errors from steps 3, 5, 6
+- Smoke test results for each item in step 7
+- Whether you applied to production or stopped at the test snapshot
