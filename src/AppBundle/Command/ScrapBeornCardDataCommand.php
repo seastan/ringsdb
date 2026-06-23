@@ -277,7 +277,10 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                 //$octgn = substr($cardCrawler->filter('img[title^="OCTGN"]')->attr('title'), -36);
 
 		// Get matching RingsDB card
-                $card = $em->getRepository('AppBundle:Card')->findOneBy(['name' => $name, 'pack' => $pack]);
+                $bcPrinting = $em->getRepository('AppBundle:CardPrinting')->createQueryBuilder('cp')
+                    ->join('cp.card', 'c')->where('c.name = :n')->andWhere('cp.pack = :p')
+                    ->setParameter('n', $name)->setParameter('p', $pack)->setMaxResults(1)->getQuery()->getOneOrNullResult();
+                $card = $bcPrinting ? $bcPrinting->getCard() : null;
                 if (!$card) {
 		   $output->writeln("Card not found in RingsDB database.");
 		   continue;

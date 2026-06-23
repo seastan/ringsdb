@@ -114,6 +114,8 @@ class SearchController extends Controller {
 
         $meta = $card->getName() . ", a " . $card->getSphere()->getName() . " " . $card->getType()->getName() . " card for $game_name from the set " . $card->getPack()->getName() . " published by $publisher_name.";
 
+        $selectedPackCode = $request->query->get('pack', null);
+
         return $this->forward('AppBundle:Search:display', [
             '_route' => $request->attributes->get('_route'),
             '_route_params' => $request->attributes->get('_route_params'),
@@ -121,7 +123,8 @@ class SearchController extends Controller {
             'view' => 'card',
             'sort' => 'set',
             'pagetitle' => $card->getName(),
-            'meta' => $meta
+            'meta' => $meta,
+            'selected_pack_code' => $selectedPackCode,
         ]);
     }
 
@@ -274,7 +277,7 @@ class SearchController extends Controller {
         ]);
     }
 
-    public function displayAction($q, $view = 'card', $sort, $page = 1, $pagetitle = '', $meta = '') {
+    public function displayAction($q, $view = 'card', $sort, $page = 1, $pagetitle = '', $meta = '', $selected_pack_code = null) {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
@@ -354,6 +357,17 @@ class SearchController extends Controller {
                 }
 
                 $cardinfo['available'] = $availability[$pack->getCode()];
+                $cardinfo['selected_pack_code'] = $selected_pack_code;
+
+                if ($selected_pack_code) {
+                    foreach ($cardinfo['packs'] as $p) {
+                        if ($p['pack_code'] === $selected_pack_code && !empty($p['imagesrc'])) {
+                            $cardinfo['imagesrc'] = $p['imagesrc'];
+                            break;
+                        }
+                    }
+                }
+
                 if ($includeReviews) {
                     $cardinfo['reviews'] = $this->get('cards_data')->get_reviews($card);
                 }
@@ -365,7 +379,7 @@ class SearchController extends Controller {
             // si on a des cartes on affiche une bande de navigation/pagination
             if (count($rows)) {
                 if (count($rows) == 1) {
-                    $pagination = $this->setnavigation($card, $q, $view, $sort);
+                    $pagination = $this->setnavigation($card, $selected_pack_code);
                 } else {
                     $pagination = $this->pagination($nb_per_page, count($rows), $first, $q, $view, $sort);
                 }
@@ -425,22 +439,52 @@ class SearchController extends Controller {
         ], $response);
     }
 
-    public function setnavigation($card) {
+    public function setnavigation($card, $selectedPackCode = null) {
         $em = $this->getDoctrine();
 
-        /* @var $card \AppBundle\Entity\Card */
-        /* @var $prev \AppBundle\Entity\Pack */
-        /* @var $next \AppBundle\Entity\Pack */
-        $prev = $em->getRepository('AppBundle:Card')->findOneBy(["pack" => $card->getPack(), "position" => $card->getPosition() - 1]);
-        $next = $em->getRepository('AppBundle:Card')->findOneBy(["pack" => $card->getPack(), "position" => $card->getPosition() + 1]);
+        $selectedPack = null;
+        if ($selectedPackCode) {
+            $selectedPack = $em->getRepository('AppBundle:Pack')->findOneBy(['code' => $selectedPackCode]);
+        }
+
+        if ($selectedPack) {
+            // Navigate within the selected printing's pack via CardPrinting positions.
+            $printing = $em->getRepository('AppBundle:CardPrinting')->findOneBy(['card' => $card, 'pack' => $selectedPack]);
+            if ($printing) {
+                $pos = $printing->getPosition();
+                $prevPrinting = $em->getRepository('AppBundle:CardPrinting')->findOneBy(['pack' => $selectedPack, 'position' => $pos - 1]);
+                $nextPrinting = $em->getRepository('AppBundle:CardPrinting')->findOneBy(['pack' => $selectedPack, 'position' => $pos + 1]);
+                $prev = $prevPrinting ? $prevPrinting->getCard() : null;
+                $next = $nextPrinting ? $nextPrinting->getCard() : null;
+            } else {
+                $prev = null;
+                $next = null;
+            }
+        } else {
+            $primaryPrinting = $card->getPrimaryPrinting();
+            $selectedPack    = $primaryPrinting ? $primaryPrinting->getPack() : null;
+            if ($primaryPrinting && $selectedPack) {
+                $pos  = $primaryPrinting->getPosition();
+                $prevP = $em->getRepository('AppBundle:CardPrinting')->findOneBy(['pack' => $selectedPack, 'position' => $pos - 1]);
+                $nextP = $em->getRepository('AppBundle:CardPrinting')->findOneBy(['pack' => $selectedPack, 'position' => $pos + 1]);
+                $prev  = $prevP ? $prevP->getCard() : null;
+                $next  = $nextP ? $nextP->getCard() : null;
+            } else {
+                $prev = null;
+                $next = null;
+            }
+        }
+
+        $packParam = $selectedPackCode ? ['pack' => $selectedPackCode] : [];
+        $router = $this->get('router');
 
         return $this->renderView('AppBundle:Search:setnavigation.html.twig', [
             "prevtitle" => $prev ? $prev->getName() : "",
-            "prevhref" => $prev ? $this->get('router')->generate('cards_zoom', ['card_code' => $prev->getCode()]) : "",
+            "prevhref" => $prev ? $router->generate('cards_zoom', array_merge(['card_code' => $prev->getCode()], $packParam)) : "",
             "nexttitle" => $next ? $next->getName() : "",
-            "nexthref" => $next ? $this->get('router')->generate('cards_zoom', ['card_code' => $next->getCode()]) : "",
-            "settitle" => $card->getPack()->getName(),
-            "sethref" => $this->get('router')->generate('cards_list', ['pack_code' => $card->getPack()->getCode()]),
+            "nexthref" => $next ? $router->generate('cards_zoom', array_merge(['card_code' => $next->getCode()], $packParam)) : "",
+            "settitle" => $selectedPack->getName(),
+            "sethref" => $router->generate('cards_list', ['pack_code' => $selectedPack->getCode()]),
         ]);
     }
 

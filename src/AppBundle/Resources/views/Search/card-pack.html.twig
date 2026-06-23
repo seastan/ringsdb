@@ -1,1 +1,20 @@
-<span class="card-pack pull-right">{{ card.pack_name | replace({'ALeP ': '<a href="https://alongextendedparty.com/" target="_blank">ALeP</a> '}) | raw }} #{{ card.position }}.</span>
+{% set current_pack = card.selected_pack_code ? card.selected_pack_code : card.pack_code %}
+{% if card.packs | length > 1 %}
+    <div class="card-printings" style="margin-top:6px">
+        <span class="text-muted" style="font-size:0.85em">Printings:</span>
+        <ul style="list-style:none; padding-left:0; margin:2px 0 0 0; font-size:0.9em">
+            {% for printing in card.packs %}
+                <li>
+                    {% set pack_label %}{{ printing.pack_name | replace({'ALeP ': 'ALeP '}) }} #{{ printing.position }}{% endset %}
+                    {% if printing.pack_code == current_pack %}
+                        <strong>&#8227; {{ pack_label }}</strong>
+                    {% else %}
+                        <a href="{{ card.url }}?pack={{ printing.pack_code }}">&#8227; {{ pack_label }}</a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% else %}
+    <span class="card-pack pull-right">{{ card.pack_name | replace({'ALeP ': 'ALeP '}) }} #{{ card.position }}</span>
+{% endif %}

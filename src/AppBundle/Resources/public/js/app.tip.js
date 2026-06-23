@@ -21,7 +21,6 @@
             }
 
             content += '<div class="card-text">' + app.format.text(card) + '</div>'
-			+ '<span class="card-pack pull-right" style="clear:right">' + app.format.pack(card) + '</span>'
 			+ '<span class="card-sphere">' + app.format.sphere(card) + '</span>';
 		} else {
 			content = card.imagesrc ? '<img src="' + card.imagesrc + '">' : '';

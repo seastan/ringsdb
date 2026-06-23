@@ -244,13 +244,26 @@ class DecklistManager {
                 }
             }
             if (!empty($packs)) {
-                $sub = $this->doctrine->createQueryBuilder();
-                $sub->select("c");
-                $sub->from("AppBundle:Card", "c");
-                $sub->innerJoin('AppBundle:Decklistslot', 's', 'WITH', 's.card = c');
-                $sub->where('s.decklist = d');
-                $sub->andWhere($sub->expr()->notIn('c.pack', $packs));
-                $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
+                // A decklist matches iff EVERY slot's card can be supplied by the
+                // allowed packs in sufficient quantity. Available copies of a card =
+                // sum over its printings in the allowed packs of the copies in that
+                // pack, counting the Core Set (pack 1) :numcores times. This both
+                // fixes the old "wrong printing excludes the deck" bug (a reprinted
+                // card is available via any allowed pack) and makes search quantity
+                // aware (e.g. a 3x Unexpected Courage deck needs enough Core sets).
+                $cores = max(1, (int) $numcores);
+                $qb->andWhere(
+                    'NOT EXISTS (' .
+                        'SELECT s.id FROM AppBundle:Decklistslot s ' .
+                        'WHERE s.decklist = d AND s.quantity > (' .
+                            'SELECT COALESCE(SUM(CASE WHEN cp.pack = 1 THEN cp.quantity * :numcores ELSE cp.quantity END), 0) ' .
+                            'FROM AppBundle:CardPrinting cp ' .
+                            'WHERE cp.card = s.card AND cp.pack IN (:packs)' .
+                        ')' .
+                    ')'
+                );
+                $qb->setParameter('packs', $packs);
+                $qb->setParameter('numcores', $cores);
             }
             if (!empty($cards_to_exclude)) {
                 $sub = $this->doctrine->createQueryBuilder();
@@ -261,18 +274,8 @@ class DecklistManager {
                 $sub->andWhere($sub->expr()->in('k.code', $cards_to_exclude));
                 $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
             }
-
-            // Num cores
-            $sub = $this->doctrine->createQueryBuilder();
-            $sub->select("j");
-            $sub->from("AppBundle:Card", "j");
-            $sub->innerJoin('AppBundle:Decklistslot', 'v', 'WITH', 'v.card = j');
-            $sub->where('v.decklist = d');
-            $sub->andWhere('j.type <> 1'); // Don't match heroes
-            $sub->andWhere('j.pack = 1'); // Match Core Set
-            $sub->andWhere('v.quantity > j.quantity * :numcores');
-            $qb->setParameter('numcores', $numcores);
-            $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
+            // (the former Core-only "num cores" quantity check is now subsumed by the
+            //  quantity-aware allowed-packs filter above.)
         }
 
         switch ($sort) {

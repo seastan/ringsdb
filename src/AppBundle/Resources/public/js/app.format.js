@@ -17,11 +17,13 @@
 	};
 
 	format.pack = function pack(card) {
-		return card.pack_name + ' #' + card.position + '. ';
+		var packName = card.pack_name || (card.packs && card.packs[0] && card.packs[0].pack_name) || '';
+		return packName ? packName + ' #' + card.position + '. ' : '';
 	};
 
 	format.pack_sphere = function pack_sphere(card) {
-		return card.pack_name + ' #' + card.position + '. ' + card.sphere_name + '. ';
+		var packName = card.pack_name || (card.packs && card.packs[0] && card.packs[0].pack_name) || '';
+		return (packName ? packName + ' #' + card.position + '. ' : '') + card.sphere_name + '. ';
 	};
 
 	format.cost = function cost(card) {

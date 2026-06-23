@@ -205,9 +205,11 @@ class FellowshipManager {
                 $sub->from("AppBundle:Card", "c");
                 $sub->innerJoin('AppBundle:Decklistslot', 's', 'WITH', 's.card = c');
                 $sub->where('s.decklist = ld');
-                $sub->andWhere($sub->expr()->notIn('c.pack', $packs));
+                $sub->andWhere("NOT EXISTS (SELECT cpfm.id FROM AppBundle:CardPrinting cpfm WHERE cpfm.card = c AND cpfm.pack IN (:fm_packs))");
+                $sub->setParameter('fm_packs', $packs);
 
                 $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
+                $qb->setParameter('fm_packs', $packs);
             }
 
             // Num cores

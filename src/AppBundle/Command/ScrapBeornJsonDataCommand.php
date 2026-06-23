@@ -90,7 +90,10 @@ class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
             }
 
             /* @var $card \AppBundle\Entity\Card */
-            $card = $em->getRepository('AppBundle:Card')->findOneBy(['name' => $data->Title, 'pack' => $pack]);
+            $bjPrinting = $em->getRepository('AppBundle:CardPrinting')->createQueryBuilder('cp')
+                ->join('cp.card', 'c')->where('c.name = :n')->andWhere('cp.pack = :p')
+                ->setParameter('n', $data->Title)->setParameter('p', $pack)->setMaxResults(1)->getQuery()->getOneOrNullResult();
+            $card = $bjPrinting ? $bjPrinting->getCard() : null;
 
             if (!$card) {
                 if ($data->CardType == 'Hero' || $data->CardType == 'Ally' || $data->CardType == 'Attachment' || $data->CardType == 'Event') {

@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use AppBundle\Entity\Card;
+use AppBundle\Entity\CardPrinting;
 
 function file_get_contents_retry($url, $attemptsRemaining = 3) {
     $content = @file_get_contents($url);
@@ -81,7 +82,10 @@ class ScrapCardDataCommand extends ContainerAwareCommand {
           	continue;
           }
           
-          $card = $em->getRepository('AppBundle:Card')->findOneBy(array('name' => $name, 'pack' => $pack));
+          $existingPrinting = $em->getRepository('AppBundle:CardPrinting')->createQueryBuilder('cp')
+              ->join('cp.card', 'c')->where('c.name = :n')->andWhere('cp.pack = :p')
+              ->setParameter('n', $name)->setParameter('p', $pack)->setMaxResults(1)->getQuery()->getOneOrNullResult();
+          $card = $existingPrinting ? $existingPrinting->getCard() : null;
           if ($card) {
             // shortcut: we already know this card
             continue;
@@ -137,7 +141,6 @@ class ScrapCardDataCommand extends ContainerAwareCommand {
 
           $card->setType($type);
           $card->setSphere($sphere);
-          $card->setPack($pack);
 
           $card->setName($name);
           $card->setTraits($data['trait']);
@@ -153,12 +156,18 @@ class ScrapCardDataCommand extends ContainerAwareCommand {
           $card->setHealth($data['hp'] !== '' ? $data['hp'] : null);
           $card->setVictory($data['victory'] !== '' ? $data['victory'] : null);
 
-          $card->setQuantity($data['packquantity']);
           $card->setDeckLimit($data['max']);
 
-          $card->setIllustrator(trim($data['illustrator']));
-
           $em->persist($card);
+
+          $printing = new CardPrinting();
+          $printing->setCard($card);
+          $printing->setPack($pack);
+          $printing->setPosition($position);
+          $printing->setQuantity($data['packquantity']);
+          $printing->setIllustrator(trim($data['illustrator']));
+          $printing->setImageCode($card->getCode());
+          $em->persist($printing);
 
           // trying to download image file
           $card_code = $card->getCode();
@@ -169,7 +178,7 @@ class ScrapCardDataCommand extends ContainerAwareCommand {
 
           $output->writeln($outputfile);
 
-          $beorn_setname = str_replace([' '], ['-'], $card->getPack()->getName());
+          $beorn_setname = str_replace([' '], ['-'], $pack->getName());
           $beorn_name = str_replace([' '], ['-'], $card->getName());
 
           // $cgdburl = "http://www.cardgamedb.com/forums/uploads/lotr/" . $data['img'];

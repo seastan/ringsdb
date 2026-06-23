@@ -1,30 +1,22 @@
 (function (ui, $) {
 
-    ui.group_coresets = function() {
-        var div = $('#owned_packs');
-        div.find('[data-id=1], [data-id=1-2], [data-id=1-3]').wrapAll('<div class="btn-group btn-inner-group" />');
-        div.show();
-    };
-
     ui.init_select_buttons = function() {
         $('#owned_packs')
             .on('click', '.select-all', function(e) {
                 var cycle = $(this).closest('.cycle');
-                cycle.find('.btn').addClass('active');
+                cycle.find('.pack-qty').val(1);
                 ui.update_pack_counting(cycle);
             })
             .on('click', '.select-none', function(e) {
                 var cycle = $(this).closest('.cycle');
-                cycle.find('.btn').removeClass('active');
+                cycle.find('.pack-qty').val(0);
                 ui.update_pack_counting(cycle);
             })
-            .on('click', 'label.btn', function() {
-                var cycle = $(this).toggleClass('active').closest('.cycle');
-                ui.update_pack_counting(cycle);
+            .on('change input', '.pack-qty', function() {
+                ui.update_pack_counting($(this).closest('.cycle'));
             });
 
-        $('#save-collection').on('click', function() {
-        });
+        $('#owned_packs').show();
     };
 
     ui.init_pack_counting = function() {
@@ -35,23 +27,25 @@
 
     ui.update_pack_counting = function(el) {
         var cycle = $(el);
-        var checked = 0;
+        var owned = 0;
         var total = 0;
-        cycle.find('label.btn').each(function() {
-            if ($(this).hasClass('active')) {
-                checked++;
-            }
-
+        cycle.find('.pack-row').each(function() {
+            var qty = (parseInt($(this).find('.pack-qty').val(), 10) || 0);
+            $(this).toggleClass('pack-row-owned', qty > 0);
+            if (qty > 0) { owned++; }
             total++;
         });
 
-        cycle.find('.pack-count').text(checked + ' / ' + total);
+        cycle.find('.pack-count').text(owned + ' / ' + total);
     };
 
     ui.update_selected_packs = function() {
         var packs = [];
-        $('#owned_packs label.btn.active').each(function() {
-            packs.push($(this).data('id'));
+        $('#owned_packs .pack-qty').each(function() {
+            var count = parseInt($(this).val(), 10) || 0;
+            if (count > 0) {
+                packs.push($(this).data('id') + ':' + count);
+            }
         });
         $('#selected-packs').val(packs.join(','));
     };
@@ -61,7 +55,6 @@
      * @memberOf ui
      */
     ui.on_dom_loaded = function() {
-        ui.group_coresets();
         ui.init_select_buttons();
         ui.init_pack_counting();
     };

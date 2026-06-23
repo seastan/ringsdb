@@ -32,7 +32,7 @@
             limit: 10,
             templates: {
                 suggestion: function(card) {
-                    return $('<div class="fg-' + card.sphere_code + '"><span class="icon-fw icon-' + card.sphere_code + '"></span> <strong>' + card.name + '</strong> <small><i>' + card.pack_name + '</i></small></div>');
+                    return $('<div class="fg-' + card.sphere_code + '"><span class="icon-fw icon-' + card.sphere_code + '"></span> <strong>' + app.data.display_name(card) + '</strong> <small><i>' + card.type_name + '</i></small></div>');
                 }
             }
         });
@@ -43,7 +43,7 @@
                 code: data.code
             })[0];
 
-            var line = $('<p class="fg-' + card.sphere_code + '" style="padding: 3px 5px; border-radius: 3px; border: 1px solid silver"><button type="button" class="close" aria-hidden="true">&times;</button><input type="hidden" name="cards[]" value="' + card.code + '">' + card.name + ' <small><i>' + card.pack_name + '</i></small></p>');
+            var line = $('<p class="fg-' + card.sphere_code + '" style="padding: 3px 5px; border-radius: 3px; border: 1px solid silver"><button type="button" class="close" aria-hidden="true">&times;</button><input type="hidden" name="cards[]" value="' + card.code + '">' + app.data.display_name(card) + ' <small><i>' + card.type_name + '</i></small></p>');
             line.on({
                 click: function(event) {
                     line.remove();

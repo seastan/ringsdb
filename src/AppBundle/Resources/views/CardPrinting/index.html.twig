@@ -1,0 +1,61 @@
+{% extends 'AppBundle:Admin:base.html.twig' %}
+
+{% block content %}
+<h1>Card Printing list</h1>
+
+<form method="GET" action="{{ path('admin_card_printing') }}" class="form-inline" style="margin-bottom:1em">
+    <div class="form-group" style="margin-right:1em">
+        <label for="pack">Pack</label>
+        <select name="pack" id="pack" class="form-control">
+            <option value="">— all packs —</option>
+            {% for pack in packs %}
+                <option value="{{ pack.id }}"{% if pack_filter == pack.id %} selected="selected"{% endif %}>{{ pack.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group" style="margin-right:1em">
+        <label for="card">Card name</label>
+        <input type="text" name="card" id="card" class="form-control" value="{{ card_filter }}" placeholder="partial match">
+    </div>
+    <button type="submit" class="btn btn-default">Filter</button>
+    <a href="{{ path('admin_card_printing') }}" class="btn btn-default">Clear</a>
+</form>
+
+<p>{{ entities|length }} printing(s) shown.</p>
+
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Card</th>
+            <th>Pack</th>
+            <th>Position</th>
+            <th>Qty</th>
+            <th>Image code</th>
+            <th>Illustrator</th>
+            <th>Overrides</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for entity in entities %}
+        <tr>
+            <td>{{ entity.id }}</td>
+            <td><a href="{{ path('admin_card_printing_show', {'id': entity.id}) }}">{{ entity.card.name }}</a></td>
+            <td>{{ entity.pack.name }}</td>
+            <td>{{ entity.position }}</td>
+            <td>{{ entity.quantity }}</td>
+            <td>{{ entity.imageCode }}</td>
+            <td>{{ entity.illustrator }}</td>
+            <td>{% if entity.text or entity.traits or entity.cost is not null or entity.threat is not null %}yes{% endif %}</td>
+            <td>
+                <a href="{{ path('admin_card_printing_show', {'id': entity.id}) }}" class="btn btn-default btn-xs">show</a>
+                <a href="{{ path('admin_card_printing_edit', {'id': entity.id}) }}" class="btn btn-default btn-xs">edit</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ path('admin_card_printing_new') }}" class="btn btn-default">Create a new printing</a>
+{% endblock %}

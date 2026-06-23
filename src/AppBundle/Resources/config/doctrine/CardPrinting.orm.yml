@@ -1,31 +1,27 @@
-AppBundle\Entity\Card:
+AppBundle\Entity\CardPrinting:
     type: entity
-    table: card
+    table: card_printing
     cache:
         usage: NONSTRICT_READ_WRITE
         region: entity_region
+    indexes:
+        card_printing_card_idx:
+            columns: [ card_id ]
+        card_printing_pack_idx:
+            columns: [ pack_id ]
     manyToOne:
-        type:
-            targetEntity: Type
-            inversedBy: cards
+        card:
+            targetEntity: Card
+            inversedBy: printings
             joinColumn:
-                name: type_id
+                name: card_id
                 referencedColumnName: id
-        sphere:
-            targetEntity: Sphere
-            inversedBy: cards
+        pack:
+            targetEntity: Pack
+            inversedBy: printings
             joinColumn:
-                name: sphere_id
+                name: pack_id
                 referencedColumnName: id
-    oneToMany:
-        reviews:
-            targetEntity: Review
-            orderBy: {'dateCreation':'DESC'}
-            mappedBy: card
-        printings:
-            targetEntity: CardPrinting
-            orderBy: {'position':'ASC'}
-            mappedBy: card
     fields:
         id:
             type: integer
@@ -35,14 +31,21 @@ AppBundle\Entity\Card:
         position:
             type: smallint
             nullable: false
-        code:
+        quantity:
+            type: smallint
+            nullable: false
+        illustrator:
+            type: string
+            length: 255
+            nullable: true
+        octgnid:
+            type: string
+            nullable: true
+        imageCode:
             type: string
             length: 255
             nullable: false
-        name:
-            type: string
-            length: 1024
-            nullable: false
+            column: image_code
         traits:
             type: string
             length: 255
@@ -50,13 +53,6 @@ AppBundle\Entity\Card:
         text:
             type: text
             nullable: true
-        flavor:
-            type: text
-            nullable: true
-        isUnique:
-            type: boolean
-            nullable: false
-            column: is_unique
         cost:
             type: string
             length: 3
@@ -82,10 +78,6 @@ AppBundle\Entity\Card:
         quest:
             type: smallint
             nullable: true
-        deckLimit:
-            type: smallint
-            nullable: true
-            column: deck_limit
         dateCreation:
             type: datetime
             nullable: false
@@ -100,9 +92,3 @@ AppBundle\Entity\Card:
             gedmo:
                 timestampable:
                     on: update
-        hasErrata:
-            type: boolean
-            nullable: false
-            column: has_errata
-            options:
-              default: false

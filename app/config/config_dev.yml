@@ -35,7 +35,7 @@ monolog:
             channels: ["doctrine"]
 
 assetic:
-    use_controller: false
+    use_controller: true
 
 #swiftmailer:
 #    delivery_address: me@example.com

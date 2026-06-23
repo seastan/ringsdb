@@ -1,0 +1,35 @@
+{% extends 'AppBundle:Admin:base.html.twig' %}
+
+{% block content %}
+<h1>Edit Card Printing — {{ entity.card.name }} / {{ entity.pack.name }}</h1>
+
+<div class="well well-sm" style="margin-bottom:1em">
+    <strong>Filter card dropdown by pack (use when reassigning the card):</strong>
+    <form method="GET" action="{{ path('admin_card_printing_edit', {'id': entity.id}) }}" class="form-inline" style="margin-top:0.4em">
+        <select name="filter_pack" class="form-control" style="width:auto">
+            <option value="">— show all cards —</option>
+            {% for pack in packs %}
+                <option value="{{ pack.id }}"{% if filter_pack == pack.id %} selected="selected"{% endif %}>{{ pack.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-default btn-sm">Apply filter</button>
+        {% if filter_pack %}
+            <a href="{{ path('admin_card_printing_edit', {'id': entity.id}) }}" class="btn btn-link btn-sm">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<form action="{{ path('admin_card_printing_update', {'id': entity.id}) }}{% if filter_pack %}?filter_pack={{ filter_pack }}{% endif %}" method="post" {{ form_enctype(edit_form) }}>
+    <input type="hidden" name="_method" value="PUT" />
+    {{ form_widget(edit_form) }}
+    <button type="submit" class="btn btn-success">Save</button>
+</form>
+<br>
+<a href="{{ path('admin_card_printing_show', {'id': entity.id}) }}" class="btn btn-default">Back to detail</a>
+<a href="{{ path('admin_card_printing') }}" class="btn btn-default">Back to list</a>
+<form action="{{ path('admin_card_printing_delete', {'id': entity.id}) }}" method="post" style="display:inline-block">
+    <input type="hidden" name="_method" value="DELETE" />
+    {{ form_widget(delete_form) }}
+    <button type="submit" class="btn btn-danger">Delete</button>
+</form>
+{% endblock %}

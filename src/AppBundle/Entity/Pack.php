@@ -36,9 +36,13 @@ class Pack {
      */
     private $dateRelease;
     /**
+     * @var boolean
+     */
+    private $isRepackaged = false;
+    /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    private $cards;
+    private $printings;
     /**
      * @var \AppBundle\Entity\Cycle
      */
@@ -48,7 +52,29 @@ class Pack {
      * Constructor
      */
     public function __construct() {
-        $this->cards = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->printings = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Set isRepackaged
+     *
+     * @param boolean $isRepackaged
+     *
+     * @return Pack
+     */
+    public function setIsRepackaged($isRepackaged) {
+        $this->isRepackaged = $isRepackaged;
+
+        return $this;
+    }
+
+    /**
+     * Get isRepackaged
+     *
+     * @return boolean
+     */
+    public function getIsRepackaged() {
+        return $this->isRepackaged;
     }
 
     /**
@@ -214,35 +240,39 @@ class Pack {
         return $this->dateRelease;
     }
 
+    public function getCards() {
+        return $this->printings->map(function($p) { return $p->getCard(); });
+    }
+
     /**
-     * Add card
+     * Add printing
      *
-     * @param \AppBundle\Entity\Card $card
+     * @param \AppBundle\Entity\CardPrinting $printing
      *
      * @return Pack
      */
-    public function addCard(\AppBundle\Entity\Card $card) {
-        $this->cards[] = $card;
+    public function addPrinting(\AppBundle\Entity\CardPrinting $printing) {
+        $this->printings[] = $printing;
 
         return $this;
     }
 
     /**
-     * Remove card
+     * Remove printing
      *
-     * @param \AppBundle\Entity\Card $card
+     * @param \AppBundle\Entity\CardPrinting $printing
      */
-    public function removeCard(\AppBundle\Entity\Card $card) {
-        $this->cards->removeElement($card);
+    public function removePrinting(\AppBundle\Entity\CardPrinting $printing) {
+        $this->printings->removeElement($printing);
     }
 
     /**
-     * Get cards
+     * Get printings
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getCards() {
-        return $this->cards;
+    public function getPrintings() {
+        return $this->printings;
     }
 
     /**

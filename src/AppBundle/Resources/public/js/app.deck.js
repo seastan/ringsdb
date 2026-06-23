@@ -538,14 +538,16 @@
                     div.addClass('invalid-card');
                 }
 
-                if (!deck.i_have_this_card(card)) {
-                    div.find('.card-count').addClass('limited-pool-conflict').attr('title', 'This card is not in my collection');
+                // Flag the quantity when this deck uses more copies than the viewer
+                // owns (owned_copies sums every owned printing, so owning a card via a
+                // repackaged product or extra Core sets correctly clears the warning).
+                var ownedCopies = (card.owned_copies != null) ? card.owned_copies : 999;
+                if (card[key] > ownedCopies) {
+                    div.find('.card-count').addClass('limited-pool-conflict').attr('title', 'You own only ' + ownedCopies + ' cop' + (ownedCopies === 1 ? 'y' : 'ies') + ' of this card');
                 }
 
                 if (sortKey == 'pack_code') {
                     div.append(' <small class="text-muted" style="padding-left: 2px">(#' + card.position + ')</small>');
-                } else if (app.data.cards.find({ 'name': card.name }).length > 1) {
-                    div.append(' <small class="text-muted">(' + card.pack_code + ')</small>');
                 }
 
                 div.appendTo(section);

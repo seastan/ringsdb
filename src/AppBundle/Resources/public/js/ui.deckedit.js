@@ -48,7 +48,7 @@
      */
     ui.init_config_buttons = function() {
         // radio
-        ['display-column', 'core-set', 'show-suggestions', 'buttons-behavior'].forEach(function (radio) {
+        ['display-column', 'show-suggestions', 'buttons-behavior'].forEach(function (radio) {
             $('input[name=' + radio + '][value=' + Config[radio] + ']').prop('checked', true);
         });
 
@@ -64,34 +64,15 @@
      */
     ui.set_max_qty = function() {
         app.data.cards.find().forEach(function (record) {
-            var max_qty = Math.min(3, record.deck_limit);
-
-            if (record.pack_code == 'Core') {
-                max_qty = Math.min(max_qty, record.quantity * Config['core-set']);
-            } else {
-                max_qty = Math.min(max_qty, record.quantity);
-            }
+            // owned_copies = copies the user owns across all this card's packs
+            // (computed in app.ui.js). Fall back to "own everything" until set.
+            var owned = (record.owned_copies == null) ? 999 : record.owned_copies;
+            var max_qty = Math.min(3, record.deck_limit, owned);
 
             app.data.cards.updateById(record.code, {
                 maxqty: max_qty
             });
         });
-    };
-
-    ui.set_cores_qty = function() {
-        var cores = 1;
-        if (app.user.data.owned_packs) {
-            if (app.user.data.owned_packs.match(/1-2/)) {
-                cores++;
-            }
-            if (app.user.data.owned_packs.match(/1-3/)) {
-                cores++;
-            }
-        } else {
-            cores = 3;
-        }
-
-        Config['core-set'] = cores;
     };
 
     /**
@@ -309,11 +290,6 @@
 
         switch (name) {
             case 'buttons-behavior':
-                break;
-
-            case 'core-set':
-                ui.set_max_qty();
-                ui.reset_list();
                 break;
 
             case 'display-column':
@@ -594,7 +570,7 @@
                 DisplayColumnsTpl = _.template([
                     '<tr>',
                     '<td><div class="btn-group" data-toggle="buttons"><%= radios %></div></td>',
-                    '<td><a class="card card-tip" data-code="<%= card.code %>" href="<%= url %>" data-target="#cardModal" data-remote="false" data-toggle="modal"><%= card.name %></a> <small class="text-muted">(<%= card.pack_code %>)</small></td>',
+                    '<td><a class="card card-tip" data-code="<%= card.code %>" href="<%= url %>" data-target="#cardModal" data-remote="false" data-toggle="modal"><%= card.name %></a></td>',
                     '<td class="sphere"><span class="icon-<%= card.sphere_code %> fg-<%= card.sphere_code %>" title="<%= card.sphere_name %>"></span></td>',
                     '<td class="type"><span class="icon-<%= card.type_code %>" title="<%= card.type_name %>"></span></td>',
                     '<td class="cost"><% if (card.type_code == "hero") { %><%= card.threat %> <span class="visible-xs-inline">T</span><% } else { if ((card.type_code == "ally") || (card.type_code == "attachment") || (card.type_code == "event") || (card.type_code == "player-side-quest") || ((card.type_code == "contract") && (card.cost != undefined)) || ((card.type_code == "treasure") && (card.cost != undefined))) { if (card.cost != undefined) { %><%= card.cost %><% } else { %>X<% } %> <span class="visible-xs-inline">C</span><% } } %></td>',
@@ -778,7 +754,7 @@
             limit: 10,
             templates: {
                 suggestion: function(card) {
-                    return $('<div class="fg-' + card.sphere_code + '"><span class="icon-fw icon-' + card.sphere_code + '"></span> <strong>' + card.name + '</strong> <small><i>' + card.pack_name + '</i></small></div>');
+                    return $('<div class="fg-' + card.sphere_code + '"><span class="icon-fw icon-' + card.sphere_code + '"></span> <strong>' + app.data.display_name(card) + '</strong> <small><i>' + card.type_name + '</i></small></div>');
                 }
             }
         });
@@ -815,7 +791,6 @@
      * @memberOf ui
      */
     ui.on_dom_loaded = function() {
-        ui.set_cores_qty();
         ui.init_config_buttons();
         ui.init_filter_help();
         ui.update_sort_caret();

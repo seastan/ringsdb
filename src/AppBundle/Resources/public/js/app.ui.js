@@ -102,33 +102,76 @@
         console.log('ui.on_all_loaded');
 
         app.user.loaded.always(function() {
-            app.data.packs.update({}, {
-                owned: true
-            });
-
-            if (app.user.data && app.user.data.owned_packs) {
-                var packs = app.user.data.owned_packs.split(',');
-                var nPacks = [];
-                _.forEach(packs, function(str) {
-                    nPacks.push(parseInt(str, 10));
-                });
-
-                app.data.packs.update({
-                    'id': {
-                        '$nin': nPacks
+            // Parse owned_packs into a per-pack-id owned COUNT. Tokens are
+            // "id", "id:count", or legacy core "1-2"/"1-3" (each = +1 copy).
+            var ownedCountById = {};
+            var hasCollection = !!(app.user.data && app.user.data.owned_packs);
+            if (hasCollection) {
+                _.forEach(app.user.data.owned_packs.split(','), function(token) {
+                    var t = ('' + token).trim(), m;
+                    if ((m = t.match(/^(\d+):(\d+)$/))) {
+                        ownedCountById[m[1]] = (ownedCountById[m[1]] || 0) + parseInt(m[2], 10);
+                    } else if ((m = t.match(/^(\d+)(?:-\d+)?$/))) {
+                        ownedCountById[m[1]] = (ownedCountById[m[1]] || 0) + 1;
                     }
-                }, {
-                    owned: false
                 });
             }
 
+            // Owned count per pack code (exposed for per-art counts in the card modal).
+            // No collection set => own one of each pack (and everything abundantly below).
+            var ownedCountByCode = {};
             app.data.packs.find().forEach(function(pack) {
-                app.data.cards.update({
-                    'pack_code': pack.code
-                }, {
-                    owned: pack.owned
+                var count = hasCollection ? (ownedCountById[pack.id] || 0) : 1;
+                ownedCountByCode[pack.code] = count;
+                app.data.packs.updateById(pack.code, { owned: count > 0 });
+            });
+            app.data.owned_pack_counts = ownedCountByCode;
+
+            // Let the card-page art selector redraw now that counts are ready.
+            if ($.isFunction(ui.setup_art_selector)) {
+                ui.setup_art_selector();
+            }
+
+            // Per card: owned_copies = sum over its printings of
+            // (count owned of that pack * copies of the card in that pack).
+            // No collection => treat as owning everything abundantly.
+            app.data.cards.find().forEach(function(card) {
+                var ownedCopies;
+                if (!hasCollection) {
+                    ownedCopies = 999;
+                } else {
+                    ownedCopies = 0;
+                    _.forEach(card.packs || [], function(pr) {
+                        ownedCopies += (ownedCountByCode[pr.pack_code] || 0) * (pr.quantity || 0);
+                    });
+                }
+                app.data.cards.updateById(card.code, {
+                    owned_copies: ownedCopies,
+                    owned: ownedCopies > 0
                 });
             });
+
+            // Apply the user's preferred art: swap card.imagesrc to the chosen printing.
+            var artPrefs = {};
+            if (app.user.data && app.user.data.art_preferences) {
+                try { artPrefs = JSON.parse(app.user.data.art_preferences) || {}; } catch (e) { artPrefs = {}; }
+            }
+            app.data.art_preferences = artPrefs;
+            _.forEach(artPrefs, function(packCode, code) {
+                var card = app.data.cards.findById(code);
+                if (!card || !card.packs) {
+                    return;
+                }
+                var pr = _.find(card.packs, function(p) { return p.pack_code === packCode; });
+                if (pr && pr.imagesrc) {
+                    app.data.cards.updateById(code, { imagesrc: pr.imagesrc });
+                }
+            });
+
+            // Deckbuilder per-card max quantities depend on ownership.
+            if (app.ui && $.isFunction(app.ui.set_max_qty)) {
+                app.ui.set_max_qty();
+            }
         });
 
         if ($.isFunction(ui.on_all_loaded)) {

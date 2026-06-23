@@ -66,7 +66,9 @@ class CardsData {
 			$smax = 0;
 
 			foreach ($cycle->getPacks() as $pack) {
-				$real = count($pack->getCards());
+				// count via printings: a repackaged pack's cards live as printings of
+				// canonical cards in other packs, so getCards() would be empty for it.
+				$real = count($pack->getPrintings());
 				$sreal += $real;
 				$max = $pack->getSize();
 				$smax += $max;
@@ -113,7 +115,7 @@ class CardsData {
         $em = $this->doctrine;
 
         $qb = $em->getRepository('AppBundle:Card')->createQueryBuilder('c');
-        $qb->leftJoin('c.pack', 'p')->leftJoin('p.cycle', 'y')->leftJoin('c.type', 't')->leftJoin('c.sphere', 's');
+        $qb->leftJoin('c.type', 't')->leftJoin('c.sphere', 's');
         $qb2 = null;
         $qb3 = null;
 
@@ -176,14 +178,16 @@ class CardsData {
                 case 'code': {
                     switch ($searchCode) {
                         case 'c':  {
+                            // cycle filter: card has a printing in a pack of this cycle (any printing)
                             $or = [];
                             foreach ($condition as $arg) {
+                                $sub = "SELECT cpc{$i}.id FROM AppBundle:CardPrinting cpc{$i} JOIN cpc{$i}.pack ppc{$i} JOIN ppc{$i}.cycle yc{$i} WHERE cpc{$i}.card = c AND yc{$i}.code = ?$i";
                                 switch ($operator) {
                                     case ':':
-                                        $or[] = "(y.code = ?$i)";
+                                        $or[] = "EXISTS ($sub)";
                                         break;
                                     case '!':
-                                        $or[] = "(y.code != ?$i)";
+                                        $or[] = "NOT EXISTS ($sub)";
                                         break;
                                 }
                                 $qb->setParameter($i++, $arg);
@@ -192,26 +196,22 @@ class CardsData {
                             break;
                         }
                         case 'e': {
+                            // pack filter: card has a printing in this pack (any printing)
                             $or = [];
                             foreach ($condition as $arg) {
+                                $base = "SELECT cpe{$i}.id FROM AppBundle:CardPrinting cpe{$i} JOIN cpe{$i}.pack ppe{$i} WHERE cpe{$i}.card = c";
                                 switch ($operator) {
                                     case ':':
-                                        $or[] = "(p.code = ?$i)";
+                                        $or[] = "EXISTS ($base AND ppe{$i}.code = ?$i)";
                                         break;
                                     case '!':
-                                        $or[] = "(p.code != ?$i)";
+                                        $or[] = "NOT EXISTS ($base AND ppe{$i}.code = ?$i)";
                                         break;
                                     case '<':
-                                        if (!isset($qb2)) {
-                                            $qb2 = $this->doctrine->getRepository('AppBundle:Pack')->createQueryBuilder('p2');
-                                            $or[] = $qb->expr()->lt('p.dateRelease', '(' . $qb2->select('p2.dateRelease')->where("p2.code = ?$i")->getDql() . ')');
-                                        }
+                                        $or[] = "EXISTS ($base AND ppe{$i}.dateRelease < (SELECT p2{$i}.dateRelease FROM AppBundle:Pack p2{$i} WHERE p2{$i}.code = ?$i))";
                                         break;
                                     case '>':
-                                        if (!isset($qb3)) {
-                                            $qb3 = $this->doctrine->getRepository('AppBundle:Pack')->createQueryBuilder('p3');
-                                            $or[] = $qb->expr()->gt('p.dateRelease', '(' . $qb3->select('p3.dateRelease')->where("p3.code = ?$i")->getDql() . ')');
-                                        }
+                                        $or[] = "EXISTS ($base AND ppe{$i}.dateRelease > (SELECT p3{$i}.dateRelease FROM AppBundle:Pack p3{$i} WHERE p3{$i}.code = ?$i))";
                                         break;
                                 }
                                 $qb->setParameter($i++, $arg);
@@ -326,15 +326,16 @@ class CardsData {
                             break;
                         }
                         case 'i': {
-                            // illustrator
+                            // illustrator — search via CardPrinting (field moved off Card in Phase 9)
                             $or = [];
                             foreach ($condition as $arg) {
+                                $sub = "SELECT cpi{$i}.id FROM AppBundle:CardPrinting cpi{$i} WHERE cpi{$i}.card = c AND cpi{$i}.illustrator = ?$i";
                                 switch ($operator) {
                                     case ':':
-                                        $or[] = "(c.illustrator = ?$i)";
+                                        $or[] = "EXISTS ($sub)";
                                         break;
                                     case '!':
-                                        $or[] = "(c.illustrator != ?$i)";
+                                        $or[] = "NOT EXISTS ($sub)";
                                         break;
                                 }
                                 $qb->setParameter($i++, $arg);
@@ -343,15 +344,16 @@ class CardsData {
                             break;
                         }
                         case 'r': {
-                            // release
+                            // release: card has a printing released by / after this date (any printing)
                             $or = [];
                             foreach ($condition as $arg) {
+                                $base = "SELECT cpr{$i}.id FROM AppBundle:CardPrinting cpr{$i} JOIN cpr{$i}.pack ppr{$i} WHERE cpr{$i}.card = c";
                                 switch ($operator) {
                                     case '<':
-                                        $or[] = "(p.dateRelease <= ?$i)";
+                                        $or[] = "EXISTS ($base AND ppr{$i}.dateRelease <= ?$i)";
                                         break;
                                     case '>':
-                                        $or[] = "(p.dateRelease > ?$i or p.dateRelease IS NULL)";
+                                        $or[] = "EXISTS ($base AND (ppr{$i}.dateRelease > ?$i OR ppr{$i}.dateRelease IS NULL))";
                                         break;
                                 }
 
@@ -376,7 +378,7 @@ class CardsData {
 
         switch ($sortorder) {
             case 'set':
-                $qb->orderBy('y.position')->addOrderBy('p.position')->addOrderBy('c.position');
+                $qb->orderBy('c.code');
                 break;
             case 'sphere':
                 $qb->orderBy('c.sphere')->addOrderBy('c.type');
@@ -450,6 +452,15 @@ class CardsData {
 			$cardinfo[$fieldName] = $value;
 		}
 
+		// Fields removed from Card ORM in Phase 9 — supply from the primary printing.
+		$primaryPrinting = $card->getPrimaryPrinting();
+		$primaryPack     = $primaryPrinting ? $primaryPrinting->getPack() : null;
+		$cardinfo['pack_code']   = $primaryPack     ? $primaryPack->getCode()             : null;
+		$cardinfo['pack_name']   = $primaryPack     ? $primaryPack->getName()             : null;
+		$cardinfo['illustrator'] = $primaryPrinting ? $primaryPrinting->getIllustrator()  : null;
+		$cardinfo['octgnid']     = $primaryPrinting ? $primaryPrinting->getOctgnid()      : null;
+		$cardinfo['quantity']    = $primaryPrinting ? intval($primaryPrinting->getQuantity()) : null;
+
 		$cardinfo['url'] = $this->router->generate('cards_zoom', ['card_code' => $card->getCode()], UrlGeneratorInterface::ABSOLUTE_URL);
 		$imageurl = $this->assets_helper->getUrl('bundles/cards/' . $card->getCode() . '.png');
 		$imagepath = $this->rootDir . '/../web' . preg_replace('/\?.*/', '', $imageurl);
@@ -459,6 +470,38 @@ class CardsData {
 		} else {
 			$cardinfo['imagesrc'] = null;
 		}
+
+		// All printings of this card (one per pack it appears in). pack_code/pack_name
+		// above stay as the canonical/primary printing for backward compatibility.
+		$cardinfo['packs'] = [];
+		foreach ($card->getPrintings() as $printing) {
+			$pack = $printing->getPack();
+			if (!$pack) {
+				continue;
+			}
+
+			$prImageUrl = $this->assets_helper->getUrl('bundles/cards/' . $printing->getImageCode() . '.png');
+			$prImagePath = $this->rootDir . '/../web' . preg_replace('/\?.*/', '', $prImageUrl);
+			$dateRelease = $pack->getDateRelease();
+
+			$cardinfo['packs'][] = [
+				'pack_code'    => $pack->getCode(),
+				'pack_name'    => $pack->getName(),
+				'position'     => $printing->getPosition(),
+				'quantity'     => intval($printing->getQuantity()),
+				'image_code'   => $printing->getImageCode(),
+				'illustrator'  => $printing->getIllustrator(),
+				'octgnid'      => $printing->getOctgnid(),
+				'imagesrc'     => file_exists($prImagePath) ? $prImageUrl : null,
+				'date_release' => $dateRelease ? $dateRelease->format('Y-m-d') : null,
+			];
+		}
+		usort($cardinfo['packs'], function($a, $b) {
+			if ($a['date_release'] === null && $b['date_release'] === null) return 0;
+			if ($a['date_release'] === null) return 1;
+			if ($b['date_release'] === null) return -1;
+			return strcmp($a['date_release'], $b['date_release']);
+		});
 
 		if ($api) {
 			unset($cardinfo['id']);

@@ -91,6 +91,20 @@
     };
 
     /**
+     * Returns the card name to show in typeahead suggestions, appending the
+     * primary pack code in parentheses for cards that share a name and type
+     * with another canonical card (currently only Gandalf ally).
+     * @memberOf data
+     */
+    data.display_name = function display_name(card) {
+        if (card.name === 'Gandalf' && card.type_code === 'ally') {
+            var packCode = card.pack_code || (card.packs && card.packs[0] && card.packs[0].pack_code) || '';
+            return card.name + ' (' + packCode + ')';
+        }
+        return card.name;
+    };
+
+    /**
      * triggers a forced update of the database
      * @memberOf data
      */

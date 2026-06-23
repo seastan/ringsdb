@@ -59,7 +59,9 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
         $packs = [];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
+            if (!$card) continue;
             $pack = $card->getPack();
+            if (!$pack) continue;
 
             if ($pack->getDateRelease()) {
                 $pos = $pack->getDateRelease()->format('c');
@@ -76,9 +78,12 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
                 ];
             }
 
-            $nbpacks = ceil($slot->getQuantity() / $card->getQuantity());
-            if ($packs[$pos]['nb'] < $nbpacks) {
-                $packs[$pos]['nb'] = $nbpacks;
+            $qty = $card->getQuantity();
+            if ($qty) {
+                $nbpacks = ceil($slot->getQuantity() / $qty);
+                if ($packs[$pos]['nb'] < $nbpacks) {
+                    $packs[$pos]['nb'] = $nbpacks;
+                }
             }
         }
         ksort($packs);
@@ -89,8 +94,10 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
     public function getSlotsByType() {
         $slotsByType = ['hero' => [], 'ally' => [], 'attachment' => [], 'event' => [], 'player-side-quest' => [], 'player-objective' => [], 'contract' => [], 'treasure' => []];
         foreach ($this->slots as $slot) {
-            if (array_key_exists($slot->getCard()->getType()->getCode(), $slotsByType)) {
-                $slotsByType[$slot->getCard()->getType()->getCode()][] = $slot;
+            $card = $slot->getCard();
+            if (!$card || !$card->getType()) continue;
+            if (array_key_exists($card->getType()->getCode(), $slotsByType)) {
+                $slotsByType[$card->getType()->getCode()][] = $slot;
             }
         }
 
@@ -100,8 +107,10 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
     public function getCountByType() {
         $countByType = ['hero' => 0, 'ally' => 0, 'attachment' => 0, 'event' => 0, 'player-side-quest' => 0, 'player-objective' => 0, 'contract' => 0, 'treasure' => 0];
         foreach ($this->slots as $slot) {
-            if (array_key_exists($slot->getCard()->getType()->getCode(), $countByType)) {
-                $countByType[$slot->getCard()->getType()->getCode()] += $slot->getQuantity();
+            $card = $slot->getCard();
+            if (!$card || !$card->getType()) continue;
+            if (array_key_exists($card->getType()->getCode(), $countByType)) {
+                $countByType[$card->getType()->getCode()] += $slot->getQuantity();
             }
         }
 
@@ -111,8 +120,10 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
     public function getCountBySphere() {
         $countBySphere = ['spirit' => 0, 'tactics' => 0, 'leadership' => 0, 'lore' => 0];
         foreach ($this->slots as $slot) {
-            if (array_key_exists($slot->getCard()->getSphere()->getCode(), $countBySphere)) {
-                $countBySphere[$slot->getCard()->getSphere()->getCode()] += $slot->getQuantity();
+            $card = $slot->getCard();
+            if (!$card || !$card->getSphere()) continue;
+            if (array_key_exists($card->getSphere()->getCode(), $countBySphere)) {
+                $countBySphere[$card->getSphere()->getCode()] += $slot->getQuantity();
             }
         }
 
@@ -122,7 +133,8 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
     public function getHeroDeck() {
         $heroDeck = [];
         foreach ($this->slots as $slot) {
-            if ($slot->getCard()->getType()->getCode() === 'hero') {
+            $card = $slot->getCard();
+            if ($card && $card->getType() && $card->getType()->getCode() === 'hero') {
                 $heroDeck[] = $slot;
             }
         }
@@ -133,7 +145,8 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
     public function getDrawDeck() {
         $drawDeck = [];
         foreach ($this->slots as $slot) {
-            if (in_array($slot->getCard()->getType()->getCode(), ['ally', 'attachment', 'event', 'player-side-quest', 'player-objective', 'contract', 'treasure'])) {
+            $card = $slot->getCard();
+            if ($card && $card->getType() && in_array($card->getType()->getCode(), ['ally', 'attachment', 'event', 'player-side-quest', 'player-objective', 'contract', 'treasure'])) {
                 $drawDeck[] = $slot;
             }
         }
@@ -152,10 +165,10 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
             $card = $slot->getCard();
             $threat += $card->getThreat();
 
-            if ($card->getName() == 'Mirlonde' && $card->getPack()->getCode() == 'TDF') {
+            if ($card->getName() == 'Mirlonde' && $card->getPack() && $card->getPack()->getCode() == 'TDF') {
                 $mirlonde = true;
             }
-            if ($card->getName() == 'Folco Boffin' && $card->getPack()->getCode() == 'DoCG') {
+            if ($card->getName() == 'Folco Boffin' && $card->getPack() && $card->getPack()->getCode() == 'DoCG') {
                 $folco = true;
             }            
         }
@@ -184,20 +197,22 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
     public function getCopiesAndDeckLimit() {
         $copiesAndDeckLimit = [];
         foreach ($this->slots as $slot) {
-            $cardName = $slot->getCard()->getName();
-            
-            if ($slot->getCard()->getType()->getCode() === 'hero') {
+            $card = $slot->getCard();
+            if (!$card || !$card->getType()) continue;
+            $cardName = $card->getName();
+
+            if ($card->getType()->getCode() === 'hero') {
                 $cardName = $cardName . 'Hero';
             }
 
             if (!key_exists($cardName, $copiesAndDeckLimit)) {
                 $copiesAndDeckLimit[$cardName] = [
                     'copies' => $slot->getQuantity(),
-                    'deck_limit' => $slot->getCard()->getDeckLimit(),
+                    'deck_limit' => $card->getDeckLimit(),
                 ];
             } else {
                 $copiesAndDeckLimit[$cardName]['copies'] += $slot->getQuantity();
-                $copiesAndDeckLimit[$cardName]['deck_limit'] = min($slot->getCard()->getDeckLimit(), $copiesAndDeckLimit[$cardName]['deck_limit']);
+                $copiesAndDeckLimit[$cardName]['deck_limit'] = min($card->getDeckLimit(), $copiesAndDeckLimit[$cardName]['deck_limit']);
             }
         }
 
