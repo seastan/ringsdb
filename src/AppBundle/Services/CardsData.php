@@ -326,15 +326,16 @@ class CardsData {
                             break;
                         }
                         case 'i': {
-                            // illustrator
+                            // illustrator — search via CardPrinting (field moved off Card in Phase 9)
                             $or = [];
                             foreach ($condition as $arg) {
+                                $sub = "SELECT cpi{$i}.id FROM AppBundle:CardPrinting cpi{$i} WHERE cpi{$i}.card = c AND cpi{$i}.illustrator = ?$i";
                                 switch ($operator) {
                                     case ':':
-                                        $or[] = "(c.illustrator = ?$i)";
+                                        $or[] = "EXISTS ($sub)";
                                         break;
                                     case '!':
-                                        $or[] = "(c.illustrator != ?$i)";
+                                        $or[] = "NOT EXISTS ($sub)";
                                         break;
                                 }
                                 $qb->setParameter($i++, $arg);
@@ -450,6 +451,15 @@ class CardsData {
 			$fieldName = ltrim(strtolower(preg_replace('/[A-Z]/', '_$0', $fieldName)), '_');
 			$cardinfo[$fieldName] = $value;
 		}
+
+		// Fields removed from Card ORM in Phase 9 — supply from the primary printing.
+		$primaryPrinting = $card->getPrimaryPrinting();
+		$primaryPack     = $primaryPrinting ? $primaryPrinting->getPack() : null;
+		$cardinfo['pack_code']   = $primaryPack     ? $primaryPack->getCode()             : null;
+		$cardinfo['pack_name']   = $primaryPack     ? $primaryPack->getName()             : null;
+		$cardinfo['illustrator'] = $primaryPrinting ? $primaryPrinting->getIllustrator()  : null;
+		$cardinfo['octgnid']     = $primaryPrinting ? $primaryPrinting->getOctgnid()      : null;
+		$cardinfo['quantity']    = $primaryPrinting ? intval($primaryPrinting->getQuantity()) : null;
 
 		$cardinfo['url'] = $this->router->generate('cards_zoom', ['card_code' => $card->getCode()], UrlGeneratorInterface::ABSOLUTE_URL);
 		$imageurl = $this->assets_helper->getUrl('bundles/cards/' . $card->getCode() . '.png');
