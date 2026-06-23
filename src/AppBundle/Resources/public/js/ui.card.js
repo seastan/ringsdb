@@ -196,7 +196,6 @@
             } else {
                 ui.setup_write();
             }
-            ui.setup_art_selector();
         });
 
         $(window.document).on('click', '.btn-write-comment', ui.write_comment);

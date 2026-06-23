@@ -127,6 +127,11 @@
             });
             app.data.owned_pack_counts = ownedCountByCode;
 
+            // Let the card-page art selector redraw now that counts are ready.
+            if ($.isFunction(ui.setup_art_selector)) {
+                ui.setup_art_selector();
+            }
+
             // Per card: owned_copies = sum over its printings of
             // (count owned of that pack * copies of the card in that pack).
             // No collection => treat as owning everything abundantly.
