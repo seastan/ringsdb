@@ -11,6 +11,8 @@
         {% if cards %}
         window._cardCode  = {{ cards[0].code | json_encode | raw }};
         window._cardPacks = {{ cards[0].packs | json_encode | raw }};
+        window._cardUrl   = {{ cards[0].url | json_encode | raw }};
+        window._cardCurrentPack = {{ (cards[0].selected_pack_code ? cards[0].selected_pack_code : cards[0].pack_code) | json_encode | raw }};
         {% endif %}
     </script>
 {% endblock %}

@@ -91,7 +91,7 @@
                                             {% for hero in decklist.getSlots().getHeroDeck() %}
                                                 {% set card = hero.getCard() %}
                                                 <a class="card card-tip fg-{{ card.sphere.code }}" data-code="{{ card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" href="">
-                                                    <span class="icon-{{ card.sphere.code }}"></span> {{ card.name }} <i>({{ card.pack.code }})</i>
+                                                    <span class="icon-{{ card.sphere.code }}"></span> {{ card.name }}
                                                 </a>
                                             {% endfor %}
                                         </span>

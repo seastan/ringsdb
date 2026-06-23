@@ -9,7 +9,7 @@
                     {% if printing.pack_code == current_pack %}
                         <strong>&#8227; {{ pack_label }}</strong>
                     {% else %}
-                        <a href="{{ card.url }}?pack={{ printing.pack_code }}">&#8227; {{ pack_label }}</a>
+                        <span>&#8227; {{ pack_label }}</span>
                     {% endif %}
                 </li>
             {% endfor %}

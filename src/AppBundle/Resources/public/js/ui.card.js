@@ -135,48 +135,31 @@
 
         // All packs this card appears in — used for the owned-count table.
         var allPacks = window._cardPacks || [];
-        // Distinct art variants (by image_code, with an actual image) — used for art switching.
-        var seenArt = {}, arts = [];
-        allPacks.forEach(function(p) {
-            if (p.imagesrc && !seenArt[p.image_code]) { seenArt[p.image_code] = true; arts.push(p); }
-        });
-
         if (allPacks.length < 1) return;
 
-        var prefs   = app.data.art_preferences || {};
-        var counts  = app.data.owned_pack_counts || {};
-        var current = prefs[window._cardCode] || null;
-        var multiArt = arts.length > 1;
-
-        // Apply saved art preference to the page image on load.
-        if (current && multiArt) {
-            arts.forEach(function(p) {
-                if (p.pack_code === current && p.imagesrc) {
-                    $('#card-full-image').attr('src', p.imagesrc);
-                }
-            });
-        }
+        var counts      = app.data.owned_pack_counts || {};
+        var currentPack = window._cardCurrentPack || null;
+        var cardUrl     = window._cardUrl || window.location.pathname;
+        // With more than one printing, a row click reloads the page on that set
+        // (same behaviour the printings list under the card info used to provide).
+        var multiPack   = allPacks.length > 1;
 
         var container = $('<div style="margin-top:10px"></div>');
-        $('<small class="text-muted">' + (multiArt ? 'Art / printing' : 'Printing') + ' (owned):</small>').appendTo(container);
-        var tableStyle = 'margin-bottom:0;margin-top:4px' + (multiArt ? ';cursor:pointer' : '');
-        var table = $('<table class="table table-condensed table-hover" style="' + tableStyle + '"><thead><tr><th>Set</th><th style="text-align:center">Owned</th></tr></thead></table>').appendTo(container);
+        $('<small class="text-muted">Printing (owned):</small>').appendTo(container);
+        var tableStyle = 'margin-bottom:0;margin-top:4px' + (multiPack ? ';cursor:pointer' : '');
+        var table = $('<table class="table table-condensed table-hover table-striped" style="' + tableStyle + '"><thead><tr><th>Set</th><th style="text-align:center">Owned</th></tr></thead></table>').appendTo(container);
         var tbody = $('<tbody></tbody>').appendTo(table);
 
         allPacks.forEach(function(p) {
-            var isCanonical = (p.image_code === window._cardCode);
-            var selected = multiArt && (current ? (current === p.pack_code) : isCanonical);
+            var selected = (p.pack_code === currentPack);
             var owned = (counts[p.pack_code] || 0) * (p.quantity || 0);
             var row = $('<tr class="' + (selected ? 'info' : '') + '">'
-                + '<td>' + p.pack_name + '</td>'
+                + '<td>' + p.pack_name + ' #' + p.position + '</td>'
                 + '<td style="text-align:center">' + owned + '</td>'
                 + '</tr>');
-            if (multiArt && p.imagesrc) {
+            if (multiPack && !selected) {
                 row.on('click', function() {
-                    tbody.find('tr').removeClass('info');
-                    row.addClass('info');
-                    $('#card-full-image').attr('src', p.imagesrc);
-                    card_modal.set_art(window._cardCode, isCanonical ? '' : p.pack_code, p.imagesrc);
+                    window.location.href = cardUrl + '?pack=' + p.pack_code;
                 });
             }
             row.appendTo(tbody);
