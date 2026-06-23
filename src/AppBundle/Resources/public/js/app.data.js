@@ -98,7 +98,8 @@
      */
     data.display_name = function display_name(card) {
         if (card.name === 'Gandalf' && card.type_code === 'ally') {
-            return card.name + ' (' + card.pack_code + ')';
+            var packCode = card.pack_code || (card.packs && card.packs[0] && card.packs[0].pack_code) || '';
+            return card.name + ' (' + packCode + ')';
         }
         return card.name;
     };
