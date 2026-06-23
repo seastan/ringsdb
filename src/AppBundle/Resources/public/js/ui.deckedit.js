@@ -754,7 +754,7 @@
             limit: 10,
             templates: {
                 suggestion: function(card) {
-                    return $('<div class="fg-' + card.sphere_code + '"><span class="icon-fw icon-' + card.sphere_code + '"></span> <strong>' + card.name + '</strong> <small><i>' + card.type_name + '</i></small></div>');
+                    return $('<div class="fg-' + card.sphere_code + '"><span class="icon-fw icon-' + card.sphere_code + '"></span> <strong>' + app.data.display_name(card) + '</strong> <small><i>' + card.type_name + '</i></small></div>');
                 }
             }
         });
