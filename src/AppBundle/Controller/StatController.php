@@ -341,6 +341,14 @@ ON c.cycle = u.cycle";
 	}
 
 	public function getStatCardsAction(Request $request) {
+		// TEMPORARILY DISABLED after the card-printings refactor: this report's raw
+		// SQL still joins the dropped card.pack_id / card.octgnid columns. Return a
+		// notice instead of a 500 until the queries are rewritten through card_printing
+		// (primary printing). Admin-only route (/admin/stat_cards).
+		return new \Symfony\Component\HttpFoundation\Response(
+			'The per-card stats report is temporarily unavailable while the card-printings migration is finalized.',
+			503
+		);
 		set_time_limit(120);
 		$month = $request->query->get('month');
 		if (!$month) {
@@ -793,6 +801,14 @@ FROM (
 	}
 
 	public function getStatPacksAction(Request $request) {
+		// TEMPORARILY DISABLED after the card-printings refactor: getQuests() below
+		// runs raw SQL that selects the dropped card.octgnid column. Return a notice
+		// instead of a 500 until rewritten through card_printing. Admin-only route
+		// (/admin/stat_packs). The main /admin/stat report is unaffected.
+		return new \Symfony\Component\HttpFoundation\Response(
+			'The per-pack stats report is temporarily unavailable while the card-printings migration is finalized.',
+			503
+		);
         /* @var $dbh \Doctrine\DBAL\Connection */
 		$packs = $this->getPacks();
 		$pack_rules = $this->getPackRuless();

@@ -21,6 +21,15 @@ input[type=number].pack-qty { -moz-appearance: textfield; text-align: center; }
 
 .pack-row { padding: 2px 4px; border-radius: 3px; transition: background 0.1s; }
 .pack-row-owned { background-color: #d9edf7; }
+
+/* Dark mode: selected rows blue with white text; quantity boxes always dark-filled */
+.dark-mode .pack-row-owned { background-color: #2d6cad; }
+.dark-mode .pack-row-owned .pack-name { color: #fff; }
+.dark-mode .pack-qty {
+    background-color: #2e2e33; /* $dark-surface-2 */
+    color: #d6d6d6;           /* $dark-text */
+    border: 1px solid #3d3d44; /* $dark-border */
+}
 </style>
 
     <div class="main white container" id="owned_packs" style="display: none">

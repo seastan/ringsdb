@@ -215,28 +215,26 @@ class FellowshipManager {
             // Num cores
             // SELECT fellowship.id, decklistslot.card_id, SUM(decklistslot.quantity), card.quantity FROM (((fellowship INNER JOIN fellowship_decklist ON fellowship.id = fellowship_decklist.fellowship_id) INNER JOIN decklistslot ON fellowship_decklist.decklist_id = decklistslot.decklist_id) INNER JOIN card ON decklistslot.card_id = card.id) WHERE card.pack_id = 1 GROUP BY fellowship.id,decklistslot.card_id HAVING SUM(decklistslot.quantity)>3*card.quantity;
             $sub = $this->doctrine->createQueryBuilder();
-            $sub->select("j");
-            $sub->select("j.quantity");
+            $sub->select("jp.quantity");
             $sub->from("AppBundle:Card", "j");
+            $sub->innerJoin('AppBundle:CardPrinting', 'jp', 'WITH', 'jp.card = j AND jp.pack = 1'); # Match Core Set printing
             $sub->innerJoin('AppBundle:Decklistslot', 'dls', 'WITH', 'dls.card = j');
             $sub->innerJoin('AppBundle:FellowshipDecklist', 'fdl', 'WITH', 'fdl.decklist = dls.decklist');
             $sub->where('fdl.fellowship = d');
-            $sub->andWhere('j.pack = 1'); # Match Core Set
             $sub->groupBy('d.id,dls.card');
-            $sub->having('SUM(dls.quantity) > :numcores * j.quantity');
+            $sub->having('SUM(dls.quantity) > :numcores * jp.quantity');
             $qb->setParameter("numcores", $numcores);
             $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
 
             $sub = $this->doctrine->createQueryBuilder();
-            $sub->select("j2");
-            $sub->select("j2.quantity");
+            $sub->select("jp2.quantity");
             $sub->from("AppBundle:Card", "j2");
+            $sub->innerJoin('AppBundle:CardPrinting', 'jp2', 'WITH', 'jp2.card = j2 AND jp2.pack = 1'); # Match Core Set printing
             $sub->innerJoin('AppBundle:Decklistslot', 'dls2', 'WITH', 'dls2.card = j2');
             $sub->innerJoin('AppBundle:FellowshipDecklist', 'fdl2', 'WITH', 'fdl2.decklist = dls2.decklist');
             $sub->where('fdl2.fellowship = d');
-            $sub->andWhere('j2.pack = 1'); # Match Core Set
             $sub->groupBy('d.id,dls2.card');
-            $sub->having('SUM(dls2.quantity) > :numplaysets * j2.quantity');
+            $sub->having('SUM(dls2.quantity) > :numplaysets * jp2.quantity');
             $qb->setParameter("numplaysets", $numplaysets);
             $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
 

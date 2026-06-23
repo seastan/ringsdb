@@ -82,7 +82,7 @@ class SearchController extends Controller {
         $traits = array_filter(array_keys($traits));
         sort($traits);
 
-        $list_illustrators = $dbh->executeQuery("SELECT DISTINCT c.illustrator FROM card c WHERE c.illustrator != '' ORDER BY c.illustrator")->fetchAll();
+        $list_illustrators = $dbh->executeQuery("SELECT DISTINCT illustrator FROM card_printing WHERE illustrator IS NOT NULL AND illustrator != '' ORDER BY illustrator")->fetchAll();
         $illustrators = array_map(function($card) {
             return $card["illustrator"];
         }, $list_illustrators);

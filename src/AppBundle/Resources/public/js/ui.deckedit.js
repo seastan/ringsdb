@@ -648,6 +648,16 @@
         var grid = $('#collection-grid').empty();
         var filters = Config['show-only-deck'] ? {} : ui.get_filters();
 
+        // The pack checkboxes must filter by a card's printings, not just its
+        // primary pack_code: a card you own via one pack (e.g. Unexpected Courage
+        // in the Core Set) must appear even when its primary printing belongs to a
+        // different pack (the Two-Player Starter). Pull the pack filter out of the
+        // ForerunnerDB query and apply it against each card's full printing list below.
+        var packFilter = (filters.pack_code && filters.pack_code['$in']) || null;
+        if (packFilter) {
+            delete filters.pack_code;
+        }
+
         var query = app.smart_filter.get_query(filters);
         var orderBy = {};
 
@@ -660,6 +670,19 @@
         }
 
         var cards = app.data.cards.find(query, { '$orderBy': orderBy });
+
+        if (packFilter) {
+            cards = cards.filter(function(card) {
+                var prs = (card.packs && card.packs.length) ? card.packs : null;
+                if (!prs) {
+                    return packFilter.indexOf(card.pack_code) !== -1;
+                }
+                return prs.some(function(pr) {
+                    return packFilter.indexOf(pr.pack_code) !== -1;
+                });
+            });
+        }
+
         var divs = CardDivs[Config['display-column'] - 1];
 
         cards.forEach(function(card) {

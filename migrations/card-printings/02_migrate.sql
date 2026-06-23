@@ -298,7 +298,10 @@ UPDATE pack SET date_release = '2022-11-04' WHERE id = 101;
 --     The Revised Core Set contains all 73 Core Set cards at 3 copies each, plus
 --     the 7 campaign-only cards (already present from step 1). Rename the pack,
 --     update its size, and insert printings for all Core Set cards at qty=3.
+--     Also rename the cycle (it was "Revised Core Set (Campaign Only)") so the card
+--     search page shows "Revised Core Set" as the heading with no redundant subheading.
 UPDATE pack SET name = 'Revised Core Set', size = 80 WHERE id = 85;
+UPDATE cycle SET name = 'Revised Core Set' WHERE code = 'RevCore';
 
 INSERT INTO card_printing (card_id, pack_id, position, quantity, illustrator, image_code, date_creation, date_update)
 SELECT cp.card_id, 85, cp.position, 3, cp.illustrator, cp.image_code, NOW(), NOW()

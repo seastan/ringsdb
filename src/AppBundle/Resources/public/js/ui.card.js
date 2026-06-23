@@ -131,13 +131,13 @@
 
     ui.setup_art_selector = function() {
         if (typeof window._cardPacks === 'undefined' || !window._cardCode) return;
-        if (!(app.user.data && app.user.data.id)) return;
 
-        // All packs this card appears in — used for the owned-count table.
+        // All packs this card appears in. The table lists, per set, how many
+        // copies of this card that set contains — it is not ownership data,
+        // so it is shown to everyone.
         var allPacks = window._cardPacks || [];
         if (allPacks.length < 1) return;
 
-        var counts      = app.data.owned_pack_counts || {};
         var currentPack = window._cardCurrentPack || null;
         var cardUrl     = window._cardUrl || window.location.pathname;
         // With more than one printing, a row click reloads the page on that set
@@ -145,17 +145,15 @@
         var multiPack   = allPacks.length > 1;
 
         var container = $('<div style="margin-top:10px"></div>');
-        $('<small class="text-muted">Printing (owned):</small>').appendTo(container);
         var tableStyle = 'margin-bottom:0;margin-top:4px' + (multiPack ? ';cursor:pointer' : '');
-        var table = $('<table class="table table-condensed table-hover table-striped" style="' + tableStyle + '"><thead><tr><th>Set</th><th style="text-align:center">Owned</th></tr></thead></table>').appendTo(container);
+        var table = $('<table class="table table-condensed table-hover table-striped" style="' + tableStyle + '"><thead><tr><th>Set</th><th style="text-align:center">Copies Contained</th></tr></thead></table>').appendTo(container);
         var tbody = $('<tbody></tbody>').appendTo(table);
 
         allPacks.forEach(function(p) {
             var selected = (p.pack_code === currentPack);
-            var owned = (counts[p.pack_code] || 0) * (p.quantity || 0);
             var row = $('<tr class="' + (selected ? 'info' : '') + '">'
                 + '<td>' + p.pack_name + ' #' + p.position + '</td>'
-                + '<td style="text-align:center">' + owned + '</td>'
+                + '<td style="text-align:center">' + (p.quantity || 0) + '</td>'
                 + '</tr>');
             if (multiPack && !selected) {
                 row.on('click', function() {
