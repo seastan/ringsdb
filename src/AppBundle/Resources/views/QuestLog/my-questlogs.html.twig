@@ -78,7 +78,7 @@
                                     {% set played = played_easy[scenario.id] is defined %}
                                     <li class="scenario-easy {% if not played %}not-played{% endif %}" data-pack="{{ scenario.pack.id }}">
                                         <span class="img" style="background-image: url('{{ asset('/bundles/app/images/encounters/' ~ (scenario.name | url_encode) ~ '.png')  }}')"></span>
-                                        {% if played %}
+                                        {% if played and scenario.nameCanonical %}
                                             <a href="{{ path('myquestlogs_list', { scenario_name_canonical: scenario.nameCanonical, quest_mode: 'easy' }) }}">{{ scenario.name }}</a>
                                             {% if played_easy[scenario.id] > 0 %}<span class="fa fa-fw fa-trophy" title="We have victory!" data-toggle="tooltip" data-container="body"></span>{% endif %}
                                         {% else %}
@@ -89,7 +89,7 @@
                                 {% set played = played_normal[scenario.id] is defined %}
                                 <li class="scenario-normal {% if not played %}not-played{% endif %}" data-pack="{{ scenario.pack.id }}">
                                     <span class="img" style="background-image: url('{{ asset('/bundles/app/images/encounters/' ~ (scenario.name | url_encode) ~ '.png')  }}')"></span>
-                                    {% if played %}
+                                    {% if played and scenario.nameCanonical %}
                                         <a href="{{ path('myquestlogs_list', { scenario_name_canonical: scenario.nameCanonical, quest_mode: 'normal' }) }}">{{ scenario.name }}</a>
                                         {% if played_normal[scenario.id] > 0 %}<span class="fa fa-fw fa-trophy" title="We have victory!" data-toggle="tooltip" data-container="body"></span>{% endif %}
                                     {% else %}
@@ -101,7 +101,7 @@
                                     {% set played = played_nightmare[scenario.id] is defined %}
                                     <li class="scenario-nightmare {% if not played %}not-played{% endif %}" data-pack="{{ scenario.pack.id }}">
                                         <span class="img" style="background-image: url('{{ asset('/bundles/app/images/encounters/' ~ (scenario.name | url_encode) ~ '.png')  }}')"></span>
-                                        {% if played %}
+                                        {% if played and scenario.nameCanonical %}
                                             <a href="{{ path('myquestlogs_list', { scenario_name_canonical: scenario.nameCanonical, quest_mode: 'nightmare' }) }}">{{ scenario.name }}</a>
                                             {% if played_nightmare[scenario.id] > 0 %}<span class="fa fa-fw fa-trophy" title="We have victory!" data-toggle="tooltip" data-container="body"></span>{% endif %}
                                         {% else %}
