@@ -100,40 +100,45 @@
      * @memberOf card_modal
      */
     card_modal.build_art_selector = function(card, modal) {
-        // distinct printings that have art, keyed by image_code
-        var seen = {}, arts = [];
-        _.forEach(card.packs || [], function(p) {
-            if (p.imagesrc && !seen[p.image_code]) {
-                seen[p.image_code] = 1;
-                arts.push(p);
-            }
+        // All packs this card appears in — used for the owned-count table.
+        var allPacks = card.packs || [];
+        // Distinct art variants (by image_code, with an actual image) — used for art switching.
+        var seenArt = {}, arts = [];
+        _.forEach(allPacks, function(p) {
+            if (p.imagesrc && !seenArt[p.image_code]) { seenArt[p.image_code] = 1; arts.push(p); }
         });
 
-        if (arts.length < 2 || !(app.user.data && app.user.data.id)) {
+        if (allPacks.length < 1 || !(app.user.data && app.user.data.id)) {
             return;
         }
 
         var prefs = app.data.art_preferences || {};
         var current = prefs[card.code]; // preferred pack_code, or undefined => canonical
         var counts = app.data.owned_pack_counts || {};
+        var multiArt = arts.length > 1;
 
         var container = $('<div class="modal-art-selector" style="margin-top:10px"></div>');
-        var table = $('<table class="table table-condensed table-hover" style="margin-bottom:0;cursor:pointer"><thead><tr><th>Set</th><th style="text-align:center">Owned</th></tr></thead></table>').appendTo(container);
+        var headerText = multiArt ? 'Art / printing (owned)' : 'Printing (owned)';
+        $('<small class="text-muted">' + headerText + ':</small>').appendTo(container);
+        var tableStyle = 'margin-bottom:0;margin-top:4px' + (multiArt ? ';cursor:pointer' : '');
+        var table = $('<table class="table table-condensed table-hover" style="' + tableStyle + '"><thead><tr><th>Set</th><th style="text-align:center">Owned</th></tr></thead></table>').appendTo(container);
         var tbody = $('<tbody></tbody>').appendTo(table);
 
-        arts.forEach(function(p) {
+        allPacks.forEach(function(p) {
             var isCanonical = (p.image_code === card.code);
-            var selected = current ? (current === p.pack_code) : isCanonical;
+            var selected = multiArt && (current ? (current === p.pack_code) : isCanonical);
             var owned = (counts[p.pack_code] || 0) * (p.quantity || 0);
             var row = $('<tr class="' + (selected ? 'info' : '') + '">'
                 + '<td>' + p.pack_name + '</td>'
                 + '<td style="text-align:center">' + owned + '</td>'
                 + '</tr>');
-            row.on('click', function() {
-                tbody.find('tr').removeClass('info');
-                row.addClass('info');
-                card_modal.set_art(card.code, isCanonical ? '' : p.pack_code, p.imagesrc);
-            });
+            if (multiArt && p.imagesrc) {
+                row.on('click', function() {
+                    tbody.find('tr').removeClass('info');
+                    row.addClass('info');
+                    card_modal.set_art(card.code, isCanonical ? '' : p.pack_code, p.imagesrc);
+                });
+            }
             row.appendTo(tbody);
         });
 
