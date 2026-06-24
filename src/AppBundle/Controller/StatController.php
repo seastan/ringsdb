@@ -355,6 +355,14 @@ ON c.cycle = u.cycle";
         /* @var $dbh \Doctrine\DBAL\Connection */
         $dbh = $this->getDoctrine()->getConnection();
 
+		// Each card->pack lookup goes through a derived table that resolves the
+		// card's primary printing. MySQL would otherwise MERGE that derived table
+		// and re-run its primary-printing subquery per slot row (filesort each
+		// time) over the millions-of-rows decklistslot/deckslot joins. Disable
+		// derived_merge for this connection so the ~1.4k-row primary-printing map
+		// materializes once and joins by auto-key. Connection is per-request.
+		$dbh->executeQuery("SET SESSION optimizer_switch = 'derived_merge=off'");
+
 		if ($step == '1') {
 			$query = "CREATE TEMPORARY TABLE decklist_filtered
 SELECT CASE WHEN CAST(c.code AS UNSIGNED) > 1000000 THEN SUBSTRING(c.code, 3) ELSE source_code(c.code, cp.name) END AS code,
