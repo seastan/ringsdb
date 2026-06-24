@@ -35,3 +35,5 @@ __pycache__/
 
 # Local card images pulled from server (large)
 /web/bundles/cards/
+
+vendor
