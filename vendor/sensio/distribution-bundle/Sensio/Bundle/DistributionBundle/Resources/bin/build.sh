@@ -32,7 +32,6 @@ fi
 # avoid the creation of ._* files
 export COPY_EXTENDED_ATTRIBUTES_DISABLE=true
 export COPYFILE_DISABLE=true
-export SENSIOLABS_FORCE_ACME_DEMO=true
 
 # Temp dir
 rm -rf /tmp/Symfony
@@ -49,8 +48,8 @@ fi
 cd /tmp/Symfony
 
 # cleanup
-rm -rf app/cache/* app/logs/* .git*
-chmod 777 app/cache app/logs
+rm -rf app/cache/* app/logs/* var/cache/* var/logs/*
+chmod 777 app/cache app/logs var/cache var/logs
 find . -name .DS_Store | xargs rm -rf -
 
 VERSION=`grep ' VERSION ' vendor/symfony/symfony/src/Symfony/Component/HttpKernel/Kernel.php | sed -E "s/.*'(.+)'.*/\1/g"`

@@ -10,7 +10,7 @@ php app/console cache:clear --env=prod
 echo "Dumping assets..."
 php app/console assetic:dump --env=prod
 
-composer install --no-dev -o --vendor-dir=vendor_new && \
+composer install --no-security-blocking --no-dev -o --vendor-dir=vendor_new && \
   rm -rf vendor_old && \
   mv vendor vendor_old && \
   mv vendor_new vendor

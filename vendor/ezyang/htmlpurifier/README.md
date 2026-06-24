@@ -1,4 +1,4 @@
-HTML Purifier [![Build Status](https://secure.travis-ci.org/ezyang/htmlpurifier.svg?branch=master)](http://travis-ci.org/ezyang/htmlpurifier)
+HTML Purifier [![Build Status](https://github.com/ezyang/htmlpurifier/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/ezyang/htmlpurifier/actions/workflows/ci.yml)
 =============
 
 HTML Purifier is an HTML filtering solution that uses a unique combination
@@ -26,4 +26,4 @@ Package available on [Composer](https://packagist.org/packages/ezyang/htmlpurifi
 
 If you're using Composer to manage dependencies, you can use
 
-    $ composer require "ezyang/htmlpurifier":"dev-master"
+    $ composer require ezyang/htmlpurifier
