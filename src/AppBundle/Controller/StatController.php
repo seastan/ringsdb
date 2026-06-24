@@ -341,6 +341,16 @@ ON c.cycle = u.cycle";
 	}
 
 	public function getStatCardsAction(Request $request) {
+		// DISABLED: this report scans all of a month's decklistslot/deckslot rows
+		// and the admin dashboard fires several steps concurrently. Against the
+		// shared 5-worker php-fpm pool that saturates and 504s all three sites
+		// (prod included). The queries below are correct (routed through the
+		// primary printing) but must not run synchronously on a request worker --
+		// re-enable only behind a job queue / off-request precompute.
+		return new \Symfony\Component\HttpFoundation\Response(
+			'The per-card stats report is temporarily disabled (too heavy to run on a web worker).',
+			503
+		);
 		set_time_limit(120);
 		$month = $request->query->get('month');
 		if (!$month) {
