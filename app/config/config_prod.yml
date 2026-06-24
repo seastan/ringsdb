@@ -33,4 +33,4 @@ monolog:
             type: console
 
 parameters:
-  channel: http
+  channel: https
