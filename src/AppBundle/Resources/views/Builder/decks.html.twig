@@ -72,6 +72,12 @@
                 <h1>My private decks
                     <small style="font-size:16px" class="hidden-xs {% if cannotcreate %}text-danger{% endif %}">({{ nbdecks }}/{{ nbmax }} slots)</small>
                 </h1>
+                {% if not show_all and nbloaded < nbdecks %}
+                <div class="alert alert-info" style="margin-bottom:10px">
+                    Showing&nbsp;{{ nbloaded }} most recent decks of&nbsp;{{ nbdecks }} total.
+                    <a href="{{ path('decks_list') }}?all=1" class="btn btn-xs btn-default">Load all&nbsp;{{ nbdecks }} decks</a>
+                </div>
+                {% endif %}
 
                 <table class="table table-expanded list-decks">
                     <tbody id="decks">

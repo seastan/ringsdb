@@ -2352,3 +2352,106 @@ h1.nightmare, h1.easy {
   letter-spacing: 2px;
   padding: 6px;
 }
+
+// Multi-deck builder deck selector
+#multi-deck-tabs {
+  margin-bottom: 16px;
+
+  .multi-deck-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .multi-deck-item {
+    border-left: 3px solid transparent;
+    transition: background-color 0.12s;
+
+    + .multi-deck-item,
+    + .multi-deck-add-item {
+      border-top: 1px solid #f0f0f0;
+    }
+
+    &:hover:not(.multi-deck-item-active) {
+      background-color: #f6f8fa;
+    }
+
+    &.multi-deck-item-active {
+      background-color: #f5f7fa;
+      border-left-color: #8a8a8a;
+    }
+  }
+
+  .multi-deck-item-inner {
+    display: block;
+    padding: 9px 12px;
+    text-decoration: none;
+    color: inherit;
+
+    &:hover, &:focus {
+      text-decoration: none;
+      color: inherit;
+    }
+  }
+
+  .multi-deck-item-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+  }
+
+  .multi-deck-item-active .multi-deck-item-name {
+    color: #222;
+  }
+
+  .multi-deck-item-heroes {
+    line-height: 1.5;
+  }
+
+  .multi-deck-hero {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 500;
+    margin-right: 10px;
+    text-decoration: none;
+
+    &:last-child { margin-right: 0; }
+    &:hover { text-decoration: none; }
+
+    .icon-leadership, .icon-lore, .icon-spirit,
+    .icon-tactics, .icon-neutral, .icon-baggins, .icon-fellowship {
+      font-size: 11px;
+    }
+  }
+
+  .multi-deck-no-heroes {
+    font-size: 12px;
+    color: #aaa;
+    font-style: italic;
+  }
+
+  .multi-deck-add-item {
+    padding: 8px 12px;
+    background-color: #fafafa;
+    font-size: 13px;
+
+    a {
+      color: #555;
+
+      &:hover { color: #333; text-decoration: none; }
+    }
+  }
+
+  .multi-deck-help {
+    cursor: pointer;
+    font-size: 12px;
+    color: #bbb;
+
+    &:hover { color: #888; }
+  }
+}

@@ -256,7 +256,12 @@
      * @memberOf ui
      * @param event
      */
-    ui.on_submit_form = function() {
+    ui.on_submit_form = function(event) {
+        if (app.multiDeck && app.multiDeck.decks.length > 1) {
+            event.preventDefault();
+            app.multiDeck.saveAll();
+            return false;
+        }
         var deck_json = app.deck.get_json();
 
         $('input[name="content"]').val(deck_json);
@@ -445,6 +450,8 @@
         var card_quantity = app.deck.set_card_copies(card_code, quantity, is_sideboard);
         ui.refresh_deck();
         ui.refresh_row(card_code, card_quantity);
+        // Keep the hero list in the deck selector current as heroes are added/removed.
+        app.multiDeck && app.multiDeck.render_tabs();
     };
 
     /**
@@ -495,6 +502,26 @@
         $('thead').on('click', 'a[data-sort]', ui.on_table_sort_click);
 
         $('#menu-sort').on('click', 'a[id]', ui.do_action_deck);
+
+        // Multi-deck tab navigation
+        $(document).on('click', '.multi-deck-tab', function(e) {
+            e.preventDefault();
+            var idx = parseInt($(this).data('idx'), 10);
+            app.multiDeck && app.multiDeck.activateDeck(idx);
+        });
+
+        $(document).on('click', '.js-add-deck', function(e) {
+            e.preventDefault();
+            app.multiDeck && app.multiDeck.addDeck();
+        });
+
+        // Sync name input back to the active deck entry so tab labels stay current
+        $('input.decklist-name').on('input', function() {
+            if (app.multiDeck && app.multiDeck.decks.length > 0) {
+                app.multiDeck.decks[app.multiDeck.activeIdx].name = $(this).val();
+                app.multiDeck.render_tabs();
+            }
+        });
     };
 
     ui.do_action_deck = function(event) {
@@ -852,6 +879,7 @@
         ui.setup_typeahead();
         ui.setup_dataupdate();
         app.deck_history && app.deck_history.setup('#history');
+        app.multiDeck && app.multiDeck.init();
     };
 
     ui.read_config_from_storage();
