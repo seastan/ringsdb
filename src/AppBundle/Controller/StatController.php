@@ -341,14 +341,6 @@ ON c.cycle = u.cycle";
 	}
 
 	public function getStatCardsAction(Request $request) {
-		// TEMPORARILY DISABLED after the card-printings refactor: this report's raw
-		// SQL still joins the dropped card.pack_id / card.octgnid columns. Return a
-		// notice instead of a 500 until the queries are rewritten through card_printing
-		// (primary printing). Admin-only route (/admin/stat_cards).
-		return new \Symfony\Component\HttpFoundation\Response(
-			'The per-card stats report is temporarily unavailable while the card-printings migration is finalized.',
-			503
-		);
 		set_time_limit(120);
 		$month = $request->query->get('month');
 		if (!$month) {
@@ -376,8 +368,9 @@ JOIN decklistslot dls
 ON dl.id = dls.decklist_id
 JOIN card c
 ON dls.card_id = c.id
+JOIN (SELECT cpx.card_id, cpx.pack_id, cpx.octgnid FROM card_printing cpx WHERE cpx.id = (SELECT cpy.id FROM card_printing cpy JOIN pack py ON py.id = cpy.pack_id WHERE cpy.card_id = cpx.card_id ORDER BY (py.date_release IS NULL), py.date_release, cpy.position, cpy.id LIMIT 1)) cprim ON cprim.card_id = c.id
 JOIN pack cp
-ON c.pack_id = cp.id
+ON cp.id = cprim.pack_id
 WHERE dl.date_creation LIKE '" . $month . "-%'
   AND p.date_release >= '2019-08-02'
   AND (c.cost IS NULL OR c.cost != '-')";
@@ -409,8 +402,9 @@ JOIN deckslot ds
 ON d.id = ds.deck_id
 JOIN card c
 ON ds.card_id = c.id
+JOIN (SELECT cpx.card_id, cpx.pack_id, cpx.octgnid FROM card_printing cpx WHERE cpx.id = (SELECT cpy.id FROM card_printing cpy JOIN pack py ON py.id = cpy.pack_id WHERE cpy.card_id = cpx.card_id ORDER BY (py.date_release IS NULL), py.date_release, cpy.position, cpy.id LIMIT 1)) cprim ON cprim.card_id = c.id
 JOIN pack cp
-ON c.pack_id = cp.id
+ON cp.id = cprim.pack_id
 WHERE dl.parent_deck_id IS NULL
   AND d.last_pack_id IS NOT NULL
   AND d.problem IS NULL
@@ -435,7 +429,7 @@ SELECT DISTINCT id
 			$dbh->executeQuery($query, []);
 
 			$query1 = "SELECT c.code,
-  c.octgnid,
+  cprim.octgnid,
   c.name,
   t.name AS type,
   s.name AS sphere,
@@ -445,8 +439,9 @@ SELECT DISTINCT id
   COUNT(sl.code) AS full_decks,
   ROUND(COALESCE(AVG(sl.quantity), 0), 2) AS full_deck_copies
 FROM card c
+JOIN (SELECT cpx.card_id, cpx.pack_id, cpx.octgnid FROM card_printing cpx WHERE cpx.id = (SELECT cpy.id FROM card_printing cpy JOIN pack py ON py.id = cpy.pack_id WHERE cpy.card_id = cpx.card_id ORDER BY (py.date_release IS NULL), py.date_release, cpy.position, cpy.id LIMIT 1)) cprim ON cprim.card_id = c.id
 JOIN pack p
-ON c.pack_id = p.id
+ON p.id = cprim.pack_id
 JOIN type t
 ON c.type_id = t.id
 JOIN sphere s
@@ -511,8 +506,9 @@ JOIN decklistslot dls
 ON dl.id = dls.decklist_id
 JOIN card c
 ON dls.card_id = c.id
+JOIN (SELECT cpx.card_id, cpx.pack_id, cpx.octgnid FROM card_printing cpx WHERE cpx.id = (SELECT cpy.id FROM card_printing cpy JOIN pack py ON py.id = cpy.pack_id WHERE cpy.card_id = cpx.card_id ORDER BY (py.date_release IS NULL), py.date_release, cpy.position, cpy.id LIMIT 1)) cprim ON cprim.card_id = c.id
 JOIN pack cp
-ON c.pack_id = cp.id
+ON cp.id = cprim.pack_id
 WHERE dl.date_creation LIKE '" . $month . "-%'
   AND p.date_release < '2019-08-02'
   AND (c.cost IS NULL OR c.cost != '-')";
@@ -544,8 +540,9 @@ JOIN deckslot ds
 ON d.id = ds.deck_id
 JOIN card c
 ON ds.card_id = c.id
+JOIN (SELECT cpx.card_id, cpx.pack_id, cpx.octgnid FROM card_printing cpx WHERE cpx.id = (SELECT cpy.id FROM card_printing cpy JOIN pack py ON py.id = cpy.pack_id WHERE cpy.card_id = cpx.card_id ORDER BY (py.date_release IS NULL), py.date_release, cpy.position, cpy.id LIMIT 1)) cprim ON cprim.card_id = c.id
 JOIN pack cp
-ON c.pack_id = cp.id
+ON cp.id = cprim.pack_id
 WHERE dl.parent_deck_id IS NULL
   AND d.last_pack_id IS NOT NULL
   AND d.problem IS NULL
@@ -573,8 +570,9 @@ SELECT DISTINCT id
     COUNT(sl.code) AS limited_decks,
     ROUND(COALESCE(AVG(sl.quantity), 0), 2) AS limited_deck_copies
 FROM card c
+JOIN (SELECT cpx.card_id, cpx.pack_id, cpx.octgnid FROM card_printing cpx WHERE cpx.id = (SELECT cpy.id FROM card_printing cpy JOIN pack py ON py.id = cpy.pack_id WHERE cpy.card_id = cpx.card_id ORDER BY (py.date_release IS NULL), py.date_release, cpy.position, cpy.id LIMIT 1)) cprim ON cprim.card_id = c.id
 JOIN pack p
-ON c.pack_id = p.id
+ON p.id = cprim.pack_id
 JOIN type t
 ON c.type_id = t.id
 JOIN sphere s
@@ -631,8 +629,9 @@ ORDER BY c.code";
     COUNT(sl.new_code) AS sides,
     ROUND(COALESCE(AVG(sl.quantity), 0), 2) AS side_copies
   FROM card c
+  JOIN (SELECT cpx.card_id, cpx.pack_id, cpx.octgnid FROM card_printing cpx WHERE cpx.id = (SELECT cpy.id FROM card_printing cpy JOIN pack py ON py.id = cpy.pack_id WHERE cpy.card_id = cpx.card_id ORDER BY (py.date_release IS NULL), py.date_release, cpy.position, cpy.id LIMIT 1)) cprim ON cprim.card_id = c.id
   JOIN pack p
-  ON c.pack_id = p.id
+  ON p.id = cprim.pack_id
   JOIN type t
   ON c.type_id = t.id
   JOIN sphere s
@@ -651,8 +650,9 @@ ORDER BY c.code";
     ON dl.id = dls.decklist_id
     JOIN card c
     ON dls.card_id = c.id
+    JOIN (SELECT cpx.card_id, cpx.pack_id, cpx.octgnid FROM card_printing cpx WHERE cpx.id = (SELECT cpy.id FROM card_printing cpy JOIN pack py ON py.id = cpy.pack_id WHERE cpy.card_id = cpx.card_id ORDER BY (py.date_release IS NULL), py.date_release, cpy.position, cpy.id LIMIT 1)) cprim ON cprim.card_id = c.id
     JOIN pack cp
-    ON c.pack_id = cp.id
+    ON cp.id = cprim.pack_id
     WHERE dl.date_creation LIKE '" . $month . "-%'
 
     UNION ALL
@@ -689,8 +689,9 @@ ORDER BY c.code";
     ON d.id = ds.deck_id
     JOIN card c
     ON ds.card_id = c.id
+    JOIN (SELECT cpx.card_id, cpx.pack_id, cpx.octgnid FROM card_printing cpx WHERE cpx.id = (SELECT cpy.id FROM card_printing cpy JOIN pack py ON py.id = cpy.pack_id WHERE cpy.card_id = cpx.card_id ORDER BY (py.date_release IS NULL), py.date_release, cpy.position, cpy.id LIMIT 1)) cprim ON cprim.card_id = c.id
     JOIN pack cp
-    ON c.pack_id = cp.id
+    ON cp.id = cprim.pack_id
     WHERE dl.parent_deck_id IS NULL
       AND d.last_pack_id IS NOT NULL
       AND d.problem IS NULL
@@ -801,14 +802,6 @@ FROM (
 	}
 
 	public function getStatPacksAction(Request $request) {
-		// TEMPORARILY DISABLED after the card-printings refactor: getQuests() below
-		// runs raw SQL that selects the dropped card.octgnid column. Return a notice
-		// instead of a 500 until rewritten through card_printing. Admin-only route
-		// (/admin/stat_packs). The main /admin/stat report is unaffected.
-		return new \Symfony\Component\HttpFoundation\Response(
-			'The per-pack stats report is temporarily unavailable while the card-printings migration is finalized.',
-			503
-		);
         /* @var $dbh \Doctrine\DBAL\Connection */
 		$packs = $this->getPacks();
 		$pack_rules = $this->getPackRuless();
@@ -867,13 +860,15 @@ ORDER BY p.name";
 	function getOctgnIdMapping() {
 		$dbh = $this->getDoctrine()->getConnection();
 
-		$query = "SELECT c1.octgnid AS id1,
-  c2.octgnid AS id2
+		$query = "SELECT cprim1.octgnid AS id1,
+  cprim2.octgnid AS id2
 FROM card c1
+JOIN (SELECT cpx.card_id, cpx.pack_id, cpx.octgnid FROM card_printing cpx WHERE cpx.id = (SELECT cpy.id FROM card_printing cpy JOIN pack py ON py.id = cpy.pack_id WHERE cpy.card_id = cpx.card_id ORDER BY (py.date_release IS NULL), py.date_release, cpy.position, cpy.id LIMIT 1)) cprim1 ON cprim1.card_id = c1.id
 JOIN pack p
-ON c1.pack_id = p.id
+ON p.id = cprim1.pack_id
 JOIN card c2
 ON source_code(c1.code, p.name) = c2.code
+JOIN (SELECT cpx.card_id, cpx.pack_id, cpx.octgnid FROM card_printing cpx WHERE cpx.id = (SELECT cpy.id FROM card_printing cpy JOIN pack py ON py.id = cpy.pack_id WHERE cpy.card_id = cpx.card_id ORDER BY (py.date_release IS NULL), py.date_release, cpy.position, cpy.id LIMIT 1)) cprim2 ON cprim2.card_id = c2.id
 WHERE c1.code != c2.code
 ORDER BY CAST(c1.code AS UNSIGNED)";
 		$res = $dbh->executeQuery($query, [])->fetchAll(\PDO::FETCH_ASSOC);
