@@ -1032,7 +1032,8 @@ app.multiDeck = {
             description_md: app.deck.get_description_md() || '',
             tags: '',
             slots: {},
-            sideslots: {}
+            sideslots: {},
+            history: app.deck_history ? app.deck_history.get_snapshots().slice() : []
         }];
         app.multiDeck.activeIdx = 0;
         app.multiDeck.render_tabs();
@@ -1043,6 +1044,10 @@ app.multiDeck = {
         var d = app.multiDeck.decks[app.multiDeck.activeIdx];
         var nameVal = jQuery('input.decklist-name').val();
         if (nameVal !== undefined) d.name = nameVal;
+
+        if (app.deck_history) {
+            d.history = app.deck_history.get_snapshots().slice();
+        }
 
         var slots = {};
         var sideslots = {};
@@ -1066,6 +1071,7 @@ app.multiDeck = {
         app.deck.set_slots(d.slots, d.sideslots);
         jQuery('input.decklist-name').val(d.name || '');
         jQuery('#deck-save-id').val(d.id || '');
+        app.deck_history && app.deck_history.reset(d.history || []);
         app.ui && app.ui.refresh_deck && app.ui.refresh_deck();
         app.ui && app.ui.reset_list && app.ui.reset_list();
         app.multiDeck.render_tabs();
@@ -1080,12 +1086,14 @@ app.multiDeck = {
             description_md: '',
             tags: '',
             slots: {},
-            sideslots: {}
+            sideslots: {},
+            history: []
         };
         app.multiDeck.decks.push(newDeck);
         app.multiDeck.activeIdx = app.multiDeck.decks.length - 1;
         app.deck.setMeta(newDeck);
         app.deck.set_slots({}, {});
+        app.deck_history && app.deck_history.reset([]);
         jQuery('input.decklist-name').val(newDeck.name);
         jQuery('#deck-save-id').val('');
         jQuery('#save_form button[type=submit]').first().text('Save All');
@@ -1190,15 +1198,13 @@ app.multiDeck = {
             var hHtml = heroListHtml(heroCards(d, isActive));
             var liClass = 'multi-deck-item' + (isActive ? ' multi-deck-item-active' : '');
 
+            var innerClass = 'multi-deck-item-inner' + (isActive ? '' : ' multi-deck-tab');
+            var innerAttrs = isActive ? '' : ' data-idx="' + i + '" role="button"';
             html += '<li class="' + liClass + '">';
-            if (isActive) {
-                html += '<div class="multi-deck-item-inner">';
-            } else {
-                html += '<a href="#" class="multi-deck-tab multi-deck-item-inner" data-idx="' + i + '">';
-            }
+            html += '<div class="' + innerClass + '"' + innerAttrs + '>';
             html += '<div class="multi-deck-item-name">' + label + '</div>';
             html += '<div class="multi-deck-item-heroes">' + hHtml + '</div>';
-            html += isActive ? '</div>' : '</a>';
+            html += '</div>';
             html += '</li>';
         });
 

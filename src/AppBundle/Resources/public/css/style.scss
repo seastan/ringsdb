@@ -2389,12 +2389,10 @@ h1.nightmare, h1.easy {
   .multi-deck-item-inner {
     display: block;
     padding: 9px 12px;
-    text-decoration: none;
     color: inherit;
 
-    &:hover, &:focus {
-      text-decoration: none;
-      color: inherit;
+    &.multi-deck-tab {
+      cursor: pointer;
     }
   }
 
