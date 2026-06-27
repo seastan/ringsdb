@@ -76,6 +76,45 @@
     };
 
     /**
+     * Recomputes maxqty accounting for packs checked in the sets dropdown that
+     * the user doesn't own. A selected-but-unowned pack is treated as granting
+     * the card's printed quantity (same as owning one copy of that pack).
+     * Clears the cached card rows so they are rebuilt with the new maxqty.
+     * @memberOf ui
+     */
+    ui.recompute_max_qty_for_selected_packs = function() {
+        var checkedPackCodes = {};
+        $('[data-filter="pack_code"] input[type=checkbox]:checked').each(function() {
+            checkedPackCodes[$(this).attr('name')] = true;
+        });
+
+        var ownedCounts = app.data.owned_pack_counts || {};
+
+        app.data.cards.find().forEach(function(record) {
+            var base = (record.owned_copies == null) ? 999 : record.owned_copies;
+            var effective = base;
+
+            if (effective < 999) {
+                var sources = (record.packs && record.packs.length)
+                    ? record.packs.map(function(pr) { return { pack_code: pr.pack_code, quantity: pr.quantity || 0 }; })
+                    : [{ pack_code: record.pack_code, quantity: 1 }];
+
+                _.forEach(sources, function(src) {
+                    if (checkedPackCodes[src.pack_code] && !(ownedCounts[src.pack_code] > 0)) {
+                        effective += src.quantity;
+                    }
+                });
+            }
+
+            app.data.cards.updateById(record.code, {
+                maxqty: Math.min(3, record.deck_limit, effective)
+            });
+        });
+
+        ui.reset_list();
+    };
+
+    /**
      * builds the sphere selector
      * @memberOf ui
      */
@@ -456,6 +495,10 @@
             change: ui.refresh_list,
             click: ui.on_click_filter
         }, 'label');
+
+        $('[data-filter="pack_code"]').on('change', 'label', function() {
+            ui.recompute_max_qty_for_selected_packs();
+        });
 
         $('#filter-text').on('input', ui.on_input_smartfilter);
 
