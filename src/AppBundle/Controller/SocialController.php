@@ -418,7 +418,8 @@ class SocialController extends Controller {
                     p.name AS pack_name
     				FROM card k
                     INNER JOIN sphere s ON s.id = k.sphere_id
-                    INNER JOIN pack p ON p.id = k.pack_id
+                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 WHERE cp2.card_id = k.id ORDER BY cp2.position ASC, cp2.id ASC LIMIT 1)
+                    INNER JOIN pack p ON p.id = cpr.pack_id
                     WHERE k.code IN (?)
     				ORDER BY k.code DESC", [$cards_to_exclude], [\Doctrine\DBAL\Connection::PARAM_INT_ARRAY])->fetchAll();
 
