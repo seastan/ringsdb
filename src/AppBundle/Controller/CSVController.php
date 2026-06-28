@@ -114,20 +114,31 @@ class CSVController extends Controller {
 		foreach ($cards as $card) {
 			$changed = false;
 
-			// Look up by octgnid scoped to this specific pack.
+			// Determine the target pack for this card: use the CSV 'pack'
+			// column if it names a different pack, otherwise default to the
+			// primary upload pack.
+			$cardPack = $pack;
+			if (!empty($card['pack']) && $card['pack'] !== $pack->getName()) {
+				$namedPack = $packRepo->findOneBy(['name' => $card['pack']]);
+				if ($namedPack) {
+					$cardPack = $namedPack;
+				}
+			}
+
+			// Look up by octgnid scoped to the card's target pack.
 			$printingEntity = $printingRepo->findOneBy([
 				'octgnid' => $card['octgnid'],
-				'pack' => $pack,
+				'pack' => $cardPack,
 			]);
 
 			if ($printingEntity) {
 				$cardEntity = $printingEntity->getCard();
 			}
 			else {
-				// For cards being promoted from MotKA, reuse the existing
-				// canonical Card rather than creating a duplicate.
+				// For cards being promoted from MotKA into a non-MotKA pack,
+				// reuse the existing canonical Card rather than creating a duplicate.
 				$cardEntity = null;
-				if ($motkPack) {
+				if ($motkPack && $cardPack !== $motkPack) {
 					$motkPrinting = $printingRepo->findOneBy([
 						'octgnid' => $card['octgnid'],
 						'pack' => $motkPack,
@@ -135,6 +146,11 @@ class CSVController extends Controller {
 					if ($motkPrinting) {
 						$cardEntity = $motkPrinting->getCard();
 					}
+				}
+
+				if (!$cardEntity) {
+					$cardRepo = $em->getRepository('AppBundle:Card');
+					$cardEntity = $cardRepo->findOneBy(['code' => $card['code']]);
 				}
 
 				if (!$cardEntity) {
@@ -149,7 +165,7 @@ class CSVController extends Controller {
 				$now = new \DateTime();
 				$printingEntity->setDateCreation($now);
 				$printingEntity->setDateUpdate($now);
-				$printingEntity->setPack($pack);
+				$printingEntity->setPack($cardPack);
 				$printingEntity->setCard($cardEntity);
 				$printingEntity->setPosition(1);
 				$printingEntity->setQuantity(1);
