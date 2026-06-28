@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
 use AppBundle\Entity\Card;
+use AppBundle\Entity\CardPrinting;
 use AppBundle\Entity\Cycle;
 use AppBundle\Entity\Pack;
 
@@ -76,66 +77,117 @@ class CSVController extends Controller {
 			$em->flush();
 		}
 
-		$oldCards = $pack->getCards();
+		// Build oldIds from the pack's CardPrintings (not Card rows, since a
+		// canonical Card may appear in multiple packs after the refactor).
 		$oldIds = [];
+		foreach ($pack->getPrintings() as $printing) {
+			$oldIds[$printing->getOctgnid()] = 1;
+			if (!array_key_exists($printing->getOctgnid(), $newIds) &&
+				strpos($printing->getCard()->getName(), '[deleted]') === false) {
+				$card = $printing->getCard();
+				$card->setName('[deleted] ' . $card->getName());
+				$card->setCode($card->getCode() . '_' . uniqid());
+			}
+		}
+
+		// Cards that existed in ALePMotKA and are now being "promoted" into a
+		// main pack upload should have the MotKA printing's Card marked deleted.
 		$motkPack = $packRepo->findOneBy(['code' => 'ALePMotKA']);
-		$oldMotkCards = $motkPack->getCards();
-
-		foreach ($oldCards as $card) {
-			$oldIds[$card->getOctgnid()] = 1;
-
-			if (!array_key_exists($card->getOctgnid(), $newIds) &&
-				(strpos($card->getName(), '[deleted]') === false)) {
-				$card->setName('[deleted] ' . $card->getName());
-				$card->setCode($card->getCode() . '_' . uniqid());
+		if ($motkPack) {
+			foreach ($motkPack->getPrintings() as $printing) {
+				if (array_key_exists($printing->getOctgnid(), $oldIds) &&
+					strpos($printing->getCard()->getName(), '[deleted]') === false) {
+					$card = $printing->getCard();
+					$card->setName('[deleted] ' . $card->getName());
+					$card->setCode($card->getCode() . '_' . uniqid());
+				}
 			}
 		}
 
-		foreach ($oldMotkCards as $card) {
-			if (array_key_exists($card->getOctgnid(), $oldIds) &&
-				(strpos($card->getName(), '[deleted]') === false)) {
-				$card->setName('[deleted] ' . $card->getName());
-				$card->setCode($card->getCode() . '_' . uniqid());
-			}
-		}
-
-		$cardRepo = $em->getRepository('AppBundle:Card');
-		$metaData = $em->getClassMetadata('AppBundle:Card');
-		$fieldNames = $metaData->getFieldNames();
-		$associationMappings = $metaData->getAssociationMappings();
+		$printingRepo = $em->getRepository('AppBundle:CardPrinting');
+		$cardMeta = $em->getClassMetadata('AppBundle:Card');
+		$cardFieldNames = $cardMeta->getFieldNames();
+		$cardAssocMappings = $cardMeta->getAssociationMappings();
+		$printingMeta = $em->getClassMetadata('AppBundle:CardPrinting');
+		$printingFieldNames = $printingMeta->getFieldNames();
 
 		foreach ($cards as $card) {
 			$changed = false;
-			$entities = $cardRepo->findBy(['octgnid' => $card['octgnid']]);
-			$entity = null;
-			if ($entities) {
-				foreach ($entities as $candidate) {
-					if (($card['pack'] == 'ALeP - Messenger of the King Allies') &&
-						($candidate->getPack()->getName() == 'ALeP - Messenger of the King Allies')) {
-						$entity = $candidate;
-						break;
-					}
-					elseif (($card['pack'] != 'ALeP - Messenger of the King Allies') &&
-						($candidate->getPack()->getName() != 'ALeP - Messenger of the King Allies')) {
-						$entity = $candidate;
-						break;
-					}
+
+			// Determine the target pack for this card: use the CSV 'pack'
+			// column if it names a different pack, otherwise default to the
+			// primary upload pack.
+			$cardPack = $pack;
+			if (!empty($card['pack']) && $card['pack'] !== $pack->getName()) {
+				$namedPack = $packRepo->findOneBy(['name' => $card['pack']]);
+				if ($namedPack) {
+					$cardPack = $namedPack;
 				}
 			}
 
-			if (!$entity) {
-				$entity = new Card();
+			// Look up by octgnid scoped to the card's target pack.
+			$printingEntity = $printingRepo->findOneBy([
+				'octgnid' => $card['octgnid'],
+				'pack' => $cardPack,
+			]);
+
+			if ($printingEntity) {
+				$cardEntity = $printingEntity->getCard();
+			}
+			else {
+				// For cards being promoted from MotKA into a non-MotKA pack,
+				// reuse the existing canonical Card rather than creating a duplicate.
+				$cardEntity = null;
+				if ($motkPack && $cardPack !== $motkPack) {
+					$motkPrinting = $printingRepo->findOneBy([
+						'octgnid' => $card['octgnid'],
+						'pack' => $motkPack,
+					]);
+					if ($motkPrinting) {
+						$cardEntity = $motkPrinting->getCard();
+					}
+				}
+
+				if (!$cardEntity) {
+					$cardRepo = $em->getRepository('AppBundle:Card');
+					$cardEntity = $cardRepo->findOneBy(['code' => $card['code']]);
+				}
+
+				if (!$cardEntity) {
+					$cardEntity = new Card();
+					$now = new \DateTime();
+					$cardEntity->setDateCreation($now);
+					$cardEntity->setDateUpdate($now);
+					$em->persist($cardEntity);
+				}
+
+				$printingEntity = new CardPrinting();
 				$now = new \DateTime();
-				$entity->setDateCreation($now);
-				$entity->setDateUpdate($now);
+				$printingEntity->setDateCreation($now);
+				$printingEntity->setDateUpdate($now);
+				$printingEntity->setPack($cardPack);
+				$printingEntity->setCard($cardEntity);
+				$printingEntity->setPosition(1);
+				$printingEntity->setQuantity(1);
+				// imageCode is non-nullable; default to the card code and let
+				// the field loop below override it from the CSV column.
+				$printingEntity->setImageCode($card['imageCode'] ?? $card['image_code'] ?? $card['code'] ?? '');
+				$em->persist($printingEntity);
+				$changed = true;
 			}
 
 			foreach ($card as $colName => $value) {
+				// octgnid is set on the printing at creation; pack comes from the form.
+				if ($colName === 'octgnid' || $colName === 'pack') {
+					continue;
+				}
+
 				$getter = str_replace(' ', '', ucwords(str_replace('_', ' ', "get_$colName")));
 				$setter = str_replace(' ', '', ucwords(str_replace('_', ' ', "set_$colName")));
 
-				if (key_exists($colName, $associationMappings)) {
-					$associationMapping = $associationMappings[$colName];
+				if (key_exists($colName, $cardAssocMappings)) {
+					// Association field on Card (type, sphere).
+					$associationMapping = $cardAssocMappings[$colName];
 					$associationRepository = $em->getRepository($associationMapping['targetEntity']);
 					$associationEntity = $associationRepository->findOneBy(['name' => $value]);
 
@@ -152,38 +204,60 @@ class CSVController extends Controller {
 						}
 					}
 
-					if (!$entity->$getter() || $entity->$getter()->getId() !== $associationEntity->getId()) {
+					if (!$cardEntity->$getter() || $cardEntity->$getter()->getId() !== $associationEntity->getId()) {
 						$changed = true;
-						$entity->$setter($associationEntity);
+						$cardEntity->$setter($associationEntity);
 					}
 				}
-				else {
-					if (in_array($colName, $fieldNames)) {
-						$type = $metaData->getTypeOfField($colName);
+				elseif (in_array($colName, $cardFieldNames)) {
+					// Scalar field on Card.
+					$type = $cardMeta->getTypeOfField($colName);
 
-						if ($type === 'boolean') {
-							$value = (boolean)$value;
-						}
-						elseif (($type === 'smallint') && ($value == '')) {
-							$value = null;
-						}
-						elseif (($type === 'smallint') && ($value == 'X')) {
-							$value = null;
-						}
-						elseif (($colName == 'cost') && ($value == '')) {
-							$value = null;
-						}
+					if ($type === 'boolean') {
+						$value = (boolean)$value;
+					}
+					elseif (($type === 'smallint') && ($value == '')) {
+						$value = null;
+					}
+					elseif (($type === 'smallint') && ($value == 'X')) {
+						$value = null;
+					}
+					elseif (($colName == 'cost') && ($value == '')) {
+						$value = null;
+					}
 
-						if ($entity->$getter() !== $value) {
-							$changed = true;
-							$entity->$setter($value);
-						}
+					if ($cardEntity->$getter() !== $value) {
+						$changed = true;
+						$cardEntity->$setter($value);
+					}
+				}
+				elseif (in_array($colName, $printingFieldNames)) {
+					// Scalar field on CardPrinting (quantity, illustrator, imageCode, …).
+					$type = $printingMeta->getTypeOfField($colName);
+
+					if ($type === 'boolean') {
+						$value = (boolean)$value;
+					}
+					elseif (($type === 'smallint') && ($value == '')) {
+						$value = null;
+					}
+					elseif (($type === 'smallint') && ($value == 'X')) {
+						$value = null;
+					}
+					elseif (($colName == 'cost') && ($value == '')) {
+						$value = null;
+					}
+
+					if ($printingEntity->$getter() !== $value) {
+						$changed = true;
+						$printingEntity->$setter($value);
 					}
 				}
 			}
 
 			if ($changed) {
-				$em->persist($entity);
+				$em->persist($cardEntity);
+				$em->persist($printingEntity);
 			}
 		}
 

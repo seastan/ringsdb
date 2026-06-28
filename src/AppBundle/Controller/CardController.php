@@ -201,6 +201,12 @@ class CardController extends Controller {
             $dbh->executeQuery($query, []);
             $query = "DELETE FROM decklistsideslot WHERE card_id = " . $id;
             $dbh->executeQuery($query, []);
+            $query = "DELETE FROM card_printing WHERE card_id = " . $id;
+            $dbh->executeQuery($query, []);
+            $query = "DELETE FROM reviewvote WHERE review_id IN (SELECT id FROM review WHERE card_id = " . $id . ")";
+            $dbh->executeQuery($query, []);
+            $query = "DELETE FROM review WHERE card_id = " . $id;
+            $dbh->executeQuery($query, []);
 
             $em->remove($entity);
             $em->flush();
