@@ -33,6 +33,14 @@ class CardStatsCalculator {
 		// correlated subquery + filesort.
 		$dbh->executeQuery("SET SESSION optimizer_switch = 'derived_merge=off'");
 
+		// Temp tables live for the whole DB connection, and the precompute command
+		// reuses one connection across months/steps -- so drop any left over from a
+		// previous computeCards() call before recreating them.
+		foreach (['decklist_filtered', 'decklist_motka', 'decklist_contract', 'deck_filtered', 'deck_motka', 'deck_contract',
+				  'decklist_filtered2', 'decklist_motka2', 'decklist_contract2', 'deck_filtered2', 'deck_motka2', 'deck_contract2'] as $tmp) {
+			$dbh->executeQuery("DROP TEMPORARY TABLE IF EXISTS $tmp");
+		}
+
 		if ($step == '1') {
 			$query = "CREATE TEMPORARY TABLE decklist_filtered
 SELECT CASE WHEN CAST(c.code AS UNSIGNED) > 1000000 THEN SUBSTRING(c.code, 3) ELSE source_code(c.code, cp.name) END AS code,
