@@ -27,6 +27,10 @@ services:
         class: AppBundle\Services\CardsData
         arguments: ["@doctrine", "@request_stack", "@router", "@templating.helper.assets", "%kernel.root_dir%"]
 
+    app.card_stats:
+        class: AppBundle\Stats\CardStatsCalculator
+        arguments: ["@doctrine"]
+
     decklist_manager:
         class: AppBundle\Model\DecklistManager
         shared: false

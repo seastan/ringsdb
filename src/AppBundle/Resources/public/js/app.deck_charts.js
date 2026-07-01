@@ -1,5 +1,7 @@
 (function app_deck_charts(deck_charts, $) {
 
+    var darkMode = $('html').hasClass('dark-mode');
+
     var sphere_colors = {
         spirit: '#00B1D4',
         lore: '#51B848',
@@ -481,7 +483,11 @@
                     enabled: true,
                     style: {
                         fontWeight: 'bold',
-                        color: 'gray'
+                        // In dark mode invert the label: light text with a dark outline,
+                        // since the default dark-gray text + white shadow is unreadable
+                        // against the dark chart background.
+                        color: darkMode ? '#d6d6d6' : 'gray',
+                        textOutline: darkMode ? '1px #1a1a1d' : undefined
                     }
                 }
             },

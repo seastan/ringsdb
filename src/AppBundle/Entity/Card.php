@@ -132,10 +132,37 @@ class Card {
     }
 
     public function getPrimaryPrinting() {
+        $primary = null;
         foreach ($this->printings as $p) {
-            return $p;
+            if ($primary === null) {
+                $primary = $p;
+                continue;
+            }
+
+            $pDate = $p->getPack() ? $p->getPack()->getDateRelease() : null;
+            $primaryDate = $primary->getPack() ? $primary->getPack()->getDateRelease() : null;
+
+            // Prefer the earliest-released pack so the canonical printing is the
+            // original one (e.g. Core Set over a later reprint or starter). A
+            // null release date (unreleased/spoiled pack) sorts last; ties fall
+            // back to the lower position.
+            if ($pDate === null && $primaryDate === null) {
+                $better = $p->getPosition() < $primary->getPosition();
+            } else if ($pDate === null) {
+                $better = false;
+            } else if ($primaryDate === null) {
+                $better = true;
+            } else if ($pDate == $primaryDate) {
+                $better = $p->getPosition() < $primary->getPosition();
+            } else {
+                $better = $pDate < $primaryDate;
+            }
+
+            if ($better) {
+                $primary = $p;
+            }
         }
-        return null;
+        return $primary;
     }
 
     /**

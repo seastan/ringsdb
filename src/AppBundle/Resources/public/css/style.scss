@@ -212,6 +212,11 @@ div.tags span.tag {
 .deck-content {
   margin-bottom: 15px;
 
+  span.icon {
+    font-size: 1em;
+    vertical-align: middle;
+  }
+
   .invalid-card {
     text-decoration: line-through;
   }
@@ -1261,13 +1266,7 @@ div.site-news {
     color: $color;
   }
 
-  .fg-#{$name} {
-    &.icon-hero, &.icon-ally, &.icon-attachment, &.icon-event, &.icon-player-side-quest, &.icon-player-objective, &.icon-contract, &.icon-treasure {
-      &:before {
-        opacity: .1;
-      }
-    }
-  }
+
 }
 
 @include fg-color(leadership, #AD62A5);
@@ -2351,4 +2350,155 @@ h1.nightmare, h1.easy {
   content: "\f142 \f142";
   letter-spacing: 2px;
   padding: 6px;
+}
+
+// Multi-deck builder deck selector
+#multi-deck-tabs {
+  margin-bottom: 0;
+}
+
+.multi-deck-browser-bar {
+  display: flex;
+  align-items: flex-end;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
+}
+
+.multi-deck-browser-tabs {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.multi-deck-browser-tab {
+  position: relative;
+  border: 1px solid transparent;
+  border-radius: 4px 4px 0 0;
+  margin-right: 2px;
+  background: #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  width: 160px;
+  flex-shrink: 0;
+
+  .multi-deck-tab-label {
+    display: block;
+    padding: 7px 16px 4px 28px;
+    font-size: 13px;
+    color: #777;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .multi-deck-tab-heroes {
+    padding: 0 16px 8px;
+    flex: 1;
+  }
+
+  .multi-deck-tab-hero-name {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .multi-deck-tab-no-heroes {
+    display: block;
+    font-size: 11px;
+    color: #bbb;
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  &.active {
+    background: #fff;
+    border-color: #ddd #ddd #fff;
+    margin-bottom: -1px;
+
+    .multi-deck-tab-label {
+      color: #333;
+      font-weight: 600;
+    }
+  }
+
+  &.multi-deck-tab {
+    cursor: pointer;
+
+    &:hover {
+      background: #e6e6e6;
+    }
+  }
+}
+
+.card-count.deck-conflict {
+  color: #FF9229;
+  font-weight: 700;
+  cursor: default;
+}
+
+.multi-deck-conflict-badge {
+  position: absolute;
+  top: -7px;
+  right: 0;
+  background: #FF9229;
+  color: #000;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 17px;
+  height: 17px;
+  line-height: 17px;
+  padding: 0 4px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.multi-deck-close-tab {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  background: none;
+  border: none;
+  color: #bbb;
+  font-size: 22px;
+  line-height: 1;
+  padding: 2px 4px;
+  cursor: pointer;
+
+  &:hover {
+    color: #555;
+  }
+}
+
+.multi-deck-add-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  padding: 7px 10px;
+  margin-bottom: 1px;
+  cursor: pointer;
+  border-radius: 4px 4px 0 0;
+  font-size: 13px;
+
+  &:hover {
+    color: #555;
+    background: #f0f0f0;
+  }
+}
+
+.multi-deck-help {
+  cursor: pointer;
+  font-size: 13px;
+  color: #ccc;
+  padding: 7px 6px;
+  margin-bottom: 1px;
+
+  &:hover { color: #999; }
 }

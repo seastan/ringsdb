@@ -399,7 +399,8 @@ class SocialController extends Controller {
                     p.name AS pack_name
     				FROM card c
                     INNER JOIN sphere s ON s.id = c.sphere_id
-                    INNER JOIN pack p ON p.id = c.pack_id
+                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 JOIN pack pp ON pp.id = cp2.pack_id WHERE cp2.card_id = c.id ORDER BY (pp.date_release IS NULL), pp.date_release, cp2.position, cp2.id LIMIT 1)
+                    INNER JOIN pack p ON p.id = cpr.pack_id
                     WHERE c.code IN (?)
     				ORDER BY c.code DESC", [$cards_code], [\Doctrine\DBAL\Connection::PARAM_INT_ARRAY])->fetchAll();
 
@@ -417,7 +418,8 @@ class SocialController extends Controller {
                     p.name AS pack_name
     				FROM card k
                     INNER JOIN sphere s ON s.id = k.sphere_id
-                    INNER JOIN pack p ON p.id = k.pack_id
+                    INNER JOIN card_printing kpr ON kpr.id = (SELECT cp2.id FROM card_printing cp2 JOIN pack pp ON pp.id = cp2.pack_id WHERE cp2.card_id = k.id ORDER BY (pp.date_release IS NULL), pp.date_release, cp2.position, cp2.id LIMIT 1)
+                    INNER JOIN pack p ON p.id = kpr.pack_id
                     WHERE k.code IN (?)
     				ORDER BY k.code DESC", [$cards_to_exclude], [\Doctrine\DBAL\Connection::PARAM_INT_ARRAY])->fetchAll();
 

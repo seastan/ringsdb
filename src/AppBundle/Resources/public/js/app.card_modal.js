@@ -95,8 +95,9 @@
 
     /**
      * Builds the art / printing selector under the modal image when a card has
-     * more than one distinct printing art. Each option shows how many copies of
-     * THAT art the user owns. Selecting one persists the preference.
+     * more than one distinct printing art. Each row shows how many copies of
+     * that set the user owns and how many copies of THIS card those sets yield.
+     * Selecting one persists the art preference.
      * @memberOf card_modal
      */
     card_modal.build_art_selector = function(card, modal) {
@@ -118,19 +119,19 @@
         var multiArt = arts.length > 1;
 
         var container = $('<div class="modal-art-selector" style="margin-top:10px"></div>');
-        var headerText = multiArt ? 'Art / printing (owned)' : 'Printing (owned)';
-        $('<small class="text-muted">' + headerText + ':</small>').appendTo(container);
         var tableStyle = 'margin-bottom:0;margin-top:4px' + (multiArt ? ';cursor:pointer' : '');
-        var table = $('<table class="table table-condensed table-hover" style="' + tableStyle + '"><thead><tr><th>Set</th><th style="text-align:center">Owned</th></tr></thead></table>').appendTo(container);
+        var table = $('<table class="table table-condensed table-hover table-striped" style="' + tableStyle + '"><thead><tr><th>Set</th><th style="text-align:center">Sets owned</th><th style="text-align:center">Cards owned</th></tr></thead></table>').appendTo(container);
         var tbody = $('<tbody></tbody>').appendTo(table);
 
         allPacks.forEach(function(p) {
             var isCanonical = (p.image_code === card.code);
             var selected = multiArt && (current ? (current === p.pack_code) : isCanonical);
-            var owned = (counts[p.pack_code] || 0) * (p.quantity || 0);
+            var setsOwned = (counts[p.pack_code] || 0);
+            var cardsOwned = setsOwned * (p.quantity || 0);
             var row = $('<tr class="' + (selected ? 'info' : '') + '">'
                 + '<td>' + p.pack_name + '</td>'
-                + '<td style="text-align:center">' + owned + '</td>'
+                + '<td style="text-align:center">' + setsOwned + '</td>'
+                + '<td style="text-align:center">' + cardsOwned + '</td>'
                 + '</tr>');
             if (multiArt && p.imagesrc) {
                 row.on('click', function() {

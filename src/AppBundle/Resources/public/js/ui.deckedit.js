@@ -64,15 +64,54 @@
      */
     ui.set_max_qty = function() {
         app.data.cards.find().forEach(function (record) {
-            // owned_copies = copies the user owns across all this card's packs
-            // (computed in app.ui.js). Fall back to "own everything" until set.
-            var owned = (record.owned_copies == null) ? 999 : record.owned_copies;
-            var max_qty = Math.min(3, record.deck_limit, owned);
+            // maxqty controls which quantity buttons are shown in the card table.
+            // It is based solely on deck rules, not on owned copies — ownership
+            // only affects the orange conflict badge shown in the deck panel.
+            var max_qty = Math.min(3, record.deck_limit);
 
             app.data.cards.updateById(record.code, {
                 maxqty: max_qty
             });
         });
+    };
+
+    /**
+     * Recomputes maxqty accounting for packs checked in the sets dropdown that
+     * the user doesn't own. A selected-but-unowned pack is treated as granting
+     * the card's printed quantity (same as owning one copy of that pack).
+     * Clears the cached card rows so they are rebuilt with the new maxqty.
+     * @memberOf ui
+     */
+    ui.recompute_max_qty_for_selected_packs = function() {
+        var checkedPackCodes = {};
+        $('[data-filter="pack_code"] input[type=checkbox]:checked').each(function() {
+            checkedPackCodes[$(this).attr('name')] = true;
+        });
+
+        var ownedCounts = app.data.owned_pack_counts || {};
+
+        app.data.cards.find().forEach(function(record) {
+            var base = (record.owned_copies == null) ? 999 : record.owned_copies;
+            var effective = base;
+
+            if (effective < 999) {
+                var sources = (record.packs && record.packs.length)
+                    ? record.packs.map(function(pr) { return { pack_code: pr.pack_code, quantity: pr.quantity || 0 }; })
+                    : [{ pack_code: record.pack_code, quantity: 1 }];
+
+                _.forEach(sources, function(src) {
+                    if (checkedPackCodes[src.pack_code] && !(ownedCounts[src.pack_code] > 0)) {
+                        effective += src.quantity;
+                    }
+                });
+            }
+
+            app.data.cards.updateById(record.code, {
+                maxqty: Math.min(3, record.deck_limit, effective)
+            });
+        });
+
+        ui.reset_list();
     };
 
     /**
@@ -191,6 +230,19 @@
         types.find('input[name=' + defaultType + ']').prop("checked", true).parent().addClass('active');
     };
 
+    ui.apply_default_filters = function() {
+        $('[data-filter="sphere_code"] input[type=checkbox]').prop('checked', false).closest('label').removeClass('active');
+        $('[data-filter="type_code"] input[type=checkbox]').prop('checked', false).closest('label').removeClass('active');
+        SortKey = 'type_code';
+        SortOrder = 1;
+        ui.update_sort_caret();
+        $('#filter-text').data('ttTypeahead') ? $('#filter-text').typeahead('val', '') : $('#filter-text').val('');
+        app.smart_filter && app.smart_filter.update('');
+        var $activeTabLink = $('.nav-tabs a[href="#tab-pane-build"]').not('#multi-deck-tabs .nav-tabs a');
+        if ($activeTabLink.length) $activeTabLink.tab('show');
+        ui.init_selectors();
+    };
+
     function uncheck_all_others() {
         $(this).closest('[data-filter]').find("input[type=checkbox]").prop("checked", false);
         $(this).children('input[type=checkbox]').prop("checked", true).trigger('change');
@@ -256,7 +308,12 @@
      * @memberOf ui
      * @param event
      */
-    ui.on_submit_form = function() {
+    ui.on_submit_form = function(event) {
+        if (app.multiDeck && app.multiDeck.decks.length > 1) {
+            event.preventDefault();
+            app.multiDeck.saveAll();
+            return false;
+        }
         var deck_json = app.deck.get_json();
 
         $('input[name="content"]').val(deck_json);
@@ -445,6 +502,8 @@
         var card_quantity = app.deck.set_card_copies(card_code, quantity, is_sideboard);
         ui.refresh_deck();
         ui.refresh_row(card_code, card_quantity);
+        // Keep the hero list in the deck selector current as heroes are added/removed.
+        app.multiDeck && app.multiDeck.render_tabs();
     };
 
     /**
@@ -456,6 +515,10 @@
             change: ui.refresh_list,
             click: ui.on_click_filter
         }, 'label');
+
+        $('[data-filter="pack_code"]').on('change', 'label', function() {
+            ui.recompute_max_qty_for_selected_packs();
+        });
 
         $('#filter-text').on('input', ui.on_input_smartfilter);
 
@@ -495,6 +558,48 @@
         $('thead').on('click', 'a[data-sort]', ui.on_table_sort_click);
 
         $('#menu-sort').on('click', 'a[id]', ui.do_action_deck);
+
+        // Multi-deck tab navigation
+        $(document).on('click', '.multi-deck-tab', function(e) {
+            e.preventDefault();
+            var idx = parseInt($(this).data('idx'), 10);
+            app.multiDeck && app.multiDeck.activateDeck(idx);
+        });
+
+        $(document).on('click', '.js-add-deck', function(e) {
+            e.preventDefault();
+            $(this).popover('hide');
+            app.multiDeck && app.multiDeck.addDeck();
+        });
+
+        $(document).on('click', '.js-load-deck', function(e) {
+            e.preventDefault();
+            $(this).popover('hide');
+            app.multiDeck && app.multiDeck.openLoadModal();
+        });
+
+        $(document).on('click', '.multi-deck-close-tab', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var idx = parseInt($(this).data('idx'), 10);
+            app.multiDeck && app.multiDeck.openCloseModal(idx);
+        });
+
+        $('#multiDeckCloseModal').on('click', '.js-close-save', function() {
+            app.multiDeck && app.multiDeck.confirmClose(true);
+        });
+
+        $('#multiDeckCloseModal').on('click', '.js-close-discard', function() {
+            app.multiDeck && app.multiDeck.confirmClose(false);
+        });
+
+        // Sync name input back to the active deck entry so tab labels stay current
+        $('input.decklist-name').on('input', function() {
+            if (app.multiDeck && app.multiDeck.decks.length > 0) {
+                app.multiDeck.decks[app.multiDeck.activeIdx].name = $(this).val();
+                app.multiDeck.render_tabs();
+            }
+        });
     };
 
     ui.do_action_deck = function(event) {
@@ -532,6 +637,64 @@
                 });
                 break;
         }
+    };
+
+    ui.capture_filter_state = function() {
+        var sphereChecked = [];
+        $('[data-filter="sphere_code"] input[type=checkbox]').each(function() {
+            if ($(this).prop('checked')) sphereChecked.push($(this).attr('name'));
+        });
+        var typeChecked = [];
+        $('[data-filter="type_code"] input[type=checkbox]').each(function() {
+            if ($(this).prop('checked')) typeChecked.push($(this).attr('name'));
+        });
+        var packChecked = [];
+        $('[data-filter="pack_code"] input[type=checkbox]').each(function() {
+            if ($(this).prop('checked')) packChecked.push($(this).attr('name'));
+        });
+        var $activeTabLink = $('.nav-tabs').not('#multi-deck-tabs .nav-tabs').find('li.active a');
+        return {
+            sphereChecked: sphereChecked,
+            typeChecked: typeChecked,
+            packChecked: packChecked,
+            filterText: $('#filter-text').val() || '',
+            sortKey: SortKey,
+            sortOrder: SortOrder,
+            activeTab: $activeTabLink.attr('href') || '#tab-pane-build'
+        };
+    };
+
+    ui.restore_filter_state = function(state) {
+        var s = state || { sphereChecked: [], typeChecked: [], packChecked: [], filterText: '', sortKey: 'type_code', sortOrder: 1, activeTab: '#tab-pane-build' };
+
+        $('[data-filter="sphere_code"] input[type=checkbox]').each(function() {
+            var checked = s.sphereChecked.indexOf($(this).attr('name')) !== -1;
+            $(this).prop('checked', checked);
+            $(this).closest('label').toggleClass('active', checked);
+        });
+        $('[data-filter="type_code"] input[type=checkbox]').each(function() {
+            var checked = s.typeChecked.indexOf($(this).attr('name')) !== -1;
+            $(this).prop('checked', checked);
+            $(this).closest('label').toggleClass('active', checked);
+        });
+        $('[data-filter="pack_code"] input[type=checkbox]').each(function() {
+            $(this).prop('checked', s.packChecked.indexOf($(this).attr('name')) !== -1);
+        });
+
+        if ($('#filter-text').data('ttTypeahead')) {
+            $('#filter-text').typeahead('val', s.filterText || '');
+        } else {
+            $('#filter-text').val(s.filterText || '');
+        }
+        app.smart_filter && app.smart_filter.update(s.filterText || '');
+
+        SortKey = s.sortKey || 'type_code';
+        SortOrder = typeof s.sortOrder === 'number' ? s.sortOrder : 1;
+        ui.update_sort_caret();
+
+        var tabHref = s.activeTab || '#tab-pane-build';
+        var $tabLink = $('.nav-tabs a[href="' + tabHref + '"]').not('#multi-deck-tabs .nav-tabs a');
+        if ($tabLink.length) $tabLink.tab('show');
     };
 
     /**
@@ -648,6 +811,16 @@
         var grid = $('#collection-grid').empty();
         var filters = Config['show-only-deck'] ? {} : ui.get_filters();
 
+        // The pack checkboxes must filter by a card's printings, not just its
+        // primary pack_code: a card you own via one pack (e.g. Unexpected Courage
+        // in the Core Set) must appear even when its primary printing belongs to a
+        // different pack (the Two-Player Starter). Pull the pack filter out of the
+        // ForerunnerDB query and apply it against each card's full printing list below.
+        var packFilter = (filters.pack_code && filters.pack_code['$in']) || null;
+        if (packFilter) {
+            delete filters.pack_code;
+        }
+
         var query = app.smart_filter.get_query(filters);
         var orderBy = {};
 
@@ -660,6 +833,19 @@
         }
 
         var cards = app.data.cards.find(query, { '$orderBy': orderBy });
+
+        if (packFilter) {
+            cards = cards.filter(function(card) {
+                var prs = (card.packs && card.packs.length) ? card.packs : null;
+                if (!prs) {
+                    return packFilter.indexOf(card.pack_code) !== -1;
+                }
+                return prs.some(function(pr) {
+                    return packFilter.indexOf(pr.pack_code) !== -1;
+                });
+            });
+        }
+
         var divs = CardDivs[Config['display-column'] - 1];
 
         cards.forEach(function(card) {
@@ -718,6 +904,7 @@
 
         app.deck.display('#deck-content', DisplayOptions, false);
         app.deck.display('#sideboard-content', DisplayOptions, true);
+        app.multiDeck && app.multiDeck.render_tabs && app.multiDeck.render_tabs();
         setTimeout(function() {
             app.draw_simulator && app.draw_simulator.reset();
             app.play_simulator && app.play_simulator.reset();
@@ -829,6 +1016,7 @@
         ui.setup_typeahead();
         ui.setup_dataupdate();
         app.deck_history && app.deck_history.setup('#history');
+        app.multiDeck && app.multiDeck.init();
     };
 
     ui.read_config_from_storage();

@@ -168,7 +168,7 @@
                 }
             });
 
-            // Deckbuilder per-card max quantities depend on ownership.
+            // Recompute deckbuilder per-card max quantities now that deck_limit is known.
             if (app.ui && $.isFunction(app.ui.set_max_qty)) {
                 app.ui.set_max_qty();
             }

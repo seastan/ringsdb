@@ -18,6 +18,20 @@ $dark-text-muted: #9a9a9a;
 $dark-link: #6ea8e0;
 $dark-link-hover: #9cc6ee;
 
+/* Dark-mode versions of the sphere foreground colors (see fg-color in style.scss).
+   Card names in deck / decklist lists are <a> elements with a `.fg-<sphere>` class;
+   without these the generic `.dark-mode a` rule wins (it's more specific than the
+   light `.fg-*` rules) and every card name renders blue. We brighten the darker
+   spheres (tactics red, fellowship, neutral) so they stay legible on dark surfaces. */
+@mixin dark-fg-color($name, $color) {
+  .fg-#{$name},
+  a.fg-#{$name},
+  a.fg-#{$name}:hover,
+  a.fg-#{$name}:focus {
+    color: $color;
+  }
+}
+
 .dark-mode {
   background-color: $dark-bg;
 
@@ -106,6 +120,26 @@ $dark-link-hover: #9cc6ee;
   .well {
     background-color: $dark-surface;
     border-color: $dark-border;
+  }
+
+  /********* ALERTS ************/
+
+  /* Bootstrap's default alert-info is a bright light-blue that glares in dark
+     mode (e.g. the "Showing N most recent decks" banner). Re-tint it to match
+     the muted info blue used for selected-printing table rows. */
+  .alert-info {
+    background-color: #2a4060;
+    border-color: #34507a;
+    color: $dark-text;
+
+    a {
+      color: $dark-link;
+
+      &:hover,
+      &:focus {
+        color: $dark-link-hover;
+      }
+    }
   }
 
   /********* TABLES ************/
@@ -381,6 +415,182 @@ $dark-link-hover: #9cc6ee;
 
     a {
       color: $dark-link;
+    }
+  }
+
+  /********* PAGER (card prev / next / set name) ************/
+
+  .pager li > a,
+  .pager li > span {
+    background-color: $dark-surface;
+    border-color: $dark-border;
+    color: $dark-link;
+  }
+
+  .pager li > a:hover,
+  .pager li > a:focus {
+    background-color: $dark-surface-2;
+    color: $dark-link-hover;
+  }
+
+  .pager .disabled > a,
+  .pager .disabled > a:hover,
+  .pager .disabled > a:focus,
+  .pager .disabled > span {
+    background-color: $dark-surface;
+    border-color: $dark-border;
+    color: $dark-text-muted;
+  }
+
+  /********* CONTEXTUAL TABLE ROWS (selected printing = .info) ************/
+
+  .table > thead > tr > td.info,
+  .table > tbody > tr > td.info,
+  .table > thead > tr.info > td,
+  .table > tbody > tr.info > td,
+  .table > thead > tr.info > th,
+  .table > tbody > tr.info > th {
+    background-color: #2a4060;
+    color: #ffffff;
+  }
+
+  .table-hover > tbody > tr > td.info:hover,
+  .table-hover > tbody > tr.info:hover > td,
+  .table-hover > tbody > tr:hover > .info {
+    background-color: #34507a;
+  }
+
+  /********* QTIP CARD TOOLTIP ************/
+
+  .qtip-bootstrap {
+    background-color: $dark-surface;
+    border-color: $dark-border;
+    color: $dark-text;
+
+    .qtip-titlebar {
+      background-color: $dark-surface-2;
+      border-bottom-color: $dark-border;
+      color: $dark-text;
+    }
+  }
+
+  /********* POPOVERS ************/
+
+  /* Bootstrap popovers (e.g. the hover help on the +/folder icons next to the
+     multi-deck tabs) default to a white body that glares in dark mode. Re-skin
+     to the dark surfaces, including the arrow tip -- for bottom-placed popovers
+     the arrow sits against the title bar, so it matches that surface. */
+  .popover {
+    background-color: $dark-surface;
+    border-color: $dark-border;
+    color: $dark-text;
+
+    .popover-title {
+      background-color: $dark-surface-2;
+      border-bottom-color: $dark-border;
+      color: $dark-text;
+    }
+
+    .popover-content {
+      color: $dark-text;
+    }
+
+    &.top > .arrow {
+      border-top-color: $dark-border;
+      &:after { border-top-color: $dark-surface; }
+    }
+
+    &.right > .arrow {
+      border-right-color: $dark-border;
+      &:after { border-right-color: $dark-surface; }
+    }
+
+    &.bottom > .arrow {
+      border-bottom-color: $dark-border;
+      &:after { border-bottom-color: $dark-surface-2; }
+    }
+
+    &.left > .arrow {
+      border-left-color: $dark-border;
+      &:after { border-left-color: $dark-surface; }
+    }
+  }
+
+  /********* SIDEBAR NAV (Decklists / Fellowships / Quest Logs) ************/
+
+  .nav-pills > li > a:hover,
+  .nav-pills > li > a:focus {
+    background-color: $dark-surface-2;
+    color: $dark-link-hover;
+  }
+
+  /********* SPHERE FOREGROUND COLORS ************/
+
+  @include dark-fg-color(leadership, #c98fc2);
+  @include dark-fg-color(tactics,    #e8595d);
+  @include dark-fg-color(spirit,     #3fc9e6);
+  @include dark-fg-color(lore,       #74cc66);
+  @include dark-fg-color(baggins,    #cdb84a);
+  @include dark-fg-color(fellowship, #e0902f);
+  @include dark-fg-color(neutral,    #9a9a9a);
+
+  /********* MULTI-DECK BUILDER TABS ************/
+
+  /* The per-deck tabs default to light greys (#f0f0f0 / #fff) which glare in
+     dark mode. Re-map to the dark surface hierarchy: the active tab blends into
+     the page background (as it does with #fff in light mode) while inactive
+     tabs sit one step lighter. */
+  .multi-deck-browser-bar {
+    border-bottom-color: $dark-border;
+  }
+
+  .multi-deck-browser-tab {
+    background: $dark-bg;
+
+    .multi-deck-tab-label {
+      color: $dark-text-muted;
+    }
+
+    .multi-deck-tab-no-heroes {
+      color: $dark-text-muted;
+    }
+
+    &.active {
+      background: $dark-surface;
+      border-color: $dark-border $dark-border $dark-surface;
+
+      .multi-deck-tab-label {
+        color: $dark-text;
+      }
+    }
+
+    &.multi-deck-tab:hover {
+      background: $dark-surface-2;
+    }
+  }
+
+  .multi-deck-close-tab {
+    color: $dark-text-muted;
+
+    &:hover {
+      color: $dark-text;
+    }
+  }
+
+  .multi-deck-add-btn {
+    color: $dark-text-muted;
+
+    &:hover {
+      color: $dark-text;
+      background: $dark-surface;
+    }
+  }
+
+  .multi-deck-help {
+    color: $dark-text-muted;
+
+    &:hover {
+      color: $dark-text;
     }
   }
 }
