@@ -521,21 +521,34 @@
 
         $(header_tpl({ code: sortValue, name: cards[0][displayLabel] || 'Cards', quantity: deck.get_nb_cards(cards, is_sideboard) })).appendTo(section);
 
+        function getConflictTitle(card) {
+            var ownedCopies = (card.owned_copies != null) ? card.owned_copies : 999;
+            var conflictQty = (app.multiDeck && app.multiDeck.decks.length > 1)
+                ? app.multiDeck.getCombinedQty(card.code)
+                : card[key];
+            if (conflictQty <= ownedCopies) return null;
+            return (app.multiDeck && app.multiDeck.decks.length > 1)
+                ? 'Total across all decks (' + conflictQty + ') exceeds your ' + ownedCopies + ' owned cop' + (ownedCopies === 1 ? 'y' : 'ies')
+                : 'You own only ' + ownedCopies + ' cop' + (ownedCopies === 1 ? 'y' : 'ies') + ' of this card';
+        }
+
         cards.forEach(function(card) {
             if (card.type_code == 'hero' && sortKey == 'type_code' && !is_sideboard) {
                 var div = $('<div class="deck-hero"/>')
                     .append('<div class="hero-thumbnail card-thumbnail-2x card-thumbnail-hero" style="background-image:url(\'/bundles/cards/' + card.code + '.png\')"></div>')
                     .append($(card_line_tpl({ card: card })));
 
-                if (!deck.i_have_this_card(card)) {
-                    div.append('&#160;<i class="fa fa-exclamation-triangle not-in-collection" title="This card is not in my collection."></i>');
-                }
-
                 div.appendTo(section);
             } else {
                 var tpl = $(card_line_tpl({ card: card }));
 
-                var div = $('<div />').append(tpl).prepend(sortKey != 'type_code' || card.type_code != 'hero' ? '<span class="card-count">' +card[key] + 'x</span> ' : '');
+                var conflictTitle = getConflictTitle(card);
+                var countSpan = $('<span class="card-count">' + card[key] + 'x</span> ');
+                if (conflictTitle) {
+                    countSpan.addClass('deck-conflict').attr('title', conflictTitle);
+                }
+
+                var div = $('<div />').append(tpl).prepend(sortKey != 'type_code' || card.type_code != 'hero' ? countSpan : '');
 
                 if (card.is_unique && card.type_code != 'hero') {
                     div.find('a').css('font-weight', 'bold');
@@ -543,20 +556,6 @@
 
                 if (!deck.can_include_card(card)) {
                     div.addClass('invalid-card');
-                }
-
-                // Flag the quantity when cards committed across all open decks exceed
-                // owned copies. In multi-deck mode the combined total is used so that
-                // over-allocation is visible even when no single deck exceeds the limit.
-                var ownedCopies = (card.owned_copies != null) ? card.owned_copies : 999;
-                var conflictQty = (app.multiDeck && app.multiDeck.decks.length > 1)
-                    ? app.multiDeck.getCombinedQty(card.code)
-                    : card[key];
-                if (conflictQty > ownedCopies) {
-                    var conflictTitle = (app.multiDeck && app.multiDeck.decks.length > 1)
-                        ? 'Total across all decks (' + conflictQty + ') exceeds your ' + ownedCopies + ' owned cop' + (ownedCopies === 1 ? 'y' : 'ies')
-                        : 'You own only ' + ownedCopies + ' cop' + (ownedCopies === 1 ? 'y' : 'ies') + ' of this card';
-                    div.find('.card-count').addClass('limited-pool-conflict').attr('title', conflictTitle);
                 }
 
                 if (sortKey == 'pack_code') {
@@ -1025,28 +1024,56 @@ app.multiDeck = {
 
     init: function() {
         var deckName = app.deck.get_name() || '';
+        if (deckName === 'New Lord of the Rings LCG Deck') deckName = 'New Deck';
         jQuery('input.decklist-name').val(deckName);
         app.multiDeck.decks = [{
             id: app.deck.get_id(),
             name: deckName,
-            description_md: app.deck.get_description_md() || '',
-            tags: '',
+            description_md: jQuery('textarea[name="description_"]').val() || app.deck.get_description_md() || '',
+            tags: jQuery('input[name="tags_"]').val() || '',
             slots: {},
             sideslots: {},
-            history: app.deck_history ? app.deck_history.get_snapshots().slice() : []
+            history: app.deck_history ? app.deck_history.get_snapshots().slice() : [],
+            uiState: null
         }];
         app.multiDeck.activeIdx = 0;
         app.multiDeck.render_tabs();
+
+        var alsoMatch = window.location.search.match(/[?&]also=([^&]+)/);
+        if (alsoMatch) {
+            var additionalIds = alsoMatch[1].split(',');
+            function loadNext(index) {
+                if (index >= additionalIds.length) return;
+                var id = additionalIds[index].trim();
+                if (!id) { loadNext(index + 1); return; }
+                jQuery.ajax(Routing.generate('api_private_load_deck', { id: id }), {
+                    type: 'GET',
+                    dataType: 'json',
+                    cache: false,
+                    success: function(deckData) {
+                        app.multiDeck.addExistingDeck(deckData);
+                        loadNext(index + 1);
+                    }
+                });
+            }
+            loadNext(0);
+        }
     },
 
-    // Snapshot the live ForerunnerDB state (and current name input) into decks[activeIdx].
+    // Snapshot the live ForerunnerDB state and all UI state into decks[activeIdx].
     captureActive: function() {
         var d = app.multiDeck.decks[app.multiDeck.activeIdx];
         var nameVal = jQuery('input.decklist-name').val();
         if (nameVal !== undefined) d.name = nameVal;
+        d.description_md = jQuery('textarea[name="description_"]').val() || '';
+        d.tags = jQuery('input[name="tags_"]').val() || '';
 
         if (app.deck_history) {
             d.history = app.deck_history.get_snapshots().slice();
+        }
+
+        if (app.ui && app.ui.capture_filter_state) {
+            d.uiState = app.ui.capture_filter_state();
         }
 
         var slots = {};
@@ -1071,7 +1098,10 @@ app.multiDeck = {
         app.deck.set_slots(d.slots, d.sideslots);
         jQuery('input.decklist-name').val(d.name || '');
         jQuery('#deck-save-id').val(d.id || '');
+        jQuery('textarea[name="description_"]').val(d.description_md || '');
+        jQuery('input[name="tags_"]').val(d.tags || '');
         app.deck_history && app.deck_history.reset(d.history || []);
+        app.ui && app.ui.restore_filter_state && app.ui.restore_filter_state(d.uiState || null);
         app.ui && app.ui.refresh_deck && app.ui.refresh_deck();
         app.ui && app.ui.reset_list && app.ui.reset_list();
         app.multiDeck.render_tabs();
@@ -1087,7 +1117,8 @@ app.multiDeck = {
             tags: '',
             slots: {},
             sideslots: {},
-            history: []
+            history: [],
+            uiState: null
         };
         app.multiDeck.decks.push(newDeck);
         app.multiDeck.activeIdx = app.multiDeck.decks.length - 1;
@@ -1096,10 +1127,35 @@ app.multiDeck = {
         app.deck_history && app.deck_history.reset([]);
         jQuery('input.decklist-name').val(newDeck.name);
         jQuery('#deck-save-id').val('');
+        jQuery('textarea[name="description_"]').val('');
+        jQuery('input[name="tags_"]').val('');
+        app.ui && app.ui.apply_default_filters && app.ui.apply_default_filters();
         jQuery('#save_form button[type=submit]').first().text('Save All');
         app.ui && app.ui.refresh_deck && app.ui.refresh_deck();
         app.ui && app.ui.reset_list && app.ui.reset_list();
         app.multiDeck.render_tabs();
+    },
+
+    // Count of distinct cards in deckIdx's main deck that exceed owned copies
+    // across all decks combined. Matches the orange alert logic in the card display.
+    getConflictCount: function(deckIdx) {
+        var count = 0;
+        if (deckIdx === app.multiDeck.activeIdx) {
+            app.data.cards.find({ indeck: { '$gt': 0 } }).forEach(function(card) {
+                var owned = card.owned_copies != null ? card.owned_copies : 999;
+                if (app.multiDeck.getCombinedQty(card.code) > owned) count++;
+            });
+        } else {
+            var d = app.multiDeck.decks[deckIdx];
+            Object.keys(d.slots || {}).forEach(function(code) {
+                if (!d.slots[code]) return;
+                var card = app.data.cards.findById(code);
+                if (!card) return;
+                var owned = card.owned_copies != null ? card.owned_copies : 999;
+                if (app.multiDeck.getCombinedQty(code) > owned) count++;
+            });
+        }
+        return count;
     },
 
     // Sum of a card's quantity across every open deck.
@@ -1121,13 +1177,10 @@ app.multiDeck = {
     saveAll: function() {
         app.multiDeck.captureActive();
 
-        var description = jQuery('textarea[name="description_"]').val() || '';
-        var tags = jQuery('input[name="tags_"]').val() || '';
-
         var btn = jQuery('#save_form button[type=submit]').first();
         btn.prop('disabled', true).text('Saving…');
 
-        var promises = app.multiDeck.decks.map(function(d, i) {
+        var promises = app.multiDeck.decks.map(function(d) {
             var content = JSON.stringify({ main: d.slots || {}, side: d.sideslots || {} });
             return jQuery.ajax({
                 url: Routing.generate('deck_save_ajax'),
@@ -1136,8 +1189,8 @@ app.multiDeck = {
                     id: d.id || '',
                     name: d.name || 'Untitled Deck',
                     content: content,
-                    description: i === 0 ? description : (d.description_md || ''),
-                    tags: i === 0 ? tags : (d.tags || '')
+                    description: d.description_md || '',
+                    tags: d.tags || ''
                 }
             }).then(function(resp) {
                 if (resp && resp.success) d.id = resp.id;
@@ -1160,9 +1213,9 @@ app.multiDeck = {
         var container = jQuery('#multi-deck-tabs');
         if (!container.length) return;
 
-        function heroCards(d, isActive) {
+        function heroCards(d, i) {
             var heroes = [];
-            if (isActive) {
+            if (i === app.multiDeck.activeIdx) {
                 app.data.cards.find({ type_code: 'hero', indeck: { '$gt': 0 } }).forEach(function(card) {
                     heroes.push(card);
                 });
@@ -1174,51 +1227,229 @@ app.multiDeck = {
                     }
                 });
             }
+            heroes.sort(function(a, b) { return a.code < b.code ? -1 : 1; });
             return heroes;
         }
 
-        function heroListHtml(heroes) {
-            if (!heroes.length) {
-                return '<span class="multi-deck-no-heroes">No heroes yet</span>';
-            }
-            return heroes.map(function(card) {
-                var esc = jQuery('<div/>').text(card.name).html();
-                var href = card.url || ('/card/' + card.code);
-                return '<a href="' + href + '" class="card card-tip multi-deck-hero fg-' + card.sphere_code + '"'
-                    + ' data-toggle="modal" data-remote="false" data-target="#cardModal" data-code="' + card.code + '">'
-                    + '<span class="icon-' + card.sphere_code + '"></span> ' + esc
-                    + '</a>';
-            }).join('');
-        }
+        var html = '<div class="multi-deck-browser-bar">';
+        html += '<ul class="multi-deck-browser-tabs">';
 
-        var html = '<ul class="multi-deck-list">';
         app.multiDeck.decks.forEach(function(d, i) {
             var isActive = (i === app.multiDeck.activeIdx);
             var label = jQuery('<div/>').text(d.name || ('Deck ' + (i + 1))).html();
-            var hHtml = heroListHtml(heroCards(d, isActive));
-            var liClass = 'multi-deck-item' + (isActive ? ' multi-deck-item-active' : '');
-
-            var innerClass = 'multi-deck-item-inner' + (isActive ? '' : ' multi-deck-tab');
-            var innerAttrs = isActive ? '' : ' data-idx="' + i + '" role="button"';
-            html += '<li class="' + liClass + '">';
-            html += '<div class="' + innerClass + '"' + innerAttrs + '>';
-            html += '<div class="multi-deck-item-name">' + label + '</div>';
-            html += '<div class="multi-deck-item-heroes">' + hHtml + '</div>';
-            html += '</div>';
+            var liClass = 'multi-deck-browser-tab' + (isActive ? ' active' : ' multi-deck-tab');
+            var attrs = isActive ? '' : ' data-idx="' + i + '" role="button"';
+            var conflicts = app.multiDeck.decks.length > 1 ? app.multiDeck.getConflictCount(i) : 0;
+            var badge = conflicts > 0
+                ? '<span class="multi-deck-conflict-badge">' + conflicts + '</span>'
+                : '';
+            var heroes = heroCards(d, i);
+            var heroHtml = '<div class="multi-deck-tab-heroes">';
+            if (heroes.length) {
+                heroHtml += heroes.map(function(h) {
+                    return '<span class="multi-deck-tab-hero-name fg-' + h.sphere_code + '">'
+                        + jQuery('<div/>').text(h.name).html()
+                        + '</span>';
+                }).join('');
+            } else {
+                heroHtml += '<span class="multi-deck-tab-no-heroes">No heroes yet</span>';
+            }
+            heroHtml += '</div>';
+            var closeBtn = app.multiDeck.decks.length > 1
+                ? '<button class="multi-deck-close-tab" data-idx="' + i + '" type="button" title="Close">×</button>'
+                : '';
+            html += '<li class="' + liClass + '"' + attrs + '>';
+            html += '<span class="multi-deck-tab-label">' + label + '</span>' + closeBtn;
+            html += heroHtml + badge;
             html += '</li>';
         });
 
-        html += '<li class="multi-deck-add-item">'
-            + '<a href="#" class="js-add-deck"><span class="fa fa-plus"></span> Add Deck</a>'
-            + ' <span class="fa fa-question-circle text-muted multi-deck-help"'
-            + ' data-toggle="popover" data-trigger="hover" data-placement="right"'
+        html += '</ul>';
+        html += '<button class="js-add-deck multi-deck-add-btn" type="button"'
+            + ' data-toggle="popover" data-trigger="hover" data-placement="bottom"'
             + ' data-title="Building multiple decks"'
             + ' data-content="Add decks to build them side by side against your collection. The orange warning fires when combined copies across all open decks exceed what you own. Each deck is saved individually.">'
-            + '</span>'
-            + '</li>';
-        html += '</ul>';
+            + '<span class="fa fa-plus"></span></button>';
+        html += '<button class="js-load-deck multi-deck-add-btn" type="button"'
+            + ' data-toggle="popover" data-trigger="hover" data-placement="bottom"'
+            + ' data-title="Load an existing deck"'
+            + ' data-content="Open one of your saved decks in the builder to compare or edit it alongside other decks.">'
+            + '<span class="fa fa-folder-open"></span></button>';
+        html += '</div>';
 
         container.html(html);
-        container.find('.multi-deck-help').popover({ html: false, container: 'body' });
+        container.find('.js-add-deck, .js-load-deck').popover({ html: false, container: 'body' });
+    },
+
+    openLoadModal: function() {
+        var modal = jQuery('#multiDeckLoadModal').modal('show');
+        var tbody = modal.find('#multiDeckLoadList').empty()
+            .append('<tr><td class="text-center"><i class="fa fa-spinner fa-spin fa-3x"></i></td></tr>');
+
+        jQuery.ajax(Routing.generate('api_private_my_decks'), {
+            type: 'GET',
+            dataType: 'json',
+            success: function(decks) {
+                tbody.empty();
+                if (!decks || !decks.length) {
+                    tbody.append('<tr><td>No decks found.</td></tr>');
+                    return;
+                }
+                decks.forEach(function(deck) {
+                    if (deck.is_published) return;
+
+                    var alreadyOpen = app.multiDeck.decks.some(function(d) {
+                        return d.id && d.id == deck.id;
+                    });
+
+                    var tr = jQuery('<tr/>');
+                    var tdHero = jQuery('<td class="decklist-hero-image hidden-xs"/>').appendTo(tr);
+                    jQuery.each(deck.heroes || {}, function(heroCode) {
+                        var heroCard = app.data.cards.findById(heroCode);
+                        if (!heroCard) return;
+                        jQuery('<div class="decklist-hero"/>')
+                            .addClass('border-light-' + heroCard.sphere_code)
+                            .append('<div class="hero-thumbnail card-thumbnail-4x card-thumbnail-hero" style="background-image:url(\'/bundles/cards/' + heroCard.code + '.png\')"></div>')
+                            .appendTo(tdHero);
+                    });
+
+                    var label = deck.name + ' ' + (deck.version || '');
+                    var tdName = jQuery('<td/>').appendTo(tr);
+                    jQuery('<div/>').text(label.trim()).appendTo(tdName);
+
+                    var tdAction = jQuery('<td class="deck-selection-actions text-right"/>').appendTo(tr);
+                    if (alreadyOpen) {
+                        jQuery('<span class="text-muted small">Open</span>').appendTo(tdAction);
+                    } else {
+                        jQuery('<a href="" class="btn btn-xs btn-default" title="Add to builder"><span class="fa fa-check fa-fw text-success"></span></a>')
+                            .appendTo(tdAction)
+                            .on('click', function(e) {
+                                e.preventDefault();
+                                var route = deck.is_published
+                                    ? Routing.generate('api_decklist', { decklist_id: deck.id })
+                                    : Routing.generate('api_private_load_deck', { id: deck.id });
+                                jQuery.ajax(route, {
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    cache: false,
+                                    success: function(deckData) {
+                                        jQuery('#multiDeckLoadModal').modal('hide');
+                                        app.multiDeck.addExistingDeck(deckData);
+                                    }
+                                });
+                            });
+                    }
+
+                    tbody.append(tr);
+                });
+            }
+        });
+    },
+
+    addExistingDeck: function(deckData) {
+        app.multiDeck.captureActive();
+        var deckName = deckData.name || 'Loaded Deck';
+        var newDeck = {
+            id: deckData.id || null,
+            name: deckName,
+            description_md: deckData.description_md || '',
+            tags: deckData.tags || '',
+            slots: deckData.slots || {},
+            sideslots: deckData.sideslots || {},
+            history: deckData.history || [],
+            uiState: null
+        };
+        app.multiDeck.decks.push(newDeck);
+        app.multiDeck.activeIdx = app.multiDeck.decks.length - 1;
+        app.deck.setMeta(newDeck);
+        app.deck.set_slots(newDeck.slots, newDeck.sideslots);
+        app.deck_history && app.deck_history.reset(newDeck.history);
+        jQuery('input.decklist-name').val(deckName);
+        jQuery('#deck-save-id').val(newDeck.id || '');
+        jQuery('textarea[name="description_"]').val(newDeck.description_md || '');
+        jQuery('input[name="tags_"]').val(newDeck.tags || '');
+        app.ui && app.ui.apply_default_filters && app.ui.apply_default_filters();
+        jQuery('#save_form button[type=submit]').first().text('Save All');
+        app.ui && app.ui.refresh_deck && app.ui.refresh_deck();
+        app.ui && app.ui.reset_list && app.ui.reset_list();
+        app.multiDeck.render_tabs();
+    },
+
+    pendingCloseIdx: null,
+
+    openCloseModal: function(idx) {
+        app.multiDeck.pendingCloseIdx = idx;
+        var d = app.multiDeck.decks[idx];
+        jQuery('#multiDeckCloseMessage').text('"' + (d.name || 'This deck') + '" has unsaved changes.');
+        jQuery('#multiDeckCloseModal').modal('show');
+    },
+
+    confirmClose: function(save) {
+        var idx = app.multiDeck.pendingCloseIdx;
+        if (idx === null) return;
+        jQuery('#multiDeckCloseModal').modal('hide');
+
+        if (save) {
+            if (idx === app.multiDeck.activeIdx) {
+                app.multiDeck.captureActive();
+            }
+            var d = app.multiDeck.decks[idx];
+            if (!d.slots || Object.keys(d.slots).length === 0) {
+                app.multiDeck.removeTab(idx);
+                return;
+            }
+            jQuery.ajax({
+                url: Routing.generate('deck_save_ajax'),
+                method: 'POST',
+                data: {
+                    id: d.id || '',
+                    name: d.name || 'Untitled Deck',
+                    content: JSON.stringify({ main: d.slots || {}, side: d.sideslots || {} }),
+                    description: d.description_md || '',
+                    tags: d.tags || ''
+                },
+                success: function(resp) {
+                    if (resp && resp.success) d.id = resp.id;
+                    app.multiDeck.removeTab(idx);
+                },
+                error: function(xhr) {
+                    var msg = 'Save failed. The tab was not closed.';
+                    try { var r = JSON.parse(xhr.responseText); msg = r.error || msg; } catch(e) {}
+                    alert(msg);
+                }
+            });
+        } else {
+            app.multiDeck.removeTab(idx);
+        }
+    },
+
+    removeTab: function(idx) {
+        var wasActive = (idx === app.multiDeck.activeIdx);
+        app.multiDeck.decks.splice(idx, 1);
+
+        var newIdx = wasActive
+            ? Math.min(idx, app.multiDeck.decks.length - 1)
+            : idx < app.multiDeck.activeIdx ? app.multiDeck.activeIdx - 1 : app.multiDeck.activeIdx;
+        app.multiDeck.activeIdx = newIdx;
+
+        if (wasActive) {
+            var d = app.multiDeck.decks[newIdx];
+            app.deck.setMeta(d);
+            app.deck.set_slots(d.slots, d.sideslots);
+            app.deck_history && app.deck_history.reset(d.history || []);
+            jQuery('input.decklist-name').val(d.name || '');
+            jQuery('#deck-save-id').val(d.id || '');
+            jQuery('textarea[name="description_"]').val(d.description_md || '');
+            jQuery('input[name="tags_"]').val(d.tags || '');
+            app.ui && app.ui.restore_filter_state && app.ui.restore_filter_state(d.uiState || null);
+            app.ui && app.ui.refresh_deck && app.ui.refresh_deck();
+            app.ui && app.ui.reset_list && app.ui.reset_list();
+        }
+
+        if (app.multiDeck.decks.length === 1) {
+            jQuery('#save_form button[type=submit]').first().text('Save');
+        }
+
+        app.multiDeck.render_tabs();
     }
 };
