@@ -248,7 +248,7 @@ class SearchController extends Controller {
         $page = $request->query->get('page') ?: 1;
         $view = $request->query->get('view') ?: 'list';
         $sort = $request->query->get('sort') ?: 'name';
-        $collection = $request->query->get('collection') ?: 0;
+        $onlyCollections = $request->query->get('collection') ?: 0;
 
         // we may be able to redirect to a better url if the search is on a single set
         $conditions = $this->get('cards_data')->syntax($q);
