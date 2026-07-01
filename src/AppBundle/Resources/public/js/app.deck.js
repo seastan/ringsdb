@@ -535,8 +535,19 @@
         cards.forEach(function(card) {
             if (card.type_code == 'hero' && sortKey == 'type_code' && !is_sideboard) {
                 var div = $('<div class="deck-hero"/>')
-                    .append('<div class="hero-thumbnail card-thumbnail-2x card-thumbnail-hero" style="background-image:url(\'/bundles/cards/' + card.code + '.png\')"></div>')
-                    .append($(card_line_tpl({ card: card })));
+                    .append('<div class="hero-thumbnail card-thumbnail-2x card-thumbnail-hero" style="background-image:url(\'/bundles/cards/' + card.code + '.png\')"></div>');
+
+                // A hero normally has no count prefix, but if the copies in use
+                // exceed what the player owns, prefix an orange "Nx" carrying the
+                // same conflict tooltip the deck's card counts use.
+                var heroConflictTitle = getConflictTitle(card);
+                if (heroConflictTitle) {
+                    $('<span class="card-count deck-conflict">' + card[key] + 'x</span> ')
+                        .attr('title', heroConflictTitle)
+                        .appendTo(div);
+                }
+
+                div.append($(card_line_tpl({ card: card })));
 
                 div.appendTo(section);
             } else {

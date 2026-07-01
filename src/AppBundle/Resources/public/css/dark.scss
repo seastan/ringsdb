@@ -122,6 +122,26 @@ $dark-link-hover: #9cc6ee;
     border-color: $dark-border;
   }
 
+  /********* ALERTS ************/
+
+  /* Bootstrap's default alert-info is a bright light-blue that glares in dark
+     mode (e.g. the "Showing N most recent decks" banner). Re-tint it to match
+     the muted info blue used for selected-printing table rows. */
+  .alert-info {
+    background-color: #2a4060;
+    border-color: #34507a;
+    color: $dark-text;
+
+    a {
+      color: $dark-link;
+
+      &:hover,
+      &:focus {
+        color: $dark-link-hover;
+      }
+    }
+  }
+
   /********* TABLES ************/
 
   .table {
@@ -454,6 +474,48 @@ $dark-link-hover: #9cc6ee;
     }
   }
 
+  /********* POPOVERS ************/
+
+  /* Bootstrap popovers (e.g. the hover help on the +/folder icons next to the
+     multi-deck tabs) default to a white body that glares in dark mode. Re-skin
+     to the dark surfaces, including the arrow tip -- for bottom-placed popovers
+     the arrow sits against the title bar, so it matches that surface. */
+  .popover {
+    background-color: $dark-surface;
+    border-color: $dark-border;
+    color: $dark-text;
+
+    .popover-title {
+      background-color: $dark-surface-2;
+      border-bottom-color: $dark-border;
+      color: $dark-text;
+    }
+
+    .popover-content {
+      color: $dark-text;
+    }
+
+    &.top > .arrow {
+      border-top-color: $dark-border;
+      &:after { border-top-color: $dark-surface; }
+    }
+
+    &.right > .arrow {
+      border-right-color: $dark-border;
+      &:after { border-right-color: $dark-surface; }
+    }
+
+    &.bottom > .arrow {
+      border-bottom-color: $dark-border;
+      &:after { border-bottom-color: $dark-surface-2; }
+    }
+
+    &.left > .arrow {
+      border-left-color: $dark-border;
+      &:after { border-left-color: $dark-surface; }
+    }
+  }
+
   /********* SIDEBAR NAV (Decklists / Fellowships / Quest Logs) ************/
 
   .nav-pills > li > a:hover,
@@ -471,4 +533,64 @@ $dark-link-hover: #9cc6ee;
   @include dark-fg-color(baggins,    #cdb84a);
   @include dark-fg-color(fellowship, #e0902f);
   @include dark-fg-color(neutral,    #9a9a9a);
+
+  /********* MULTI-DECK BUILDER TABS ************/
+
+  /* The per-deck tabs default to light greys (#f0f0f0 / #fff) which glare in
+     dark mode. Re-map to the dark surface hierarchy: the active tab blends into
+     the page background (as it does with #fff in light mode) while inactive
+     tabs sit one step lighter. */
+  .multi-deck-browser-bar {
+    border-bottom-color: $dark-border;
+  }
+
+  .multi-deck-browser-tab {
+    background: $dark-bg;
+
+    .multi-deck-tab-label {
+      color: $dark-text-muted;
+    }
+
+    .multi-deck-tab-no-heroes {
+      color: $dark-text-muted;
+    }
+
+    &.active {
+      background: $dark-surface;
+      border-color: $dark-border $dark-border $dark-surface;
+
+      .multi-deck-tab-label {
+        color: $dark-text;
+      }
+    }
+
+    &.multi-deck-tab:hover {
+      background: $dark-surface-2;
+    }
+  }
+
+  .multi-deck-close-tab {
+    color: $dark-text-muted;
+
+    &:hover {
+      color: $dark-text;
+    }
+  }
+
+  .multi-deck-add-btn {
+    color: $dark-text-muted;
+
+    &:hover {
+      color: $dark-text;
+      background: $dark-surface;
+    }
+  }
+
+  .multi-deck-help {
+    color: $dark-text-muted;
+
+    &:hover {
+      color: $dark-text;
+    }
+  }
 }
