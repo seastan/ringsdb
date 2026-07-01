@@ -26,6 +26,8 @@ AppBundle\Entity\Card:
             targetEntity: CardPrinting
             orderBy: {'position':'ASC'}
             mappedBy: card
+            cascade: [remove]
+            orphanRemoval: true
     fields:
         id:
             type: integer

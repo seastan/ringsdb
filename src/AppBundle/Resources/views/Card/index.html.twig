@@ -20,7 +20,7 @@
         {% for entity in entities %}
             <tr>
                 <td><a href="{{ path('admin_card_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
-                <td>{{ entity.pack.name }}</td>
+                <td>{{ entity.pack ? entity.pack.name : '' }}</td>
                 <td>{{ entity.position }}</td>
                 <td>{{ entity.code }}</td>
                 <td>{{ entity.sphere.name }}</td>
