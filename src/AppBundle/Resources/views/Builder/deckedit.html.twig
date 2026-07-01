@@ -19,6 +19,8 @@
             <div class="alert alert-danger" role="alert" id="deck-unsaved-alert"><span class="fa fa-exclamation-triangle"></span> This deck has unsaved changes. Please save the deck or cancel the changes before making further edits.</div>
         {% endif %}
 
+        <div id="multi-deck-tabs"></div>
+
         <div class="row">
             <!-- Left-side Column -->
             <div class="col-md-6">
@@ -92,5 +94,40 @@
     </div>
 
     {% include 'AppBundle:Modale:odds.html.twig' %}
+
+    <div class="modal fade" id="multiDeckCloseModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Close deck</h4>
+                </div>
+                <div class="modal-body">
+                    <p id="multiDeckCloseMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-default js-close-discard">Close without saving</button>
+                    <button type="button" class="btn btn-success js-close-save">Save &amp; Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="multiDeckLoadModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 class="modal-title">Add a Deck to Builder</h3>
+                </div>
+                <div class="modal-body" style="padding: 0">
+                    <table class="table table-expanded list-decks" style="margin-bottom: 0">
+                        <tbody id="multiDeckLoadList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}

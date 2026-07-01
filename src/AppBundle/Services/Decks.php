@@ -31,6 +31,43 @@ class Decks {
         return $list;
     }
 
+    public function getDecksWithSlotsForUser($user, $limit = null) {
+        // Step 1: get the right deck IDs with no collection join so LIMIT works correctly
+        $idQuery = $this->doctrine->createQuery(
+            'SELECT d.id FROM AppBundle\Entity\Deck d
+             WHERE d.user = :user
+             ORDER BY d.dateUpdate DESC'
+        )->setParameter('user', $user);
+
+        if ($limit !== null) {
+            $idQuery->setMaxResults($limit);
+        }
+
+        $ids = array_column($idQuery->getScalarResult(), 'id');
+
+        if (empty($ids)) {
+            return [];
+        }
+
+        // Step 2: load those decks with all slot/card data in one query
+        return $this->doctrine->createQuery(
+            'SELECT d, lp, s, c, ct
+             FROM AppBundle\Entity\Deck d
+             LEFT JOIN d.lastPack lp
+             LEFT JOIN d.slots s
+             LEFT JOIN s.card c
+             LEFT JOIN c.type ct
+             WHERE d.id IN (:ids)
+             ORDER BY d.dateUpdate DESC'
+        )->setParameter('ids', $ids)->getResult();
+    }
+
+    public function countDecksForUser($user) {
+        return (int) $this->doctrine->createQuery(
+            'SELECT COUNT(d.id) FROM AppBundle\Entity\Deck d WHERE d.user = :user'
+        )->setParameter('user', $user)->getSingleScalarResult();
+    }
+
     public function cloneDeck($deck, $user) {
         /* @var $deck \AppBundle\Entity\Deck */
         if (!$deck) {

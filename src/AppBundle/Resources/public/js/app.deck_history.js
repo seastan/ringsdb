@@ -13,7 +13,28 @@
     /**
      * @memberOf deck_history
      */
+    deck_history.get_init_snapshots = function() {
+        return snapshots_init;
+    };
+
+    deck_history.get_snapshots = function() {
+        return snapshots;
+    };
+
+    deck_history.reset = function(data) {
+        snapshots = [];
+        if (tbody) tbody.empty();
+        (data || []).forEach(function(snapshot) {
+            deck_history.add_snapshot(snapshot);
+        });
+    };
+
     deck_history.autosave = function autosave() {
+
+        // Don't autosave when the active deck hasn't been persisted yet
+        if (!app.deck.get_id()) {
+            return;
+        }
 
         // check if deck has been modified since last autosave
         if (!changed_since_last_autosave) {
