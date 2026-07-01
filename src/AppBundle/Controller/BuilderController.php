@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\Deck;
@@ -20,7 +21,7 @@ class BuilderController extends Controller {
 
         /* @var $deck \AppBundle\Entity\Deck */
         $deck = new Deck();
-        $deck->setName('New Lord of the Rings LCG Deck');
+        $deck->setName('New Deck');
         $deck->setDescriptionMd('');
         $deck->setLastPack(null);
         $deck->setProblem('too_few_heroes');
@@ -423,6 +424,55 @@ class BuilderController extends Controller {
         return $this->redirect($this->generateUrl('decks_list'));
     }
 
+    public function saveAjaxAction(Request $request) {
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        /* @var $user \AppBundle\Entity\User */
+        $user = $this->getUser();
+        if (count($user->getDecks()) > $user->getMaxNbDecks()) {
+            return new JsonResponse(['success' => false, 'error' => 'You have reached the maximum number of decks allowed.'], 422);
+        }
+
+        $id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
+        $deck = null;
+        $source_deck = null;
+
+        if ($id) {
+            /* @var $deck \AppBundle\Entity\Deck */
+            $deck = $em->getRepository('AppBundle:Deck')->find($id);
+
+            if (!$deck || $user->getId() != $deck->getUser()->getId()) {
+                return new JsonResponse(['success' => false, 'error' => "You don't have access to this deck."], 403);
+            }
+
+            $source_deck = $deck;
+        }
+
+        if (!$id) {
+            $deck = new Deck();
+        }
+
+        $content = (array) json_decode($request->get('content'));
+        if (!isset($content['main']) || empty($content['main'])) {
+            return new JsonResponse(['success' => false, 'error' => 'Cannot save an empty deck.'], 422);
+        }
+
+        $name = filter_var($request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+        if (empty($name)) {
+            $name = 'Untitled Deck';
+        }
+
+        $decklist_id = filter_var($request->get('decklist_id'), FILTER_SANITIZE_NUMBER_INT);
+        $description = trim($request->get('description'));
+        $tags = filter_var($request->get('tags'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+
+        $this->get('decks')->saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);
+        $em->flush();
+
+        return new JsonResponse(['success' => true, 'id' => $deck->getId()]);
+    }
+
     public function deleteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -521,50 +571,70 @@ class BuilderController extends Controller {
         ]);
     }
 
-    public function listAction() {
-        /* @var $em \Doctrine\ORM\EntityManager */
-        $em = $this->getDoctrine()->getManager();
-
+    public function listAction(Request $request) {
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
+        $decksService = $this->get('decks');
 
-        /* @var $decks \AppBundle\Entity\Deck[] */
-        $decks = $this->get('decks')->getByUser($user, false);
+        $showAll = (bool) $request->query->get('all', false);
+        $limit = $showAll ? null : 10;
 
-        if (count($decks)) {
-            $tags = [];
-            foreach ($decks as &$deck) {
-                $tags[] = $deck['tags'];
+        $totalDecks = $decksService->countDecksForUser($user);
 
-                /* @var $heroDeck \AppBundle\Entity\Deckslot[] */
-                $heroDeck = $em->getRepository('AppBundle:Deck')->find($deck['id'])->getSlots()->getHeroDeck();
-                $heroes = [];
-
-                foreach ($heroDeck as $hero) {
-                    $heroes[] = $hero->getCard();
-                }
-
-                $deck['heroes'] = $heroes;
-            }
-
-            $tags = array_unique($tags);
-
-            return $this->render('AppBundle:Builder:decks.html.twig', [
-                'pagetitle' => "My Decks",
-                'pagedescription' => "Create custom decks with the help of a powerful deckbuilder.",
-                'decks' => $decks,
-                'tags' => $tags,
-                'nbmax' => $user->getMaxNbDecks(),
-                'nbdecks' => count($decks),
-                'cannotcreate' => $user->getMaxNbDecks() <= count($decks),
-            ]);
-        } else {
+        if ($totalDecks === 0) {
             return $this->render('AppBundle:Builder:no-decks.html.twig', [
                 'pagetitle' => "My Decks",
                 'pagedescription' => "Create custom decks with the help of a powerful deckbuilder.",
                 'nbmax' => $user->getMaxNbDecks(),
             ]);
         }
+
+        $deckEntities = $decksService->getDecksWithSlotsForUser($user, $limit);
+
+        $decks = [];
+        $tags = [];
+
+        foreach ($deckEntities as $deckEntity) {
+            $slotContent = [];
+            $heroes = [];
+            foreach ($deckEntity->getSlots() as $slot) {
+                $card = $slot->getCard();
+                $slotContent[$card->getCode()] = $slot->getQuantity();
+                if ($card->getType() && $card->getType()->getCode() === 'hero') {
+                    $heroes[] = $card;
+                }
+            }
+            ksort($slotContent);
+
+            $deck = [
+                'id' => $deckEntity->getId(),
+                'name' => $deckEntity->getName(),
+                'date_creation' => $deckEntity->getDateCreation(),
+                'version' => $deckEntity->getVersion(),
+                'problem' => $deckEntity->getProblem(),
+                'tags' => $deckEntity->getTags(),
+                'last_pack' => $deckEntity->getLastPack(),
+                'slots' => $slotContent,
+                'heroes' => $heroes,
+            ];
+
+            $tags[] = $deck['tags'];
+            $decks[] = $deck;
+        }
+
+        $tags = array_unique($tags);
+
+        return $this->render('AppBundle:Builder:decks.html.twig', [
+            'pagetitle' => "My Decks",
+            'pagedescription' => "Create custom decks with the help of a powerful deckbuilder.",
+            'decks' => $decks,
+            'tags' => $tags,
+            'nbmax' => $user->getMaxNbDecks(),
+            'nbdecks' => $totalDecks,
+            'nbloaded' => count($decks),
+            'cannotcreate' => $user->getMaxNbDecks() <= $totalDecks,
+            'show_all' => $showAll,
+        ]);
     }
 
     public function copyAction($decklist_id) {

@@ -180,6 +180,17 @@
         }
     };
 
+    ui.edit_decks = function(ids) {
+        if (!ids.length) return;
+        var first = ids[0];
+        var rest = ids.slice(1);
+        var url = Routing.generate('deck_edit', { deck_id: first });
+        if (rest.length) {
+            url += '?also=' + rest.join(',');
+        }
+        location.href = url;
+    };
+
     ui.do_diff = function(ids) {
         if (ids.length < 2) {
             return false;
@@ -231,6 +242,9 @@
             return;
         }
         switch (action_id) {
+            case 'btn-edit-decks':
+                ui.edit_decks(ids);
+                break;
             case 'btn-fellowship':
                 ui.create_fellowship(ids);
                 break;

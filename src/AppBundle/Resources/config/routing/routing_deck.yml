@@ -10,6 +10,12 @@ deck_save:
     defaults:
         _controller: AppBundle:Builder:save
 
+deck_save_ajax:
+    path: /save-ajax
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:Builder:saveAjax
+
 deck_edit:
     path: /edit/{deck_id}
     methods: [GET]

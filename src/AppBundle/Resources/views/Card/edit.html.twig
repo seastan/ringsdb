@@ -12,6 +12,9 @@
     <a href="{{ path('admin_card') }}" class="btn btn-default">
         Back to the list
     </a>
+    <a href="{{ path('admin_card_printing', { 'card': entity.name }) }}" class="btn btn-default">
+        Manage printings (pack, quantity, illustrator, OCTGN ID)
+    </a>
     <form action="{{ path('admin_card_delete', { 'id': entity.id }) }}" method="post" style="display:inline-block">
         <input type="hidden" name="_method" value="DELETE"/>
         {{ form_widget(delete_form) }}
