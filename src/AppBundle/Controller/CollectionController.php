@@ -82,10 +82,15 @@ class CollectionController extends Controller {
             $categories[] = $repackaged;
         }
 
+        $customPacks = $this->getDoctrine()
+            ->getRepository('AppBundle:UserCustomPack')
+            ->findBy(['user' => $this->getUser()], ['createdAt' => 'ASC']);
+
         return $this->render('AppBundle:Collection:packs.html.twig', [
             'pagetitle' =>  "My Collection",
             'categories' => $categories,
-            'reloaduser' => $reloaduser
+            'reloaduser' => $reloaduser,
+            'customPacks' => $customPacks,
         ]);
     }
 

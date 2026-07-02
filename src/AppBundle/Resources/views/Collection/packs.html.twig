@@ -65,4 +65,55 @@ input[type=number].pack-qty { -moz-appearance: textfield; text-align: center; }
             </div>
         </form>
     </div>
+</div>
+
+<div class="main white container" style="margin-top: 30px">
+    <h3>Custom Packs</h3>
+
+    {% if customPacks is empty %}
+        <p class="text-muted">No custom packs yet.</p>
+    {% else %}
+        <table class="table table-condensed" style="margin-bottom: 10px">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th style="width:80px; text-align:center">Cards</th>
+                    <th style="width:100px; text-align:center">Status</th>
+                    <th style="width:140px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pack in customPacks %}
+                <tr>
+                    <td>{{ pack.name }}</td>
+                    <td style="text-align:center">{{ pack.cards|length }}</td>
+                    <td style="text-align:center">
+                        <form method="POST" action="{{ path('collection_custom_pack_toggle', {id: pack.id}) }}" style="display:inline">
+                            <button type="submit" class="btn btn-xs{% if pack.isEnabled %} btn-success{% else %} btn-default{% endif %}">
+                                {% if pack.isEnabled %}Enabled{% else %}Disabled{% endif %}
+                            </button>
+                        </form>
+                    </td>
+                    <td class="text-right">
+                        <a href="{{ path('collection_custom_pack_edit', {id: pack.id}) }}" class="btn btn-xs btn-default">
+                            <span class="fa fa-pencil"></span> Edit
+                        </a>
+                        <form method="POST" action="{{ path('collection_custom_pack_delete', {id: pack.id}) }}"
+                              style="display:inline"
+                              onsubmit="return confirm('Delete custom pack \'{{ pack.name|e('js') }}\'?')">
+                            <button type="submit" class="btn btn-xs btn-danger" style="margin-left:4px">
+                                <span class="fa fa-trash"></span> Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <a href="{{ path('collection_custom_pack_new') }}" class="btn btn-default">
+        <span class="fa fa-plus"></span> Create a custom pack
+    </a>
+</div>
 {% endblock %}

@@ -1,4 +1,48 @@
 
+collection_custom_pack_new:
+    path: /custom-pack/new
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:CustomPack:newForm
+
+collection_custom_pack_save:
+    path: /custom-pack/save
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:CustomPack:save
+
+collection_custom_pack_edit:
+    path: /custom-pack/{id}/edit
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:CustomPack:editForm
+    requirements:
+        id: \d+
+
+collection_custom_pack_update:
+    path: /custom-pack/{id}/update
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:CustomPack:update
+    requirements:
+        id: \d+
+
+collection_custom_pack_delete:
+    path: /custom-pack/{id}/delete
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:CustomPack:delete
+    requirements:
+        id: \d+
+
+collection_custom_pack_toggle:
+    path: /custom-pack/{id}/toggle
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:CustomPack:toggle
+    requirements:
+        id: \d+
+
 collection_packs:
     path: /packs
     methods: [GET]

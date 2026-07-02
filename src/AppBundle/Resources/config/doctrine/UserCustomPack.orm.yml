@@ -1,0 +1,47 @@
+AppBundle\Entity\UserCustomPack:
+    type: entity
+    table: user_custom_pack
+    manyToOne:
+        user:
+            targetEntity: User
+            joinColumn:
+                name: user_id
+                referencedColumnName: id
+            nullable: false
+    oneToMany:
+        cards:
+            targetEntity: UserCustomPackCard
+            mappedBy: customPack
+            cascade: ["persist", "remove"]
+            orphanRemoval: true
+    fields:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+        name:
+            type: string
+            length: 255
+            nullable: false
+        code:
+            type: string
+            length: 64
+            nullable: false
+        isEnabled:
+            type: boolean
+            nullable: false
+            column: is_enabled
+            options:
+                default: true
+        createdAt:
+            type: datetime
+            nullable: false
+            column: created_at
+        updatedAt:
+            type: datetime
+            nullable: false
+            column: updated_at
+    uniqueConstraints:
+        ucp_code_idx:
+            columns: [ code ]

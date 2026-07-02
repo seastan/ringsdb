@@ -1,3 +1,11 @@
+api_private_custom_packs:
+    path: /custom-packs
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:CustomPack:apiList
+    options:
+        expose: true
+
 api_private_my_decks:
     path: /decks
     methods: [GET]
