@@ -1,0 +1,98 @@
+{% extends 'AppBundle::layout.html.twig' %}
+
+{% block javascripts %}
+    {% javascripts '@AppBundle/Resources/public/js/ui.custom_pack.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+<style>
+#custom-pack-cards .custom-pack-card-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(0,0,0,.06);
+}
+.dark-mode #custom-pack-cards .custom-pack-card-row {
+    border-bottom-color: rgba(255,255,255,.07);
+}
+#custom-pack-cards .card-qty {
+    flex: 0 0 auto;
+    width: 42px;
+    padding: 3px 6px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 13px;
+}
+.dark-mode #custom-pack-cards .card-qty {
+    background: #2e2e33;
+    color: #d6d6d6;
+    border-color: #3d3d44;
+}
+#custom-pack-cards .card-label {
+    flex: 1;
+    min-width: 0;
+}
+#custom-pack-cards .card-tip {
+    cursor: default;
+}
+#custom-pack-cards .remove-card-btn {
+    flex: 0 0 auto;
+}
+</style>
+<div class="main white container">
+    <h2>{{ pagetitle }}</h2>
+
+    <form id="custom-pack-form" method="POST"
+          action="{{ pack ? path(save_route, {id: pack.id}) : path(save_route) }}">
+
+        <input type="hidden" name="cards_json" id="cards-json" value="">
+
+        <div class="form-group">
+            <label for="pack-name">Pack name</label>
+            <input type="text" class="form-control" id="pack-name" name="name"
+                   value="{{ pack ? pack.name : '' }}"
+                   placeholder="e.g. My Alt-Art Core Set" maxlength="255" required>
+        </div>
+
+        <div class="form-group">
+            <label>Add cards</label>
+            <input type="text" class="form-control" id="card-search"
+                   placeholder="Type a card name to search…" autocomplete="off">
+        </div>
+
+        <div id="custom-pack-cards">
+            {% if pack %}
+                {% for entry in pack.cards %}
+                {% set sphere = entry.card.sphere ? entry.card.sphere.code : 'neutral' %}
+                <div class="custom-pack-card-row" data-code="{{ entry.card.code }}">
+                    <input type="number" class="card-qty" min="1" max="9" value="{{ entry.quantity }}">
+                    <div class="card-label">
+                        <div class="card-tip fg-{{ sphere }}" data-code="{{ entry.card.code }}" style="display:inline">
+                            <span class="icon-fw icon-{{ sphere }}"></span>
+                            <strong>{{ entry.card.name }}</strong>{% if entry.card.type %} <small><i>{{ entry.card.type.name }}</i></small>{% endif %}
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-xs btn-danger remove-card-btn">
+                        <span class="fa fa-times"></span>
+                    </button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-sm-12 text-right">
+                <a href="{{ path('collection_packs') }}" class="btn btn-default">Cancel</a>
+                <button type="submit" class="btn btn-success" style="margin-left:8px">Save Pack</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+{% endblock %}

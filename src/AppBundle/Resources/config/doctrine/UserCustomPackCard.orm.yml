@@ -1,0 +1,31 @@
+AppBundle\Entity\UserCustomPackCard:
+    type: entity
+    table: user_custom_pack_card
+    manyToOne:
+        customPack:
+            targetEntity: UserCustomPack
+            inversedBy: cards
+            joinColumn:
+                name: custom_pack_id
+                referencedColumnName: id
+            nullable: false
+        card:
+            targetEntity: Card
+            joinColumn:
+                name: card_id
+                referencedColumnName: id
+            nullable: false
+    fields:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+        quantity:
+            type: smallint
+            nullable: false
+            options:
+                default: 1
+    uniqueConstraints:
+        ucpc_pack_card_idx:
+            columns: [ custom_pack_id, card_id ]

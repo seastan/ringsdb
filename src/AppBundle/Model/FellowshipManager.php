@@ -24,12 +24,17 @@ class FellowshipManager {
 	protected $start = 0;
 	protected $limit = 30;
 	protected $maxcount = 0;
+	protected $user = null;
 
 	public function __construct(EntityManager $doctrine, RequestStack $request_stack, Router $router, LoggerInterface $logger) {
 		$this->doctrine = $doctrine;
 		$this->request_stack = $request_stack;
 		$this->router = $router;
 		$this->logger = $logger;
+	}
+
+	public function setUser($user) {
+		$this->user = $user;
 	}
 
 	public function setLimit($limit) {
@@ -159,6 +164,11 @@ class FellowshipManager {
 
         $sort = $request->query->get('sort');
         $packs = $request->query->get('packs');
+        if (!is_array($packs)) {
+            $packs = [];
+        }
+
+        $customPackCodes = array_values(array_filter((array) $request->query->get('custom_packs', []), 'is_string'));
 
         $qb = $this->getQueryBuilder();
         $joinTables = [];
@@ -180,7 +190,9 @@ class FellowshipManager {
             $qb->setParameter('nbdecks', $nb_decks);
         }
 
-        if (!empty($cards_code) || !empty($packs)) {
+        $useCustomPacks = !empty($customPackCodes) && $this->user;
+
+        if (!empty($cards_code) || !empty($packs) || $useCustomPacks) {
             $qb->innerJoin('d.decklists', "l");
             $qb->innerJoin('l.decklist', "ld");
 
@@ -199,17 +211,35 @@ class FellowshipManager {
                     // $packs[] = $card->getPack()->getId();
                 }
             }
-            if (!empty($packs)) {
+            if (!empty($packs) || $useCustomPacks) {
+                // A card is "not covered" if it has no printing in the official allowed
+                // packs AND is not present in any selected custom pack.
                 $sub = $this->doctrine->createQueryBuilder();
                 $sub->select("c");
                 $sub->from("AppBundle:Card", "c");
                 $sub->innerJoin('AppBundle:Decklistslot', 's', 'WITH', 's.card = c');
                 $sub->where('s.decklist = ld');
-                $sub->andWhere("NOT EXISTS (SELECT cpfm.id FROM AppBundle:CardPrinting cpfm WHERE cpfm.card = c AND cpfm.pack IN (:fm_packs))");
-                $sub->setParameter('fm_packs', $packs);
+
+                if (!empty($packs)) {
+                    $sub->andWhere("NOT EXISTS (SELECT cpfm.id FROM AppBundle:CardPrinting cpfm WHERE cpfm.card = c AND cpfm.pack IN (:fm_packs))");
+                    $qb->setParameter('fm_packs', $packs);
+                }
+
+                if ($useCustomPacks) {
+                    $sub->andWhere(
+                        "NOT EXISTS (" .
+                            "SELECT ucpcfm.id FROM AppBundle:UserCustomPackCard ucpcfm " .
+                            "JOIN ucpcfm.customPack ucpfm " .
+                            "WHERE ucpcfm.card = c " .
+                            "AND ucpfm.code IN (:fm_custom_codes) " .
+                            "AND ucpfm.user = :fm_custom_user" .
+                        ")"
+                    );
+                    $qb->setParameter('fm_custom_codes', $customPackCodes);
+                    $qb->setParameter('fm_custom_user', $this->user);
+                }
 
                 $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
-                $qb->setParameter('fm_packs', $packs);
             }
 
             // Num cores
