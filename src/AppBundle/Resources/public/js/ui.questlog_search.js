@@ -1,7 +1,52 @@
 (function(ui, $) {
     ui.handle_checkbox_change = function handle_checkbox_change() {
-        $('#packs-on').text($('#allowed_packs').find('input[type="checkbox"]:checked').size());
-        $('#packs-off').text($('#allowed_packs').find('input[type="checkbox"]:not(:checked)').size());
+        var $allowed = $('#allowed_packs');
+        var $official = $allowed.find('input[name="packs[]"]');
+        var $custom = $allowed.find('input[data-custom-pack]');
+        $('#packs-on').text($official.filter(':checked').size() + $custom.filter(':checked').size());
+        $('#packs-off').text($official.filter(':not(:checked)').size() + $custom.filter(':not(:checked)').size());
+    };
+
+    ui.add_custom_pack_section = function add_custom_pack_section() {
+        var customPacks = app.user && app.user.customPacks;
+        if (!customPacks || !customPacks.length) { return; }
+        var $allowed = $('#allowed_packs');
+        if (!$allowed.length || $allowed.find('#custom-pack-section').length) { return; }
+
+        // Restore which custom packs were explicitly selected in the previous search.
+        var selectedCodes = {};
+        if (window.URLSearchParams) {
+            new URLSearchParams(window.location.search).getAll('custom_packs[]').forEach(function(code) {
+                selectedCodes[code] = true;
+            });
+        }
+
+        var $section = $('<div id="custom-pack-section"></div>');
+        $section.append('<p><small>My Custom Packs</small></p>');
+        _.forEach(customPacks, function(cp) {
+            var checked = selectedCodes[cp.code] ? ' checked="checked"' : '';
+            $section.append(
+                '<div class="checkbox"><label>'
+                + '<input type="checkbox" data-custom-pack="' + cp.code + '"' + checked + '> '
+                + cp.name
+                + '</label></div>'
+            );
+        });
+        $allowed.append($section);
+
+        ui.handle_checkbox_change();
+
+        $allowed.on('change', 'input[data-custom-pack]', ui.handle_checkbox_change);
+
+        // On submit, inject hidden inputs so custom pack selection survives the page reload.
+        $allowed.closest('form').on('submit', function() {
+            var $form = $(this);
+            $form.find('input[name="custom_packs[]"]').remove();
+            $section.find('input[data-custom-pack]:checked').each(function() {
+                $('<input type="hidden" name="custom_packs[]">').val($(this).data('custom-pack')).appendTo($form);
+            });
+        });
+
     };
 
     /**
@@ -89,5 +134,7 @@
     ui.on_all_loaded = function on_all_loaded() {
         ui.setup_typeahead();
     };
+
+    $(document).on('custom_packs_loaded', ui.add_custom_pack_section);
 
 })(app.ui, jQuery);

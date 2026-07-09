@@ -24,12 +24,17 @@ class QuestLogManager {
 	protected $start = 0;
 	protected $limit = 30;
 	protected $maxcount = 0;
+	protected $user = null;
 
 	public function __construct(EntityManager $doctrine, RequestStack $request_stack, Router $router, LoggerInterface $logger) {
 		$this->doctrine = $doctrine;
 		$this->request_stack = $request_stack;
 		$this->router = $router;
 		$this->logger = $logger;
+	}
+
+	public function setUser($user) {
+		$this->user = $user;
 	}
 
 	public function setLimit($limit) {
@@ -157,6 +162,11 @@ class QuestLogManager {
 
         $sort = $request->query->get('sort');
         $packs = $request->query->get('packs');
+        if (!is_array($packs)) {
+            $packs = [];
+        }
+
+        $customPackCodes = array_values(array_filter((array) $request->query->get('custom_packs', []), 'is_string'));
 
         $qb = $this->getQueryBuilder();
         $joinTables = [];
@@ -178,7 +188,9 @@ class QuestLogManager {
             $qb->setParameter('nbdecks', $nb_decks);
         }
 
-        if (!empty($cards_code) || !empty($packs)) {
+        $useCustomPacks = !empty($customPackCodes) && $this->user;
+
+        if (!empty($cards_code) || !empty($packs) || $useCustomPacks) {
             $qb->innerJoin('d.decks', "l");
             $qb->innerJoin('l.deck', "ld");
 
@@ -197,17 +209,33 @@ class QuestLogManager {
                     //$packs[] = $card->getPack()->getId();
                 }
             }
-            if (!empty($packs)) {
+            if (!empty($packs) || $useCustomPacks) {
                 $sub = $this->doctrine->createQueryBuilder();
                 $sub->select("c");
                 $sub->from("AppBundle:Card", "c");
                 $sub->innerJoin('AppBundle:Deckslot', 's', 'WITH', 's.card = c');
                 $sub->where('s.deck = ld');
-                $sub->andWhere("NOT EXISTS (SELECT cpqlm.id FROM AppBundle:CardPrinting cpqlm WHERE cpqlm.card = c AND cpqlm.pack IN (:qlm_packs))");
-                $sub->setParameter('qlm_packs', $packs);
+
+                if (!empty($packs)) {
+                    $sub->andWhere("NOT EXISTS (SELECT cpqlm.id FROM AppBundle:CardPrinting cpqlm WHERE cpqlm.card = c AND cpqlm.pack IN (:qlm_packs))");
+                    $qb->setParameter('qlm_packs', $packs);
+                }
+
+                if ($useCustomPacks) {
+                    $sub->andWhere(
+                        "NOT EXISTS (" .
+                            "SELECT ucpcqlm.id FROM AppBundle:UserCustomPackCard ucpcqlm " .
+                            "JOIN ucpcqlm.customPack ucpqlm " .
+                            "WHERE ucpcqlm.card = c " .
+                            "AND ucpqlm.code IN (:qlm_custom_codes) " .
+                            "AND ucpqlm.user = :qlm_custom_user" .
+                        ")"
+                    );
+                    $qb->setParameter('qlm_custom_codes', $customPackCodes);
+                    $qb->setParameter('qlm_custom_user', $this->user);
+                }
 
                 $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
-                $qb->setParameter('qlm_packs', $packs);
             }
         }
 

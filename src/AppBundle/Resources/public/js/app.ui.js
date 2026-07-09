@@ -172,6 +172,63 @@
             if (app.ui && $.isFunction(app.ui.set_max_qty)) {
                 app.ui.set_max_qty();
             }
+
+            // Inject custom pack data for logged-in users. Each custom pack entry
+            // is added to the affected card's packs[] array so the modal and
+            // deckbuilder owned_copies calculation pick it up automatically.
+            if (app.user.data && app.user.data.id) {
+                $.getJSON(Routing.generate('api_private_custom_packs')).done(function(customPacks) {
+                    var counts = app.data.owned_pack_counts;
+                    _.forEach(customPacks, function(cp) {
+                        counts[cp.code] = cp.is_enabled ? 1 : 0;
+                        _.forEach(cp.cards, function(entry) {
+                            var card = app.data.cards.findById(entry.card_code);
+                            if (!card) { return; }
+                            var newPacks = (card.packs || []).concat([{
+                                pack_code: cp.code,
+                                pack_name: cp.name,
+                                quantity: entry.quantity,
+                                image_code: null,
+                                imagesrc: null,
+                                illustrator: null
+                            }]);
+                            var owned = 0;
+                            _.forEach(newPacks, function(pr) {
+                                owned += (counts[pr.pack_code] || 0) * (pr.quantity || 0);
+                            });
+                            app.data.cards.updateById(entry.card_code, {
+                                packs: newPacks,
+                                owned_copies: owned,
+                                owned: owned > 0
+                            });
+                        });
+                    });
+                    if (app.ui && $.isFunction(app.ui.set_max_qty)) {
+                        app.ui.set_max_qty();
+                    }
+
+                    // Store globally for other pages to use.
+                    app.user.customPacks = customPacks;
+
+                    // Deckbuilder: append custom pack entries to the Sets dropdown.
+                    var $packFilter = $('[data-filter="pack_code"]');
+                    if ($packFilter.length) {
+                        _.forEach(customPacks, function(cp) {
+                            if ($packFilter.find('input[name="' + cp.code + '"]').length) { return; }
+                            var checked = cp.is_enabled ? ' checked="checked"' : '';
+                            $('<li><a href=""><label><input type="checkbox" name="' + cp.code + '"' + checked + '> '
+                                + cp.name + ' <small><i>(custom)</i></small></label></a></li>')
+                                .appendTo($packFilter);
+                        });
+                        if ($.isFunction(app.ui.recompute_max_qty_for_selected_packs)) {
+                            app.ui.recompute_max_qty_for_selected_packs();
+                        }
+                    }
+
+                    // Notify search pages so they can add the proxy section.
+                    $(document).trigger('custom_packs_loaded');
+                });
+            }
         });
 
         if ($.isFunction(ui.on_all_loaded)) {

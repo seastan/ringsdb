@@ -1,3 +1,11 @@
+api_public_custom_packs_published:
+    path: /custom-packs/published
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:CustomPack:publishedList
+    options:
+        expose: true
+
 api_packs:
     path: /packs/
     methods: [GET]

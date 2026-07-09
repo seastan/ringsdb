@@ -24,12 +24,17 @@ class DecklistManager {
 	protected $start = 0;
 	protected $limit = 30;
 	protected $maxcount = 0;
+	protected $user = null;
 
 	public function __construct(EntityManager $doctrine, RequestStack $request_stack, Router $router, LoggerInterface $logger) {
 		$this->doctrine = $doctrine;
 		$this->request_stack = $request_stack;
 		$this->router = $router;
 		$this->logger = $logger;
+	}
+
+	public function setUser($user) {
+		$this->user = $user;
 	}
 
 	public function setPredominantSphere(Sphere $predominantSphere = null) {
@@ -171,6 +176,11 @@ class DecklistManager {
         $sort = $request->query->get('sort');
 
         $packs = $request->query->get('packs');
+        if (!is_array($packs)) {
+            $packs = [];
+        }
+
+        $customPackCodes = array_values(array_filter((array) $request->query->get('custom_packs', []), 'is_string'));
 
         $threat_op = $request->query->get('threato');
         $threat = $request->query->get('threat');
@@ -228,7 +238,9 @@ class DecklistManager {
             $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'),0));
         }
 
-        if (!empty($cards_code) || !empty($packs)) {
+        $useCustomPacks = !empty($customPackCodes) && $this->user;
+
+        if (!empty($cards_code) || !empty($packs) || $useCustomPacks) {
             if (!empty($cards_code)) {
                 foreach ($cards_code as $i => $card_code) {
                     /* @var $card \AppBundle\Entity\Card */
@@ -243,27 +255,82 @@ class DecklistManager {
                     // $packs[] = $card->getPack()->getId(); 
                 }
             }
-            if (!empty($packs)) {
-                // A decklist matches iff EVERY slot's card can be supplied by the
-                // allowed packs in sufficient quantity. Available copies of a card =
-                // sum over its printings in the allowed packs of the copies in that
-                // pack, counting the Core Set (pack 1) :numcores times. This both
-                // fixes the old "wrong printing excludes the deck" bug (a reprinted
-                // card is available via any allowed pack) and makes search quantity
-                // aware (e.g. a 3x Unexpected Courage deck needs enough Core sets).
+            if (!empty($packs) || $useCustomPacks) {
+                // A decklist matches iff every slot's card can be supplied in sufficient
+                // quantity by the allowed official packs OR by the user's custom packs.
                 $cores = max(1, (int) $numcores);
+
+                // Build the "slot is uncovered" condition.
+                //
+                // Official-only: slot.quantity > official_copies  (original form)
+                //
+                // Combined: official alone doesn't cover AND no single custom-pack entry
+                //   together with official covers the remaining need.
+                //   "Custom entry covers remaining" ⟺ s.quantity - ucpc.quantity <= official_copies
+                //   i.e. ucpc.quantity + official_copies >= s.quantity.
+                //   We put the arithmetic on the left side of ≤ so the right side stays a
+                //   plain scalar subquery — the form Doctrine's DQL parser handles cleanly.
+                //
+                // Custom-only: same nested NOT EXISTS but with official_copies = 0, expressed
+                //   as ucpc.quantity >= s.quantity (left-side arithmetic becomes s.quantity - ucpc.quantity <= 0).
+                if (!empty($packs)) {
+                    $officialSubquery =
+                        '(SELECT COALESCE(SUM(CASE WHEN cp.pack = 1 THEN cp.quantity * :numcores ELSE cp.quantity END), 0) ' .
+                        'FROM AppBundle:CardPrinting cp ' .
+                        'WHERE cp.card = s.card AND cp.pack IN (:packs))';
+                    $qb->setParameter('packs', $packs);
+                    $qb->setParameter('numcores', $cores);
+                }
+
+                if ($useCustomPacks) {
+                    $qb->setParameter('customPackCodes', $customPackCodes);
+                    $qb->setParameter('customPackUser', $this->user);
+                }
+
+                if (!empty($packs) && $useCustomPacks) {
+                    // Inner version of the official subquery uses alias cp2 so it doesn't
+                    // collide with cp from the outer official-check occurrence.
+                    $officialSubquery2 = str_replace(
+                        ['FROM AppBundle:CardPrinting cp ', 'cp.pack', 'cp.card', 'cp.quantity'],
+                        ['FROM AppBundle:CardPrinting cp2 ', 'cp2.pack', 'cp2.card', 'cp2.quantity'],
+                        $officialSubquery
+                    );
+
+                    // Slot uncovered when official alone fails AND no custom entry covers the gap.
+                    // "Custom covers the gap" ⟺ remaining need after custom ≤ official_copies.
+                    // remaining = CASE WHEN s.quantity >= ucpc.quantity THEN s.quantity - ucpc.quantity ELSE 0 END
+                    // (the CASE avoids unsigned-integer subtraction underflow when custom has surplus copies).
+                    $uncoveredCondition =
+                        's.quantity > ' . $officialSubquery .
+                        ' AND NOT EXISTS (' .
+                            'SELECT ucpc.id FROM AppBundle:UserCustomPackCard ucpc ' .
+                            'JOIN ucpc.customPack ucp ' .
+                            'WHERE ucpc.card = s.card ' .
+                            'AND ucp.code IN (:customPackCodes) ' .
+                            'AND ucp.user = :customPackUser ' .
+                            'AND CASE WHEN s.quantity >= ucpc.quantity THEN s.quantity - ucpc.quantity ELSE 0 END <= ' . $officialSubquery2 .
+                        ')';
+                } elseif (!empty($packs)) {
+                    $uncoveredCondition = 's.quantity > ' . $officialSubquery;
+                } else {
+                    // Custom-only: custom pack must fully supply the slot on its own.
+                    $uncoveredCondition =
+                        'NOT EXISTS (' .
+                            'SELECT ucpc.id FROM AppBundle:UserCustomPackCard ucpc ' .
+                            'JOIN ucpc.customPack ucp ' .
+                            'WHERE ucpc.card = s.card ' .
+                            'AND ucp.code IN (:customPackCodes) ' .
+                            'AND ucp.user = :customPackUser ' .
+                            'AND ucpc.quantity >= s.quantity' .
+                        ')';
+                }
+
                 $qb->andWhere(
                     'NOT EXISTS (' .
                         'SELECT s.id FROM AppBundle:Decklistslot s ' .
-                        'WHERE s.decklist = d AND s.quantity > (' .
-                            'SELECT COALESCE(SUM(CASE WHEN cp.pack = 1 THEN cp.quantity * :numcores ELSE cp.quantity END), 0) ' .
-                            'FROM AppBundle:CardPrinting cp ' .
-                            'WHERE cp.card = s.card AND cp.pack IN (:packs)' .
-                        ')' .
+                        'WHERE s.decklist = d AND ' . $uncoveredCondition .
                     ')'
                 );
-                $qb->setParameter('packs', $packs);
-                $qb->setParameter('numcores', $cores);
             }
             if (!empty($cards_to_exclude)) {
                 $sub = $this->doctrine->createQueryBuilder();
