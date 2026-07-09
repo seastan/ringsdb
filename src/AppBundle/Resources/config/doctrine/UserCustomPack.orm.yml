@@ -34,6 +34,12 @@ AppBundle\Entity\UserCustomPack:
             column: is_enabled
             options:
                 default: true
+        isPublished:
+            type: boolean
+            nullable: false
+            column: is_published
+            options:
+                default: false
         createdAt:
             type: datetime
             nullable: false

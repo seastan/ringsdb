@@ -396,9 +396,10 @@ class SocialController extends Controller {
     				c.name,
     				c.code,
                     s.code AS sphere_code,
-                    p.name AS pack_name
+                    t.name AS type_name
     				FROM card c
                     INNER JOIN sphere s ON s.id = c.sphere_id
+                    INNER JOIN type t ON t.id = c.type_id
                     INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 JOIN pack pp ON pp.id = cp2.pack_id WHERE cp2.card_id = c.id ORDER BY (pp.date_release IS NULL), pp.date_release, cp2.position, cp2.id LIMIT 1)
                     INNER JOIN pack p ON p.id = cpr.pack_id
                     WHERE c.code IN (?)
@@ -415,9 +416,10 @@ class SocialController extends Controller {
     				k.name,
     				k.code,
                     s.code AS sphere_code,
-                    p.name AS pack_name
+                    t.name AS type_name
     				FROM card k
                     INNER JOIN sphere s ON s.id = k.sphere_id
+                    INNER JOIN type t ON t.id = k.type_id
                     INNER JOIN card_printing kpr ON kpr.id = (SELECT cp2.id FROM card_printing cp2 JOIN pack pp ON pp.id = cp2.pack_id WHERE cp2.card_id = k.id ORDER BY (pp.date_release IS NULL), pp.date_release, cp2.position, cp2.id LIMIT 1)
                     INNER JOIN pack p ON p.id = kpr.pack_id
                     WHERE k.code IN (?)
@@ -458,6 +460,7 @@ class SocialController extends Controller {
             case 'find':
                 $pagetitle = "Decklist search results";
                 $header = $this->searchForm($request);
+                $decklist_manager->setUser($this->getUser());
                 $paginator = $decklist_manager->findDecklistsWithComplexSearch();
                 break;
 

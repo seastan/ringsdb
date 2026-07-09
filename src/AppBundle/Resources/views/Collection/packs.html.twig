@@ -10,6 +10,104 @@
             app.user.forceReload = true;
         </script>
     {% endif %}
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+        var publishedPacksCache = null;
+
+        function escHtml(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        $('#browse-published-btn').on('click', function() {
+            $('#browsePacks-modal').modal('show');
+            if (!publishedPacksCache) {
+                $.getJSON(Routing.generate('api_public_custom_packs_published'))
+                    .done(function(data) {
+                        publishedPacksCache = data;
+                        renderPublished(data);
+                    })
+                    .fail(function() {
+                        $('#published-packs-container').html('<p class="text-danger">Failed to load packs. Please try again.</p>');
+                    });
+            }
+        });
+
+        $('#browsePacks-modal').on('shown.bs.modal', function() {
+            $('#published-pack-filter').focus();
+        });
+
+        function renderPublished(packs) {
+            var container = $('#published-packs-container');
+            if (!packs || !packs.length) {
+                container.html('<p class="text-muted">No published packs yet.</p>');
+                return;
+            }
+            var html = '<table class="table table-condensed table-hover" style="margin-bottom:0">'
+                + '<thead><tr>'
+                + '<th>Pack Name</th>'
+                + '<th style="width:100px">Owner</th>'
+                + '<th style="width:50px;text-align:center">Cards</th>'
+                + '<th style="width:70px"></th>'
+                + '</tr></thead><tbody>';
+            packs.forEach(function(pack, idx) {
+                html += '<tr class="published-pack-header-row" style="cursor:pointer" data-pack-idx="' + idx + '">'
+                    + '<td><strong>' + escHtml(pack.name) + '</strong></td>'
+                    + '<td><small class="text-muted">' + escHtml(pack.owner_name) + '</small></td>'
+                    + '<td style="text-align:center">' + pack.cards.length + '</td>'
+                    + '<td><button type="button" class="btn btn-xs btn-primary copy-pack-btn" data-id="' + pack.id + '">Copy</button></td>'
+                    + '</tr>'
+                    + '<tr class="published-pack-cards-row" style="display:none" data-pack-idx="' + idx + '">'
+                    + '<td colspan="4" style="padding:4px 12px 8px">';
+                pack.cards.forEach(function(c) {
+                    var sphere = c.sphere_code || 'neutral';
+                    html += '<span class="fg-' + escHtml(sphere) + '" style="display:inline-block;margin:1px 12px 2px 0">'
+                        + '<span class="icon-fw icon-' + escHtml(sphere) + '"></span>'
+                        + ' <strong>' + escHtml(c.card_name) + '</strong>'
+                        + (c.type_name ? ' <small><i>' + escHtml(c.type_name) + '</i></small>' : '')
+                        + ' ×' + c.quantity
+                        + '</span>';
+                });
+                html += '</td></tr>';
+            });
+            html += '</tbody></table>';
+            container.html(html);
+        }
+
+        $(document).on('click', '.published-pack-header-row', function(e) {
+            if ($(e.target).closest('.copy-pack-btn').length) { return; }
+            var idx = $(this).data('pack-idx');
+            $('.published-pack-cards-row[data-pack-idx="' + idx + '"]').toggle();
+        });
+
+        $(document).on('input', '#published-pack-filter', function() {
+            if (!publishedPacksCache) { return; }
+            var q = $(this).val().toLowerCase().trim();
+            if (!q) { renderPublished(publishedPacksCache); return; }
+            var filtered = publishedPacksCache.filter(function(p) {
+                if (p.name.toLowerCase().indexOf(q) !== -1) { return true; }
+                if (p.owner_name.toLowerCase().indexOf(q) !== -1) { return true; }
+                return p.cards.some(function(c) { return c.card_name.toLowerCase().indexOf(q) !== -1; });
+            });
+            renderPublished(filtered);
+        });
+
+        $(document).on('click', '.copy-pack-btn', function(e) {
+            e.stopPropagation();
+            var btn = $(this);
+            var id = btn.data('id');
+            btn.prop('disabled', true).text('Copying…');
+            $.post(Routing.generate('collection_custom_pack_copy', { id: id }))
+                .done(function() {
+                    btn.removeClass('btn-primary').addClass('btn-success').text('Copied!');
+                    setTimeout(function() { window.location.reload(); }, 800);
+                })
+                .fail(function() {
+                    btn.prop('disabled', false).text('Copy');
+                });
+        });
+    });
+    </script>
 {% endblock %}
 
 {% block body %}
@@ -31,6 +129,89 @@ input[type=number].pack-qty { -moz-appearance: textfield; text-align: center; }
     border: 1px solid #3d3d44; /* $dark-border */
 }
 </style>
+
+
+<div class="main white container" style="margin-bottom: 30px">
+    <h3>Custom Packs</h3>
+
+    {% if customPacks is empty %}
+        <p class="text-muted">No custom packs yet.</p>
+    {% else %}
+        <table class="table table-condensed" style="margin-bottom: 10px">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th style="width:80px; text-align:center">Cards</th>
+                    <th style="width:200px; text-align:center">Status</th>
+                    <th style="width:140px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pack in customPacks %}
+                <tr>
+                    <td>{{ pack.name }}</td>
+                    <td style="text-align:center">{{ pack.cards|length }}</td>
+                    <td style="text-align:center; white-space:nowrap">
+                        <form method="POST" action="{{ path('collection_custom_pack_toggle', {id: pack.id}) }}" style="display:inline">
+                            <button type="submit" class="btn btn-xs{% if pack.isEnabled %} btn-success{% else %} btn-default{% endif %}">
+                                {% if pack.isEnabled %}Enabled{% else %}Disabled{% endif %}
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ path('collection_custom_pack_publish', {id: pack.id}) }}" style="display:inline; margin-left:4px">
+                            <button type="submit" class="btn btn-xs{% if pack.isPublished %} btn-info{% else %} btn-default{% endif %}">
+                                {% if pack.isPublished %}Published{% else %}Unpublished{% endif %}
+                            </button>
+                        </form>
+                    </td>
+                    <td class="text-right">
+                        <a href="{{ path('collection_custom_pack_edit', {id: pack.id}) }}" class="btn btn-xs btn-default">
+                            <span class="fa fa-pencil"></span> Edit
+                        </a>
+                        <form method="POST" action="{{ path('collection_custom_pack_delete', {id: pack.id}) }}"
+                              style="display:inline"
+                              onsubmit="return confirm('Delete custom pack \'{{ pack.name|e('js') }}\'?')">
+                            <button type="submit" class="btn btn-xs btn-danger" style="margin-left:4px">
+                                <span class="fa fa-trash"></span> Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <a href="{{ path('collection_custom_pack_new') }}" class="btn btn-default">
+        <span class="fa fa-plus"></span> Create a custom pack
+    </a>
+    <button type="button" class="btn btn-default" id="browse-published-btn" style="margin-left:8px">
+        <span class="fa fa-globe"></span> Copy a published pack
+    </button>
+</div>
+
+<div class="modal fade" id="browsePacks-modal" tabindex="-1" role="dialog" aria-labelledby="browsePacks-modal-label">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="browsePacks-modal-label">Browse Published Custom Packs</h4>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="published-pack-filter" class="form-control"
+                       placeholder="Filter by pack name, owner, or card…"
+                       style="margin-bottom: 12px">
+                <div id="published-packs-container">
+                    <p class="text-muted"><span class="fa fa-spinner fa-spin"></span> Loading…</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
     <div class="main white container" id="owned_packs" style="display: none">
         <form action="{{ path('collection_save_packs') }}" method="POST" enctype="application/x-www-form-urlencoded" onsubmit="app.ui.update_selected_packs()">
@@ -67,53 +248,4 @@ input[type=number].pack-qty { -moz-appearance: textfield; text-align: center; }
     </div>
 </div>
 
-<div class="main white container" style="margin-top: 30px">
-    <h3>Custom Packs</h3>
-
-    {% if customPacks is empty %}
-        <p class="text-muted">No custom packs yet.</p>
-    {% else %}
-        <table class="table table-condensed" style="margin-bottom: 10px">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th style="width:80px; text-align:center">Cards</th>
-                    <th style="width:100px; text-align:center">Status</th>
-                    <th style="width:140px"></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for pack in customPacks %}
-                <tr>
-                    <td>{{ pack.name }}</td>
-                    <td style="text-align:center">{{ pack.cards|length }}</td>
-                    <td style="text-align:center">
-                        <form method="POST" action="{{ path('collection_custom_pack_toggle', {id: pack.id}) }}" style="display:inline">
-                            <button type="submit" class="btn btn-xs{% if pack.isEnabled %} btn-success{% else %} btn-default{% endif %}">
-                                {% if pack.isEnabled %}Enabled{% else %}Disabled{% endif %}
-                            </button>
-                        </form>
-                    </td>
-                    <td class="text-right">
-                        <a href="{{ path('collection_custom_pack_edit', {id: pack.id}) }}" class="btn btn-xs btn-default">
-                            <span class="fa fa-pencil"></span> Edit
-                        </a>
-                        <form method="POST" action="{{ path('collection_custom_pack_delete', {id: pack.id}) }}"
-                              style="display:inline"
-                              onsubmit="return confirm('Delete custom pack \'{{ pack.name|e('js') }}\'?')">
-                            <button type="submit" class="btn btn-xs btn-danger" style="margin-left:4px">
-                                <span class="fa fa-trash"></span> Delete
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-
-    <a href="{{ path('collection_custom_pack_new') }}" class="btn btn-default">
-        <span class="fa fa-plus"></span> Create a custom pack
-    </a>
-</div>
 {% endblock %}

@@ -43,6 +43,24 @@ collection_custom_pack_toggle:
     requirements:
         id: \d+
 
+collection_custom_pack_publish:
+    path: /custom-pack/{id}/publish
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:CustomPack:publish
+    requirements:
+        id: \d+
+
+collection_custom_pack_copy:
+    path: /custom-pack/{id}/copy
+    methods: [POST]
+    defaults:
+        _controller: AppBundle:CustomPack:copy
+    requirements:
+        id: \d+
+    options:
+        expose: true
+
 collection_packs:
     path: /packs
     methods: [GET]

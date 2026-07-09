@@ -88,6 +88,7 @@ class CustomPackController extends Controller {
         $pack->setName($name);
         $pack->setUpdatedAt(new \DateTime());
         $pack->clearCards();
+        $em->flush(); // delete old cards before inserting new ones
         $this->attachCards($em, $pack, $cardEntries);
 
         $em->persist($pack);
@@ -124,6 +125,93 @@ class CustomPackController extends Controller {
         $em->flush();
 
         return $this->redirectToRoute('collection_packs');
+    }
+
+    public function publishAction(Request $request, $id) {
+        $pack = $this->loadOwnedPack($id);
+        if (!$pack) {
+            throw $this->createNotFoundException();
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $pack->setIsPublished(!$pack->getIsPublished());
+        $pack->setUpdatedAt(new \DateTime());
+        $em->persist($pack);
+        $em->flush();
+
+        return $this->redirectToRoute('collection_packs');
+    }
+
+    public function publishedListAction() {
+        $packs = $this->getDoctrine()
+            ->getRepository('AppBundle:UserCustomPack')
+            ->findBy(['isPublished' => true], ['createdAt' => 'ASC']);
+
+        $result = [];
+        foreach ($packs as $pack) {
+            $cards = [];
+            foreach ($pack->getCards() as $entry) {
+                $card = $entry->getCard();
+                $sphere = $card->getSphere();
+                $type = $card->getType();
+                $cards[] = [
+                    'card_code' => $card->getCode(),
+                    'card_name' => $card->getName(),
+                    'sphere_code' => $sphere ? $sphere->getCode() : 'neutral',
+                    'type_name' => $type ? $type->getName() : null,
+                    'quantity' => $entry->getQuantity(),
+                ];
+            }
+            $result[] = [
+                'id' => $pack->getId(),
+                'name' => $pack->getName(),
+                'owner_name' => $pack->getUser()->getUsername(),
+                'cards' => $cards,
+            ];
+        }
+
+        return new JsonResponse($result);
+    }
+
+    public function copyAction(Request $request, $id) {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Not authenticated'], 401);
+        }
+
+        $source = $this->getDoctrine()
+            ->getRepository('AppBundle:UserCustomPack')
+            ->findOneBy(['id' => $id, 'isPublished' => true]);
+
+        if (!$source) {
+            return new JsonResponse(['error' => 'Pack not found'], 404);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $copy = new UserCustomPack();
+        $copy->setUser($user);
+        $copy->setName($source->getName());
+        $copy->setCode('tmp');
+
+        $em->persist($copy);
+        $em->flush();
+
+        $copy->setCode('custom_' . $copy->getId() . '_' . substr(md5(uniqid('', true)), 0, 6));
+
+        $cardEntries = [];
+        foreach ($source->getCards() as $entry) {
+            $cardEntries[] = [
+                'card_code' => $entry->getCard()->getCode(),
+                'quantity' => $entry->getQuantity(),
+            ];
+        }
+        $this->attachCards($em, $copy, $cardEntries);
+
+        $em->persist($copy);
+        $em->flush();
+
+        return new JsonResponse(['success' => true, 'name' => $copy->getName()]);
     }
 
     public function apiListAction() {
@@ -174,16 +262,18 @@ class CustomPackController extends Controller {
 
     private function attachCards($em, UserCustomPack $pack, array $cardEntries) {
         $cardRepo = $this->getDoctrine()->getRepository('AppBundle:Card');
+        $seen = [];
         foreach ($cardEntries as $entry) {
             $code = isset($entry['card_code']) ? preg_replace('/[^0-9]/', '', $entry['card_code']) : '';
             $qty = isset($entry['quantity']) ? (int)$entry['quantity'] : 1;
-            if ($code === '' || $qty < 1 || $qty > 9) {
+            if ($code === '' || $qty < 1 || $qty > 9 || isset($seen[$code])) {
                 continue;
             }
             $card = $cardRepo->findOneBy(['code' => $code]);
             if (!$card) {
                 continue;
             }
+            $seen[$code] = true;
             $packCard = new UserCustomPackCard();
             $packCard->setCustomPack($pack);
             $packCard->setCard($card);

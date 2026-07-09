@@ -11,6 +11,7 @@ class UserCustomPack {
     private $name;
     private $code;
     private $isEnabled = true;
+    private $isPublished = false;
     private $createdAt;
     private $updatedAt;
     private $cards;
@@ -34,6 +35,9 @@ class UserCustomPack {
 
     public function getIsEnabled() { return $this->isEnabled; }
     public function setIsEnabled($isEnabled) { $this->isEnabled = (bool)$isEnabled; return $this; }
+
+    public function getIsPublished() { return $this->isPublished; }
+    public function setIsPublished($isPublished) { $this->isPublished = (bool)$isPublished; return $this; }
 
     public function getCreatedAt() { return $this->createdAt; }
     public function setCreatedAt($createdAt) { $this->createdAt = $createdAt; return $this; }

@@ -57,6 +57,7 @@ class FellowshipController extends Controller {
             case 'find':
                 $pagetitle = "Fellowship search results";
                 $header = $this->searchForm($request);
+                $fellowship_manager->setUser($this->getUser());
                 $paginator = $fellowship_manager->findFellowshipsWithComplexSearch();
                 break;
 
@@ -732,9 +733,10 @@ class FellowshipController extends Controller {
     				c.name,
     				c.code,
                     s.code AS sphere_code,
-                    p.name AS pack_name
+                    t.name AS type_name
     				FROM card c
                     INNER JOIN sphere s ON s.id = c.sphere_id
+                    INNER JOIN type t ON t.id = c.type_id
                     INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 WHERE cp2.card_id = c.id ORDER BY cp2.position ASC, cp2.id ASC LIMIT 1)
                     INNER JOIN pack p ON p.id = cpr.pack_id
                     WHERE c.code IN (?)

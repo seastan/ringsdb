@@ -206,6 +206,27 @@
                     if (app.ui && $.isFunction(app.ui.set_max_qty)) {
                         app.ui.set_max_qty();
                     }
+
+                    // Store globally for other pages to use.
+                    app.user.customPacks = customPacks;
+
+                    // Deckbuilder: append custom pack entries to the Sets dropdown.
+                    var $packFilter = $('[data-filter="pack_code"]');
+                    if ($packFilter.length) {
+                        _.forEach(customPacks, function(cp) {
+                            if ($packFilter.find('input[name="' + cp.code + '"]').length) { return; }
+                            var checked = cp.is_enabled ? ' checked="checked"' : '';
+                            $('<li><a href=""><label><input type="checkbox" name="' + cp.code + '"' + checked + '> '
+                                + cp.name + ' <small><i>(custom)</i></small></label></a></li>')
+                                .appendTo($packFilter);
+                        });
+                        if ($.isFunction(app.ui.recompute_max_qty_for_selected_packs)) {
+                            app.ui.recompute_max_qty_for_selected_packs();
+                        }
+                    }
+
+                    // Notify search pages so they can add the proxy section.
+                    $(document).trigger('custom_packs_loaded');
                 });
             }
         });

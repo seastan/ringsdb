@@ -21,16 +21,8 @@
         var defaultQty = (card.type_code === 'hero') ? 1 : 3;
         var quantity = qty !== undefined ? qty : defaultQty;
 
-        var row = $('<div class="custom-pack-card-row clearfix"></div>')
+        var row = $('<div class="custom-pack-card-row"></div>')
             .attr('data-code', card.code);
-
-        $('<button type="button" class="btn btn-xs btn-danger pull-right remove-card-btn">')
-            .html('<span class="fa fa-times"></span>')
-            .on('click', function() {
-                delete addedCodes[card.code];
-                row.remove();
-            })
-            .appendTo(row);
 
         $('<input type="number" class="card-qty" min="1" max="9">')
             .val(quantity)
@@ -42,6 +34,14 @@
             + '<strong>' + app.data.display_name(card) + '</strong>'
             + (card.type_name ? ' <small><i>' + card.type_name + '</i></small>' : '')
             + '</div></div>')
+            .appendTo(row);
+
+        $('<button type="button" class="btn btn-xs btn-danger remove-card-btn">')
+            .html('<span class="fa fa-times"></span>')
+            .on('click', function() {
+                delete addedCodes[card.code];
+                row.remove();
+            })
             .appendTo(row);
 
         row.appendTo('#custom-pack-cards');
