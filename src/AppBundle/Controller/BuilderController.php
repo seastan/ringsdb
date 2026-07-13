@@ -589,39 +589,14 @@ class BuilderController extends Controller {
             ]);
         }
 
-        $deckEntities = $decksService->getDecksWithSlotsForUser($user, $limit);
+        // The service returns lightweight per-deck arrays (id/name/version/problem/tags/
+        // last_pack/slots/heroes) already shaped for the template — no entity hydration.
+        $decks = $decksService->getDecksWithSlotsForUser($user, $limit);
 
-        $decks = [];
         $tags = [];
-
-        foreach ($deckEntities as $deckEntity) {
-            $slotContent = [];
-            $heroes = [];
-            foreach ($deckEntity->getSlots() as $slot) {
-                $card = $slot->getCard();
-                $slotContent[$card->getCode()] = $slot->getQuantity();
-                if ($card->getType() && $card->getType()->getCode() === 'hero') {
-                    $heroes[] = $card;
-                }
-            }
-            ksort($slotContent);
-
-            $deck = [
-                'id' => $deckEntity->getId(),
-                'name' => $deckEntity->getName(),
-                'date_creation' => $deckEntity->getDateCreation(),
-                'version' => $deckEntity->getVersion(),
-                'problem' => $deckEntity->getProblem(),
-                'tags' => $deckEntity->getTags(),
-                'last_pack' => $deckEntity->getLastPack(),
-                'slots' => $slotContent,
-                'heroes' => $heroes,
-            ];
-
+        foreach ($decks as $deck) {
             $tags[] = $deck['tags'];
-            $decks[] = $deck;
         }
-
         $tags = array_unique($tags);
 
         return $this->render('AppBundle:Builder:decks.html.twig', [

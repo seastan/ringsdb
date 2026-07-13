@@ -49,17 +49,85 @@ class Decks {
             return [];
         }
 
-        // Step 2: load those decks with all slot/card data in one query
-        return $this->doctrine->createQuery(
-            'SELECT d, lp, s, c, ct
+        // Step 2: pull only the scalar columns the deck list needs, one row per slot.
+        // Hydrating the full Card graph for every slot (tens of thousands of rows for
+        // users with many decks) blew the PHP memory limit, so we avoid entity
+        // hydration here and rebuild the lightweight per-deck structure by hand.
+        $rows = $this->doctrine->createQuery(
+            'SELECT d.id AS deck_id, d.name AS name,
+                    d.majorVersion AS major_version, d.minorVersion AS minor_version,
+                    d.problem AS problem, d.tags AS tags, d.dateCreation AS date_creation,
+                    lp.name AS last_pack_name,
+                    s.quantity AS qty, c.code AS card_code, ct.code AS type_code
              FROM AppBundle\Entity\Deck d
              LEFT JOIN d.lastPack lp
              LEFT JOIN d.slots s
              LEFT JOIN s.card c
              LEFT JOIN c.type ct
              WHERE d.id IN (:ids)
-             ORDER BY d.dateUpdate DESC'
-        )->setParameter('ids', $ids)->getResult();
+             ORDER BY d.dateUpdate DESC, d.id ASC'
+        )->setParameter('ids', $ids)->getScalarResult();
+
+        $decks = [];
+        $heroCodes = [];
+
+        foreach ($rows as $row) {
+            $deckId = $row['deck_id'];
+
+            if (!isset($decks[$deckId])) {
+                $decks[$deckId] = [
+                    'id' => (int) $deckId,
+                    'name' => $row['name'],
+                    'version' => $row['major_version'] . '.' . $row['minor_version'],
+                    'problem' => $row['problem'],
+                    'tags' => $row['tags'],
+                    'date_creation' => $row['date_creation'] ? new \DateTime($row['date_creation']) : null,
+                    'last_pack' => $row['last_pack_name'] !== null ? ['name' => $row['last_pack_name']] : null,
+                    'slots' => [],
+                    'heroes' => [],
+                ];
+            }
+
+            if ($row['card_code'] !== null) {
+                $decks[$deckId]['slots'][$row['card_code']] = (int) $row['qty'];
+                if ($row['type_code'] === 'hero') {
+                    // remember hero codes; the Card entities are bulk-loaded below
+                    $decks[$deckId]['heroes'][$row['card_code']] = true;
+                    $heroCodes[$row['card_code']] = true;
+                }
+            }
+        }
+
+        // Load the (small, bounded) set of distinct hero cards as real entities so the
+        // template's hero.sphere.code / hero.pack.code accessors keep working unchanged.
+        $heroCards = [];
+        if (!empty($heroCodes)) {
+            $heroEntities = $this->doctrine->createQuery(
+                'SELECT c, p, pk FROM AppBundle\Entity\Card c
+                 LEFT JOIN c.printings p
+                 LEFT JOIN p.pack pk
+                 WHERE c.code IN (:codes)'
+            )->setParameter('codes', array_keys($heroCodes))->getResult();
+
+            foreach ($heroEntities as $heroCard) {
+                $heroCards[$heroCard->getCode()] = $heroCard;
+            }
+        }
+
+        foreach ($decks as &$deck) {
+            ksort($deck['slots']);
+
+            $heroes = [];
+            foreach (array_keys($deck['heroes']) as $code) {
+                if (isset($heroCards[$code])) {
+                    $heroes[] = $heroCards[$code];
+                }
+            }
+            $deck['heroes'] = $heroes;
+        }
+        unset($deck);
+
+        return array_values($decks);
     }
 
     public function countDecksForUser($user) {
