@@ -1,3 +1,0 @@
-gregwar_captcha.generate_captcha:
-    path:           /generate-captcha/{key}
-    defaults:       { _controller: Gregwar\CaptchaBundle\Controller\CaptchaController::generateCaptchaAction }
