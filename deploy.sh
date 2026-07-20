@@ -29,6 +29,26 @@ if [ "${SKIP_PULL:-0}" != "1" ]; then
     echo "==> Fetching origin and fast-forwarding $BRANCH..."
     git fetch origin
     if git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
+        # vendor/ is populated via rsync, not composer install, and is meant to
+        # stay on disk untouched by deploys. But if it's still *tracked* here
+        # while the upstream commit we're about to fast-forward to has stopped
+        # tracking it, the fast-forward's checkout will delete it from disk
+        # (git removes anything absent from the new tree, even when the file
+        # content itself never changed). Refuse and tell the operator to
+        # untrack it locally first, which is a no-op for the working tree.
+        if git ls-files --error-unmatch vendor >/dev/null 2>&1 \
+            && ! git diff --quiet HEAD '@{u}' -- vendor; then
+            echo "!! @{u} stops tracking vendor/, but it's still tracked in this checkout." >&2
+            echo "   Fast-forwarding now would DELETE vendor/ from disk." >&2
+            echo "   One-time fix — untrack it locally, then merge (not fast-forward;" >&2
+            echo "   both sides remove the same paths so this resolves with no conflicts" >&2
+            echo "   and never touches the files on disk):" >&2
+            echo "     git rm -r --cached vendor && git commit -m 'Untrack vendor/'" >&2
+            echo "     git merge '@{u}'" >&2
+            echo "   Then re-run this script (SKIP_PULL=1 if it's already up to date)." >&2
+            exit 1
+        fi
+
         # --ff-only refuses to merge if the branch has diverged: fail loudly
         # rather than create a merge commit or rewrite history.
         git merge --ff-only '@{u}'

@@ -23,11 +23,13 @@ Login with `tester` / `test1234` (or a prod account).
    ```
 
 2. **vendor/**: rsync from server (do NOT run `composer install` — lock is Composer-1 era,
-   Composer-2 drifts Symfony 2.7→2.8 and breaks FOSUserBundle):
+   Composer-2 drifts Symfony 2.7→2.8 and breaks FOSUserBundle). `vendor/` is gitignored
+   (untracked as of `chore/untrack-vendor`); front controllers (`web/app.php`,
+   `web/app_dev.php`, `app/console`) load `vendor/autoload.php` directly rather than a
+   generated `app/bootstrap.php.cache`, so no separate bootstrap-build step is needed:
    ```bash
    rsync -az rings@ringsdb.com:/var/www/ringsdb/vendor/ vendor/
    composer dump-autoload   # Composer 1
-   php app/build_bootstrap.php app
    ```
 
 3. **Card images** (~832 MB, optional but needed for card/deck pages):
