@@ -1,6 +1,0 @@
-main:
-    resource: "routing.yml"
-
-dunglas_api:
-    resource: "."
-    type:     "api"

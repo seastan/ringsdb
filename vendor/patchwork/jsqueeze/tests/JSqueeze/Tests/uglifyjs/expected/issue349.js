@@ -1,1 +1,0 @@
-(function(){var e;if(noFreeCakes)return e=new FreeCake();return e})()(function(){var e;if(noFreeCakes)return e=new FreeCake();return e})()(function(){var e;if(noFreeCakes)return e=new FreeCake();return e})()
