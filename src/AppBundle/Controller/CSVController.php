@@ -52,7 +52,13 @@ class CSVController extends Controller {
 
 		if (!$pack && !$oldPack) {
 			$cycleRepo = $em->getRepository('AppBundle:Cycle');
-			$cycle = $cycleRepo->findOneBy(['code' => 'ALeP']);
+			// 'ALeP' cycle code doesn't exist; fall back to the most recent cycle.
+			$cycle = $cycleRepo->findOneBy(['code' => 'ALeP'])
+				?? $cycleRepo->findOneBy([], ['id' => 'DESC']);
+
+			if (!$cycle) {
+				return new Response('Error: no cycle found to assign to new pack');
+			}
 
 			$pack = new Pack();
 			$pack->setCode($inputCode);
@@ -167,6 +173,7 @@ class CSVController extends Controller {
 				$printingEntity->setDateUpdate($now);
 				$printingEntity->setPack($cardPack);
 				$printingEntity->setCard($cardEntity);
+				$printingEntity->setOctgnid($card['octgnid']);
 				$printingEntity->setPosition(1);
 				$printingEntity->setQuantity(1);
 				// imageCode is non-nullable; default to the card code and let

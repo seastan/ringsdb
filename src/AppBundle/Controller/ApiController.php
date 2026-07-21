@@ -61,7 +61,7 @@ class ApiController extends Controller {
                 "name" => $pack->getName(),
                 "code" => $pack->getCode(),
                 "position" => $pack->getPosition(),
-                "cycle_position" => $pack->getCycle()->getPosition(),
+                "cycle_position" => $pack->getCycle() ? $pack->getCycle()->getPosition() : 0,
                 "available" => $pack->getDateRelease() ? $pack->getDateRelease()->format('Y-m-d') : '',
                 "known" => intval($real),
                 "total" => $max,
