@@ -528,6 +528,39 @@
             $('#deck-save-as-copy').val(1);
         });
 
+        $('#btn-apply').on('click', function() {
+            var btn = $(this);
+            btn.prop('disabled', true).text('Saving…');
+            var content = JSON.stringify(JSON.parse(app.deck.get_json()));
+            $.ajax({
+                url: Routing.generate('deck_save_ajax'),
+                method: 'POST',
+                data: {
+                    id: $('#deck-save-id').val(),
+                    name: $('input.decklist-name').val(),
+                    content: content,
+                    description: $('textarea[name="description_"]').val(),
+                    tags: $('input[name="tags_"]').val()
+                },
+                success: function(resp) {
+                    if (resp && resp.success) {
+                        if (resp.id) $('#deck-save-id').val(resp.id);
+                        btn.text('Saved!');
+                        setTimeout(function() { btn.prop('disabled', false).text('Apply'); }, 1500);
+                    } else {
+                        alert(resp.error || 'Save failed.');
+                        btn.prop('disabled', false).text('Apply');
+                    }
+                },
+                error: function(xhr) {
+                    var msg = 'Save failed.';
+                    try { msg = JSON.parse(xhr.responseText).error || msg; } catch(e) {}
+                    alert(msg);
+                    btn.prop('disabled', false).text('Apply');
+                }
+            });
+        });
+
         $('#btn-cancel-edits').on('click', function() {
             var unsaved_edits = app.deck_history.get_unsaved_edits();
             if (unsaved_edits.length) {
