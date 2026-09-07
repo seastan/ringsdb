@@ -177,6 +177,26 @@
     ui.build_pack_selector = function() {
         $('[data-filter="pack_code"]').empty();
 
+        // Packs that must be checked because a card in the deck isn't available
+        // from any pack the user owns. Ownership is printing-aware (card.owned is
+        // computed over every printing), so a repackaged reprint the user does own
+        // — Zigil Miner in a starter deck, say — no longer drags in the pack of its
+        // original printing and fills the search list with unowned cards.
+        var forced_packs = {};
+
+        app.data.cards.find({
+            '$or': [
+                { indeck: { '$gt': 0 } },
+                { insideboard: { '$gt': 0 } }
+            ]
+        }).forEach(function(card) {
+            if (card.owned) {
+                return;
+            }
+
+            forced_packs[card.pack_code] = true;
+        });
+
         app.data.packs.find({
             name: {
                 '$exists': true
@@ -187,20 +207,7 @@
                 position: 1
             }
         }).forEach(function(record) {
-            var checked = record.owned;
-
-            // if pack used by cards in deck, check pack
-            var cards = app.data.cards.find({
-                pack_code: record.code,
-                '$or': [
-                    { indeck: { '$gt': 0 } },
-                    { insideboard: { '$gt': 0 }
-                }]
-            });
-
-            if (cards.length) {
-                checked = true;
-            }
+            var checked = record.owned || !!forced_packs[record.code];
 
             $('<li><a href=""><label><input type="checkbox" name="' + record.code + '"' + (checked ? ' checked="checked"' : '') + '>' + record.name + '</label></a></li>').appendTo('[data-filter=pack_code]');
         });
