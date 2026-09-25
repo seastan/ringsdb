@@ -1,0 +1,199 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Search
+Sort by Name
+Sort by Set
+Sort by Sphere
+Sort by Type
+Sort by Cost/Threat
+Sort by Willpower
+Sort by Attack
+Sort by Defense
+Sort by Hit Points
+View as a Checklist
+View as a Spoiler
+View as Full Cards
+View as Scans only
+View as Simple List
+1–8
+8 cards
+Aragorn
+Hero.
+Threat: 12.
+2
+3
+2
+5
+Dúnedain. Noble. Ranger.
+Sentinel.
+Response:
+After Aragorn commits to a quest, spend 1 resource from his resource pool to ready him.
+"I am Aragorn son of Arathorn; and if by life or death I can save you, I will."
+The Fellowship of the Ring
+John Stanko
+Printings:
+‣ Core Set #1
+‣ Two-Player Limited Edition Starter #1
+‣ Revised Core Set #1
+Leadership.
+Aragorn
+Hero.
+Threat: 12.
+2
+3
+2
+5
+Dúnedain. Ranger.
+Sentinel.
+Refresh Action:
+Reduce your threat to your starting threat level. (Limit once per game.)
+"I am older than I look, I might prove useful."
+The Fellowship of the Ring
+Tony Foti
+The Watcher in the Water #53
+Lore.
+Aragorn
+Hero.
+Threat: 12.
+2
+3
+2
+5
+Dúnedain. Ranger. Warrior.
+Each enemy engaged with you gets -1
+.
+Response:
+After Aragorn participates in an attack that destroys an enemy, choose an enemy not engaged with you and engage that enemy.
+"I serve no man," said Aragorn; "but the servants of Sauron I pursue into whatever land they may go."
+The Two Towers
+Sebastian Giacobino
+The Lost Realm #1
+Tactics.
+Aragorn
+Hero.
+Threat: 0.
+2
+3
+2
+5
+Dúnedain. Noble. Ranger.
+The first player gains control of Aragorn. If Aragorn leaves play, the players lose the game.
+Action:
+Spend 2 resources from Aragorn's resource pool to ready a hero.
+"I am Aragorn son of Arathorn and am called Elessar, the Elfstone, Dunadan, the heir of Isildur Elendil’s son of Gondor."
+The Two Towers
+Mark Behm
+The Treason of Saruman #1
+Fellowship.
+Aragorn
+Hero.
+Threat: 0.
+2
+3
+2
+5
+Dúnedain. Noble. Ranger.
+The first player gains control of Aragorn. If Aragorn leaves play,the players lose the game.
+While Aragorn has an
+Artifact
+attached, he gains sentinel and does not exhaust to quest.
+"I have no help to send, therefore I must go myself..."
+The Return of the King
+Javier Charro Martinez
+The Flame of the West #1
+Fellowship.
+Aragorn
+Hero.
+Threat: 0.
+2
+3
+2
+5
+Dunedain. Gondor. Noble. Warrior.
+Sentinel. The first player gains control of Aragorn.
+Action:
+Spend 1 resource from Aragorn's pool to ready him. (Limit once per phase.)
+If Aragorn leaves play, the players lose the game.
+"As I have begun, so I will go on.."
+The Return of the King
+David A. Nash
+The Mountain of Fire #2
+Fellowship.
+Aragorn
+Hero.
+Threat: 12.
+2
+3
+2
+5
+Dúnedain. Ranger. Scout.
+Sentinel.
+Action:
+Exhaust Aragorn to choose a location in the staging area. Until the end of the phase, that location gets -X
+, where X is Aragorn's
+. If this effect reduces the location's
+to 0, place 1 progress on it. (Limit once per round.)
+Aleksander Karcz
+The Fortress of Nurn #137
+Spirit.
+Aragorn
+Hero.
+Threat: 12.
+2
+3
+2
+5
+Dúnedain. Ranger.
+Aragorn gains a resource icon matching each
+Title
+attachment attached to him.
+Setup
+: Search your collection for a
+Title
+attachment with a printed cost of 1 and attach it to Aragorn.
+Action
+: Ready a
+Title
+attachment with a printed cost of 1 attached to Aragorn. (Limit once per round.)
+Jan Pospíšil
+ALeP - Blood in the Isen #183
+Neutral.
+1–8
+8 cards
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

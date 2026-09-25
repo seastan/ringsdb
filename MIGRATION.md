@@ -114,5 +114,37 @@ drop them before migrating.
   (XSS vector). Consider validating it (`^[\w.]+$`) or dropping JSONP in favour of CORS.
 - `listDecklistsByDateAction` builds its DQL by string concatenation (`LIKE '$date%'`); it is
   only safe because of the route requirement `\d\d\d\d-\d\d-\d\d`. Use a parameter.
-- `/custom-packs/published` has no fixture data, so only the empty response is tested.
+- `/custom-packs/published` is tested with a single published pack (`LoadCustomPackData`).
 - The `/cards/` snapshot is ~2 MB (1315 cards).
+
+## Website browsing (read-only)
+
+Covered by `src/AppBundle/Tests/Controller/WebsiteBrowsingTest.php`. HTML pages are compared to
+text snapshots in `src/AppBundle/Tests/Resources/snapshots/pages/` (visible text only, one line
+per text node, no scripts/styles): strict on displayed content, not on markup or attributes.
+Downloads are compared byte for byte; zip archives entry by entry.
+
+### Current behaviour pinned by the tests
+
+- `/questlog/view/{id}/{name}` redirects anonymous visitors to the login page, even for public
+  quest logs: the `^/questlog/` access rule has no `view` exception (unlike `^/fellowship/view/`
+  and `^/deck/view/`). Probably unintended.
+- `/myquestlogs` and a private `/deck/view/{id}` are not covered by `access_control`: the
+  controllers answer `403` instead of redirecting to the login page.
+- `/decklists/mine` and `/decklists/favorites` are reachable anonymously (empty lists).
+
+### To look at during the migration
+
+- Some GET routes write to the database: `/deck/new` (creates a deck), `/deck/clone/{id}`,
+  `/fellowship/publish/{id}`. They should become POST (with CSRF protection).
+- `/deck/can_publish/{id}` (`deck_publish`) points to `SocialController::publishAction`, which
+  does not exist (500). Dead route to remove.
+- Fixed: `Texts::slugify()` relied on catching an iconv error when `//TRANSLIT` is not
+  supported (musl, i.e. the Alpine Docker image), but the exception class differs between
+  Symfony's and PHPUnit's error handlers. It now checks iconv's return value. With musl, accents
+  are dropped from file names instead of transliterated (`Dáin` → `Din`).
+- Fixed: zip exports used `tempnam("tmp", "zip")`, relative to the process working directory
+  (`web/tmp` under the web server). They now use `%kernel.cache_dir%` and fail explicitly if
+  the temporary file cannot be created.
+- `slugify()` starts with `preg_replace('[^\w\-]', '-', ...)`: the brackets are taken as regex
+  delimiters, so this line does not do what it seems to. Harmless, but worth cleaning up.

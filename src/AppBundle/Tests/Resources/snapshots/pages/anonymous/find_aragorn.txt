@@ -1,0 +1,148 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Search
+Sort by Name
+Sort by Set
+Sort by Sphere
+Sort by Type
+Sort by Cost/Threat
+Sort by Willpower
+Sort by Attack
+Sort by Defense
+Sort by Hit Points
+View as a Checklist
+View as a Spoiler
+View as Full Cards
+View as Scans only
+View as Simple List
+1–8
+8 cards
+Name
+Sphere
+Type
+Cost
+Traits
+Sets
+Aragorn
+Leadership
+Hero
+12
+2
+3
+2
+5
+Dúnedain. Noble. Ranger.
+Core
+·
+Starter
+·
+RevCore
+Aragorn
+Lore
+Hero
+12
+2
+3
+2
+5
+Dúnedain. Ranger.
+WitW
+Aragorn
+Tactics
+Hero
+12
+2
+3
+2
+5
+Dúnedain. Ranger. Warrior.
+TLR
+Aragorn
+Fellowship
+Hero
+0
+2
+3
+2
+5
+Dúnedain. Noble. Ranger.
+ToS
+Aragorn
+Fellowship
+Hero
+0
+2
+3
+2
+5
+Dúnedain. Noble. Ranger.
+FotW
+Aragorn
+Fellowship
+Hero
+0
+2
+3
+2
+5
+Dunedain. Gondor. Noble. Warrior.
+MoF
+Aragorn
+Spirit
+Hero
+12
+2
+3
+2
+5
+Dúnedain. Ranger. Scout.
+TFoN
+Aragorn
+Neutral
+Hero
+12
+2
+3
+2
+5
+Dúnedain. Ranger.
+BitI
+1–8
+8 cards
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

@@ -1,0 +1,472 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Quest logging is currently in beta. Feel free to play around with it, but be aware that logs you make right now may be deleted without warning.
+Please report bugs and provide feedback on
+GitHub
+.
+Log a Quest
+Show All
+With Selection
+Delete
+Delete all selected quest logs
+Easy
+Normal
+Nightmare
+Display only quests in my collection
+Display only played quests
+Core Set
+Passage Through Mirkwood
+Passage Through Mirkwood
+Passage Through Mirkwood
+Journey Along the Anduin
+Journey Along the Anduin
+Journey Along the Anduin
+Escape from Dol Guldur
+Escape from Dol Guldur
+Escape from Dol Guldur
+Shadows of Mirkwood
+The Hunt for Gollum
+The Hunt for Gollum
+The Hunt for Gollum
+Conflict at the Carrock
+Conflict at the Carrock
+Conflict at the Carrock
+A Journey to Rhosgobel
+A Journey to Rhosgobel
+A Journey to Rhosgobel
+The Hills of Emyn Muil
+The Hills of Emyn Muil
+The Hills of Emyn Muil
+The Dead Marshes
+The Dead Marshes
+The Dead Marshes
+Return to Mirkwood
+Return to Mirkwood
+Return to Mirkwood
+Khazad-dûm
+Into the Pit
+Into the Pit
+Into the Pit
+The Seventh Level
+The Seventh Level
+The Seventh Level
+Flight from Moria
+Flight from Moria
+Flight from Moria
+Dwarrowdelf
+The Redhorn Gate
+The Redhorn Gate
+The Redhorn Gate
+Road to Rivendell
+Road to Rivendell
+Road to Rivendell
+The Watcher in the Water
+The Watcher in the Water
+The Watcher in the Water
+The Long Dark
+The Long Dark
+The Long Dark
+Foundations of Stone
+Foundations of Stone
+Foundations of Stone
+Shadow and Flame
+Shadow and Flame
+Shadow and Flame
+Heirs of Númenor
+Peril in Pelargir
+Peril in Pelargir
+Peril in Pelargir
+Into Ithilien
+Into Ithilien
+Into Ithilien
+The Siege of Cair Andros
+The Siege of Cair Andros
+The Siege of Cair Andros
+Against the Shadow
+The Steward's Fear
+The Steward's Fear
+The Steward's Fear
+The Drúadan Forest
+The Drúadan Forest
+The Drúadan Forest
+Encounter at Amon Dîn
+Encounter at Amon Dîn
+Encounter at Amon Dîn
+Assault on Osgiliath
+Assault on Osgiliath
+Assault on Osgiliath
+The Blood of Gondor
+The Blood of Gondor
+The Blood of Gondor
+The Morgul Vale
+The Morgul Vale
+The Morgul Vale
+The Voice of Isengard
+The Fords of Isen
+The Fords of Isen
+The Fords of Isen
+To Catch an Orc
+To Catch an Orc
+To Catch an Orc
+Into Fangorn
+Into Fangorn
+Into Fangorn
+The Ring-maker
+The Dunland Trap
+The Dunland Trap
+The Dunland Trap
+The Three Trials
+The Three Trials
+The Three Trials
+Trouble in Tharbad
+Trouble in Tharbad
+Trouble in Tharbad
+The Nîn-in-Eilph
+The Nîn-in-Eilph
+The Nîn-in-Eilph
+Celebrimbor's Secret
+Celebrimbor's Secret
+Celebrimbor's Secret
+The Antlered Crown
+The Antlered Crown
+The Antlered Crown
+The Lost Realm
+Intruders in Chetwood
+Intruders in Chetwood
+Intruders in Chetwood
+The Weather Hills
+The Weather Hills
+The Weather Hills
+Deadmen's Dike
+Deadmen's Dike
+Deadmen's Dike
+Angmar Awakened
+The Wastes of Eriador
+The Wastes of Eriador
+The Wastes of Eriador
+Escape from Mount Gram
+Escape from Mount Gram
+Escape from Mount Gram
+Across the Ettenmoors
+Across the Ettenmoors
+Across the Ettenmoors
+The Treachery of Rhudaur
+The Treachery of Rhudaur
+The Treachery of Rhudaur
+The Battle of Carn Dûm
+The Battle of Carn Dûm
+The Battle of Carn Dûm
+The Dread Realm
+The Dread Realm
+The Dread Realm
+The Grey Havens
+Voyage Across Belegaer
+Voyage Across Belegaer
+Voyage Across Belegaer
+The Fate of Númenor
+The Fate of Númenor
+The Fate of Númenor
+Raid on the Grey Havens
+Raid on the Grey Havens
+Raid on the Grey Havens
+Dream-chaser
+Flight of the Stormcaller
+Flight of the Stormcaller
+Flight of the Stormcaller
+The Thing in the Depths
+The Thing in the Depths
+The Thing in the Depths
+Temple of the Deceived
+Temple of the Deceived
+Temple of the Deceived
+The Drowned Ruins
+The Drowned Ruins
+The Drowned Ruins
+A Storm on Cobas Haven
+A Storm on Cobas Haven
+A Storm on Cobas Haven
+The City of Corsairs
+The City of Corsairs
+The City of Corsairs
+The Sands of Harad
+Escape from Umbar
+Escape from Umbar
+Desert Crossing
+Desert Crossing
+The Long Arm of Mordor
+The Long Arm of Mordor
+The Haradrim
+The Mûmakil
+The Mûmakil
+Race Across Harad
+Race Across Harad
+Beneath the Sands
+Beneath the Sands
+The Black Serpent
+The Black Serpent
+The Dungeons of Cirith Gurat
+The Dungeons of Cirith Gurat
+The Crossings of Poros
+The Crossings of Poros
+The Wilds of Rhovanion
+Journey Up the Anduin
+Journey Up the Anduin
+Lost in Mirkwood
+Lost in Mirkwood
+The King's Quest
+The King's Quest
+Ered Mithrin
+The Withered Heath
+The Withered Heath
+Roam Across Rhovanion
+Roam Across Rhovanion
+Fire in the Night
+Fire in the Night
+The Ghost of Framsburg
+The Ghost of Framsburg
+Mount Gundabad
+Mount Gundabad
+The Fate of Wilderland
+The Fate of Wilderland
+A Shadow in the East
+The River Running
+The River Running
+Danger in Dorwinion
+Danger in Dorwinion
+The Temple of Doom
+The Temple of Doom
+The Vengeance of Mordor
+Wrath and Ruin
+Wrath and Ruin
+The City of Ulfast
+The City of Ulfast
+Challenge of the Wainriders
+Challenge of the Wainriders
+Under the Ash Mountains
+Under the Ash Mountains
+The Land of Sorrow
+The Land of Sorrow
+The Fortress of Nurn
+The Fortress of Nurn
+ALeP - Children of Eorl
+ALeP - Ambush at Erelas
+ALeP - Ambush at Erelas
+ALeP - The Battle for the Beacon
+ALeP - The Battle for the Beacon
+ALeP - The Horse Lord's Ire
+ALeP - The Horse Lord's Ire
+ALeP - Oaths of the Rohirrim
+ALeP - The Aldburg Plot
+ALeP - The Aldburg Plot
+ALeP - Fire on the Eastemnet
+ALeP - Fire on the Eastemnet
+ALeP - The Gap of Rohan
+ALeP - The Gap of Rohan
+ALeP - The Glittering Caves
+ALeP - The Glittering Caves
+ALeP - Mustering of the Rohirrim
+ALeP - Mustering of the Rohirrim
+ALeP - Blood in the Isen
+ALeP - Blood in the Isen
+ALeP - The Shire's Reckoning
+ALeP - Pies for the Party
+ALeP - Pies for the Party
+ALeP - Sundown on the Shire
+ALeP - Sundown on the Shire
+ALeP - Secrets of the Old Forest
+ALeP - Secrets of the Old Forest
+ALeP - Fell Summer
+ALeP - Strange News in Bree
+ALeP - Strange News in Bree
+ALeP - Fangs in the Dark
+ALeP - Fangs in the Dark
+ALeP - The Brandywine Pursuit
+ALeP - The Brandywine Pursuit
+The Hobbit
+We Must Away, Ere Break of Day
+We Must Away, Ere Break of Day
+We Must Away, Ere Break of Day
+Over the Misty Mountains Grim
+Over the Misty Mountains Grim
+Over the Misty Mountains Grim
+Dungeons Deep and Caverns Dim
+Dungeons Deep and Caverns Dim
+Dungeons Deep and Caverns Dim
+Flies and Spiders
+Flies and Spiders
+Flies and Spiders
+The Lonely Mountain
+The Lonely Mountain
+The Lonely Mountain
+The Battle of Five Armies
+The Battle of Five Armies
+The Battle of Five Armies
+The Lord of the Rings
+A Shadow of the Past
+A Shadow of the Past
+A Shadow of the Past
+A Knife in the Dark
+A Knife in the Dark
+A Knife in the Dark
+Flight to the Ford
+Flight to the Ford
+Flight to the Ford
+The Ring Goes South
+The Ring Goes South
+The Ring Goes South
+Journey in the Dark
+Journey in the Dark
+Journey in the Dark
+Breaking of the Fellowship
+Breaking of the Fellowship
+Breaking of the Fellowship
+The Uruk-hai
+The Uruk-hai
+The Uruk-hai
+Helm's Deep
+Helm's Deep
+Helm's Deep
+The Road to Isengard
+The Road to Isengard
+The Road to Isengard
+The Passage of the Marshes
+The Passage of the Marshes
+The Passage of the Marshes
+Journey to the Cross-roads
+Journey to the Cross-roads
+Journey to the Cross-roads
+Shelob's Lair
+Shelob's Lair
+Shelob's Lair
+The Passing of the Grey Company
+The Passing of the Grey Company
+The Siege of Gondor
+The Siege of Gondor
+The Battle of the Pelennor Fields
+The Battle of the Pelennor Fields
+The Tower of Cirith Ungol
+The Tower of Cirith Ungol
+The Black Gate Opens
+The Black Gate Opens
+Mount Doom
+Mount Doom
+Standalone Scenarios
+The Massing at Osgiliath
+The Massing at Osgiliath
+The Battle of Lake-town
+The Battle of Lake-town
+The Stone of Erech
+The Stone of Erech
+The Old Forest
+The Old Forest
+Fog on the Barrow-downs
+Fog on the Barrow-downs
+The Ruins of Belegost
+The Ruins of Belegost
+Murder at the Prancing Pony
+Murder at the Prancing Pony
+The Siege of Annúminas
+The Siege of Annúminas
+Attack on Dol Guldur
+Attack on Dol Guldur
+The Wizard's Quest
+The Wizard's Quest
+The Woodland Realm
+The Woodland Realm
+The Mines of Moria
+The Mines of Moria
+Escape from Khazad-dûm
+Escape from Khazad-dûm
+The Hunt for the Dreadnaught
+The Hunt for the Dreadnaught
+The Oath
+The Oath
+The Caves of Nibin-Dûm
+The Caves of Nibin-Dûm
+ALeP - The Scouring of the Shire
+ALeP - The Scouring of the Shire
+ALeP - The Nine are Abroad
+ALeP - The Nine are Abroad
+ALeP - The Siege of Erebor
+ALeP - The Siege of Erebor
+ALeP - The Hobbit
+ALeP - The Hobbit
+ALeP - The Mirror of Galadriel
+ALeP - The Mirror of Galadriel
+Two-Player Limited Edition Starter
+The Oath
+The Oath
+The Caves of Nibin-Dûm
+The Caves of Nibin-Dûm
+My Quest Logs
+Times logged: 1 · Victories: 1 · Defeats: 0 · Victory ratio: 100%
+Untitled Questlog
+Victory
+with a score of 25 points on August 16, 2015
+0
+0
+0
+Dwarf Lore/Leadership/Tactics
+Gimli
+Dáin Ironfoot
+Bifur
+Gondor/Dunedain Leadership/Spirit
+Aragorn
+Eleanor
+Boromir
+Noldor/Rohan Lore/Spirit
+Éowyn
+Glorfindel
+Elrond
+Gondor/Rohan/Silvan Tactics
+Legolas
+Beregond
+Théoden
+×
+Delete questlog
+Are you sure that you want to delete the questlog
+?
+Yes, delete
+Cancel
+×
+Delete questlogs
+Are you sure that you want to delete all the selected questlogs?
+Yes, delete
+Cancel
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

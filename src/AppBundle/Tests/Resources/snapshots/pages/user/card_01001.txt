@@ -1,0 +1,88 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Search
+Sort by Name
+Sort by Set
+Sort by Sphere
+Sort by Type
+Sort by Cost/Threat
+Sort by Willpower
+Sort by Attack
+Sort by Defense
+Sort by Hit Points
+View as a Checklist
+View as a Spoiler
+View as Full Cards
+View as Scans only
+View as Simple List
+Core Set
+Théodred →
+Aragorn
+Hero.
+Threat: 12.
+2
+3
+2
+5
+Dúnedain. Noble. Ranger.
+Sentinel.
+Response:
+After Aragorn commits to a quest, spend 1 resource from his resource pool to ready him.
+"I am Aragorn son of Arathorn; and if by life or death I can save you, I will."
+The Fellowship of the Ring
+John Stanko
+Printings:
+‣ Core Set #1
+‣ Two-Player Limited Edition Starter #1
+‣ Revised Core Set #1
+Leadership.
+No image
+Reviews
+0
+Aragorn is a
+great
+leader.
+He readies after committing to the quest.
+8/16/15
+test
+1
+Add a comment
+Core Set
+Théodred →
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

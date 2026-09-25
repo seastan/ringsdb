@@ -240,7 +240,7 @@ class ApiControllerTest extends WebTestCase {
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
-        $this->assertMatchesJsonSnapshot('empty_array', $response->getContent());
+        $this->assertMatchesJsonSnapshot('custom_packs_published', $response->getContent());
     }
 
     public function testUserInfoAnonymous() {
