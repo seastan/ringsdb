@@ -324,6 +324,41 @@ access rule, the `/oauth/v2/*` and `/api/oauth2/*` routes (`routing.yml`, `routi
 `AppBundle:Security:login.html.twig` (only used by the `oauth_server_auth_login*` routes), the 4
 entities and their mappings, and the `oauth2_*` tables.
 
+## Quest logs
+
+Covered by `src/AppBundle/Tests/Controller/QuestlogWorkflowTest.php`. The deck picker fills the
+hidden `deckN_id`, `deckN_is_decklist` and `questlogdeckN_content` fields; the tests fill them
+directly.
+
+### Current behaviour pinned by the tests
+
+- A quest log stores its own copy of each deck's cards (`questlog_deck.content`, JSON as posted),
+  next to the deck (and decklist, with its parent deck) it references, and the player's name
+  (prefilled with the deck author's username). Slots are compacted.
+- Scenario, date played, difficulty (`normal`, `easy`, `nightmare`; anything else becomes
+  `normal`), victory (anything but `no` is a success), score (non numeric becomes 0), name
+  (default "Untitled Questlog"), Markdown description.
+- Checking "public" sets `is_public` and `date_publish` (on every save of a public quest log).
+- Refused: no deck (`422`), a deck without content ("Cannot save a questlog with an empty
+  deck", `200`), unknown scenario (`404`).
+- A quest log with votes, favorites or comments keeps its decks and visibility (the "public"
+  checkbox is disabled); the other fields can still change. It cannot be deleted.
+- Another user's deck requires them to share their decks and is cloned; a decklist needs no
+  sharing.
+- A private quest log is visible to its owner, and to others only if the owner shares their
+  decks (`403` otherwise). Anonymous visitors are always redirected to the login page (see
+  "Website browsing").
+- Another user's quest log cannot be edited, saved or deleted (`403`).
+
+### To look at during the migration
+
+- BUG: the branch of `saveAction` meant for "the referenced deck was deleted" (`deckN_id` = 0
+  with a content) reads `deckN_content`, but the form posts `questlogdeckN_content`: such a slot
+  is silently dropped.
+- The deck contents are decoded with `(array) json_decode(...)` (objects inside), like the deck
+  builder does: `{"main": {}}` passes the "empty deck" guard.
+- No CSRF protection on `/questlog/save`, `/questlog/delete`, `/questlog/delete_list`.
+
 ## Tests and time
 
 Dates written during the tests come from `new \DateTime()` (controllers, `DecklistFactory`) and
