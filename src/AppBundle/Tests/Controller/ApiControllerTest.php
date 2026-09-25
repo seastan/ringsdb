@@ -13,8 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
  * (see JsonSnapshotTrait).
  *
  * Relies on ringsdb_bootstrap.sql (cards, packs, scenarios) and on the fixtures (decklists).
- *
- * @coversNothing
  */
 class ApiControllerTest extends WebTestCase {
     use JsonSnapshotTrait;

@@ -15,8 +15,6 @@ use Symfony\Component\DomCrawler\Form;
  *
  * Fixtures: decks 1-4 and decklists 1-4 of "test"; quest log 1 (public, Passage Through
  * Mirkwood) with those 4 decks. Everything is restored in tearDown().
- *
- * @coversNothing
  */
 class QuestlogWorkflowTest extends WebTestCase {
     /** @var int[] max ids before the test, by table */

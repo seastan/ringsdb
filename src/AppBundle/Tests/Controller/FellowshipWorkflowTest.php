@@ -16,8 +16,6 @@ use Symfony\Component\DomCrawler\Form;
  * Fixtures: decks 1-4 of "test" (versions 1.1), each published as decklist 1-4; fellowship 1
  * (public) with decks 1-4. Publishing a fellowship publishes its decks, which changes the
  * fixture decks: everything is restored in tearDown().
- *
- * @coversNothing
  */
 class FellowshipWorkflowTest extends WebTestCase {
     /** @var int[] max ids before the test, by table */

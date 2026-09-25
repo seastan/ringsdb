@@ -14,8 +14,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  *
  * Everything created here is deleted in tearDown(), so the other tests (and their snapshots)
  * keep seeing the fixtures only.
- *
- * @coversNothing
  */
 class DeckWorkflowTest extends WebTestCase {
     /** @var int[] */

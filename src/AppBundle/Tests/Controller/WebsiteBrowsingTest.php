@@ -20,8 +20,6 @@ use Symfony\Component\DomCrawler\Crawler;
  *
  * GET routes that write to the database (/deck/new, /deck/clone/{id}, /fellowship/publish/{id})
  * are deliberately left out.
- *
- * @coversNothing
  */
 class WebsiteBrowsingTest extends WebTestCase {
 

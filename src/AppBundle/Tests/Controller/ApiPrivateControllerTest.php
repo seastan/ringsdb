@@ -16,8 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * Fixtures: "test" owns decks 1-4, decklists 1-4 and one custom pack; "admin" owns nothing.
  * Neither shares their decks.
- *
- * @coversNothing
  */
 class ApiPrivateControllerTest extends WebTestCase {
     use JsonSnapshotTrait;

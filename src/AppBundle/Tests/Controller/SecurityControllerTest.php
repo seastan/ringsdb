@@ -11,8 +11,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  *
  * Relies on the "test" / "test" user loaded by LoadUserData.
  * Users created by these tests are prefixed with "phpunit_" and removed in tearDown().
- *
- * @coversNothing
  */
 class SecurityControllerTest extends WebTestCase {
     const PREFIX = 'phpunit_';

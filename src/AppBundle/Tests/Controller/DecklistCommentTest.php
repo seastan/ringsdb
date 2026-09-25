@@ -14,8 +14,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * Fixtures: decklist 1 belongs to "test" and has one comment by "test"; decklists 2 to 4 belong
  * to "test" and have no comment. Everything created here is removed in tearDown(), and the
  * decklists' counters and dates (used by the API's Last-Modified) are restored.
- *
- * @coversNothing
  */
 class DecklistCommentTest extends WebTestCase {
     const DECKLIST_1_URL = '/decklist/view/1/dwarfloreleadershiptactics-1.0';
