@@ -3,8 +3,15 @@
 namespace AppBundle\Services;
 
 class Texts {
-    public function __construct($root_dir) {
-        $config = \HTMLPurifier_Config::create(['Cache.SerializerPath' => $root_dir]);
+    /**
+     * @param string $cache_dir where HTMLPurifier caches its definitions
+     */
+    public function __construct($cache_dir) {
+        // HTMLPurifier does not create its base cache directory, and warns if it is missing
+        if (!is_dir($cache_dir)) {
+            mkdir($cache_dir, 0775, true);
+        }
+        $config = \HTMLPurifier_Config::create(['Cache.SerializerPath' => $cache_dir]);
         $def = $config->getHTMLDefinition(true);
         $def->addAttribute('a', 'data-code', 'Text');
         $this->purifier_service = new \HTMLPurifier($config);
