@@ -96,7 +96,7 @@ class Texts {
         try {
             $filename = iconv('utf-8', 'us-ascii//TRANSLIT', $filename);
         } catch (ContextErrorException $e)  {
-            $filename = iconv('utf-8', 'us-ascii//IGNORE', $filename);
+            $filename = preg_replace('/[^\x00-\x7F]/', '', $filename);
         }
         $filename = preg_replace('/[^\w\-]/', '', $filename);
         $filename = preg_replace('/\-+/', '-', $filename);
