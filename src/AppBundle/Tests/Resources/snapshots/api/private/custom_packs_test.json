@@ -1,0 +1,22 @@
+[
+    {
+        "id": 1,
+        "code": "custom_test",
+        "name": "Test Custom Pack",
+        "is_enabled": true,
+        "cards": [
+            {
+                "card_code": "01001",
+                "card_name": "Aragorn",
+                "type_code": "hero",
+                "quantity": 1
+            },
+            {
+                "card_code": "01016",
+                "card_name": "Snowbourn Scout",
+                "type_code": "ally",
+                "quantity": 3
+            }
+        ]
+    }
+]

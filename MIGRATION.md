@@ -91,8 +91,14 @@ checked too, as well as `304 Not Modified` on `If-Modified-Since` and JSONP (`?j
 Regenerate the snapshots only on purpose, and review the diff:
 `docker compose exec -e UPDATE_SNAPSHOTS=1 -u www-data symfony php bin/simple-phpunit`
 
-The private (`/api/private`) and OAuth2 (`/api/oauth2`) APIs are not covered: the plan is to
-drop them before migrating.
+The private API (`/api/private`) is kept: the site's own JavaScript uses its 4 routes,
+authenticated by the regular session cookie (`api_private_load_deck`, `api_private_my_decks`,
+`api_private_user_decks` for the builder's multi-deck mode and the deck picker of fellowships and
+quest logs, in `app.deck.js` / `app.deck_selection.js`; `api_private_custom_packs` in
+`app.ui.js`). Covered by `src/AppBundle/Tests/Controller/ApiPrivateControllerTest.php` (see
+"Private API" below).
+
+The OAuth2 API (`/api/oauth2`) is to be removed before migrating: see "OAuth2 server" below.
 
 ### Current behaviour pinned by the tests (quirks to keep or fix on purpose)
 
@@ -224,3 +230,104 @@ dates in `tearDown()` (the API's `Last-Modified` depends on them).
 - No CSRF protection on `/user/comment` and `/user/hidecomment`.
 - Emails are sent synchronously during the request, with `\Swift_Message::newInstance()`
   (SwiftMailer, replaced by Symfony Mailer in recent Symfony versions).
+
+## Fellowships
+
+Covered by `src/AppBundle/Tests/Controller/FellowshipWorkflowTest.php`. The deck picker
+(`app.deck_selection.js`) fills the hidden `deckN_id` / `deckN_is_decklist` fields of the form;
+the tests fill them directly. Publishing a fellowship publishes its decks, which changes the
+fixture decks: the tests restore them in `tearDown()`.
+
+### Current behaviour pinned by the tests
+
+- A fellowship holds 1 to 4 decks or decklists; empty slots are compacted (deck numbers 1..n).
+  An empty fellowship is refused (`422`).
+- Using another user's deck requires them to share their decks (`403` otherwise); the deck is
+  then cloned for the current user.
+- The publish form offers, for each deck, to publish it as a new decklist or to reuse a matching
+  decklist (preselected when the deck is at version x.1 with a published child). Publishing
+  replaces all decks by decklists, sets `is_public` and `date_publish`, and redirects to
+  `/fellowship/view/{id}/{name_canonical}`.
+- Hero conflicts (the same hero in two decks) prevent publishing (flash error).
+- A published fellowship cannot be published again; its decks cannot be changed any more, its
+  name and description can.
+- A fellowship with votes, favorites or comments cannot be deleted; deleting a fellowship keeps
+  its decks. `delete_list` takes `ids` as `1-2-3` and skips unknown or foreign ids.
+- Another user's fellowship cannot be edited, saved, published or deleted (`403`).
+
+### To look at during the migration
+
+- BUG: "Save and Publish" (`auto_publish`) never publishes: `saveAction` tests
+  `empty($fellowship->getDecks())`, and a Doctrine collection object is never `empty()`.
+- No CSRF protection on `/fellowship/save`, `/fellowship/publish`, `/fellowship/delete`,
+  `/fellowship/delete_list`.
+- The fixture fellowship 1 is public but references decks (not decklists) and has no
+  `date_publish`: a state the application itself does not produce.
+
+## Private API (`/api/private/*`)
+
+Covered by `src/AppBundle/Tests/Controller/ApiPrivateControllerTest.php`, same approach as the
+public API (snapshots in `src/AppBundle/Tests/Resources/snapshots/api/private/`). Requests are
+sent with AJAX after logging in, like the site's JavaScript does.
+
+### Current behaviour pinned by the tests
+
+- `/decks`: the user's decklists then decks (descriptions emptied), newest first.
+- `/decks_by_user/{username}`: same for the given user, but another user only gets the
+  decklists, even if they share their decks (`$show_private_decks` ignores `is_share_decks`,
+  commented out).
+- `/deck/load/{id}`: a deck of the user, or of a user who shares their decks.
+- `/custom-packs`: the user's custom packs.
+- Errors (unknown user or deck, deck not shared) are `200` with
+  `{"success": false, "error": ...}`.
+- With data: `Cache-Control: private, must-revalidate` + `Last-Modified`, and `304` on
+  `If-Modified-Since`; without data: `no-cache`, no `Last-Modified`.
+- Anonymous: `403` `{"success": false, "message": "Access Denied."}` for AJAX requests (through
+  `CoreExceptionListener`), redirect to the login page otherwise.
+
+## OAuth2 server (to be removed)
+
+`FOSOAuthServerBundle` makes RingsDB an OAuth2 server, so that third-party applications can act
+on behalf of a user through `/api/oauth2/*`. Inherited from ThronesDB. Plan: remove it before
+the migration (the bundle depends on FOSUserBundle and is not maintained for recent Symfony
+versions).
+
+What is there today:
+
+- Config: `fos_oauth_server` in `config.yml` (entities `Client`, `AccessToken`, `RefreshToken`,
+  `AuthCode`, tables `oauth2_*`; user provider `fos_user.user_manager`), bundle registered in
+  `AppKernel`.
+- Token endpoints, still active: `/oauth/v2/token` (firewall `oauth_token`, `security: false`)
+  and `/oauth/v2/auth` (firewall `oauth_authorize`, with its own login form: routes
+  `oauth_server_auth_login` / `oauth_server_auth_login_check`, `SecurityController`). Tokens can
+  still be issued if clients are registered in `oauth2_client`.
+- Token checking is disabled: the `api_oauth2` firewall (`fos_oauth: true`) is commented out, so
+  `/api/oauth2/*` goes through the regular `default` firewall and `access_control` lets
+  anonymous users in. Tokens are ignored.
+- `Oauth2Controller`:
+  - `GET /api/oauth2/decks`: decks of the session user (empty without a session);
+  - `GET /api/oauth2/deck/load/{id}`: any deck whose owner shares their decks, to anyone
+    (owner check commented out), with `Access-Control-Allow-Origin: *`;
+  - `PUT /api/oauth2/deck/save/{id}`: the action is commented out (route to a missing method,
+    `500`);
+  - `PUT /api/oauth2/deck/publish/{id}`: always `403` "Publishing via API has been disabled.".
+
+Before removing it, check whether anything still calls it: `oauth2_client` /
+`oauth2_access_token` rows (`SELECT COUNT(*), FROM_UNIXTIME(MAX(expires_at)) FROM
+oauth2_access_token`) and, more reliably, the nginx logs for `/api/oauth2/` and `/oauth/v2/`
+(`deck/load` works without a token). If `deck/load` has to survive, move it to `/api/public`.
+
+To remove: the bundle (`AppKernel`, `composer.json`, `config.yml`), the `oauth_token` /
+`oauth_authorize` firewalls and the commented `api_oauth2` one, the `^/api/oauth2`
+access rule, the `/oauth/v2/*` and `/api/oauth2/*` routes (`routing.yml`, `routing_api.yml`,
+`routing_api_oauth2.yml`), `Oauth2Controller`, `SecurityController` and its template
+`AppBundle:Security:login.html.twig` (only used by the `oauth_server_auth_login*` routes), the 4
+entities and their mappings, and the `oauth2_*` tables.
+
+## Tests and time
+
+Dates written during the tests come from `new \DateTime()` (controllers, `DecklistFactory`) and
+from Gedmo timestampable, so the tests restore them in `tearDown()` (decklists, fixture decks)
+and only check them loosely. Plan: once on a recent Symfony, use `Symfony\Component\Clock`
+(`ClockInterface`, `MockClock` in tests) everywhere, including for the timestampable fields, to
+freeze the time in all tests.
