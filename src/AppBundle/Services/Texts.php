@@ -2,8 +2,6 @@
 
 namespace AppBundle\Services;
 
-use Symfony\Component\Debug\Exception\ContextErrorException;
-
 class Texts {
     public function __construct($root_dir) {
         $config = \HTMLPurifier_Config::create(['Cache.SerializerPath' => $root_dir]);
@@ -93,11 +91,9 @@ class Texts {
      */
     public function slugify($filename) {
         $filename = preg_replace('[^\w\-]', '-', $filename);
-        try {
-            $filename = iconv('utf-8', 'us-ascii//TRANSLIT', $filename);
-        } catch (ContextErrorException $e)  {
-            $filename = preg_replace('/[^\x00-\x7F]/', '', $filename);
-        }
+        // //TRANSLIT is not supported by every iconv implementation (e.g. musl on Alpine)
+        $ascii = @iconv('utf-8', 'us-ascii//TRANSLIT', $filename);
+        $filename = $ascii !== false ? $ascii : preg_replace('/[^\x00-\x7F]/', '', $filename);
         $filename = preg_replace('/[^\w\-]/', '', $filename);
         $filename = preg_replace('/\-+/', '-', $filename);
         $filename = trim($filename, '-');
