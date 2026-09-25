@@ -147,6 +147,9 @@ class SocialController extends Controller {
 
         /* @var $deck \AppBundle\Entity\Deck */
         $deck = $this->getDoctrine()->getRepository('AppBundle:Deck')->find($deck_id);
+        if (!$deck) {
+            throw new BadRequestHttpException("Invalid deck_id.");
+        }
         if ($user->getId() !== $deck->getUser()->getId()) {
             throw $this->createAccessDeniedException("Access denied to this object.");
         }
