@@ -539,6 +539,7 @@ class ApiController extends Controller {
         // high popularity
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
         $qb->orderBy('popularity', 'DESC');
+        $qb->addOrderBy('d.id', 'DESC');
 
         // containing the card
         $qb->innerJoin('d.slots', "s");

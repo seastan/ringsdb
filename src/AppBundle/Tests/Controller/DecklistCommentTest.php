@@ -233,6 +233,31 @@ class DecklistCommentTest extends WebTestCase {
         $this->assertSame([], $this->newComments($client));
     }
 
+    /* --------------------------------------------------------- hot topics */
+
+    /**
+     * Hot Topics: decklists with comments of the day first, then by number of comments.
+     */
+    public function testHotTopicsFavourRecentComments() {
+        $client = $this->createAuthenticatedClient('admin');
+        // decklist 1: 5 comments, none recent; decklist 3: 1 comment, posted now
+        $this->db($client)->update('decklist', ['nb_comments' => 5], ['id' => 1]);
+        $this->postComment($client, 3, 'Fresh');
+
+        $crawler = $client->request('GET', '/decklists/hottopics');
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $links = array_unique($crawler->filter('a[href^="/decklist/view/"]')->each(function ($link) {
+            return $link->attr('href');
+        }));
+
+        $this->assertSame([
+            '/decklist/view/3/noldorrohanlorespirit-1.0',
+            '/decklist/view/1/dwarfloreleadershiptactics-1.0',
+            '/decklist/view/4/gondorrohansilvantactics-1.0',
+            '/decklist/view/2/gondordunedainleadershipspirit-1.0',
+        ], array_values($links));
+    }
+
     /* ------------------------------------------------------------- hiding */
 
     public function testDecklistAuthorCanHideAndShowAComment() {

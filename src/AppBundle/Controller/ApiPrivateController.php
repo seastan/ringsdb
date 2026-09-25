@@ -14,14 +14,14 @@ class ApiPrivateController extends Controller {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $decklists \AppBundle\Entity\Decklist[] */
-        $decklists = $em->getRepository('AppBundle:Decklist')->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC']);
+        $decklists = $em->getRepository('AppBundle:Decklist')->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC', 'id' => 'DESC']);
 
         foreach($decklists as &$decklist) {
             $decklist->setDescriptionMd('');
         }
 
         /* @var $decks \AppBundle\Entity\Deck[] */
-        $decks = $em->getRepository('AppBundle:Deck')->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC']);
+        $decks = $em->getRepository('AppBundle:Deck')->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC', 'id' => 'DESC']);
 
         foreach($decks as &$deck) {
             $deck->setDescriptionMd('');
@@ -73,7 +73,7 @@ class ApiPrivateController extends Controller {
         $show_private_decks = /*$user->getIsShareDecks() ||*/ $user->getId() == $this->getUser()->getId();
 
         /* @var $decklists \AppBundle\Entity\Decklist[] */
-        $decklists = $em->getRepository('AppBundle:Decklist')->findBy(['user' => $user], ['dateCreation' => 'DESC']);
+        $decklists = $em->getRepository('AppBundle:Decklist')->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
 
         foreach($decklists as &$decklist) {
             $decklist->setDescriptionMd('');
@@ -81,7 +81,7 @@ class ApiPrivateController extends Controller {
 
         if ($show_private_decks) {
             /* @var $decks \AppBundle\Entity\Deck[] */
-            $decks = $em->getRepository('AppBundle:Deck')->findBy(['user' => $user], ['dateCreation' => 'DESC']);
+            $decks = $em->getRepository('AppBundle:Deck')->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
 
             foreach($decks as &$deck) {
                 $deck->setDescriptionMd('');

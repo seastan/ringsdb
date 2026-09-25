@@ -96,9 +96,9 @@ class QuestLogController extends Controller {
 
             /* @var $questlogs \AppBundle\Entity\Questlog[] */
             if ($show_all) {
-                $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user], ['dateCreation' => 'DESC']);
+                $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
             } else {
-                $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => 'DESC']);
+                $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => 'DESC', 'id' => 'DESC']);
             }
             $this->setSnapshots($questlogs);
 
@@ -163,7 +163,7 @@ class QuestLogController extends Controller {
         }
 
         /* @var $questlogs \AppBundle\Entity\Questlog[] */
-        $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user], ['dateCreation' => 'DESC']);
+        $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
         $this->setSnapshots($questlogs);
 
         return $this->render('AppBundle:QuestLog:my-questlogs.html.twig', [

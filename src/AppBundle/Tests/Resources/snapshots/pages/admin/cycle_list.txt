@@ -1,0 +1,324 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Index
+Admin
+admin_cycle
+Cycle list
+Id
+Code
+Name
+Position
+Box
+Creation
+Update
+Actions
+1
+Core
+Core Set
+1
+1
+2016-03-08 21:35:00
+2022-01-22 10:21:49
+show
+edit
+2
+SoM
+Shadows of Mirkwood
+10
+2016-01-23 11:43:23
+2022-01-26 13:12:01
+show
+edit
+3
+KD
+Khazad-dûm
+11
+1
+2016-01-23 11:44:18
+2022-01-26 13:12:04
+show
+edit
+4
+DD
+Dwarrowdelf
+12
+2016-01-23 11:44:36
+2022-01-26 13:12:08
+show
+edit
+5
+HoN
+Heirs of Númenor
+13
+1
+2016-01-23 11:45:48
+2022-01-26 13:12:12
+show
+edit
+6
+AtS
+Against the Shadow
+14
+2016-01-23 11:46:09
+2022-01-26 13:12:17
+show
+edit
+7
+VoI
+The Voice of Isengard
+15
+1
+2016-01-23 11:46:27
+2022-01-26 13:12:21
+show
+edit
+8
+TRM
+The Ring-maker
+16
+2016-01-23 11:46:46
+2022-01-26 13:12:26
+show
+edit
+9
+TLR
+The Lost Realm
+17
+1
+2016-01-23 11:47:02
+2022-01-26 13:12:31
+show
+edit
+10
+AA
+Angmar Awakened
+18
+2016-01-23 11:47:17
+2022-01-26 13:12:35
+show
+edit
+11
+TGH
+The Grey Havens
+20
+1
+2016-01-23 11:47:32
+2022-09-16 12:48:45
+show
+edit
+12
+DC
+Dream-chaser
+21
+2016-01-23 11:47:43
+2024-09-01 04:33:48
+show
+edit
+13
+TH
+The Hobbit
+40
+2016-01-23 11:48:48
+2022-01-26 13:13:17
+show
+edit
+14
+LotR
+The Lord of the Rings
+41
+2016-01-23 11:49:13
+2022-01-26 13:13:22
+show
+edit
+15
+PoD
+Standalone Scenarios
+50
+2016-04-05 10:09:19
+2022-01-26 13:13:34
+show
+edit
+16
+TSoH
+The Sands of Harad
+23
+1
+2016-10-05 10:40:02
+2024-09-01 04:34:07
+show
+edit
+17
+H
+The Haradrim
+24
+2016-10-05 10:40:35
+2024-09-01 04:34:18
+show
+edit
+18
+TWoR
+The Wilds of Rhovanion
+25
+1
+2018-05-22 12:26:55
+2024-09-01 04:34:33
+show
+edit
+19
+EM
+Ered Mithrin
+26
+2018-08-13 11:25:07
+2024-09-01 04:34:42
+show
+edit
+20
+Starter
+Two-Player Limited Edition Starter
+60
+1
+2018-08-26 01:19:22
+2022-01-26 13:14:24
+show
+edit
+26
+ASitE
+A Shadow in the East
+28
+1
+2019-08-04 16:51:13
+2024-09-01 04:35:13
+show
+edit
+27
+TVoM
+The Vengeance of Mordor
+29
+2019-08-04 16:52:16
+2024-09-01 04:35:24
+show
+edit
+28
+MotKA
+Messenger of the King Allies
+70
+2020-02-22 00:08:37
+2022-01-26 13:14:29
+show
+edit
+29
+CoE
+ALeP - Children of Eorl
+30
+1
+2021-03-22 14:28:56
+2022-01-24 18:29:10
+show
+edit
+30
+OotR
+ALeP - Oaths of the Rohirrim
+31
+2021-06-28 11:29:15
+2022-01-24 18:29:19
+show
+edit
+31
+RevCore
+Revised Core Set
+2
+1
+2022-01-21 15:33:50
+2022-01-26 13:14:46
+show
+edit
+32
+StarterDecks
+Starter Decks
+61
+2022-03-12 16:56:58
+2022-03-12 16:56:58
+show
+edit
+33
+AACE
+Angmar Awakened Campaign Expansion
+19
+1
+2022-09-16 12:48:18
+2022-09-16 12:48:18
+show
+edit
+34
+TSR
+ALeP - The Shire's Reckoning
+32
+1
+2024-02-29 15:46:20
+2024-02-29 15:46:20
+show
+edit
+35
+TDCCE
+Dream-chaser Campaign Expansion
+22
+1
+2024-08-20 12:22:39
+2024-09-01 04:33:36
+show
+edit
+36
+EMCE
+Ered Mithrin Campaign Expansion
+27
+1
+2024-08-20 12:23:02
+2024-09-01 04:34:52
+show
+edit
+37
+TFS
+ALeP - Fell Summer
+33
+2025-01-30 12:57:27
+2025-01-30 12:57:27
+show
+edit
+Create a new entry
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

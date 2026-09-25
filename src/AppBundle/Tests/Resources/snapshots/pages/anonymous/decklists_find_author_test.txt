@@ -200,30 +200,17 @@ ALeP - Messenger of the King Allies
 »
 0
 0
-1
+0
 1.0
-Dwarf Lore/Leadership/Tactics
-29 threat, cards up to
+Gondor/Rohan/Silvan Tactics
+31 threat, cards up to
 The Morgul Vale
 Aug 16
 test
 1
-Gimli
-Dáin Ironfoot
-Bifur
-0
-0
-0
-1.0
-Gondor/Dunedain Leadership/Spirit
-30 threat, cards up to
-The Morgul Vale
-Aug 16
-test
-1
-Aragorn
-Eleanor
-Boromir
+Legolas
+Beregond
+Théoden
 0
 0
 0
@@ -241,15 +228,28 @@ Elrond
 0
 0
 1.0
-Gondor/Rohan/Silvan Tactics
-31 threat, cards up to
+Gondor/Dunedain Leadership/Spirit
+30 threat, cards up to
 The Morgul Vale
 Aug 16
 test
 1
-Legolas
-Beregond
-Théoden
+Aragorn
+Eleanor
+Boromir
+0
+0
+1
+1.0
+Dwarf Lore/Leadership/Tactics
+29 threat, cards up to
+The Morgul Vale
+Aug 16
+test
+1
+Gimli
+Dáin Ironfoot
+Bifur
 «
 1
 (current)

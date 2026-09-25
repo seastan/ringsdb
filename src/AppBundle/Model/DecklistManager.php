@@ -91,6 +91,9 @@ class DecklistManager {
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
         $qb->orderBy('popularity', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -98,6 +101,9 @@ class DecklistManager {
         $qb = $this->getQueryBuilder();
 
         $qb->orderBy('d.dateCreation', 'DESC');
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -107,6 +113,9 @@ class DecklistManager {
 
         $qb->andWhere('d.nbComments > 0');
         $qb->orderBy('d.dateLastComment', 'DESC');
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -118,6 +127,9 @@ class DecklistManager {
         $qb->setParameter('user', $user);
         $qb->orderBy('d.dateCreation', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -128,6 +140,9 @@ class DecklistManager {
         $qb->setParameter('user', $user);
         $qb->orderBy('d.dateCreation', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -137,6 +152,9 @@ class DecklistManager {
         $qb->andWhere('d.nbVotes > 10');
         $qb->orderBy('d.nbVotes', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -145,7 +163,10 @@ class DecklistManager {
 
         $qb->addSelect('(SELECT count(c) FROM AppBundle:Comment c WHERE c.decklist=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
         $qb->orderBy('nbRecentComments', 'DESC');
-        $qb->orderBy('d.nbComments', 'DESC');
+        $qb->addOrderBy('d.nbComments', 'DESC');
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -390,6 +411,9 @@ class DecklistManager {
                 $qb->orderBy('popularity', 'DESC');
                 break;
         }
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }

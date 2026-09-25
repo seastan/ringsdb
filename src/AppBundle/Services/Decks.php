@@ -36,7 +36,7 @@ class Decks {
         $idQuery = $this->doctrine->createQuery(
             'SELECT d.id FROM AppBundle\Entity\Deck d
              WHERE d.user = :user
-             ORDER BY d.dateUpdate DESC'
+             ORDER BY d.dateUpdate DESC, d.id ASC'
         )->setParameter('user', $user);
 
         if ($limit !== null) {

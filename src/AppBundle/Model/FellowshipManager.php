@@ -86,6 +86,9 @@ class FellowshipManager {
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.datePublish), 2)) AS HIDDEN popularity');
         $qb->orderBy('popularity', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -93,6 +96,9 @@ class FellowshipManager {
         $qb = $this->getQueryBuilder();
 
         $qb->orderBy('d.datePublish', 'DESC');
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -102,6 +108,9 @@ class FellowshipManager {
 
         $qb->andWhere('d.nbComments > 0');
         $qb->orderBy('d.dateLastComment', 'DESC');
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -114,6 +123,9 @@ class FellowshipManager {
         $qb->setParameter('user', $user);
         $qb->orderBy('d.datePublish', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -124,6 +136,9 @@ class FellowshipManager {
         $qb->setParameter('user', $user);
         $qb->orderBy('d.datePublish', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -133,6 +148,9 @@ class FellowshipManager {
         $qb->andWhere('d.nbVotes > 10');
         $qb->orderBy('d.nbVotes', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -141,7 +159,10 @@ class FellowshipManager {
 
         $qb->addSelect('(SELECT count(c) FROM AppBundle:FellowshipComment c WHERE c.fellowship=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
         $qb->orderBy('nbRecentComments', 'DESC');
-        $qb->orderBy('d.nbComments', 'DESC');
+        $qb->addOrderBy('d.nbComments', 'DESC');
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -290,6 +311,9 @@ class FellowshipManager {
                 $qb->orderBy('popularity', 'DESC');
                 break;
         }
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }

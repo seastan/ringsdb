@@ -1,0 +1,162 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Index
+Admin
+admin_encounter_edit
+Encounter edit
+Code
+Name
+Pack
+Core Set
+The Hunt for Gollum
+Conflict at the Carrock
+A Journey to Rhosgobel
+The Hills of Emyn Muil
+The Dead Marshes
+Return to Mirkwood
+Khazad-dûm
+The Redhorn Gate
+Road to Rivendell
+The Watcher in the Water
+The Long Dark
+Foundations of Stone
+Shadow and Flame
+Heirs of Númenor
+The Steward's Fear
+The Drúadan Forest
+Encounter at Amon Dîn
+Assault on Osgiliath
+The Blood of Gondor
+The Morgul Vale
+The Voice of Isengard
+The Dunland Trap
+The Three Trials
+Trouble in Tharbad
+The Nîn-in-Eilph
+Celebrimbor's Secret
+The Antlered Crown
+The Lost Realm
+The Wastes of Eriador
+Escape from Mount Gram
+Across the Ettenmoors
+The Treachery of Rhudaur
+The Battle of Carn Dûm
+The Dread Realm
+The Grey Havens
+Over Hill and Under Hill
+On the Doorstep
+The Black Riders
+The Road Darkens
+The Treason of Saruman
+The Land of Shadow
+Flight of the Stormcaller
+The Thing in the Depths
+Temple of the Deceived
+The Drowned Ruins
+The Flame of the West
+A Storm on Cobas Haven
+The City of Corsairs
+The Mûmakil
+Race Across Harad
+Beneath the Sands
+The Sands of Harad
+The Black Serpent
+The Mountain of Fire
+The Dungeons of Cirith Gurat
+The Crossings of Poros
+The Wilds of Rhovanion
+The Withered Heath
+Roam Across Rhovanion
+Two-Player Limited Edition Starter
+Fire in the Night
+The Ghost of Framsburg
+The Massing at Osgiliath
+Mount Gundabad
+The Fate of Wilderland
+A Shadow in the East
+Wrath and Ruin
+The City of Ulfast
+Challenge of the Wainriders
+Under the Ash Mountains
+The Land of Sorrow
+Messenger of the King Allies
+The Fortress of Nurn
+The Hunt for the Dreadnaught
+The Old Forest
+Fog on the Barrow-downs
+ALeP - Children of Eorl
+ALeP - The Aldburg Plot
+ALeP - The Scouring of the Shire
+ALeP - Fire on the Eastemnet
+ALeP - Messenger of the King Allies
+ALeP - The Gap of Rohan
+Revised Core Set
+The Dark of Mirkwood
+The Battle of Lake-town
+The Stone of Erech
+The Ruins of Belegost
+Murder at the Prancing Pony
+The Siege of Annúminas
+Attack on Dol Guldur
+The Wizard's Quest
+The Woodland Realm
+The Mines of Moria
+Escape from Khazad-dûm
+ALeP - The Glittering Caves
+Dwarves of Durin
+Elves of Lórien
+Defenders of Gondor
+Riders of Rohan
+ALeP - Mustering of the Rohirrim
+ALeP - Blood in the Isen
+Angmar Awakened Campaign Expansion
+ALeP - The Nine are Abroad
+ALeP - The Siege of Erebor
+ALeP - The Shire's Reckoning
+Dream-chaser Campaign Expansion
+Ered Mithrin Campaign Expansion
+ALeP - The Hobbit
+ALeP - Strange News in Bree
+ALeP - Fangs in the Dark
+ALeP - The Mirror of Galadriel
+ALeP - The Brandywine Pursuit
+Edit
+Back to the list
+Delete
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

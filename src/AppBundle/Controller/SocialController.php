@@ -549,7 +549,7 @@ class SocialController extends Controller {
 
         $commenters[] = $decklist->getUser()->getUsername();
 
-        $versions = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->findBy(['parent' => $decklist->getParent()], ['version' => 'DESC']);
+        $versions = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->findBy(['parent' => $decklist->getParent()], ['version' => 'DESC', 'id' => 'DESC']);
 
         return $this->render('AppBundle:Decklist:decklist.html.twig', [
             'pagetitle' => $decklist->getName(),
@@ -921,7 +921,7 @@ class SocialController extends Controller {
 				FROM comment c
 				JOIN decklist d ON c.decklist_id = d.id
 				WHERE c.user_id = ?
-				ORDER BY date_creation DESC
+				ORDER BY c.date_creation DESC, c.id DESC
 				LIMIT $start, $limit", [
             $user->getId()
         ])->fetchAll(\PDO::FETCH_ASSOC);
@@ -990,7 +990,7 @@ class SocialController extends Controller {
 				FROM comment c
 				JOIN decklist d on c.decklist_id = d.id
 				JOIN user u on c.user_id = u.id
-				ORDER BY date_creation DESC
+				ORDER BY c.date_creation DESC, c.id DESC
 				LIMIT $start, $limit", [])->fetchAll(\PDO::FETCH_ASSOC);
 
         $maxcount = $dbh->executeQuery("SELECT FOUND_ROWS()")->fetch(\PDO::FETCH_NUM)[0];

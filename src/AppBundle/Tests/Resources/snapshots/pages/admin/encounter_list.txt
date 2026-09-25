@@ -1,0 +1,1537 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Index
+Admin
+admin_encounter
+Encounter list
+Id
+Pack
+Code
+Name
+Image
+1
+Core Set
+Passage Through Mirkwood
+Passage Through Mirkwood
+show
+edit
+2
+Core Set
+Dol Guldur Orcs
+Dol Guldur Orcs
+show
+edit
+3
+Core Set
+Spiders of Mirkwood
+Spiders of Mirkwood
+show
+edit
+4
+Core Set
+Journey Along the Anduin
+Journey Along the Anduin
+show
+edit
+5
+Core Set
+Sauron's Reach
+Sauron's Reach
+show
+edit
+6
+Core Set
+Wilderlands
+Wilderlands
+show
+edit
+7
+Core Set
+Escape from Dol Guldur
+Escape from Dol Guldur
+show
+edit
+8
+The Hunt for Gollum
+The Hunt for Gollum
+The Hunt for Gollum
+show
+edit
+9
+Conflict at the Carrock
+Conflict at the Carrock
+Conflict at the Carrock
+show
+edit
+10
+A Journey to Rhosgobel
+A Journey to Rhosgobel
+A Journey to Rhosgobel
+show
+edit
+11
+The Hills of Emyn Muil
+The Hills of Emyn Muil
+The Hills of Emyn Muil
+show
+edit
+12
+The Dead Marshes
+The Dead Marshes
+The Dead Marshes
+show
+edit
+13
+Return to Mirkwood
+Return to Mirkwood
+Return to Mirkwood
+show
+edit
+14
+Khazad-dûm
+Into the Pit
+Into the Pit
+show
+edit
+15
+Khazad-dûm
+Twists and Turns
+Twists and Turns
+show
+edit
+16
+Khazad-dûm
+Hazards of the Pit
+Hazards of the Pit
+show
+edit
+17
+Khazad-dûm
+Goblins of the Deep
+Goblins of the Deep
+show
+edit
+18
+Khazad-dûm
+The Seventh Level
+The Seventh Level
+show
+edit
+19
+Khazad-dûm
+Plundering Goblins
+Plundering Goblins
+show
+edit
+20
+Khazad-dûm
+Flight from Moria
+Flight from Moria
+show
+edit
+21
+Khazad-dûm
+Deeps of Moria
+Deeps of Moria
+show
+edit
+22
+Khazad-dûm
+Misty Mountains
+Misty Mountains
+show
+edit
+23
+The Redhorn Gate
+The Redhorn Gate
+The Redhorn Gate
+show
+edit
+24
+Road to Rivendell
+Road to Rivendell
+Road to Rivendell
+show
+edit
+25
+The Watcher in the Water
+The Watcher in the Water
+The Watcher in the Water
+show
+edit
+26
+The Long Dark
+The Long Dark
+The Long Dark
+show
+edit
+27
+Foundations of Stone
+Foundations of Stone
+Foundations of Stone
+show
+edit
+28
+Shadow and Flame
+Shadow and Flame
+Shadow and Flame
+show
+edit
+29
+Heirs of Númenor
+Peril in Pelargir
+Peril in Pelargir
+show
+edit
+30
+Heirs of Númenor
+Streets of Gondor
+Streets of Gondor
+show
+edit
+31
+Heirs of Númenor
+Brigands
+Brigands
+show
+edit
+32
+Heirs of Númenor
+Into Ithilien
+Into Ithilien
+show
+edit
+33
+Heirs of Númenor
+Brooding Forest
+Brooding Forest
+show
+edit
+34
+Heirs of Númenor
+Creatures of the Forest
+Creatures of the Forest
+show
+edit
+35
+Heirs of Númenor
+Southrons
+Southrons
+show
+edit
+36
+Heirs of Númenor
+The Siege of Cair Andros
+The Siege of Cair Andros
+show
+edit
+37
+Heirs of Númenor
+Ravaging Orcs
+Ravaging Orcs
+show
+edit
+38
+Heirs of Númenor
+Mordor Elite
+Mordor Elite
+show
+edit
+39
+The Steward's Fear
+The Steward's Fear
+The Steward's Fear
+show
+edit
+40
+The Drúadan Forest
+The Drúadan Forest
+The Drúadan Forest
+show
+edit
+41
+Encounter at Amon Dîn
+Encounter at Amon Dîn
+Encounter at Amon Dîn
+show
+edit
+42
+Assault on Osgiliath
+Assault on Osgiliath
+Assault on Osgiliath
+show
+edit
+43
+The Blood of Gondor
+The Blood of Gondor
+The Blood of Gondor
+show
+edit
+44
+The Morgul Vale
+The Morgul Vale
+The Morgul Vale
+show
+edit
+45
+The Voice of Isengard
+The Fords of Isen
+The Fords of Isen
+show
+edit
+46
+The Voice of Isengard
+Dunland Warriors
+Dunland Warriors
+show
+edit
+47
+The Voice of Isengard
+Dunland Raiders
+Dunland Raiders
+show
+edit
+48
+The Voice of Isengard
+To Catch an Orc
+To Catch an Orc
+show
+edit
+49
+The Voice of Isengard
+Misty Mountain Orcs
+Misty Mountain Orcs
+show
+edit
+50
+The Voice of Isengard
+Broken Lands
+Broken Lands
+show
+edit
+51
+The Voice of Isengard
+Into Fangorn
+Into Fangorn
+show
+edit
+52
+The Voice of Isengard
+Ancient Forest
+Ancient Forest
+show
+edit
+53
+The Voice of Isengard
+Weary Travelers
+Weary Travelers
+show
+edit
+54
+The Dunland Trap
+The Dunland Trap
+The Dunland Trap
+show
+edit
+55
+The Three Trials
+The Three Trials
+The Three Trials
+show
+edit
+56
+Trouble in Tharbad
+Trouble in Tharbad
+Trouble in Tharbad
+show
+edit
+57
+The Nîn-in-Eilph
+The Nîn-in-Eilph
+The Nîn-in-Eilph
+show
+edit
+58
+Celebrimbor's Secret
+Celebrimbor's Secret
+Celebrimbor's Secret
+show
+edit
+59
+The Antlered Crown
+The Antlered Crown
+The Antlered Crown
+show
+edit
+60
+The Lost Realm
+Intruders in Chetwood
+Intruders in Chetwood
+show
+edit
+61
+The Lost Realm
+Iârion
+Iârion
+show
+edit
+62
+The Lost Realm
+Eriador Wilds
+Eriador Wilds
+show
+edit
+63
+The Lost Realm
+Angmar Orcs
+Angmar Orcs
+show
+edit
+64
+The Lost Realm
+Ruins of Arnor
+Ruins of Arnor
+show
+edit
+65
+The Lost Realm
+The Weather Hills
+The Weather Hills
+show
+edit
+66
+The Lost Realm
+Foul Weather
+Foul Weather
+show
+edit
+67
+The Lost Realm
+Dark Sorcery
+Dark Sorcery
+show
+edit
+68
+The Lost Realm
+Deadmen's Dike
+Deadmen's Dike
+show
+edit
+69
+The Lost Realm
+Cursed Dead
+Cursed Dead
+show
+edit
+70
+The Wastes of Eriador
+The Wastes of Eriador
+The Wastes of Eriador
+show
+edit
+71
+Escape from Mount Gram
+Escape from Mount Gram
+Escape from Mount Gram
+show
+edit
+72
+Across the Ettenmoors
+Across the Ettenmoors
+Across the Ettenmoors
+show
+edit
+73
+The Treachery of Rhudaur
+The Treachery of Rhudaur
+The Treachery of Rhudaur
+show
+edit
+74
+The Battle of Carn Dûm
+The Battle of Carn Dûm
+The Battle of Carn Dûm
+show
+edit
+75
+The Dread Realm
+The Dread Realm
+The Dread Realm
+show
+edit
+76
+The Grey Havens
+Corsair Pirates
+Corsair Pirates
+show
+edit
+77
+The Grey Havens
+Corsair Raiders
+Corsair Raiders
+show
+edit
+78
+The Grey Havens
+Drowned Dead
+Drowned Dead
+show
+edit
+79
+The Grey Havens
+Raid on the Grey Havens
+Raid on the Grey Havens
+show
+edit
+80
+The Grey Havens
+Stormy Weather
+Stormy Weather
+show
+edit
+81
+The Grey Havens
+The Dream-chaser's Fleet
+The Dream-chaser's Fleet
+show
+edit
+82
+The Grey Havens
+The Fate of Númenor
+The Fate of Númenor
+show
+edit
+83
+The Grey Havens
+Ruins of Númenor
+Ruins of Númenor
+show
+edit
+84
+The Grey Havens
+The Stormcaller Elite
+The Stormcaller Elite
+show
+edit
+85
+The Grey Havens
+Umbar Fleet
+Umbar Fleet
+show
+edit
+86
+The Grey Havens
+Vast Oceans
+Vast Oceans
+show
+edit
+87
+The Grey Havens
+Voyage Across Belegaer
+Voyage Across Belegaer
+show
+edit
+88
+Over Hill and Under Hill
+We Must Away, Ere Break of Day
+We Must Away, Ere Break of Day
+show
+edit
+89
+Over Hill and Under Hill
+Western Lands
+Western Lands
+show
+edit
+90
+Over Hill and Under Hill
+Over the Misty Mountains Grim
+Over the Misty Mountains Grim
+show
+edit
+91
+Over Hill and Under Hill
+The Great Goblin
+The Great Goblin
+show
+edit
+92
+Over Hill and Under Hill
+Misty Mountain Goblins
+Misty Mountain Goblins
+show
+edit
+93
+Over Hill and Under Hill
+Dungeons Deep and Caverns Dim
+Dungeons Deep and Caverns Dim
+show
+edit
+94
+On the Doorstep
+Flies and Spiders
+Flies and Spiders
+show
+edit
+95
+On the Doorstep
+Wilderland
+Wilderland
+show
+edit
+96
+On the Doorstep
+The Lonely Mountain
+The Lonely Mountain
+show
+edit
+97
+On the Doorstep
+The Battle of Five Armies
+The Battle of Five Armies
+show
+edit
+98
+The Black Riders
+A Shadow of the Past
+A Shadow of the Past
+show
+edit
+99
+The Black Riders
+Hunted
+Hunted
+show
+edit
+100
+The Black Riders
+The Ring
+The Ring
+show
+edit
+101
+The Black Riders
+The Black Riders
+The Black Riders
+show
+edit
+102
+The Black Riders
+A Knife in the Dark
+A Knife in the Dark
+show
+edit
+103
+The Black Riders
+The Nazgûl
+The Nazgûl
+show
+edit
+104
+The Black Riders
+Flight to the Ford
+Flight to the Ford
+show
+edit
+105
+The Road Darkens
+The Ring Goes South
+The Ring Goes South
+show
+edit
+106
+The Road Darkens
+Journey in the Dark
+Journey in the Dark
+show
+edit
+107
+The Road Darkens
+Breaking of the Fellowship
+Breaking of the Fellowship
+show
+edit
+108
+The Treason of Saruman
+The Uruk-hai
+The Uruk-hai
+show
+edit
+109
+The Treason of Saruman
+Orcs of the White Hand
+Orcs of the White Hand
+show
+edit
+110
+The Treason of Saruman
+Snaga Orcs
+Snaga Orcs
+show
+edit
+111
+The Treason of Saruman
+Helm's Deep
+Helm's Deep
+show
+edit
+112
+The Treason of Saruman
+The Road to Isengard
+The Road to Isengard
+show
+edit
+113
+The Land of Shadow
+The Passage of the Marshes
+The Passage of the Marshes
+show
+edit
+114
+The Land of Shadow
+Gollum
+Gollum
+show
+edit
+115
+The Land of Shadow
+Morgul Nazgûl
+Morgul Nazgûl
+show
+edit
+116
+The Land of Shadow
+Journey to the Cross-roads
+Journey to the Cross-roads
+show
+edit
+117
+The Land of Shadow
+Men of Harad
+Men of Harad
+show
+edit
+118
+The Land of Shadow
+Shelob's Lair
+Shelob's Lair
+show
+edit
+119
+The Land of Shadow
+The Great Spider
+The Great Spider
+show
+edit
+120
+The Massing at Osgiliath
+The Massing at Osgiliath
+The Massing at Osgiliath
+show
+edit
+121
+The Battle of Lake-town
+The Battle of Lake-town
+The Battle of Lake-town
+show
+edit
+122
+The Stone of Erech
+The Stone of Erech
+The Stone of Erech
+show
+edit
+123
+The Old Forest
+The Old Forest
+The Old Forest
+show
+edit
+124
+Fog on the Barrow-downs
+Fog on the Barrow-downs
+Fog on the Barrow-downs
+show
+edit
+125
+The Ruins of Belegost
+The Ruins of Belegost
+The Ruins of Belegost
+show
+edit
+126
+Murder at the Prancing Pony
+Murder at the Prancing Pony
+Murder at the Prancing Pony
+show
+edit
+127
+Murder at the Prancing Pony
+Investigation
+Investigation
+show
+edit
+128
+The Flame of the West
+The Passing of the Grey Company
+The Passing of the Grey Company
+show
+edit
+129
+The Flame of the West
+The Siege of Gondor
+The Siege of Gondor
+show
+edit
+130
+The Flame of the West
+The Battle of the Pelennor Fields
+The Battle of the Pelennor Fields
+show
+edit
+131
+The Mountain of Fire
+The Tower of Cirith Ungol
+The Tower of Cirith Ungol
+show
+edit
+132
+The Mountain of Fire
+Orcs of Mordor
+Orcs of Mordor
+show
+edit
+133
+The Mountain of Fire
+Deep Shadows
+Deep Shadows
+show
+edit
+134
+The Mountain of Fire
+The Black Gate Opens
+The Black Gate Opens
+show
+edit
+135
+The Mountain of Fire
+Mount Doom
+Mount Doom
+show
+edit
+137
+Flight of the Stormcaller
+Flight of the Stormcaller
+Flight of the Stormcaller
+show
+edit
+138
+The Thing in the Depths
+The Thing in the Depths
+The Thing in the Depths
+show
+edit
+139
+Core Set
+Temple of the Deceived
+Temple of the Deceived
+show
+edit
+140
+The Drowned Ruins
+The Drowned Ruins
+The Drowned Ruins
+show
+edit
+141
+A Storm on Cobas Haven
+A Storm on Cobas Haven
+A Storm on Cobas Haven
+show
+edit
+142
+The City of Corsairs
+The City of Corsairs
+The City of Corsairs
+show
+edit
+143
+The Thing in the Depths
+The Stormcaller
+The Stormcaller
+show
+edit
+144
+The City of Corsairs
+Coast of Umbar
+Coast of Umbar
+show
+edit
+145
+The Sands of Harad
+Harad Territory
+Harad Territory
+show
+edit
+146
+The Sands of Harad
+Harad Soldiers
+Harad Soldiers
+show
+edit
+147
+The Sands of Harad
+Desert Creatures
+Desert Creatures
+show
+edit
+148
+The Sands of Harad
+Desert Sands
+Desert Sands
+show
+edit
+149
+The Sands of Harad
+Mordor Orcs
+Mordor Orcs
+show
+edit
+150
+The Sands of Harad
+Jungle Forest
+Jungle Forest
+show
+edit
+151
+The Sands of Harad
+Escape from Umbar
+Escape from Umbar
+show
+edit
+152
+The Sands of Harad
+Desert Crossing
+Desert Crossing
+show
+edit
+153
+The Sands of Harad
+The Long Arm of Mordor
+The Long Arm of Mordor
+show
+edit
+154
+The Mûmakil
+The Mûmakil
+The Mûmakil
+show
+edit
+155
+Race Across Harad
+Race Across Harad
+Race Across Harad
+show
+edit
+156
+Beneath the Sands
+Beneath the Sands
+Beneath the Sands
+show
+edit
+157
+The Black Serpent
+The Black Serpent
+The Black Serpent
+show
+edit
+158
+The Dungeons of Cirith Gurat
+The Dungeons of Cirith Gurat
+The Dungeons of Cirith Gurat
+show
+edit
+159
+The Crossings of Poros
+The Crossings of Poros
+The Crossings of Poros
+show
+edit
+160
+The Crossings of Poros
+Mountains of Shadow
+Mountains of Shadow
+show
+edit
+161
+The Wilds of Rhovanion
+Grey Mountain Goblins
+Grey Mountain Goblins
+show
+edit
+162
+The Wilds of Rhovanion
+Hills of Wilderland
+Hills of Wilderland
+show
+edit
+163
+The Wilds of Rhovanion
+Lost in the Wilderness
+Lost in the Wilderness
+show
+edit
+164
+The Wilds of Rhovanion
+Dark Woods
+Dark Woods
+show
+edit
+165
+The Wilds of Rhovanion
+Gathering Gloom
+Gathering Gloom
+show
+edit
+166
+The Wilds of Rhovanion
+Fell Beasts
+Fell Beasts
+show
+edit
+167
+The Wilds of Rhovanion
+Wild Creatures
+Wild Creatures
+show
+edit
+168
+The Wilds of Rhovanion
+Deep Underground
+Deep Underground
+show
+edit
+169
+The Wilds of Rhovanion
+Afraid of the Dark
+Afraid of the Dark
+show
+edit
+170
+The Wilds of Rhovanion
+Dragon Might
+Dragon Might
+show
+edit
+171
+The Wilds of Rhovanion
+Lost Caves
+Lost Caves
+show
+edit
+172
+The Wilds of Rhovanion
+Journey up the Anduin
+Journey up the Anduin
+show
+edit
+173
+The Wilds of Rhovanion
+Lost in Mirkwood
+Lost in Mirkwood
+show
+edit
+174
+The Wilds of Rhovanion
+The King's Quest
+The King's Quest
+show
+edit
+175
+Two-Player Limited Edition Starter
+The Goblins
+The Goblins
+show
+edit
+176
+Two-Player Limited Edition Starter
+The Oath
+The Oath
+show
+edit
+177
+Two-Player Limited Edition Starter
+The Caves of Nibin-Dûm
+The Caves of Nibin-Dûm
+show
+edit
+178
+The Withered Heath
+The Withered Heath
+The Withered Heath
+show
+edit
+179
+Roam Across Rhovanion
+Roam Across Rhovanion
+Roam Across Rhovanion
+show
+edit
+180
+Fire in the Night
+Fire in the Night
+Fire in the Night
+show
+edit
+181
+The Ghost of Framsburg
+The Ghost of Framsburg
+The Ghost of Framsburg
+show
+edit
+183
+Mount Gundabad
+Mount Gundabad
+Mount Gundabad
+show
+edit
+184
+The Fate of Wilderland
+The Fate of Wilderland
+The Fate of Wilderland
+show
+edit
+185
+The Siege of Annúminas
+The Siege of Annúminas
+The Siege of Annúminas
+show
+edit
+186
+Attack on Dol Guldur
+Attack on Dol Guldur
+Attack on Dol Guldur
+show
+edit
+187
+The Wizard's Quest
+The Wizard's Quest
+The Wizard's Quest
+show
+edit
+188
+The Woodland Realm
+The Woodland Realm
+The Woodland Realm
+show
+edit
+189
+A Shadow in the East
+Riders of Rhûn
+Riders of Rhûn
+show
+edit
+190
+A Shadow in the East
+Easterling Raiders
+Easterling Raiders
+show
+edit
+191
+A Shadow in the East
+Rolling Plains
+Rolling Plains
+show
+edit
+192
+A Shadow in the East
+Servants of Sauron
+Servants of Sauron
+show
+edit
+193
+A Shadow in the East
+City of Rhûn
+City of Rhûn
+show
+edit
+194
+A Shadow in the East
+Under Guard
+Under Guard
+show
+edit
+195
+A Shadow in the East
+Ulchor's Guard
+Ulchor's Guard
+show
+edit
+196
+A Shadow in the East
+Twisted Tunnels
+Twisted Tunnels
+show
+edit
+197
+A Shadow in the East
+The Power of Mordor
+The Power of Mordor
+show
+edit
+198
+A Shadow in the East
+The River Running
+The River Running
+show
+edit
+199
+A Shadow in the East
+Danger in Dorwinion
+Danger in Dorwinion
+show
+edit
+200
+A Shadow in the East
+The Temple of Doom
+The Temple of Doom
+show
+edit
+201
+Wrath and Ruin
+Wrath and Ruin
+Wrath and Ruin
+show
+edit
+202
+The City of Ulfast
+The City of Ulfast
+The City of Ulfast
+show
+edit
+203
+Challenge of the Wainriders
+Challenge of the Wainriders
+Challenge of the Wainriders
+show
+edit
+204
+Under the Ash Mountains
+Under the Ash Mountains
+Under the Ash Mountains
+show
+edit
+205
+The Fortress of Nurn
+The Fortress of Nurn
+The Fortress of Nurn
+show
+edit
+206
+The Land of Sorrow
+The Land of Sorrow
+The Land of Sorrow
+show
+edit
+207
+ALeP - Children of Eorl
+Ambush at Erelas
+Ambush at Erelas
+show
+edit
+208
+ALeP - Children of Eorl
+The Battle for the Beacon
+The Battle for the Beacon
+show
+edit
+209
+ALeP - Children of Eorl
+The Horse Lord's Ire
+The Horse Lord's Ire
+show
+edit
+210
+The Mines of Moria
+The Mines of Moria
+The Mines of Moria
+show
+edit
+211
+Escape from Khazad-dûm
+Escape from Khazad-dûm
+Escape from Khazad-dûm
+show
+edit
+212
+The Hunt for the Dreadnaught
+The Hunt for the Dreadnaught
+The Hunt for the Dreadnaught
+show
+edit
+213
+ALeP - Children of Eorl
+Rohan Encampment
+Rohan Encampment
+show
+edit
+214
+ALeP - Children of Eorl
+Rohan Weather
+Rohan Weather
+show
+edit
+215
+ALeP - Children of Eorl
+Rohan Lands
+Rohan Lands
+show
+edit
+216
+ALeP - Children of Eorl
+Dunlending Warriors
+Dunlending Warriors
+show
+edit
+217
+ALeP - Children of Eorl
+Faithless Rohirrim
+Faithless Rohirrim
+show
+edit
+218
+ALeP - Children of Eorl
+Orc-host
+Orc-host
+show
+edit
+219
+ALeP - The Aldburg Plot
+The Aldburg Plot
+The Aldburg Plot
+show
+edit
+220
+ALeP - The Scouring of the Shire
+The Scouring of the Shire
+The Scouring of the Shire
+show
+edit
+221
+ALeP - Fire on the Eastemnet
+Fire on the Eastemnet
+Fire on the Eastemnet
+show
+edit
+222
+ALeP - The Gap of Rohan
+The Gap of Rohan
+The Gap of Rohan
+show
+edit
+223
+The Dark of Mirkwood
+The Caves of Nibin-Dûm TDoM
+The Caves of Nibin-Dûm
+show
+edit
+224
+The Dark of Mirkwood
+The Oath TDoM
+The Oath
+show
+edit
+225
+The Dark of Mirkwood
+The Goblins TDoM
+The Goblins
+show
+edit
+226
+ALeP - The Glittering Caves
+The Glittering Caves
+The Glittering Caves
+show
+edit
+227
+ALeP - The Glittering Caves
+Search for the Horn
+Search for the Horn
+show
+edit
+228
+ALeP - The Glittering Caves
+Exploring the Caves
+Exploring the Caves
+show
+edit
+229
+ALeP - Mustering of the Rohirrim
+Mustering of the Rohirrim
+Mustering of the Rohirrim
+show
+edit
+230
+ALeP - Blood in the Isen
+Blood in the Isen
+Blood in the Isen
+show
+edit
+231
+ALeP - The Nine are Abroad
+The Nine are Abroad
+The Nine are Abroad
+show
+edit
+232
+ALeP - The Siege of Erebor
+The Siege of Erebor
+The Siege of Erebor
+show
+edit
+233
+ALeP - The Shire's Reckoning
+The Shire's Reckoning
+The Shire's Reckoning
+show
+edit
+234
+ALeP - The Shire's Reckoning
+Drawing Attention
+Drawing Attention
+show
+edit
+235
+ALeP - The Shire's Reckoning
+Distractions
+Distractions
+show
+edit
+236
+ALeP - The Shire's Reckoning
+Shire's Edge
+Shire's Edge
+show
+edit
+237
+ALeP - The Shire's Reckoning
+Wolves
+Wolves
+show
+edit
+238
+ALeP - The Shire's Reckoning
+Wolf-cult
+Wolf-cult
+show
+edit
+239
+ALeP - The Shire's Reckoning
+Ruffians
+Ruffians
+show
+edit
+240
+ALeP - The Shire's Reckoning
+Pies for the Party
+Pies for the Party
+show
+edit
+241
+ALeP - The Shire's Reckoning
+Sundown on the Shire
+Sundown on the Shire
+show
+edit
+242
+ALeP - The Shire's Reckoning
+Secrets of the Old Forest
+Secrets of the Old Forest
+show
+edit
+243
+ALeP - The Hobbit
+The Hobbit
+The Hobbit
+show
+edit
+244
+ALeP - Strange News in Bree
+Strange News in Bree
+Strange News in Bree
+show
+edit
+245
+ALeP - Fangs in the Dark
+Fangs in the Dark
+Fangs in the Dark
+show
+edit
+246
+ALeP - Fangs in the Dark
+Bree-landers
+Bree-landers
+show
+edit
+247
+ALeP - The Mirror of Galadriel
+The Mirror of Galadriel
+The Mirror of Galadriel
+show
+edit
+248
+ALeP - The Mirror of Galadriel
+The Mirror of Galadriel - Gondor
+The Mirror of Galadriel - Gondor
+show
+edit
+249
+ALeP - The Mirror of Galadriel
+The Mirror of Galadriel - Sauron
+The Mirror of Galadriel - Sauron
+show
+edit
+250
+ALeP - The Brandywine Pursuit
+The Brandywine Pursuit
+The Brandywine Pursuit
+show
+edit
+Create a new entry
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

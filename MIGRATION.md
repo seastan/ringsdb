@@ -393,6 +393,55 @@ posted with AJAX (`ui.card.js`, `ui.reviews.js`); on error, the JavaScript displ
 - `/review/remove/{id}` accepts any method, GET included, and has no CSRF protection (nor do
   the other review routes).
 
+## Admin area (`/admin/*`)
+
+Covered (read-only for now) by `src/AppBundle/Tests/Controller/AdminPagesTest.php`: access
+control (anonymous redirected to the login page, users `403`, also on write routes), and every
+GET page as the fixture `admin` (ROLE_ADMIN): text snapshots in
+`src/AppBundle/Tests/Resources/snapshots/pages/admin/`, row counts for the card and card
+printing lists (1300+ rows), JSON snapshots for the statistics (`?month=2015-08`, in
+`snapshots/api/admin/`). Not covered yet: the write routes (CRUD, user moderation, command,
+Excel/CSV imports).
+
+### To look at during the migration
+
+- Fixed: `/admin/user/show/{id}` and the "Block" button crashed, FOSUserBundle 2 having dropped
+  the "locked" feature: `User` kept the `$locked` property (the prod database still has the
+  column) without accessors. `isLocked()` / `setLocked()` were added.
+- BUG, not fixed: blocking a user has no effect, FOSUser 2's `isAccountNonLocked()` always
+  returns `true` (pinned by `testBlockedUserCanStillLogIn`). To reimplement with a `UserChecker`
+  when replacing FOSUser, or to drop.
+- The user's "Date of last update" changes at each login (`last_login`, then Gedmo
+  timestampable); it is masked in the admin user page snapshot.
+- `StatController` concatenates the `month` query parameter into its SQL
+  (`"SELECT '" . $month . "' AS month, ..."`): SQL injection, admin only. Use parameters.
+- `/admin/stat` and `/admin/stat_packs` default to last month (`date()`): the tests pass a month.
+  `/admin/stat_cards` reads `stat_cards_cache`, filled by the `app:stats:precompute-cards` cron,
+  and answers `503` when it is empty.
+- Moderation actions are GET routes that write: `/admin/user/toggle_locked/{id}`,
+  `/admin/decklist/delete/{id}`, `/admin/comment/toggle_hidden/{id}`,
+  `/admin/comment/delete/{id}`.
+- The generated CRUD controllers accept any method on `new`/`edit`/`show`; `/admin/command/`
+  runs `ScrapBeornScenarioDataCommand` from a form.
+
+## Stable order of lists
+
+User content lists were sorted by non-unique keys only (dates, popularity, votes), so ties came
+back in an arbitrary order: flaky tests, and duplicated or missing items across pages in
+production. An `id` tie-breaker was added (same direction as the main key, or `ASC` for
+"oldest first" lists) to: the list methods of `DecklistManager`, `FellowshipManager` and
+`QuestLogManager`, the home page lists (`DefaultController`), the review lists
+(`DefaultController`, `ReviewController`, `CardsData::get_reviews`), the top decklists by card
+(`ApiController`), the private API lists, the quest log lists (`QuestLogController`), the user
+comment lists and decklist versions (`SocialController`), custom packs, and
+`Decks::getDecksWithSlotsForUser()`.
+
+- Fixed: in the "Hot Topics" lists (`DecklistManager`, `FellowshipManager`, `QuestLogManager`),
+  `orderBy('d.nbComments')` replaced `orderBy('nbRecentComments')` instead of adding to it:
+  recent comments were ignored. Now sorted by comments of the day, then by number of comments
+  (`testHotTopicsFavourRecentComments`, decklists only: the fixtures have a single fellowship
+  and a single quest log).
+
 ## Tests and time
 
 Dates written during the tests come from `new \DateTime()` (controllers, `DecklistFactory`) and
