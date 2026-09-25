@@ -1028,4 +1028,29 @@ class User extends BaseUser {
     public function getQuestlogVotes() {
         return $this->questlog_votes;
     }
+
+    /**
+     * @var bool
+     */
+    protected $locked = false;
+
+    /**
+     * @var bool
+     */
+    protected $expired = false;
+
+    /**
+     * @var \DateTime|null
+     */
+    protected $expiresAt;
+
+    /**
+     * @var bool
+     */
+    protected $credentialsExpired = false;
+
+    /**
+     * @var \DateTime|null
+     */
+    protected $credentialsExpireAt;
 }
