@@ -44,7 +44,7 @@ class ApiControllerTest extends WebTestCase {
         foreach ($data as $item) {
             $this->assertInternalType('array', $item);
             $this->assertArrayHasKey("pack_code", $item);
-            $this->assertEquals("core", $item['pack_code']);
+            $this->assertEquals("Core", $item['pack_code']);
         }
     }
 
