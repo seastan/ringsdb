@@ -148,3 +148,43 @@ Downloads are compared byte for byte; zip archives entry by entry.
   the temporary file cannot be created.
 - `slugify()` starts with `preg_replace('[^\w\-]', '-', ...)`: the brackets are taken as regex
   delimiters, so this line does not do what it seems to. Harmless, but worth cleaning up.
+
+## Deck workflow (create / edit / publish)
+
+Covered by `src/AppBundle/Tests/Controller/DeckWorkflowTest.php`. Forms are submitted like the
+browser does (the builder's JavaScript serializes the deck as JSON into the hidden `content`
+field). Everything the tests create is deleted in `tearDown()`.
+
+### Current behaviour pinned by the tests
+
+- `GET /deck/new` creates an empty `New Deck` (problem `too_few_heroes`, version 0.0) and
+  redirects to the builder.
+- Each save increments the minor version and records a `deckchange` entry
+  `[main added, main removed, side added, side removed]`. Quantities above the deck limit are
+  capped silently.
+- Publishing creates a decklist at version `<major+1>.0` with a canonical name
+  `<slug>-<version>`; the deck moves on to `<major+1>.1`.
+- An invalid deck cannot be published: the publish form redirects to the deck page with a
+  flash error.
+- Another user's deck cannot be edited, saved, or published (`403`).
+
+### To look at during the migration
+
+- Empty decks, production behaviour kept on purpose: the "Cannot import an empty deck" guard
+  of `/deck/save` (422 "Cannot save an empty deck." on `/deck/save-ajax`) only rejects a
+  `content` whose `main` is missing or decodes to an empty array. The builder sends
+  `{"main": {}, ...}`, decoded as a `stdClass` that is never `empty()`, so it can save an empty
+  deck; a file import without any card sends `{"main": [], ...}` and is refused. Keep this
+  distinction when rewriting the decoding (e.g. with `json_decode(..., true)` both would look
+  the same).
+- `QuestLogController` decodes deck contents the same way (`(array) json_decode(...)`), and
+  refuses quest logs with an empty deck.
+- Fixed: text import with a pack name (`1x Aragorn (Core Set)`, the format of the text export)
+  crashed with "Unrecognized field: pack": `BuilderController::parseTextImport()` still queried
+  `Card.pack`, removed by the card printings refactor. It now looks for a card with a printing
+  in that pack. Covered by an export → import round trip of the fixture decks.
+- `src/AppBundle/Resources/public/js/directimport.js` is not loaded by any template (the import
+  page uses `ui.deckimport.js`). Dead file.
+- `/deck/save` and `/decklist/create` have no CSRF protection.
+- Fixed: `POST /decklist/create` with an unknown or missing `deck_id` crashed (`getUser()` on
+  null); it now answers `400 Bad Request`.

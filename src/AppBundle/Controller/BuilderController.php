@@ -178,11 +178,13 @@ class BuilderController extends Controller {
             }
 
             if ($pack) {
-                /* @var $pack \AppBundle\Entity\Card */
-                $card = $em->getRepository('AppBundle:Card')->findOneBy([
-                    'name' => $name,
-                    'pack' => $pack
-                ]);
+                // a card belongs to its packs through its printings
+                /* @var $card \AppBundle\Entity\Card */
+                $card = $em->createQuery('SELECT c FROM AppBundle:Card c JOIN c.printings p WHERE c.name = :name AND p.pack = :pack ORDER BY c.code')
+                    ->setParameter('name', $name)
+                    ->setParameter('pack', $pack)
+                    ->setMaxResults(1)
+                    ->getOneOrNullResult();
             } else {
                 /* @var $pack \AppBundle\Entity\Card */
                 $card = $em->getRepository('AppBundle:Card')->findOneBy([
