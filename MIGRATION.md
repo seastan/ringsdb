@@ -359,6 +359,40 @@ directly.
   builder does: `{"main": {}}` passes the "empty deck" guard.
 - No CSRF protection on `/questlog/save`, `/questlog/delete`, `/questlog/delete_list`.
 
+## Card reviews
+
+Covered by `src/AppBundle/Tests/Controller/ReviewTest.php`. The forms of the card page are
+posted with AJAX (`ui.card.js`, `ui.reviews.js`); on error, the JavaScript displays the
+`message` of the JSON built by `CoreExceptionListener`.
+
+### Current behaviour pinned by the tests
+
+- Write (`/review/post`): one review per card and per user, and no more reviews than the user's
+  reputation; not on a card whose primary printing's pack has no release date. Bare URLs become
+  Markdown links; the text is rendered and purified. The 200-character minimum is only checked
+  in the browser.
+- Validation errors are generic `\Exception`s: `500` with the message in the JSON answer (the
+  JavaScript relies on it). Anonymous users get a `403` JSON.
+- Edit (`/review/edit`): own reviews only. An empty text returns a plain-text `200` "Your review
+  is empty." (not JSON).
+- Like (`/review/like`): +1 vote and +1 reputation for the author; once per user; liking your own
+  review does nothing (still `success: true`).
+- Comment (`/review/comment`): plain text, stored HTML-escaped; updates `date_last_comment`.
+- Remove (`/review/remove/{id}`): `ROLE_SUPER_ADMIN` only (the fixture admin, `ROLE_ADMIN`,
+  cannot); removes the votes too.
+
+### To look at during the migration
+
+- BUG: review comments are escaped twice (`htmlspecialchars()` when saved, Twig autoescape when
+  displayed in `Search/display-card-reviews.html.twig` and `Reviews/reviews.html.twig`): `<b>`
+  is shown as `&lt;b&gt;`.
+- BUG (JavaScript): the comment form's error handler reads `jqXHR.responseBody.message`
+  (`ui.card.js`) instead of `responseJSON`: errors are not displayed.
+- For AJAX requests, the `403`/`400` HTTP exceptions of `/review/edit` become `500`s (see
+  `CoreExceptionListener` above).
+- `/review/remove/{id}` accepts any method, GET included, and has no CSRF protection (nor do
+  the other review routes).
+
 ## Tests and time
 
 Dates written during the tests come from `new \DateTime()` (controllers, `DecklistFactory`) and
