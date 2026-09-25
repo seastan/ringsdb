@@ -42,6 +42,9 @@ class LoadFellowshipData extends AbstractFixture implements ContainerAwareInterf
         $fellowship->setUser($user);
         $fellowship->setName("Heirs to Numeror Cycle");
         $fellowship->setNameCanonical("heirs-to-numeror-cycle");
+        $fellowship->setDateCreation(new \DateTime('2015-08-16'));
+        $fellowship->setDateUpdate(new \DateTime('2015-08-16'));
+        $fellowship->setDateLastComment(new \DateTime('2015-08-16'));
 
         for($i = 1; $i < 5; $i++) {
             /** @var Deck $deck */

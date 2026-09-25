@@ -41,7 +41,7 @@ class LoadQuestlogData extends AbstractFixture implements ContainerAwareInterfac
         $questlog->setNbFavorites(0);
         $questlog->setNbDecks(4);
         $questlog->setIsPublic(true);
-        $questlog->setDatePublish(new \DateTime());
+        $questlog->setDatePublish(new \DateTime('2015-08-16'));
 
         $scenario = $manager->getRepository('AppBundle:Scenario')->find(1);
 
@@ -51,10 +51,12 @@ class LoadQuestlogData extends AbstractFixture implements ContainerAwareInterfac
         $questlog->setDescriptionMd("Hello world");
         $questlog->setDescriptionHtml("Hello world");
         $questlog->setScenario($scenario);
-        $questlog->setDatePlayed(new \DateTime());
+        $questlog->setDatePlayed(new \DateTime('2015-08-16'));
         $questlog->setQuestMode('normal');
         $questlog->setSuccess(true);
         $questlog->setScore(25);
+        $questlog->setDateCreation(new \DateTime('2015-08-16'));
+        $questlog->setDateUpdate(new \DateTime('2015-08-16'));
 
         for($i=1; $i<5; $i++){
             /** @var Decklist $decklist */

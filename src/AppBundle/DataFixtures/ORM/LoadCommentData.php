@@ -37,13 +37,13 @@ class LoadCommentData extends AbstractFixture implements ContainerAwareInterface
 
         $comment = new Comment();
         $comment->setText('Comment test');
-        $comment->setDateCreation(new \DateTime());
+        $comment->setDateCreation(new \DateTime('2015-08-16'));
         $comment->setUser($user);
         $comment->setDecklist($decklist);
         $comment->setIsHidden(false);
 
-        $decklist->setDateUpdate(new \DateTime());
-        $decklist->setDateLastComment(new \DateTime());
+        $decklist->setDateUpdate(new \DateTime('2015-08-16'));
+        $decklist->setDateLastComment(new \DateTime('2015-08-16'));
         $decklist->setNbcomments(1);
 
         $manager->persist($comment);

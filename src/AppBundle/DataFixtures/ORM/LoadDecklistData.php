@@ -36,6 +36,11 @@ class LoadDecklistData extends AbstractFixture implements ContainerAwareInterfac
             $deck = $this->getReference('test-deck-' . $i);
 
             $decklist = $decklistFactory->createDecklistFromDeck($deck, $deck->getName(), 'Hello World');
+            $decklist->setDateCreation(new \DateTime('2015-08-16'));
+            $decklist->setDateUpdate(new \DateTime('2015-08-16'));
+            $decklist->setDateLastComment(new \DateTime('2015-08-16'));
+
+            $deck->setDateUpdate(new \DateTime('2015-08-16'));
 
             $manager->persist($decklist);
             $this->addReference('test-decklist-' . $i, $decklist);
