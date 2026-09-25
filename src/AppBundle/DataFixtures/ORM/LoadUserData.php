@@ -33,5 +33,19 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
         $userManager->updateUser($user);
 
         $this->addReference('test-user', $user);
+
+        /** @var User $admin */
+        $admin = $userManager->createUser();
+        $admin->setUsername('admin');
+        $admin->setEmail('admin@example.com');
+        $admin->setPlainPassword('admin');
+        $admin->setEnabled(true);
+        $admin->addRole('ROLE_ADMIN');
+        $admin->setDateCreation(new \DateTime('2015-08-16'));
+        $admin->setDateUpdate(new \DateTime('2015-08-16'));
+
+        $userManager->updateUser($admin);
+
+        $this->addReference('admin-user', $admin);
     }
 }
