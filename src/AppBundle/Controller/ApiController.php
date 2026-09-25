@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Collections\Criteria;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ApiController extends Controller {
@@ -276,7 +277,7 @@ class ApiController extends Controller {
         /* @var $pack \AppBundle\Entity\Pack */
         $pack = $em->getRepository('AppBundle:Pack')->findOneBy(['code' => $pack_code]);
         if (!$pack) {
-            die();
+            throw $this->createNotFoundException('Pack not found');
         }
 
         $conditions = $this->get('cards_data')->syntax("e:$pack_code");
@@ -364,7 +365,7 @@ class ApiController extends Controller {
         /* @var $decklist \AppBundle\Entity\Decklist */
         $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
         if (!$decklist) {
-            die();
+            throw $this->createNotFoundException('Decklist not found');
         }
 
         $response->setLastModified($decklist->getDateUpdate());

@@ -28,9 +28,7 @@ beorn.json
 ringsdb_daily.sql
 __pycache__/
 
-# Local dev docker stack (not for the shared branch)
-/docker/
-/docker-compose.yml
+# Local front controller
 /web/app_local.php
 
 # Local card images pulled from server (large)

@@ -10,7 +10,14 @@
     }
   },
   "require": {
-    "php": ">=5.3.3",
+    "php": ">=7.1.33",
+    "ext-dom": "*",
+    "ext-fileinfo": "*",
+    "ext-iconv": "*",
+    "ext-libxml": "*",
+    "ext-json": "*",
+    "ext-pdo": "*",
+    "ext-zip": "*",
     "symfony/symfony": "^2.7",
     "symfony/css-selector": "^2.7",
     "symfony/dom-crawler": "^2.7",
@@ -32,13 +39,13 @@
     "leafo/scssphp": "^0.2.0",
     "patchwork/jsqueeze": "~1.0",
     "friendsofsymfony/oauth-server-bundle": "^1.4",
-    "phpunit/phpunit": "4.8.*",
     "nelmio/api-doc-bundle": "^2.9",
     "erusev/parsedown": "^1.6",
     "gregwar/captcha-bundle": "2.0.7"
   },
   "require-dev": {
-    "sensio/generator-bundle": "~2.3"
+    "sensio/generator-bundle": "~2.3",
+    "symfony/phpunit-bridge": "4.4"
   },
   "scripts": {
     "post-root-package-install": [
@@ -64,10 +71,7 @@
     ]
   },
   "config": {
-    "bin-dir": "bin",
-    "platform": {
-	"php": "5.6"
-    }
+    "bin-dir": "bin"
   },
   "extra": {
     "symfony-app-dir": "app",
