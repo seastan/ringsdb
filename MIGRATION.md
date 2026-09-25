@@ -167,6 +167,9 @@ field). Everything the tests create is deleted in `tearDown()`.
 - An invalid deck cannot be published: the publish form redirects to the deck page with a
   flash error.
 - Another user's deck cannot be edited, saved, or published (`403`).
+- `GET /deck/copy/{decklist_id}` copies a decklist into a new deck (version 0.1) whose parent is
+  the decklist; publishing that deck creates a decklist whose predecessor is the original one
+  ("Derived from" / "Inspiration for").
 
 ### To look at during the migration
 
@@ -186,5 +189,38 @@ field). Everything the tests create is deleted in `tearDown()`.
 - `src/AppBundle/Resources/public/js/directimport.js` is not loaded by any template (the import
   page uses `ui.deckimport.js`). Dead file.
 - `/deck/save` and `/decklist/create` have no CSRF protection.
+- `/deck/copy/{decklist_id}` writes to the database on GET (see also `/deck/new`).
 - Fixed: `POST /decklist/create` with an unknown or missing `deck_id` crashed (`getUser()` on
   null); it now answers `400 Bad Request`.
+
+## Decklist comments
+
+Covered by `src/AppBundle/Tests/Controller/DecklistCommentTest.php`. The comment form is built in
+JavaScript (`ui.decklist.js`) and posted with AJAX to `POST /user/comment` (`id`, `comment`); the
+server answers with a redirect to the decklist. The tests restore the decklists' counters and
+dates in `tearDown()` (the API's `Last-Modified` depends on them).
+
+### Current behaviour pinned by the tests
+
+- The comment is stored as HTML: Markdown rendered, bare URLs turned into links, then purified
+  (HTMLPurifier: no `<script>`, no event handlers). `nb_comments`, `date_update` and
+  `date_last_comment` of the decklist are updated.
+- Notification emails ("[ringsdb] New comment", from `seastan@ringsdb.com` with the commenter's
+  name): to the decklist author (`is_notif_author`), to previous commenters
+  (`is_notif_commenter`) and to users mentioned as `` `@username` `` (`is_notif_mention`), never
+  to the commenter. One email per recipient.
+- An empty comment is silently ignored (redirect, nothing saved).
+- Only the decklist author can hide/show a comment (`POST /user/hidecomment/{id}/{0|1}`); others
+  get `200` with the JSON string "You don't have permission to edit this comment.". Hidden
+  comments stay in the page, collapsed.
+
+### To look at during the migration
+
+- Fixed: commenting on an unknown decklist crashed on the final redirect (`getNameCanonical()`
+  on null); it now answers `400 Bad Request`.
+- BUG: for AJAX requests, `CoreExceptionListener` uses `$exception->getCode()` as the HTTP
+  status instead of `getStatusCode()`: every HTTP exception (400, 403, 404...) becomes a `500`
+  (with the right JSON message). Affects all AJAX calls, e.g. the comment form.
+- No CSRF protection on `/user/comment` and `/user/hidecomment`.
+- Emails are sent synchronously during the request, with `\Swift_Message::newInstance()`
+  (SwiftMailer, replaced by Symfony Mailer in recent Symfony versions).

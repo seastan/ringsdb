@@ -106,7 +106,7 @@ class SecurityControllerTest extends WebTestCase {
         $email = 'phpunit_frodo@example.com';
         $client = static::createClient();
 
-        // 1. submit the form: a confirmation email is sent, user must check his inbox
+        // 1. submit the form: a confirmation email is sent, the user must check their inbox
         $this->submitRegistration($client, $username, $email, 'secret123', null, true);
         $this->assertRedirectsTo($client, '#/register/check-email$#');
 

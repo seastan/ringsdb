@@ -478,6 +478,110 @@ class DeckWorkflowTest extends WebTestCase {
         ];
     }
 
+    /* ------------------------------------------------------ decklist copy */
+
+    /**
+     * Copy a decklist into a new deck (GET /deck/copy/{decklist_id}, "Copy" button of the
+     * decklist toolbar). Returns the new deck id.
+     */
+    private function copyDecklist(Client $client, $decklistId) {
+        $maxId = $this->maxDeckId($client);
+        $client->request('GET', "/deck/copy/$decklistId");
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertSame('/decks', $client->getResponse()->headers->get('Location'));
+        $ids = $this->newDeckIds($client, $maxId);
+        $this->assertCount(1, $ids);
+
+        return $ids[0];
+    }
+
+    /**
+     * Full circle: decklist -> copy into a deck -> edit -> publish. The new decklist is derived
+     * from the original one.
+     */
+    public function testCopyDecklistEditAndPublishAgain() {
+        $client = $this->createAuthenticatedClient();
+        $userId = (string) $this->db($client)->fetchColumn("SELECT id FROM user WHERE username = 'test'");
+        $original = $this->fetchSlots($client, 'decklistslot', 'decklist_id', 1);
+
+        // 1. copy: a new deck, with the decklist's name and cards, derived from the decklist
+        $deckId = $this->copyDecklist($client, 1);
+        $this->assertSame([
+            'name' => 'Dwarf Lore/Leadership/Tactics',
+            'description_md' => '',
+            'tags' => 'tactics leadership lore',
+            'problem' => null,
+            'major_version' => '0',
+            'minor_version' => '1',
+            'user_id' => $userId,
+            'last_pack' => 'TMV',
+        ], $this->fetchDeck($client, $deckId));
+        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT parent_decklist_id FROM deck WHERE id = ?', [$deckId]));
+        $this->assertSame($original, $this->fetchSlots($client, 'deckslot', 'deck_id', $deckId));
+
+        $crawler = $client->request('GET', "/deck/view/$deckId");
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertCount(1, $crawler->filter('a[href="/decklist/view/1/dwarfloreleadershiptactics-1.0"]'));
+
+        // 2. edit: one less Veteran Axehand, add a Blade of Gondolin
+        $edited = $original;
+        $edited['01028'] = 2;
+        $edited['01039'] = 1;
+        ksort($edited);
+        $this->saveDeck($client, $deckId, 'PHPUnit Dwarves Remix', 'Remixed', 'dwarf', $edited);
+        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT parent_decklist_id FROM deck WHERE id = ?', [$deckId]));
+
+        // 3. publish: the new decklist is derived from decklist 1
+        $crawler = $client->request('GET', "/deck/publish/$deckId");
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $form = $crawler->filter('form[action="/decklist/create"]')->form();
+        $client->submit($form);
+
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $location = $client->getResponse()->headers->get('Location');
+        $this->assertRegExp('#^/decklist/view/\d+/phpunitdwarvesremix-1\.0$#', $location);
+        $decklist = $this->db($client)->fetchAssoc('SELECT id, name, parent_deck_id, precedent_decklist_id FROM decklist WHERE parent_deck_id = ?', [$deckId]);
+        $this->assertSame(['PHPUnit Dwarves Remix', (string) $deckId, '1'], [$decklist['name'], $decklist['parent_deck_id'], $decklist['precedent_decklist_id']]);
+        $this->assertSame($edited, $this->fetchSlots($client, 'decklistslot', 'decklist_id', $decklist['id']));
+
+        // 4. both decklist pages show the link
+        $crawler = $client->request('GET', $location);
+        $this->assertContains('Dwarf Lore/Leadership/Tactics', $crawler->filter('#table-predecessor')->text());
+        $crawler = $client->request('GET', '/decklist/view/1/dwarfloreleadershiptactics-1.0');
+        $this->assertContains('PHPUnit Dwarves Remix', $crawler->filter('#table-successor')->text());
+    }
+
+    public function testAnotherUserCanCopyADecklist() {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/login');
+        $client->submit($crawler->selectButton('_submit')->form(['_username' => 'admin', '_password' => 'admin']));
+        $adminId = (string) $this->db($client)->fetchColumn("SELECT id FROM user WHERE username = 'admin'");
+
+        $deckId = $this->copyDecklist($client, 2);
+
+        $deck = $this->fetchDeck($client, $deckId);
+        $this->assertSame(['Gondor/Dunedain Leadership/Spirit', $adminId], [$deck['name'], $deck['user_id']]);
+        $this->assertSame($this->fetchSlots($client, 'decklistslot', 'decklist_id', 2), $this->fetchSlots($client, 'deckslot', 'deck_id', $deckId));
+    }
+
+    public function testCopyingAnUnknownDecklist() {
+        $client = $this->createAuthenticatedClient();
+        $maxId = $this->maxDeckId($client);
+
+        $client->request('GET', '/deck/copy/999');
+
+        $this->assertSame(404, $client->getResponse()->getStatusCode());
+        $this->assertSame([], $this->newDeckIds($client, $maxId));
+    }
+
+    public function testAnonymousCannotCopyADecklist() {
+        $client = static::createClient();
+        $client->request('GET', '/deck/copy/1');
+
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertSame('http://localhost/login', $client->getResponse()->headers->get('Location'));
+    }
+
     public function testPublishingAnInvalidDeckIsRefused() {
         $client = $this->createAuthenticatedClient();
         $deckId = $this->createDeck($client);

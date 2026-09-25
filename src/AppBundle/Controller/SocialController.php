@@ -624,9 +624,12 @@ class SocialController extends Controller {
 
         $decklist_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         $decklist = $this->getDoctrine()->getRepository('AppBundle:Decklist')->find($decklist_id);
+        if (!$decklist instanceof Decklist) {
+            throw new BadRequestHttpException('Wrong decklist id');
+        }
 
         $comment_text = trim($request->get('comment'));
-        if ($decklist && !empty($comment_text)) {
+        if (!empty($comment_text)) {
             $comment_text = preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $comment_text);
 
             $mentionned_usernames = [];
