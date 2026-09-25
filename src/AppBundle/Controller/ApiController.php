@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Card;
+use AppBundle\Entity\Scenario;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -123,6 +125,10 @@ class ApiController extends Controller {
 
         /* @var $card \AppBundle\Entity\Card */
         $card = $em->getRepository('AppBundle:Card')->findOneBy(["code" => $card_code]);
+
+        if (!$card instanceof Card) {
+            throw $this->createNotFoundException('Card not found');
+        }
 
         // check the last-modified-since header
         $lastModified = null;
@@ -625,6 +631,10 @@ class ApiController extends Controller {
 
         /* @var $scenario \AppBundle\Entity\Scenario */
         $scenario = $em->getRepository('AppBundle:Scenario')->findOneBy(['id' => $scenario_id]);
+
+        if (!$scenario instanceof Scenario) {
+            throw $this->createNotFoundException('Scenario not found.');
+        }
 
         // check the last-modified-since header
         $lastModified = null;

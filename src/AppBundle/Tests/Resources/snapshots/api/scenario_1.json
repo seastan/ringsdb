@@ -1,0 +1,58 @@
+{
+    "id": 1,
+    "code": "Passage Through Mirkwood",
+    "name": "Passage Through Mirkwood",
+    "nameCanonical": "passage-through-mirkwood",
+    "pack": "Core Set",
+    "date_creation": "2016-03-28T01:35:10+00:00",
+    "date_update": "2019-03-13T18:44:33+00:00",
+    "encounters": [
+        {
+            "id": 1,
+            "code": "Passage Through Mirkwood",
+            "name": "Passage Through Mirkwood"
+        },
+        {
+            "id": 2,
+            "code": "Dol Guldur Orcs",
+            "name": "Dol Guldur Orcs"
+        },
+        {
+            "id": 3,
+            "code": "Spiders of Mirkwood",
+            "name": "Spiders of Mirkwood"
+        }
+    ],
+    "has_easy": true,
+    "has_nightmare": true,
+    "easy_cards": 27,
+    "easy_enemies": 13,
+    "easy_locations": 12,
+    "easy_treacheries": 2,
+    "easy_shadows": 12,
+    "easy_objectives": 0,
+    "easy_objective_allies": 0,
+    "easy_objective_locations": 0,
+    "easy_surges": 1,
+    "easy_encounter_side_quests": 0,
+    "normal_cards": 36,
+    "normal_enemies": 16,
+    "normal_locations": 13,
+    "normal_treacheries": 7,
+    "normal_shadows": 13,
+    "normal_objectives": 0,
+    "normal_objective_allies": 0,
+    "normal_objective_locations": 0,
+    "normal_surges": 1,
+    "normal_encounter_side_quests": 0,
+    "nightmare_cards": 56,
+    "nightmare_enemies": 25,
+    "nightmare_locations": 18,
+    "nightmare_treacheries": 12,
+    "nightmare_shadows": 27,
+    "nightmare_objectives": 0,
+    "nightmare_objective_allies": 0,
+    "nightmare_objective_locations": 0,
+    "nightmare_surges": 3,
+    "nightmare_encounter_side_quests": 0
+}

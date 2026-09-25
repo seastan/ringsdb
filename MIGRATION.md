@@ -79,3 +79,40 @@ In Symfony 7.4:
 - `app/Resources/FOSUserBundle/views/Registration/checkEmail.html.twig` uses the FOSUser 1.x
   file name; FOSUser 2.0 looks for `check_email.html.twig`. This override is probably ignored
   today (not verified).
+
+## Public API (`/api/public/*`)
+
+Covered by `src/AppBundle/Tests/Controller/ApiControllerTest.php`. Response bodies are compared
+to snapshots in `src/AppBundle/Tests/Resources/snapshots/api/`: strict on structure, key order,
+value types and `{}` vs `[]`, but not on whitespace or JSON escaping. Status codes and the
+`Content-Type`, `Cache-Control`, `Access-Control-Allow-Origin` and `Last-Modified` headers are
+checked too, as well as `304 Not Modified` on `If-Modified-Since` and JSONP (`?jsonp=callback`).
+
+Regenerate the snapshots only on purpose, and review the diff:
+`docker compose exec -e UPDATE_SNAPSHOTS=1 -u www-data symfony php bin/simple-phpunit`
+
+The private (`/api/private`) and OAuth2 (`/api/oauth2`) APIs are not covered: the plan is to
+drop them before migrating.
+
+### Current behaviour pinned by the tests (quirks to keep or fix on purpose)
+
+- `/cards/{pack_code}` is case-insensitive (`core` and `Core` both work).
+- `/cards/{pack_code}.xml|xls|xlsx` returns `200` with the plain text body
+  `<format> format not supported. Only json is supported.` (`text/xml` for xml, `text/html`
+  for xls/xlsx). `/card/{code}.xml` is a `404` (route requirement).
+- `/cards/search/{q}` ignores the `jsonp` parameter.
+- `/cards/` `Last-Modified` is the most recent `dateUpdate` of the cards **and** of their
+  printings.
+- `/custom-packs/published` and `/user/info` are not in `ApiController`: they return a
+  `JsonResponse` with `Cache-Control: no-cache`/`private` and no CORS header.
+- `/user/info` returns `null` for anonymous users.
+- Error bodies (404) are not checked: they are the Symfony debug output in the test env.
+
+### To look at during the migration
+
+- JSONP: the callback name is echoed unsanitised into an `application/javascript` response
+  (XSS vector). Consider validating it (`^[\w.]+$`) or dropping JSONP in favour of CORS.
+- `listDecklistsByDateAction` builds its DQL by string concatenation (`LIKE '$date%'`); it is
+  only safe because of the route requirement `\d\d\d\d-\d\d-\d\d`. Use a parameter.
+- `/custom-packs/published` has no fixture data, so only the empty response is tested.
+- The `/cards/` snapshot is ~2 MB (1315 cards).
