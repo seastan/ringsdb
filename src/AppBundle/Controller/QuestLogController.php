@@ -914,7 +914,7 @@ class QuestLogController extends Controller {
         }
 
         /* @var $questlog \AppBundle\Entity\QuestLog */
-        $questlog = $em->getRepository('AppBundle:QuestLog')->find($questlog_id);
+        $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
         if (!$questlog) {
             throw new AccessDeniedHttpException("You don't have access to this questlog.");
         }
@@ -994,7 +994,7 @@ class QuestLogController extends Controller {
         $questlog_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
 
         /* @var $questlog \AppBundle\Entity\QuestLog */
-        $questlog = $em->getRepository('AppBundle:QuestLog')->find($questlog_id);
+        $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
         if (!$questlog) {
             throw new NotFoundHttpException('Wrong id');
         }
@@ -1048,7 +1048,7 @@ class QuestLogController extends Controller {
         }
 
         $questlog_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
-        $questlog = $em->getRepository('AppBundle:QuestLog')->find($questlog_id);
+        $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
 
         $comment_text = trim($request->get('comment'));
         if ($questlog && !empty($comment_text)) {
@@ -1169,10 +1169,10 @@ class QuestLogController extends Controller {
         $questlog_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
 
         /* @var $questlog \AppBundle\Entity\QuestLog */
-        $questlog = $em->getRepository('AppBundle:QuestLog')->find($questlog_id);
+        $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
 
         if ($questlog->getUser()->getId() != $user->getId()) {
-            $query = $em->getRepository('AppBundle:QuestLog')
+            $query = $em->getRepository('AppBundle:Questlog')
                 ->createQueryBuilder('d')
                 ->innerJoin('d.votes', 'u')
                 ->where('d.id = :questlog_id')

@@ -54,7 +54,7 @@ class QuestLogManager {
 	private function getQueryBuilder() {
 		$qb = $this->doctrine->createQueryBuilder();
 		$qb->select('d');
-		$qb->from('AppBundle:QuestLog', 'd');
+		$qb->from('AppBundle:Questlog', 'd');
         $qb->andWhere('d.isPublic = 1');
         $qb->setFirstResult($this->start);
 		$qb->setMaxResults($this->limit);
