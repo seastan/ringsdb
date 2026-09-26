@@ -1,0 +1,1162 @@
+{
+    "packs": [
+        {
+            "name": "Core Set",
+            "date_release": "2011-04-20"
+        },
+        {
+            "name": "The Dark of Mirkwood",
+            "date_release": "2011-04-22"
+        },
+        {
+            "name": "The Hunt for Gollum",
+            "date_release": "2011-07-21"
+        },
+        {
+            "name": "Conflict at the Carrock",
+            "date_release": "2011-08-10"
+        },
+        {
+            "name": "A Journey to Rhosgobel",
+            "date_release": "2011-09-01"
+        },
+        {
+            "name": "The Massing at Osgiliath",
+            "date_release": "2011-09-15"
+        },
+        {
+            "name": "The Hills of Emyn Muil",
+            "date_release": "2011-09-30"
+        },
+        {
+            "name": "The Dead Marshes",
+            "date_release": "2011-11-02"
+        },
+        {
+            "name": "Return to Mirkwood",
+            "date_release": "2011-11-23"
+        },
+        {
+            "name": "Khazad-dûm",
+            "date_release": "2012-01-06"
+        },
+        {
+            "name": "The Redhorn Gate",
+            "date_release": "2012-03-01"
+        },
+        {
+            "name": "Road to Rivendell",
+            "date_release": "2012-03-21"
+        },
+        {
+            "name": "The Watcher in the Water",
+            "date_release": "2012-04-25"
+        },
+        {
+            "name": "The Long Dark",
+            "date_release": "2012-05-16"
+        },
+        {
+            "name": "Foundations of Stone",
+            "date_release": "2012-06-20"
+        },
+        {
+            "name": "Shadow and Flame",
+            "date_release": "2012-08-08"
+        },
+        {
+            "name": "Over Hill and Under Hill",
+            "date_release": "2012-08-17"
+        },
+        {
+            "name": "The Battle of Lake-town",
+            "date_release": "2012-10-01"
+        },
+        {
+            "name": "Heirs of Númenor",
+            "date_release": "2012-11-26"
+        },
+        {
+            "name": "On the Doorstep",
+            "date_release": "2013-02-22"
+        },
+        {
+            "name": "The Steward's Fear",
+            "date_release": "2013-05-09"
+        },
+        {
+            "name": "The Drúadan Forest",
+            "date_release": "2013-05-31"
+        },
+        {
+            "name": "Encounter at Amon Dîn",
+            "date_release": "2013-07-05"
+        },
+        {
+            "name": "Assault on Osgiliath",
+            "date_release": "2013-08-09"
+        },
+        {
+            "name": "The Black Riders",
+            "date_release": "2013-09-01"
+        },
+        {
+            "name": "The Blood of Gondor",
+            "date_release": "2013-10-17"
+        },
+        {
+            "name": "The Stone of Erech",
+            "date_release": "2013-10-30"
+        },
+        {
+            "name": "The Morgul Vale",
+            "date_release": "2013-11-15"
+        },
+        {
+            "name": "The Voice of Isengard",
+            "date_release": "2014-02-21"
+        },
+        {
+            "name": "The Dunland Trap",
+            "date_release": "2014-06-26"
+        },
+        {
+            "name": "The Three Trials",
+            "date_release": "2014-07-24"
+        },
+        {
+            "name": "Trouble in Tharbad",
+            "date_release": "2014-08-21"
+        },
+        {
+            "name": "The Road Darkens",
+            "date_release": "2014-10-03"
+        },
+        {
+            "name": "The Nîn-in-Eilph",
+            "date_release": "2014-10-23"
+        },
+        {
+            "name": "The Old Forest",
+            "date_release": "2014-11-01"
+        },
+        {
+            "name": "Celebrimbor's Secret",
+            "date_release": "2014-11-13"
+        },
+        {
+            "name": "The Antlered Crown",
+            "date_release": "2014-12-23"
+        },
+        {
+            "name": "Fog on the Barrow-downs",
+            "date_release": "2015-01-01"
+        },
+        {
+            "name": "The Lost Realm",
+            "date_release": "2015-04-03"
+        },
+        {
+            "name": "The Treason of Saruman",
+            "date_release": "2015-04-23"
+        },
+        {
+            "name": "The Wastes of Eriador",
+            "date_release": "2015-07-02"
+        },
+        {
+            "name": "Escape from Mount Gram",
+            "date_release": "2015-07-30"
+        },
+        {
+            "name": "Across the Ettenmoors",
+            "date_release": "2015-09-03"
+        },
+        {
+            "name": "The Treachery of Rhudaur",
+            "date_release": "2015-09-24"
+        },
+        {
+            "name": "The Battle of Carn Dûm",
+            "date_release": "2015-11-06"
+        },
+        {
+            "name": "The Land of Shadow",
+            "date_release": "2015-11-19"
+        },
+        {
+            "name": "The Dread Realm",
+            "date_release": "2015-12-17"
+        },
+        {
+            "name": "Angmar Awakened Campaign Expansion",
+            "date_release": "2015-12-18"
+        },
+        {
+            "name": "The Grey Havens",
+            "date_release": "2016-02-11"
+        },
+        {
+            "name": "The Ruins of Belegost",
+            "date_release": "2016-02-15"
+        },
+        {
+            "name": "Murder at the Prancing Pony",
+            "date_release": "2016-02-20"
+        },
+        {
+            "name": "Flight of the Stormcaller",
+            "date_release": "2016-05-05"
+        },
+        {
+            "name": "The Thing in the Depths",
+            "date_release": "2016-06-02"
+        },
+        {
+            "name": "Temple of the Deceived",
+            "date_release": "2016-06-30"
+        },
+        {
+            "name": "The Flame of the West",
+            "date_release": "2016-08-03"
+        },
+        {
+            "name": "The Drowned Ruins",
+            "date_release": "2016-09-01"
+        },
+        {
+            "name": "A Storm on Cobas Haven",
+            "date_release": "2016-09-29"
+        },
+        {
+            "name": "The City of Corsairs",
+            "date_release": "2016-10-27"
+        },
+        {
+            "name": "The Sands of Harad",
+            "date_release": "2016-11-23"
+        },
+        {
+            "name": "The Mûmakil",
+            "date_release": "2017-01-30"
+        },
+        {
+            "name": "The Siege of Annúminas",
+            "date_release": "2017-03-01"
+        },
+        {
+            "name": "Race Across Harad",
+            "date_release": "2017-04-01"
+        },
+        {
+            "name": "Beneath the Sands",
+            "date_release": "2017-05-01"
+        },
+        {
+            "name": "Two-Player Limited Edition Starter",
+            "date_release": "2017-07-06"
+        },
+        {
+            "name": "The Black Serpent",
+            "date_release": "2017-07-20"
+        },
+        {
+            "name": "The Mountain of Fire",
+            "date_release": "2017-08-16"
+        },
+        {
+            "name": "The Dungeons of Cirith Gurat",
+            "date_release": "2017-12-07"
+        },
+        {
+            "name": "The Crossings of Poros",
+            "date_release": "2018-02-08"
+        },
+        {
+            "name": "Attack on Dol Guldur",
+            "date_release": "2018-02-15"
+        },
+        {
+            "name": "The Wilds of Rhovanion",
+            "date_release": "2018-06-14"
+        },
+        {
+            "name": "The Withered Heath",
+            "date_release": "2018-08-16"
+        },
+        {
+            "name": "Roam Across Rhovanion",
+            "date_release": "2018-10-18"
+        },
+        {
+            "name": "Fire in the Night",
+            "date_release": "2018-12-07"
+        },
+        {
+            "name": "The Ghost of Framsburg",
+            "date_release": "2019-02-07"
+        },
+        {
+            "name": "Mount Gundabad",
+            "date_release": "2019-04-04"
+        },
+        {
+            "name": "The Fate of Wilderland",
+            "date_release": "2019-06-06"
+        },
+        {
+            "name": "The Wizard's Quest",
+            "date_release": "2019-06-15"
+        },
+        {
+            "name": "The Woodland Realm",
+            "date_release": "2019-06-16"
+        },
+        {
+            "name": "A Shadow in the East",
+            "date_release": "2019-08-02"
+        },
+        {
+            "name": "Wrath and Ruin",
+            "date_release": "2019-11-15"
+        },
+        {
+            "name": "The City of Ulfast",
+            "date_release": "2020-01-10"
+        },
+        {
+            "name": "Challenge of the Wainriders",
+            "date_release": "2020-02-07"
+        },
+        {
+            "name": "Under the Ash Mountains",
+            "date_release": "2020-06-01"
+        },
+        {
+            "name": "The Mines of Moria",
+            "date_release": "2020-07-01"
+        },
+        {
+            "name": "Escape from Khazad-dûm",
+            "date_release": "2020-07-02"
+        },
+        {
+            "name": "Messenger of the King Allies",
+            "date_release": "2020-07-30"
+        },
+        {
+            "name": "The Land of Sorrow",
+            "date_release": "2020-08-01"
+        },
+        {
+            "name": "The Fortress of Nurn",
+            "date_release": "2020-10-01"
+        },
+        {
+            "name": "The Hunt for the Dreadnaught",
+            "date_release": "2020-12-01"
+        },
+        {
+            "name": "ALeP - Messenger of the King Allies",
+            "date_release": "2021-03-21"
+        },
+        {
+            "name": "ALeP - Children of Eorl",
+            "date_release": "2021-03-22"
+        },
+        {
+            "name": "ALeP - The Aldburg Plot",
+            "date_release": "2021-06-28"
+        },
+        {
+            "name": "ALeP - The Scouring of the Shire",
+            "date_release": "2021-08-06"
+        },
+        {
+            "name": "ALeP - Fire on the Eastemnet",
+            "date_release": "2021-09-09"
+        },
+        {
+            "name": "ALeP - The Gap of Rohan",
+            "date_release": "2021-12-07"
+        },
+        {
+            "name": "ALeP - The Glittering Caves",
+            "date_release": "2022-02-22"
+        },
+        {
+            "name": "ALeP - Mustering of the Rohirrim",
+            "date_release": "2022-06-13"
+        },
+        {
+            "name": "ALeP - Blood in the Isen",
+            "date_release": "2022-09-09"
+        },
+        {
+            "name": "ALeP - The Nine are Abroad",
+            "date_release": "2022-10-18"
+        },
+        {
+            "name": "Revised Core Set",
+            "date_release": "2022-11-03"
+        },
+        {
+            "name": "Dwarves of Durin",
+            "date_release": "2022-11-04"
+        },
+        {
+            "name": "Elves of Lórien",
+            "date_release": "2022-11-04"
+        },
+        {
+            "name": "Defenders of Gondor",
+            "date_release": "2022-11-04"
+        },
+        {
+            "name": "Riders of Rohan",
+            "date_release": "2022-11-04"
+        },
+        {
+            "name": "ALeP - The Siege of Erebor",
+            "date_release": "2023-09-06"
+        },
+        {
+            "name": "ALeP - The Shire's Reckoning",
+            "date_release": "2024-02-29"
+        },
+        {
+            "name": "Dream-chaser Campaign Expansion",
+            "date_release": "2024-08-14"
+        },
+        {
+            "name": "Ered Mithrin Campaign Expansion",
+            "date_release": "2024-08-14"
+        },
+        {
+            "name": "ALeP - The Hobbit",
+            "date_release": "2024-11-07"
+        },
+        {
+            "name": "ALeP - Strange News in Bree",
+            "date_release": "2025-01-30"
+        },
+        {
+            "name": "ALeP - Fangs in the Dark",
+            "date_release": "2025-06-30"
+        },
+        {
+            "name": "ALeP - The Mirror of Galadriel",
+            "date_release": "2025-11-04"
+        },
+        {
+            "name": "ALeP - The Brandywine Pursuit",
+            "date_release": "2026-03-25"
+        }
+    ],
+    "pack_rules": {
+        "Core Set": [
+            "2000-01-01",
+            "2011-07-21"
+        ],
+        "Shadows of Mirkwood": [
+            "2011-07-21",
+            "2012-01-06"
+        ],
+        "Dwarrowdelf": [
+            "2012-01-06",
+            "2012-08-17"
+        ],
+        "Against the Shadow": [
+            "2012-08-17",
+            "2014-02-21"
+        ],
+        "The Ring-maker": [
+            "2014-02-21",
+            "2015-04-03"
+        ],
+        "Angmar Awakened": [
+            "2015-04-03",
+            "2016-02-11"
+        ],
+        "Dream-chaser": [
+            "2016-02-11",
+            "2016-11-23"
+        ],
+        "Haradrim": [
+            "2016-11-23",
+            "2018-06-14"
+        ],
+        "Ered Mithrin": [
+            "2018-06-14",
+            "2019-08-02"
+        ],
+        "Vengeance of Mordor": [
+            "2019-08-02",
+            "2021-03-21"
+        ],
+        "ALeP - Oaths of the Rohirrim": [
+            "2021-03-21",
+            "2099-12-31"
+        ]
+    },
+    "quests": [
+        {
+            "name": "A Journey to Rhosgobel",
+            "quests": [
+                "A Journey to Rhosgobel"
+            ]
+        },
+        {
+            "name": "A Shadow in the East",
+            "quests": [
+                "The River Running",
+                "Danger in Dorwinion",
+                "The Temple of Doom"
+            ]
+        },
+        {
+            "name": "A Storm on Cobas Haven",
+            "quests": [
+                "A Storm on Cobas Haven"
+            ]
+        },
+        {
+            "name": "Across the Ettenmoors",
+            "quests": [
+                "Across the Ettenmoors"
+            ]
+        },
+        {
+            "name": "ALeP - Blood in the Isen",
+            "quests": [
+                "ALeP - Blood in the Isen"
+            ]
+        },
+        {
+            "name": "ALeP - Children of Eorl",
+            "quests": [
+                "ALeP - Ambush at Erelas",
+                "ALeP - The Battle for the Beacon",
+                "ALeP - The Horse Lord's Ire"
+            ]
+        },
+        {
+            "name": "ALeP - Fangs in the Dark",
+            "quests": [
+                "ALeP - Fangs in the Dark"
+            ]
+        },
+        {
+            "name": "ALeP - Fire on the Eastemnet",
+            "quests": [
+                "ALeP - Fire on the Eastemnet"
+            ]
+        },
+        {
+            "name": "ALeP - Mustering of the Rohirrim",
+            "quests": [
+                "ALeP - Mustering of the Rohirrim"
+            ]
+        },
+        {
+            "name": "ALeP - Strange News in Bree",
+            "quests": [
+                "ALeP - Strange News in Bree"
+            ]
+        },
+        {
+            "name": "ALeP - The Aldburg Plot",
+            "quests": [
+                "ALeP - The Aldburg Plot"
+            ]
+        },
+        {
+            "name": "ALeP - The Brandywine Pursuit",
+            "quests": [
+                "ALeP - The Brandywine Pursuit"
+            ]
+        },
+        {
+            "name": "ALeP - The Gap of Rohan",
+            "quests": [
+                "ALeP - The Gap of Rohan"
+            ]
+        },
+        {
+            "name": "ALeP - The Glittering Caves",
+            "quests": [
+                "ALeP - The Glittering Caves"
+            ]
+        },
+        {
+            "name": "ALeP - The Hobbit",
+            "quests": [
+                "ALeP - The Hobbit"
+            ]
+        },
+        {
+            "name": "ALeP - The Mirror of Galadriel",
+            "quests": [
+                "ALeP - The Mirror of Galadriel"
+            ]
+        },
+        {
+            "name": "ALeP - The Nine are Abroad",
+            "quests": [
+                "ALeP - The Nine are Abroad"
+            ]
+        },
+        {
+            "name": "ALeP - The Scouring of the Shire",
+            "quests": [
+                "ALeP - The Scouring of the Shire"
+            ]
+        },
+        {
+            "name": "ALeP - The Shire's Reckoning",
+            "quests": [
+                "ALeP - Pies for the Party",
+                "ALeP - Sundown on the Shire",
+                "ALeP - Secrets of the Old Forest"
+            ]
+        },
+        {
+            "name": "ALeP - The Siege of Erebor",
+            "quests": [
+                "ALeP - The Siege of Erebor"
+            ]
+        },
+        {
+            "name": "Assault on Osgiliath",
+            "quests": [
+                "Assault on Osgiliath"
+            ]
+        },
+        {
+            "name": "Attack on Dol Guldur",
+            "quests": [
+                "Attack on Dol Guldur"
+            ]
+        },
+        {
+            "name": "Beneath the Sands",
+            "quests": [
+                "Beneath the Sands"
+            ]
+        },
+        {
+            "name": "Celebrimbor's Secret",
+            "quests": [
+                "Celebrimbor's Secret"
+            ]
+        },
+        {
+            "name": "Challenge of the Wainriders",
+            "quests": [
+                "Challenge of the Wainriders"
+            ]
+        },
+        {
+            "name": "Conflict at the Carrock",
+            "quests": [
+                "Conflict at the Carrock"
+            ]
+        },
+        {
+            "name": "Core Set",
+            "quests": [
+                "Passage Through Mirkwood",
+                "Journey Along the Anduin",
+                "Escape from Dol Guldur"
+            ]
+        },
+        {
+            "name": "Encounter at Amon Dîn",
+            "quests": [
+                "Encounter at Amon Dîn"
+            ]
+        },
+        {
+            "name": "Escape from Khazad-dûm",
+            "quests": [
+                "Escape from Khazad-dûm"
+            ]
+        },
+        {
+            "name": "Escape from Mount Gram",
+            "quests": [
+                "Escape from Mount Gram"
+            ]
+        },
+        {
+            "name": "Fire in the Night",
+            "quests": [
+                "Fire in the Night"
+            ]
+        },
+        {
+            "name": "Flight of the Stormcaller",
+            "quests": [
+                "Flight of the Stormcaller"
+            ]
+        },
+        {
+            "name": "Fog on the Barrow-downs",
+            "quests": [
+                "Fog on the Barrow-downs"
+            ]
+        },
+        {
+            "name": "Foundations of Stone",
+            "quests": [
+                "Foundations of Stone"
+            ]
+        },
+        {
+            "name": "Heirs of Númenor",
+            "quests": [
+                "Peril in Pelargir",
+                "Into Ithilien",
+                "The Siege of Cair Andros"
+            ]
+        },
+        {
+            "name": "Khazad-dûm",
+            "quests": [
+                "Into the Pit",
+                "The Seventh Level",
+                "Flight from Moria"
+            ]
+        },
+        {
+            "name": "Mount Gundabad",
+            "quests": [
+                "Mount Gundabad"
+            ]
+        },
+        {
+            "name": "Murder at the Prancing Pony",
+            "quests": [
+                "Murder at the Prancing Pony"
+            ]
+        },
+        {
+            "name": "On the Doorstep",
+            "quests": [
+                "Flies and Spiders",
+                "The Lonely Mountain",
+                "The Battle of Five Armies"
+            ]
+        },
+        {
+            "name": "Over Hill and Under Hill",
+            "quests": [
+                "We Must Away, Ere Break of Day",
+                "Over the Misty Mountains Grim",
+                "Dungeons Deep and Caverns Dim"
+            ]
+        },
+        {
+            "name": "Race Across Harad",
+            "quests": [
+                "Race Across Harad"
+            ]
+        },
+        {
+            "name": "Return to Mirkwood",
+            "quests": [
+                "Return to Mirkwood"
+            ]
+        },
+        {
+            "name": "Road to Rivendell",
+            "quests": [
+                "Road to Rivendell"
+            ]
+        },
+        {
+            "name": "Roam Across Rhovanion",
+            "quests": [
+                "Roam Across Rhovanion"
+            ]
+        },
+        {
+            "name": "Shadow and Flame",
+            "quests": [
+                "Shadow and Flame"
+            ]
+        },
+        {
+            "name": "Temple of the Deceived",
+            "quests": [
+                "Temple of the Deceived"
+            ]
+        },
+        {
+            "name": "The Antlered Crown",
+            "quests": [
+                "The Antlered Crown"
+            ]
+        },
+        {
+            "name": "The Battle of Carn Dûm",
+            "quests": [
+                "The Battle of Carn Dûm"
+            ]
+        },
+        {
+            "name": "The Battle of Lake-town",
+            "quests": [
+                "The Battle of Lake-town"
+            ]
+        },
+        {
+            "name": "The Black Riders",
+            "quests": [
+                "A Shadow of the Past",
+                "A Knife in the Dark",
+                "Flight to the Ford"
+            ]
+        },
+        {
+            "name": "The Black Serpent",
+            "quests": [
+                "The Black Serpent"
+            ]
+        },
+        {
+            "name": "The Blood of Gondor",
+            "quests": [
+                "The Blood of Gondor"
+            ]
+        },
+        {
+            "name": "The City of Corsairs",
+            "quests": [
+                "The City of Corsairs"
+            ]
+        },
+        {
+            "name": "The City of Ulfast",
+            "quests": [
+                "The City of Ulfast"
+            ]
+        },
+        {
+            "name": "The Crossings of Poros",
+            "quests": [
+                "The Crossings of Poros"
+            ]
+        },
+        {
+            "name": "The Dark of Mirkwood",
+            "quests": [
+                "The Caves of Nibin-Dûm",
+                "The Oath"
+            ]
+        },
+        {
+            "name": "The Dead Marshes",
+            "quests": [
+                "The Dead Marshes"
+            ]
+        },
+        {
+            "name": "The Dread Realm",
+            "quests": [
+                "The Dread Realm"
+            ]
+        },
+        {
+            "name": "The Drowned Ruins",
+            "quests": [
+                "The Drowned Ruins"
+            ]
+        },
+        {
+            "name": "The Drúadan Forest",
+            "quests": [
+                "The Drúadan Forest"
+            ]
+        },
+        {
+            "name": "The Dungeons of Cirith Gurat",
+            "quests": [
+                "The Dungeons of Cirith Gurat"
+            ]
+        },
+        {
+            "name": "The Dunland Trap",
+            "quests": [
+                "The Dunland Trap"
+            ]
+        },
+        {
+            "name": "The Fate of Wilderland",
+            "quests": [
+                "The Fate of Wilderland"
+            ]
+        },
+        {
+            "name": "The Flame of the West",
+            "quests": [
+                "The Passing of the Grey Company",
+                "The Siege of Gondor",
+                "The Battle of the Pelennor Fields"
+            ]
+        },
+        {
+            "name": "The Fortress of Nurn",
+            "quests": [
+                "The Fortress of Nurn"
+            ]
+        },
+        {
+            "name": "The Ghost of Framsburg",
+            "quests": [
+                "The Ghost of Framsburg"
+            ]
+        },
+        {
+            "name": "The Grey Havens",
+            "quests": [
+                "Voyage Across Belegaer",
+                "The Fate of Númenor",
+                "Raid on the Grey Havens"
+            ]
+        },
+        {
+            "name": "The Hills of Emyn Muil",
+            "quests": [
+                "The Hills of Emyn Muil"
+            ]
+        },
+        {
+            "name": "The Hunt for Gollum",
+            "quests": [
+                "The Hunt for Gollum"
+            ]
+        },
+        {
+            "name": "The Hunt for the Dreadnaught",
+            "quests": [
+                "The Hunt for the Dreadnaught"
+            ]
+        },
+        {
+            "name": "The Land of Shadow",
+            "quests": [
+                "The Passage of the Marshes",
+                "Journey to the Cross-roads",
+                "Shelob's Lair"
+            ]
+        },
+        {
+            "name": "The Land of Sorrow",
+            "quests": [
+                "The Land of Sorrow"
+            ]
+        },
+        {
+            "name": "The Long Dark",
+            "quests": [
+                "The Long Dark"
+            ]
+        },
+        {
+            "name": "The Lost Realm",
+            "quests": [
+                "Intruders in Chetwood",
+                "The Weather Hills",
+                "Deadmen's Dike"
+            ]
+        },
+        {
+            "name": "The Massing at Osgiliath",
+            "quests": [
+                "The Massing at Osgiliath"
+            ]
+        },
+        {
+            "name": "The Mines of Moria",
+            "quests": [
+                "The Mines of Moria"
+            ]
+        },
+        {
+            "name": "The Morgul Vale",
+            "quests": [
+                "The Morgul Vale"
+            ]
+        },
+        {
+            "name": "The Mountain of Fire",
+            "quests": [
+                "The Tower of Cirith Ungol",
+                "The Black Gate Opens",
+                "Mount Doom"
+            ]
+        },
+        {
+            "name": "The Mûmakil",
+            "quests": [
+                "The Mûmakil"
+            ]
+        },
+        {
+            "name": "The Nîn-in-Eilph",
+            "quests": [
+                "The Nîn-in-Eilph"
+            ]
+        },
+        {
+            "name": "The Old Forest",
+            "quests": [
+                "The Old Forest"
+            ]
+        },
+        {
+            "name": "The Redhorn Gate",
+            "quests": [
+                "The Redhorn Gate"
+            ]
+        },
+        {
+            "name": "The Road Darkens",
+            "quests": [
+                "The Ring Goes South",
+                "Journey in the Dark",
+                "Breaking of the Fellowship"
+            ]
+        },
+        {
+            "name": "The Ruins of Belegost",
+            "quests": [
+                "The Ruins of Belegost"
+            ]
+        },
+        {
+            "name": "The Sands of Harad",
+            "quests": [
+                "Escape from Umbar",
+                "Desert Crossing",
+                "The Long Arm of Mordor"
+            ]
+        },
+        {
+            "name": "The Siege of Annúminas",
+            "quests": [
+                "The Siege of Annúminas"
+            ]
+        },
+        {
+            "name": "The Steward's Fear",
+            "quests": [
+                "The Steward's Fear"
+            ]
+        },
+        {
+            "name": "The Stone of Erech",
+            "quests": [
+                "The Stone of Erech"
+            ]
+        },
+        {
+            "name": "The Thing in the Depths",
+            "quests": [
+                "The Thing in the Depths"
+            ]
+        },
+        {
+            "name": "The Three Trials",
+            "quests": [
+                "The Three Trials"
+            ]
+        },
+        {
+            "name": "The Treachery of Rhudaur",
+            "quests": [
+                "The Treachery of Rhudaur"
+            ]
+        },
+        {
+            "name": "The Treason of Saruman",
+            "quests": [
+                "The Uruk-hai",
+                "Helm's Deep",
+                "The Road to Isengard"
+            ]
+        },
+        {
+            "name": "The Voice of Isengard",
+            "quests": [
+                "The Fords of Isen",
+                "To Catch an Orc",
+                "Into Fangorn"
+            ]
+        },
+        {
+            "name": "The Wastes of Eriador",
+            "quests": [
+                "The Wastes of Eriador"
+            ]
+        },
+        {
+            "name": "The Watcher in the Water",
+            "quests": [
+                "The Watcher in the Water"
+            ]
+        },
+        {
+            "name": "The Wilds of Rhovanion",
+            "quests": [
+                "Journey Up the Anduin",
+                "Lost in Mirkwood",
+                "The King's Quest"
+            ]
+        },
+        {
+            "name": "The Withered Heath",
+            "quests": [
+                "The Withered Heath"
+            ]
+        },
+        {
+            "name": "The Wizard's Quest",
+            "quests": [
+                "The Wizard's Quest"
+            ]
+        },
+        {
+            "name": "The Woodland Realm",
+            "quests": [
+                "The Woodland Realm"
+            ]
+        },
+        {
+            "name": "Trouble in Tharbad",
+            "quests": [
+                "Trouble in Tharbad"
+            ]
+        },
+        {
+            "name": "Two-Player Limited Edition Starter",
+            "quests": [
+                "The Oath",
+                "The Caves of Nibin-Dûm"
+            ]
+        },
+        {
+            "name": "Under the Ash Mountains",
+            "quests": [
+                "Under the Ash Mountains"
+            ]
+        },
+        {
+            "name": "Wrath and Ruin",
+            "quests": [
+                "Wrath and Ruin"
+            ]
+        }
+    ]
+}

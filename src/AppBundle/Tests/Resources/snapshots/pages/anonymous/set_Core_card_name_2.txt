@@ -1,0 +1,412 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Search
+Sort by Name
+Sort by Set
+Sort by Sphere
+Sort by Type
+Sort by Cost/Threat
+Sort by Willpower
+Sort by Attack
+Sort by Defense
+Sort by Hit Points
+View as a Checklist
+View as a Spoiler
+View as Full Cards
+View as Scans only
+View as Simple List
+1–20
+21–40
+41–60
+61–73
+73 cards
+Erebor Hammersmith
+Ally.
+Cost: 2.
+1
+1
+1
+3
+Dwarf. Craftsman.
+Response:
+After you play Erebor Hammersmith, return the topmost attachment in any player's discard pile to his hand.
+"In Erebor in the Kingdom of Dain there is such skill..."
+Aragorn, The Return of the King
+Empty Room Studios
+Printings:
+‣ Core Set #59
+‣ Two-Player Limited Edition Starter #46
+‣ Revised Core Set #59
+‣ Dwarves of Durin #6
+Lore.
+No image
+Ever Vigilant
+Event.
+Cost: 1.
+Action:
+Choose and ready 1 ally card.
+"...no road looks toward safety any longer. Be vigilant!"
+Gandalf, The Return of the King
+Daarken
+Printings:
+‣ Core Set #20
+‣ Two-Player Limited Edition Starter #29
+‣ Revised Core Set #20
+Leadership.
+No image
+Faramir
+Ally.
+Cost: 4.
+2
+1
+2
+3
+Gondor. Noble. Ranger.
+Action:
+Exhaust Faramir to choose a player. Each character controlled by that player gets +1
+until the end of the phase.
+"He leads now in all perilous ventures. But his life is charmed, or fate spares him for some other end."
+Mablung, Ranger of Ithilien,
+The Two Towers
+Jeff Himmelman
+Printings:
+‣ Core Set #14
+‣ Two-Player Limited Edition Starter #7
+‣ Revised Core Set #14
+‣ Defenders of Gondor #10
+Leadership.
+No image
+Feint
+Event.
+Cost: 1.
+This card was errata'd
+Combat Action:
+Choose an enemy engaged with a player. That enemy cannot attack that player this phase.
+A few brave men were strung before them to make a feint of resistance, and many there fell before the rest drew back and fled to either side.
+The Hobbit
+Lius Lasahido
+Printings:
+‣ Core Set #34
+‣ Two-Player Limited Edition Starter #59
+‣ Revised Core Set #34
+‣ Defenders of Gondor #22
+‣ Riders of Rohan #22
+Tactics.
+No image
+For Gondor!
+Event.
+Cost: 2.
+Action:
+Until the end of the phase, all characters get +1
+. All
+Gondor
+characters also get +1
+until the end of the phase.
+And the tree that was withered shall be renewed,
+and he shall plant it in high places,
+and the City shall be blessed.
+The Return of the King
+Margaret Hardy
+Printings:
+‣ Core Set #22
+‣ Revised Core Set #22
+Leadership.
+No image
+Forest Snare
+Attachment.
+Cost: 3.
+Item. Trap.
+Attach to an enemy engaged with a player.
+Attached enemy cannot attack.
+"We shall have it like a coney in a trap. Then we shall learn what kind of thing it is."
+Unidentified Man of Gondor,
+The Two Towers
+Alexandru Sabo
+Printings:
+‣ Core Set #69
+‣ Revised Core Set #69
+Lore.
+No image
+Fortune or Fate
+Event.
+Cost: 5.
+Action:
+Choose a hero in any player's discard pile. Put that card into play, under its owner's control.
+'Yes, fortune or fate have heped you,' said Gandalf, 'not to mention courage.'
+The Fellowship of the Ring
+Igor Kieryluk
+Printings:
+‣ Core Set #54
+‣ Revised Core Set #54
+Spirit.
+No image
+Gandalf
+Ally.
+Cost: 5.
+4
+4
+4
+4
+Istari.
+At the end of the round, discard Gandalf from play.
+Response:
+After Gandalf enters play, (choose 1): draw 3 cards, deal 4 damage to 1 enemy in play, or reduce your threat by 5.
+Lucas Graciano
+Printings:
+‣ Core Set #73
+‣ Two-Player Limited Edition Starter #4
+‣ Revised Core Set #73
+‣ Riders of Rohan #6
+‣ Elves of Lórien #7
+‣ Dwarves of Durin #10
+‣ Defenders of Gondor #11
+Neutral.
+No image
+Gandalf's Search
+Event.
+Cost: X.
+Action:
+Look at the top X cards of any player's deck, add 1 of those cards to its owner's hand, and return the rest to the top of the deck in any order.
+"Less welcome did the Lord Denethor show me then than of old, and grudgingly he permitted me to search among his hoarded scrolls and books."
+Gandalf, The Fellowship of the Ring
+Mike Nash
+Printings:
+‣ Core Set #67
+‣ Revised Core Set #67
+Lore.
+No image
+Gimli
+Hero.
+Threat: 11.
+2
+2
+2
+5
+Dwarf. Noble. Warrior.
+Gimli gets +1
+for each damage token on him.
+"Men need many words before deeds. My axe is restless in my hands."
+The Two Towers
+Tony Foti
+Printings:
+‣ Core Set #4
+‣ Revised Core Set #4
+Tactics.
+No image
+Gléowine
+Ally.
+Cost: 2.
+1
+0
+0
+2
+Minstrel. Rohan.
+Action:
+Exhaust Gléowine to choose a player. That player draws 1 card.
+Then the Riders of the King's House upon white horses rode round about the barrow and sang together a song of Théoden Thengle's son that Gléowine his minstrel made...
+The Return of the King
+Tony Foti
+Printings:
+‣ Core Set #62
+‣ Revised Core Set #62
+Lore.
+No image
+Glóin
+Hero.
+Threat: 9.
+2
+2
+1
+4
+Dwarf. Noble.
+Response:
+After Glóin suffers damage, add 1 resource to his resource pool for each point of damage he just suffered.
+His beard, very long and forked, was white, nearly as white as the snow-white cloth of his garments.
+The Fellowship of the Ring
+Tom Garden
+Printings:
+‣ Core Set #3
+‣ Revised Core Set #3
+Leadership.
+No image
+Glorfindel
+Hero.
+Threat: 12.
+3
+3
+1
+5
+Noble. Noldor. Warrior.
+Action:
+Pay 1 resource from Glorfindel's pool to heal 1 damage on any character. (Limit once per round.)
+"You saw him for a moment as he is upon the other side: one of the mighty of the firstborn."
+Gandalf, The Fellowship of the Ring
+Katherine Dinger
+Printings:
+‣ Core Set #11
+‣ Two-Player Limited Edition Starter #34
+‣ Revised Core Set #11
+Lore.
+No image
+Gondorian Spearman
+Ally.
+Cost: 2.
+0
+1
+1
+1
+Gondor. Warrior.
+Sentinel.
+Response:
+After Gondorian Spearman is declared as a defender, deal 1 damage to the attacking enemy.
+More than a thousand were there mustered. Their spears were like a sprining wood.
+The Two Towers
+Winona Nelson
+Printings:
+‣ Core Set #29
+‣ Revised Core Set #29
+‣ Defenders of Gondor #12
+Tactics.
+No image
+Grim Resolve
+Event.
+Cost: 5.
+Action:
+Ready all character cards in play.
+"If there is only one way, then I must take it. What comes after must come."
+Frodo Baggins, The Two Towers
+Daarken
+Printings:
+‣ Core Set #25
+‣ Two-Player Limited Edition Starter #26
+‣ Revised Core Set #25
+Leadership.
+No image
+Guard of the Citadel
+Ally.
+Cost: 2.
+1
+1
+0
+2
+Gondor. Warrior.
+"But the Lords of Minas Tirith still fight on, defying our enemies, keeping the passage of the River from Argonath to the Sea."
+Elrond, The Fellowship of the Ring
+Leonardo Borazio
+Printings:
+‣ Core Set #13
+‣ Revised Core Set #13
+Leadership.
+No image
+Hasty Stroke
+Event.
+Cost: 1.
+Response:
+Cancel a shadow effect just triggered during combat.
+'The hasy stroke goes oft astray,' said Aragorn. 'We must press our Enemy, and no longer wait on him for the next move.'
+The Return of the King
+Lius Lasahido
+Printings:
+‣ Core Set #48
+‣ Two-Player Limited Edition Starter #30
+‣ Revised Core Set #48
+Spirit.
+No image
+Henamarth Riversong
+Ally.
+Cost: 1.
+1
+1
+0
+1
+Silvan.
+Action:
+Exhaust Henamarth Riversong to look at the top card of the encounter deck.
+"And I reckon there's Elves and Elves. They're all elvish enough, but they're not all the same."
+Sam Gamgee,
+The Fellowship of the Ring
+Jen Zee
+Printings:
+‣ Core Set #60
+‣ Two-Player Limited Edition Starter #43
+‣ Revised Core Set #60
+‣ Elves of Lórien #9
+Lore.
+No image
+Horn of Gondor
+Attachment.
+Cost: 1.
+Item. Artifact.
+This card was errata'd
+Attach to a hero. Restricted.
+Response:
+After a character is destroyed, add 1 resource to attached hero's pool.
+'Slow should you be to wind that horn again, Boromir,' said Elrond, 'until you stand once more on the borders of your land, and dire need is on you.'
+The Fellowship of the Ring
+Mark Winters
+Printings:
+‣ Core Set #42
+‣ Two-Player Limited Edition Starter #52
+‣ Revised Core Set #42
+Tactics.
+No image
+Horseback Archer
+Ally.
+Cost: 3.
+0
+2
+1
+2
+Rohan. Archer.
+Ranged.
+A few of the riders appeared to be bowmen, skilled at shooting from a running horse.
+The Two Towers
+Loren Fetterman
+Printings:
+‣ Core Set #30
+‣ Revised Core Set #30
+‣ Riders of Rohan #8
+Tactics.
+No image
+1–20
+21–40
+41–60
+61–73
+73 cards
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

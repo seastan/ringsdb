@@ -145,7 +145,7 @@ class CustomPackController extends Controller {
     public function publishedListAction() {
         $packs = $this->getDoctrine()
             ->getRepository('AppBundle:UserCustomPack')
-            ->findBy(['isPublished' => true], ['createdAt' => 'ASC']);
+            ->findBy(['isPublished' => true], ['createdAt' => 'ASC', 'id' => 'ASC']);
 
         $result = [];
         foreach ($packs as $pack) {
@@ -222,7 +222,7 @@ class CustomPackController extends Controller {
 
         $packs = $this->getDoctrine()
             ->getRepository('AppBundle:UserCustomPack')
-            ->findBy(['user' => $user], ['createdAt' => 'ASC']);
+            ->findBy(['user' => $user], ['createdAt' => 'ASC', 'id' => 'ASC']);
 
         $result = [];
         foreach ($packs as $pack) {

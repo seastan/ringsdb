@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<deck game="a21af4e8-be4b-4cda-a6b6-534f9717391f">
+  <section name="Hero" shared="False">
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801200c9001">Aragorn</card>
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801200c9008">Eleanor</card>
+    <card qty="1" id="4823aae3-46ef-4a75-89f9-cbd3aa1b9008">Boromir</card>
+  </section>
+  <section name="Ally" shared="False">
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801200c9013">Guard of the Citadel</card>
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801200c9014">Faramir</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801200c9073">Gandalf</card>
+    <card qty="3" id="4823aae3-46ef-4a75-89f9-cbd3aa1b9016">Errand-rider</card>
+    <card qty="3" id="4823aae3-46ef-4a75-89f9-cbd3aa1b9010">Citadel Custodian</card>
+    <card qty="3" id="4823aae3-46ef-4a75-89f9-cbd3aa1b9015">Envoy of Pelargir</card>
+    <card qty="1" id="fd89bdbf-7475-4f3e-96fc-8f5315a90022">Denethor</card>
+    <card qty="3" id="fd89bdbf-7475-4f3e-96fc-8f5315a90026">Minas Tirith Lampwright</card>
+    <card qty="3" id="d4f034b0-2444-4b61-a249-8d86e8856f7c">Squire of the Citadel</card>
+    <card qty="3" id="1f28f098-09d4-43fa-8fba-eae551a5d4fe">Pelargir Ship Captain</card>
+  </section>
+  <section name="Attachment" shared="False">
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801200c9026">Steward of Gondor</card>
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801200c9027">Celebrían&#039;s Stone</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801201c9002">Dúnedain Mark</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801202c9008">Dúnedain Warning</card>
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801210c9018">Sword that was Broken</card>
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801212c9028">Path of Need</card>
+    <card qty="1" id="0ef9e385-b7e5-4676-a690-2dd8031aa8c8">Ring of Barahir</card>
+    <card qty="1" id="1e9a6c59-8dc7-4dc4-a5a4-f5f4f9ccdc55">Palantir</card>
+    <card qty="2" id="2f0a3f18-c84f-4458-b6f7-2e6be9acee6b">Visionary Leadership</card>
+  </section>
+  <section name="Event" shared="False">
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801200c9023">Sneak Attack</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801200c9048">Hasty Stroke</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801200c9050">A Test of Will</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801201c9003">Campfire Tales</card>
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801206c9006">Dawn Take You All</card>
+  </section>
+  <section name="Side Quest" shared="False">
+  </section>
+  <section name="Sideboard" shared="False">
+  </section>
+  <section name="Quest" shared="True" />
+  <section name="Encounter" shared="True" />
+  <section name="Special" shared="True" />
+  <section name="Setup" shared="True" />
+  <notes><![CDATA[]]></notes>
+</deck>

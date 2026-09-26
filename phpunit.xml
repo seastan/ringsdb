@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/6.5/phpunit.xsd"
+         bootstrap="phpunit.bootstrap.php"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutTodoAnnotatedTests="true"
+         verbose="true">
+    <testsuites>
+        <testsuite name="default">
+            <directory suffix="Test.php">src/AppBundle/Tests</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <env name="KERNEL_DIR" value="app"/>
+        <env name="SYMFONY_PHPUNIT_VERSION" value="6.5"/>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
+    </php>
+    <!-- Code coverage: lines executed by the tests are detected automatically (no @covers
+         annotations). Files never executed are listed at 0% without being loaded. -->
+    <filter>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">src</directory>
+            <exclude>
+                <directory>src/AppBundle/Tests</directory>
+                <directory>src/AppBundle/DataFixtures</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+</phpunit>

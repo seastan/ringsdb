@@ -1,0 +1,144 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Deck #1
+Dwarf Lore/Leadership/Tactics
+Deck #2
+Gondor/Dunedain Leadership/Spirit
+Heroes
+1x
+Gimli
+1x
+Dáin Ironfoot
+1x
+Bifur
+1x
+Aragorn
+1x
+Eleanor
+1x
+Boromir
+Draw Decks
+3x
+Veteran Axehand
+3x
+Dwarven Axe
+3x
+Erebor Hammersmith
+3x
+Miner of the Iron Hills
+1x
+Longbeard Map-Maker
+3x
+Narvi's Belt
+3x
+Durin's Song
+3x
+Veteran of Nanduhirion
+3x
+Dwarrowdelf Axe
+3x
+Khazâd! Khazâd!
+3x
+Erebor Record Keeper
+3x
+Lure of Moria
+1x
+Legacy of Durin
+3x
+Erebor Battle Master
+3x
+Ring Mail
+3x
+Longbeard Elder
+3x
+We Are Not Idle
+1x
+Hardy Leadership
+3x
+Ered Nimrais Prospector
+3x
+Guard of the Citadel
+1x
+Faramir
+3x
+Sneak Attack
+3x
+Steward of Gondor
+1x
+Celebrían's Stone
+3x
+Hasty Stroke
+3x
+A Test of Will
+3x
+Gandalf
+3x
+Dúnedain Mark
+3x
+Campfire Tales
+3x
+Dúnedain Warning
+1x
+Dawn Take You All
+1x
+Sword that was Broken
+1x
+Path of Need
+3x
+Errand-rider
+3x
+Citadel Custodian
+3x
+Envoy of Pelargir
+1x
+Ring of Barahir
+1x
+Denethor
+3x
+Minas Tirith Lampwright
+1x
+Palantir
+3x
+Squire of the Citadel
+3x
+Pelargir Ship Captain
+2x
+Visionary Leadership
+Sideboard
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "name": "Test Custom Pack",
+        "owner_name": "test",
+        "cards": [
+            {
+                "card_code": "01001",
+                "card_name": "Aragorn",
+                "sphere_code": "leadership",
+                "type_name": "Hero",
+                "quantity": 1
+            },
+            {
+                "card_code": "01016",
+                "card_name": "Snowbourn Scout",
+                "sphere_code": "leadership",
+                "type_name": "Ally",
+                "quantity": 3
+            }
+        ]
+    }
+]

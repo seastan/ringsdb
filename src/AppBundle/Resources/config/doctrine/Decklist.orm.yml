@@ -165,3 +165,6 @@ AppBundle\Entity\Decklist:
             type: smallint
             nullable: false
             column: starting_threat
+    indexes:
+        idx_decklist_date_creation:
+            columns: [date_creation]

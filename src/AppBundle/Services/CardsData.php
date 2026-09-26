@@ -414,7 +414,7 @@ class CardsData {
 	 *
 	 * @param \AppBundle\Entity\Card $card
 	 * @param string $api
-	 * @return multitype:multitype: string number mixed NULL unknown
+	 * @return mixed string number mixed NULL unknown
 	 */
 	public function getCardInfo($card, $api = false) {
 		$cardinfo = [];
@@ -617,7 +617,7 @@ class CardsData {
 	}
 
 	public function get_reviews($card) {
-		$reviews = $this->doctrine->getRepository('AppBundle:Review')->findBy(['card' => $card], ['nbVotes' => 'DESC']);
+		$reviews = $this->doctrine->getRepository('AppBundle:Review')->findBy(['card' => $card], ['nbVotes' => 'DESC', 'id' => 'ASC']);
 
 		$response = $reviews;
 

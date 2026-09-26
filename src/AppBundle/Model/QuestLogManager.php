@@ -5,12 +5,10 @@ namespace AppBundle\Model;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
-use AppBundle\Services\DeckInterface;
 use Psr\Log\LoggerInterface;
 use AppBundle\Entity\User;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use AppBundle\Entity\Sphere;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
@@ -88,6 +86,9 @@ class QuestLogManager {
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.datePublish), 2)) AS HIDDEN popularity');
         $qb->orderBy('popularity', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -95,6 +96,9 @@ class QuestLogManager {
         $qb = $this->getQueryBuilder();
 
         $qb->orderBy('d.datePublish', 'DESC');
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -104,6 +108,9 @@ class QuestLogManager {
 
         $qb->andWhere('d.nbComments > 0');
         $qb->orderBy('d.dateLastComment', 'DESC');
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -116,6 +123,9 @@ class QuestLogManager {
         $qb->setParameter('user', $user);
         $qb->orderBy('d.datePublish', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -126,6 +136,9 @@ class QuestLogManager {
         $qb->setParameter('user', $user);
         $qb->orderBy('d.datePublish', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -135,6 +148,9 @@ class QuestLogManager {
         $qb->andWhere('d.nbVotes > 10');
         $qb->orderBy('d.nbVotes', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -143,7 +159,10 @@ class QuestLogManager {
 
         $qb->addSelect('(SELECT count(c) FROM AppBundle:QuestlogComment c WHERE c.questlog=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
         $qb->orderBy('nbRecentComments', 'DESC');
-        $qb->orderBy('d.nbComments', 'DESC');
+        $qb->addOrderBy('d.nbComments', 'DESC');
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -261,6 +280,9 @@ class QuestLogManager {
                 $qb->orderBy('popularity', 'DESC');
                 break;
         }
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }

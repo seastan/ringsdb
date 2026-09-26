@@ -1,0 +1,271 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+New Deck
+Import Deck
+Copy/paste
+File
+Archive
+With Selection
+Build
+Edit decks
+questting
+Create a Fellowship
+Log a Quest
+Play on DragnCards
+Compare
+Compare two decks
+Tags
+Add one or more tags
+Remove one or more tags
+Clear all tags
+Download
+Download as Text files
+Download as Octgn files
+Delete
+Delete all selected decks
+Cards used
+Cards not used
+My private decks
+(4/500 slots)
+Dwarf Lore/Leadership/Tactics
+1.1
+tactics
+leadership
+lore
+01004
+01028
+01041
+01059
+01061
+02032
+02116
+03002
+03003
+03004
+03006
+03007
+03008
+03011
+04030
+04061
+04079
+04080
+04102
+04129
+04130
+06141
+cards up to
+The Morgul Vale
+Gimli
+(Core)
+Dáin Ironfoot
+(RtM)
+Bifur
+(KD)
+Aug 16
+Gondor/Dunedain Leadership/Spirit
+1.1
+leadership
+spirit
+01001
+01008
+01013
+01014
+01023
+01026
+01027
+01048
+01050
+01073
+02002
+02003
+02026
+02118
+04055
+04103
+05002
+05003
+05004
+05018
+06007
+06057
+06061
+06090
+06108
+06135
+06136
+cards up to
+The Morgul Vale
+Aragorn
+(Core)
+Eleanor
+(Core)
+Boromir
+(HoN)
+Aug 16
+Noldor/Rohan Lore/Spirit
+1.1
+spirit
+lore
+01007
+01057
+01062
+01066
+01070
+02030
+02033
+02057
+02079
+02100
+02121
+02123
+03009
+04034
+04058
+04059
+04083
+04101
+04106
+04107
+04110
+04128
+04134
+04137
+05017
+cards up to
+Heirs of Númenor
+Éowyn
+(Core)
+Glorfindel
+(FoS)
+Elrond
+(SaF)
+Aug 16
+Gondor/Rohan/Silvan Tactics
+1.1
+tactics
+01005
+01029
+01030
+01034
+01040
+01042
+02004
+02005
+02098
+02119
+04031
+04057
+04131
+05001
+05007
+05008
+05009
+06005
+06084
+06085
+06110
+06134
+06137
+cards up to
+The Morgul Vale
+Legolas
+(Core)
+Beregond
+(HoN)
+Théoden
+(TMV)
+Aug 16
+×
+Upload deck file
+File
+File type
+auto
+OCTGN
+Text
+Upload
+Cancel
+×
+Delete deck
+Are you sure that you want to delete the deck
+?
+Yes, delete
+Cancel
+×
+Delete decks
+Are you sure that you want to delete all the selected decks?
+Yes, delete
+Cancel
+×
+Export deck
+×
+Odds Calculator
+Number of cards in deck
+Number of
+desired
+cards in deck
+Number of cards drawn
+Number of
+desired
+cards in draw (at least)
+Probability of such an outcome
+%
+×
+Add one or more tags
+Please enter the list of tags, separated by spaces
+Add
+Cancel
+×
+Delete one or more tags
+Please enter the list of tags you want to remove, separated by spaces
+Remove
+Cancel
+×
+Clear all tags
+Are you sure you want to clear all tags from the selected decks?
+Yes, clear
+Cancel
+×
+Decks comparison
+×
+Upload deck archive
+File
+Upload
+Cancel
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

@@ -1,0 +1,822 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Search
+Sort by Name
+Sort by Set
+Sort by Sphere
+Sort by Type
+Sort by Cost/Threat
+Sort by Willpower
+Sort by Attack
+Sort by Defense
+Sort by Hit Points
+View as a Checklist
+View as a Spoiler
+View as Full Cards
+View as Scans only
+View as Simple List
+1–73
+73 cards
+Name
+Sphere
+Type
+Cost
+Traits
+Sets
+Gimli
+Tactics
+Hero
+11
+2
+2
+2
+5
+Dwarf. Noble. Warrior.
+Core
+·
+RevCore
+Legolas
+Tactics
+Hero
+9
+1
+3
+1
+4
+Noble. Silvan. Warrior.
+Core
+·
+RevCore
+Thalin
+Tactics
+Hero
+9
+1
+2
+2
+4
+Dwarf. Warrior.
+Core
+·
+RevCore
+Beorn
+Tactics
+Ally
+6
+1
+3
+3
+6
+Beorning. Warrior.
+Core
+·
+RevCore
+Gondorian Spearman
+Tactics
+Ally
+2
+0
+1
+1
+1
+Gondor. Warrior.
+Core
+·
+RevCore
+·
+DoG
+Horseback Archer
+Tactics
+Ally
+3
+0
+2
+1
+2
+Rohan. Archer.
+Core
+·
+RevCore
+·
+RoR
+Veteran Axehand
+Tactics
+Ally
+2
+0
+2
+1
+2
+Dwarf. Warrior.
+Core
+·
+RevCore
+Blade of Gondolin
+Tactics
+Attachment
+1
+Item. Weapon.
+Core
+·
+Starter
+·
+RevCore
+Citadel Plate
+Tactics
+Attachment
+4
+Item. Armor.
+Core
+·
+RevCore
+Dwarven Axe
+Tactics
+Attachment
+2
+Item. Weapon.
+Core
+·
+RevCore
+Horn of Gondor
+Tactics
+Attachment
+1
+Item. Artifact.
+Core
+·
+Starter
+·
+RevCore
+Blade Mastery
+Tactics
+Event
+1
+Core
+·
+RevCore
+Feint
+Tactics
+Event
+1
+Core
+·
+Starter
+·
+RevCore
+·
+DoG
+·
+RoR
+Quick Strike
+Tactics
+Event
+1
+Core
+·
+Starter
+·
+RevCore
+Rain of Arrows
+Tactics
+Event
+1
+Core
+·
+RevCore
+Stand Together
+Tactics
+Event
+0
+Core
+·
+RevCore
+Swift Strike
+Tactics
+Event
+2
+Core
+·
+RevCore
+Thicket of Spears
+Tactics
+Event
+3
+Core
+·
+RevCore
+Dúnhere
+Spirit
+Hero
+8
+1
+2
+1
+4
+Rohan. Warrior.
+Core
+·
+RevCore
+Eleanor
+Spirit
+Hero
+7
+1
+1
+2
+3
+Gondor. Noble.
+Core
+·
+RevCore
+Éowyn
+Spirit
+Hero
+9
+4
+1
+1
+3
+Noble. Rohan.
+Core
+·
+RevCore
+Lórien Guide
+Spirit
+Ally
+3
+1
+1
+0
+2
+Silvan. Scout.
+Core
+·
+RevCore
+Northern Tracker
+Spirit
+Ally
+4
+1
+2
+2
+3
+Dúnedain. Ranger.
+Core
+·
+RevCore
+Wandering Took
+Spirit
+Ally
+2
+1
+1
+1
+2
+Hobbit.
+Core
+·
+RevCore
+Power in the Earth
+Spirit
+Attachment
+1
+Condition.
+Core
+·
+RevCore
+The Favor of the Lady
+Spirit
+Attachment
+2
+Condition.
+Core
+·
+RevCore
+Unexpected Courage
+Spirit
+Attachment
+2
+Condition.
+Core
+·
+Starter
+·
+RevCore
+A Light in the Dark
+Spirit
+Event
+2
+Core
+·
+RevCore
+A Test of Will
+Spirit
+Event
+1
+Core
+·
+Starter
+·
+RevCore
+·
+EoL
+·
+RoR
+Dwarven Tomb
+Spirit
+Event
+1
+Core
+·
+Starter
+·
+RevCore
+Fortune or Fate
+Spirit
+Event
+5
+Core
+·
+RevCore
+Hasty Stroke
+Spirit
+Event
+1
+Core
+·
+Starter
+·
+RevCore
+Stand and Fight
+Spirit
+Event
+X
+Core
+·
+RevCore
+Strength of Will
+Spirit
+Event
+0
+Core
+·
+RevCore
+The Galadhrim's Greeting
+Spirit
+Event
+3
+Core
+·
+RevCore
+Will of the West
+Spirit
+Event
+1
+Core
+·
+RevCore
+Aragorn
+Leadership
+Hero
+12
+2
+3
+2
+5
+Dúnedain. Noble. Ranger.
+Core
+·
+Starter
+·
+RevCore
+Glóin
+Leadership
+Hero
+9
+2
+2
+1
+4
+Dwarf. Noble.
+Core
+·
+RevCore
+Théodred
+Leadership
+Hero
+8
+1
+2
+1
+4
+Noble. Rohan. Warrior.
+Core
+·
+RevCore
+Brok Ironfist
+Leadership
+Ally
+6
+2
+2
+1
+4
+Dwarf. Warrior.
+Core
+·
+RevCore
+Faramir
+Leadership
+Ally
+4
+2
+1
+2
+3
+Gondor. Noble. Ranger.
+Core
+·
+Starter
+·
+RevCore
+·
+DoG
+Guard of the Citadel
+Leadership
+Ally
+2
+1
+1
+0
+2
+Gondor. Warrior.
+Core
+·
+RevCore
+Longbeard Orc Slayer
+Leadership
+Ally
+4
+0
+2
+1
+3
+Dwarf. Warrior.
+Core
+·
+RevCore
+Silverlode Archer
+Leadership
+Ally
+3
+1
+2
+0
+1
+Archer. Silvan.
+Core
+·
+Starter
+·
+RevCore
+Snowbourn Scout
+Leadership
+Ally
+1
+0
+0
+1
+1
+Rohan. Scout.
+Core
+·
+RevCore
+Son of Arnor
+Leadership
+Ally
+3
+0
+2
+0
+2
+Dúnedain.
+Core
+·
+RevCore
+Celebrían's Stone
+Leadership
+Attachment
+2
+Artifact. Item.
+Core
+·
+Starter
+·
+RevCore
+Steward of Gondor
+Leadership
+Attachment
+2
+Gondor. Title.
+Core
+·
+Starter
+·
+RevCore
+·
+DoG
+Common Cause
+Leadership
+Event
+0
+Core
+·
+RevCore
+Ever Vigilant
+Leadership
+Event
+1
+Core
+·
+Starter
+·
+RevCore
+For Gondor!
+Leadership
+Event
+2
+Core
+·
+RevCore
+Grim Resolve
+Leadership
+Event
+5
+Core
+·
+Starter
+·
+RevCore
+Sneak Attack
+Leadership
+Event
+1
+Core
+·
+Starter
+·
+RevCore
+Valiant Sacrifice
+Leadership
+Event
+1
+Core
+·
+RevCore
+·
+DoG
+Beravor
+Lore
+Hero
+10
+2
+2
+2
+4
+Dúnedain. Ranger.
+Core
+·
+RevCore
+Denethor
+Lore
+Hero
+8
+1
+1
+3
+3
+Gondor. Noble. Steward.
+Core
+·
+RevCore
+Glorfindel
+Lore
+Hero
+12
+3
+3
+1
+5
+Noble. Noldor. Warrior.
+Core
+·
+Starter
+·
+RevCore
+Daughter of the Nimrodel
+Lore
+Ally
+3
+1
+0
+0
+1
+Silvan.
+Core
+·
+RevCore
+Erebor Hammersmith
+Lore
+Ally
+2
+1
+1
+1
+3
+Dwarf. Craftsman.
+Core
+·
+Starter
+·
+RevCore
+·
+DoD
+Gléowine
+Lore
+Ally
+2
+1
+0
+0
+2
+Minstrel. Rohan.
+Core
+·
+RevCore
+Henamarth Riversong
+Lore
+Ally
+1
+1
+1
+0
+1
+Silvan.
+Core
+·
+Starter
+·
+RevCore
+·
+EoL
+Miner of the Iron Hills
+Lore
+Ally
+2
+0
+1
+1
+2
+Dwarf.
+Core
+·
+RevCore
+·
+DoD
+Dark Knowledge
+Lore
+Attachment
+1
+Condition.
+Core
+·
+RevCore
+Forest Snare
+Lore
+Attachment
+3
+Item. Trap.
+Core
+·
+RevCore
+Protector of Lórien
+Lore
+Attachment
+1
+Title.
+Core
+·
+RevCore
+Self Preservation
+Lore
+Attachment
+3
+Skill.
+Core
+·
+RevCore
+Beorn's Hospitality
+Lore
+Event
+5
+Core
+·
+RevCore
+Gandalf's Search
+Lore
+Event
+X
+Core
+·
+RevCore
+Lore of Imladris
+Lore
+Event
+2
+Core
+·
+RevCore
+Lórien's Wealth
+Lore
+Event
+3
+Core
+·
+RevCore
+Radagast's Cunning
+Lore
+Event
+1
+Core
+·
+RevCore
+Secret Paths
+Lore
+Event
+1
+Core
+·
+Starter
+·
+RevCore
+Gandalf
+Neutral
+Ally
+5
+4
+4
+4
+4
+Istari.
+Core
+·
+Starter
+·
+RevCore
+·
+RoR
+·
+EoL
+·
+DoD
+·
+DoG
+1–73
+73 cards
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

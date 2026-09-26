@@ -86,6 +86,7 @@ class DefaultController extends Controller {
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
         $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'),0));
         $qb->orderBy('popularity', 'DESC');
+        $qb->addOrderBy('d.id', 'DESC');
         $paginator = new Paginator($qb->getQuery(), $fetchJoinCollection = false);
         $decklists_trending = iterator_to_array($paginator->getIterator());
 
@@ -100,6 +101,7 @@ class DefaultController extends Controller {
         $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'),0));
         $qb->andWhere('d.isPublic = TRUE');
         $qb->orderBy('popularity', 'DESC');
+        $qb->addOrderBy('d.id', 'DESC');
         $paginator = new Paginator($qb->getQuery(), $fetchJoinCollection = false);
         $fellowships_trending = iterator_to_array($paginator->getIterator());
 
@@ -116,6 +118,7 @@ class DefaultController extends Controller {
 		$qb->distinct();
         $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'),0));
         $qb->orderBy('d.dateCreation', 'DESC');
+        $qb->addOrderBy('d.id', 'DESC');
         $paginator = new Paginator($qb->getQuery(), $fetchJoinCollection = false);
         $decklists_new_temp = iterator_to_array($paginator->getIterator());
         $decklists_new = [];
@@ -138,6 +141,7 @@ class DefaultController extends Controller {
         $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'),0));
         $qb->andWhere('d.isPublic = TRUE');
         $qb->orderBy('d.dateCreation', 'DESC');
+        $qb->addOrderBy('d.id', 'DESC');
         $paginator = new Paginator($qb->getQuery(), $fetchJoinCollection = false);
         $fellowships_new_temp = iterator_to_array($paginator->getIterator());
         $fellowships_new = [];
@@ -213,7 +217,7 @@ class DefaultController extends Controller {
             $all_comments[] = $comment;
         }
         // Get recent card reviews
-        $dql = "SELECT DISTINCT r FROM AppBundle:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC";
+        $dql = "SELECT DISTINCT r FROM AppBundle:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC, r.id DESC";
         $query = $em->createQuery($dql)->setMaxResults($num_comments);
         $paginator = new Paginator($query, false);
         $reviews_recent = iterator_to_array($paginator->getIterator());
@@ -231,7 +235,7 @@ class DefaultController extends Controller {
         }
         // Recent review comments
         $em = $this->getDoctrine()->getManager();
-        $dql = "SELECT DISTINCT r FROM AppBundle:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateLastComment DESC";
+        $dql = "SELECT DISTINCT r FROM AppBundle:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateLastComment DESC, r.id DESC";
         $query = $em->createQuery($dql)->setMaxResults($num_comments);
         $paginator = new Paginator($query, false);
         $reviews_recent_discussion = iterator_to_array($paginator->getIterator());

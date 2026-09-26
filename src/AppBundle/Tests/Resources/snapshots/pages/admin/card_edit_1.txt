@@ -1,0 +1,85 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Index
+Admin
+admin_card_edit
+Card edit
+Position
+Deck limit
+Code
+Type
+Hero
+Ally
+Attachment
+Event
+Campaign
+Player Side Quest
+Contract
+Player Objective
+Sphere
+Tactics
+Spirit
+Leadership
+Lore
+Neutral
+Baggins
+Fellowship
+Name
+Traits
+Text
+Sentinel. <b>Response:</b> After Aragorn commits to a quest, spend 1 resource from his resource pool to ready him.
+Flavor
+"I am Aragorn son of Arathorn; and if by life or death I can save you, I will." <cite>The Fellowship of the Ring</cite>
+Cost
+Threat
+Willpower
+Attack
+Defense
+Health
+Victory
+Quest
+Is unique
+Has errata
+Image File
+Edit
+Back to the list
+Manage printings (pack, quantity, illustrator, OCTGN ID)
+Delete
+Force Delete
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

@@ -96,9 +96,9 @@ class QuestLogController extends Controller {
 
             /* @var $questlogs \AppBundle\Entity\Questlog[] */
             if ($show_all) {
-                $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user], ['dateCreation' => 'DESC']);
+                $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
             } else {
-                $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => 'DESC']);
+                $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => 'DESC', 'id' => 'DESC']);
             }
             $this->setSnapshots($questlogs);
 
@@ -163,7 +163,7 @@ class QuestLogController extends Controller {
         }
 
         /* @var $questlogs \AppBundle\Entity\Questlog[] */
-        $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user], ['dateCreation' => 'DESC']);
+        $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
         $this->setSnapshots($questlogs);
 
         return $this->render('AppBundle:QuestLog:my-questlogs.html.twig', [
@@ -926,7 +926,11 @@ class QuestLogController extends Controller {
             throw new AccessDeniedHttpException("You don't have access to this questlog.");
         }
 
-        $file = tempnam("tmp", "zip");
+        $tmpDir = $this->getParameter('kernel.cache_dir');
+        $file = tempnam($tmpDir, "zip");
+        if ($file === false) {
+            throw new \RuntimeException("Cannot create a temporary file in $tmpDir");
+        }
         $zip = new \ZipArchive();
         $res = $zip->open($file, \ZipArchive::OVERWRITE);
 

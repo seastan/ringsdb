@@ -2,11 +2,16 @@
 
 namespace AppBundle\Services;
 
-use Symfony\Component\Debug\Exception\ContextErrorException;
-
 class Texts {
-    public function __construct($root_dir) {
-        $config = \HTMLPurifier_Config::create(['Cache.SerializerPath' => $root_dir]);
+    /**
+     * @param string $cache_dir where HTMLPurifier caches its definitions
+     */
+    public function __construct($cache_dir) {
+        // HTMLPurifier does not create its base cache directory, and warns if it is missing
+        if (!is_dir($cache_dir)) {
+            mkdir($cache_dir, 0775, true);
+        }
+        $config = \HTMLPurifier_Config::create(['Cache.SerializerPath' => $cache_dir]);
         $def = $config->getHTMLDefinition(true);
         $def->addAttribute('a', 'data-code', 'Text');
         $this->purifier_service = new \HTMLPurifier($config);
@@ -58,7 +63,7 @@ class Texts {
     /**
      * removes any dangerous code from a HTML string
      *
-     * @param unknown $string
+     * @param mixed $string
      * @return string
      */
     public function purify($string) {
@@ -68,7 +73,7 @@ class Texts {
     /**
      * turns a Markdown string into a HTML string
      *
-     * @param unknown $string
+     * @param mixed $string
      * @return string
      */
     public function transform($string) {
@@ -78,7 +83,7 @@ class Texts {
     /**
      * adds class="img-responsive" to every <img> tag
      *
-     * @param unknown $string
+     * @param mixed $string
      * @return string
      */
     public function img_responsive($string) {
@@ -93,11 +98,9 @@ class Texts {
      */
     public function slugify($filename) {
         $filename = preg_replace('[^\w\-]', '-', $filename);
-        try {
-            $filename = iconv('utf-8', 'us-ascii//TRANSLIT', $filename);
-        } catch (ContextErrorException $e)  {
-            $filename = iconv('utf-8', 'us-ascii//IGNORE', $filename);
-        }
+        // //TRANSLIT is not supported by every iconv implementation (e.g. musl on Alpine)
+        $ascii = @iconv('utf-8', 'us-ascii//TRANSLIT', $filename);
+        $filename = $ascii !== false ? $ascii : preg_replace('/[^\x00-\x7F]/', '', $filename);
         $filename = preg_replace('/[^\w\-]/', '', $filename);
         $filename = preg_replace('/\-+/', '-', $filename);
         $filename = trim($filename, '-');

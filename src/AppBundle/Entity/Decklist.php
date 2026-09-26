@@ -933,4 +933,22 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
             return $k->getQuestlog()->getIsPublic();
         });
     }
+
+    public function getContent()
+    {
+        $content = [
+            'main' => [],
+            'side' => []
+        ];
+
+        foreach ($this->getSlots() as $slot) {
+            $content['main'][$slot->getCard()->getCode()] = $slot->getQuantity();
+        }
+
+        foreach ($this->getSideslots() as $slot) {
+            $content['side'][$slot->getCard()->getCode()] = $slot->getQuantity();
+        }
+
+        return $content;
+    }
 }

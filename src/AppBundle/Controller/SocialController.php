@@ -147,6 +147,9 @@ class SocialController extends Controller {
 
         /* @var $deck \AppBundle\Entity\Deck */
         $deck = $this->getDoctrine()->getRepository('AppBundle:Deck')->find($deck_id);
+        if (!$deck) {
+            throw new BadRequestHttpException("Invalid deck_id.");
+        }
         if ($user->getId() !== $deck->getUser()->getId()) {
             throw $this->createAccessDeniedException("Access denied to this object.");
         }
@@ -546,7 +549,7 @@ class SocialController extends Controller {
 
         $commenters[] = $decklist->getUser()->getUsername();
 
-        $versions = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->findBy(['parent' => $decklist->getParent()], ['version' => 'DESC']);
+        $versions = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->findBy(['parent' => $decklist->getParent()], ['version' => 'DESC', 'id' => 'DESC']);
 
         return $this->render('AppBundle:Decklist:decklist.html.twig', [
             'pagetitle' => $decklist->getName(),
@@ -621,9 +624,12 @@ class SocialController extends Controller {
 
         $decklist_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         $decklist = $this->getDoctrine()->getRepository('AppBundle:Decklist')->find($decklist_id);
+        if (!$decklist instanceof Decklist) {
+            throw new BadRequestHttpException('Wrong decklist id');
+        }
 
         $comment_text = trim($request->get('comment'));
-        if ($decklist && !empty($comment_text)) {
+        if (!empty($comment_text)) {
             $comment_text = preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $comment_text);
 
             $mentionned_usernames = [];
@@ -915,7 +921,7 @@ class SocialController extends Controller {
 				FROM comment c
 				JOIN decklist d ON c.decklist_id = d.id
 				WHERE c.user_id = ?
-				ORDER BY date_creation DESC
+				ORDER BY c.date_creation DESC, c.id DESC
 				LIMIT $start, $limit", [
             $user->getId()
         ])->fetchAll(\PDO::FETCH_ASSOC);
@@ -984,7 +990,7 @@ class SocialController extends Controller {
 				FROM comment c
 				JOIN decklist d on c.decklist_id = d.id
 				JOIN user u on c.user_id = u.id
-				ORDER BY date_creation DESC
+				ORDER BY c.date_creation DESC, c.id DESC
 				LIMIT $start, $limit", [])->fetchAll(\PDO::FETCH_ASSOC);
 
         $maxcount = $dbh->executeQuery("SELECT FOUND_ROWS()")->fetch(\PDO::FETCH_NUM)[0];
