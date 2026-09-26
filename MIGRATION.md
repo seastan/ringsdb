@@ -400,8 +400,35 @@ control (anonymous redirected to the login page, users `403`, also on write rout
 GET page as the fixture `admin` (ROLE_ADMIN): text snapshots in
 `src/AppBundle/Tests/Resources/snapshots/pages/admin/`, row counts for the card and card
 printing lists (1300+ rows), JSON snapshots for the statistics (`?month=2015-08`, in
-`snapshots/api/admin/`). Not covered yet: the write routes (CRUD, user moderation, command,
-Excel/CSV imports).
+`snapshots/api/admin/`).
+
+The write forms are covered by `src/AppBundle/Tests/Controller/AdminWriteTest.php`, on records
+created by the test only: the generated CRUD of the 8 reference entities (create → show,
+edit → edit, delete → list, through the real forms, CSRF tokens included), scenario encounters,
+card force delete, user search, comment hide/delete, decklist delete. Not covered yet: the card
+image upload (unused, see below), the scenario import command
+(`/admin/command/`, downloads from hallofbeorn.com unless a custom JSON is given) and the
+Excel / CSV imports.
+
+### Pending: import tests, waiting for sample files
+
+To be written once representative files are available (to be stored under
+`src/AppBundle/Tests/Resources/fixtures/`):
+
+- **CSV import** (`POST /admin/csv/upload`, `CSVController`): fields `code`, `old_code`, `name`
+  (the pack) and the file `upfile`. Header line + one card per line, in the format produced by
+  `BeornJSONtoRingsDBcsv.py` from a Hall of Beorn JSON export: `pack, type, sphere, position,
+  code, name, traits, text, flavor, isUnique, cost, threat, willpower, attack, defense, health,
+  victory, quest, quantity, deckLimit, illustrator, octgnid, hasErrata`. Creates or renames the
+  pack (new packs go to the `ALeP` cycle, or the last one), creates or updates cards and
+  printings. Needed: a real CSV for a new pack, and one updating an existing pack.
+- **Excel import** (`POST /admin/excel/upload`, `ExcelController`, PHPExcel): file `upfile`,
+  first row = column names, then one card per row. Answers "N cards changed or added". Needed: a
+  real file (ideally one produced by `/admin/excel/download`, to test the round trip).
+- **Scenario import** (`POST /admin/command/`, `command=scenario`,
+  `ScrapBeornScenarioDataCommand`): downloads `http://hallofbeorn.com/LotR/ScenarioDetails/...`
+  unless `customjson` is given. Needed: a saved Hall of Beorn scenario JSON, so the test never
+  calls the network.
 
 ### To look at during the migration
 
@@ -423,6 +450,20 @@ Excel/CSV imports).
   `/admin/comment/delete/{id}`.
 - The generated CRUD controllers accept any method on `new`/`edit`/`show`; `/admin/command/`
   runs `ScrapBeornScenarioDataCommand` from a form.
+- To be removed (probably unused in production, inherited from ThronesDB): the card image upload
+  of the admin card form (unmapped `file` field in `CardType`, file move in
+  `CardController::updateAction`). It writes `web/bundles/app/images/cards/<code>.png`, but the
+  site reads card images from `web/bundles/cards/<code>.png` (and `<image_code>.png` for
+  printings, `CardsData`): uploaded images are never displayed. It also keeps the `.png` name
+  whatever the actual format. Not tested.
+- The generated CRUD controllers use the Symfony 2 form API (`createForm(new XxxType())`,
+  `$form->bind($request)`, `'entity'` / `'checkbox'` type names, `getName()`), which is gone in
+  recent versions (`createForm(XxxType::class)`, `handleRequest()`, FQCN types,
+  `getBlockPrefix()`).
+- Deleting reference data still in use (e.g. a cycle with packs, a card in decks) fails on the
+  foreign keys with a `500` instead of an error message. `Card` has a "force delete" that
+  removes its slots, printings and reviews, with SQL built by concatenation (the id comes from
+  the route, `\d+` not enforced).
 
 ## Stable order of lists
 
