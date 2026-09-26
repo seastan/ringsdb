@@ -45,6 +45,7 @@ class LoadFellowshipData extends AbstractFixture implements ContainerAwareInterf
         $fellowship->setDateCreation(new \DateTime('2015-08-16'));
         $fellowship->setDateUpdate(new \DateTime('2015-08-16'));
         $fellowship->setDateLastComment(new \DateTime('2015-08-16'));
+        $fellowship->setDatePublish(new \DateTime('2015-08-16'));
 
         for($i = 1; $i < 5; $i++) {
             /** @var Deck $deck */

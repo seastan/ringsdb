@@ -261,8 +261,9 @@ fixture decks: the tests restore them in `tearDown()`.
   `empty($fellowship->getDecks())`, and a Doctrine collection object is never `empty()`.
 - No CSRF protection on `/fellowship/save`, `/fellowship/publish`, `/fellowship/delete`,
   `/fellowship/delete_list`.
-- The fixture fellowship 1 is public but references decks (not decklists) and has no
-  `date_publish`: a state the application itself does not produce.
+- The fixture fellowship 1 is public but references decks (not decklists): a state the
+  application itself does not produce. (It had no `date_publish` either, which Twig displayed as
+  the current date: fixed in `LoadFellowshipData`.)
 
 ## Private API (`/api/private/*`)
 
@@ -483,9 +484,69 @@ comment lists and decklist versions (`SocialController`), custom packs, and
   (`testHotTopicsFavourRecentComments`, decklists only: the fixtures have a single fellowship
   and a single quest log).
 
+## Profile
+
+Covered by `src/AppBundle/Tests/Controller/UserProfileTest.php`: the site's profile form
+(`/user/profile_edit` → `/user/profile_save`) and the FOSUserBundle forms (account
+`/profile/edit`, password change `/profile/change-password`, password reset `/resetting/*`),
+which have to be reimplemented when FOSUserBundle is removed.
+
+### Current behaviour pinned by the tests
+
+- Profile form: username (unique, checked), email, resume (tags stripped by
+  `FILTER_SANITIZE_STRING`), sphere color, notification and sharing checkboxes (unticked =
+  false), dark mode (also stored in a non-HttpOnly `dark_mode` cookie for 1 year, to apply the
+  theme before the page is loaded). Renaming updates `username_canonical` (FOSUser listener):
+  the user logs in with the new name. Redirects to the form with a flash message.
+- FOSUser account and password forms require the current password ("The entered password is
+  invalid."); password confirmation must match.
+- Password reset: an email with a `/resetting/reset/{token}` link; a second request is ignored
+  while the first one is recent (`retry_ttl`); no hint when the user does not exist; the token
+  is single-use, an unknown or used token is a `404`; after the reset the user is logged in.
+
+### To look at during the migration
+
+- The site's profile form validates neither the email format nor its uniqueness: a duplicated
+  email is only stopped by the database's unique index (`500`).
+- No CSRF protection on `/user/profile_save`.
+
+## Collection
+
+Covered by `src/AppBundle/Tests/Controller/CollectionTest.php`.
+
+### Current behaviour pinned by the tests
+
+- Owned packs (`/collection/packs/save`): `selected-packs`, a list of `id` / `id:count` tokens,
+  stored as is in `user.owned_packs` (anything else than digits, `:`, `,` and `-` is refused
+  with a plain-text "Invalid pack selection."). The collection page is rendered directly
+  (forward, no redirect).
+- Art preferences (`/collection/art/save`, AJAX from the card modal): `{card code: pack code}`
+  JSON in `user.art_preferences`, `default` or empty removes the entry, `null` when empty.
+- Custom packs: create / edit (cards posted as `cards_json`; unknown cards, duplicates and
+  quantities outside 1..9 are skipped; the code is `custom_<id>_<6 hex>`), enable / publish
+  toggles, delete, copy of a published pack by another user (JSON). Another user's pack is a
+  `404`; the name is required.
+- Flash messages are displayed by JavaScript (`app.ui.insert_alert_message(...)` in
+  `layout.html.twig`), so they are JSON-encoded in the page source.
+
+### To look at during the migration
+
+- No CSRF protection on the collection and custom pack forms.
+
+## After the migration
+
+- The single text exports (`BuilderController::textexportAction`,
+  `SocialController` decklist text export) convert the line endings to CRLF
+  (`str_replace("\n", "\r\n", ...)`), the zipped exports do not. Keep CRLF until the migration
+  is done, then switch to LF (and regenerate `downloads/deck_1.txt` and
+  `downloads/decklist_1.txt`).
+- `.gitattributes` stores the test snapshots without line ending conversion (`-text`), so that
+  the byte-for-byte comparisons do not depend on each developer's `core.autocrlf`.
+
 ## Tests and time
 
-Dates written during the tests come from `new \DateTime()` (controllers, `DecklistFactory`) and
+The home page's "Daily Challenge" is picked with `srand(<day number>)` (`DefaultController`): it
+is masked in the home page snapshots. Dates written during the tests come from `new \DateTime()` (controllers, `DecklistFactory`) and
 from Gedmo timestampable, so the tests restore them in `tearDown()` (decklists, fixture decks)
 and only check them loosely. Plan: once on a recent Symfony, use `Symfony\Component\Clock`
 (`ClockInterface`, `MockClock` in tests) everywhere, including for the timestampable fields, to

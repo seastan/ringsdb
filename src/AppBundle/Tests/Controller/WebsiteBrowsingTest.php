@@ -35,7 +35,9 @@ class WebsiteBrowsingTest extends WebTestCase {
         $this->assertSame(200, $response->getStatusCode(), "GET $uri");
         $this->assertSame('text/html; charset=UTF-8', $response->headers->get('Content-Type'));
         $this->assertSame($title, trim($crawler->filter('title')->text()));
-        $this->assertMatchesSnapshot($snapshot . '.txt', self::pageText($crawler));
+        // the home page's daily challenge is picked with srand(<day number>)
+        $text = preg_replace('/^Daily Challenge: .*$/m', 'Daily Challenge: <masked, changes every day>', self::pageText($crawler));
+        $this->assertMatchesSnapshot($snapshot . '.txt', $text);
     }
 
     /* ------------------------------------------------------ public pages */
