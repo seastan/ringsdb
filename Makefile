@@ -26,3 +26,8 @@ test-fixtures:
 
 phpunit: test-fixtures
 	docker compose exec -it -u www-data symfony php bin/simple-phpunit
+
+# Code coverage report in app/cache/coverage/index.html (uses Xdebug)
+coverage: test-fixtures
+	docker compose exec -it -u www-data symfony php bin/simple-phpunit --coverage-html app/cache/coverage --coverage-text=php://stdout --colors=never
+	@echo "Code coverage report: \033[36mfile://${PWD}/app/cache/coverage/index.html\033[0m"
