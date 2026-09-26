@@ -270,7 +270,7 @@ class FellowshipManager {
             $sub->innerJoin('AppBundle:Decklistslot', 'dls', 'WITH', 'dls.card = j');
             $sub->innerJoin('AppBundle:FellowshipDecklist', 'fdl', 'WITH', 'fdl.decklist = dls.decklist');
             $sub->where('fdl.fellowship = d');
-            $sub->groupBy('d.id,dls.card');
+            $sub->groupBy('d.id, dls.card, jp.quantity');
             $sub->having('SUM(dls.quantity) > :numcores * jp.quantity');
             $qb->setParameter("numcores", $numcores);
             $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
@@ -282,7 +282,7 @@ class FellowshipManager {
             $sub->innerJoin('AppBundle:Decklistslot', 'dls2', 'WITH', 'dls2.card = j2');
             $sub->innerJoin('AppBundle:FellowshipDecklist', 'fdl2', 'WITH', 'fdl2.decklist = dls2.decklist');
             $sub->where('fdl2.fellowship = d');
-            $sub->groupBy('d.id,dls2.card');
+            $sub->groupBy('d.id, dls2.card, jp2.quantity');
             $sub->having('SUM(dls2.quantity) > :numplaysets * jp2.quantity');
             $qb->setParameter("numplaysets", $numplaysets);
             $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
