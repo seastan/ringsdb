@@ -1,0 +1,278 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Popular
+Recent
+Hot topics
+Hall of Fame
+My favorites
+My decklists
+Search
+Sphere
+any
+Baggins
+Fellowship
+Leadership
+Lore
+Neutral
+Spirit
+Tactics
+Number of Core Sets
+3
+2
+1
+Starting Threat
+=
+<
+>
+Author Reputation
+=
+<
+>
+Cards used
+Cards not used
+Author name
+Decklist name
+Sort
+by Popularity
+by Date
+by Number of Likes
+by Reputation of Author
+by Starting Threat
+Require a deck description
+Search
+Select allowed packs
+(
+113
+on,
+0
+off)
+all
+/
+none
+Core / Deluxe
+Core Set
+Revised Core Set
+Khazad-dûm
+Heirs of Númenor
+The Voice of Isengard
+The Lost Realm
+Angmar Awakened Campaign Expansion
+The Grey Havens
+Dream-chaser Campaign Expansion
+The Sands of Harad
+The Wilds of Rhovanion
+Ered Mithrin Campaign Expansion
+A Shadow in the East
+ALeP - Children of Eorl
+ALeP - The Shire's Reckoning
+Two-Player Limited Edition Starter
+Shadows of Mirkwood
+The Hunt for Gollum
+Conflict at the Carrock
+A Journey to Rhosgobel
+The Hills of Emyn Muil
+The Dead Marshes
+Return to Mirkwood
+Dwarrowdelf
+The Redhorn Gate
+Road to Rivendell
+The Watcher in the Water
+The Long Dark
+Foundations of Stone
+Shadow and Flame
+Against the Shadow
+The Steward's Fear
+The Drúadan Forest
+Encounter at Amon Dîn
+Assault on Osgiliath
+The Blood of Gondor
+The Morgul Vale
+The Ring-maker
+The Dunland Trap
+The Three Trials
+Trouble in Tharbad
+The Nîn-in-Eilph
+Celebrimbor's Secret
+The Antlered Crown
+Angmar Awakened
+The Wastes of Eriador
+Escape from Mount Gram
+Across the Ettenmoors
+The Treachery of Rhudaur
+The Battle of Carn Dûm
+The Dread Realm
+Dream-chaser
+Flight of the Stormcaller
+The Thing in the Depths
+Temple of the Deceived
+The Drowned Ruins
+A Storm on Cobas Haven
+The City of Corsairs
+The Haradrim
+The Mûmakil
+Race Across Harad
+Beneath the Sands
+The Black Serpent
+The Dungeons of Cirith Gurat
+The Crossings of Poros
+Ered Mithrin
+The Withered Heath
+Roam Across Rhovanion
+Fire in the Night
+The Ghost of Framsburg
+Mount Gundabad
+The Fate of Wilderland
+The Vengeance of Mordor
+Wrath and Ruin
+The City of Ulfast
+Challenge of the Wainriders
+Under the Ash Mountains
+The Land of Sorrow
+The Fortress of Nurn
+ALeP - Oaths of the Rohirrim
+ALeP - The Aldburg Plot
+ALeP - Fire on the Eastemnet
+ALeP - The Gap of Rohan
+ALeP - The Glittering Caves
+ALeP - Mustering of the Rohirrim
+ALeP - Blood in the Isen
+ALeP - Fell Summer
+ALeP - Strange News in Bree
+ALeP - Fangs in the Dark
+ALeP - The Brandywine Pursuit
+The Hobbit
+Over Hill and Under Hill
+On the Doorstep
+The Lord of the Rings
+The Black Riders
+The Road Darkens
+The Treason of Saruman
+The Land of Shadow
+The Flame of the West
+The Mountain of Fire
+Standalone Scenarios
+The Massing at Osgiliath
+The Battle of Lake-town
+The Stone of Erech
+The Old Forest
+Fog on the Barrow-downs
+The Ruins of Belegost
+Murder at the Prancing Pony
+The Siege of Annúminas
+Attack on Dol Guldur
+The Wizard's Quest
+The Woodland Realm
+The Mines of Moria
+Escape from Khazad-dûm
+The Hunt for the Dreadnaught
+The Dark of Mirkwood
+ALeP - The Scouring of the Shire
+ALeP - The Nine are Abroad
+ALeP - The Siege of Erebor
+ALeP - The Hobbit
+ALeP - The Mirror of Galadriel
+Starter Decks
+Dwarves of Durin
+Elves of Lórien
+Defenders of Gondor
+Riders of Rohan
+Messenger of the King Allies
+Messenger of the King Allies
+ALeP - Messenger of the King Allies
+«
+1
+(current)
+»
+0
+0
+0
+1.0
+Gondor/Rohan/Silvan Tactics
+31 threat, cards up to
+The Morgul Vale
+Aug 16
+test
+1
+Legolas
+Beregond
+Théoden
+0
+0
+0
+1.0
+Noldor/Rohan Lore/Spirit
+27 threat, cards up to
+Heirs of Númenor
+Aug 16
+test
+1
+Éowyn
+Glorfindel
+Elrond
+0
+0
+0
+1.0
+Gondor/Dunedain Leadership/Spirit
+30 threat, cards up to
+The Morgul Vale
+Aug 16
+test
+1
+Aragorn
+Eleanor
+Boromir
+0
+0
+1
+1.0
+Dwarf Lore/Leadership/Tactics
+29 threat, cards up to
+The Morgul Vale
+Aug 16
+test
+1
+Gimli
+Dáin Ironfoot
+Bifur
+«
+1
+(current)
+»
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

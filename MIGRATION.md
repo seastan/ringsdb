@@ -562,6 +562,45 @@ heroes counted as the card they copy and implying the contract 22134, sideboards
 - MySQL-specific: temporary tables, `SET SESSION optimizer_switch`, stored function. The date
   thresholds, `pack_rules` and the excluded packs / spheres are hard-coded.
 
+## Lists and search managers (`FellowshipManager`, `QuestLogManager`, `DecklistManager`)
+
+The `find*()` methods of `FellowshipManager` and `QuestLogManager` are covered by
+`src/AppBundle/Tests/Model/FellowshipManagerTest.php` and `QuestLogManagerTest.php`, on data
+inserted by the tests (not shared fixtures): every list (popularity, age, recent discussion,
+favorites, author, hall of fame, hot topics), pagination, and the complex search (author,
+name, number of decks, cards, packs, custom packs, number of Core Sets, sort orders).
+
+- Fixed: the fellowship search by card or pack failed on MySQL 8 (`ONLY_FULL_GROUP_BY`): the
+  "number of Core Sets" subqueries selected `jp.quantity` without grouping by it. Added to the
+  `GROUP BY` (one Core Set printing per card).
+- Fixed: the "sort by reputation" of the three searches (decklists, fellowships, quest logs)
+  failed on MySQL 5.7+ (`DISTINCT` with an `ORDER BY` on a column that is not selected, error
+  3065, whatever the `sql_mode`): the reputation is now selected as a hidden column.
+- Fixed: `QuestLogManager` and 5 queries of `QuestLogController` used the entity alias
+  `AppBundle:QuestLog` instead of `AppBundle:Questlog`: it only worked when the class was
+  already loaded under its real name (PHP class names are case-insensitive), and would fail to
+  autoload on a case-sensitive file system.
+
+### Current behaviour pinned by the tests
+
+- Only public items are listed, even for their author.
+- Popularity is `(1 + votes) / (1 + days²)`, from `datePublish` in the lists but from
+  `dateCreation` in the complex search.
+- Fellowships are searched by card or pack through their decklists only: a fellowship made of
+  (unpublished) decks is never found that way. Quest logs are searched through their decks.
+- Several cards must be in the same deck / decklist. A pack filter matches when at least one of
+  the item's decks only uses cards of the given packs (plus the user's selected custom packs,
+  ignored for anonymous users).
+- The "number of Core Sets" filters (fellowships only) are only applied with a card or pack
+  filter; without a value they filter nothing.
+- The `$ignoreEmptyDescriptions` parameter of the `ByAge` / `ByRecentDiscussion` methods is
+  ignored.
+
+### To look at during the migration
+
+- `QuestLogManager::findQuestLogsByRecentDiscussion()` is dead code: `Questlog` has no
+  `dateLastComment` field, so the query fails; nothing calls it.
+
 ## After the migration
 
 - The single text exports (`BuilderController::textexportAction`,

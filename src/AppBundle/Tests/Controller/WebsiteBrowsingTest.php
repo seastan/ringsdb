@@ -67,6 +67,7 @@ class WebsiteBrowsingTest extends WebTestCase {
             'decklist search form' => ['/decklists/search', 'decklists_search', 'Decklist Search · RingsDB'],
             'decklist search results' => ['/decklists/find?cards[]=01001', 'decklists_find_01001', 'Decklist search results · RingsDB'],
             'decklist search by author' => ['/decklists/find?author=test', 'decklists_find_author_test', 'Decklist search results · RingsDB'],
+            'decklist search sorted by reputation' => ['/decklists/find?sort=reputation', 'decklists_find_sort_reputation', 'Decklist search results · RingsDB'],
             'decklist' => ['/decklist/view/1/dwarfloreleadershiptactics-1.0', 'decklist_1', 'Dwarf Lore/Leadership/Tactics · RingsDB'],
             'popular fellowships' => ['/fellowships', 'fellowships_popular', 'Popular Fellowships · RingsDB'],
             'recent fellowships' => ['/fellowships/recent', 'fellowships_recent', 'Recent Fellowships · RingsDB'],
