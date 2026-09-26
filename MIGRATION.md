@@ -533,6 +533,35 @@ Covered by `src/AppBundle/Tests/Controller/CollectionTest.php`.
 
 - No CSRF protection on the collection and custom pack forms.
 
+## Card statistics (`CardStatsCalculator`)
+
+Per-card monthly usage statistics: for each card, the number of decks using it and the average
+number of copies (capped at 3 per deck), in "full" decks (last pack released on or after
+2019-08-02) and "limited" decks (older), plus sideboards and totals. Precomputed by the
+`app:stats:precompute-cards` command (cron) into `stat_cards_cache`, served as JSON by
+`/admin/stat_cards` (admin only). Nothing in the repository consumes that JSON: probably an
+external report made by an admin, to be confirmed (nginx logs, maintainers) before deciding
+whether to keep it.
+
+Covered by `src/AppBundle/Tests/Stats/CardStatsCalculatorTest.php`: JSON snapshots of the 3 steps
+on the fixture month (2015-08), and the counting rules on decks inserted by the test (copies
+capped at 3, invalid decks and other months excluded, full vs limited, Messenger of the King
+heroes counted as the card they copy and implying the contract 22134, sideboards, totals, the
+2022 change of the month rule for private decks), plus the command.
+
+- Fixed: the step 1 query did `GROUP BY c.code` while selecting non-aggregated columns
+  (`cprim.octgnid`, from a derived table), rejected by MySQL 8's default `ONLY_FULL_GROUP_BY`.
+  The selected columns were added to the `GROUP BY` (same result, one primary printing per
+  card); production presumably runs without `ONLY_FULL_GROUP_BY`.
+- It relies on the `source_code()` MySQL stored function (`function-source-code.sql`), which
+  `ringsdb_bootstrap.sql` does not contain: `make fixtures` / `make test-fixtures` now load it,
+  as root (with binary logging, creating a function requires SUPER).
+- The month is concatenated into the SQL; only the command validates its `YYYY-MM` format.
+- Not covered: the merging of reprints by `source_code()` (none of the packs it handles are in
+  the bootstrap data).
+- MySQL-specific: temporary tables, `SET SESSION optimizer_switch`, stored function. The date
+  thresholds, `pack_rules` and the excluded packs / spheres are hard-coded.
+
 ## After the migration
 
 - The single text exports (`BuilderController::textexportAction`,
