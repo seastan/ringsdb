@@ -15,6 +15,8 @@ fixtures:
 	docker compose exec -it -u www-data symfony php app/console doctrine:database:create
 	docker compose exec -T mysql mysql -u symfony -ppasswd ringsdb < ringsdb_bootstrap.sql
 	docker compose exec -T mysql mysql -u symfony -ppasswd ringsdb < ringsdb_reset_auto_increment.sql
+	# stored function used by the card statistics; created as root (binary logging requires SUPER)
+	docker compose exec -T mysql mysql -u root -ppasswd ringsdb < function-source-code.sql
 	docker compose exec -it -u www-data symfony php app/console doctrine:fixtures:load --append
 
 test-fixtures:
@@ -22,6 +24,8 @@ test-fixtures:
 	docker compose exec -it -u www-data symfony php app/console doctrine:database:create --env=test
 	docker compose exec -T mysql_test mysql -u symfony -ppasswd ringsdb_test < ringsdb_bootstrap.sql
 	docker compose exec -T mysql_test mysql -u symfony -ppasswd ringsdb_test < ringsdb_reset_auto_increment.sql
+	# stored function used by the card statistics; created as root (binary logging requires SUPER)
+	docker compose exec -T mysql_test mysql -u root -ppasswd ringsdb_test < function-source-code.sql
 	docker compose exec -it -u www-data symfony php app/console doctrine:fixtures:load --append --env=test
 
 phpunit: test-fixtures
