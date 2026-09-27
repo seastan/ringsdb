@@ -86,14 +86,6 @@ class ApiControllerTest extends WebTestCase {
         $this->assertApiHeaders($response, 'application/json', 'Fri, 09 Sep 2022 12:59:33 GMT');
     }
 
-    public function testSearchIgnoresJsonp() {
-        $client = static::createClient();
-        $response = $this->get($client, '/api/public/cards/search/Aragorn?jsonp=myCallback');
-
-        $this->assertSame('application/json', $response->headers->get('Content-Type'));
-        $this->assertMatchesJsonSnapshot('search_aragorn', $response->getContent());
-    }
-
     /* -------------------------------------------------------------- JSONP */
 
     /**
@@ -119,6 +111,7 @@ class ApiControllerTest extends WebTestCase {
             'decklists by date' => ['decklists_2015-08-16', '/api/public/decklists/by_date/2015-08-16'],
             'top decklists by card' => ['top_decklists_01001', '/api/public/decklists/top_by_card/01001'],
             'scenario' => ['scenario_1', '/api/public/scenario/1'],
+            'card search' => ['search_aragorn', '/api/public/cards/search/Aragorn'],
         ];
     }
 
