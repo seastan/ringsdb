@@ -779,64 +779,6 @@ class SocialController extends Controller {
     }
 
     /*
-	 * (unused) returns an ordered list of decklists similar to the one given
-	 */
-    public function findSimilarDecklists($decklist_id, $number) {
-        $dbh = $this->getDoctrine()->getConnection();
-
-        $list = $dbh->executeQuery("SELECT
-    			l.id,
-    			(
-    				SELECT COUNT(s.id)
-    				FROM decklistslot s
-    				WHERE (
-    					s.decklist_id = l.id
-    					AND s.card_id NOT IN (
-    						SELECT t.card_id
-    						FROM decklistslot t
-    						WHERE t.decklist_id = ?
-    					)
-    				) OR (
-    					s.decklist_id = ?
-    					AND s.card_id NOT IN (
-    						SELECT t.card_id
-    						FROM decklistslot t
-    						WHERE t.decklist_id=l.id
-    					)
-			    	)
-    			) difference
-     			FROM decklist l
-    			WHERE l.id != ?
-    			ORDER BY difference ASC
-    			LIMIT 0, $number", [
-            $decklist_id,
-            $decklist_id,
-            $decklist_id
-        ])->fetchAll();
-
-        $arr = [];
-        foreach ($list as $item) {
-            $dbh = $this->getDoctrine()->getConnection();
-            $rows = $dbh->executeQuery("SELECT
-					d.id,
-					d.name,
-					d.name_canonical,
-					d.nb_votes,
-					d.nb_favorites,
-					d.nb_comments
-					FROM decklist d
-					WHERE d.id = ?", [
-                $item["id"]
-            ])->fetchAll();
-
-            $decklist = $rows[0];
-            $arr[] = $decklist;
-        }
-
-        return $arr;
-    }
-
-    /*
 	 * returns a text file with the content of a decklist
 	 */
     public function textexportAction($decklist_id) {

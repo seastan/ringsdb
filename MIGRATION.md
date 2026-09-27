@@ -648,6 +648,7 @@ Code no route, template, script or other code could reach (found with the covera
 removed before the migration so that it does not have to be ported:
 
 - `Texts::truncate()`: never called.
+- `SocialController::findSimilarDecklists()`: never called (already marked "(unused)").
 - `SocialController::usercommentsAction()` and `commentsAction()`, with their templates
   `Default/usercomments.html.twig` and `Default/allcomments.html.twig`: the comment lists of a
   user and of the whole site. Their routes were reused for the user admin panel on 2016-04-01
