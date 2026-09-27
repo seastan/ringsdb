@@ -48,7 +48,7 @@ class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
         $output->writeln("Done.");
     }
 
-	function command($em, $name, $skip, $customjson) {
+	public static function command($em, $name, $skip, $customjson) {
 		$res = '';
 		$name = $name ?: null;
 		$skip = $skip ?: 0;
