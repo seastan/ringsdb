@@ -23,6 +23,7 @@
             <exclude>
                 <directory>src/AppBundle/Tests</directory>
                 <directory>src/AppBundle/DataFixtures</directory>
+                <directory>src/AppBundle/PHPStan</directory>
             </exclude>
         </whitelist>
     </filter>

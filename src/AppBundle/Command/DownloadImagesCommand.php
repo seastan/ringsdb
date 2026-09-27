@@ -62,5 +62,6 @@ class DownloadImagesCommand extends ContainerAwareCommand
 
         }
 
+        return 0;
     }
 }

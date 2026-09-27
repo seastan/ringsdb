@@ -451,7 +451,7 @@ class SocialController extends Controller {
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
 
         /**
-         * @var $decklist_manager DecklistManager
+         * @var DecklistManager $decklist_manager
          */
         $decklist_manager = $this->get('decklist_manager');
         $decklist_manager->setLimit(30);
@@ -490,7 +490,7 @@ class SocialController extends Controller {
                 break;
 
             case 'recent':
-                $paginator = $decklist_manager->findDecklistsByAge(false);
+                $paginator = $decklist_manager->findDecklistsByAge();
                 $pagetitle = "Recent Decklists";
                 break;
 

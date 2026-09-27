@@ -31,5 +31,7 @@ class FixThreatCommand extends ContainerAwareCommand {
 
         $em->flush();
         $output->writeln(date('c') . " Fixed $count starting threats.");
+
+        return 0;
     }
 }

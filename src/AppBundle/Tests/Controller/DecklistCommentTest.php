@@ -16,6 +16,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * decklists' counters and dates (used by the API's Last-Modified) are restored.
  */
 class DecklistCommentTest extends WebTestCase {
+    use SentEmailsTrait;
+
     const DECKLIST_1_URL = '/decklist/view/1/dwarfloreleadershiptactics-1.0';
 
     /** @var int */
@@ -78,7 +80,7 @@ class DecklistCommentTest extends WebTestCase {
     private function sentEmails(Client $client) {
         $emails = [];
         /** @var \Swift_Message $message */
-        foreach ($client->getProfile()->getCollector('swiftmailer')->getMessages() as $message) {
+        foreach ($this->sentMessages($client) as $message) {
             $this->assertSame(['seastan@ringsdb.com'], array_keys($message->getFrom()));
             $emails[key($message->getTo())] = $message->getSubject();
         }
@@ -108,7 +110,7 @@ class DecklistCommentTest extends WebTestCase {
         $this->assertGreaterThan('2015-08-16 00:00:00', $decklist['date_update']);
 
         // the author is notified; the commenter is never notified of their own comment
-        $message = $client->getProfile()->getCollector('swiftmailer')->getMessages()[0];
+        $message = $this->sentMessages($client)[0];
         $this->assertSame(['test@example.com' => '[ringsdb] New comment'], $this->sentEmails($client));
         $this->assertSame(['seastan@ringsdb.com' => 'admin'], $message->getFrom());
         $this->assertContains('<p>Nice <strong>deck</strong>!</p>', $message->getBody());

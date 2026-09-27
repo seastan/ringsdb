@@ -136,7 +136,7 @@ class CardsData {
 
     public function get_search_rows($conditions, $sortorder, $forceempty = false) {
         $i = 0;
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var \Doctrine\ORM\EntityManager $em */
         $em = $this->doctrine;
 
         $qb = $em->getRepository('AppBundle:Card')->createQueryBuilder('c');
@@ -436,7 +436,7 @@ class CardsData {
 	/**
 	 *
 	 * @param \AppBundle\Entity\Card $card
-	 * @param string $api
+	 * @param bool $api
 	 * @return mixed string number mixed NULL unknown
 	 */
 	public function getCardInfo($card, $api = false) {
@@ -649,7 +649,7 @@ class CardsData {
 
 	public function getDistinctTraits() {
 		/**
-		 * @var $em \Doctrine\ORM\EntityManager
+		 * @var \Doctrine\ORM\EntityManager $em
 		 */
 		$em = $this->doctrine->getManager();
 		$qb = $em->createQueryBuilder();

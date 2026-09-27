@@ -75,5 +75,7 @@ class UpdateOctgnCommand extends ContainerAwareCommand {
         }
 
         $em->flush();
+
+        return 0;
     }
 }

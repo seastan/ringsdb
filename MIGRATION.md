@@ -801,8 +801,8 @@ name, number of decks, cards, packs, custom packs, number of Core Sets, sort ord
   ignored for anonymous users).
 - The "number of Core Sets" filters (fellowships only) are only applied with a card or pack
   filter; without a value they filter nothing.
-- The `$ignoreEmptyDescriptions` parameter of the `ByAge` / `ByRecentDiscussion` methods is
-  ignored.
+- Removed: the `$ignoreEmptyDescriptions` parameter of the `ByAge` / `ByRecentDiscussion` methods,
+  which was ignored (found by phpstan).
 
 ### To look at during the migration
 

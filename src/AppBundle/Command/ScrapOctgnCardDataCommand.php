@@ -133,5 +133,7 @@ class ScrapOctgnCardDataCommand extends ContainerAwareCommand {
 
         $em->flush();
         $output->writeln("Done.");
+
+        return 0;
     }
 }

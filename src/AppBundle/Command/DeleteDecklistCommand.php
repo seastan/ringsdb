@@ -50,5 +50,7 @@ class DeleteDecklistCommand extends ContainerAwareCommand {
         $em->flush();
         
         $output->writeln("Decklist deleted");
+
+        return 0;
     }
 }

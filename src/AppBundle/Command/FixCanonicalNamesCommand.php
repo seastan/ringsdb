@@ -33,5 +33,7 @@ class FixCanonicalNamesCommand extends ContainerAwareCommand {
 
         $em->flush();
         $output->writeln(date('c') . " Fixed $count scenario canonical names.");
+
+        return 0;
     }
 }

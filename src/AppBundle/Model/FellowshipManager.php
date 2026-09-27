@@ -112,7 +112,7 @@ class FellowshipManager {
         return $this->getPaginator($qb->getQuery());
     }
 
-    public function findFellowshipsByAge($ignoreEmptyDescriptions = false) {
+    public function findFellowshipsByAge() {
         $qb = $this->getQueryBuilder();
 
         $qb->orderBy('d.datePublish', 'DESC');
@@ -123,7 +123,7 @@ class FellowshipManager {
         return $this->getPaginator($qb->getQuery());
     }
 
-    public function findFellowshipsByRecentDiscussion($ignoreEmptyDescriptions = false) {
+    public function findFellowshipsByRecentDiscussion() {
         $qb = $this->getQueryBuilder();
 
         $qb->andWhere('d.nbComments > 0');

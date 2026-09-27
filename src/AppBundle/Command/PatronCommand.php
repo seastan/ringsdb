@@ -51,5 +51,7 @@ class PatronCommand extends ContainerAwareCommand {
         } else {
             $output->writeln(date('c') . " " . "Cannot find user [$email]");
         }
+
+        return 0;
     }
 }

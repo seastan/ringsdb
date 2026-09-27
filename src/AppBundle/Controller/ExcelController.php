@@ -120,6 +120,7 @@ class ExcelController extends Controller {
 		$uploadedFile = $request->files->get('upfile');
 		$inputFileName = $uploadedFile->getPathname();
 		$inputFileType = \PHPExcel_IOFactory::identify($inputFileName);
+		/** @var \PHPExcel_Reader_Abstract $objReader */
 		$objReader = \PHPExcel_IOFactory::createReader($inputFileType);
 		$objReader->setReadDataOnly(true);
 		$objPHPExcel = $objReader->load($inputFileName);

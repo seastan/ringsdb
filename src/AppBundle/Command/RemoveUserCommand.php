@@ -86,5 +86,7 @@ class RemoveUserCommand extends ContainerAwareCommand {
         $output->writeln("User locked");
 
         $em->flush();
+
+        return 0;
     }
 }

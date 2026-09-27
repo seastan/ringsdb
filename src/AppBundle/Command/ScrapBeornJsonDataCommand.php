@@ -55,7 +55,7 @@ class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
         $allSpheres = $em->getRepository('AppBundle:Sphere')->findAll();
         $allTypes = $em->getRepository('AppBundle:Type')->findAll();
 
-        $skip = $input->getOption('skip') ?: 0;
+        $skip = (int) $input->getOption('skip');
         $forceData = $input->getOption('force-data');
         $forceImage = $input->getOption('force-image');
         $showTexts = $input->getOption('show-texts');
@@ -163,5 +163,7 @@ class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
 
         $em->flush();
         $output->writeln("Done.");
+
+        return 0;
     }
 }

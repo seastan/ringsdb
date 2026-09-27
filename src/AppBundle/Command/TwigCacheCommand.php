@@ -51,5 +51,7 @@ class TwigCacheCommand extends ContainerAwareCommand {
             $this->write($output, $actionName . ' ' . $name . "\ncacheFile: " . $fileName);
         }
         $this->write($output, 'Done');
+
+        return 0;
     }
 }

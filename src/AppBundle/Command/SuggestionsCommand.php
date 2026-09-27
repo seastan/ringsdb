@@ -24,6 +24,8 @@ class SuggestionsCommand extends ContainerAwareCommand {
         file_put_contents($webdir . "/suggestions.json", json_encode($suggestions));
 
         $output->writeln('done');
+
+        return 0;
     }
 
     private function getAllPairs($arr) {

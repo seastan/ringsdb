@@ -67,7 +67,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
         $allTypes = $em->getRepository('AppBundle:Type')->findAll();
 
         $setname = $input->getArgument('beornset');
-        $skip = $input->getOption('skip') ?: 0;
+        $skip = (int) $input->getOption('skip');
         $forceData = $input->getOption('force-data');
         $forceImage = $input->getOption('force-image');
         $showTexts = $input->getOption('show-texts');
@@ -449,5 +449,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
         $em->flush();
         $output->writeln("Done.");
+
+        return 0;
     }
 }

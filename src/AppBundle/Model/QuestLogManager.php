@@ -112,7 +112,7 @@ class QuestLogManager {
         return $this->getPaginator($qb->getQuery());
     }
 
-    public function findQuestLogsByAge($ignoreEmptyDescriptions = false) {
+    public function findQuestLogsByAge() {
         $qb = $this->getQueryBuilder();
 
         $qb->orderBy('d.datePublish', 'DESC');
@@ -123,7 +123,7 @@ class QuestLogManager {
         return $this->getPaginator($qb->getQuery());
     }
 
-    public function findQuestLogsByRecentDiscussion($ignoreEmptyDescriptions = false) {
+    public function findQuestLogsByRecentDiscussion() {
         $qb = $this->getQueryBuilder();
 
         $qb->andWhere('d.nbComments > 0');

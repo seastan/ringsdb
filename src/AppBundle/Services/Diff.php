@@ -12,7 +12,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  *
  * @author AWOPM
- * @property $em EntityManager
  */
 class Diff {
     /**

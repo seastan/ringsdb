@@ -186,7 +186,7 @@ class QuestLogController extends Controller {
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
 
         /**
-         * @var $questlog_manager \AppBundle\Model\QuestLogManager
+         * @var \AppBundle\Model\QuestLogManager $questlog_manager
          */
         $questlog_manager = $this->get('questlog_manager');
         $questlog_manager->setLimit(30);
@@ -225,7 +225,7 @@ class QuestLogController extends Controller {
                 break;
 
             case 'recent':
-                $paginator = $questlog_manager->findQuestLogsByAge(false);
+                $paginator = $questlog_manager->findQuestLogsByAge();
                 $pagetitle = "Recent Quest Logs";
                 break;
 

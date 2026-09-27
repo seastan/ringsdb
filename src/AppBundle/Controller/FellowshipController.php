@@ -45,7 +45,7 @@ class FellowshipController extends Controller {
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
 
         /**
-         * @var $fellowship_manager \AppBundle\Model\FellowshipManager
+         * @var \AppBundle\Model\FellowshipManager $fellowship_manager
          */
         $fellowship_manager = $this->get('fellowship_manager');
         $fellowship_manager->setLimit(30);
@@ -84,7 +84,7 @@ class FellowshipController extends Controller {
                 break;
 
             case 'recent':
-                $paginator = $fellowship_manager->findFellowshipsByAge(false);
+                $paginator = $fellowship_manager->findFellowshipsByAge();
                 $pagetitle = "Recent Fellowships";
                 break;
 

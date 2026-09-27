@@ -7,6 +7,29 @@ namespace AppBundle\Model;
  */
 interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \ArrayAccess {
     /**
+     * Add a slot
+     *
+     * @param SlotInterface $element
+     * @return bool
+     */
+    public function add($element);
+
+    /**
+     * Remove a slot
+     *
+     * @param SlotInterface $element
+     * @return bool
+     */
+    public function removeElement($element);
+
+    /**
+     * Get the underlying collection of slots
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getSlots();
+
+    /**
      * Get quantity of cards
      *
      * @return integer

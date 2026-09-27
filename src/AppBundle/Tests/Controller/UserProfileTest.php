@@ -14,6 +14,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * The users' rows are restored in tearDown() (passwords included).
  */
 class UserProfileTest extends WebTestCase {
+    use SentEmailsTrait;
+
     /** @var array */
     private $fixtureUsers;
 
@@ -247,7 +249,7 @@ class UserProfileTest extends WebTestCase {
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/resetting/check-email?username=test', $client->getResponse()->headers->get('Location'));
-        $messages = $client->getProfile()->getCollector('swiftmailer')->getMessages();
+        $messages = $this->sentMessages($client);
         $this->assertCount(1, $messages);
         $this->assertSame(['test@example.com'], array_keys($messages[0]->getTo()));
         $token = $this->fetchUser($client)['confirmation_token'];
@@ -257,7 +259,7 @@ class UserProfileTest extends WebTestCase {
         // 2. a second request is ignored while the first one is recent (no second email)
         $client->enableProfiler();
         $client->submit($form);
-        $this->assertCount(0, $client->getProfile()->getCollector('swiftmailer')->getMessages());
+        $this->assertCount(0, $this->sentMessages($client));
         $this->assertSame($token, $this->fetchUser($client)['confirmation_token']);
 
         // 3. the link opens the reset form; the new password logs the user in
@@ -287,7 +289,7 @@ class UserProfileTest extends WebTestCase {
         // no hint that the user does not exist, and no email
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/resetting/check-email?username=nobody', $client->getResponse()->headers->get('Location'));
-        $this->assertCount(0, $client->getProfile()->getCollector('swiftmailer')->getMessages());
+        $this->assertCount(0, $this->sentMessages($client));
     }
 
     public function testUnknownResetToken() {

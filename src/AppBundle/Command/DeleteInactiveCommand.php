@@ -32,5 +32,7 @@ class DeleteInactiveCommand extends ContainerAwareCommand {
         }
         $em->flush();
         $output->writeln(date('c') . " Delete $count inactive users.");
+
+        return 0;
     }
 }

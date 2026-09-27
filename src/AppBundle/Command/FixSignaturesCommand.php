@@ -40,5 +40,7 @@ class FixSignaturesCommand extends ContainerAwareCommand {
 
         $em->flush();
         $output->writeln(date('c') . " Fixed $count decklist signatures.");
+
+        return 0;
     }
 }

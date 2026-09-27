@@ -46,5 +46,7 @@ class CreateClientCommand extends ContainerAwareCommand {
             $client->getPublicId(),
             $client->getSecret()
         ));
+
+        return 0;
     }
 }

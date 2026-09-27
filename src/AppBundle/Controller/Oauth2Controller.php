@@ -59,7 +59,6 @@ class Oauth2Controller extends Controller {
 	 *      },
 	 *  },
 	 * )
-	 * @param Request $request
 	 */
 	public function loadDeckAction($id) {
 		$response = new Response();

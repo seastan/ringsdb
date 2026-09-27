@@ -437,7 +437,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Add sideslot
      *
-     * @param \AppBundle\Entity\Decklistsideslot $slot
+     * @param \AppBundle\Entity\Decklistsideslot $sideslots
      *
      * @return Decklist
      */
@@ -450,9 +450,9 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Remove sideslot
      *
-     * @param \AppBundle\Entity\Decklistsideslot $slot
+     * @param \AppBundle\Entity\Decklistsideslot $sideslots
      */
-    public function removeSideslot(\AppBundle\Entity\Decklistslot $sideslots) {
+    public function removeSideslot(\AppBundle\Entity\Decklistsideslot $sideslots) {
         $this->sideslots->removeElement($sideslots);
     }
 

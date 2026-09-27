@@ -13,6 +13,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * Users created by these tests are prefixed with "phpunit_" and removed in tearDown().
  */
 class SecurityControllerTest extends WebTestCase {
+    use SentEmailsTrait;
+
     const PREFIX = 'phpunit_';
 
     protected function tearDown() {
@@ -108,10 +110,9 @@ class SecurityControllerTest extends WebTestCase {
         $this->submitRegistration($client, $username, $email, 'secret123', null, true);
         $this->assertRedirectsTo($client, '#/register/check-email$#');
 
-        $mailCollector = $client->getProfile()->getCollector('swiftmailer');
-        $this->assertEquals(1, $mailCollector->getMessageCount());
-        /** @var \Swift_Message $message */
-        $message = $mailCollector->getMessages()[0];
+        $messages = $this->sentMessages($client);
+        $this->assertCount(1, $messages);
+        $message = $messages[0];
         $this->assertEquals([$email => null], $message->getTo());
 
         // 2. user is created, disabled, with a confirmation token
