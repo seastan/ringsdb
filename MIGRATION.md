@@ -642,6 +642,18 @@ name, number of decks, cards, packs, custom packs, number of Core Sets, sort ord
 - `QuestLogManager::findQuestLogsByRecentDiscussion()` is dead code: `Questlog` has no
   `dateLastComment` field, so the query fails; nothing calls it.
 
+## Removed dead code
+
+Code no route, template, script or other code could reach (found with the coverage report),
+removed before the migration so that it does not have to be ported:
+
+- `Texts::truncate()`: never called.
+- `SocialController::usercommentsAction()` and `commentsAction()`, with their templates
+  `Default/usercomments.html.twig` and `Default/allcomments.html.twig`: the comment lists of a
+  user and of the whole site. Their routes were reused for the user admin panel on 2016-04-01
+  (commit `497ccf27`); the admin pages `/admin/user/comments/{user_id}`
+  (`UserAdminController::commentsAction`) replace them.
+
 ## After the migration
 
 - The single text exports (`BuilderController::textexportAction`,
