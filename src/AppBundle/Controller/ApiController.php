@@ -666,7 +666,7 @@ class ApiController extends Controller {
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        static $availability = [];
+        $jsonp = $request->query->get('jsonp');
 
         $cards = [];
 
