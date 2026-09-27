@@ -248,7 +248,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      */
     private $lastPack;
     /**
-     * @var \AppBundle\Entity\Decklist
+     * @var \AppBundle\Entity\Decklist|null
      */
     private $parent;
 
@@ -590,7 +590,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Get parent
      *
-     * @return \AppBundle\Entity\Decklist
+     * @return \AppBundle\Entity\Decklist|null
      */
     public function getParent() {
         return $this->parent;
@@ -648,7 +648,6 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      * @var \Doctrine\Common\Collections\Collection
      */
     private $fellowships;
-    private $allFellowships;
 
     /**
      * Add fellowship

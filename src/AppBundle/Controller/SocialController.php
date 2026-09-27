@@ -659,9 +659,7 @@ class SocialController extends Controller {
             // send emails
             $spool = [];
             if ($decklist->getUser()->getIsNotifAuthor()) {
-                if (!isset($spool[$decklist->getUser()->getEmail()])) {
-                    $spool[$decklist->getUser()->getEmail()] = 'AppBundle:Emails:newcomment_author.html.twig';
-                }
+                $spool[$decklist->getUser()->getEmail()] = 'AppBundle:Emails:newcomment_author.html.twig';
             }
             foreach ($decklist->getComments() as $comment) {
                 /* @var $comment Comment */

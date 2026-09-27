@@ -131,10 +131,7 @@ class ApiController extends Controller {
         }
 
         // check the last-modified-since header
-        $lastModified = null;
-        if (!$lastModified || $lastModified < $card->getDateUpdate()) {
-            $lastModified = $card->getDateUpdate();
-        }
+        $lastModified = $card->getDateUpdate();
 
         $response->setLastModified($lastModified);
         if ($response->isNotModified($request)) {
@@ -638,10 +635,7 @@ class ApiController extends Controller {
         }
 
         // check the last-modified-since header
-        $lastModified = null;
-        if (!$lastModified || $lastModified < $scenario->getDateUpdate()) {
-            $lastModified = $scenario->getDateUpdate();
-        }
+        $lastModified = $scenario->getDateUpdate();
 
         $response->setLastModified($lastModified);
         if ($response->isNotModified($request)) {

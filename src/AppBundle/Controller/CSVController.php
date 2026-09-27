@@ -70,7 +70,7 @@ class CSVController extends Controller {
 			$em->persist($pack);
 			$em->flush();
 		}
-		elseif (!$pack && $oldPack) {
+		elseif (!$pack) {
 			$pack = $oldPack;
 			$pack->setCode($inputCode);
 			$em->persist($pack);

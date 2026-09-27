@@ -588,7 +588,7 @@ class FellowshipController extends Controller {
             return $this->redirect($this->generateUrl('myfellowships_list'));
         }
 
-        if (!$fellowship || $fellowship->getUser()->getId() != $user->getId()) {
+        if ($fellowship->getUser()->getId() != $user->getId()) {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
 
@@ -1047,9 +1047,7 @@ class FellowshipController extends Controller {
             // send emails
             $spool = [];
             if ($fellowship->getUser()->getIsNotifAuthor()) {
-                if (!isset($spool[$fellowship->getUser()->getEmail()])) {
-                    $spool[$fellowship->getUser()->getEmail()] = 'AppBundle:Emails:newfellowshipcomment_author.html.twig';
-                }
+                $spool[$fellowship->getUser()->getEmail()] = 'AppBundle:Emails:newfellowshipcomment_author.html.twig';
             }
 
             foreach ($fellowship->getComments() as $comment) {

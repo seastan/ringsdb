@@ -99,7 +99,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      */
     private $lastPack;
     /**
-     * @var \AppBundle\Entity\Deck
+     * @var \AppBundle\Entity\Deck|null
      */
     private $parent;
     /**
@@ -618,7 +618,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get parent
      *
-     * @return \AppBundle\Entity\Deck
+     * @return \AppBundle\Entity\Deck|null
      */
     public function getParent() {
         return $this->parent;

@@ -1,5 +1,5 @@
 parameters:
-    level: 3
+    level: 4
     paths:
         - src
     bootstrapFiles:
@@ -12,3 +12,7 @@ services:
         class: AppBundle\PHPStan\DoctrineRegistryReturnTypeExtension
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: AppBundle\PHPStan\DoctrineIdentifierReadWriteExtension
+        tags:
+            - phpstan.properties.readWriteExtension

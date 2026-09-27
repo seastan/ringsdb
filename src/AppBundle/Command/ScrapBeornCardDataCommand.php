@@ -2,7 +2,6 @@
 
 namespace AppBundle\Command;
 
-use AppBundle\Entity\Card;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -286,13 +285,13 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 		   continue;
 		}
 		$output->writeln("15b");		
-                if ($card && !$forceData && !$forceImage) {
+                if (!$forceData && !$forceImage) {
                     // shortcut: we already know this card
                     continue;
                 }
 		$output->writeln("16");
 
-                if ($card && $forceData) {
+                if ($forceData) {
 
                     $objSphere = null;
                     foreach ($allSpheres as $oneSphere) {
@@ -362,9 +361,6 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                     }
     		$output->writeln("25");
     
-                    if (!$card) {
-                        $card = new Card();
-                    }
     		$output->writeln("26");
     
                     $card->setPosition($position);
@@ -400,7 +396,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                     $card->setAttack($attack !== '' ? $attack : null);
                     $card->setDefense($defense !== '' ? $defense : null);
                     $card->setHealth($health !== '' ? $health : null);
-                    $card->setVictory($victory !== '' ? $victory : null);
+                    $card->setVictory($victory);
                     $card->setQuest($quest !== '' ? $quest : null);
     
                     $card->setQuantity($quantity);

@@ -583,7 +583,7 @@ class QuestLogController extends Controller {
                         $questlog->addDeck($questlog_decklist);
                     }
                     $nb_decks++;
-                } elseif ($deck_id == 0) {
+                } else {
                     // deck_id == 0 occurs if:
                     // 1. the deck slot in the builder is empty
                     // 2. the deck being referenced was deleted
@@ -604,8 +604,6 @@ class QuestLogController extends Controller {
 
                     $questlog->addDeck($questlog_deck);
                     $nb_decks++;
-                } else {
-                    $skip++;
                 }
             }
 
@@ -643,7 +641,7 @@ class QuestLogController extends Controller {
             return $this->redirect($this->generateUrl('myquestlogs_list'));
         }
 
-        if (!$questlog || $questlog->getUser()->getId() != $user->getId()) {
+        if ($questlog->getUser()->getId() != $user->getId()) {
             throw new AccessDeniedHttpException("You don't have access to this quest log.");
         }
 
@@ -1081,9 +1079,7 @@ class QuestLogController extends Controller {
             // send emails
             $spool = [];
             if ($questlog->getUser()->getIsNotifAuthor()) {
-                if (!isset($spool[$questlog->getUser()->getEmail()])) {
-                    $spool[$questlog->getUser()->getEmail()] = 'AppBundle:Emails:newquestlogcomment_author.html.twig';
-                }
+                $spool[$questlog->getUser()->getEmail()] = 'AppBundle:Emails:newquestlogcomment_author.html.twig';
             }
 
             foreach ($questlog->getComments() as $comment) {

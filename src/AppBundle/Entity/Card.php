@@ -84,11 +84,11 @@ class Card {
      */
     private $printings;
     /**
-     * @var \AppBundle\Entity\Type
+     * @var \AppBundle\Entity\Type|null
      */
     private $type;
     /**
-     * @var \AppBundle\Entity\Sphere
+     * @var \AppBundle\Entity\Sphere|null
      */
     private $sphere;
 

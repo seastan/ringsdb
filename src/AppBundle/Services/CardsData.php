@@ -3,7 +3,6 @@
 
 namespace AppBundle\Services;
 
-use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper;
@@ -17,11 +16,6 @@ class CardsData {
 	 * @var Registry
 	 */
 	private $doctrine;
-
-	/**
-	 * @var RequestStack
-	 */
-	private $request_stack;
 
 	/**
 	 * @var Router
@@ -38,9 +32,8 @@ class CardsData {
 	 */
 	private $rootDir;
 
-	public function __construct(Registry $doctrine, RequestStack $request_stack, Router $router, AssetsHelper $assets_helper, $rootDir) {
+	public function __construct(Registry $doctrine, Router $router, AssetsHelper $assets_helper, $rootDir) {
 		$this->doctrine = $doctrine;
-		$this->request_stack = $request_stack;
 		$this->router = $router;
 		$this->assets_helper = $assets_helper;
 		$this->rootDir = $rootDir;
@@ -466,7 +459,6 @@ class CardsData {
 				case 'datetime':
 				case 'date':
 					continue 2;
-					break;
 				case 'boolean':
 					$value = (boolean)$value;
 					break;
@@ -559,7 +551,7 @@ class CardsData {
 		$etat = 1;
 		while ($query != "") {
 			if ($etat == 1) {
-				if (isset($cond) && $etat != 4 && count($cond) > 2) {
+				if (isset($cond) && count($cond) > 2) {
 					$list[] = $cond;
 				}
 				// on commence par rechercher un type de condition

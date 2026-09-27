@@ -5,7 +5,6 @@ namespace AppBundle\Model;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
-use Psr\Log\LoggerInterface;
 use AppBundle\Entity\User;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -39,16 +38,10 @@ class QuestLogManager {
 	 */
 	private $router;
 
-	/**
-	 * @var LoggerInterface
-	 */
-	private $logger;
-
-	public function __construct(EntityManager $doctrine, RequestStack $request_stack, Router $router, LoggerInterface $logger) {
+	public function __construct(EntityManager $doctrine, RequestStack $request_stack, Router $router) {
 		$this->doctrine = $doctrine;
 		$this->request_stack = $request_stack;
 		$this->router = $router;
-		$this->logger = $logger;
 	}
 
 	public function setUser($user) {
