@@ -747,6 +747,10 @@ class SocialController extends Controller {
         /* @var $decklist \AppBundle\Entity\Decklist */
         $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
 
+        if (!$decklist instanceof Decklist) {
+            throw new BadRequestHttpException('Unable to find deck');
+        }
+
         if ($decklist->getUser()->getId() != $user->getId()) {
             $query = $em->getRepository('AppBundle:Decklist')
                 ->createQueryBuilder('d')
