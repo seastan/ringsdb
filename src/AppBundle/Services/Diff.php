@@ -15,6 +15,11 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @property $em EntityManager
  */
 class Diff {
+    /**
+     * @var EntityManager
+     */
+    private $em;
+
     public function __construct(EntityManager $doctrine) {
         $this->em = $doctrine;
     }

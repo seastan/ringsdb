@@ -2,7 +2,30 @@
 
 namespace AppBundle\Model;
 
-class ExportableDeck {
+/**
+ * Base class of Deck and Decklist, which implement the getters used by the exports.
+ */
+abstract class ExportableDeck {
+    abstract public function getId();
+
+    abstract public function getName();
+
+    abstract public function getDateCreation();
+
+    abstract public function getDateUpdate();
+
+    abstract public function getDescriptionMd();
+
+    abstract public function getUser();
+
+    abstract public function getVersion();
+
+    abstract public function getLastPack();
+
+    abstract public function getSlots();
+
+    abstract public function getSideslots();
+
     public function getArrayExport($withUnsavedChanges = false) {
         /* @var $this \AppBundle\Entity\Deck */
         $slots = $this->getSlots();

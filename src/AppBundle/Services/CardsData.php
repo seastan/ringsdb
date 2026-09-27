@@ -13,6 +13,31 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  */
 class CardsData {
+	/**
+	 * @var Registry
+	 */
+	private $doctrine;
+
+	/**
+	 * @var RequestStack
+	 */
+	private $request_stack;
+
+	/**
+	 * @var Router
+	 */
+	private $router;
+
+	/**
+	 * @var AssetsHelper
+	 */
+	private $assets_helper;
+
+	/**
+	 * @var string
+	 */
+	private $rootDir;
+
 	public function __construct(Registry $doctrine, RequestStack $request_stack, Router $router, AssetsHelper $assets_helper, $rootDir) {
 		$this->doctrine = $doctrine;
 		$this->request_stack = $request_stack;

@@ -12,6 +12,26 @@ use AppBundle\Helper\DeckValidationHelper;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Decks {
+    /**
+     * @var EntityManager
+     */
+    private $doctrine;
+
+    /**
+     * @var DeckValidationHelper
+     */
+    private $deck_validation_helper;
+
+    /**
+     * @var Diff
+     */
+    private $diff;
+
+    /**
+     * @var Logger
+     */
+    private $logger;
+
     public function __construct(EntityManager $doctrine, DeckValidationHelper $deck_validation_helper, Diff $diff, Logger $logger) {
         $this->doctrine = $doctrine;
         $this->deck_validation_helper = $deck_validation_helper;

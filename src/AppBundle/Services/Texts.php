@@ -4,6 +4,16 @@ namespace AppBundle\Services;
 
 class Texts {
     /**
+     * @var \HTMLPurifier
+     */
+    private $purifier_service;
+
+    /**
+     * @var \Parsedown
+     */
+    private $markdown_service;
+
+    /**
      * @param string $cache_dir where HTMLPurifier caches its definitions
      */
     public function __construct($cache_dir) {

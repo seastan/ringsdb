@@ -24,6 +24,26 @@ class QuestLogManager {
 	protected $maxcount = 0;
 	protected $user = null;
 
+	/**
+	 * @var EntityManager
+	 */
+	private $doctrine;
+
+	/**
+	 * @var RequestStack
+	 */
+	private $request_stack;
+
+	/**
+	 * @var Router
+	 */
+	private $router;
+
+	/**
+	 * @var LoggerInterface
+	 */
+	private $logger;
+
 	public function __construct(EntityManager $doctrine, RequestStack $request_stack, Router $router, LoggerInterface $logger) {
 		$this->doctrine = $doctrine;
 		$this->request_stack = $request_stack;

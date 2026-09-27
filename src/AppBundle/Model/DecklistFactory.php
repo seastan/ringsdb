@@ -11,6 +11,21 @@ use AppBundle\Entity\Decklistslot;
 use AppBundle\Entity\Decklistsideslot;
 
 class DecklistFactory {
+    /**
+     * @var EntityManager
+     */
+    private $doctrine;
+
+    /**
+     * @var DeckValidationHelper
+     */
+    private $deckValidationHelper;
+
+    /**
+     * @var Texts
+     */
+    private $texts;
+
     public function __construct(EntityManager $doctrine, DeckValidationHelper $deckValidationHelper, Texts $texts) {
         $this->doctrine = $doctrine;
         $this->deckValidationHelper = $deckValidationHelper;
