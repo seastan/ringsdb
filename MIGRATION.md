@@ -209,6 +209,16 @@ field). Everything the tests create is deleted in `tearDown()`.
   heroes' spheres like empty ones. Existing badly spaced tags are cleaned up on the next change.
   The JSON answer is sent as `text/html`. Other users' and unknown decks are skipped silently.
 - `/deck/copy/{decklist_id}` writes to the database on GET (see also `/deck/new`).
+- Decklist edit / save / delete (`/decklist/edit|save|delete/{id}`, `DecklistEditTest`): no
+  `access_control` rule for `/decklist/`, the controllers check the user; anonymous users are
+  redirected to the login page on edit / save but get a `403` on delete (different exception
+  classes). Only the author, or `ROLE_SUPER_ADMIN` (not `ROLE_ADMIN`), can edit. The predecessor
+  is given as an id or a decklist URL; itself or an unknown id means none. Delete is refused
+  (`403`) with votes, favorites or comments; decks copied from the decklist and its successors
+  are attached to its predecessor. BUG-ish: a decklist used in a fellowship is silently removed
+  from it (cascade remove on `Decklist.fellowships`: the fellowship stays published with the same
+  `nb_decks`); quest logs are unlinked (`ON DELETE SET NULL`, they keep their copy of the cards).
+  No CSRF protection on save and delete.
 - Fixed: `POST /decklist/create` with an unknown or missing `deck_id` crashed (`getUser()` on
   null); it now answers `400 Bad Request`.
 
