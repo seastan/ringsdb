@@ -209,6 +209,20 @@ field). Everything the tests create is deleted in `tearDown()`.
   heroes' spheres like empty ones. Existing badly spaced tags are cleaned up on the next change.
   The JSON answer is sent as `text/html`. Other users' and unknown decks are skipped silently.
 - `/deck/copy/{decklist_id}` writes to the database on GET (see also `/deck/new`).
+- Clone, delete, delete list, autosave (`DeckManagementTest`):
+  - `GET /deck/clone/{id}` (a GET that writes) copies a deck, own or shared, for the current user
+    ("<name> (clone)", same parent decklist, version 0.1).
+  - `POST /deck/delete` refuses a deck that belongs to a fellowship (flash error); decklists
+    published from the deck are detached from it. BUG-ish: `POST /deck/delete_list` has no such
+    check: the deck is deleted and silently removed from its fellowship (cascade remove on
+    `Deck.fellowships`, the fellowship keeps its `nb_decks`).
+  - `POST /deck/autosave` stores the builder's diff as an unsaved `deckchange`, replaced by a
+    saved one on the next save. The diff is decoded as objects and tested with `count()`, which
+    is always 1 for an object in PHP 7.1 (an empty diff still creates an entry) and a `TypeError`
+    in PHP 8: to rewrite with `json_decode(..., true)`. A 2-part diff with its first two parts
+    empty reads undefined offsets 2 and 3 (`500` in debug mode).
+  - Unknown deck, another user's deck, wrong diff: HTTP exceptions, `500` for AJAX requests
+    (`CoreExceptionListener`).
 - Decklist edit / save / delete (`/decklist/edit|save|delete/{id}`, `DecklistEditTest`): no
   `access_control` rule for `/decklist/`, the controllers check the user; anonymous users are
   redirected to the login page on edit / save but get a `403` on delete (different exception

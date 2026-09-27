@@ -1,0 +1,359 @@
+<?php
+
+namespace AppBundle\Tests\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+
+/**
+ * Deck actions of BuilderController, other than create / edit / publish (see DeckWorkflowTest):
+ * - clone (GET /deck/clone/{id}, "Clone" button of the deck page), a GET that writes;
+ * - delete (POST /deck/delete, modal of the deck page and of My Decks);
+ * - delete a selection (POST /deck/delete_list, "ids" = "1-2-3", My Decks);
+ * - autosave (POST /deck/autosave, sent by app.deck_history.js from the deck builder).
+ *
+ * The tests work on decks inserted for them (copies of fixture deck 2, owned by "test");
+ * everything is removed or restored in tearDown().
+ */
+class DeckManagementTest extends WebTestCase {
+    /** @var int[] */
+    private $maxIds = [];
+    /** @var array */
+    private $fixtureDecklists;
+    /** @var array */
+    private $fixtureUsers;
+
+    protected function setUp() {
+        $connection = $this->db(static::createClient());
+        foreach (['deck', 'deckchange', 'fellowship', 'questlog'] as $table) {
+            $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
+        }
+        $this->fixtureDecklists = $connection->fetchAll('SELECT * FROM decklist');
+        $this->fixtureUsers = $connection->fetchAll('SELECT id, is_share_decks FROM user');
+    }
+
+    protected function tearDown() {
+        $connection = $this->db(static::createClient());
+        $max = $this->maxIds;
+        foreach ($this->fixtureDecklists as $decklist) {
+            $connection->update('decklist', $decklist, ['id' => $decklist['id']]);
+        }
+        foreach ([
+            "DELETE FROM fellowship_deck WHERE fellowship_id > {$max['fellowship']} OR deck_id > {$max['deck']}",
+            "DELETE FROM fellowship WHERE id > {$max['fellowship']}",
+            "DELETE FROM questlog_deck WHERE questlog_id > {$max['questlog']}",
+            "DELETE FROM questlog WHERE id > {$max['questlog']}",
+            "DELETE FROM deckchange WHERE id > {$max['deckchange']} OR deck_id > {$max['deck']}",
+            "DELETE FROM deckslot WHERE deck_id > {$max['deck']}",
+            "DELETE FROM decksideslot WHERE deck_id > {$max['deck']}",
+            "DELETE FROM deck WHERE id > {$max['deck']}",
+        ] as $sql) {
+            $connection->exec($sql);
+        }
+        foreach ($this->fixtureUsers as $user) {
+            $connection->update('user', $user, ['id' => $user['id']]);
+        }
+        parent::tearDown();
+    }
+
+    /* ------------------------------------------------------------ helpers */
+
+    private function db(Client $client) {
+        return $client->getContainer()->get('doctrine')->getConnection();
+    }
+
+    private function createAuthenticatedClient($username = 'test') {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/login');
+        $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $username]));
+        $this->assertTrue($client->getResponse()->isRedirect(), "Login as $username failed");
+
+        return $client;
+    }
+
+    /**
+     * A copy of fixture deck 2 (cards included), plus 2 Feint in the sideboard, returns its id.
+     */
+    private function insertDeck(Client $client, $name, array $values = []) {
+        $connection = $this->db($client);
+        $row = $connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
+        unset($row['id']);
+        $connection->insert('deck', $values + ['name' => $name] + $row);
+        $id = (int) $connection->lastInsertId();
+        $connection->exec("INSERT INTO deckslot (deck_id, card_id, quantity) SELECT $id, card_id, quantity FROM deckslot WHERE deck_id = 2");
+        $connection->insert('decksideslot', ['deck_id' => $id, 'card_id' => 34, 'quantity' => 2]);
+
+        return $id;
+    }
+
+    private function slots(Client $client, $table, $deckId) {
+        return array_column($this->db($client)->fetchAll("SELECT card_id, quantity FROM $table WHERE deck_id = ? ORDER BY card_id", [$deckId]), 'quantity', 'card_id');
+    }
+
+    private function deckExists(Client $client, $id) {
+        return (bool) $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deck WHERE id = ?', [$id]);
+    }
+
+    private function newDeckIds(Client $client) {
+        return array_map('intval', array_column($this->db($client)->fetchAll('SELECT id FROM deck WHERE id > ? ORDER BY id', [$this->maxIds['deck']]), 'id'));
+    }
+
+    private function flashMessages(Client $client) {
+        preg_match_all("/insert_alert_message\\('(\\w+)', (\"[^\"]*\")\\)/", $client->getResponse()->getContent(), $matches, PREG_SET_ORDER);
+
+        return array_map(function ($match) {
+            return [$match[1], json_decode($match[2])];
+        }, $matches);
+    }
+
+    /* -------------------------------------------------------------- clone */
+
+    public function testCloneOwnDeck() {
+        $client = $this->createAuthenticatedClient();
+        $source = $this->insertDeck($client, 'PHPUnit Source', ['parent_decklist_id' => 2]);
+
+        $client->request('GET', "/deck/clone/$source");
+
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertSame('/decks', $client->getResponse()->headers->get('Location'));
+        $clone = array_values(array_diff($this->newDeckIds($client), [$source]));
+        $this->assertCount(1, $clone);
+        $deck = $this->db($client)->fetchAssoc('SELECT d.name, d.parent_decklist_id, d.major_version, d.minor_version, u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$clone[0]]);
+        // a new deck, derived from the same decklist as its source
+        $this->assertSame(['name' => 'PHPUnit Source (clone)', 'parent_decklist_id' => '2', 'major_version' => '0', 'minor_version' => '1', 'username' => 'test'], $deck);
+        $this->assertSame($this->slots($client, 'deckslot', $source), $this->slots($client, 'deckslot', $clone[0]));
+        $this->assertSame([34 => '2'], $this->slots($client, 'decksideslot', $clone[0]));
+    }
+
+    public function testCloneAnotherUsersDeck() {
+        $client = $this->createAuthenticatedClient('admin');
+        $source = $this->insertDeck($client, 'PHPUnit Shared');
+
+        // not shared
+        $client->request('GET', "/deck/clone/$source");
+        $this->assertSame(403, $client->getResponse()->getStatusCode());
+        $this->assertSame([$source], $this->newDeckIds($client));
+
+        // shared: the clone belongs to the current user
+        $this->db($client)->update('user', ['is_share_decks' => 1], ['username' => 'test']);
+        $client->request('GET', "/deck/clone/$source");
+        $this->assertSame('/decks', $client->getResponse()->headers->get('Location'));
+        $clone = array_values(array_diff($this->newDeckIds($client), [$source]))[0];
+        $this->assertSame('admin', $this->db($client)->fetchColumn('SELECT u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$clone]));
+    }
+
+    public function testCloneUnknownDeck() {
+        $client = $this->createAuthenticatedClient();
+        $client->request('GET', '/deck/clone/999');
+
+        $this->assertSame(404, $client->getResponse()->getStatusCode());
+    }
+
+    /* ------------------------------------------------------------- delete */
+
+    public function testDelete() {
+        $client = $this->createAuthenticatedClient();
+        $id = $this->insertDeck($client, 'PHPUnit Delete');
+        // a decklist published from it
+        $this->db($client)->update('decklist', ['parent_deck_id' => $id], ['id' => 4]);
+        $this->db($client)->insert('deckchange', ['deck_id' => $id, 'date_creation' => '2015-08-16 00:00:00', 'variation' => '[{},{},{},{}]', 'is_saved' => 1]);
+
+        $client->request('POST', '/deck/delete', ['deck_id' => $id]);
+
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertSame('/decks', $client->getResponse()->headers->get('Location'));
+        $this->assertFalse($this->deckExists($client, $id));
+        $this->assertSame([], $this->slots($client, 'deckslot', $id));
+        $this->assertSame([], $this->slots($client, 'decksideslot', $id));
+        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
+        // the decklist stays, detached from the deck
+        $this->assertNull($this->db($client)->fetchColumn('SELECT parent_deck_id FROM decklist WHERE id = 4'));
+        $client->followRedirect();
+        $this->assertSame([['success', 'Deck deleted.']], $this->flashMessages($client));
+    }
+
+    public function testDeckOfAFellowshipCannotBeDeleted() {
+        $client = $this->createAuthenticatedClient();
+        $id = $this->insertDeck($client, 'PHPUnit In A Fellowship');
+        $this->addToFellowship($client, $id);
+
+        $client->request('POST', '/deck/delete', ['deck_id' => $id]);
+
+        $this->assertSame('/decks', $client->getResponse()->headers->get('Location'));
+        $this->assertTrue($this->deckExists($client, $id));
+        $client->followRedirect();
+        $this->assertSame([['danger', "You can't delete a deck that is member of a fellowship."]], $this->flashMessages($client));
+    }
+
+    private function addToFellowship(Client $client, $deckId) {
+        $connection = $this->db($client);
+        $connection->insert('fellowship', ['user_id' => 1, 'name' => 'PHPUnit', 'name_canonical' => 'phpunit', 'is_public' => 0,
+            'nb_decks' => 1, 'nb_votes' => 0, 'nb_favorites' => 0, 'nb_comments' => 0,
+            'date_creation' => '2015-08-16 00:00:00', 'date_update' => '2015-08-16 00:00:00']);
+        $fellowshipId = (int) $connection->lastInsertId();
+        $connection->insert('fellowship_deck', ['fellowship_id' => $fellowshipId, 'deck_id' => $deckId, 'deck_number' => 1]);
+
+        return $fellowshipId;
+    }
+
+    public function testDeleteAnotherUsersDeck() {
+        $client = $this->createAuthenticatedClient('admin');
+        $id = $this->insertDeck($client, 'PHPUnit Not Yours');
+
+        $client->request('POST', '/deck/delete', ['deck_id' => $id]);
+
+        $this->assertSame(403, $client->getResponse()->getStatusCode());
+        $this->assertTrue($this->deckExists($client, $id));
+    }
+
+    public function testDeleteAnUnknownDeck() {
+        $client = $this->createAuthenticatedClient();
+        $client->request('POST', '/deck/delete', ['deck_id' => 999]);
+
+        $this->assertSame('/decks', $client->getResponse()->headers->get('Location'));
+    }
+
+    /* -------------------------------------------------------- delete list */
+
+    /**
+     * Other users' and unknown decks are skipped silently.
+     */
+    public function testDeleteList() {
+        $client = $this->createAuthenticatedClient();
+        $first = $this->insertDeck($client, 'PHPUnit Delete 1');
+        $second = $this->insertDeck($client, 'PHPUnit Delete 2');
+        $kept = $this->insertDeck($client, 'PHPUnit Kept');
+        $foreign = $this->insertDeck($client, 'PHPUnit Foreign', ['user_id' => 2]);
+
+        $client->request('POST', '/deck/delete_list', ['ids' => "$first-$second-$foreign-999"]);
+
+        $this->assertSame('/decks', $client->getResponse()->headers->get('Location'));
+        $this->assertSame([$kept, $foreign], $this->newDeckIds($client));
+        $client->followRedirect();
+        $this->assertSame([['success', 'Decks deleted.']], $this->flashMessages($client));
+    }
+
+    /**
+     * BUG-ish: unlike the single delete, the list delete does not check fellowships: the deck is
+     * deleted and silently removed from its fellowship (cascade remove on Deck.fellowships), which
+     * keeps the same nb_decks.
+     */
+    public function testDeleteListIgnoresFellowships() {
+        $client = $this->createAuthenticatedClient();
+        $id = $this->insertDeck($client, 'PHPUnit In A Fellowship');
+        $fellowship = $this->addToFellowship($client, $id);
+
+        $client->request('POST', '/deck/delete_list', ['ids' => "$id"]);
+
+        $this->assertSame('/decks', $client->getResponse()->headers->get('Location'));
+        $this->assertFalse($this->deckExists($client, $id));
+        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM fellowship_deck WHERE fellowship_id = ?', [$fellowship]));
+        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT nb_decks FROM fellowship WHERE id = ?', [$fellowship]));
+    }
+
+    /* ----------------------------------------------------------- autosave */
+
+    /**
+     * The builder sends the changes since the last save as
+     * [main added, main removed, side added, side removed]; they are stored as an unsaved history
+     * entry, replaced by a saved one when the deck is saved.
+     */
+    public function testAutosaveThenSave() {
+        $client = $this->createAuthenticatedClient();
+        $id = $this->insertDeck($client, 'PHPUnit Autosave');
+        $diff = [['01001' => 1], ['01013' => 3], [], []];
+
+        $client->request('POST', '/deck/autosave', ['deck_id' => $id, 'diff' => json_encode($diff)], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
+
+        // the answer is the date of the change
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertRegExp('/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d:\d\d$/', $client->getResponse()->getContent());
+        $changes = $this->db($client)->fetchAll('SELECT variation, is_saved FROM deckchange WHERE deck_id = ?', [$id]);
+        $this->assertSame([['variation' => json_encode($diff), 'is_saved' => '0']], $changes);
+        // the deck itself is not changed
+        $this->assertSame($this->slots($client, 'deckslot', 2), $this->slots($client, 'deckslot', $id));
+
+        // saving the deck replaces the unsaved entries by a saved one
+        $crawler = $client->request('GET', "/deck/edit/$id");
+        $form = $crawler->filter('#save_form')->form();
+        $form['content'] = json_encode(['main' => ['01001' => 1, '01002' => 1, '01003' => 1], 'side' => new \stdClass()]);
+        $client->submit($form);
+        $changes = $this->db($client)->fetchAll('SELECT is_saved FROM deckchange WHERE deck_id = ?', [$id]);
+        $this->assertSame([['is_saved' => '1']], $changes);
+    }
+
+    /**
+     * The diff is decoded as objects, and count() of an object is always 1 in PHP 7.1 (a
+     * TypeError in PHP 8): an empty diff still creates a history entry. The builder does not send
+     * empty diffs.
+     */
+    public function testAutosaveEmptyDiff() {
+        $client = $this->createAuthenticatedClient();
+        $id = $this->insertDeck($client, 'PHPUnit Autosave');
+
+        $client->request('POST', '/deck/autosave', ['deck_id' => $id, 'diff' => '[{},{},{},{}]'], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
+    }
+
+    public function testAutosaveDiffInTwoParts() {
+        $client = $this->createAuthenticatedClient();
+        $id = $this->insertDeck($client, 'PHPUnit Autosave');
+
+        $client->request('POST', '/deck/autosave', ['deck_id' => $id, 'diff' => '[{"01001":1},[]]'], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame('[{"01001":1},[]]', $this->db($client)->fetchColumn('SELECT variation FROM deckchange WHERE deck_id = ?', [$id]));
+    }
+
+    /**
+     * @dataProvider invalidAutosaveProvider
+     */
+    public function testInvalidAutosave($username, $deckId, $diff, $status, $message) {
+        $client = $this->createAuthenticatedClient($username);
+        $id = $this->insertDeck($client, 'PHPUnit Autosave');
+
+        $client->request('POST', '/deck/autosave', ['deck_id' => $deckId ?: $id, 'diff' => $diff], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
+
+        // BUG (CoreExceptionListener): the 422 / 403 HTTP exceptions become 500s for AJAX requests
+        $this->assertSame($status, $client->getResponse()->getStatusCode());
+        $this->assertSame(['success' => false, 'message' => $message], json_decode($client->getResponse()->getContent(), true));
+        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
+    }
+
+    public function invalidAutosaveProvider() {
+        return [
+            'unknown deck' => ['test', 999, '[[],[],[],[]]', 500, 'Cannot find deck 999'],
+            'another user\'s deck' => ['admin', null, '[{"01001":1},[],[],[]]', 500, "You don't have access to this deck."],
+            'wrong diff' => ['test', null, '[{"01001":1}]', 500, 'Wrong content [{"01001":1}]'],
+            // 2 parts are accepted by the check, but when the first two are empty parts 2 and 3
+            // are read: undefined offset (a notice turned into an exception in debug mode, a
+            // warning in production)
+            'empty diff in 2 parts' => ['test', null, '[[],[]]', 500, 'Undefined offset: 2'],
+        ];
+    }
+
+    /* ------------------------------------------------------------ access */
+
+    /**
+     * @dataProvider anonymousRouteProvider
+     */
+    public function testAnonymousIsRedirectedToLogin($method, $uri) {
+        $client = static::createClient();
+        $client->request($method, $uri, ['deck_id' => 1, 'ids' => '1', 'diff' => '[[],[],[],[]]']);
+
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertSame('http://localhost/login', $client->getResponse()->headers->get('Location'));
+        $this->assertTrue($this->deckExists($client, 1));
+    }
+
+    public function anonymousRouteProvider() {
+        return [
+            'clone' => ['GET', '/deck/clone/1'],
+            'delete' => ['POST', '/deck/delete'],
+            'delete list' => ['POST', '/deck/delete_list'],
+            'autosave' => ['POST', '/deck/autosave'],
+        ];
+    }
+}
