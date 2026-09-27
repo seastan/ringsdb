@@ -667,13 +667,19 @@ name, number of decks, cards, packs, custom packs, number of Core Sets, sort ord
 
 - `app:suggestions` (`SuggestionsCommand`, still used, `SuggestionsCommandTest`): computes which
   cards are used together in decks (all decks, private or not) and writes
-  `web/suggestions.json`, loaded by the deck builder (`app.suggestions-statistics.js`,
-  `app.suggestions-mixed.js`): `index` = the codes of the cards used in at least one deck, by card
+  `web/suggestions.json`, loaded by the deck builder (`app.suggestions-mixed.js`, when the
+  "show suggestions" option is on; `app.suggestions-statistics.js` and
+  `app.suggestions-heuristics.js` are variants no template loads): `index` = the codes of the cards used in at least one deck, by card
   id; `matrix` = lower triangular, number of decks with both cards divided by
   `max(100, min(decks of each card))`, in percent. The output path is hard-coded from
   `kernel.root_dir` (gone in recent Symfony, use `kernel.project_dir`), and the command always
   overwrites the file: the test saves and restores it. The file is generated: no longer tracked by git
   (it was committed although listed in `.gitignore`), it has to be (re)generated on each server.
+- `app:patron <email or username> [donation]` (`PatronCommand`, `PatronCommandTest`): the only way
+  to record a donation (`user.donation`, cumulative; `> 0` makes a "Gracious Patron": badge next
+  to the name, `/patrons` page, extra buttons in the play simulator through
+  `/api/public/user/info`). Without an amount (or with 0) it shows the total. The amount is not
+  checked (a negative one is subtracted); an unknown user is reported but exits with code 0.
 
 ## OCTGN features (to be removed)
 
@@ -717,6 +723,8 @@ removed before the migration so that it does not have to be ported:
 
 - `Texts::truncate()`: never called.
 - `SocialController::findSimilarDecklists()`: never called (already marked "(unused)").
+- `Default/recent_reviews.html.twig`: included by no template nor controller (it also read a
+  `review.donation` that reviews do not have).
 - `SocialController::usercommentsAction()` and `commentsAction()`, with their templates
   `Default/usercomments.html.twig` and `Default/allcomments.html.twig`: the comment lists of a
   user and of the whole site. Their routes were reused for the user admin panel on 2016-04-01
