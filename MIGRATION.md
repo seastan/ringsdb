@@ -199,6 +199,15 @@ field). Everything the tests create is deleted in `tearDown()`.
 - `src/AppBundle/Resources/public/js/directimport.js` is not loaded by any template (the import
   page uses `ui.deckimport.js`). Dead file.
 - `/deck/save` and `/decklist/create` have no CSRF protection.
+- Deck tags (`/tag/add`, `/tag/remove`, `/tag/clear`, `TagControllerTest`): fixed, `/tag/` had no
+  `access_control` rule and the controller calls `getUser()->getId()` without checking the user,
+  so an anonymous request on an existing deck crashed (`500`); `^/tag/` now requires `ROLE_USER`
+  (`403` JSON for AJAX, redirect to the login page otherwise). Fixed too: empty tags (from an
+  empty or badly spaced tag string, or from the page splitting the typed text on spaces) were
+  stored (`" gondor"`); tags are now normalized by `Decks::normalizeTags()` (distinct, non-empty),
+  in `TagController` and in `Decks::saveDeck()`, where whitespace-only tags now fall back to the
+  heroes' spheres like empty ones. Existing badly spaced tags are cleaned up on the next change.
+  The JSON answer is sent as `text/html`. Other users' and unknown decks are skipped silently.
 - `/deck/copy/{decklist_id}` writes to the database on GET (see also `/deck/new`).
 - Fixed: `POST /decklist/create` with an unknown or missing `deck_id` crashed (`getUser()` on
   null); it now answers `400 Bad Request`.

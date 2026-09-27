@@ -580,6 +580,37 @@ class DeckWorkflowTest extends WebTestCase {
         $this->assertSame('http://localhost/login', $client->getResponse()->headers->get('Location'));
     }
 
+    /**
+     * The tags typed in the builder are split on spaces; empty tags are dropped, and a deck
+     * without tags gets the spheres of its heroes.
+     *
+     * @dataProvider tagsProvider
+     */
+    public function testSavedTags($tags, $expected) {
+        $client = $this->createAuthenticatedClient();
+        $deckId = $this->createDeck($client);
+
+        $client->request('POST', '/deck/save-ajax', [
+            'id' => $deckId,
+            'name' => 'PHPUnit Tags',
+            'tags' => $tags,
+            'content' => json_encode(['main' => self::coreLeadershipDeck(), 'side' => new \stdClass()]),
+        ]);
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame($expected, $this->fetchDeck($client, $deckId)['tags']);
+    }
+
+    public function tagsProvider() {
+        return [
+            'tags' => ['gondor leadership', 'gondor leadership'],
+            'extra spaces and duplicates' => ['  gondor   leadership gondor ', 'gondor leadership'],
+            // the heroes (Aragorn, Théodred, Glóin) are all Leadership
+            'no tags' => ['', 'leadership'],
+            'only spaces' => ['   ', 'leadership'],
+        ];
+    }
+
     public function testPublishingAnInvalidDeckIsRefused() {
         $client = $this->createAuthenticatedClient();
         $deckId = $this->createDeck($client);
