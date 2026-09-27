@@ -77,6 +77,7 @@ doctrine:
         dql:
             string_functions:
                 binary: AppBundle\DQL\BinaryFunction
+                replace: AppBundle\DQL\ReplaceFunction
             numeric_functions:
                 power: AppBundle\DQL\PowerFunction
 

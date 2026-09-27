@@ -716,6 +716,22 @@ Decisions needed before removing:
   and an OCTGN id `mapping` of the reprints, probably used by the external report that consumes
   them (see "Card statistics").
 
+## Card search
+
+Covered by `src/AppBundle/Tests/Controller/CardSearchTest.php` (public API
+`/api/public/cards/search/{q}` and site search `/find`).
+
+- Fixed: a search term in capitals (2 letters or more) is also searched as an acronym
+  (`CardsData`, name search): case-sensitively in the name (`BINARY(...)`,
+  `AppBundle\DQL\BinaryFunction`) and as the initials of the words, dashes counting as spaces
+  (`REPLACE(c.name, '-', ' ') LIKE 'S% O% G%'`, `AppBundle\DQL\ReplaceFunction`). The `replace`
+  DQL function had never been registered (since the conversion from ThronesDB), so every such
+  search failed with a `500` ("Expected known function, got 'REPLACE'"). Registered in
+  `config.yml`: "SOG" finds "Steward of Gondor" (and "Soldier of Gondor"), "LOS" "Longbeard Orc
+  Slayer".
+- The custom DQL functions (`binary`, `replace`, `power`) are MySQL-specific; Doctrine ORM 2.x
+  has no built-in equivalent (DoctrineExtensions provides them).
+
 ## Removed dead code
 
 Code no route, template, script or other code could reach (found with the coverage report),
