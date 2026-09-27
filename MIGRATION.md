@@ -223,6 +223,13 @@ field). Everything the tests create is deleted in `tearDown()`.
     empty reads undefined offsets 2 and 3 (`500` in debug mode).
   - Unknown deck, another user's deck, wrong diff: HTTP exceptions, `500` for AJAX requests
     (`CoreExceptionListener`).
+  - `POST /deck/import/all` (zip archive, "uparchive"): one deck per file, named after the file
+    (without folder nor extension); text files through the text import parser, `.o8d` through the
+    OCTGN one; a file without any card gives an empty deck; a non-zip file or no file is a `422`.
+    BUG: the OCTGN parser (`BuilderController::parseOctgnImport`, also used by the single file
+    import of a `.o8d`, `/deck/fileimport`) still looks cards up by `Card.octgnid`, moved to
+    `CardPrinting` by the card printings refactor ("Unrecognized field: octgnid", `500`, nothing
+    imported).
 - Decklist edit / save / delete (`/decklist/edit|save|delete/{id}`, `DecklistEditTest`): no
   `access_control` rule for `/decklist/`, the controllers check the user; anonymous users are
   redirected to the login page on edit / save but get a `403` on delete (different exception
@@ -655,6 +662,41 @@ name, number of decks, cards, packs, custom packs, number of Core Sets, sort ord
 
 - `QuestLogManager::findQuestLogsByRecentDiscussion()` is dead code: `Questlog` has no
   `dateLastComment` field, so the query fails; nothing calls it.
+
+## OCTGN features (to be removed)
+
+Plan: drop every OCTGN feature (OCTGN is a desktop client for the game) before the migration, so
+they do not have to be ported. Do not fix the OCTGN bugs found by the tests, remove the features
+instead.
+
+What there is today:
+
+- Exports as `.o8d` (template `Export/octgn.xml.twig`): routes `deck_export_octgn`,
+  `deck_export_octgn_list`, `decklist_export_octgn`, `fellowship_export_octgn`,
+  `questlog_export_octgn`, with their buttons in the toolbars (`Builder/`, `Decklist/`,
+  `Fellowship/`, `Quest/`, `QuestLog/toolbar.html.twig`), the My Decks page
+  (`Builder/decks.html.twig`, `no-decks.html.twig`) and the scripts `ui.decklist.js`,
+  `ui.decks.js`, `ui.fellowshipview.js`, `ui.questlogview.js`.
+- Imports of `.o8d`: `BuilderController::parseOctgnImport()`, used by the single file import
+  (`/deck/fileimport`, `Modale/file.html.twig`) and the archive import (`/deck/import/all`).
+  BUG, not to be fixed: the parser looks cards up by `Card.octgnid`, moved to `CardPrinting` by
+  the card printings refactor, so both imports fail on a `.o8d` (pinned by
+  `DeckManagementTest::testImportAnArchiveWithAnOctgnFile`).
+- Data: `CardPrinting.octgnid` and `Sphere.octgnid` (mappings, forms `CardPrintingType`,
+  `SphereType`, admin templates `Card/`, `CardPrinting/`, `Sphere/`), filled by the CSV import
+  (`CSVController`) and `BeornJSONtoRingsDBcsv.py`.
+- Commands: `UpdateOctgnCommand`, `ScrapOctgnCardDataCommand`, and the OCTGN parts of
+  `ScrapBeornCardDataCommand`.
+- The "about" page mentions OCTGN (`Default/about.html.twig`).
+
+Decisions needed before removing:
+
+- The public API returns `octgnid` for each card and each printing (`CardsData`, served by
+  `/api/public/card(s)`): removing it changes the public API (its snapshots) for its external
+  consumers.
+- The card statistics (`CardStatsCalculator`, `StatController`) return the cards' `octgnid`
+  and an OCTGN id `mapping` of the reprints, probably used by the external report that consumes
+  them (see "Card statistics").
 
 ## Removed dead code
 

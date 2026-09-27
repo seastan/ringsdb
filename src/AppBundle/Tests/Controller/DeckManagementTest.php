@@ -10,7 +10,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * - clone (GET /deck/clone/{id}, "Clone" button of the deck page), a GET that writes;
  * - delete (POST /deck/delete, modal of the deck page and of My Decks);
  * - delete a selection (POST /deck/delete_list, "ids" = "1-2-3", My Decks);
- * - autosave (POST /deck/autosave, sent by app.deck_history.js from the deck builder).
+ * - autosave (POST /deck/autosave, sent by app.deck_history.js from the deck builder);
+ * - import of several decks from a zip archive (POST /deck/import/all, My Decks).
  *
  * The tests work on decks inserted for them (copies of fixture deck 2, owned by "test");
  * everything is removed or restored in tearDown().
@@ -334,6 +335,96 @@ class DeckManagementTest extends WebTestCase {
         ];
     }
 
+    /* ----------------------------------------------------- import archive */
+
+    /**
+     * Downloads an export of a fixture deck ("text" or "octgn").
+     */
+    private function export(Client $client, $format, $deckId) {
+        $client->request('GET', "/deck/export/$format/$deckId");
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+
+        return $client->getResponse()->getContent();
+    }
+
+    /**
+     * Posts a zip archive of [name => content] to POST /deck/import/all ("Import from an archive"
+     * modal of My Decks).
+     */
+    private function uploadArchive(Client $client, array $entries) {
+        $file = tempnam(sys_get_temp_dir(), 'archive');
+        $zip = new \ZipArchive();
+        $zip->open($file, \ZipArchive::OVERWRITE);
+        foreach ($entries as $name => $content) {
+            $zip->addFromString($name, $content);
+        }
+        $zip->close();
+
+        $client->request('POST', '/deck/import/all', [], ['uparchive' => new \Symfony\Component\HttpFoundation\File\UploadedFile($file, 'decks.zip', null, filesize($file), null, true)]);
+        unlink($file);
+
+        return $client->getResponse();
+    }
+
+    /**
+     * One deck per file of the archive, named after the file (without folder nor extension).
+     */
+    public function testImportAnArchive() {
+        $client = $this->createAuthenticatedClient();
+
+        $response = $this->uploadArchive($client, [
+            'Dwarves.txt' => $this->export($client, 'text', 1),
+            'folder/Gondor.txt' => $this->export($client, 'text', 2),
+            'Nothing.txt' => "Nothing to see here\n",
+        ]);
+
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame('/decks', $response->headers->get('Location'));
+        $decks = $this->db($client)->fetchAll('SELECT id, name, user_id FROM deck WHERE id > ? ORDER BY id', [$this->maxIds['deck']]);
+        $this->assertSame(['Dwarves', 'Gondor', 'Nothing'], array_column($decks, 'name'));
+        $this->assertSame(['1', '1', '1'], array_column($decks, 'user_id'));
+        // the cards of the exported decks come back; a file without any card gives an empty deck
+        $this->assertSame($this->slots($client, 'deckslot', 1), $this->slots($client, 'deckslot', $decks[0]['id']));
+        $this->assertSame($this->slots($client, 'deckslot', 2), $this->slots($client, 'deckslot', $decks[1]['id']));
+        $this->assertSame([], $this->slots($client, 'deckslot', $decks[2]['id']));
+        $client->followRedirect();
+        $this->assertSame([['success', 'Decks imported.']], $this->flashMessages($client));
+    }
+
+    /**
+     * BUG: the OCTGN parser (BuilderController::parseOctgnImport, also used by the single file
+     * import of a .o8d) still looks cards up by Card.octgnid, moved to CardPrinting by the card
+     * printings refactor: an archive with a .o8d file fails, and nothing is imported (a single
+     * flush at the end).
+     */
+    public function testImportAnArchiveWithAnOctgnFile() {
+        $client = $this->createAuthenticatedClient();
+
+        $response = $this->uploadArchive($client, [
+            'Dwarves.txt' => $this->export($client, 'text', 1),
+            'Noldor.o8d' => $this->export($client, 'octgn', 3),
+        ]);
+
+        $this->assertSame(500, $response->getStatusCode());
+        $this->assertContains('Unrecognized field: octgnid', $response->getContent());
+        $this->assertSame([], $this->newDeckIds($client));
+    }
+
+    public function testImportSomethingElseThanAnArchive() {
+        $client = $this->createAuthenticatedClient();
+        $file = tempnam(sys_get_temp_dir(), 'archive');
+        file_put_contents($file, "1x Aragorn\n");
+
+        $client->request('POST', '/deck/import/all', [], ['uparchive' => new \Symfony\Component\HttpFoundation\File\UploadedFile($file, 'decks.zip', null, filesize($file), null, true)]);
+        unlink($file);
+
+        $this->assertSame(422, $client->getResponse()->getStatusCode());
+        $this->assertSame([], $this->newDeckIds($client));
+
+        $client->request('POST', '/deck/import/all');
+        $this->assertSame(422, $client->getResponse()->getStatusCode());
+    }
+
     /* ------------------------------------------------------------ access */
 
     /**
@@ -354,6 +445,7 @@ class DeckManagementTest extends WebTestCase {
             'delete' => ['POST', '/deck/delete'],
             'delete list' => ['POST', '/deck/delete_list'],
             'autosave' => ['POST', '/deck/autosave'],
+            'import archive' => ['POST', '/deck/import/all'],
         ];
     }
 }
