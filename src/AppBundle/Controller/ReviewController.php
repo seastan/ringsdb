@@ -15,6 +15,9 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class ReviewController extends Controller {
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function postAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -72,6 +75,9 @@ class ReviewController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function editAction(Request $request) {
 
         /* @var $em \Doctrine\ORM\EntityManager */
@@ -115,6 +121,9 @@ class ReviewController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function likeAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -163,6 +172,10 @@ class ReviewController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function removeAction($id, Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -191,6 +204,10 @@ class ReviewController extends Controller {
         ]);
     }
 
+    /**
+     * @param int $page
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function listAction($page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
@@ -257,6 +274,11 @@ class ReviewController extends Controller {
         ], $response);
     }
 
+    /**
+     * @param mixed $user_id
+     * @param int $page
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function byauthorAction($user_id, $page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
@@ -328,6 +350,9 @@ class ReviewController extends Controller {
         ], $response);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function commentAction(Request $request) {
 
         /* @var $em \Doctrine\ORM\EntityManager */

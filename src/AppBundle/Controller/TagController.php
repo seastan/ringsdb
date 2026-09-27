@@ -7,6 +7,9 @@ use AppBundle\Entity\Deck;
 use Symfony\Component\HttpFoundation\Response;
 
 class TagController extends Controller {
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function addAction(Request $request) {
         $list_id = $request->get('ids');
         $list_tag = $this->get('decks')->normalizeTags((array) $request->get('tags'));
@@ -37,6 +40,9 @@ class TagController extends Controller {
         return new Response(json_encode($response));
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function removeAction(Request $request) {
         $list_id = $request->get('ids');
         $list_tag = $this->get('decks')->normalizeTags((array) $request->get('tags'));
@@ -67,6 +73,9 @@ class TagController extends Controller {
         return new Response(json_encode($response));
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function clearAction(Request $request) {
         $list_id = $request->get('ids');
 

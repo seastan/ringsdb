@@ -8,6 +8,9 @@ use Doctrine\Common\Collections\ArrayCollection;
  * Decorator for a collection of SlotInterface
  */
 class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterface {
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
     protected $slots;
 
     public function __construct(\Doctrine\Common\Collections\Collection $slots) {
@@ -22,8 +25,11 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
         return $this->slots->removeElement($element);
     }
 
+    /**
+     * @param mixed $mode
+     */
     public function count($mode = null) {
-        return $this->slots->count($mode);
+        return $this->slots->count();
     }
 
     public function getIterator() {
@@ -194,6 +200,9 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
         return $threat;
     }
 
+    /**
+     * @return array
+     */
     public function getCopiesAndDeckLimit() {
         $copiesAndDeckLimit = [];
         foreach ($this->slots as $slot) {

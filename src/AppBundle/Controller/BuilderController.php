@@ -15,6 +15,9 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class BuilderController extends Controller {
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function newAction() {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -34,6 +37,10 @@ class BuilderController extends Controller {
         return $this->redirect($this->get('router')->generate('deck_edit', ['deck_id' => $deck->getId()]));
     }
 
+    /**
+     * @param mixed $deck_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function editAction($deck_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -55,6 +62,10 @@ class BuilderController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $deck_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function viewAction($deck_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -80,6 +91,9 @@ class BuilderController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function importAction() {
         $response = new Response();
         $response->setPublic();
@@ -90,6 +104,9 @@ class BuilderController extends Controller {
         ], $response);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function fileimportAction(Request $request) {
         $filetype = filter_var($request->get('type'), FILTER_SANITIZE_STRING);
         $uploadedFile = $request->files->get('upfile');
@@ -126,6 +143,10 @@ class BuilderController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $text
+     * @return array
+     */
     public function parseTextImport($text) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -207,6 +228,10 @@ class BuilderController extends Controller {
         ];
     }
 
+    /**
+     * @param mixed $octgn
+     * @return array
+     */
     public function parseOctgnImport($octgn) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -266,6 +291,10 @@ class BuilderController extends Controller {
         ];
     }
 
+    /**
+     * @param mixed $deck_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function textexportAction($deck_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -298,6 +327,10 @@ class BuilderController extends Controller {
         return $response;
     }
 
+    /**
+     * @param mixed $deck_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function octgnexportAction($deck_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -329,6 +362,10 @@ class BuilderController extends Controller {
         return $response;
     }
 
+    /**
+     * @param mixed $deck_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function cloneAction($deck_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -366,6 +403,9 @@ class BuilderController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function saveAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -426,6 +466,9 @@ class BuilderController extends Controller {
         return $this->redirect($this->generateUrl('decks_list'));
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function saveAjaxAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -475,6 +518,9 @@ class BuilderController extends Controller {
         return new JsonResponse(['success' => true, 'id' => $deck->getId()]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function deleteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -506,6 +552,9 @@ class BuilderController extends Controller {
         return $this->redirect($this->generateUrl('decks_list'));
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function deleteListAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -535,6 +584,11 @@ class BuilderController extends Controller {
         return $this->redirect($this->generateUrl('decks_list'));
     }
 
+    /**
+     * @param mixed $deck1_id
+     * @param mixed $deck2_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function compareAction($deck1_id, $deck2_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -573,6 +627,9 @@ class BuilderController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function listAction(Request $request) {
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
@@ -614,6 +671,10 @@ class BuilderController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $decklist_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function copyAction($decklist_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -645,18 +706,29 @@ class BuilderController extends Controller {
         ]);
     }
 
+    /**
+     * @return mixed
+     */
     public function octgnexportListAction(Request $request) {
         $list_id = $request->get('ids');
 
         return $this->downloadFromSelection($list_id, true);
     }
 
+    /**
+     * @return mixed
+     */
     public function textexportListAction(Request $request) {
         $list_id = $request->get('ids');
 
         return $this->downloadFromSelection($list_id, false);
     }
 
+    /**
+     * @param mixed $list_id
+     * @param mixed $octgn
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function downloadFromSelection($list_id, $octgn) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -711,6 +783,9 @@ class BuilderController extends Controller {
         return $response;
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function uploadallAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -766,6 +841,9 @@ class BuilderController extends Controller {
         return $this->redirect($this->generateUrl('decks_list'));
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function autosaveAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();

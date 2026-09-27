@@ -11,6 +11,11 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use AppBundle\Entity\Card;
 use AppBundle\Entity\CardPrinting;
 
+/**
+ * @param string $url
+ * @param int $attemptsRemaining
+ * @return string|false
+ */
 function file_get_contents_retry($url, $attemptsRemaining = 3) {
     $content = @file_get_contents($url);
     $attemptsRemaining--;
@@ -24,6 +29,9 @@ function file_get_contents_retry($url, $attemptsRemaining = 3) {
 
 class ScrapCardDataCommand extends ContainerAwareCommand {
 
+    /**
+     * @return void
+     */
     protected function configure() {
         $this->setName('app:cgdb:cards')
              ->setDescription('Download new card data from CGDB')

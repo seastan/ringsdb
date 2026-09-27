@@ -10,6 +10,9 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class ScrapOctgnCardDataCommand extends ContainerAwareCommand {
 
+    /**
+     * @return void
+     */
     protected function configure() {
         $this->setName('app:cards:octgn')
              ->setDescription('Load Card Data from OCTGN sets')

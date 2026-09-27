@@ -15,6 +15,9 @@ use Symfony\Component\DomCrawler\Crawler;
  *   docker compose exec -e UPDATE_SNAPSHOTS=1 -u www-data symfony php bin/simple-phpunit
  */
 trait PageSnapshotTrait {
+    /**
+     * @return string
+     */
     private static function pageText(Crawler $crawler) {
         $crawler->filter('script, style, noscript')->each(function (Crawler $node) {
             $domNode = $node->getNode(0);
@@ -32,7 +35,11 @@ trait PageSnapshotTrait {
         return implode("\n", $lines) . "\n";
     }
 
-    private function assertMatchesSnapshot($name, $actual) {
+    /**
+     * @param mixed $name
+     * @param mixed $actual
+     */
+    private function assertMatchesSnapshot($name, $actual): void {
         $file = __DIR__ . '/../Resources/snapshots/pages/' . $name;
 
         if (getenv('UPDATE_SNAPSHOTS')) {

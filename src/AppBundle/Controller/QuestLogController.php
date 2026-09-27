@@ -20,6 +20,10 @@ use DateTime;
 class QuestLogController extends Controller {
 
     // Set the deck content to the QuestlogDeck snapshot
+    /**
+     * @param mixed $questlog
+     * @return void
+     */
     public function setSnapshot($questlog) {
         $questlog_decks = $questlog->getDecks();
         $decks_service = $this->get('decks');
@@ -34,12 +38,21 @@ class QuestLogController extends Controller {
             $decks_service->setSlots($deck,$questlogdeck_content);
         }
     }
+    /**
+     * @param mixed $questlogs
+     * @return void
+     */
     public function setSnapshots($questlogs) {
         foreach ($questlogs as $questlog) {
             $this->setSnapshot($questlog);
         }
     }
 
+    /**
+     * @param mixed $scenario_name_canonical
+     * @param mixed $quest_mode
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function mylistAction($scenario_name_canonical, $quest_mode) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -134,6 +147,9 @@ class QuestLogController extends Controller {
     }
 
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function myCompleteListAction() {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -180,6 +196,11 @@ class QuestLogController extends Controller {
     }
 
 
+    /**
+     * @param mixed $type
+     * @param int $page
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function listAction($type, $page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
@@ -260,6 +281,14 @@ class QuestLogController extends Controller {
         ], $response);
     }
 
+    /**
+     * @param mixed $deck1_id
+     * @param mixed $deck2_id
+     * @param mixed $deck3_id
+     * @param mixed $deck4_id
+     * @param mixed $public
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function newAction($deck1_id, $deck2_id, $deck3_id, $deck4_id, $public) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -320,6 +349,10 @@ class QuestLogController extends Controller {
         ], $response);
     }
 
+    /**
+     * @param mixed $questlog_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function editAction($questlog_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -376,6 +409,10 @@ class QuestLogController extends Controller {
         return $this->render('AppBundle:QuestLog:edit.html.twig', $data, $response);
     }
 
+    /**
+     * @param mixed $questlog_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function viewAction($questlog_id) {
         /* @var $questlog \AppBundle\Entity\Questlog */
         $questlog = $this->getDoctrine()->getManager()->getRepository('AppBundle:Questlog')->find($questlog_id);
@@ -436,6 +473,9 @@ class QuestLogController extends Controller {
         return $this->render('AppBundle:QuestLog:view.html.twig', $data);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function saveAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -623,6 +663,9 @@ class QuestLogController extends Controller {
         ]));
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function deleteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -661,6 +704,9 @@ class QuestLogController extends Controller {
         return $this->redirect($this->generateUrl('myquestlogs_list'));
     }
 
+    /**
+     * @return string
+     */
     private function searchForm(Request $request) {
         $dbh = $this->getDoctrine()->getConnection();
 
@@ -748,6 +794,9 @@ class QuestLogController extends Controller {
         return $this->renderView('AppBundle:QuestLog:form.html.twig', $params);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function searchAction(Request $request) {
         $response = new Response();
         $response->setPublic();
@@ -850,6 +899,9 @@ class QuestLogController extends Controller {
     }
 
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function deleteListAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -893,14 +945,27 @@ class QuestLogController extends Controller {
         return $this->redirect($this->generateUrl('myquestlogs_list'));
     }
 
+    /**
+     * @param mixed $questlog_id
+     * @return mixed
+     */
     public function octgnexportAction($questlog_id) {
         return $this->downloadFromSelection($questlog_id, true);
     }
 
+    /**
+     * @param mixed $questlog_id
+     * @return mixed
+     */
     public function textexportAction($questlog_id) {
         return $this->downloadFromSelection($questlog_id, false);
     }
 
+    /**
+     * @param mixed $questlog_id
+     * @param mixed $octgn
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function downloadFromSelection($questlog_id, $octgn) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -979,6 +1044,9 @@ class QuestLogController extends Controller {
         return $response;
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function favoriteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -1034,6 +1102,9 @@ class QuestLogController extends Controller {
         return new Response($questlog->getNbFavorites());
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function commentAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -1125,6 +1196,11 @@ class QuestLogController extends Controller {
     /*
      * hides a comment, or if $hidden is false, unhide a comment
      */
+    /**
+     * @param mixed $comment_id
+     * @param mixed $hidden
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function hidecommentAction($comment_id, $hidden) {
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
@@ -1153,6 +1229,9 @@ class QuestLogController extends Controller {
     /*
 	 * records a user's vote
 	 */
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function voteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -1192,6 +1271,10 @@ class QuestLogController extends Controller {
         return new Response($questlog->getNbVotes());
     }
 
+    /**
+     * @param mixed $username
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function byauthorAction($username) {
         return $this->redirect($this->generateUrl('questlogs_list', ['type' => 'find', 'author' => $username]));
     }

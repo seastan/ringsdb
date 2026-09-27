@@ -32,6 +32,11 @@ class DecklistFactory {
         $this->texts = $texts;
     }
 
+    /**
+     * @param mixed $name
+     * @param mixed $descriptionMd
+     * @return \AppBundle\Entity\Decklist
+     */
     public function createDecklistFromDeck(Deck $deck, $name = null, $descriptionMd = null) {
         /* @var $lastPack \AppBundle\Entity\Pack */
         $lastPack = $deck->getLastPack();

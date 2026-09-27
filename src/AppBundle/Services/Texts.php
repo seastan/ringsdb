@@ -31,6 +31,8 @@ class Texts {
 
     /**
      * Returns the processed version of a markdown text
+     * @param mixed $string
+     * @return string
      */
     public function markdown($string) {
         return $this->purify($this->img_responsive($this->transform($string)));

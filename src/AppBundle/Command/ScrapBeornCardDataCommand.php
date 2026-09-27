@@ -14,6 +14,9 @@ use Symfony\Component\VarDumper\VarDumper;
 
 class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
+    /**
+     * @return void
+     */
     protected function configure() {
         $this->setName('app:beorn:html')
              ->setDescription('Download new card data from Hall of Beorn')

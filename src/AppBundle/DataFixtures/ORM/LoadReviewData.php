@@ -12,8 +12,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LoadReviewData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
+    /**
+     * @var \Symfony\Component\DependencyInjection\ContainerInterface|null
+     */
     private $container;
 
+    /**
+     * @return void
+     */
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
@@ -26,6 +32,9 @@ class LoadReviewData extends AbstractFixture implements ContainerAwareInterface,
         ];
     }
 
+    /**
+     * @return void
+     */
     public function load(ObjectManager $manager)
     {
         /** @var User $user */

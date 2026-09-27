@@ -21,6 +21,9 @@ class LoadQuestlogData extends AbstractFixture implements DependentFixtureInterf
         ];
     }
 
+    /**
+     * @return void
+     */
     public function load(ObjectManager $manager)
     {
         /** @var User $user */

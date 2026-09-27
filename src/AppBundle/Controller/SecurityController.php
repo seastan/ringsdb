@@ -7,6 +7,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\SecurityContext;
 
 class SecurityController extends Controller {
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function loginAction(Request $request) {
         $session = $request->getSession();
 
@@ -34,6 +37,9 @@ class SecurityController extends Controller {
         );
     }
 
+    /**
+     * @return void
+     */
     public function loginCheckAction(Request $request) {
         
     }

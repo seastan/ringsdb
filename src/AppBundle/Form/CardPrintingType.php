@@ -8,6 +8,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class CardPrintingType extends AbstractType {
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $filterPack = $options['filter_pack'];
 
@@ -46,6 +49,9 @@ class CardPrintingType extends AbstractType {
             ->add('quest', null, array('required' => false, 'label' => 'Quest override'));
     }
 
+    /**
+     * @return void
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver) {
         $resolver->setDefaults([
             'data_class'  => 'AppBundle\Entity\CardPrinting',

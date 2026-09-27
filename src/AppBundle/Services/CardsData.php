@@ -32,6 +32,9 @@ class CardsData {
 	 */
 	private $rootDir;
 
+	/**
+	 * @param mixed $rootDir
+	 */
 	public function __construct(Registry $doctrine, Router $router, AssetsHelper $assets_helper, $rootDir) {
 		$this->doctrine = $doctrine;
 		$this->router = $router;
@@ -64,6 +67,10 @@ class CardsData {
 		return str_replace(array_keys($displayTextReplacements), array_values($displayTextReplacements), $text);
 	}
 
+	/**
+	 * @param mixed $text
+	 * @return string
+	 */
 	public function splitInParagraphs($text) {
 		if (empty($text)) {
 			return '';
@@ -74,6 +81,9 @@ class CardsData {
 		}, preg_split('/[\r?\n]+/', $text)));
 	}
 
+	/**
+	 * @return array
+	 */
 	public function allSetsData() {
 		$list_cycles = $this->doctrine->getRepository('AppBundle:Cycle')->findBy([], ["position" => "ASC"]);
 		$cycles = [];
@@ -121,12 +131,21 @@ class CardsData {
 		return $cycles;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getPrimarySpheres() {
 		$spheres = $this->doctrine->getRepository('AppBundle:Sphere')->findBy(["is_primary" => true], ["code" => "ASC"]);
 
 		return $spheres;
 	}
 
+    /**
+     * @param mixed $conditions
+     * @param mixed $sortorder
+     * @param bool $forceempty
+     * @return array
+     */
     public function get_search_rows($conditions, $sortorder, $forceempty = false) {
         $i = 0;
         /* @var \Doctrine\ORM\EntityManager $em */
@@ -532,6 +551,10 @@ class CardsData {
 		return $cardinfo;
 	}
 
+	/**
+	 * @param mixed $query
+	 * @return array
+	 */
 	public function syntax($query) {
 		// renvoie une liste de conditions (array)
 		// chaque condition est un tableau à n>1 éléments
@@ -606,6 +629,10 @@ class CardsData {
 		return $list;
 	}
 
+    /**
+     * @param mixed $conditions
+     * @return array<int, mixed>
+     */
     public function validateConditions($conditions) {
 		// suppression des conditions invalides
 		$numeric = ['<', '>'];
@@ -623,6 +650,10 @@ class CardsData {
 		return array_values($conditions);
 	}
 
+	/**
+	 * @param mixed $conditions
+	 * @return string
+	 */
 	public function buildQueryFromConditions($conditions) {
 		return implode(" ", array_map(function($l) {
 			return ($l[0] ? $l[0] . $l[1] : "") . implode("|", array_map(function($s) {
@@ -631,6 +662,10 @@ class CardsData {
 		}, $conditions));
 	}
 
+	/**
+	 * @param mixed $card
+	 * @return array
+	 */
 	public function get_reviews($card) {
 		$reviews = $this->doctrine->getRepository('AppBundle:Review')->findBy(['card' => $card], ['nbVotes' => 'DESC', 'id' => 'ASC']);
 
@@ -639,6 +674,9 @@ class CardsData {
 		return $response;
 	}
 
+	/**
+	 * @return array<string, int>
+	 */
 	public function getDistinctTraits() {
 		/**
 		 * @var \Doctrine\ORM\EntityManager $em

@@ -14,10 +14,20 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 
 class DefaultController extends Controller {
+    /**
+     * Newest first
+     *
+     * @param array $a
+     * @param array $b
+     * @return int
+     */
     function orderNew($a, $b) {
-        return ($a['dateCreation'] < $b['dateCreation']);
+        return $b['dateCreation'] <=> $a['dateCreation'];
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function indexAction() {
         $response = new Response();
         $response->setPublic();
@@ -302,6 +312,9 @@ class DefaultController extends Controller {
         ], $response);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     function rulesAction() {
         $response = new Response();
         $response->setPublic();
@@ -318,6 +331,9 @@ class DefaultController extends Controller {
         return $response;
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     function aboutAction() {
         $response = new Response();
         $response->setPublic();
@@ -329,6 +345,9 @@ class DefaultController extends Controller {
         ], $response);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     function apiIntroAction() {
         $response = new Response();
         $response->setPublic();

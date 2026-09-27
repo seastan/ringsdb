@@ -10,6 +10,9 @@ use AppBundle\Form\CardPrintingType;
 
 class CardPrintingController extends Controller {
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function indexAction(Request $request) {
         $em = $this->getDoctrine()->getManager();
 
@@ -43,6 +46,10 @@ class CardPrintingController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function showAction($id) {
         $em     = $this->getDoctrine()->getManager();
         $entity = $em->getRepository('AppBundle:CardPrinting')->find($id);
@@ -59,6 +66,9 @@ class CardPrintingController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function newAction(Request $request) {
         $em         = $this->getDoctrine()->getManager();
         $filterPack = $this->resolveFilterPack($request, $em);
@@ -73,6 +83,9 @@ class CardPrintingController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function createAction(Request $request) {
         $em         = $this->getDoctrine()->getManager();
         $filterPack = $this->resolveFilterPack($request, $em);
@@ -95,6 +108,10 @@ class CardPrintingController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function editAction(Request $request, $id) {
         $em         = $this->getDoctrine()->getManager();
         $entity     = $em->getRepository('AppBundle:CardPrinting')->find($id);
@@ -116,6 +133,10 @@ class CardPrintingController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function updateAction(Request $request, $id) {
         $em     = $this->getDoctrine()->getManager();
         $entity = $em->getRepository('AppBundle:CardPrinting')->find($id);
@@ -145,6 +166,10 @@ class CardPrintingController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function deleteAction(Request $request, $id) {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
@@ -164,6 +189,10 @@ class CardPrintingController extends Controller {
         return $this->redirect($this->generateUrl('admin_card_printing'));
     }
 
+    /**
+     * @param mixed $em
+     * @return mixed
+     */
     private function resolveFilterPack(Request $request, $em) {
         $id = $request->query->get('filter_pack');
         if (!$id) {
@@ -172,6 +201,10 @@ class CardPrintingController extends Controller {
         return $em->getRepository('AppBundle:Pack')->find($id);
     }
 
+    /**
+     * @param mixed $id
+     * @return \Symfony\Component\Form\FormInterface
+     */
     private function createDeleteForm($id) {
         return $this->createFormBuilder(['id' => $id])
             ->add('id', 'hidden')

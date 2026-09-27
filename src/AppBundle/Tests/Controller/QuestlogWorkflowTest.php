@@ -22,7 +22,7 @@ class QuestlogWorkflowTest extends WebTestCase {
     /** @var array */
     private $fixtureQuestlog;
 
-    protected function setUp() {
+    protected function setUp(): void {
         $connection = $this->db(static::createClient());
         foreach (['questlog', 'questlog_deck', 'deck'] as $table) {
             $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
@@ -30,6 +30,10 @@ class QuestlogWorkflowTest extends WebTestCase {
         $this->fixtureQuestlog = $this->questlogOneState($connection);
     }
 
+    /**
+     * @param mixed $connection
+     * @return array<int, mixed>
+     */
     private function questlogOneState($connection) {
         return [
             $connection->fetchAssoc('SELECT * FROM questlog WHERE id = 1'),
@@ -37,7 +41,7 @@ class QuestlogWorkflowTest extends WebTestCase {
         ];
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $connection = $this->db(static::createClient());
         $max = $this->maxIds;
         foreach ([
@@ -64,10 +68,17 @@ class QuestlogWorkflowTest extends WebTestCase {
 
     /* ------------------------------------------------------------ helpers */
 
+    /**
+     * @return mixed
+     */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
     }
 
+    /**
+     * @param string $username
+     * @return \Symfony\Bundle\FrameworkBundle\Client
+     */
     private function createAuthenticatedClient($username = 'test') {
         $client = static::createClient();
         $crawler = $client->request('GET', '/login');
@@ -79,6 +90,8 @@ class QuestlogWorkflowTest extends WebTestCase {
 
     /**
      * The cards of a deck, as the deck picker serializes them.
+     * @param mixed $deckId
+     * @return bool|string
      */
     private function deckContent(Client $client, $deckId) {
         $rows = $this->db($client)->fetchAll('SELECT c.code, s.quantity FROM deckslot s JOIN card c ON c.id = s.card_id WHERE s.deck_id = ? ORDER BY c.code', [$deckId]);
@@ -89,7 +102,7 @@ class QuestlogWorkflowTest extends WebTestCase {
     /**
      * Fills the deck picker's hidden fields: [slot => [id, is_decklist, content]].
      */
-    private static function selectDecks(Form $form, array $decks) {
+    private static function selectDecks(Form $form, array $decks): void {
         for ($i = 1; $i <= 4; $i++) {
             $form["deck{$i}_id"] = isset($decks[$i]) ? $decks[$i][0] : '';
             $form["deck{$i}_is_decklist"] = isset($decks[$i]) ? ($decks[$i][1] ? 'true' : 'false') : '';
@@ -97,6 +110,10 @@ class QuestlogWorkflowTest extends WebTestCase {
         }
     }
 
+    /**
+     * @param string $uri
+     * @return array<int, \Symfony\Component\DomCrawler\Crawler|\Symfony\Component\DomCrawler\Form>
+     */
     private function newForm(Client $client, $uri = '/questlog/new/0/0/0/0/0') {
         $crawler = $client->request('GET', $uri);
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -104,6 +121,9 @@ class QuestlogWorkflowTest extends WebTestCase {
         return [$crawler, $crawler->filter('#save_form')->form()];
     }
 
+    /**
+     * @return int
+     */
     private function questlogIdFromRedirect(Client $client) {
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $location = $client->getResponse()->headers->get('Location');
@@ -112,6 +132,10 @@ class QuestlogWorkflowTest extends WebTestCase {
         return (int) explode('/', $location)[3];
     }
 
+    /**
+     * @param mixed $id
+     * @return mixed
+     */
     private function fetchQuestlog(Client $client, $id) {
         return $this->db($client)->fetchAssoc(
             'SELECT q.name, q.name_canonical, q.description_md, q.description_html, s.name AS scenario, q.date_played, q.quest_mode,
@@ -121,13 +145,17 @@ class QuestlogWorkflowTest extends WebTestCase {
         );
     }
 
+    /**
+     * @param mixed $id
+     * @return mixed
+     */
     private function fetchQuestlogDecks(Client $client, $id) {
         return $this->db($client)->fetchAll('SELECT deck_number, deck_id, decklist_id, player, content FROM questlog_deck WHERE questlog_id = ? ORDER BY deck_number', [$id]);
     }
 
     /* -------------------------------------------------------------- tests */
 
-    public function testLogEditAndPublishAQuest() {
+    public function testLogEditAndPublishAQuest(): void {
         $client = $this->createAuthenticatedClient();
         $deck1 = $this->deckContent($client, 1);
         $deck2 = $this->deckContent($client, 2);
@@ -222,7 +250,7 @@ class QuestlogWorkflowTest extends WebTestCase {
     /**
      * The quest log keeps the cards that were posted, not the deck's current cards.
      */
-    public function testLoggedContentIsKept() {
+    public function testLoggedContentIsKept(): void {
         $client = $this->createAuthenticatedClient();
         list(, $form) = $this->newForm($client);
         $form['quest'] = '1';
@@ -235,7 +263,7 @@ class QuestlogWorkflowTest extends WebTestCase {
         $this->assertSame('Untitled Questlog', $this->fetchQuestlog($client, $id)['name']);
     }
 
-    public function testInvalidValuesAreReplacedByDefaults() {
+    public function testInvalidValuesAreReplacedByDefaults(): void {
         $client = $this->createAuthenticatedClient();
         list(, $form) = $this->newForm($client);
         $values = $form->getValues();
@@ -254,7 +282,7 @@ class QuestlogWorkflowTest extends WebTestCase {
 
     /* ------------------------------------------------------------ refused */
 
-    public function testQuestlogWithoutDeckIsRefused() {
+    public function testQuestlogWithoutDeckIsRefused(): void {
         $client = $this->createAuthenticatedClient();
         list(, $form) = $this->newForm($client);
         $form['quest'] = '1';
@@ -265,7 +293,7 @@ class QuestlogWorkflowTest extends WebTestCase {
         $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM questlog WHERE id > ?', [$this->maxIds['questlog']]));
     }
 
-    public function testDeckWithoutContentIsRefused() {
+    public function testDeckWithoutContentIsRefused(): void {
         $client = $this->createAuthenticatedClient();
         list(, $form) = $this->newForm($client);
         $form['quest'] = '1';
@@ -277,7 +305,7 @@ class QuestlogWorkflowTest extends WebTestCase {
         $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM questlog WHERE id > ?', [$this->maxIds['questlog']]));
     }
 
-    public function testUnknownScenarioIsRefused() {
+    public function testUnknownScenarioIsRefused(): void {
         $client = $this->createAuthenticatedClient();
         list(, $form) = $this->newForm($client);
         $values = $form->getValues();
@@ -293,7 +321,7 @@ class QuestlogWorkflowTest extends WebTestCase {
      * BUG: the branch meant for "the referenced deck was deleted" (deckN_id = 0 with a content)
      * reads "deckN_content", but the form posts "questlogdeckN_content": the slot is dropped.
      */
-    public function testContentWithoutDeckIsDropped() {
+    public function testContentWithoutDeckIsDropped(): void {
         $client = $this->createAuthenticatedClient();
         list(, $form) = $this->newForm($client);
         $form['quest'] = '1';
@@ -307,7 +335,7 @@ class QuestlogWorkflowTest extends WebTestCase {
 
     /* --------------------------------------------------- locked quest logs */
 
-    public function testQuestlogWithSocialActivityKeepsItsDecks() {
+    public function testQuestlogWithSocialActivityKeepsItsDecks(): void {
         $client = $this->createAuthenticatedClient();
         $this->db($client)->update('questlog', ['nb_favorites' => 1], ['id' => 1]);
         $decks = $this->fetchQuestlogDecks($client, 1);
@@ -326,7 +354,7 @@ class QuestlogWorkflowTest extends WebTestCase {
 
     /* ---------------------------------------------------- other users */
 
-    public function testUsingAnotherUsersDeckRequiresSharing() {
+    public function testUsingAnotherUsersDeckRequiresSharing(): void {
         $client = $this->createAuthenticatedClient('admin');
         list(, $form) = $this->newForm($client);
         $form['quest'] = '1';
@@ -346,7 +374,7 @@ class QuestlogWorkflowTest extends WebTestCase {
         $this->assertSame(['2', '2'], [$decks[1]['deck_id'], $decks[1]['decklist_id']]);
     }
 
-    public function testPrivateQuestlogVisibility() {
+    public function testPrivateQuestlogVisibility(): void {
         $client = $this->createAuthenticatedClient();
         list(, $form) = $this->newForm($client);
         $form['quest'] = '1';
@@ -365,7 +393,7 @@ class QuestlogWorkflowTest extends WebTestCase {
         $this->assertSame(200, $client->getResponse()->getStatusCode());
     }
 
-    public function testCannotChangeAnotherUsersQuestlog() {
+    public function testCannotChangeAnotherUsersQuestlog(): void {
         $client = $this->createAuthenticatedClient('admin');
 
         $client->request('GET', '/questlog/edit/1');
@@ -382,7 +410,7 @@ class QuestlogWorkflowTest extends WebTestCase {
 
     /* ------------------------------------------------------------- delete */
 
-    public function testDeleteQuestlog() {
+    public function testDeleteQuestlog(): void {
         $client = $this->createAuthenticatedClient();
         list(, $form) = $this->newForm($client);
         $form['quest'] = '1';
@@ -399,7 +427,7 @@ class QuestlogWorkflowTest extends WebTestCase {
         $this->assertSame('1', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deck WHERE id = 1'));
     }
 
-    public function testQuestlogWithSocialActivityCannotBeDeleted() {
+    public function testQuestlogWithSocialActivityCannotBeDeleted(): void {
         $client = $this->createAuthenticatedClient();
         $this->db($client)->update('questlog', ['nb_votes' => 1], ['id' => 1]);
 
@@ -411,7 +439,7 @@ class QuestlogWorkflowTest extends WebTestCase {
         $this->assertSame('Untitled Questlog', $this->fetchQuestlog($client, 1)['name']);
     }
 
-    public function testDeleteList() {
+    public function testDeleteList(): void {
         $client = $this->createAuthenticatedClient();
         $ids = [];
         foreach ([1, 2] as $deckId) {

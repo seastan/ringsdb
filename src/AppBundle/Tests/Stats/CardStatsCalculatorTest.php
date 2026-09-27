@@ -34,7 +34,7 @@ class CardStatsCalculatorTest extends KernelTestCase {
     /** @var int[] */
     private $maxIds = [];
 
-    protected function setUp() {
+    protected function setUp(): void {
         static::bootKernel();
         $this->connection = static::$kernel->getContainer()->get('doctrine')->getConnection();
         $this->calculator = static::$kernel->getContainer()->get('app.card_stats');
@@ -43,7 +43,7 @@ class CardStatsCalculatorTest extends KernelTestCase {
         }
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $max = $this->maxIds;
         foreach ([
             "DELETE FROM decklistslot WHERE decklist_id > {$max['decklist']}",
@@ -65,6 +65,7 @@ class CardStatsCalculatorTest extends KernelTestCase {
      *
      * @param array $main [card id => quantity]
      * @param array $side [card id => quantity]
+     * @return int
      */
     private function insertDeck(array $values, array $main, array $side = []) {
         $row = $this->connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
@@ -83,6 +84,7 @@ class CardStatsCalculatorTest extends KernelTestCase {
 
     /**
      * Inserts a decklist (a copy of fixture decklist 2 with other values), returns its id.
+     * @return int
      */
     private function insertDecklist(array $values, array $main) {
         $row = $this->connection->fetchAssoc('SELECT * FROM decklist WHERE id = 2');
@@ -115,16 +117,20 @@ class CardStatsCalculatorTest extends KernelTestCase {
 
     /**
      * @dataProvider stepProvider
+     * @param mixed $step
      */
-    public function testFixtureMonthSnapshot($step) {
+    public function testFixtureMonthSnapshot($step): void {
         $this->assertMatchesJsonSnapshot("stats/cards_2015-08_step$step", json_encode($this->calculator->computeCards('2015-08', $step)));
     }
 
+    /**
+     * @return array
+     */
     public function stepProvider() {
         return ['full decks' => ['1'], 'limited decks' => ['2'], 'sideboards and totals' => ['3']];
     }
 
-    public function testFixtureMonth() {
+    public function testFixtureMonth(): void {
         // step 2: the 4 decklists are "limited" (last packs before 2019-08-02); the fixture decks
         // are all published, so they are not counted twice
         $cards = $this->calculator->computeCards('2015-08', '2')['cards'];
@@ -142,7 +148,7 @@ class CardStatsCalculatorTest extends KernelTestCase {
         $this->assertSame([], self::byCode($step3['cards'], ['22134'], ['code']));
     }
 
-    public function testUnknownStep() {
+    public function testUnknownStep(): void {
         $this->assertNull($this->calculator->computeCards('2015-08', '4'));
     }
 
@@ -150,7 +156,7 @@ class CardStatsCalculatorTest extends KernelTestCase {
      * The temporary tables are dropped at each call: the command computes several months and
      * steps on the same connection.
      */
-    public function testRepeatedCallsOnTheSameConnection() {
+    public function testRepeatedCallsOnTheSameConnection(): void {
         $first = $this->calculator->computeCards('2015-08', '1');
         $this->calculator->computeCards('2015-08', '2');
         $this->assertSame($first, $this->calculator->computeCards('2015-08', '1'));
@@ -158,7 +164,7 @@ class CardStatsCalculatorTest extends KernelTestCase {
 
     /* -------------------------------------------------- counting rules */
 
-    public function testCountingRules() {
+    public function testCountingRules(): void {
         // cards: 1 Aragorn, 13 Guard of the Citadel, 14 Faramir, 20 Ever Vigilant, 985 (MotK) Faramir
         $this->insertDeck(['date_creation' => '2023-05-10 12:00:00', 'date_update' => '2023-05-10 12:00:00'],
             [1 => 1, 13 => 5, 985 => 1], [20 => 2]);
@@ -194,14 +200,21 @@ class CardStatsCalculatorTest extends KernelTestCase {
      * the creation or update date in July 2022, the creation date from August 2022.
      *
      * @dataProvider monthRuleProvider
+     * @param mixed $month
+     * @param mixed $created
+     * @param mixed $updated
+     * @param mixed $counted
      */
-    public function testMonthRuleForPrivateDecks($month, $created, $updated, $counted) {
+    public function testMonthRuleForPrivateDecks($month, $created, $updated, $counted): void {
         $this->insertDeck(['date_creation' => $created, 'date_update' => $updated], [1 => 1]);
 
         $cards = $this->calculator->computeCards($month, '1')['cards'];
         $this->assertSame(['01001' => ['full_decks' => $counted ? '1' : '0']], self::byCode($cards, ['01001'], ['full_decks']));
     }
 
+    /**
+     * @return array
+     */
     public function monthRuleProvider() {
         return [
             'before 2022-07: updated in the month' => ['2021-03', '2020-01-01 00:00:00', '2021-03-15 00:00:00', true],
@@ -216,6 +229,9 @@ class CardStatsCalculatorTest extends KernelTestCase {
 
     /* ----------------------------------------------------------- command */
 
+    /**
+     * @return array<int, int|string>
+     */
     private function runCommand(array $input) {
         $application = new Application(static::$kernel);
         $tester = new CommandTester($application->find('app:stats:precompute-cards'));
@@ -224,7 +240,7 @@ class CardStatsCalculatorTest extends KernelTestCase {
         return [$status, $tester->getDisplay()];
     }
 
-    public function testPrecomputeCommand() {
+    public function testPrecomputeCommand(): void {
         list($status, $display) = $this->runCommand(['month' => '2015-08', '--months' => '2']);
 
         $this->assertSame(0, $status);
@@ -243,7 +259,7 @@ class CardStatsCalculatorTest extends KernelTestCase {
         $this->assertSame('6', $this->connection->fetchColumn("SELECT COUNT(*) FROM stat_cards_cache WHERE month IN ('2015-07', '2015-08')"));
     }
 
-    public function testPrecomputeCommandRefusesAnInvalidMonth() {
+    public function testPrecomputeCommandRefusesAnInvalidMonth(): void {
         list($status, $display) = $this->runCommand(['month' => "2015-08' OR '1"]);
 
         $this->assertSame(1, $status);

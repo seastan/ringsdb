@@ -217,6 +217,7 @@ class Review {
      * Remove comment
      *
      * @param \AppBundle\Entity\Reviewcomment $comment
+     * @return void
      */
     public function removeComment(\AppBundle\Entity\Reviewcomment $comment) {
         $this->comments->removeElement($comment);
@@ -292,6 +293,7 @@ class Review {
      * Remove vote
      *
      * @param \AppBundle\Entity\User $vote
+     * @return void
      */
     public function removeVote(\AppBundle\Entity\User $vote) {
         $this->votes->removeElement($vote);

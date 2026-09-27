@@ -31,7 +31,7 @@ class FellowshipManagerTest extends KernelTestCase {
     /** @var array */
     private $fixtureUsers;
 
-    protected function setUp() {
+    protected function setUp(): void {
         static::bootKernel();
         $this->connection = static::$kernel->getContainer()->get('doctrine')->getConnection();
         foreach (['fellowship', 'fellowshipcomment', 'decklist'] as $table) {
@@ -54,7 +54,7 @@ class FellowshipManagerTest extends KernelTestCase {
             'date_creation' => date('Y-m-d H:i:s'), 'is_hidden' => 0]);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $max = $this->maxIds;
         foreach ([
             "DELETE FROM fellowshipcomment WHERE id > {$max['fellowshipcomment']}",
@@ -74,6 +74,11 @@ class FellowshipManagerTest extends KernelTestCase {
 
     /* ------------------------------------------------------------ helpers */
 
+    /**
+     * @param mixed $name
+     * @param mixed $userId
+     * @return int
+     */
     private function insertFellowship($name, $userId, array $decklistIds, array $values) {
         $this->connection->insert('fellowship', $values + [
             'user_id' => $userId, 'name' => $name, 'name_canonical' => strtolower(str_replace(' ', '-', $name)),
@@ -90,6 +95,7 @@ class FellowshipManagerTest extends KernelTestCase {
 
     /**
      * A copy of fixture decklist 2 with the given cards ([card id => quantity]).
+     * @return int
      */
     private function insertDecklist(array $slots) {
         $row = $this->connection->fetchAssoc('SELECT * FROM decklist WHERE id = 2');
@@ -105,6 +111,7 @@ class FellowshipManagerTest extends KernelTestCase {
 
     /**
      * @return FellowshipManager
+     * @param mixed $username
      */
     private function manager(array $query = [], $username = null) {
         $container = static::$kernel->getContainer();
@@ -117,12 +124,17 @@ class FellowshipManagerTest extends KernelTestCase {
         return $manager;
     }
 
+    /**
+     * @param mixed $username
+     * @return mixed
+     */
     private function user($username) {
         return static::$kernel->getContainer()->get('doctrine')->getRepository('AppBundle:User')->findOneBy(['username' => $username]);
     }
 
     /**
      * @return string[] the names (F1...F5) of the fellowships found, in order
+     * @param mixed $paginator
      */
     private function names($paginator) {
         $names = array_flip($this->ids);
@@ -136,7 +148,7 @@ class FellowshipManagerTest extends KernelTestCase {
 
     /* -------------------------------------------------------------- lists */
 
-    public function testLists() {
+    public function testLists(): void {
         $this->assertSame(['F2', 'F3', 'F5', 'F1'], $this->names($this->manager()->findFellowshipsByPopularity()));
         $this->assertSame(['F3', 'F2', 'F5', 'F1'], $this->names($this->manager()->findFellowshipsByAge()));
         $this->assertSame(['F3', 'F2'], $this->names($this->manager()->findFellowshipsByRecentDiscussion()));
@@ -150,7 +162,7 @@ class FellowshipManagerTest extends KernelTestCase {
         $this->assertSame(['F3', 'F2', 'F5', 'F1'], $this->names($this->manager()->findFellowshipsInHotTopic()));
     }
 
-    public function testPagination() {
+    public function testPagination(): void {
         $manager = $this->manager();
         $manager->setLimit(2);
         $manager->setPage(2);
@@ -161,7 +173,7 @@ class FellowshipManagerTest extends KernelTestCase {
         $this->assertSame(2, $manager->getNumberOfPages());
     }
 
-    public function testEmptyList() {
+    public function testEmptyList(): void {
         $manager = $this->manager();
         $this->assertCount(0, $manager->getEmptyList());
         $this->assertSame(0, $manager->getMaxCount());
@@ -171,11 +183,15 @@ class FellowshipManagerTest extends KernelTestCase {
 
     /**
      * @dataProvider searchProvider
+     * @param mixed $username
      */
-    public function testComplexSearch(array $query, array $expected, $username = null) {
+    public function testComplexSearch(array $query, array $expected, $username = null): void {
         $this->assertSame($expected, $this->names($this->manager($query, $username)->findFellowshipsWithComplexSearch()));
     }
 
+    /**
+     * @return array
+     */
     public function searchProvider() {
         return [
             'no criteria' => [[], ['F2', 'F3', 'F5', 'F1']],
@@ -202,7 +218,7 @@ class FellowshipManagerTest extends KernelTestCase {
         ];
     }
 
-    public function testSortByReputation() {
+    public function testSortByReputation(): void {
         $this->connection->update('user', ['reputation' => 10], ['username' => 'admin']);
 
         $this->assertSame(['F3', 'F5', 'F2', 'F1'], $this->names($this->manager(['sort' => 'reputation'])->findFellowshipsWithComplexSearch()));

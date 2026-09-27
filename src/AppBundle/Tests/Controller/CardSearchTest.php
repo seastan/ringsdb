@@ -15,6 +15,7 @@ class CardSearchTest extends WebTestCase {
 
     /**
      * @return string[] the names of the cards found by the API
+     * @param mixed $q
      */
     private function search($q) {
         $client = static::createClient();
@@ -26,14 +27,18 @@ class CardSearchTest extends WebTestCase {
 
     /**
      * @dataProvider acronymProvider
+     * @param mixed $acronym
      */
-    public function testAcronym($acronym, array $expected) {
+    public function testAcronym($acronym, array $expected): void {
         $names = $this->search($acronym);
         sort($names);
 
         $this->assertSame($expected, $names);
     }
 
+    /**
+     * @return array
+     */
     public function acronymProvider() {
         return [
             'initials' => ['LOS', ['Longbeard Orc Slayer']],
@@ -45,7 +50,7 @@ class CardSearchTest extends WebTestCase {
         ];
     }
 
-    public function testAcronymsAreCaseSensitive() {
+    public function testAcronymsAreCaseSensitive(): void {
         // in lower case, "los" is only searched in the names, case-insensitively
         $names = $this->search('los');
         $this->assertNotContains('Longbeard Orc Slayer', $names);
@@ -54,7 +59,7 @@ class CardSearchTest extends WebTestCase {
         }
     }
 
-    public function testSiteSearch() {
+    public function testSiteSearch(): void {
         $client = static::createClient();
         $crawler = $client->request('GET', '/find?q=LOS');
 

@@ -23,14 +23,14 @@ class AdminWriteTest extends WebTestCase {
     /** @var int[] */
     private $maxIds = [];
 
-    protected function setUp() {
+    protected function setUp(): void {
         $connection = $this->db(static::createClient());
         foreach (array_merge(self::TABLES, ['comment', 'decklist', 'deck']) as $table) {
             $this->maxIds[$table] = $table === 'scenario_encounter' ? 0 : (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
         }
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $connection = $this->db(static::createClient());
         $max = $this->maxIds;
         $connection->exec("DELETE FROM scenario_encounter WHERE scenario_id > {$max['scenario']} OR encounter_id > {$max['encounter']}");
@@ -54,10 +54,16 @@ class AdminWriteTest extends WebTestCase {
 
     /* ------------------------------------------------------------ helpers */
 
+    /**
+     * @return mixed
+     */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
     }
 
+    /**
+     * @return \Symfony\Bundle\FrameworkBundle\Client
+     */
     private function createAdminClient() {
         $client = static::createClient();
         $crawler = $client->request('GET', '/login');
@@ -67,6 +73,11 @@ class AdminWriteTest extends WebTestCase {
         return $client;
     }
 
+    /**
+     * @param mixed $pageUri
+     * @param mixed $action
+     * @return \Symfony\Component\HttpFoundation\Response|null
+     */
     private function submitForm(Client $client, $pageUri, $action, array $values) {
         $crawler = $client->request('GET', $pageUri);
         $this->assertSame(200, $client->getResponse()->getStatusCode(), "GET $pageUri");
@@ -75,6 +86,10 @@ class AdminWriteTest extends WebTestCase {
         return $client->getResponse();
     }
 
+    /**
+     * @param mixed $prefix
+     * @return array<string, mixed>
+     */
     private static function prefixed($prefix, array $values) {
         $fields = [];
         foreach ($values as $name => $value) {
@@ -88,6 +103,7 @@ class AdminWriteTest extends WebTestCase {
 
     /**
      * [route slug, form name, table, created values, expected columns, updated values, expected columns]
+     * @return array
      */
     public function crudProvider() {
         return [
@@ -144,8 +160,11 @@ class AdminWriteTest extends WebTestCase {
 
     /**
      * @dataProvider crudProvider
+     * @param mixed $slug
+     * @param mixed $formName
+     * @param mixed $table
      */
-    public function testCreateEditDelete($slug, $formName, $table, array $created, array $expectedCreated, array $updated, array $expectedUpdated) {
+    public function testCreateEditDelete($slug, $formName, $table, array $created, array $expectedCreated, array $updated, array $expectedUpdated): void {
         $client = $this->createAdminClient();
         $columns = implode(', ', array_keys($expectedCreated));
 
@@ -173,7 +192,7 @@ class AdminWriteTest extends WebTestCase {
         $this->assertSame('0', $this->db($client)->fetchColumn("SELECT COUNT(*) FROM $table WHERE id = ?", [$id]));
     }
 
-    public function testScenarioEncounters() {
+    public function testScenarioEncounters(): void {
         $client = $this->createAdminClient();
         $crawler = $client->request('GET', '/admin/scenario/new');
         $form = $crawler->filter('form[action="/admin/scenario/create"]')->form(self::prefixed('appbundle_scenario', [
@@ -192,7 +211,7 @@ class AdminWriteTest extends WebTestCase {
      * The delete button of a pack's page used to post to the cycle delete route: the delete forms
      * share their CSRF token, so it deleted the cycle with the same id.
      */
-    public function testPackPageDeletesThePack() {
+    public function testPackPageDeletesThePack(): void {
         $client = $this->createAdminClient();
         $crawler = $client->request('GET', '/admin/pack/1/show');
 
@@ -201,7 +220,7 @@ class AdminWriteTest extends WebTestCase {
         $this->assertCount(0, $crawler->filter('form[action^="/admin/cycle/"]'));
     }
 
-    public function testDeleteRequiresTheFormToken() {
+    public function testDeleteRequiresTheFormToken(): void {
         $client = $this->createAdminClient();
         $client->request('POST', '/admin/type/1/delete', []);
 
@@ -215,7 +234,7 @@ class AdminWriteTest extends WebTestCase {
      * A card used in decks and decklists cannot be deleted, but can be "force deleted": its
      * slots, printings and reviews are deleted with it.
      */
-    public function testForceDeleteACard() {
+    public function testForceDeleteACard(): void {
         $client = $this->createAdminClient();
         $response = $this->submitForm($client, '/admin/card/new', '/admin/card/create', self::prefixed('appbundle_cardtype', [
             'position' => '1', 'deck_limit' => '3', 'code' => '99901', 'type' => '2', 'sphere' => '1', 'name' => 'PHPUnit Card',
@@ -242,7 +261,7 @@ class AdminWriteTest extends WebTestCase {
     /**
      * Reference data still in use cannot be deleted (foreign keys): 500, nothing is deleted.
      */
-    public function testReferenceDataInUseCannotBeDeleted() {
+    public function testReferenceDataInUseCannotBeDeleted(): void {
         $client = $this->createAdminClient();
         $response = $this->submitForm($client, '/admin/cycle/1/edit', '/admin/cycle/1/delete', []);
 
@@ -254,8 +273,9 @@ class AdminWriteTest extends WebTestCase {
 
     /**
      * @dataProvider findUserProvider
+     * @param mixed $location
      */
-    public function testFindUser(array $values, $location) {
+    public function testFindUser(array $values, $location): void {
         $client = $this->createAdminClient();
         $client->request('POST', '/admin/user/find_process', $values);
 
@@ -263,6 +283,9 @@ class AdminWriteTest extends WebTestCase {
         $this->assertSame($location, $client->getResponse()->headers->get('Location'));
     }
 
+    /**
+     * @return array
+     */
     public function findUserProvider() {
         return [
             'by username' => [['username' => 'test'], '/admin/user/show/1'],
@@ -271,7 +294,7 @@ class AdminWriteTest extends WebTestCase {
         ];
     }
 
-    public function testToggleAndDeleteAComment() {
+    public function testToggleAndDeleteAComment(): void {
         $client = $this->createAdminClient();
 
         $client->request('GET', '/admin/comment/toggle_hidden/1');
@@ -291,7 +314,7 @@ class AdminWriteTest extends WebTestCase {
     /**
      * Deleting a decklist unlinks its successors and the decks copied from it.
      */
-    public function testDeleteADecklist() {
+    public function testDeleteADecklist(): void {
         $client = $this->createAdminClient();
         $connection = $this->db($client);
         // a copy of decklist 1, derived from it, with a deck copied from the copy

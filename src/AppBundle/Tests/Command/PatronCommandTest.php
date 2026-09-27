@@ -20,13 +20,13 @@ class PatronCommandTest extends KernelTestCase {
     /** @var array */
     private $fixtureUsers;
 
-    protected function setUp() {
+    protected function setUp(): void {
         static::bootKernel();
         $this->connection = static::$kernel->getContainer()->get('doctrine')->getConnection();
         $this->fixtureUsers = $this->connection->fetchAll('SELECT id, donation FROM user');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         foreach ($this->fixtureUsers as $user) {
             $this->connection->update('user', $user, ['id' => $user['id']]);
         }
@@ -49,13 +49,17 @@ class PatronCommandTest extends KernelTestCase {
         return preg_replace('/^\S+ /m', '', $display);
     }
 
+    /**
+     * @param mixed $username
+     * @return mixed
+     */
     private function donation($username) {
         return $this->connection->fetchColumn('SELECT donation FROM user WHERE username = ?', [$username]);
     }
 
     /* -------------------------------------------------------------- tests */
 
-    public function testAddADonationByEmail() {
+    public function testAddADonationByEmail(): void {
         $this->assertSame("Success\n", $this->runCommand(['email' => 'test@example.com', 'donation' => '10']));
         $this->assertSame('10', $this->donation('test'));
 
@@ -65,12 +69,12 @@ class PatronCommandTest extends KernelTestCase {
         $this->assertSame('0', $this->donation('admin'));
     }
 
-    public function testAddADonationByUsername() {
+    public function testAddADonationByUsername(): void {
         $this->assertSame("Success\n", $this->runCommand(['email' => 'admin', 'donation' => '7']));
         $this->assertSame('7', $this->donation('admin'));
     }
 
-    public function testShowTheDonation() {
+    public function testShowTheDonation(): void {
         $this->connection->update('user', ['donation' => 25], ['username' => 'test']);
 
         $this->assertSame("User test donated 25\n", $this->runCommand(['email' => 'test']));
@@ -79,7 +83,7 @@ class PatronCommandTest extends KernelTestCase {
         $this->assertSame('25', $this->donation('test'));
     }
 
-    public function testUnknownUser() {
+    public function testUnknownUser(): void {
         // not an error for the console: the exit code is 0
         $this->assertSame("Cannot find user [nobody@example.com]\n", $this->runCommand(['email' => 'nobody@example.com', 'donation' => '10']));
     }
@@ -87,14 +91,14 @@ class PatronCommandTest extends KernelTestCase {
     /**
      * Nothing checks the amount: a negative one is subtracted.
      */
-    public function testNegativeDonation() {
+    public function testNegativeDonation(): void {
         $this->connection->update('user', ['donation' => 10], ['username' => 'test']);
 
         $this->runCommand(['email' => 'test', 'donation' => '-4']);
         $this->assertSame('6', $this->donation('test'));
     }
 
-    public function testEmailOrUsernameIsRequired() {
+    public function testEmailOrUsernameIsRequired(): void {
         $application = new Application(static::$kernel);
         $tester = new CommandTester($application->find('app:patron'));
 

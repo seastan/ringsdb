@@ -13,6 +13,10 @@ namespace AppBundle\Tests\Controller;
  *   docker compose exec -e UPDATE_SNAPSHOTS=1 -u www-data symfony php bin/simple-phpunit
  */
 trait JsonSnapshotTrait {
+    /**
+     * @param mixed $json
+     * @return string
+     */
     private static function normalizeJson($json) {
         $data = json_decode($json);
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -22,7 +26,11 @@ trait JsonSnapshotTrait {
         return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION) . "\n";
     }
 
-    private function assertMatchesJsonSnapshot($name, $json) {
+    /**
+     * @param mixed $name
+     * @param mixed $json
+     */
+    private function assertMatchesJsonSnapshot($name, $json): void {
         $file = __DIR__ . '/../Resources/snapshots/api/' . $name . '.json';
         $actual = self::normalizeJson($json);
 

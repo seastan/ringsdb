@@ -16,6 +16,7 @@ class PackController extends Controller {
     /**
      * Lists all Pack entities.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction() {
         $em = $this->getDoctrine()->getManager();
@@ -30,6 +31,7 @@ class PackController extends Controller {
     /**
      * Creates a new Pack entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function createAction(Request $request) {
         $entity = new Pack();
@@ -53,6 +55,7 @@ class PackController extends Controller {
     /**
      * Displays a form to create a new Pack entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function newAction() {
         $entity = new Pack();
@@ -67,6 +70,8 @@ class PackController extends Controller {
     /**
      * Finds and displays a Pack entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -88,6 +93,8 @@ class PackController extends Controller {
     /**
      * Displays a form to edit an existing Pack entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -111,6 +118,8 @@ class PackController extends Controller {
     /**
      * Edits an existing Pack entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
@@ -142,6 +151,8 @@ class PackController extends Controller {
     /**
      * Deletes a Pack entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, $id) {
         $form = $this->createDeleteForm($id);

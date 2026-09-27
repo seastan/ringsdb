@@ -21,13 +21,21 @@ class ApiControllerTest extends WebTestCase {
 
     /* ------------------------------------------------------------ helpers */
 
+    /**
+     * @param mixed $uri
+     * @return \Symfony\Component\HttpFoundation\Response|null
+     */
     private function get(Client $client, $uri, array $headers = []) {
         $client->request('GET', $uri, [], [], $headers);
 
         return $client->getResponse();
     }
 
-    private function assertApiHeaders(Response $response, $contentType, $lastModified) {
+    /**
+     * @param mixed $contentType
+     * @param mixed $lastModified
+     */
+    private function assertApiHeaders(Response $response, $contentType, $lastModified): void {
         $this->assertSame($contentType, $response->headers->get('Content-Type'));
         $this->assertSame(self::CACHE_CONTROL, $response->headers->get('Cache-Control'));
         $this->assertSame('*', $response->headers->get('Access-Control-Allow-Origin'));
@@ -38,6 +46,7 @@ class ApiControllerTest extends WebTestCase {
 
     /**
      * [snapshot name, uri, expected Last-Modified header (null if none)]
+     * @return array
      */
     public function jsonEndpointProvider() {
         return [
@@ -62,8 +71,11 @@ class ApiControllerTest extends WebTestCase {
 
     /**
      * @dataProvider jsonEndpointProvider
+     * @param mixed $snapshot
+     * @param mixed $uri
+     * @param mixed $lastModified
      */
-    public function testJsonEndpoint($snapshot, $uri, $lastModified) {
+    public function testJsonEndpoint($snapshot, $uri, $lastModified): void {
         $client = static::createClient();
         $response = $this->get($client, $uri);
 
@@ -79,7 +91,7 @@ class ApiControllerTest extends WebTestCase {
         $this->assertMatchesJsonSnapshot($snapshot, $response->getContent());
     }
 
-    public function testSearchLastModified() {
+    public function testSearchLastModified(): void {
         $client = static::createClient();
         $response = $this->get($client, '/api/public/cards/search/Aragorn');
 
@@ -90,8 +102,10 @@ class ApiControllerTest extends WebTestCase {
 
     /**
      * @dataProvider jsonpEndpointProvider
+     * @param mixed $snapshot
+     * @param mixed $uri
      */
-    public function testJsonp($snapshot, $uri) {
+    public function testJsonp($snapshot, $uri): void {
         $client = static::createClient();
         $response = $this->get($client, $uri . '?jsonp=myCallback');
 
@@ -102,6 +116,9 @@ class ApiControllerTest extends WebTestCase {
         $this->assertMatchesJsonSnapshot($snapshot, $json);
     }
 
+    /**
+     * @return array
+     */
     public function jsonpEndpointProvider() {
         return [
             'packs' => ['packs', '/api/public/packs/'],
@@ -119,8 +136,10 @@ class ApiControllerTest extends WebTestCase {
 
     /**
      * @dataProvider cachedEndpointProvider
+     * @param mixed $uri
+     * @param mixed $lastModified
      */
-    public function testNotModifiedSince($uri, $lastModified) {
+    public function testNotModifiedSince($uri, $lastModified): void {
         $client = static::createClient();
 
         $response = $this->get($client, $uri, ['HTTP_IF_MODIFIED_SINCE' => $lastModified]);
@@ -132,6 +151,9 @@ class ApiControllerTest extends WebTestCase {
         $this->assertNotEmpty($response->getContent());
     }
 
+    /**
+     * @return array
+     */
     public function cachedEndpointProvider() {
         return [
             'packs' => ['/api/public/packs/', 'Wed, 25 Mar 2026 16:18:09 GMT'],
@@ -149,14 +171,19 @@ class ApiControllerTest extends WebTestCase {
 
     /**
      * @dataProvider errorProvider
+     * @param mixed $uri
+     * @param mixed $expectedStatus
      */
-    public function testErrors($uri, $expectedStatus) {
+    public function testErrors($uri, $expectedStatus): void {
         $client = static::createClient();
         $response = $this->get($client, $uri);
 
         $this->assertSame($expectedStatus, $response->getStatusCode());
     }
 
+    /**
+     * @return array
+     */
     public function errorProvider() {
         return [
             'unknown pack' => ['/api/public/cards/nope', 404],
@@ -171,8 +198,10 @@ class ApiControllerTest extends WebTestCase {
 
     /**
      * @dataProvider unsupportedFormatProvider
+     * @param mixed $format
+     * @param mixed $contentType
      */
-    public function testUnsupportedFormatOnCardsByPack($format, $contentType) {
+    public function testUnsupportedFormatOnCardsByPack($format, $contentType): void {
         $client = static::createClient();
         $response = $this->get($client, '/api/public/cards/Core.' . $format);
 
@@ -181,6 +210,9 @@ class ApiControllerTest extends WebTestCase {
         $this->assertSame("$format format not supported. Only json is supported.", $response->getContent());
     }
 
+    /**
+     * @return array
+     */
     public function unsupportedFormatProvider() {
         return [
             'xml' => ['xml', 'text/xml; charset=UTF-8'],
@@ -189,7 +221,7 @@ class ApiControllerTest extends WebTestCase {
         ];
     }
 
-    public function testPostIsNotAllowed() {
+    public function testPostIsNotAllowed(): void {
         $client = static::createClient();
         $client->request('POST', '/api/public/card/01001');
 
@@ -198,7 +230,7 @@ class ApiControllerTest extends WebTestCase {
 
     /* ------------------------------------------ endpoints outside ApiController */
 
-    public function testPublishedCustomPacks() {
+    public function testPublishedCustomPacks(): void {
         $client = static::createClient();
         $response = $this->get($client, '/api/public/custom-packs/published');
 
@@ -207,7 +239,7 @@ class ApiControllerTest extends WebTestCase {
         $this->assertMatchesJsonSnapshot('custom_packs_published', $response->getContent());
     }
 
-    public function testUserInfoAnonymous() {
+    public function testUserInfoAnonymous(): void {
         $client = static::createClient();
         $response = $this->get($client, '/api/public/user/info');
 
@@ -216,7 +248,7 @@ class ApiControllerTest extends WebTestCase {
         $this->assertSame('null', $response->getContent());
     }
 
-    public function testUserInfoAuthenticated() {
+    public function testUserInfoAuthenticated(): void {
         $client = static::createClient();
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => 'test', '_password' => 'test']));

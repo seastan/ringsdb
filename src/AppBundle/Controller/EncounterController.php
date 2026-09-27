@@ -16,6 +16,7 @@ class EncounterController extends Controller {
     /**
      * Lists all Encounter entities.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction() {
         $em = $this->getDoctrine()->getManager();
@@ -30,6 +31,7 @@ class EncounterController extends Controller {
     /**
      * Creates a new Encounter entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function createAction(Request $request) {
         $entity = new Encounter();
@@ -53,6 +55,7 @@ class EncounterController extends Controller {
     /**
      * Displays a form to create a new Encounter entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function newAction() {
         $entity = new Encounter();
@@ -67,6 +70,8 @@ class EncounterController extends Controller {
     /**
      * Finds and displays a Encounter entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -88,6 +93,8 @@ class EncounterController extends Controller {
     /**
      * Displays a form to edit an existing Encounter entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -111,6 +118,8 @@ class EncounterController extends Controller {
     /**
      * Edits an existing Encounter entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
@@ -142,6 +151,8 @@ class EncounterController extends Controller {
     /**
      * Deletes a Encounter entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, $id) {
         $form = $this->createDeleteForm($id);

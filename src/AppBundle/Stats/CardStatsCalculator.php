@@ -24,6 +24,9 @@ class CardStatsCalculator {
 	/**
 	 * Returns the same array StatController::getStatCardsAction used to return
 	 * for ($month, $step). $step is '1', '2' or '3'.
+	 * @param mixed $month
+	 * @param mixed $step
+	 * @return array<string, mixed>|null
 	 */
 	public function computeCards($month, $step) {
 		$dbh = $this->conn;
@@ -483,6 +486,9 @@ FROM (
 		return null;
 	}
 
+	/**
+	 * @return array
+	 */
 	private function getPacks() {
 		$dbh = $this->conn;
 
@@ -494,6 +500,9 @@ ORDER BY date_release";
 		return $packs;
 	}
 
+	/**
+	 * @return array
+	 */
 	private function getPackRuless() {
 		$pack_rules = ['Core Set' => ['2000-01-01', '2011-07-21'],
 						'Shadows of Mirkwood' => ['2011-07-21', '2012-01-06'],
@@ -509,6 +518,9 @@ ORDER BY date_release";
 		return $pack_rules;
 	}
 
+	/**
+	 * @return array<int|string, mixed>
+	 */
 	private function getOctgnIdMapping() {
 		$dbh = $this->conn;
 

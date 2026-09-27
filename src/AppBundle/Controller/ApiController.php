@@ -111,6 +111,7 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $card_code
      */
     public function getCardAction($card_code, Request $request) {
         $response = new Response();
@@ -258,6 +259,7 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $pack_code
      */
     public function listCardsByPackAction($pack_code, Request $request) {
         $response = new Response();
@@ -346,6 +348,7 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $decklist_id
      */
     public function getDecklistAction($decklist_id, Request $request) {
         $response = new Response();
@@ -417,6 +420,7 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $date
      */
     public function listDecklistsByDateAction($date, Request $request) {
         $response = new Response();
@@ -502,6 +506,7 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $card_code
      */
     public function listTopDecklistsByCardAction($card_code, Request $request) {
         $response = new Response();
@@ -615,6 +620,7 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $scenario_id
      */
     public function getScenarioAction($scenario_id, Request $request) {
         $response = new Response();
@@ -654,6 +660,10 @@ class ApiController extends Controller {
         return $response;
     }
 
+    /**
+     * @param mixed $q
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function searchCardsAction($q, Request $request) {
         $response = new Response();
         $response->setPublic();

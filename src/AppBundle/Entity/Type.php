@@ -97,6 +97,7 @@ class Type {
      * Remove card
      *
      * @param \AppBundle\Entity\Card $card
+     * @return void
      */
     public function removeCard(\AppBundle\Entity\Card $card) {
         $this->cards->removeElement($card);

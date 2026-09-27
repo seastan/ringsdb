@@ -175,6 +175,9 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
         return $array;
     }
 
+    /**
+     * @return bool
+     */
     public function getIsUnsaved() {
         $changes = $this->getChanges();
 
@@ -423,6 +426,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      * Remove slot
      *
      * @param \AppBundle\Entity\Deckslot $slot
+     * @return void
      */
     public function removeSlot(\AppBundle\Entity\Deckslot $slot) {
         $this->slots->removeElement($slot);
@@ -454,6 +458,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      * Remove sideslot
      *
      * @param \AppBundle\Entity\Decksideslot $sideslot
+     * @return void
      */
     public function removeSideslot(\AppBundle\Entity\Decksideslot $sideslot) {
         $this->sideslots->removeElement($sideslot);
@@ -485,6 +490,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      * Remove child
      *
      * @param \AppBundle\Entity\Decklist $child
+     * @return void
      */
     public function removeChild(\AppBundle\Entity\Decklist $child) {
         $this->children->removeElement($child);
@@ -516,6 +522,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      * Remove change
      *
      * @param \AppBundle\Entity\Deckchange $change
+     * @return void
      */
     public function removeChange(\AppBundle\Entity\Deckchange $change) {
         $this->changes->removeElement($change);
@@ -640,6 +647,9 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
         return $this->minorVersion;
     }
 
+    /**
+     * @return string
+     */
     public function getVersion() {
         return $this->majorVersion . "." . $this->minorVersion;
     }
@@ -666,6 +676,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      * Remove fellowship
      *
      * @param \AppBundle\Entity\FellowshipDeck $fellowship
+     * @return void
      */
     public function removeFellowship(\AppBundle\Entity\FellowshipDeck $fellowship) {
         $this->fellowships->removeElement($fellowship);
@@ -717,6 +728,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      * Remove questlog
      *
      * @param \AppBundle\Entity\QuestlogDeck $questlog
+     * @return void
      */
     public function removeQuestlog(\AppBundle\Entity\QuestlogDeck $questlog) {
         $this->questlogs->removeElement($questlog);

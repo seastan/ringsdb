@@ -8,6 +8,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CollectionController extends Controller {
 
+    /**
+     * @param bool $reloaduser
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function packsAction($reloaduser = false) {
         $categories = [];
         $categories[] = ["label" => "Core / Deluxe", "packs" => []];
@@ -94,6 +98,9 @@ class CollectionController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function savePacksAction(Request $request) {
         $selectedPacks = $request->get('selected-packs');
 
@@ -118,6 +125,7 @@ class CollectionController extends Controller {
     /**
      * Save the user's preferred art (printing) for a card.
      * POST card_code + pack_code; pack_code empty/"default" clears the preference.
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function saveArtPreferenceAction(Request $request) {
         $user = $this->getUser();

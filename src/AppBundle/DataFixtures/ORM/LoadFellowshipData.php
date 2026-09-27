@@ -20,6 +20,9 @@ class LoadFellowshipData extends AbstractFixture implements DependentFixtureInte
         ];
     }
 
+    /**
+     * @return void
+     */
     public function load(ObjectManager $manager)
     {
         /** @var User $user */

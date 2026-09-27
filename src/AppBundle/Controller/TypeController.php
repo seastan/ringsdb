@@ -16,6 +16,7 @@ class TypeController extends Controller {
     /**
      * Lists all Type entities.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction() {
         $em = $this->getDoctrine()->getManager();
@@ -30,6 +31,7 @@ class TypeController extends Controller {
     /**
      * Creates a new Type entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function createAction(Request $request) {
         $entity = new Type();
@@ -69,6 +71,7 @@ class TypeController extends Controller {
     /**
      * Displays a form to create a new Type entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function newAction() {
         $entity = new Type();
@@ -83,6 +86,8 @@ class TypeController extends Controller {
     /**
      * Finds and displays a Type entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -104,6 +109,8 @@ class TypeController extends Controller {
     /**
      * Displays a form to edit an existing Type entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -145,6 +152,8 @@ class TypeController extends Controller {
     /**
      * Edits an existing Type entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
@@ -175,6 +184,8 @@ class TypeController extends Controller {
     /**
      * Deletes a Type entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, $id) {
         $form = $this->createDeleteForm($id);

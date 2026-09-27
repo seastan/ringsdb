@@ -10,6 +10,7 @@ class EncounterType extends AbstractType {
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
+     * @return void
      */
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder
@@ -20,6 +21,7 @@ class EncounterType extends AbstractType {
 
     /**
      * @param OptionsResolverInterface $resolver
+     * @return void
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver) {
         $resolver->setDefaults([

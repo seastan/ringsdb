@@ -12,6 +12,9 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 class DownloadImagesCommand extends ContainerAwareCommand
 {
 
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this

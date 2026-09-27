@@ -18,6 +18,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FellowshipController extends Controller {
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function mylistAction() {
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
@@ -39,6 +42,11 @@ class FellowshipController extends Controller {
         }
     }
 
+    /**
+     * @param mixed $type
+     * @param int $page
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function listAction($type, $page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
@@ -118,6 +126,13 @@ class FellowshipController extends Controller {
         ], $response);
     }
 
+    /**
+     * @param mixed $deck1_id
+     * @param mixed $deck2_id
+     * @param mixed $deck3_id
+     * @param mixed $deck4_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function newAction($deck1_id, $deck2_id, $deck3_id, $deck4_id) {
         $response = new Response();
 
@@ -152,6 +167,10 @@ class FellowshipController extends Controller {
         ], $response);
     }
 
+    /**
+     * @param mixed $fellowship_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function editAction($fellowship_id) {
         $response = new Response();
 
@@ -194,6 +213,10 @@ class FellowshipController extends Controller {
         return $this->render('AppBundle:Fellowship:edit.html.twig', $data, $response);
     }
 
+    /**
+     * @param mixed $fellowship_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function viewAction($fellowship_id) {
         /* @var $fellowship \AppBundle\Entity\Fellowship */
         $fellowship = $this->getDoctrine()->getManager()->getRepository('AppBundle:Fellowship')->find($fellowship_id);
@@ -247,6 +270,9 @@ class FellowshipController extends Controller {
         return $this->render('AppBundle:Fellowship:view.html.twig', $data);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function saveAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -380,6 +406,10 @@ class FellowshipController extends Controller {
         ]));
     }
 
+    /**
+     * @param mixed $fellowship_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function publishFormAction($fellowship_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -485,6 +515,9 @@ class FellowshipController extends Controller {
     }
 
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function publishAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -570,6 +603,9 @@ class FellowshipController extends Controller {
         ]));
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function deleteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -614,6 +650,9 @@ class FellowshipController extends Controller {
         return $this->redirect($this->generateUrl('myfellowships_list'));
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function deleteListAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -663,6 +702,9 @@ class FellowshipController extends Controller {
         return $this->redirect($this->generateUrl('myfellowships_list'));
     }
 
+    /**
+     * @return string
+     */
     private function searchForm(Request $request) {
         $dbh = $this->getDoctrine()->getConnection();
 
@@ -752,6 +794,9 @@ class FellowshipController extends Controller {
         return $this->renderView('AppBundle:Fellowship:form.html.twig', $params);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function searchAction(Request $request) {
         $response = new Response();
         $response->setPublic();
@@ -854,14 +899,27 @@ class FellowshipController extends Controller {
         ], $response);
     }
 
+    /**
+     * @param mixed $fellowship_id
+     * @return mixed
+     */
     public function octgnexportAction($fellowship_id) {
         return $this->downloadFromSelection($fellowship_id, true);
     }
 
+    /**
+     * @param mixed $fellowship_id
+     * @return mixed
+     */
     public function textexportAction($fellowship_id) {
         return $this->downloadFromSelection($fellowship_id, false);
     }
 
+    /**
+     * @param mixed $fellowship_id
+     * @param mixed $octgn
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function downloadFromSelection($fellowship_id, $octgn) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -943,6 +1001,9 @@ class FellowshipController extends Controller {
         return $response;
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function favoriteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -1001,6 +1062,9 @@ class FellowshipController extends Controller {
     /*
 	 * records a user's comment
 	 */
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function commentAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -1093,6 +1157,11 @@ class FellowshipController extends Controller {
     /*
      * hides a comment, or if $hidden is false, unhide a comment
      */
+    /**
+     * @param mixed $comment_id
+     * @param mixed $hidden
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function hidecommentAction($comment_id, $hidden) {
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
@@ -1121,6 +1190,9 @@ class FellowshipController extends Controller {
     /*
 	 * records a user's vote
 	 */
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function voteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -1160,6 +1232,10 @@ class FellowshipController extends Controller {
         return new Response($fellowship->getNbVotes());
     }
 
+    /**
+     * @param mixed $username
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function byauthorAction($username) {
         return $this->redirect($this->generateUrl('fellowships_list', ['type' => 'find', 'author' => $username]));
     }

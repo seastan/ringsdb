@@ -33,7 +33,7 @@ class DeckCompareTest extends WebTestCase {
     /** @var int */
     private $deckB;
 
-    protected function setUp() {
+    protected function setUp(): void {
         $connection = $this->db(static::createClient());
         $this->maxDeckId = (int) $connection->fetchColumn('SELECT MAX(id) FROM deck');
         $this->deckA = $this->insertDeck('PHPUnit Deck A',
@@ -44,7 +44,7 @@ class DeckCompareTest extends WebTestCase {
             [self::FEINT => 1, self::QUICK_STRIKE => 1]);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $connection = $this->db(static::createClient());
         foreach (['deckslot', 'decksideslot'] as $table) {
             $connection->exec("DELETE FROM $table WHERE deck_id > {$this->maxDeckId}");
@@ -56,10 +56,17 @@ class DeckCompareTest extends WebTestCase {
 
     /* ------------------------------------------------------------ helpers */
 
+    /**
+     * @return mixed
+     */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
     }
 
+    /**
+     * @param string $username
+     * @return \Symfony\Bundle\FrameworkBundle\Client
+     */
     private function createAuthenticatedClient($username = 'test') {
         $client = static::createClient();
         $crawler = $client->request('GET', '/login');
@@ -71,6 +78,8 @@ class DeckCompareTest extends WebTestCase {
 
     /**
      * A copy of fixture deck 2 with the given cards ([card id => quantity]).
+     * @param mixed $name
+     * @return int
      */
     private function insertDeck($name, array $main, array $side) {
         $connection = $this->db(static::createClient());
@@ -88,6 +97,11 @@ class DeckCompareTest extends WebTestCase {
         return $id;
     }
 
+    /**
+     * @param mixed $table
+     * @param mixed $deckId
+     * @return mixed
+     */
     private function slots(Client $client, $table, $deckId) {
         return $this->db($client)->fetchAll("SELECT card_id, quantity FROM $table WHERE deck_id = ? ORDER BY card_id", [$deckId]);
     }
@@ -105,7 +119,7 @@ class DeckCompareTest extends WebTestCase {
 
     /* -------------------------------------------------------------- tests */
 
-    public function testCompareTwoDecks() {
+    public function testCompareTwoDecks(): void {
         $client = $this->createAuthenticatedClient();
         $before = [$this->slots($client, 'deckslot', $this->deckA), $this->slots($client, 'decksideslot', $this->deckB)];
 
@@ -136,7 +150,7 @@ class DeckCompareTest extends WebTestCase {
         $this->assertSame($before, [$this->slots($client, 'deckslot', $this->deckA), $this->slots($client, 'decksideslot', $this->deckB)]);
     }
 
-    public function testCompareADeckWithItself() {
+    public function testCompareADeckWithItself(): void {
         $client = $this->createAuthenticatedClient();
         $crawler = $client->request('GET', "/deck/compare/{$this->deckA}/{$this->deckA}");
 
@@ -148,7 +162,7 @@ class DeckCompareTest extends WebTestCase {
         $this->assertSame([[], []], self::columns($rows->eq(9)));
     }
 
-    public function testAnotherUsersDecksRequireSharing() {
+    public function testAnotherUsersDecksRequireSharing(): void {
         $client = $this->createAuthenticatedClient('admin');
 
         $client->request('GET', "/deck/compare/{$this->deckA}/{$this->deckB}");
@@ -159,7 +173,7 @@ class DeckCompareTest extends WebTestCase {
         $this->assertSame(200, $client->getResponse()->getStatusCode());
     }
 
-    public function testUnknownDeck() {
+    public function testUnknownDeck(): void {
         $client = $this->createAuthenticatedClient();
         $client->request('GET', "/deck/compare/{$this->deckA}/999");
 

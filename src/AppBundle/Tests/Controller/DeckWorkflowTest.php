@@ -19,7 +19,7 @@ class DeckWorkflowTest extends WebTestCase {
     /** @var int[] */
     private $deckIds = [];
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         if ($this->deckIds) {
             $connection = static::createClient()->getContainer()->get('doctrine')->getConnection();
             $ids = implode(',', array_map('intval', $this->deckIds));
@@ -48,6 +48,9 @@ class DeckWorkflowTest extends WebTestCase {
 
     /* ------------------------------------------------------------ helpers */
 
+    /**
+     * @return \Symfony\Bundle\FrameworkBundle\Client
+     */
     private function createAuthenticatedClient() {
         $client = static::createClient();
         $crawler = $client->request('GET', '/login');
@@ -57,10 +60,17 @@ class DeckWorkflowTest extends WebTestCase {
         return $client;
     }
 
+    /**
+     * @return mixed
+     */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
     }
 
+    /**
+     * @param mixed $id
+     * @return mixed
+     */
     private function fetchDeck(Client $client, $id) {
         return $this->db($client)->fetchAssoc(
             'SELECT d.name, d.description_md, d.tags, d.problem, d.major_version, d.minor_version, d.user_id, p.code AS last_pack
@@ -69,6 +79,12 @@ class DeckWorkflowTest extends WebTestCase {
         );
     }
 
+    /**
+     * @param mixed $table
+     * @param mixed $column
+     * @param mixed $id
+     * @return array<int|string, int>
+     */
     private function fetchSlots(Client $client, $table, $column, $id) {
         $rows = $this->db($client)->fetchAll(
             "SELECT c.code, s.quantity FROM $table s JOIN card c ON c.id = s.card_id WHERE s.$column = ? ORDER BY c.code",
@@ -78,7 +94,13 @@ class DeckWorkflowTest extends WebTestCase {
         return array_map('intval', array_column($rows, 'quantity', 'code'));
     }
 
-    private function saveDeck(Client $client, $deckId, $name, $description, $tags, array $main) {
+    /**
+     * @param mixed $deckId
+     * @param mixed $name
+     * @param mixed $description
+     * @param mixed $tags
+     */
+    private function saveDeck(Client $client, $deckId, $name, $description, $tags, array $main): void {
         $crawler = $client->request('GET', "/deck/edit/$deckId");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
 
@@ -96,6 +118,7 @@ class DeckWorkflowTest extends WebTestCase {
 
     /**
      * GET /deck/new creates an empty deck and redirects to the builder.
+     * @return int
      */
     private function createDeck(Client $client) {
         $client->request('GET', '/deck/new');
@@ -108,6 +131,9 @@ class DeckWorkflowTest extends WebTestCase {
         return $deckId;
     }
 
+    /**
+     * @return array<string, int>
+     */
     private static function coreLeadershipDeck() {
         $main = ['01001' => 1, '01002' => 1, '01003' => 1];
         foreach (range(13, 29) as $i) {
@@ -119,7 +145,7 @@ class DeckWorkflowTest extends WebTestCase {
 
     /* -------------------------------------------------------------- tests */
 
-    public function testCreateEditPublishDeck() {
+    public function testCreateEditPublishDeck(): void {
         $client = $this->createAuthenticatedClient();
         $userId = (int) $this->db($client)->fetchColumn("SELECT id FROM user WHERE username = 'test'");
 
@@ -255,7 +281,7 @@ class DeckWorkflowTest extends WebTestCase {
      * The builder sends {"main": {}, "side": {}}: "main" is decoded as a stdClass, which is never
      * empty(), so the builder can save an empty deck.
      */
-    public function testSavingAnEmptyDeckFromTheBuilderIsAccepted() {
+    public function testSavingAnEmptyDeckFromTheBuilderIsAccepted(): void {
         $client = $this->createAuthenticatedClient();
         $deckId = $this->createDeck($client);
         // start from a non-empty deck, to check that saving empties it
@@ -275,8 +301,9 @@ class DeckWorkflowTest extends WebTestCase {
 
     /**
      * @dataProvider refusedContentProvider
+     * @param mixed $content
      */
-    public function testSavingADeckWithoutCardsIsRefused($content) {
+    public function testSavingADeckWithoutCardsIsRefused($content): void {
         $client = $this->createAuthenticatedClient();
         $deckId = $this->createDeck($client);
 
@@ -292,6 +319,9 @@ class DeckWorkflowTest extends WebTestCase {
         $this->assertSame(['New Deck', '0'], [$deck['name'], $deck['minor_version']]);
     }
 
+    /**
+     * @return array
+     */
     public function refusedContentProvider() {
         return [
             'main as an empty array' => [json_encode(['main' => [], 'side' => []])],
@@ -304,7 +334,7 @@ class DeckWorkflowTest extends WebTestCase {
     /**
      * /deck/save-ajax (the builder's multi-deck mode): same guard as /deck/save, JSON answers.
      */
-    public function testSaveAjax() {
+    public function testSaveAjax(): void {
         $client = $this->createAuthenticatedClient();
         $deckId = $this->createDeck($client);
         $post = function ($content) use ($client, $deckId) {
@@ -342,6 +372,8 @@ class DeckWorkflowTest extends WebTestCase {
 
     /**
      * Ids of the test user's decks created since $maxId, registered for deletion in tearDown().
+     * @param mixed $maxId
+     * @return array<int, int>
      */
     private function newDeckIds(Client $client, $maxId) {
         $ids = array_map('intval', array_column($this->db($client)->fetchAll('SELECT id FROM deck WHERE id > ? ORDER BY id', [$maxId]), 'id'));
@@ -350,6 +382,9 @@ class DeckWorkflowTest extends WebTestCase {
         return $ids;
     }
 
+    /**
+     * @return int
+     */
     private function maxDeckId(Client $client) {
         return (int) $this->db($client)->fetchColumn('SELECT MAX(id) FROM deck');
     }
@@ -360,8 +395,10 @@ class DeckWorkflowTest extends WebTestCase {
      * pasted.
      *
      * @dataProvider importProvider
+     * @param mixed $content
+     * @param mixed $expectedSlots
      */
-    public function testImportPage($content, $expectedSlots) {
+    public function testImportPage($content, $expectedSlots): void {
         $client = $this->createAuthenticatedClient();
         $maxId = $this->maxDeckId($client);
 
@@ -387,6 +424,9 @@ class DeckWorkflowTest extends WebTestCase {
         $this->assertSame($expectedSlots, $this->fetchSlots($client, 'deckslot', 'deck_id', $ids[0]));
     }
 
+    /**
+     * @return array
+     */
     public function importProvider() {
         $main = self::coreLeadershipDeck();
 
@@ -403,8 +443,12 @@ class DeckWorkflowTest extends WebTestCase {
      * recognized card gives {"main": [], "side": []}, which the guard refuses.
      *
      * @dataProvider fileImportProvider
+     * @param mixed $filename
+     * @param mixed $fileContent
+     * @param mixed $expectedSlots
+     * @param mixed $expectedProblem
      */
-    public function testFileImport($filename, $fileContent, $expectedSlots, $expectedProblem = null) {
+    public function testFileImport($filename, $fileContent, $expectedSlots, $expectedProblem = null): void {
         $client = $this->createAuthenticatedClient();
         $maxId = $this->maxDeckId($client);
 
@@ -431,6 +475,9 @@ class DeckWorkflowTest extends WebTestCase {
         $this->assertSame($expectedSlots, $this->fetchSlots($client, 'deckslot', 'deck_id', $ids[0]));
     }
 
+    /**
+     * @return array
+     */
     public function fileImportProvider() {
         return [
             'text file' => ['PHPUnit Text.txt', "1x Aragorn\n3x Guard of the Citadel\n", ['01001' => 1, '01013' => 3], 'too_few_cards'],
@@ -444,8 +491,9 @@ class DeckWorkflowTest extends WebTestCase {
      * A deck exported as text ("1x Gimli (Core Set)" lines) can be imported back as is.
      *
      * @dataProvider fixtureDeckProvider
+     * @param mixed $deckId
      */
-    public function testTextExportCanBeImportedBack($deckId) {
+    public function testTextExportCanBeImportedBack($deckId): void {
         $client = $this->createAuthenticatedClient();
         $client->request('GET', "/deck/export/text/$deckId");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -467,6 +515,9 @@ class DeckWorkflowTest extends WebTestCase {
         );
     }
 
+    /**
+     * @return array
+     */
     public function fixtureDeckProvider() {
         return [
             'deck 1' => [1],
@@ -481,6 +532,8 @@ class DeckWorkflowTest extends WebTestCase {
     /**
      * Copy a decklist into a new deck (GET /deck/copy/{decklist_id}, "Copy" button of the
      * decklist toolbar). Returns the new deck id.
+     * @param mixed $decklistId
+     * @return mixed
      */
     private function copyDecklist(Client $client, $decklistId) {
         $maxId = $this->maxDeckId($client);
@@ -497,7 +550,7 @@ class DeckWorkflowTest extends WebTestCase {
      * Full circle: decklist -> copy into a deck -> edit -> publish. The new decklist is derived
      * from the original one.
      */
-    public function testCopyDecklistEditAndPublishAgain() {
+    public function testCopyDecklistEditAndPublishAgain(): void {
         $client = $this->createAuthenticatedClient();
         $userId = (string) $this->db($client)->fetchColumn("SELECT id FROM user WHERE username = 'test'");
         $original = $this->fetchSlots($client, 'decklistslot', 'decklist_id', 1);
@@ -549,7 +602,7 @@ class DeckWorkflowTest extends WebTestCase {
         $this->assertContains('PHPUnit Dwarves Remix', $crawler->filter('#table-successor')->text());
     }
 
-    public function testAnotherUserCanCopyADecklist() {
+    public function testAnotherUserCanCopyADecklist(): void {
         $client = static::createClient();
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => 'admin', '_password' => 'admin']));
@@ -562,7 +615,7 @@ class DeckWorkflowTest extends WebTestCase {
         $this->assertSame($this->fetchSlots($client, 'decklistslot', 'decklist_id', 2), $this->fetchSlots($client, 'deckslot', 'deck_id', $deckId));
     }
 
-    public function testCopyingAnUnknownDecklist() {
+    public function testCopyingAnUnknownDecklist(): void {
         $client = $this->createAuthenticatedClient();
         $maxId = $this->maxDeckId($client);
 
@@ -572,7 +625,7 @@ class DeckWorkflowTest extends WebTestCase {
         $this->assertSame([], $this->newDeckIds($client, $maxId));
     }
 
-    public function testAnonymousCannotCopyADecklist() {
+    public function testAnonymousCannotCopyADecklist(): void {
         $client = static::createClient();
         $client->request('GET', '/deck/copy/1');
 
@@ -585,8 +638,10 @@ class DeckWorkflowTest extends WebTestCase {
      * without tags gets the spheres of its heroes.
      *
      * @dataProvider tagsProvider
+     * @param mixed $tags
+     * @param mixed $expected
      */
-    public function testSavedTags($tags, $expected) {
+    public function testSavedTags($tags, $expected): void {
         $client = $this->createAuthenticatedClient();
         $deckId = $this->createDeck($client);
 
@@ -601,6 +656,9 @@ class DeckWorkflowTest extends WebTestCase {
         $this->assertSame($expected, $this->fetchDeck($client, $deckId)['tags']);
     }
 
+    /**
+     * @return array
+     */
     public function tagsProvider() {
         return [
             'tags' => ['gondor leadership', 'gondor leadership'],
@@ -611,7 +669,7 @@ class DeckWorkflowTest extends WebTestCase {
         ];
     }
 
-    public function testPublishingAnInvalidDeckIsRefused() {
+    public function testPublishingAnInvalidDeckIsRefused(): void {
         $client = $this->createAuthenticatedClient();
         $deckId = $this->createDeck($client);
 
@@ -630,7 +688,7 @@ class DeckWorkflowTest extends WebTestCase {
     /**
      * @dataProvider invalidDeckIdProvider
      */
-    public function testPublishingAnUnknownDeckIsABadRequest(array $parameters) {
+    public function testPublishingAnUnknownDeckIsABadRequest(array $parameters): void {
         $client = $this->createAuthenticatedClient();
         $client->request('POST', '/decklist/create', $parameters + ['name' => 'PHPUnit Unknown']);
 
@@ -638,6 +696,9 @@ class DeckWorkflowTest extends WebTestCase {
         $this->assertSame('0', $this->db($client)->fetchColumn("SELECT COUNT(*) FROM decklist WHERE name = 'PHPUnit Unknown'"));
     }
 
+    /**
+     * @return array
+     */
     public function invalidDeckIdProvider() {
         return [
             'unknown deck' => [['deck_id' => 999]],
@@ -645,7 +706,7 @@ class DeckWorkflowTest extends WebTestCase {
         ];
     }
 
-    public function testCannotEditOrPublishAnotherUsersDeck() {
+    public function testCannotEditOrPublishAnotherUsersDeck(): void {
         $client = $this->createAuthenticatedClient();
         $connection = $this->db($client);
         $adminId = $connection->fetchColumn("SELECT id FROM user WHERE username = 'admin'");

@@ -11,6 +11,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
 
 class TwigCacheCommand extends ContainerAwareCommand {
+    /**
+     * @return void
+     */
     public function configure() {
         $this->setName('app:twig')
              ->setDescription('selectively manage the twig cache')
@@ -18,6 +21,11 @@ class TwigCacheCommand extends ContainerAwareCommand {
              ->addOption('clear', 'c', InputOption::VALUE_NONE, 'delete cache files');
     }
 
+    /**
+     * @param mixed $output
+     * @param mixed $text
+     * @return void
+     */
     public function write($output, $text) {
         $output->writeln($text);
     }

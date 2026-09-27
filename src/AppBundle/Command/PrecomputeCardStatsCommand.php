@@ -19,6 +19,9 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
  *   php app/console app:stats:precompute-cards --months=3   # last 3 months
  */
 class PrecomputeCardStatsCommand extends ContainerAwareCommand {
+    /**
+     * @return void
+     */
     protected function configure() {
         $this
             ->setName('app:stats:precompute-cards')

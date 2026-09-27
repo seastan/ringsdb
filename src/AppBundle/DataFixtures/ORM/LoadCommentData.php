@@ -20,6 +20,9 @@ class LoadCommentData extends AbstractFixture implements DependentFixtureInterfa
         ];
     }
 
+    /**
+     * @return void
+     */
     public function load(ObjectManager $manager)
     {
         /** @var User $user */

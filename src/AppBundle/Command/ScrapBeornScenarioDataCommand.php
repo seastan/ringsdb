@@ -13,6 +13,9 @@ use Symfony\Component\VarDumper\VarDumper;
 
 class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
 
+    /**
+     * @return void
+     */
     protected function configure() {
         $this->setName('app:beorn:scenario')
             ->setDescription('Download scenario statistics data from Hall of Beorn')
@@ -50,6 +53,13 @@ class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
         return 0;
     }
 
+	/**
+	 * @param mixed $em
+	 * @param mixed $name
+	 * @param mixed $skip
+	 * @param mixed $customjson
+	 * @return string
+	 */
 	public static function command($em, $name, $skip, $customjson) {
 		$res = '';
 		$name = $name ?: null;

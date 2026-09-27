@@ -14,6 +14,9 @@ use Symfony\Component\VarDumper\VarDumper;
 
 class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
 
+    /**
+     * @return void
+     */
     protected function configure() {
         $this->setName('app:beorn:json')
              ->setDescription('Download new card data from Hall of Beorn JSON Export')

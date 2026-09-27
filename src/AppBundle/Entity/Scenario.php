@@ -231,6 +231,7 @@ class Scenario implements \JsonSerializable {
      * Remove encounter
      *
      * @param \AppBundle\Entity\Encounter $encounter
+     * @return void
      */
     public function removeEncounter(\AppBundle\Entity\Encounter $encounter) {
         $this->encounters->removeElement($encounter);
@@ -1128,6 +1129,7 @@ class Scenario implements \JsonSerializable {
      * Remove questlog
      *
      * @param \AppBundle\Entity\Questlog $questlog
+     * @return void
      */
     public function removeQuestlog(\AppBundle\Entity\Questlog $questlog) {
         $this->questlogs->removeElement($questlog);

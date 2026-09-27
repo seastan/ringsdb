@@ -10,13 +10,22 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 {
+    /**
+     * @var \Symfony\Component\DependencyInjection\ContainerInterface|null
+     */
     private $container;
 
+    /**
+     * @return void
+     */
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
 
+    /**
+     * @return void
+     */
     public function load(ObjectManager $manager)
     {
         $userManager = $this->container->get('fos_user.user_manager');

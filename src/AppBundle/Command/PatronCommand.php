@@ -12,6 +12,9 @@ use AppBundle\Entity\Review;
 use AppBundle\Entity\Reviewcomment;
 
 class PatronCommand extends ContainerAwareCommand {
+    /**
+     * @return void
+     */
     protected function configure() {
         $this
             ->setName('app:patron')

@@ -12,10 +12,16 @@ use AppBundle\Entity\Cycle;
 use AppBundle\Entity\Pack;
 
 class CSVController extends Controller {
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function uploadFormAction() {
 		return $this->render('AppBundle:CSV:upload_form.html.twig');
 	}
 
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function uploadProcessAction(Request $request) {
 		$inputCode = $request->request->get('code');
 		$inputOldCode = $request->request->get('old_code');

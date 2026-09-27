@@ -25,13 +25,13 @@ class DecklistCommentTest extends WebTestCase {
     /** @var array */
     private $decklists;
 
-    protected function setUp() {
+    protected function setUp(): void {
         $connection = $this->db(static::createClient());
         $this->maxCommentId = (int) $connection->fetchColumn('SELECT MAX(id) FROM comment');
         $this->decklists = $connection->fetchAll('SELECT id, nb_comments, date_update, date_last_comment FROM decklist');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $connection = $this->db(static::createClient());
         $connection->executeUpdate('DELETE FROM comment WHERE id > ?', [$this->maxCommentId]);
         $connection->executeUpdate('UPDATE comment SET is_hidden = 0');
@@ -43,10 +43,17 @@ class DecklistCommentTest extends WebTestCase {
 
     /* ------------------------------------------------------------ helpers */
 
+    /**
+     * @return mixed
+     */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
     }
 
+    /**
+     * @param mixed $username
+     * @return \Symfony\Bundle\FrameworkBundle\Client
+     */
     private function createAuthenticatedClient($username) {
         $client = static::createClient();
         $crawler = $client->request('GET', '/login');
@@ -59,6 +66,9 @@ class DecklistCommentTest extends WebTestCase {
     /**
      * Posts the comment form as the JavaScript does it (AJAX), with the profiler enabled to
      * inspect the notification emails.
+     * @param mixed $decklistId
+     * @param mixed $text
+     * @return \Symfony\Component\HttpFoundation\Response|null
      */
     private function postComment(Client $client, $decklistId, $text) {
         $client->enableProfiler();
@@ -67,6 +77,9 @@ class DecklistCommentTest extends WebTestCase {
         return $client->getResponse();
     }
 
+    /**
+     * @return mixed
+     */
     private function newComments(Client $client) {
         return $this->db($client)->fetchAll(
             'SELECT c.decklist_id, u.username, c.text, c.is_hidden FROM comment c JOIN user u ON u.id = c.user_id WHERE c.id > ? ORDER BY c.id',
@@ -90,7 +103,7 @@ class DecklistCommentTest extends WebTestCase {
 
     /* ------------------------------------------------------------ posting */
 
-    public function testCommentOnAnotherUsersDecklist() {
+    public function testCommentOnAnotherUsersDecklist(): void {
         $client = $this->createAuthenticatedClient('admin');
 
         $response = $this->postComment($client, 1, "Nice **deck**!");
@@ -126,7 +139,7 @@ class DecklistCommentTest extends WebTestCase {
         $this->assertSame('2 comments', trim($crawler->filter('th:contains("comments")')->text()));
     }
 
-    public function testCommentOnOwnDecklistNotifiesMentionedUsers() {
+    public function testCommentOnOwnDecklistNotifiesMentionedUsers(): void {
         $client = $this->createAuthenticatedClient('test');
 
         // mentions are written `@username` (the autocomplete of the form inserts the backticks)
@@ -143,7 +156,7 @@ class DecklistCommentTest extends WebTestCase {
         $this->assertSame(['admin@example.com' => '[ringsdb] New comment'], $this->sentEmails($client));
     }
 
-    public function testPreviousCommentersAreNotified() {
+    public function testPreviousCommentersAreNotified(): void {
         // decklist 2 is commented by admin, then by test (its author): admin is notified as a commenter
         $client = $this->createAuthenticatedClient('admin');
         $this->postComment($client, 2, 'First');
@@ -154,7 +167,7 @@ class DecklistCommentTest extends WebTestCase {
         $this->assertSame(['admin@example.com' => '[ringsdb] New comment'], $this->sentEmails($client));
     }
 
-    public function testNotificationsCanBeDisabled() {
+    public function testNotificationsCanBeDisabled(): void {
         $client = $this->createAuthenticatedClient('admin');
         $connection = $this->db($client);
         try {
@@ -173,8 +186,10 @@ class DecklistCommentTest extends WebTestCase {
 
     /**
      * @dataProvider markdownProvider
+     * @param mixed $text
+     * @param mixed $expectedHtml
      */
-    public function testCommentMarkdown($text, $expectedHtml) {
+    public function testCommentMarkdown($text, $expectedHtml): void {
         $client = $this->createAuthenticatedClient('test');
         $this->postComment($client, 1, $text);
 
@@ -183,6 +198,9 @@ class DecklistCommentTest extends WebTestCase {
         $this->assertSame($expectedHtml, $comments[0]['text']);
     }
 
+    /**
+     * @return array
+     */
     public function markdownProvider() {
         return [
             'bare URLs become links' => ['See http://example.com/page', '<p>See <a href="http://example.com/page">example.com</a></p>'],
@@ -192,7 +210,7 @@ class DecklistCommentTest extends WebTestCase {
         ];
     }
 
-    public function testEmptyCommentIsIgnored() {
+    public function testEmptyCommentIsIgnored(): void {
         $client = $this->createAuthenticatedClient('test');
 
         $response = $this->postComment($client, 1, "   \n  ");
@@ -204,7 +222,7 @@ class DecklistCommentTest extends WebTestCase {
         $this->assertSame([], $this->sentEmails($client));
     }
 
-    public function testAnonymousCannotComment() {
+    public function testAnonymousCannotComment(): void {
         $client = static::createClient();
         $client->request('POST', '/user/comment', ['id' => 1, 'comment' => 'Anonymous']);
 
@@ -213,7 +231,7 @@ class DecklistCommentTest extends WebTestCase {
         $this->assertSame([], $this->newComments($client));
     }
 
-    public function testCommentOnUnknownDecklist() {
+    public function testCommentOnUnknownDecklist(): void {
         $client = $this->createAuthenticatedClient('test');
         $client->request('POST', '/user/comment', ['id' => 999, 'comment' => 'Lost']);
 
@@ -225,7 +243,7 @@ class DecklistCommentTest extends WebTestCase {
      * BUG: for AJAX requests, CoreExceptionListener takes the status from getCode() instead of
      * getStatusCode(): every HTTP exception (400, 403, 404...) becomes a 500. The JSON body is right.
      */
-    public function testCommentOnUnknownDecklistWithAjax() {
+    public function testCommentOnUnknownDecklistWithAjax(): void {
         $client = $this->createAuthenticatedClient('test');
         $client->request('POST', '/user/comment', ['id' => 999, 'comment' => 'Lost'], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
@@ -240,7 +258,7 @@ class DecklistCommentTest extends WebTestCase {
     /**
      * Hot Topics: decklists with comments of the day first, then by number of comments.
      */
-    public function testHotTopicsFavourRecentComments() {
+    public function testHotTopicsFavourRecentComments(): void {
         $client = $this->createAuthenticatedClient('admin');
         // decklist 1: 5 comments, none recent; decklist 3: 1 comment, posted now
         $this->db($client)->update('decklist', ['nb_comments' => 5], ['id' => 1]);
@@ -262,7 +280,7 @@ class DecklistCommentTest extends WebTestCase {
 
     /* ------------------------------------------------------------- hiding */
 
-    public function testDecklistAuthorCanHideAndShowAComment() {
+    public function testDecklistAuthorCanHideAndShowAComment(): void {
         $client = $this->createAuthenticatedClient('admin');
         $this->postComment($client, 1, 'Hide me');
         $commentId = (int) $this->db($client)->fetchColumn('SELECT MAX(id) FROM comment');
@@ -282,7 +300,7 @@ class DecklistCommentTest extends WebTestCase {
         $this->assertSame('0', $this->db($client)->fetchColumn('SELECT is_hidden FROM comment WHERE id = ?', [$commentId]));
     }
 
-    public function testOnlyTheDecklistAuthorCanHideComments() {
+    public function testOnlyTheDecklistAuthorCanHideComments(): void {
         // comment 1 of the fixtures: by test, on test's decklist 1
         $client = $this->createAuthenticatedClient('admin');
         $client->request('POST', '/user/hidecomment/1/1');
@@ -292,7 +310,7 @@ class DecklistCommentTest extends WebTestCase {
         $this->assertSame('0', $this->db($client)->fetchColumn('SELECT is_hidden FROM comment WHERE id = 1'));
     }
 
-    public function testHidingAnUnknownComment() {
+    public function testHidingAnUnknownComment(): void {
         $client = $this->createAuthenticatedClient('test');
         $client->request('POST', '/user/hidecomment/999/1');
 

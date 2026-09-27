@@ -19,13 +19,13 @@ class DecklistSocialTest extends WebTestCase {
     /** @var array */
     private $fixtureUsers;
 
-    protected function setUp() {
+    protected function setUp(): void {
         $connection = $this->db(static::createClient());
         $this->fixtureDecklists = $connection->fetchAll('SELECT id, nb_votes, nb_favorites, date_update FROM decklist');
         $this->fixtureUsers = $connection->fetchAll('SELECT id, reputation FROM user');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $connection = $this->db(static::createClient());
         $connection->exec('DELETE FROM favorite');
         $connection->exec('DELETE FROM vote');
@@ -40,10 +40,17 @@ class DecklistSocialTest extends WebTestCase {
 
     /* ------------------------------------------------------------ helpers */
 
+    /**
+     * @return mixed
+     */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
     }
 
+    /**
+     * @param mixed $username
+     * @return \Symfony\Bundle\FrameworkBundle\Client
+     */
     private function createAuthenticatedClient($username) {
         $client = static::createClient();
         $crawler = $client->request('GET', '/login');
@@ -53,12 +60,20 @@ class DecklistSocialTest extends WebTestCase {
         return $client;
     }
 
+    /**
+     * @param mixed $action
+     * @param mixed $decklistId
+     * @return \Symfony\Component\HttpFoundation\Response|null
+     */
     private function post(Client $client, $action, $decklistId) {
         $client->request('POST', "/user/$action", ['id' => $decklistId], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
         return $client->getResponse();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function state(Client $client) {
         $connection = $this->db($client);
 
@@ -76,7 +91,7 @@ class DecklistSocialTest extends WebTestCase {
     /**
      * Favorite is a toggle; the author gains (then loses) 5 reputation points.
      */
-    public function testFavoriteAndUnfavorite() {
+    public function testFavoriteAndUnfavorite(): void {
         $client = $this->createAuthenticatedClient('admin');
 
         $response = $this->post($client, 'favorite', 2);
@@ -94,14 +109,14 @@ class DecklistSocialTest extends WebTestCase {
         $this->assertSame(['nb_favorites' => '0', 'nb_votes' => '0', 'favorites' => '0', 'votes' => '0', 'author_reputation' => '1'], $this->state($client));
     }
 
-    public function testFavoriteOwnDecklistGivesNoReputation() {
+    public function testFavoriteOwnDecklistGivesNoReputation(): void {
         $client = $this->createAuthenticatedClient('test');
 
         $this->assertSame('1', $this->post($client, 'favorite', 2)->getContent());
         $this->assertSame(['nb_favorites' => '1', 'nb_votes' => '0', 'favorites' => '1', 'votes' => '0', 'author_reputation' => '1'], $this->state($client));
     }
 
-    public function testFavoriteAnUnknownDecklist() {
+    public function testFavoriteAnUnknownDecklist(): void {
         $client = $this->createAuthenticatedClient('admin');
 
         $response = $this->post($client, 'favorite', 999);
@@ -116,7 +131,7 @@ class DecklistSocialTest extends WebTestCase {
     /**
      * A vote cannot be taken back; voting twice does nothing; the author gains 1 reputation point.
      */
-    public function testVote() {
+    public function testVote(): void {
         $client = $this->createAuthenticatedClient('admin');
 
         $response = $this->post($client, 'like', 2);
@@ -129,14 +144,14 @@ class DecklistSocialTest extends WebTestCase {
         $this->assertSame(['nb_favorites' => '0', 'nb_votes' => '1', 'favorites' => '0', 'votes' => '1', 'author_reputation' => '2'], $this->state($client));
     }
 
-    public function testCannotVoteForOwnDecklist() {
+    public function testCannotVoteForOwnDecklist(): void {
         $client = $this->createAuthenticatedClient('test');
 
         $this->assertSame('0', $this->post($client, 'like', 2)->getContent());
         $this->assertSame(['nb_favorites' => '0', 'nb_votes' => '0', 'favorites' => '0', 'votes' => '0', 'author_reputation' => '1'], $this->state($client));
     }
 
-    public function testVoteForAnUnknownDecklist() {
+    public function testVoteForAnUnknownDecklist(): void {
         $client = $this->createAuthenticatedClient('admin');
 
         $client->request('POST', '/user/like', ['id' => 999]);
@@ -152,8 +167,9 @@ class DecklistSocialTest extends WebTestCase {
 
     /**
      * @dataProvider actionProvider
+     * @param mixed $action
      */
-    public function testAnonymousAjaxIsDenied($action) {
+    public function testAnonymousAjaxIsDenied($action): void {
         $client = static::createClient();
         $response = $this->post($client, $action, 2);
 
@@ -162,14 +178,18 @@ class DecklistSocialTest extends WebTestCase {
         $this->assertSame(['nb_favorites' => '0', 'nb_votes' => '0', 'favorites' => '0', 'votes' => '0', 'author_reputation' => '1'], $this->state($client));
     }
 
+    /**
+     * @return array
+     */
     public function actionProvider() {
         return ['favorite' => ['favorite'], 'vote' => ['like']];
     }
 
     /**
      * @dataProvider actionProvider
+     * @param mixed $action
      */
-    public function testGetIsNotAllowed($action) {
+    public function testGetIsNotAllowed($action): void {
         $client = $this->createAuthenticatedClient('admin');
         $client->request('GET', "/user/$action?id=2");
 

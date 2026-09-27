@@ -100,6 +100,10 @@ class Diff {
         return new SlotCollectionDecorator($intersection);
     }
 
+    /**
+     * @param mixed $decks
+     * @return array
+     */
     public function diffContents($decks) {
 
         // n flat lists of the cards of each decklist

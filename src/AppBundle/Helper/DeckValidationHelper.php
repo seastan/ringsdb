@@ -6,6 +6,10 @@ class DeckValidationHelper {
     public function __construct() {
     }
 
+    /**
+     * @param mixed $deck
+     * @return array
+     */
     public function getInvalidCards($deck) {
         $invalidCards = [];
 
@@ -20,10 +24,20 @@ class DeckValidationHelper {
         return $invalidCards;
     }
 
+    /**
+     * @param mixed $deck
+     * @param mixed $card
+     * @return bool
+     */
     public function canIncludeCard($deck, $card) {
         return true;
     }
 
+    /**
+     * @param mixed $deck
+     * @param bool $casualPlay
+     * @return string|null
+     */
     public function findProblem($deck, $casualPlay = false) {
         /* @var $deck \AppBundle\Entity\Deck */
         $heroDeck = $deck->getSlots()->getHeroDeck();
@@ -67,6 +81,10 @@ class DeckValidationHelper {
         return null;
     }
 
+    /**
+     * @param mixed $problem
+     * @return string
+     */
     public function getProblemLabel($problem) {
         if (!$problem) {
             return '';

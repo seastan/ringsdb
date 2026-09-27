@@ -8,6 +8,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class PackType extends AbstractType {
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder
             ->add('code')
@@ -19,6 +22,9 @@ class PackType extends AbstractType {
             ->add('position');
     }
 
+    /**
+     * @return void
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver) {
         $resolver->setDefaults([
             'data_class' => 'AppBundle\Entity\Pack'

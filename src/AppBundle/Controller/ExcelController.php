@@ -9,6 +9,9 @@ use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\Card;
 
 class ExcelController extends Controller {
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function downloadFormAction() {
 		$em = $this->getDoctrine()->getManager();
 		$packs = $em->getRepository('AppBundle:Pack')->findBy([], ['dateRelease' => 'ASC', 'name' => 'ASC']);
@@ -18,6 +21,9 @@ class ExcelController extends Controller {
 		]);
 	}
 
+	/**
+	 * @return mixed
+	 */
 	public function downloadProcessAction(Request $request) {
 		$ignoredFields = ['id', 'dateCreation', 'dateUpdate'];
 
@@ -111,10 +117,16 @@ class ExcelController extends Controller {
 		return $response;
 	}
 
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function uploadFormAction() {
 		return $this->render('AppBundle:Excel:upload_form.html.twig');
 	}
 
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function uploadProcessAction(Request $request) {
 		/* @var $uploadedFile \Symfony\Component\HttpFoundation\File\UploadedFile */
 		$uploadedFile = $request->files->get('upfile');
