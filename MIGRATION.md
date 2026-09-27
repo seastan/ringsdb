@@ -836,6 +836,13 @@ name, number of decks, cards, packs, custom packs, number of Core Sets, sort ord
   `/api/public/user/info`). Without an amount (or with 0) it shows the total. The amount is not
   checked (a negative one is subtracted); an unknown user is reported but exits with code 0.
 
+- Card scraping commands, candidates for removal: `app:beorn:html` (`ScrapBeornCardDataCommand`,
+  scrapes the Hall of Beorn HTML pages, still full of debug output), `app:beorn:json`,
+  `app:cgdb:cards`, `app:cards:octgn` (OCTGN, see below) and `app:download-images`. The CSV import
+  (`BeornJSONtoRingsDBcsv.py`, see "Admin area") seems to have replaced them; `app:beorn:scenario`
+  is still used by the admin scenario import. Keep only what the maintainers still run.
+- `app:remove-user` now exits with code 1 when the user is not found.
+
 ## OCTGN features (to be removed)
 
 Plan: drop every OCTGN feature (OCTGN is a desktop client for the game) before the migration, so
