@@ -35,3 +35,8 @@ phpunit: test-fixtures
 coverage: test-fixtures
 	docker compose exec -it -u www-data symfony php bin/simple-phpunit --coverage-html app/cache/coverage --coverage-text=php://stdout --colors=never
 	@echo "Code coverage report: \033[36mfile://${PWD}/app/cache/coverage/index.html\033[0m"
+
+# simple-phpunit install: PHPUnit is needed to analyse the tests (see phpstan.neon)
+phpstan:
+	docker compose exec -it -u www-data symfony php bin/simple-phpunit install
+	docker compose exec -it -u www-data symfony php bin/phpstan

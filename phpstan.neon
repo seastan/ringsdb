@@ -1,0 +1,8 @@
+parameters:
+    level: 0
+    paths:
+        - src
+    bootstrapFiles:
+        # PHPUnit is installed by simple-phpunit (SYMFONY_PHPUNIT_VERSION in phpunit.xml), outside
+        # Composer's autoloader: KernelTestCase / WebTestCase extend its TestCase
+        - vendor/bin/.phpunit/phpunit-6.5-0/vendor/autoload.php

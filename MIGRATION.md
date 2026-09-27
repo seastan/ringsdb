@@ -251,7 +251,8 @@ The OAuth2 API (`/api/oauth2`) is to be removed before migrating: see "OAuth2 se
 - `/cards/{pack_code}.xml|xls|xlsx` returns `200` with the plain text body
   `<format> format not supported. Only json is supported.` (`text/xml` for xml, `text/html`
   for xls/xlsx). `/card/{code}.xml` is a `404` (route requirement).
-- `/cards/search/{q}` ignores the `jsonp` parameter.
+- Fixed: `/cards/search/{q}` ignored the `jsonp` parameter (the action tested `isset($jsonp)` but
+  never read it from the request). It now supports JSONP like the other endpoints.
 - `/cards/` `Last-Modified` is the most recent `dateUpdate` of the cards **and** of their
   printings.
 - `/custom-packs/published` and `/user/info` are not in `ApiController`: they return a
