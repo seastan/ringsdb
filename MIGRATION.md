@@ -556,6 +556,9 @@ directly.
 - The deck contents are decoded with `(array) json_decode(...)` (objects inside), like the deck
   builder does: `{"main": {}}` passes the "empty deck" guard.
 - No CSRF protection on `/questlog/save`, `/questlog/delete`, `/questlog/delete_list`.
+- Fixed: the quest log list of a decklist page (`Decklist::getAllQuestlogs()`) was meant to include
+  the quest logs of its parent deck, but they were assigned to a misspelled variable
+  (`$parentlogs`) and never listed (found by phpstan).
 
 ## Card reviews
 
@@ -654,6 +657,13 @@ To be written once representative files are available (to be stored under
   with an output buffer). The export file names come from `slugify()`, which drops the spaces
   (`lotrlcgcards.xlsx`).
 - PHPExcel (`liuggio/ExcelBundle`) is abandoned: replace it with PhpSpreadsheet.
+- Fixed: the "Delete" button of an admin pack page (`Pack/show.html.twig`) posted to
+  `admin_cycle_delete`; the delete forms share their CSRF token, so it deleted the cycle with the
+  same id as the pack (`testPackPageDeletesThePack`).
+- The generated CRUD controllers of card, cycle, card printing, pack, encounter and scenario used
+  the Symfony 2 `$form->bind($request)`, which ignores the request method. They now use
+  `handleRequest()`; their edit and delete forms declare the `PUT` / `DELETE` methods that the
+  templates send with the `_method` field (found by phpstan).
 - Moderation actions are GET routes that write: `/admin/user/toggle_locked/{id}`,
   `/admin/decklist/delete/{id}`, `/admin/comment/toggle_hidden/{id}`,
   `/admin/comment/delete/{id}`.
@@ -666,9 +676,8 @@ To be written once representative files are available (to be stored under
   printings, `CardsData`): uploaded images are never displayed. It also keeps the `.png` name
   whatever the actual format. Not tested.
 - The generated CRUD controllers use the Symfony 2 form API (`createForm(new XxxType())`,
-  `$form->bind($request)`, `'entity'` / `'checkbox'` type names, `getName()`), which is gone in
-  recent versions (`createForm(XxxType::class)`, `handleRequest()`, FQCN types,
-  `getBlockPrefix()`).
+  `'entity'` / `'checkbox'` type names, `getName()`), which is gone in recent versions
+  (`createForm(XxxType::class)`, FQCN types, `getBlockPrefix()`).
 - Deleting reference data still in use (e.g. a cycle with packs, a card in decks) fails on the
   foreign keys with a `500` instead of an error message. `Card` has a "force delete" that
   removes its slots, printings and reviews, with SQL built by concatenation (the id comes from

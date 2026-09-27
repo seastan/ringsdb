@@ -39,11 +39,11 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
     }
 
     public function offsetSet($offset, $value) {
-        return $this->slots->offsetSet($offset, $value);
+        $this->slots->offsetSet($offset, $value);
     }
 
     public function offsetUnset($offset) {
-        return $this->slots->offsetUnset($offset);
+        $this->slots->offsetUnset($offset);
     }
 
     public function countCards() {

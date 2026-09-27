@@ -78,7 +78,7 @@ class CardPrintingController extends Controller {
         $filterPack = $this->resolveFilterPack($request, $em);
         $entity     = new CardPrinting();
         $form       = $this->createForm(new CardPrintingType(), $entity, ['filter_pack' => $filterPack]);
-        $form->bind($request);
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             $em->persist($entity);
@@ -104,7 +104,7 @@ class CardPrintingController extends Controller {
         }
 
         $filterPack = $this->resolveFilterPack($request, $em);
-        $editForm   = $this->createForm(new CardPrintingType(), $entity, ['filter_pack' => $filterPack]);
+        $editForm   = $this->createForm(new CardPrintingType(), $entity, ['filter_pack' => $filterPack, 'method' => 'PUT']);
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('AppBundle:CardPrinting:edit.html.twig', [
@@ -126,8 +126,8 @@ class CardPrintingController extends Controller {
 
         $filterPack = $this->resolveFilterPack($request, $em);
         $deleteForm = $this->createDeleteForm($id);
-        $editForm   = $this->createForm(new CardPrintingType(), $entity, ['filter_pack' => $filterPack]);
-        $editForm->bind($request);
+        $editForm   = $this->createForm(new CardPrintingType(), $entity, ['filter_pack' => $filterPack, 'method' => 'PUT']);
+        $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
             $em->persist($entity);
@@ -147,7 +147,7 @@ class CardPrintingController extends Controller {
 
     public function deleteAction(Request $request, $id) {
         $form = $this->createDeleteForm($id);
-        $form->bind($request);
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             $em     = $this->getDoctrine()->getManager();
@@ -175,6 +175,7 @@ class CardPrintingController extends Controller {
     private function createDeleteForm($id) {
         return $this->createFormBuilder(['id' => $id])
             ->add('id', 'hidden')
+            ->setMethod('DELETE')
             ->getForm();
     }
 }

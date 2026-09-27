@@ -67,7 +67,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      */
     private $freezeComments;
     /**
-     * @var integer
+     * @var string
      */
     private $version;
     /**
@@ -384,7 +384,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Set freezeComments
      *
-     * @param integer $freezeComments
+     * @param bool $freezeComments
      *
      * @return Decklist
      */
@@ -397,7 +397,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get freezeComments
      *
-     * @return integer
+     * @return bool
      */
     public function getFreezeComments() {
         return $this->freezeComments;
@@ -834,7 +834,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get allFellowships
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return array
      */
     public function getAllFellowships() {
         $allFellowships = $this->getFellowships()->toArray();
@@ -922,12 +922,12 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get allQuestlogs
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return array
      */
     public function getAllQuestlogs() {
         $theseLogs = $this->getQuestlogs()->toArray();
         $parentLogs = [];
-        if ($this->getParent()) $parentlogs = $this->getParent()->getQuestlogs()->toArray();
+        if ($this->getParent()) $parentLogs = $this->getParent()->getQuestlogs()->toArray();
         $allQuestlogs = array_unique(array_merge($theseLogs, $parentLogs), SORT_REGULAR);
         return array_filter($allQuestlogs, function($k) {
             return $k->getQuestlog()->getIsPublic();

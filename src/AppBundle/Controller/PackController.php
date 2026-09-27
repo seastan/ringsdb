@@ -34,7 +34,7 @@ class PackController extends Controller {
     public function createAction(Request $request) {
         $entity = new Pack();
         $form = $this->createForm(new PackType(), $entity);
-        $form->bind($request);
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
@@ -98,7 +98,7 @@ class PackController extends Controller {
             throw $this->createNotFoundException('Unable to find Pack entity.');
         }
 
-        $editForm = $this->createForm(new PackType(), $entity);
+        $editForm = $this->createForm(new PackType(), $entity, ['method' => 'PUT']);
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('AppBundle:Pack:edit.html.twig', [
@@ -122,8 +122,8 @@ class PackController extends Controller {
         }
 
         $deleteForm = $this->createDeleteForm($id);
-        $editForm = $this->createForm(new PackType(), $entity);
-        $editForm->bind($request);
+        $editForm = $this->createForm(new PackType(), $entity, ['method' => 'PUT']);
+        $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
             $em->persist($entity);
@@ -145,7 +145,7 @@ class PackController extends Controller {
      */
     public function deleteAction(Request $request, $id) {
         $form = $this->createDeleteForm($id);
-        $form->bind($request);
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
@@ -167,11 +167,12 @@ class PackController extends Controller {
      *
      * @param mixed $id The entity id
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createDeleteForm($id) {
         return $this->createFormBuilder(array('id' => $id))
             ->add('id', 'hidden')
+            ->setMethod('DELETE')
             ->getForm();
     }
 }

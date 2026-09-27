@@ -139,7 +139,9 @@ class ExcelController extends Controller {
 				$firstRow = false;
 
 				// analysis of first row
-				foreach ($row->getCellIterator() as $cell) {
+				/** @var \PHPExcel_Worksheet_RowCellIterator $cellIterator */
+				$cellIterator = $row->getCellIterator();
+				foreach ($cellIterator as $cell) {
 					$colNames[$cell->getColumn()] = $cell->getValue();
 				}
 				continue;
@@ -147,6 +149,7 @@ class ExcelController extends Controller {
 
 			$card = [];
 
+			/** @var \PHPExcel_Worksheet_RowCellIterator $cellIterator */
 			$cellIterator = $row->getCellIterator();
 			foreach ($cellIterator as $cell) {
 				$col = $cell->getColumn();

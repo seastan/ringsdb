@@ -684,7 +684,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Get allFellowships
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return array
      */
     public function getAllFellowships() {
         $childrenFellowships = $this->getFellowships()->toArray();
@@ -735,7 +735,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Get allQuestlogs
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return array
      */
     public function getAllQuestlogs() {
         $allQuestlogs = $this->getQuestlogs()->toArray();

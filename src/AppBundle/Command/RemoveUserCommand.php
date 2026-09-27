@@ -29,7 +29,7 @@ class RemoveUserCommand extends ContainerAwareCommand {
 
         if (!$user) {
             $output->writeln("User not found");
-            return;
+            return 1;
         }
 
         $output->writeln("User " . $user->getUsername());

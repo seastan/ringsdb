@@ -188,6 +188,19 @@ class AdminWriteTest extends WebTestCase {
         $this->assertSame(['1', '3'], array_column($encounters, 'encounter_id'));
     }
 
+    /**
+     * The delete button of a pack's page used to post to the cycle delete route: the delete forms
+     * share their CSRF token, so it deleted the cycle with the same id.
+     */
+    public function testPackPageDeletesThePack() {
+        $client = $this->createAdminClient();
+        $crawler = $client->request('GET', '/admin/pack/1/show');
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertCount(1, $crawler->filter('form[action="/admin/pack/1/delete"]'));
+        $this->assertCount(0, $crawler->filter('form[action^="/admin/cycle/"]'));
+    }
+
     public function testDeleteRequiresTheFormToken() {
         $client = $this->createAdminClient();
         $client->request('POST', '/admin/type/1/delete', []);

@@ -56,7 +56,7 @@ class SphereController extends Controller {
      *
      * @param Sphere $entity The entity
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createCreateForm(Sphere $entity) {
         $form = $this->createForm(new SphereType(), $entity, array(
@@ -130,7 +130,7 @@ class SphereController extends Controller {
     *
     * @param Sphere $entity The entity
     *
-    * @return \Symfony\Component\Form\Form The form
+    * @return \Symfony\Component\Form\FormInterface The form
     */
     private function createEditForm(Sphere $entity) {
         $form = $this->createForm(new SphereType(), $entity, array(
@@ -201,7 +201,7 @@ class SphereController extends Controller {
      *
      * @param mixed $id The entity id
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createDeleteForm($id) {
         return $this->createFormBuilder()

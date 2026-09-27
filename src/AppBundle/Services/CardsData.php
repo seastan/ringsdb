@@ -437,7 +437,7 @@ class CardsData {
 	 *
 	 * @param \AppBundle\Entity\Card $card
 	 * @param bool $api
-	 * @return mixed string number mixed NULL unknown
+	 * @return array
 	 */
 	public function getCardInfo($card, $api = false) {
 		$cardinfo = [];

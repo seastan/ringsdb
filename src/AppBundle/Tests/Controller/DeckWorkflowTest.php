@@ -87,7 +87,7 @@ class DeckWorkflowTest extends WebTestCase {
         $form['name'] = $name;
         $form['description'] = $description;
         $form['tags'] = $tags;
-        $form['content'] = json_encode(['main' => (object) $main, 'side' => new \stdClass()]);
+        $form['content'] = (string) json_encode(['main' => (object) $main, 'side' => new \stdClass()]);
         $client->submit($form);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());

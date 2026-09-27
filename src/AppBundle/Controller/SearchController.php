@@ -347,6 +347,7 @@ class SearchController extends Controller {
                 $card = $rows[$rowindex];
                 /* @var $pack \AppBundle\Entity\Pack */
                 $pack = $card->getPack();
+                /** @var array $cardinfo */
                 $cardinfo = $this->get('cards_data')->getCardInfo($card, false);
 
                 if (empty($availability[$pack->getCode()])) {

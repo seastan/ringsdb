@@ -37,9 +37,9 @@ interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \Array
     public function countCards();
 
     /**
-     * Get included packs
+     * Get included packs, by release date: ['pack' => Pack, 'nb' => number of copies of the pack needed]
      *
-     * @return \AppBundle\Entity\Pack[]
+     * @return array<int, array<string, mixed>>
      */
     public function getIncludedPacks();
 

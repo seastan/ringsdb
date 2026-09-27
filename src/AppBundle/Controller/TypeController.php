@@ -55,7 +55,7 @@ class TypeController extends Controller {
      *
      * @param Type $entity The entity
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createCreateForm(Type $entity) {
         $form = $this->createForm(new TypeType(), $entity, [
@@ -129,7 +129,7 @@ class TypeController extends Controller {
      *
      * @param Type $entity The entity
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createEditForm(Type $entity) {
         $form = $this->createForm(new TypeType(), $entity, [
@@ -200,7 +200,7 @@ class TypeController extends Controller {
      *
      * @param mixed $id The entity id
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createDeleteForm($id) {
         return $this->createFormBuilder()
