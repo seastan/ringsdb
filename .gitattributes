@@ -1,0 +1,3 @@
+# Test snapshots are compared byte for byte (the text exports use CRLF line endings):
+# store them as is, without line ending conversion.
+src/AppBundle/Tests/Resources/snapshots/** -text

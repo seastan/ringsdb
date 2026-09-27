@@ -1035,6 +1035,28 @@ class User extends BaseUser {
     protected $locked = false;
 
     /**
+     * Set locked
+     *
+     * @param boolean $locked
+     *
+     * @return User
+     */
+    public function setLocked($locked) {
+        $this->locked = (bool) $locked;
+
+        return $this;
+    }
+
+    /**
+     * Get locked
+     *
+     * @return boolean
+     */
+    public function isLocked() {
+        return $this->locked;
+    }
+
+    /**
      * @var bool
      */
     protected $expired = false;

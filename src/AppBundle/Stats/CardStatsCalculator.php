@@ -169,7 +169,7 @@ WHERE t.name != 'Campaign'
   AND p.name NOT IN ('Messenger of the King Allies', 'ALeP - Messenger of the King Allies', 'Two-Player Limited Edition Starter',
                      'Dwarves of Durin', 'Elves of Lórien', 'Defenders of Gondor', 'Riders of Rohan')
   AND CAST(p.date_release AS CHAR) <= '" . $month . "-31'
-GROUP BY c.code
+GROUP BY c.code, cprim.octgnid, c.name, t.name, s.name, p.name, p.date_release, c.cost
 ORDER BY encounter, full_decks DESC, CAST(c.code AS UNSIGNED) DESC";
 			$cards = $dbh->executeQuery($query1, [])->fetchAll(\PDO::FETCH_ASSOC);
 

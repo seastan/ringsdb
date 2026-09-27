@@ -1,0 +1,2309 @@
+{
+    "cards": [
+        {
+            "code": "01001",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "01002",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01003",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01004",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "01005",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "01006",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01007",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "01008",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "01009",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01010",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01011",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01012",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01013",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "01014",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "01015",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01016",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01017",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01018",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01019",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01020",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01021",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01022",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01023",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "01024",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01025",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01026",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "01027",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "01028",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "01029",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "01030",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "01031",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01032",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01033",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01034",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "01035",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01036",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01037",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01038",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01039",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01040",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "01041",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "01042",
+            "limited_decks": "1",
+            "limited_deck_copies": "2.00"
+        },
+        {
+            "code": "01043",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01044",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01045",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01046",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01047",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01048",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "01049",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01050",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "01051",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01052",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01053",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01054",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01055",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01056",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01057",
+            "limited_decks": "1",
+            "limited_deck_copies": "2.00"
+        },
+        {
+            "code": "01058",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01059",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "01060",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01061",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "01062",
+            "limited_decks": "1",
+            "limited_deck_copies": "2.00"
+        },
+        {
+            "code": "01063",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01064",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01065",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01066",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "01067",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01068",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01069",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01070",
+            "limited_decks": "1",
+            "limited_deck_copies": "2.00"
+        },
+        {
+            "code": "01071",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01072",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "01073",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "02001",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02002",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "02003",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "02004",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "02005",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "02006",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02007",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02008",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02009",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02010",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02025",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02026",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "02027",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02028",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02029",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02030",
+            "limited_decks": "1",
+            "limited_deck_copies": "2.00"
+        },
+        {
+            "code": "02031",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02032",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "02033",
+            "limited_decks": "1",
+            "limited_deck_copies": "2.00"
+        },
+        {
+            "code": "02034",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02050",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02051",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02052",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02053",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02054",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02055",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02056",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02057",
+            "limited_decks": "1",
+            "limited_deck_copies": "2.00"
+        },
+        {
+            "code": "02058",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02059",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02072",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02073",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02074",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02075",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02076",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02077",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02078",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02079",
+            "limited_decks": "1",
+            "limited_deck_copies": "2.00"
+        },
+        {
+            "code": "02080",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02081",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02095",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02096",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02097",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02098",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "02099",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02100",
+            "limited_decks": "1",
+            "limited_deck_copies": "2.00"
+        },
+        {
+            "code": "02101",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02102",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02103",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02104",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02116",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "02117",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02118",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "02119",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "02120",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02121",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "02122",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02123",
+            "limited_decks": "1",
+            "limited_deck_copies": "2.00"
+        },
+        {
+            "code": "02124",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "02125",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "03001",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "03002",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "03003",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "03004",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "03005",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "03006",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "03007",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "03008",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "03009",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "03010",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "03011",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "03012",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "03013",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04001",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04002",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04003",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04004",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04005",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04006",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04007",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04008",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04009",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04010",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04028",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04029",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04030",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "04031",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "04032",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04033",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04034",
+            "limited_decks": "1",
+            "limited_deck_copies": "2.00"
+        },
+        {
+            "code": "04035",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04036",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04037",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04053",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04054",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04055",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "04056",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04057",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "04058",
+            "limited_decks": "1",
+            "limited_deck_copies": "2.00"
+        },
+        {
+            "code": "04059",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "04060",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04061",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "04062",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04076",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04077",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04078",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04079",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "04080",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "04081",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04082",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04083",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "04084",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04085",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04101",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "04102",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "04103",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "04104",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04105",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04106",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "04107",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "04108",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04109",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04110",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "04128",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "04129",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "04130",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "04131",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "04132",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04133",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04134",
+            "limited_decks": "1",
+            "limited_deck_copies": "2.00"
+        },
+        {
+            "code": "04135",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04136",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "04137",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "05001",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "05002",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "05003",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "05004",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "05005",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "05006",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "05007",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "05008",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "05009",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "05010",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "05011",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "05012",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "05013",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "05014",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "05015",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "05016",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "05017",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "05018",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "06001",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06002",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06003",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06004",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06005",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "06006",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06007",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "06008",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06009",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06010",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06032",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06033",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06034",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06035",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06036",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06037",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06038",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06039",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06040",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06041",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06056",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06057",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "06058",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06059",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06060",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06061",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "06062",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06063",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06064",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06065",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06081",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06082",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06083",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06084",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "06085",
+            "limited_decks": "1",
+            "limited_deck_copies": "2.00"
+        },
+        {
+            "code": "06086",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06087",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06088",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06089",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06090",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "06107",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06108",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "06109",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06110",
+            "limited_decks": "1",
+            "limited_deck_copies": "2.00"
+        },
+        {
+            "code": "06111",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06112",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06113",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06114",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06115",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06116",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06134",
+            "limited_decks": "1",
+            "limited_deck_copies": "1.00"
+        },
+        {
+            "code": "06135",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "06136",
+            "limited_decks": "1",
+            "limited_deck_copies": "2.00"
+        },
+        {
+            "code": "06137",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "06138",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06139",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06140",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06141",
+            "limited_decks": "1",
+            "limited_deck_copies": "3.00"
+        },
+        {
+            "code": "06142",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "06143",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "07001",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "07002",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "07003",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "07004",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "07005",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "07006",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "07007",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "07008",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "07009",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "07010",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "07011",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "07012",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "07013",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "07014",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "07015",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08001",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08002",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08003",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08004",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08005",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08006",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08007",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08008",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08009",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08010",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08025",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08026",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08027",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08028",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08029",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08030",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08031",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08032",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08033",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08034",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08056",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08057",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08058",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08059",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08060",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08061",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08062",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08063",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08064",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08065",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08084",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08085",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08086",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08087",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08088",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08089",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08090",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08091",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08092",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08093",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08112",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08113",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08114",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08115",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08116",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08117",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08118",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08119",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08120",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08121",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08137",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08138",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08139",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08140",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08141",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08142",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08143",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08144",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08145",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "08146",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "09001",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "09002",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "09003",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "09004",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "09005",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "09006",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "09007",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "09008",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "09009",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "09010",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "09011",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "09012",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "09013",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "09014",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "09015",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10001",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10002",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10003",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10004",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10005",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10006",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10007",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10008",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10009",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10010",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10028",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10029",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10030",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10031",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10032",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10033",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10034",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10035",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10036",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "10037",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "131002",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "131003",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "131004",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "131005",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "131006",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "131007",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "131008",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "131009",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "131010",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "131011",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "131012",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "131013",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "131014",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "131015",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "131016",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "131017",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "131018",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "132002",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "132003",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "132004",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "132005",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "132006",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "132007",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "132008",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "132009",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "132010",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "132011",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "132012",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "132014",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "132015",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "132016",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "132017",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "132018",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "141002",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "141003",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "141004",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "141005",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "141006",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "141007",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "141008",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "141009",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "141010",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "141011",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "141013",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "141014",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "141015",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "141016",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "142002",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "142003",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "142004",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "142005",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "142006",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "142007",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "142008",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "142009",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "143002",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "143003",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "143004",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "143005",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "143006",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "143007",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "143008",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "143009",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "143010",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "143011",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "143012",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        },
+        {
+            "code": "143014",
+            "limited_decks": "0",
+            "limited_deck_copies": "0.00"
+        }
+    ]
+}

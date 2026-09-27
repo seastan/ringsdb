@@ -178,11 +178,13 @@ class BuilderController extends Controller {
             }
 
             if ($pack) {
-                /* @var $pack \AppBundle\Entity\Card */
-                $card = $em->getRepository('AppBundle:Card')->findOneBy([
-                    'name' => $name,
-                    'pack' => $pack
-                ]);
+                // a card belongs to its packs through its printings
+                /* @var $card \AppBundle\Entity\Card */
+                $card = $em->createQuery('SELECT c FROM AppBundle:Card c JOIN c.printings p WHERE c.name = :name AND p.pack = :pack ORDER BY c.code')
+                    ->setParameter('name', $name)
+                    ->setParameter('pack', $pack)
+                    ->setMaxResults(1)
+                    ->getOneOrNullResult();
             } else {
                 /* @var $pack \AppBundle\Entity\Card */
                 $card = $em->getRepository('AppBundle:Card')->findOneBy([
@@ -659,7 +661,11 @@ class BuilderController extends Controller {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
-        $file = tempnam("tmp", "zip");
+        $tmpDir = $this->getParameter('kernel.cache_dir');
+        $file = tempnam($tmpDir, "zip");
+        if ($file === false) {
+            throw new \RuntimeException("Cannot create a temporary file in $tmpDir");
+        }
         $zip = new \ZipArchive();
         $res = $zip->open($file, \ZipArchive::OVERWRITE);
 

@@ -1,0 +1,412 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Index
+Admin
+admin_scenario_edit
+Scenario edit
+Code
+Name
+Position
+Pack
+Core Set
+The Hunt for Gollum
+Conflict at the Carrock
+A Journey to Rhosgobel
+The Hills of Emyn Muil
+The Dead Marshes
+Return to Mirkwood
+Khazad-dûm
+The Redhorn Gate
+Road to Rivendell
+The Watcher in the Water
+The Long Dark
+Foundations of Stone
+Shadow and Flame
+Heirs of Númenor
+The Steward's Fear
+The Drúadan Forest
+Encounter at Amon Dîn
+Assault on Osgiliath
+The Blood of Gondor
+The Morgul Vale
+The Voice of Isengard
+The Dunland Trap
+The Three Trials
+Trouble in Tharbad
+The Nîn-in-Eilph
+Celebrimbor's Secret
+The Antlered Crown
+The Lost Realm
+The Wastes of Eriador
+Escape from Mount Gram
+Across the Ettenmoors
+The Treachery of Rhudaur
+The Battle of Carn Dûm
+The Dread Realm
+The Grey Havens
+Over Hill and Under Hill
+On the Doorstep
+The Black Riders
+The Road Darkens
+The Treason of Saruman
+The Land of Shadow
+Flight of the Stormcaller
+The Thing in the Depths
+Temple of the Deceived
+The Drowned Ruins
+The Flame of the West
+A Storm on Cobas Haven
+The City of Corsairs
+The Mûmakil
+Race Across Harad
+Beneath the Sands
+The Sands of Harad
+The Black Serpent
+The Mountain of Fire
+The Dungeons of Cirith Gurat
+The Crossings of Poros
+The Wilds of Rhovanion
+The Withered Heath
+Roam Across Rhovanion
+Two-Player Limited Edition Starter
+Fire in the Night
+The Ghost of Framsburg
+The Massing at Osgiliath
+Mount Gundabad
+The Fate of Wilderland
+A Shadow in the East
+Wrath and Ruin
+The City of Ulfast
+Challenge of the Wainriders
+Under the Ash Mountains
+The Land of Sorrow
+Messenger of the King Allies
+The Fortress of Nurn
+The Hunt for the Dreadnaught
+The Old Forest
+Fog on the Barrow-downs
+ALeP - Children of Eorl
+ALeP - The Aldburg Plot
+ALeP - The Scouring of the Shire
+ALeP - Fire on the Eastemnet
+ALeP - Messenger of the King Allies
+ALeP - The Gap of Rohan
+Revised Core Set
+The Dark of Mirkwood
+The Battle of Lake-town
+The Stone of Erech
+The Ruins of Belegost
+Murder at the Prancing Pony
+The Siege of Annúminas
+Attack on Dol Guldur
+The Wizard's Quest
+The Woodland Realm
+The Mines of Moria
+Escape from Khazad-dûm
+ALeP - The Glittering Caves
+Dwarves of Durin
+Elves of Lórien
+Defenders of Gondor
+Riders of Rohan
+ALeP - Mustering of the Rohirrim
+ALeP - Blood in the Isen
+Angmar Awakened Campaign Expansion
+ALeP - The Nine are Abroad
+ALeP - The Siege of Erebor
+ALeP - The Shire's Reckoning
+Dream-chaser Campaign Expansion
+Ered Mithrin Campaign Expansion
+ALeP - The Hobbit
+ALeP - Strange News in Bree
+ALeP - Fangs in the Dark
+ALeP - The Mirror of Galadriel
+ALeP - The Brandywine Pursuit
+Encounters
+Passage Through Mirkwood
+Dol Guldur Orcs
+Spiders of Mirkwood
+Journey Along the Anduin
+Sauron's Reach
+Wilderlands
+Escape from Dol Guldur
+The Hunt for Gollum
+Conflict at the Carrock
+A Journey to Rhosgobel
+The Hills of Emyn Muil
+The Dead Marshes
+Return to Mirkwood
+Into the Pit
+Twists and Turns
+Hazards of the Pit
+Goblins of the Deep
+The Seventh Level
+Plundering Goblins
+Flight from Moria
+Deeps of Moria
+Misty Mountains
+The Redhorn Gate
+Road to Rivendell
+The Watcher in the Water
+The Long Dark
+Foundations of Stone
+Shadow and Flame
+Peril in Pelargir
+Streets of Gondor
+Brigands
+Into Ithilien
+Brooding Forest
+Creatures of the Forest
+Southrons
+The Siege of Cair Andros
+Ravaging Orcs
+Mordor Elite
+The Steward's Fear
+The Drúadan Forest
+Encounter at Amon Dîn
+Assault on Osgiliath
+The Blood of Gondor
+The Morgul Vale
+The Fords of Isen
+Dunland Warriors
+Dunland Raiders
+To Catch an Orc
+Misty Mountain Orcs
+Broken Lands
+Into Fangorn
+Ancient Forest
+Weary Travelers
+The Dunland Trap
+The Three Trials
+Trouble in Tharbad
+The Nîn-in-Eilph
+Celebrimbor's Secret
+The Antlered Crown
+Intruders in Chetwood
+Iârion
+Eriador Wilds
+Angmar Orcs
+Ruins of Arnor
+The Weather Hills
+Foul Weather
+Dark Sorcery
+Deadmen's Dike
+Cursed Dead
+The Wastes of Eriador
+Escape from Mount Gram
+Across the Ettenmoors
+The Treachery of Rhudaur
+The Battle of Carn Dûm
+The Dread Realm
+Corsair Pirates
+Corsair Raiders
+Drowned Dead
+Raid on the Grey Havens
+Stormy Weather
+The Dream-chaser's Fleet
+The Fate of Númenor
+Ruins of Númenor
+The Stormcaller Elite
+Umbar Fleet
+Vast Oceans
+Voyage Across Belegaer
+We Must Away, Ere Break of Day
+Western Lands
+Over the Misty Mountains Grim
+The Great Goblin
+Misty Mountain Goblins
+Dungeons Deep and Caverns Dim
+Flies and Spiders
+Wilderland
+The Lonely Mountain
+The Battle of Five Armies
+A Shadow of the Past
+Hunted
+The Ring
+The Black Riders
+A Knife in the Dark
+The Nazgûl
+Flight to the Ford
+The Ring Goes South
+Journey in the Dark
+Breaking of the Fellowship
+The Uruk-hai
+Orcs of the White Hand
+Snaga Orcs
+Helm's Deep
+The Road to Isengard
+The Passage of the Marshes
+Gollum
+Morgul Nazgûl
+Journey to the Cross-roads
+Men of Harad
+Shelob's Lair
+The Great Spider
+The Massing at Osgiliath
+The Battle of Lake-town
+The Stone of Erech
+The Old Forest
+Fog on the Barrow-downs
+The Ruins of Belegost
+Murder at the Prancing Pony
+Investigation
+The Passing of the Grey Company
+The Siege of Gondor
+The Battle of the Pelennor Fields
+The Tower of Cirith Ungol
+Orcs of Mordor
+Deep Shadows
+The Black Gate Opens
+Mount Doom
+Flight of the Stormcaller
+The Thing in the Depths
+Temple of the Deceived
+The Drowned Ruins
+A Storm on Cobas Haven
+The City of Corsairs
+The Stormcaller
+Coast of Umbar
+Harad Territory
+Harad Soldiers
+Desert Creatures
+Desert Sands
+Mordor Orcs
+Jungle Forest
+Escape from Umbar
+Desert Crossing
+The Long Arm of Mordor
+The Mûmakil
+Race Across Harad
+Beneath the Sands
+The Black Serpent
+The Dungeons of Cirith Gurat
+The Crossings of Poros
+Mountains of Shadow
+Grey Mountain Goblins
+Hills of Wilderland
+Lost in the Wilderness
+Dark Woods
+Gathering Gloom
+Fell Beasts
+Wild Creatures
+Deep Underground
+Afraid of the Dark
+Dragon Might
+Lost Caves
+Journey up the Anduin
+Lost in Mirkwood
+The King's Quest
+The Goblins
+The Oath
+The Caves of Nibin-Dûm
+The Withered Heath
+Roam Across Rhovanion
+Fire in the Night
+The Ghost of Framsburg
+Mount Gundabad
+The Fate of Wilderland
+The Siege of Annúminas
+Attack on Dol Guldur
+The Wizard's Quest
+The Woodland Realm
+Riders of Rhûn
+Easterling Raiders
+Rolling Plains
+Servants of Sauron
+City of Rhûn
+Under Guard
+Ulchor's Guard
+Twisted Tunnels
+The Power of Mordor
+The River Running
+Danger in Dorwinion
+The Temple of Doom
+Wrath and Ruin
+The City of Ulfast
+Challenge of the Wainriders
+Under the Ash Mountains
+The Fortress of Nurn
+The Land of Sorrow
+Ambush at Erelas
+The Battle for the Beacon
+The Horse Lord's Ire
+The Mines of Moria
+Escape from Khazad-dûm
+The Hunt for the Dreadnaught
+Rohan Encampment
+Rohan Weather
+Rohan Lands
+Dunlending Warriors
+Faithless Rohirrim
+Orc-host
+The Aldburg Plot
+The Scouring of the Shire
+Fire on the Eastemnet
+The Gap of Rohan
+The Caves of Nibin-Dûm
+The Oath
+The Goblins
+The Glittering Caves
+Search for the Horn
+Exploring the Caves
+Mustering of the Rohirrim
+Blood in the Isen
+The Nine are Abroad
+The Siege of Erebor
+The Shire's Reckoning
+Drawing Attention
+Distractions
+Shire's Edge
+Wolves
+Wolf-cult
+Ruffians
+Pies for the Party
+Sundown on the Shire
+Secrets of the Old Forest
+The Hobbit
+Strange News in Bree
+Fangs in the Dark
+Bree-landers
+The Mirror of Galadriel
+The Mirror of Galadriel - Gondor
+The Mirror of Galadriel - Sauron
+The Brandywine Pursuit
+Edit
+Back to the list
+Delete
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

@@ -253,8 +253,6 @@ class CardsData {
                                     $qb->setParameter($i++, $arg);
                                 } else {
                                     if ($acronym) {
-                                        $or[] = "(BINARY(c.name) like ?$i)";
-                                        $qb->setParameter($i++, "%$arg%");
                                         $like = implode('% ', str_split($arg));
                                         $or[] = "(REPLACE(c.name, '-', ' ') like ?$i)";
                                         $qb->setParameter($i++, "$like%");
@@ -617,7 +615,7 @@ class CardsData {
 	}
 
 	public function get_reviews($card) {
-		$reviews = $this->doctrine->getRepository('AppBundle:Review')->findBy(['card' => $card], ['nbVotes' => 'DESC']);
+		$reviews = $this->doctrine->getRepository('AppBundle:Review')->findBy(['card' => $card], ['nbVotes' => 'DESC', 'id' => 'ASC']);
 
 		$response = $reviews;
 

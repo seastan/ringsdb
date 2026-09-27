@@ -1,0 +1,148 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Index
+Admin
+admin_pack_edit
+Pack edit
+Code
+Name
+Date release
+2010
+2011
+2012
+2013
+2014
+2015
+2016
+2017
+2018
+2019
+2020
+2021
+2022
+2023
+2024
+2025
+2026
+2027
+2028
+2029
+2030
+Jan
+Feb
+Mar
+Apr
+May
+Jun
+Jul
+Aug
+Sep
+Oct
+Nov
+Dec
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+Size
+Cycle
+Core Set
+Shadows of Mirkwood
+Khazad-dûm
+Dwarrowdelf
+Heirs of Númenor
+Against the Shadow
+The Voice of Isengard
+The Ring-maker
+The Lost Realm
+Angmar Awakened
+The Grey Havens
+Dream-chaser
+The Hobbit
+The Lord of the Rings
+Standalone Scenarios
+The Sands of Harad
+The Haradrim
+The Wilds of Rhovanion
+Ered Mithrin
+Two-Player Limited Edition Starter
+A Shadow in the East
+The Vengeance of Mordor
+Messenger of the King Allies
+ALeP - Children of Eorl
+ALeP - Oaths of the Rohirrim
+Revised Core Set
+Starter Decks
+Angmar Awakened Campaign Expansion
+ALeP - The Shire's Reckoning
+Dream-chaser Campaign Expansion
+Ered Mithrin Campaign Expansion
+ALeP - Fell Summer
+Position
+Edit
+Back to the list
+Delete
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

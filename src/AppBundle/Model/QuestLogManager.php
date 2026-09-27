@@ -54,7 +54,7 @@ class QuestLogManager {
 	private function getQueryBuilder() {
 		$qb = $this->doctrine->createQueryBuilder();
 		$qb->select('d');
-		$qb->from('AppBundle:QuestLog', 'd');
+		$qb->from('AppBundle:Questlog', 'd');
         $qb->andWhere('d.isPublic = 1');
         $qb->setFirstResult($this->start);
 		$qb->setMaxResults($this->limit);
@@ -86,6 +86,9 @@ class QuestLogManager {
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.datePublish), 2)) AS HIDDEN popularity');
         $qb->orderBy('popularity', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -93,6 +96,9 @@ class QuestLogManager {
         $qb = $this->getQueryBuilder();
 
         $qb->orderBy('d.datePublish', 'DESC');
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -102,6 +108,9 @@ class QuestLogManager {
 
         $qb->andWhere('d.nbComments > 0');
         $qb->orderBy('d.dateLastComment', 'DESC');
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -114,6 +123,9 @@ class QuestLogManager {
         $qb->setParameter('user', $user);
         $qb->orderBy('d.datePublish', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -124,6 +136,9 @@ class QuestLogManager {
         $qb->setParameter('user', $user);
         $qb->orderBy('d.datePublish', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -133,6 +148,9 @@ class QuestLogManager {
         $qb->andWhere('d.nbVotes > 10');
         $qb->orderBy('d.nbVotes', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -141,7 +159,10 @@ class QuestLogManager {
 
         $qb->addSelect('(SELECT count(c) FROM AppBundle:QuestlogComment c WHERE c.questlog=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
         $qb->orderBy('nbRecentComments', 'DESC');
-        $qb->orderBy('d.nbComments', 'DESC');
+        $qb->addOrderBy('d.nbComments', 'DESC');
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -250,7 +271,9 @@ class QuestLogManager {
                 if (!in_array('d.user', $joinTables)) {
                     $qb->innerJoin('d.user', 'u');
                 }
-                $qb->orderBy('u.reputation', 'DESC');
+                // with DISTINCT, MySQL 5.7+ only sorts on selected columns
+                $qb->addSelect('u.reputation AS HIDDEN reputation');
+                $qb->orderBy('reputation', 'DESC');
                 break;
 
             case 'popularity':
@@ -259,6 +282,9 @@ class QuestLogManager {
                 $qb->orderBy('popularity', 'DESC');
                 break;
         }
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }

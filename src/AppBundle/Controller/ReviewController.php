@@ -207,7 +207,7 @@ class ReviewController extends Controller {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
-        $dql = "SELECT DISTINCT r FROM AppBundle:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC";
+        $dql = "SELECT DISTINCT r FROM AppBundle:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC, r.id DESC";
         $query = $em->createQuery($dql)->setFirstResult($start)->setMaxResults($limit);
 
         $paginator = new Paginator($query, false);
@@ -275,7 +275,7 @@ class ReviewController extends Controller {
 
         $pagetitle = "Card Reviews by " . $user->getUsername();
 
-        $dql = "SELECT r FROM AppBundle:Review r WHERE r.user=:USER ORDER BY r.dateCreation DESC";
+        $dql = "SELECT r FROM AppBundle:Review r WHERE r.user=:USER ORDER BY r.dateCreation DESC, r.id DESC";
         $query = $em->createQuery($dql)->setFirstResult($start)->setMaxResults($limit)->setParameter('USER', $user);
 
         $paginator = new Paginator($query, false);

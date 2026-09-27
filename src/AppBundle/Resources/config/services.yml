@@ -17,7 +17,7 @@ services:
 
     texts:
         class: AppBundle\Services\Texts
-        arguments: ["%kernel.root_dir%"]
+        arguments: ["%kernel.cache_dir%/htmlpurifier"]
 
     diff:
         class: AppBundle\Services\Diff

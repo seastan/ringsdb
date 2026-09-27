@@ -24,6 +24,31 @@ services:
             timeout: 5s
             retries: 10
 
+    mysql_test:
+        image: "mysql:8"
+        volumes:
+          - type: bind
+            source: ./docker/dev/mysql/init.sql
+            target: /docker-entrypoint-initdb.d/init.sql
+            read_only: true
+          - type: bind
+            source: ./docker/dev/mysql/my.cnf
+            target: /etc/mysql/conf.d/my.cnf
+            read_only: true
+          - type: volume
+            source: mysql_test_data
+            target: /var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: passwd
+            MYSQL_DATABASE: ringsdb_test
+            MYSQL_USER: symfony
+            MYSQL_PASSWORD: passwd
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "symfony", "-ppasswd"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+
     symfony:
         build:
             context: .
@@ -54,4 +79,6 @@ services:
 
 volumes:
     mysql_data:
+        driver: local
+    mysql_test_data:
         driver: local
