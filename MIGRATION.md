@@ -219,6 +219,13 @@ field). Everything the tests create is deleted in `tearDown()`.
   from it (cascade remove on `Decklist.fellowships`: the fellowship stays published with the same
   `nb_decks`); quest logs are unlinked (`ON DELETE SET NULL`, they keep their copy of the cards).
   No CSRF protection on save and delete.
+- Decklist favorites and votes (`POST /user/favorite`, `POST /user/like`, `DecklistSocialTest`):
+  plain-text answer with the new count. Favorite is a toggle, +5 / -5 reputation for the author
+  (not on one's own decklist). A vote cannot be taken back, is refused on one's own decklist, +1
+  reputation. Fixed: `voteAction` did not check that the decklist exists (`getUser()` on null);
+  it now answers `400`, `favoriteAction` `404` (both a `500` for AJAX, see
+  `CoreExceptionListener`). No
+  CSRF protection.
 - Fixed: `POST /decklist/create` with an unknown or missing `deck_id` crashed (`getUser()` on
   null); it now answers `400 Bad Request`.
 
