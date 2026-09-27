@@ -38,6 +38,7 @@ class ExcelController extends Controller {
 
 		$associationMappings = $em->getClassMetadata('AppBundle:Card')->getAssociationMappings();
 
+		$lastModified = null;
 		/* @var $card \AppBundle\Entity\Card */
 		foreach ($cards as $card) {
 			if (empty($lastModified) || $lastModified < $card->getDateUpdate()) {
@@ -46,7 +47,7 @@ class ExcelController extends Controller {
 		}
 
 		$phpExcelObject = $this->get('phpexcel')->createPHPExcelObject();
-		$phpExcelObject->getProperties()->setCreator("Sydtrack")->setLastModifiedBy($lastModified->format('Y-m-d'))->setTitle($pack_name);
+		$phpExcelObject->getProperties()->setCreator("Sydtrack")->setLastModifiedBy($lastModified ? $lastModified->format('Y-m-d') : '')->setTitle($pack_name);
 		$phpActiveSheet = $phpExcelObject->setActiveSheetIndex(0);
 		$phpActiveSheet->setTitle(mb_substr($pack_name, 0, 31));
 

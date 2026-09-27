@@ -332,6 +332,7 @@ class DecklistManager {
                     //
                     // Custom-only: same nested NOT EXISTS but with official_copies = 0, expressed
                     //   as ucpc.quantity >= s.quantity (left-side arithmetic becomes s.quantity - ucpc.quantity <= 0).
+                    $officialSubquery = '';
                     if (!empty($packs)) {
                         $officialSubquery =
                             '(SELECT COALESCE(SUM(CASE WHEN cp.pack = 1 THEN cp.quantity * :numcores ELSE cp.quantity END), 0) ' .

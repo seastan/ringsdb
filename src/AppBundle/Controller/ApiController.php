@@ -673,6 +673,8 @@ class ApiController extends Controller {
         $conditions = $this->get('cards_data')->syntax(urldecode($q));
         $conditions = $this->get('cards_data')->validateConditions($conditions);
 
+        $last_modified = null;
+
         $query = $this->get('cards_data')->buildQueryFromConditions($conditions);
         if ($query && $rows = $this->get('cards_data')->get_search_rows($conditions, "set")) {
             for ($rowindex = 0; $rowindex < count($rows); $rowindex++) {
