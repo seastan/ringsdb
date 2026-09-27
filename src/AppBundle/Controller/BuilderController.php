@@ -496,9 +496,7 @@ class BuilderController extends Controller {
             }
 
             $source_deck = $deck;
-        }
-
-        if (!$id) {
+        } else {
             $deck = new Deck();
         }
 

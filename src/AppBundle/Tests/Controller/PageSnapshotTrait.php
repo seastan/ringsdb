@@ -21,13 +21,15 @@ trait PageSnapshotTrait {
     private static function pageText(Crawler $crawler) {
         $crawler->filter('script, style, noscript')->each(function (Crawler $node) {
             $domNode = $node->getNode(0);
-            $domNode->parentNode->removeChild($domNode);
+            if ($domNode !== null && $domNode->parentNode !== null) {
+                $domNode->parentNode->removeChild($domNode);
+            }
         });
 
         $lines = [];
         /** @var \DOMNode $textNode */
         foreach ($crawler->filterXPath('//body//text()') as $textNode) {
-            $line = trim(preg_replace('/\s+/u', ' ', $textNode->nodeValue));
+            $line = trim((string) preg_replace('/\s+/u', ' ', (string) $textNode->nodeValue));
             if ($line !== '') {
                 $lines[] = $line;
             }

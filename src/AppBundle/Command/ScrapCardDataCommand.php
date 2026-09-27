@@ -136,12 +136,12 @@ class ScrapCardDataCommand extends ContainerAwareCommand {
           $text = (string) $data['text'];
           $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', '\'', '\''], $text);
           $text = str_replace(['<br />'], ["\n"], $text);
-          $text = preg_replace('/<SPAN  style="font-weight: bold" >([^<]+)<\/SPAN>/', '<b>\\1</b>', $text);
-          $text = preg_replace('/<SPAN  style=\"font-weight: bold;font-style:italic\" >([^<]+)<\/SPAN>/', '<b><em>\\1</em></b>', $text);
-          $text = preg_replace('/<SPAN STYLE="" >([^<]+)<\/SPAN>/', '\\1', $text);
+          $text = (string) preg_replace('/<SPAN  style="font-weight: bold" >([^<]+)<\/SPAN>/', '<b>\\1</b>', $text);
+          $text = (string) preg_replace('/<SPAN  style=\"font-weight: bold;font-style:italic\" >([^<]+)<\/SPAN>/', '<b><em>\\1</em></b>', $text);
+          $text = (string) preg_replace('/<SPAN STYLE="" >([^<]+)<\/SPAN>/', '\\1', $text);
           $text = str_replace("</b>: ", ":</b> ", $text);
-          $text = preg_replace("/ +/", " ", $text);
-          $text = preg_replace("/\n+/", "\n", $text);
+          $text = (string) preg_replace("/ +/", " ", $text);
+          $text = (string) preg_replace("/\n+/", "\n", $text);
           $text = trim((string) $text);
 
 

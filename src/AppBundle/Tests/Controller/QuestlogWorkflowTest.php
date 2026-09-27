@@ -17,6 +17,8 @@ use Symfony\Component\DomCrawler\Form;
  * Mirkwood) with those 4 decks. Everything is restored in tearDown().
  */
 class QuestlogWorkflowTest extends WebTestCase {
+    use \AppBundle\Tests\LocationTrait;
+
     /** @var int[] max ids before the test, by table */
     private $maxIds = [];
     /** @var array */
@@ -126,7 +128,7 @@ class QuestlogWorkflowTest extends WebTestCase {
      */
     private function questlogIdFromRedirect(Client $client) {
         $this->assertSame(302, $client->getResponse()->getStatusCode());
-        $location = $client->getResponse()->headers->get('Location');
+        $location = self::location($client->getResponse());
         $this->assertRegExp('#^/questlog/view/\d+/#', $location);
 
         return (int) explode('/', $location)[3];
@@ -460,5 +462,18 @@ class QuestlogWorkflowTest extends WebTestCase {
         $this->assertNotFalse($this->fetchQuestlog($client, $ids[1]));
         $crawler = $client->followRedirect();
         $this->assertContains("You can't delete a published quest log. Unpublished selected quest logs were deleted.", $crawler->filter('body')->text());
+    }
+
+    /**
+     * Fixed: commenting on or voting for an unknown quest log crashed (500): 400.
+     */
+    public function testCommentAndVoteOnAnUnknownQuestLog(): void {
+        $client = $this->createAuthenticatedClient();
+
+        $client->request('POST', '/user/questlog_comment', ['id' => 999, 'comment' => 'Hello']);
+        $this->assertSame(400, $client->getResponse()->getStatusCode());
+
+        $client->request('POST', '/user/questlog_like', ['id' => 999]);
+        $this->assertSame(400, $client->getResponse()->getStatusCode());
     }
 }

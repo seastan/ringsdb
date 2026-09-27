@@ -28,6 +28,9 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
      */
     public function load(ObjectManager $manager)
     {
+        if ($this->container === null) {
+            throw new \LogicException('The container is not set.');
+        }
         $userManager = $this->container->get('fos_user.user_manager');
 
         /** @var User $user */

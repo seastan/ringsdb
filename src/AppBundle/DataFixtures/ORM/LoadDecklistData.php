@@ -37,6 +37,9 @@ class LoadDecklistData extends AbstractFixture implements ContainerAwareInterfac
      */
     public function load(ObjectManager $manager)
     {
+        if ($this->container === null) {
+            throw new \LogicException('The container is not set.');
+        }
         /** @var DecklistFactory $decklistFactory */
         $decklistFactory = $this->container->get('decklist_factory');
 

@@ -127,10 +127,13 @@ class FellowshipManagerTest extends KernelTestCase {
 
     /**
      * @param mixed $username
-     * @return \AppBundle\Entity\User|null
+     * @return \AppBundle\Entity\User
      */
     private function user($username) {
-        return static::$kernel->getContainer()->get('doctrine')->getRepository('AppBundle:User')->findOneBy(['username' => $username]);
+        $user = static::$kernel->getContainer()->get('doctrine')->getRepository('AppBundle:User')->findOneBy(['username' => $username]);
+        $this->assertNotNull($user);
+
+        return $user;
     }
 
     /**

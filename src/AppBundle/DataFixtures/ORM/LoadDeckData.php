@@ -38,6 +38,9 @@ class LoadDeckData extends AbstractFixture implements ContainerAwareInterface, D
      */
     public function load(ObjectManager $manager)
     {
+        if ($this->container === null) {
+            throw new \LogicException('The container is not set.');
+        }
         /** @var Decks $deckService */
         $deckService = $this->container->get('decks');
 

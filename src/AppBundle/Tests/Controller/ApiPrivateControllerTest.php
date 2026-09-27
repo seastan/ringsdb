@@ -45,7 +45,7 @@ class ApiPrivateControllerTest extends WebTestCase {
 
     /**
      * @param mixed $uri
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     private function ajax(Client $client, $uri, array $headers = []) {
         $client->request('GET', $uri, [], [], $headers + ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);

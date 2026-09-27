@@ -23,7 +23,7 @@ class ApiControllerTest extends WebTestCase {
 
     /**
      * @param mixed $uri
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     private function get(Client $client, $uri, array $headers = []) {
         $client->request('GET', $uri, [], [], $headers);

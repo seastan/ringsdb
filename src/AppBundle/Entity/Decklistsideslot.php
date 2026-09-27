@@ -58,7 +58,7 @@ class Decklistsideslot implements \AppBundle\Model\SlotInterface {
      *
      * @return Decklistsideslot
      */
-    public function setDecklist(\AppBundle\Entity\Decklist $decklist = null) {
+    public function setDecklist(\AppBundle\Entity\Decklist $decklist) {
         $this->decklist = $decklist;
 
         return $this;
@@ -80,7 +80,7 @@ class Decklistsideslot implements \AppBundle\Model\SlotInterface {
      *
      * @return Decklistsideslot
      */
-    public function setCard(\AppBundle\Entity\Card $card = null) {
+    public function setCard(\AppBundle\Entity\Card $card) {
         $this->card = $card;
 
         return $this;

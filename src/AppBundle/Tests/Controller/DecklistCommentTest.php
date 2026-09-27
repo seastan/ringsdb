@@ -68,7 +68,7 @@ class DecklistCommentTest extends WebTestCase {
      * inspect the notification emails.
      * @param mixed $decklistId
      * @param mixed $text
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     private function postComment(Client $client, $decklistId, $text) {
         $client->enableProfiler();
@@ -136,7 +136,7 @@ class DecklistCommentTest extends WebTestCase {
         $this->assertCount(2, $comments);
         $this->assertSame('Nice deck!', trim($comments->eq(1)->text()));
         // the author's name is followed by their reputation
-        $this->assertSame('admin 1', trim(preg_replace('/\s+/', ' ', $crawler->filter('.comment-author')->eq(1)->text())));
+        $this->assertSame('admin 1', trim((string) preg_replace('/\s+/', ' ', $crawler->filter('.comment-author')->eq(1)->text())));
         $this->assertSame('2 comments', trim($crawler->filter('th:contains("comments")')->text()));
     }
 

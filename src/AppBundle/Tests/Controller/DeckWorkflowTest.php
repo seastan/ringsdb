@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class DeckWorkflowTest extends WebTestCase {
     use \AppBundle\Tests\TemporaryFileTrait;
+    use \AppBundle\Tests\LocationTrait;
 
     /** @var int[] */
     private $deckIds = [];
@@ -125,7 +126,7 @@ class DeckWorkflowTest extends WebTestCase {
     private function createDeck(Client $client) {
         $client->request('GET', '/deck/new');
         $this->assertSame(302, $client->getResponse()->getStatusCode());
-        $location = $client->getResponse()->headers->get('Location');
+        $location = self::location($client->getResponse());
         $this->assertRegExp('#^/deck/edit/\d+$#', $location);
         $deckId = (int) substr($location, strlen('/deck/edit/'));
         $this->deckIds[] = $deckId;
@@ -184,7 +185,7 @@ class DeckWorkflowTest extends WebTestCase {
 
         $crawler = $client->request('GET', '/decks');
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertSame('My private decks (5/500 slots)', trim(preg_replace('/\s+/', ' ', $crawler->filter('h1')->text())));
+        $this->assertSame('My private decks (5/500 slots)', trim((string) preg_replace('/\s+/', ' ', $crawler->filter('h1')->text())));
         $this->assertContains('PHPUnit Leadership', $client->getResponse()->getContent());
 
         // 3. edit: rename, swap a hero (Glóin -> Gimli) and an ally (Gondorian Spearman -> Horseback Archer)
@@ -240,7 +241,7 @@ class DeckWorkflowTest extends WebTestCase {
         $client->submit($form);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
-        $location = $client->getResponse()->headers->get('Location');
+        $location = self::location($client->getResponse());
         $this->assertRegExp('#^/decklist/view/(\d+)/phpunitpublished-1\.0$#', $location);
         preg_match('#/view/(\d+)/#', $location, $matches);
         $decklistId = (int) $matches[1];
@@ -591,7 +592,7 @@ class DeckWorkflowTest extends WebTestCase {
         $client->submit($form);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
-        $location = $client->getResponse()->headers->get('Location');
+        $location = self::location($client->getResponse());
         $this->assertRegExp('#^/decklist/view/\d+/phpunitdwarvesremix-1\.0$#', $location);
         $decklist = $this->db($client)->fetchAssoc('SELECT id, name, parent_deck_id, precedent_decklist_id FROM decklist WHERE parent_deck_id = ?', [$deckId]);
         $this->assertNotFalse($decklist);

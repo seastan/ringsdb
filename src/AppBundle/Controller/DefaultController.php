@@ -285,9 +285,9 @@ class DefaultController extends Controller {
             $comment = $all_comments[$i];
             $text = $comment['text'];
             if (strlen($text) > 300) {
-                $text = preg_replace('/\s+?(\S+)?$/', '', substr($text . ' ', 0, 301));
+                $text = (string) preg_replace('/\s+?(\S+)?$/', '', substr($text . ' ', 0, 301));
                 if (strrpos($text, '<') > strrpos($text, '>')) $text = substr($text . ' ', 0, strrpos($text, '<')); 
-                $text = preg_replace('/\s+?(\S+)?$/', '', $text);
+                $text = (string) preg_replace('/\s+?(\S+)?$/', '', $text);
                 $text = $text . '...';
                 // Fix unclosed html tags
                 libxml_use_internal_errors(true);
@@ -296,8 +296,10 @@ class DefaultController extends Controller {
                 // Strip wrapping <html> and <body> tags
                 $mock = new \DOMDocument;
                 $body = $dom->getElementsByTagName('body')->item(0);
-                foreach ($body->childNodes as $child) {
-                    $mock->appendChild($mock->importNode($child, true));
+                if ($body) {
+                    foreach ($body->childNodes as $child) {
+                        $mock->appendChild($mock->importNode($child, true));
+                    }
                 }
                 $text = trim((string) $mock->saveHTML());
                 $text = preg_replace('/\n$/','',$text);

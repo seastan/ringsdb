@@ -392,7 +392,7 @@ class DeckManagementTest extends WebTestCase {
     /**
      * Posts a zip archive of [name => content] to POST /deck/import/all ("Import from an archive"
      * modal of My Decks).
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     private function uploadArchive(Client $client, array $entries) {
         $file = self::temporaryFile('archive');

@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 class SecurityControllerTest extends WebTestCase {
     use SentEmailsTrait;
+    use \AppBundle\Tests\LocationTrait;
 
     const PREFIX = 'phpunit_';
 
@@ -89,7 +90,7 @@ class SecurityControllerTest extends WebTestCase {
     private function assertRedirectsTo(Client $client, $pathPattern): void {
         $response = $client->getResponse();
         $this->assertTrue($response->isRedirect(), 'Expected a redirect, got ' . $response->getStatusCode());
-        $this->assertRegExp($pathPattern, $response->headers->get('Location'));
+        $this->assertRegExp($pathPattern, self::location($response));
     }
 
     private function assertAnonymous(Client $client): void {
@@ -168,6 +169,7 @@ class SecurityControllerTest extends WebTestCase {
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
         $user = $this->findUser($client, $username);
+        $this->assertNotNull($user);
         $this->assertTrue($user->isEnabled());
         $this->assertNull($user->getConfirmationToken());
         $this->assertAuthenticatedAs($client, $username);

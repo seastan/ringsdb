@@ -18,6 +18,8 @@ use Symfony\Component\DomCrawler\Form;
  * fixture decks: everything is restored in tearDown().
  */
 class FellowshipWorkflowTest extends WebTestCase {
+    use \AppBundle\Tests\LocationTrait;
+
     /** @var int[] max ids before the test, by table */
     private $maxIds = [];
     /** @var array */
@@ -161,9 +163,9 @@ class FellowshipWorkflowTest extends WebTestCase {
         $client->submit($form);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('#^/fellowship/view/\d+$#', $client->getResponse()->headers->get('Location'));
+        $this->assertRegExp('#^/fellowship/view/\d+$#', self::location($client->getResponse()));
 
-        return (int) substr($client->getResponse()->headers->get('Location'), strlen('/fellowship/view/'));
+        return (int) substr(self::location($client->getResponse()), strlen('/fellowship/view/'));
     }
 
     /* -------------------------------------------------------------- tests */
@@ -286,7 +288,7 @@ class FellowshipWorkflowTest extends WebTestCase {
         $client->request('POST', '/fellowship/save', $form->getValues() + ['auto_publish' => '1']);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
-        $id = (int) substr($client->getResponse()->headers->get('Location'), strlen('/fellowship/view/'));
+        $id = (int) substr(self::location($client->getResponse()), strlen('/fellowship/view/'));
         $fellowship = $this->fetchFellowship($client, $id);
         $this->assertSame(['0', '0'], [$fellowship['is_public'], $fellowship['published']]);
     }
@@ -346,7 +348,7 @@ class FellowshipWorkflowTest extends WebTestCase {
         $this->db($client)->update('user', ['is_share_decks' => 1], ['username' => 'test']);
         $client->submit($form);
         $this->assertSame(302, $client->getResponse()->getStatusCode());
-        $id = (int) substr($client->getResponse()->headers->get('Location'), strlen('/fellowship/view/'));
+        $id = (int) substr(self::location($client->getResponse()), strlen('/fellowship/view/'));
         $decks = $this->fetchFellowshipDecks($client, $id);
         $cloneId = (int) substr($decks[1], strlen('deck:'));
         $this->assertGreaterThan($this->maxIds['deck'], $cloneId);
@@ -416,5 +418,18 @@ class FellowshipWorkflowTest extends WebTestCase {
         $this->assertSame('/myfellowships', $client->getResponse()->headers->get('Location'));
         $this->assertFalse($this->fetchFellowship($client, $id1));
         $this->assertSame('PHPUnit Delete 2', $this->fetchFellowship($client, $id2)['name']);
+    }
+
+    /**
+     * Fixed: commenting on or voting for an unknown fellowship crashed (500): 400.
+     */
+    public function testCommentAndVoteOnAnUnknownFellowship(): void {
+        $client = $this->createAuthenticatedClient();
+
+        $client->request('POST', '/user/fellowship_comment', ['id' => 999, 'comment' => 'Hello']);
+        $this->assertSame(400, $client->getResponse()->getStatusCode());
+
+        $client->request('POST', '/user/fellowship_like', ['id' => 999]);
+        $this->assertSame(400, $client->getResponse()->getStatusCode());
     }
 }

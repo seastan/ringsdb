@@ -63,7 +63,7 @@ class DecklistSocialTest extends WebTestCase {
     /**
      * @param mixed $action
      * @param mixed $decklistId
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     private function post(Client $client, $action, $decklistId) {
         $client->request('POST', "/user/$action", ['id' => $decklistId], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);

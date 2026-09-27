@@ -239,7 +239,7 @@ class Review {
      *
      * @return Review
      */
-    public function setCard(\AppBundle\Entity\Card $card = null) {
+    public function setCard(\AppBundle\Entity\Card $card) {
         $this->card = $card;
 
         return $this;
@@ -261,7 +261,7 @@ class Review {
      *
      * @return Review
      */
-    public function setUser(\AppBundle\Entity\User $user = null) {
+    public function setUser(\AppBundle\Entity\User $user) {
         $this->user = $user;
 
         return $this;

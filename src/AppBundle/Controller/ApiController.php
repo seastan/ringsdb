@@ -64,7 +64,7 @@ class ApiController extends Controller {
                 "name" => $pack->getName(),
                 "code" => $pack->getCode(),
                 "position" => $pack->getPosition(),
-                "cycle_position" => $pack->getCycle() ? $pack->getCycle()->getPosition() : 0,
+                "cycle_position" => $pack->getCycle()->getPosition(),
                 "available" => $pack->getDateRelease() ? $pack->getDateRelease()->format('Y-m-d') : '',
                 "known" => intval($real),
                 "total" => $max,
@@ -458,6 +458,9 @@ class ApiController extends Controller {
             $codes = array_keys($decklist['heroes']);
             foreach ($codes as $code) {
                 $card = $cardRepo->findOneBy(['code' => $code]);
+                if (!$card) {
+                    continue;
+                }
                 $decklist['heroes_details'][] = [
                     'name' => $card->getName(),
                     'sphere' => $card->getSphere()->getName(),

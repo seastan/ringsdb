@@ -17,6 +17,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * Excel / CSV imports.
  */
 class AdminWriteTest extends WebTestCase {
+    use \AppBundle\Tests\LocationTrait;
+
     /** tables of the reference data, in an order that respects the foreign keys when deleting */
     const TABLES = ['card_printing', 'scenario_encounter', 'scenario', 'encounter', 'card', 'pack', 'cycle', 'type', 'sphere'];
 
@@ -76,7 +78,7 @@ class AdminWriteTest extends WebTestCase {
     /**
      * @param mixed $pageUri
      * @param mixed $action
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     private function submitForm(Client $client, $pageUri, $action, array $values) {
         $crawler = $client->request('GET', $pageUri);
@@ -171,8 +173,8 @@ class AdminWriteTest extends WebTestCase {
         // create: redirect to the show page
         $response = $this->submitForm($client, "/admin/$slug/new", "/admin/$slug/create", self::prefixed($formName, $created));
         $this->assertSame(302, $response->getStatusCode());
-        $this->assertRegExp("#^/admin/$slug/\\d+/show$#", $response->headers->get('Location'));
-        $id = (int) explode('/', $response->headers->get('Location'))[3];
+        $this->assertRegExp("#^/admin/$slug/\\d+/show$#", self::location($response));
+        $id = (int) explode('/', self::location($response))[3];
         $this->assertGreaterThan($this->maxIds[$table], $id);
         $this->assertEquals($expectedCreated, $this->db($client)->fetchAssoc("SELECT $columns FROM $table WHERE id = ?", [$id]));
 
@@ -204,7 +206,7 @@ class AdminWriteTest extends WebTestCase {
         $encounters[2]->tick();
         $client->submit($form);
 
-        $id = (int) explode('/', $client->getResponse()->headers->get('Location'))[3];
+        $id = (int) explode('/', self::location($client->getResponse()))[3];
         $encounters = $this->db($client)->fetchAll('SELECT encounter_id FROM scenario_encounter WHERE scenario_id = ? ORDER BY encounter_id', [$id]);
         $this->assertSame(['1', '3'], array_column($encounters, 'encounter_id'));
     }
@@ -241,7 +243,7 @@ class AdminWriteTest extends WebTestCase {
         $response = $this->submitForm($client, '/admin/card/new', '/admin/card/create', self::prefixed('appbundle_cardtype', [
             'position' => '1', 'deck_limit' => '3', 'code' => '99901', 'type' => '2', 'sphere' => '1', 'name' => 'PHPUnit Card',
         ]));
-        $cardId = (int) explode('/', $response->headers->get('Location'))[3];
+        $cardId = (int) explode('/', self::location($response))[3];
         $connection = $this->db($client);
         $connection->insert('card_printing', ['card_id' => $cardId, 'pack_id' => 1, 'position' => 999, 'quantity' => 1, 'image_code' => '99901', 'date_creation' => '2015-08-16 00:00:00', 'date_update' => '2015-08-16 00:00:00']);
         $connection->insert('deckslot', ['deck_id' => 1, 'card_id' => $cardId, 'quantity' => 1]);

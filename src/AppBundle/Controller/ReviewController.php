@@ -52,7 +52,7 @@ class ReviewController extends Controller {
 
         $review_raw = trim($request->get('review'));
 
-        $review_raw = preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $review_raw);
+        $review_raw = (string) preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $review_raw);
 
         $review_html = $this->get('texts')->markdown($review_raw);
         if (!$review_html) {
@@ -104,7 +104,7 @@ class ReviewController extends Controller {
 
         $review_raw = trim($request->get('review'));
 
-        $review_raw = preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $review_raw);
+        $review_raw = (string) preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $review_raw);
 
         $review_html = $this->get('texts')->markdown($review_raw);
         if (!$review_html) {
@@ -294,6 +294,9 @@ class ReviewController extends Controller {
         $em = $this->getDoctrine()->getManager();
 
         $user = $em->getRepository('AppBundle:User')->find($user_id);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found.');
+        }
 
         $pagetitle = "Card Reviews by " . $user->getUsername();
 

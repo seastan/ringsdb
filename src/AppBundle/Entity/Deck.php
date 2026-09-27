@@ -247,7 +247,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      */
     private $user;
     /**
-     * @var \AppBundle\Entity\Pack
+     * @var \AppBundle\Entity\Pack|null
      */
     private $lastPack;
     /**
@@ -544,7 +544,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      *
      * @return Deck
      */
-    public function setUser(\AppBundle\Entity\User $user = null) {
+    public function setUser(\AppBundle\Entity\User $user) {
         $this->user = $user;
 
         return $this;
@@ -575,7 +575,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Get lastPack
      *
-     * @return \AppBundle\Entity\Pack
+     * @return \AppBundle\Entity\Pack|null
      */
     public function getLastPack() {
         return $this->lastPack;

@@ -29,6 +29,10 @@ class DeleteDecklistCommand extends ContainerAwareCommand {
         
         $decklist_id = $input->getArgument('decklist_id');
         $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
+        if (!$decklist) {
+            $output->writeln("Decklist not found");
+            return 1;
+        }
         
         $successors = $em->getRepository('AppBundle:Decklist')->findBy(array(
             'precedent' => $decklist

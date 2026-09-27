@@ -103,7 +103,7 @@ class DecklistEditTest extends WebTestCase {
 
     /**
      * @param mixed $decklistId
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     private function saveForm(Client $client, $decklistId, array $values) {
         $crawler = $client->request('GET', "/decklist/edit/$decklistId");

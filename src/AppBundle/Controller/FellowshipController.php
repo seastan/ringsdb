@@ -489,7 +489,7 @@ class FellowshipController extends Controller {
 
             foreach ($old_decklists as $decklist) {
                 /* @var $decklist \AppBundle\Entity\Decklist */
-                if ($decklist->getParent()->getId() == $deck->getId()) {
+                if ($decklist->getParent() && $decklist->getParent()->getId() == $deck->getId()) {
                     continue;
                 }
 
@@ -1080,10 +1080,13 @@ class FellowshipController extends Controller {
 
         $fellowship_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+        if (!$fellowship) {
+            throw new BadRequestHttpException('Wrong fellowship id');
+        }
 
         $comment_text = trim($request->get('comment'));
-        if ($fellowship && !empty($comment_text)) {
-            $comment_text = preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $comment_text);
+        if (!empty($comment_text)) {
+            $comment_text = (string) preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $comment_text);
 
             $mentionned_usernames = [];
             $matches = [];
@@ -1208,6 +1211,9 @@ class FellowshipController extends Controller {
 
         /* @var $fellowship \AppBundle\Entity\Fellowship */
         $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+        if (!$fellowship) {
+            throw new BadRequestHttpException('Unable to find fellowship');
+        }
 
         if ($fellowship->getUser()->getId() != $user->getId()) {
             $query = $em->getRepository('AppBundle:Fellowship')

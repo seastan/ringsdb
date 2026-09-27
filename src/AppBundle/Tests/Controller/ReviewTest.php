@@ -80,7 +80,7 @@ class ReviewTest extends WebTestCase {
     /**
      * @param mixed $uri
      * @param string $method
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     private function ajax(Client $client, $uri, array $parameters, $method = 'POST') {
         $client->request($method, $uri, $parameters, [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
@@ -292,8 +292,11 @@ class ReviewTest extends WebTestCase {
 
         // BUG: escaped once more by Twig when displayed, the entities are shown as is
         $crawler = $client->request('GET', self::CARD_URL);
-        $text = $crawler->filter('#review-1 .review-comment')->first()->getNode(0)->firstChild->nodeValue;
-        $this->assertSame('Agreed &lt;b&gt;100%&lt;/b&gt; —', trim(preg_replace('/\s+/u', ' ', $text)));
+        $node = $crawler->filter('#review-1 .review-comment')->first()->getNode(0);
+        $this->assertNotNull($node);
+        $this->assertNotNull($node->firstChild);
+        $text = (string) $node->firstChild->nodeValue;
+        $this->assertSame('Agreed &lt;b&gt;100%&lt;/b&gt; —', trim((string) preg_replace('/\s+/u', ' ', $text)));
     }
 
     /**

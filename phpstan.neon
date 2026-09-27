@@ -1,5 +1,5 @@
 parameters:
-    level: 7
+    level: 8
     paths:
         - src
     excludePaths:
@@ -11,6 +11,8 @@ parameters:
     ignoreErrors:
         # PHPExcel documents the column and row indexes as strings, they are ints
         - '#^Parameter \#[12] \$p(Column|Row) of method PHPExcel_Worksheet::\w+\(\) expects string, int(<0, max>)? given\.$#'
+        # PHPExcel_Worksheet::getCellByColumnAndRow() creates the cell when it does not exist
+        - '#^Cannot call method setValue(Explicit)?\(\) on PHPExcel_Cell\|null\.$#'
         # DBAL documents the parameter of bindValue() as a string, positional parameters are ints
         - '#^Parameter \#1 \$name of method Doctrine\\DBAL\\Statement::bindValue\(\) expects string, int given\.$#'
     # legacy code: arrays are untyped structures and Doctrine collections have no generic types;
@@ -69,3 +71,20 @@ services:
         class: AppBundle\PHPStan\DoctrineIdentifierReadWriteExtension
         tags:
             - phpstan.properties.readWriteExtension
+    # the tests only read the response, request and container of the client after a request
+    -
+        class: AppBundle\PHPStan\NonNullReturnTypeExtension
+        arguments: [Symfony\Component\BrowserKit\Client, [getResponse, getRequest, getInternalResponse, getInternalRequest, getCrawler]]
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: AppBundle\PHPStan\NonNullReturnTypeExtension
+        arguments: [Symfony\Bundle\FrameworkBundle\Client, [getContainer, getKernel]]
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    # the kernel is booted
+    -
+        class: AppBundle\PHPStan\NonNullReturnTypeExtension
+        arguments: [Symfony\Component\HttpKernel\KernelInterface, [getContainer]]
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension

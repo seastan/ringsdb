@@ -1118,10 +1118,13 @@ class QuestLogController extends Controller {
 
         $questlog_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
+        if (!$questlog) {
+            throw new BadRequestHttpException('Wrong quest log id');
+        }
 
         $comment_text = trim($request->get('comment'));
-        if ($questlog && !empty($comment_text)) {
-            $comment_text = preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $comment_text);
+        if (!empty($comment_text)) {
+            $comment_text = (string) preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $comment_text);
 
             $mentionned_usernames = [];
             $matches = [];
@@ -1245,6 +1248,9 @@ class QuestLogController extends Controller {
 
         /* @var $questlog \AppBundle\Entity\QuestLog */
         $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
+        if (!$questlog) {
+            throw new BadRequestHttpException('Unable to find quest log');
+        }
 
         if ($questlog->getUser()->getId() != $user->getId()) {
             $query = $em->getRepository('AppBundle:Questlog')

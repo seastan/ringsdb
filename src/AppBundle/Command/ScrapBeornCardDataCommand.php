@@ -181,7 +181,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 		$output->writeln("2");
 
                 if ($c->filter('img')->count() > 0) {
-                    $sphere = basename($c->filter('img')->attr('src'), '.png');
+                    $sphere = basename((string) $c->filter('img')->attr('src'), '.png');
 		    $sphere = substr( $sphere, 0, (int) strrpos( $sphere, '-' ) );
                 } else {
                     $sphere = 'Neutral';
@@ -208,7 +208,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 		$output->writeln("7");
 
                 // Image URL
-                $imageurl = $cardCrawler->filter('div.titleBox > img')->last()->attr('src');
+                $imageurl = (string) $cardCrawler->filter('div.titleBox > img')->last()->attr('src');
 		$output->writeln("8");
 
                 // Threat, Willpower, Attack, Defense, Hit Points
@@ -327,16 +327,16 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
     		$output->writeln("20");
     
                     $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', '\'', '\''], $text);
-                    $text = preg_replace('/<a title="Search:.*?>(.*?)<\/a>/', '\\1', $text);
-                    $text = preg_replace('/<a title="Keyword:.*?>(.*?)<\/a>/', '\\1', $text);
-                    $text = preg_replace_callback('/<img .*?src="\/Images\/(.*?)\..*?>/', function($m) {
+                    $text = (string) preg_replace('/<a title="Search:.*?>(.*?)<\/a>/', '\\1', $text);
+                    $text = (string) preg_replace('/<a title="Keyword:.*?>(.*?)<\/a>/', '\\1', $text);
+                    $text = (string) preg_replace_callback('/<img .*?src="\/Images\/(.*?)\..*?>/', function($m) {
                         return strtolower("[$m[1]]");
                     }, $text);
                     $text = str_replace(['<br />', '<br>'], ["\n", "\n"], $text);
                     $text = str_replace("</b><b>", " ", $text);
                     $text = str_replace("</b>: ", ":</b> ", $text);
-                    $text = preg_replace("/ +/", " ", $text);
-                    $text = preg_replace("/\n+/", "\n", $text);
+                    $text = (string) preg_replace("/ +/", " ", $text);
+                    $text = (string) preg_replace("/\n+/", "\n", $text);
                     $text = trim($text);
     		$output->writeln("21");
     
@@ -347,10 +347,10 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
     		$output->writeln("22");
     
                     $flavor = str_replace(['<br />', '<br>'], ["\n", "\n"], $flavor);
-                    $flavor = preg_replace('/([a-z])–/s', '\\1-', $flavor);
-                    $flavor = preg_replace('/–(.*)$/s', '<cite>\\1</cite>', $flavor);
-                    $flavor = preg_replace("/ +/", " ", $flavor);
-                    $flavor = preg_replace("/\n+/", "\n", $flavor);
+                    $flavor = (string) preg_replace('/([a-z])–/s', '\\1-', $flavor);
+                    $flavor = (string) preg_replace('/–(.*)$/s', '<cite>\\1</cite>', $flavor);
+                    $flavor = (string) preg_replace("/ +/", " ", $flavor);
+                    $flavor = (string) preg_replace("/\n+/", "\n", $flavor);
     		$output->writeln("23");
     
     
@@ -426,7 +426,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 		$output->writeln("32");
                 if (!file_exists($outputfile) || $forceImage) {
  		    $output->writeln("33");
-                    $imageurl = preg_replace('/û/', '%C3%BB', $imageurl);
+                    $imageurl = (string) preg_replace('/û/', '%C3%BB', $imageurl);
                     $u = dirname($imageurl) . '/' . urlencode(basename($imageurl, '.jpg')) . '.jpg';
 		    $output->writeln("34");
 

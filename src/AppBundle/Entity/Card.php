@@ -84,11 +84,11 @@ class Card {
      */
     private $printings;
     /**
-     * @var \AppBundle\Entity\Type|null
+     * @var \AppBundle\Entity\Type
      */
     private $type;
     /**
-     * @var \AppBundle\Entity\Sphere|null
+     * @var \AppBundle\Entity\Sphere
      */
     private $sphere;
 
@@ -248,10 +248,7 @@ class Card {
      * @return string
      */
     public function getAdminLabel() {
-        $parts = [];
-        if ($this->sphere) $parts[] = $this->sphere->getName();
-        if ($this->type)   $parts[] = $this->type->getName();
-        return $this->name . ($parts ? ' (' . implode(', ', $parts) . ')' : '');
+        return $this->name . ' (' . $this->sphere->getName() . ', ' . $this->type->getName() . ')';
     }
 
     /**
@@ -633,7 +630,7 @@ class Card {
      *
      * @return Card
      */
-    public function setType(\AppBundle\Entity\Type $type = null) {
+    public function setType(\AppBundle\Entity\Type $type) {
         $this->type = $type;
 
         return $this;
@@ -655,7 +652,7 @@ class Card {
      *
      * @return Card
      */
-    public function setSphere(\AppBundle\Entity\Sphere $sphere = null) {
+    public function setSphere(\AppBundle\Entity\Sphere $sphere) {
         $this->sphere = $sphere;
 
         return $this;

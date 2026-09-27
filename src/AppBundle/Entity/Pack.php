@@ -286,7 +286,7 @@ class Pack {
      *
      * @return Pack
      */
-    public function setCycle(\AppBundle\Entity\Cycle $cycle = null) {
+    public function setCycle(\AppBundle\Entity\Cycle $cycle) {
         $this->cycle = $cycle;
 
         return $this;
@@ -295,7 +295,7 @@ class Pack {
     /**
      * Get cycle
      *
-     * @return \AppBundle\Entity\Cycle|null
+     * @return \AppBundle\Entity\Cycle
      */
     public function getCycle() {
         return $this->cycle;

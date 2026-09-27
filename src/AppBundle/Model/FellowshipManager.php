@@ -3,6 +3,7 @@
 namespace AppBundle\Model;
 
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
 use AppBundle\Entity\User;
@@ -57,6 +58,18 @@ class FellowshipManager {
 		$this->doctrine = $doctrine;
 		$this->request_stack = $request_stack;
 		$this->router = $router;
+	}
+
+	/**
+	 * The current request: the searches and the pagination read its parameters.
+	 */
+	private function currentRequest(): Request {
+		$request = $this->request_stack->getCurrentRequest();
+		if ($request === null) {
+			throw new \LogicException('No current request.');
+		}
+
+		return $request;
 	}
 
 	/**
@@ -240,7 +253,7 @@ class FellowshipManager {
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findFellowshipsWithComplexSearch() {
-        $request = $this->request_stack->getCurrentRequest();
+        $request = $this->currentRequest();
 
         $cards_code = $request->query->get('cards');
         if (!is_array($cards_code)) {
@@ -403,7 +416,7 @@ class FellowshipManager {
      * @return array
      */
     public function getAllPages() {
-        $request = $this->request_stack->getCurrentRequest();
+        $request = $this->currentRequest();
         $route = $request->get('_route');
         $route_params = $request->get('_route_params');
         $query = $request->query->all();
@@ -447,7 +460,7 @@ class FellowshipManager {
             return null;
         }
 
-        $request = $this->request_stack->getCurrentRequest();
+        $request = $this->currentRequest();
         $route = $request->get('_route');
         $route_params = $request->get('_route_params');
 
@@ -468,7 +481,7 @@ class FellowshipManager {
             return null;
         }
 
-        $request = $this->request_stack->getCurrentRequest();
+        $request = $this->currentRequest();
         $route = $request->get('_route');
         $route_params = $request->get('_route_params');
 

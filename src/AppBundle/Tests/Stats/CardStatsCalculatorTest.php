@@ -115,6 +115,16 @@ class CardStatsCalculatorTest extends KernelTestCase {
         return $result;
     }
 
+    /**
+     * The statistics of a valid step.
+     */
+    private function compute(string $month, string $step): array {
+        $result = $this->calculator->computeCards($month, $step);
+        $this->assertNotNull($result);
+
+        return $result;
+    }
+
     /* --------------------------------------------------------- fixtures */
 
     /**
@@ -135,14 +145,14 @@ class CardStatsCalculatorTest extends KernelTestCase {
     public function testFixtureMonth(): void {
         // step 2: the 4 decklists are "limited" (last packs before 2019-08-02); the fixture decks
         // are all published, so they are not counted twice
-        $cards = $this->calculator->computeCards('2015-08', '2')['cards'];
+        $cards = $this->compute('2015-08', '2')['cards'];
         $this->assertSame([
             '01001' => ['limited_decks' => '1', 'limited_deck_copies' => '1.00'],
             '01004' => ['limited_decks' => '1', 'limited_deck_copies' => '1.00'],
             '01028' => ['limited_decks' => '1', 'limited_deck_copies' => '3.00'],
         ], self::byCode($cards, ['01001', '01004', '01028'], ['limited_decks', 'limited_deck_copies']));
 
-        $step3 = $this->calculator->computeCards('2015-08', '3');
+        $step3 = $this->compute('2015-08', '3');
         $this->assertSame(['full_decks' => '0', 'limited_decks' => '4', 'sides' => '4'], $step3['total']);
         $this->assertSame(['Core Set' => ['2000-01-01', '2011-07-21']], array_slice($step3['pack_rules'], 0, 1));
         $this->assertSame(['name' => 'Core Set', 'date_release' => '2011-04-20'], $step3['packs'][0]);
@@ -176,7 +186,7 @@ class CardStatsCalculatorTest extends KernelTestCase {
         $this->insertDeck(['date_creation' => '2023-04-30 12:00:00'], [1 => 1]);
         $this->insertDeck(['date_creation' => '2023-05-12 12:00:00', 'last_pack_id' => 1], [1 => 1]);
 
-        $full = $this->calculator->computeCards('2023-05', '1')['cards'];
+        $full = $this->compute('2023-05', '1')['cards'];
         $this->assertSame([
             // counted once per deck
             '01001' => ['full_decks' => '1', 'full_deck_copies' => '1.00'],
@@ -189,10 +199,10 @@ class CardStatsCalculatorTest extends KernelTestCase {
         // MotK cards themselves are not listed
         $this->assertSame([], self::byCode($full, ['9901014'], ['code']));
 
-        $limited = $this->calculator->computeCards('2023-05', '2')['cards'];
+        $limited = $this->compute('2023-05', '2')['cards'];
         $this->assertSame(['01001' => ['limited_decks' => '1']], self::byCode($limited, ['01001'], ['limited_decks']));
 
-        $step3 = $this->calculator->computeCards('2023-05', '3');
+        $step3 = $this->compute('2023-05', '3');
         $this->assertSame(['01020' => ['sides' => '1', 'side_copies' => '2.00']], self::byCode($step3['cards'], ['01020'], ['sides', 'side_copies']));
         $this->assertSame(['full_decks' => '2', 'limited_decks' => '1', 'sides' => '3'], $step3['total']);
     }
@@ -210,7 +220,7 @@ class CardStatsCalculatorTest extends KernelTestCase {
     public function testMonthRuleForPrivateDecks($month, $created, $updated, $counted): void {
         $this->insertDeck(['date_creation' => $created, 'date_update' => $updated], [1 => 1]);
 
-        $cards = $this->calculator->computeCards($month, '1')['cards'];
+        $cards = $this->compute($month, '1')['cards'];
         $this->assertSame(['01001' => ['full_decks' => $counted ? '1' : '0']], self::byCode($cards, ['01001'], ['full_decks']));
     }
 

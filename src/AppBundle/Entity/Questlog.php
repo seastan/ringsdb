@@ -515,7 +515,7 @@ class Questlog {
      *
      * @return Questlog
      */
-    public function setUser(\AppBundle\Entity\User $user = null) {
+    public function setUser(\AppBundle\Entity\User $user) {
         $this->user = $user;
 
         return $this;
@@ -537,7 +537,7 @@ class Questlog {
      *
      * @return Questlog
      */
-    public function setScenario(\AppBundle\Entity\Scenario $scenario = null) {
+    public function setScenario(\AppBundle\Entity\Scenario $scenario) {
         $this->scenario = $scenario;
 
         return $this;

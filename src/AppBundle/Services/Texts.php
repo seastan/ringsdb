@@ -22,6 +22,8 @@ class Texts {
             mkdir($cache_dir, 0775, true);
         }
         $config = \HTMLPurifier_Config::create(['Cache.SerializerPath' => $cache_dir]);
+        // raw definition: never null
+        /** @var \HTMLPurifier_HTMLDefinition $def */
         $def = $config->getHTMLDefinition(true);
         $def->addAttribute('a', 'data-code', 'Text');
         $this->purifier_service = new \HTMLPurifier($config);
@@ -75,12 +77,12 @@ class Texts {
      * @return string
      */
     public function slugify($filename) {
-        $filename = preg_replace('[^\w\-]', '-', $filename);
+        $filename = (string) preg_replace('[^\w\-]', '-', $filename);
         // //TRANSLIT is not supported by every iconv implementation (e.g. musl on Alpine)
         $ascii = @iconv('utf-8', 'us-ascii//TRANSLIT', $filename);
-        $filename = $ascii !== false ? $ascii : preg_replace('/[^\x00-\x7F]/', '', $filename);
-        $filename = preg_replace('/[^\w\-]/', '', $filename);
-        $filename = preg_replace('/\-+/', '-', $filename);
+        $filename = $ascii !== false ? $ascii : (string) preg_replace('/[^\x00-\x7F]/', '', $filename);
+        $filename = (string) preg_replace('/[^\w\-]/', '', $filename);
+        $filename = (string) preg_replace('/\-+/', '-', $filename);
         $filename = trim($filename, '-');
         $filename = strtolower($filename);
 

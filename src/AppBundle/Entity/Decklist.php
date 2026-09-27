@@ -95,7 +95,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      */
     private $user;
     /**
-     * @var \AppBundle\Entity\Pack
+     * @var \AppBundle\Entity\Pack|null
      */
     private $lastPack;
     /**
@@ -103,7 +103,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      */
     private $parent;
     /**
-     * @var \AppBundle\Entity\Decklist
+     * @var \AppBundle\Entity\Decklist|null
      */
     private $precedent;
     /**
@@ -570,7 +570,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      *
      * @return Decklist
      */
-    public function setUser(\AppBundle\Entity\User $user = null) {
+    public function setUser(\AppBundle\Entity\User $user) {
         $this->user = $user;
 
         return $this;
@@ -601,7 +601,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get lastPack
      *
-     * @return \AppBundle\Entity\Pack
+     * @return \AppBundle\Entity\Pack|null
      */
     public function getLastPack() {
         return $this->lastPack;
@@ -645,7 +645,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get precedent
      *
-     * @return \AppBundle\Entity\Decklist
+     * @return \AppBundle\Entity\Decklist|null
      */
     public function getPrecedent() {
         return $this->precedent;
@@ -777,7 +777,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     }
 
     /**
-     * @var \AppBundle\Entity\Sphere
+     * @var \AppBundle\Entity\Sphere|null
      */
     private $predominantSphere;
 
@@ -797,7 +797,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get predominantSphere
      *
-     * @return \AppBundle\Entity\Sphere
+     * @return \AppBundle\Entity\Sphere|null
      */
     public function getPredominantSphere() {
         return $this->predominantSphere;

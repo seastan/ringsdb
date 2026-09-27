@@ -97,7 +97,7 @@ class CollectionTest extends WebTestCase {
      * hidden "cards_json" field.
      * @param mixed $pageUri
      * @param mixed $name
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     private function submitPackForm(Client $client, $pageUri, $name, array $cards) {
         $crawler = $client->request('GET', $pageUri);

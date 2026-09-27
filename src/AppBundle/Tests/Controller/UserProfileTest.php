@@ -126,6 +126,7 @@ class UserProfileTest extends WebTestCase {
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/user/profile_edit', $client->getResponse()->headers->get('Location'));
         $cookie = $client->getCookieJar()->get('dark_mode');
+        $this->assertNotNull($cookie);
         $this->assertSame('1', $cookie->getValue());
         $this->assertFalse($cookie->isHttpOnly());
 
@@ -149,7 +150,9 @@ class UserProfileTest extends WebTestCase {
         self::checkbox($form, 'dark_mode')->untick();
         $client->submit($form);
         $this->assertSame('0', $this->fetchUser($client)['dark_mode']);
-        $this->assertSame('0', $client->getCookieJar()->get('dark_mode')->getValue());
+        $cookie = $client->getCookieJar()->get('dark_mode');
+        $this->assertNotNull($cookie);
+        $this->assertSame('0', $cookie->getValue());
     }
 
     public function testRenameUser(): void {

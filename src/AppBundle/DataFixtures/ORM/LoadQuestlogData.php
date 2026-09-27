@@ -39,6 +39,9 @@ class LoadQuestlogData extends AbstractFixture implements DependentFixtureInterf
         $questlog->setDatePublish(new \DateTime('2015-08-16'));
 
         $scenario = $manager->getRepository('AppBundle:Scenario')->find(1);
+        if ($scenario === null) {
+            throw new \LogicException('Scenario 1 is missing.');
+        }
 
         $questlog->setUser($user);
         $questlog->setName("Untitled Questlog");

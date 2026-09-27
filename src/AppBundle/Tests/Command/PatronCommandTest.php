@@ -46,7 +46,7 @@ class PatronCommandTest extends KernelTestCase {
         $display = $tester->getDisplay();
         $this->assertRegExp('/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d:\d\d /', $display);
 
-        return preg_replace('/^\S+ /m', '', $display);
+        return (string) preg_replace('/^\S+ /m', '', $display);
     }
 
     /**

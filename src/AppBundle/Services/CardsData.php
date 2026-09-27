@@ -564,7 +564,8 @@ class CardsData {
 		$query = preg_replace('/\s+/u', ' ', trim($query));
 
 		$list = [];
-		$cond = null;
+		// an empty condition, never kept
+		$cond = ["", ":"];
 		// l'automate a 3 états :
 		// 1:recherche de type
 		// 2:recherche d'argument principal
@@ -574,7 +575,7 @@ class CardsData {
 		$etat = 1;
 		while ($query != "") {
 			if ($etat == 1) {
-				if (isset($cond) && count($cond) > 2) {
+				if (count($cond) > 2) {
 					$list[] = $cond;
 				}
 				// on commence par rechercher un type de condition
@@ -622,7 +623,7 @@ class CardsData {
 				}
 			}
 		}
-		if (isset($cond) && $etat != 4 && count($cond) > 2) {
+		if ($etat != 4 && count($cond) > 2) {
 			$list[] = $cond;
 		}
 

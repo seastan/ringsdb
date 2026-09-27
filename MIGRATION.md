@@ -458,6 +458,9 @@ fixture decks: the tests restore them in `tearDown()`.
   `empty($fellowship->getDecks())`, and a Doctrine collection object is never `empty()`.
 - No CSRF protection on `/fellowship/save`, `/fellowship/publish`, `/fellowship/delete`,
   `/fellowship/delete_list`.
+- Fixed (found by phpstan): commenting on or voting for an unknown fellowship
+  (`/user/fellowship_comment`, `/user/fellowship_like`) crashed on `null`; it now answers `400`,
+  like the decklists.
 - The fixture fellowship 1 is public but references decks (not decklists): a state the
   application itself does not produce. (It had no `date_publish` either, which Twig displayed as
   the current date: fixed in `LoadFellowshipData`.)
@@ -558,6 +561,8 @@ directly.
 - The deck contents are decoded with `(array) json_decode(...)` (objects inside), like the deck
   builder does: `{"main": {}}` passes the "empty deck" guard.
 - No CSRF protection on `/questlog/save`, `/questlog/delete`, `/questlog/delete_list`.
+- Fixed (found by phpstan): commenting on or voting for an unknown quest log
+  (`/user/questlog_comment`, `/user/questlog_like`) crashed on `null`; it now answers `400`.
 - Fixed: the quest log list of a decklist page (`Decklist::getAllQuestlogs()`) was meant to include
   the quest logs of its parent deck, but they were assigned to a misspelled variable
   (`$parentlogs`) and never listed (found by phpstan).
@@ -843,7 +848,8 @@ name, number of decks, cards, packs, custom packs, number of Core Sets, sort ord
   `app:cgdb:cards`, `app:cards:octgn` (OCTGN, see below) and `app:download-images`. The CSV import
   (`BeornJSONtoRingsDBcsv.py`, see "Admin area") seems to have replaced them; `app:beorn:scenario`
   is still used by the admin scenario import. Keep only what the maintainers still run.
-- `app:remove-user` now exits with code 1 when the user is not found.
+- `app:remove-user` and `app:decklist:delete` now exit with code 1 when the user or decklist is
+  not found (the latter crashed).
 
 ## OCTGN features (to be removed)
 

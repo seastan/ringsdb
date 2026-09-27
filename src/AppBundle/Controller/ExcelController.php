@@ -35,6 +35,9 @@ class ExcelController extends Controller {
 			$pack_name = 'LotR LCG Cards';
 		} else {
 			$pack = $em->getRepository('AppBundle:Pack')->find($pack_id);
+			if (!$pack) {
+				throw $this->createNotFoundException('Pack not found.');
+			}
 			$printings = $em->getRepository('AppBundle:CardPrinting')->findBy(['pack' => $pack], ['position' => 'ASC']);
 			$cards = array_values(array_unique(array_map(function($p) { return $p->getCard(); }, $printings), SORT_REGULAR));
 			$pack_name = $pack->getName();
