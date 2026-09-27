@@ -104,7 +104,7 @@ class ScrapCardDataCommand extends ContainerAwareCommand {
 
           if (!$sphere) {
           	$output->writeln("<error>Cannot find sphere [" . $data['sphere'] . "] for this card</error>");
-          	dump($data);
+          	print_r($data);
           	die();
           }
           
@@ -117,7 +117,7 @@ class ScrapCardDataCommand extends ContainerAwareCommand {
 
           if (!$type) {
           	$output->writeln("<error>Cannot find type [" . $data['type'] . "] for this card</error>");
-          	dump($data);
+          	print_r($data);
           	die();
           }
 

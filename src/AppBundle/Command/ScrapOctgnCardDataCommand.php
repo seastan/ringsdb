@@ -30,7 +30,7 @@ class ScrapOctgnCardDataCommand extends ContainerAwareCommand {
         if (!is_dir($path)) {
             die("Invalid directory $path");
         }
-        dump("Loading Sets from $path");
+        $output->writeln("Loading Sets from $path");
 
         $fixedNames = [
             'The Hobbit - On the Doorstep' => 'On the Doorstep',
