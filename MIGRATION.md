@@ -663,6 +663,18 @@ name, number of decks, cards, packs, custom packs, number of Core Sets, sort ord
 - `QuestLogManager::findQuestLogsByRecentDiscussion()` is dead code: `Questlog` has no
   `dateLastComment` field, so the query fails; nothing calls it.
 
+## Console commands
+
+- `app:suggestions` (`SuggestionsCommand`, still used, `SuggestionsCommandTest`): computes which
+  cards are used together in decks (all decks, private or not) and writes
+  `web/suggestions.json`, loaded by the deck builder (`app.suggestions-statistics.js`,
+  `app.suggestions-mixed.js`): `index` = the codes of the cards used in at least one deck, by card
+  id; `matrix` = lower triangular, number of decks with both cards divided by
+  `max(100, min(decks of each card))`, in percent. The output path is hard-coded from
+  `kernel.root_dir` (gone in recent Symfony, use `kernel.project_dir`), and the command always
+  overwrites the file: the test saves and restores it. The file is generated: no longer tracked by git
+  (it was committed although listed in `.gitignore`), it has to be (re)generated on each server.
+
 ## OCTGN features (to be removed)
 
 Plan: drop every OCTGN feature (OCTGN is a desktop client for the game) before the migration, so
