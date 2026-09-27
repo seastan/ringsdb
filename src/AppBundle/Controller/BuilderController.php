@@ -702,7 +702,7 @@ class BuilderController extends Controller {
         }
         $response = new Response();
         $response->headers->set('Content-Type', 'application/zip');
-        $response->headers->set('Content-Length', filesize($file));
+        $response->headers->set('Content-Length', (string) filesize($file));
         $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->get('texts')->slugify('ringsdb') . '.zip'));
 
         $response->setContent(file_get_contents($file));
@@ -716,7 +716,7 @@ class BuilderController extends Controller {
         $em = $this->getDoctrine()->getManager();
 
         // time-consuming task
-        ini_set('max_execution_time', 300);
+        ini_set('max_execution_time', '300');
 
         $uploadedFile = $request->files->get('uparchive');
         if (!isset($uploadedFile)) {

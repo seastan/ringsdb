@@ -41,8 +41,8 @@ class ScenarioController extends Controller {
 #            $entity->setCanonicalName($texts->slugify($entity->getName()));
             # Set defaults
             $entity->setNameCanonical('');
-            $entity->setHasEasy(1);
-            $entity->setHasNightmare(0);
+            $entity->setHasEasy(true);
+            $entity->setHasNightmare(false);
             
             $entity->setEasyCards(0);
 	        $entity->setEasyEnemies(0);

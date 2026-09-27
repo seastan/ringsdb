@@ -150,7 +150,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
             $crawler = new Crawler($html);
             $output->writeln("b");
 
-            $cardsUrls = $crawler->filter('a[href^="/LotR/Details"][style]')->extract('href');
+            $cardsUrls = $crawler->filter('a[href^="/LotR/Details"][style]')->extract(['href']);
             $output->writeln("c");
 
             $i = 0;
@@ -247,7 +247,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
                 // Traits, text and flavor
                 $c = $cardCrawler->filter('div.statTextBox')->first();
-                $traits = $c->filter('a[title="Trait Search"] i')->extract('_text');
+                $traits = $c->filter('a[title="Trait Search"] i')->extract(['_text']);
                 $traits = implode(' ', $traits);
 		$output->writeln("11");
 

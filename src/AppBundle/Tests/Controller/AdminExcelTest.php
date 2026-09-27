@@ -100,7 +100,9 @@ class AdminExcelTest extends WebTestCase {
         $sheet = $excel->getActiveSheet();
         foreach ($changes as $row => $values) {
             foreach ($values as $column => $value) {
-                $sheet->setCellValueExplicitByColumnAndRow(array_search($column, self::HEADER), $row, $value,
+                // PHPExcel documents the column index as a string, it is an int
+                /** @phpstan-ignore-next-line */
+                $sheet->setCellValueExplicitByColumnAndRow((int) array_search($column, self::HEADER), $row, $value,
                     is_int($value) ? \PHPExcel_Cell_DataType::TYPE_NUMERIC : \PHPExcel_Cell_DataType::TYPE_STRING);
             }
         }
