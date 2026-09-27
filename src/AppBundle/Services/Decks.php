@@ -171,6 +171,19 @@ class Decks {
         return $deck;
     }
 
+    /**
+     * Normalizes deck tags: a space-separated string or an array of tags becomes a list of
+     * distinct, trimmed, non-empty tags.
+     *
+     * @param string|string[]|null $tags
+     * @return string[]
+     */
+    public function normalizeTags($tags) {
+        $tags = preg_split('/\s+/', trim(implode(' ', (array) $tags)), -1, PREG_SPLIT_NO_EMPTY);
+
+        return array_values(array_unique($tags));
+    }
+
     public function saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, $source_deck) {
         /* @var $deck \AppBundle\Entity\Deck */
         /* @var $source_deck \AppBundle\Entity\Deck */
@@ -255,17 +268,13 @@ class Decks {
         }
 
         $deck->setLastPack($latestPack);
-        if (empty ($tags)) {
+        $tags = $this->normalizeTags($tags);
+        if (empty($tags)) {
             // tags can never be empty. if it is we put spheres in
-            $tags = $spheres;
+            $tags = $this->normalizeTags($spheres);
         }
 
-        if (is_string($tags)) {
-            $tags = preg_split('/\s+/', $tags);
-        }
-
-        $tags = implode(' ', array_unique(array_values($tags)));
-        $deck->setTags($tags);
+        $deck->setTags(implode(' ', $tags));
         $this->doctrine->persist($deck);
 
         // on the deck content

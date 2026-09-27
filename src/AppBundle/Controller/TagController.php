@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class TagController extends Controller {
     public function addAction(Request $request) {
         $list_id = $request->get('ids');
-        $list_tag = $request->get('tags');
+        $list_tag = $this->get('decks')->normalizeTags((array) $request->get('tags'));
 
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -28,7 +28,7 @@ class TagController extends Controller {
                 continue;
             }
 
-            $tags = array_unique(array_values(array_merge(preg_split('/\s+/', $deck->getTags()), $list_tag)));
+            $tags = $this->get('decks')->normalizeTags(array_merge($this->get('decks')->normalizeTags($deck->getTags()), $list_tag));
             $response['tags'][$deck->getId()] = $tags;
             $deck->setTags(implode(' ', $tags));
         }
@@ -39,7 +39,7 @@ class TagController extends Controller {
 
     public function removeAction(Request $request) {
         $list_id = $request->get('ids');
-        $list_tag = $request->get('tags');
+        $list_tag = $this->get('decks')->normalizeTags((array) $request->get('tags'));
 
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -58,7 +58,7 @@ class TagController extends Controller {
                 continue;
             }
 
-            $tags = array_values(array_diff(preg_split('/\s+/', $deck->getTags()), $list_tag));
+            $tags = array_values(array_diff($this->get('decks')->normalizeTags($deck->getTags()), $list_tag));
             $response['tags'][$deck->getId()] = $tags;
             $deck->setTags(implode(' ', $tags));
         }
