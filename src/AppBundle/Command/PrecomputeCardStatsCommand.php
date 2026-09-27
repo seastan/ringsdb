@@ -19,6 +19,8 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
  *   php app/console app:stats:precompute-cards --months=3   # last 3 months
  */
 class PrecomputeCardStatsCommand extends ContainerAwareCommand {
+    use StringInputTrait;
+
     /**
      * @return void
      */
@@ -37,7 +39,7 @@ class PrecomputeCardStatsCommand extends ContainerAwareCommand {
         $calc = $this->getContainer()->get('app.card_stats');
         $dbh = $this->getContainer()->get('doctrine')->getConnection();
 
-        $month = $input->getArgument('month') ?: date('Y-m', strtotime('first day of last month'));
+        $month = self::stringArgument($input, 'month') ?: date('Y-m', strtotime('first day of last month'));
         if (!preg_match('/^\d{4}-\d{2}$/', $month)) {
             $output->writeln("<error>month must be YYYY-MM, got '$month'</error>");
             return 1;
@@ -45,12 +47,12 @@ class PrecomputeCardStatsCommand extends ContainerAwareCommand {
         $count = max(1, (int) $input->getOption('months'));
 
         for ($i = 0; $i < $count; $i++) {
-            $m = date('Y-m', strtotime("$month-01 -$i month"));
+            $m = date('Y-m', (int) strtotime("$month-01 -$i month"));
             $output->writeln("Computing $m ...");
             foreach ([1, 2, 3] as $step) {
                 $t = microtime(true);
                 $res = $calc->computeCards($m, (string) $step);
-                $payload = json_encode($res);
+                $payload = (string) json_encode($res);
                 $dbh->executeUpdate(
                     "INSERT INTO stat_cards_cache (month, step, payload, computed_at) VALUES (?, ?, ?, NOW())
                      ON DUPLICATE KEY UPDATE payload = VALUES(payload), computed_at = VALUES(computed_at)",

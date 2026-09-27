@@ -36,7 +36,7 @@ class SuggestionsCommandTest extends KernelTestCase {
         $this->connection = static::$kernel->getContainer()->get('doctrine')->getConnection();
         $this->maxDeckId = (int) $this->connection->fetchColumn('SELECT MAX(id) FROM deck');
         $this->file = static::$kernel->getRootDir() . '/../web/suggestions.json';
-        $this->backup = file_exists($this->file) ? file_get_contents($this->file) : null;
+        $this->backup = file_exists($this->file) ? (string) file_get_contents($this->file) : null;
     }
 
     protected function tearDown(): void {
@@ -63,11 +63,12 @@ class SuggestionsCommandTest extends KernelTestCase {
         $this->assertSame("done\n", $tester->getDisplay());
         $this->assertFileExists($this->file);
 
-        return json_decode(file_get_contents($this->file), true);
+        return json_decode((string) file_get_contents($this->file), true);
     }
 
     private function insertDeck(array $cardIds): void {
         $row = $this->connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
+        $this->assertNotFalse($row);
         unset($row['id']);
         $this->connection->insert('deck', ['name' => 'PHPUnit Suggestions'] + $row);
         $id = (int) $this->connection->lastInsertId();

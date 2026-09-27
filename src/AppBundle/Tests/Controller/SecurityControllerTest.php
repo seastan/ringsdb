@@ -30,7 +30,7 @@ class SecurityControllerTest extends WebTestCase {
 
     /**
      * @param mixed $username
-     * @return mixed
+     * @return \AppBundle\Entity\User|null
      */
     private function findUser(Client $client, $username) {
         $em = $client->getContainer()->get('doctrine')->getManager();

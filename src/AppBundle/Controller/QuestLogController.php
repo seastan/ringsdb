@@ -504,7 +504,7 @@ class QuestLogController extends Controller {
             $questlog->setNbDecks(0);
         }
 
-        $name = trim(filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
         $name = substr($name, 0, 250);
         if (empty($name)) {
             $name = "Untitled Questlog";
@@ -514,9 +514,9 @@ class QuestLogController extends Controller {
         $descriptionHtml = $this->get('texts')->markdown($descriptionMd);
 
         $quest = intval(filter_var($request->request->get('quest'), FILTER_SANITIZE_NUMBER_INT));
-        $date = trim(filter_var($request->request->get('date'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
-        $difficulty = trim(filter_var($request->request->get('difficulty'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
-        $victory = trim(filter_var($request->request->get('victory'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $date = trim((string) filter_var($request->request->get('date'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $difficulty = trim((string) filter_var($request->request->get('difficulty'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $victory = trim((string) filter_var($request->request->get('victory'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
         $score = intval(filter_var($request->request->get('score'), FILTER_SANITIZE_NUMBER_INT));
         $public = boolval(filter_var($request->request->get('public'), FILTER_SANITIZE_NUMBER_INT));
 
@@ -562,7 +562,7 @@ class QuestLogController extends Controller {
             for ($i = 1; $i <= 4; $i++) {
                 $deck_id = intval(filter_var($request->request->get("deck".$i."_id"), FILTER_SANITIZE_NUMBER_INT));
                 $is_decklist = filter_var($request->get("deck".$i."_is_decklist"), FILTER_SANITIZE_STRING) == 'true';
-                $player = trim(filter_var($request->get("questlogdeck".$i."_player_name"), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+                $player = trim((string) filter_var($request->get("questlogdeck".$i."_player_name"), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
                 $content = (array) json_decode($request->get("questlogdeck".$i."_content"));
 
                 if ($deck_id) {
@@ -592,7 +592,7 @@ class QuestLogController extends Controller {
 
                         $questlog_deck = new QuestlogDeck();
                         $questlog_deck->setDeck($deck);
-                        $questlog_deck->setContent(json_encode($content));
+                        $questlog_deck->setContent((string) json_encode($content));
                         $questlog_deck->setDeckNumber($i - $skip);
                         $questlog_deck->setQuestlog($questlog);
                         $questlog_deck->setPlayer($player);
@@ -615,7 +615,7 @@ class QuestLogController extends Controller {
                         $questlog_decklist = new QuestlogDeck();
                         $questlog_decklist->setDecklist($decklist);
                         $questlog_decklist->setDeck($decklist->getParent());
-                        $questlog_decklist->setContent(json_encode($content));
+                        $questlog_decklist->setContent((string) json_encode($content));
                         $questlog_decklist->setDeckNumber($i - $skip);
                         $questlog_decklist->setQuestlog($questlog);
                         $questlog_decklist->setPlayer($player);
@@ -637,7 +637,7 @@ class QuestLogController extends Controller {
 
                     // Reference deck was deleted
                     $questlog_deck = new QuestlogDeck();
-                    $questlog_deck->setContent(json_encode($content));
+                    $questlog_deck->setContent((string) json_encode($content));
                     $questlog_deck->setDeckNumber($i - $skip);
                     $questlog_deck->setQuestlog($questlog);
                     $questlog_deck->setPlayer($player);
@@ -947,7 +947,7 @@ class QuestLogController extends Controller {
 
     /**
      * @param mixed $questlog_id
-     * @return mixed
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function octgnexportAction($questlog_id) {
         return $this->downloadFromSelection($questlog_id, true);
@@ -955,7 +955,7 @@ class QuestLogController extends Controller {
 
     /**
      * @param mixed $questlog_id
-     * @return mixed
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function textexportAction($questlog_id) {
         return $this->downloadFromSelection($questlog_id, false);

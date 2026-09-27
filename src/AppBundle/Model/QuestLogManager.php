@@ -85,7 +85,7 @@ class QuestLogManager {
 	}
 
 	/**
-	 * @return mixed
+	 * @return int
 	 */
 	public function getMaxCount() {
 		return $this->maxcount;
@@ -130,7 +130,7 @@ class QuestLogManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findQuestLogsByPopularity() {
         $qb = $this->getQueryBuilder();
@@ -144,7 +144,7 @@ class QuestLogManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findQuestLogsByAge() {
         $qb = $this->getQueryBuilder();
@@ -158,7 +158,7 @@ class QuestLogManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findQuestLogsByRecentDiscussion() {
         $qb = $this->getQueryBuilder();
@@ -173,7 +173,7 @@ class QuestLogManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findQuestLogsByFavorite(User $user) {
         $qb = $this->getQueryBuilder();
@@ -190,7 +190,7 @@ class QuestLogManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findQuestLogsByAuthor(User $user) {
         $qb = $this->getQueryBuilder();
@@ -206,7 +206,7 @@ class QuestLogManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findQuestLogsInHallOfFame() {
         $qb = $this->getQueryBuilder();
@@ -221,7 +221,7 @@ class QuestLogManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findQuestLogsInHotTopic() {
         $qb = $this->getQueryBuilder();
@@ -237,7 +237,7 @@ class QuestLogManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findQuestLogsWithComplexSearch() {
         $request = $this->request_stack->getCurrentRequest();

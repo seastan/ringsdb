@@ -101,6 +101,7 @@ class QuestLogManagerTest extends KernelTestCase {
      */
     private function insertDeck(array $slots) {
         $row = $this->connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
+        $this->assertNotFalse($row);
         unset($row['id']);
         $this->connection->insert('deck', ['name' => 'PHPUnit Deck'] + $row);
         $id = (int) $this->connection->lastInsertId();
@@ -128,7 +129,7 @@ class QuestLogManagerTest extends KernelTestCase {
 
     /**
      * @param mixed $username
-     * @return mixed
+     * @return \AppBundle\Entity\User|null
      */
     private function user($username) {
         return static::$kernel->getContainer()->get('doctrine')->getRepository('AppBundle:User')->findOneBy(['username' => $username]);

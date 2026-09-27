@@ -122,9 +122,10 @@ class BuilderController extends Controller {
         if (function_exists("finfo_open")) {
             // return mime type ala mimetype extension
             $finfo = finfo_open(FILEINFO_MIME);
+            $mime = $finfo !== false ? (string) finfo_file($finfo, $filename) : '';
 
             // check to see if the mime-type starts with 'text'
-            $is_text = substr(finfo_file($finfo, $filename), 0, 4) == 'text' || substr(finfo_file($finfo, $filename), 0, 15) == "application/xml";
+            $is_text = substr($mime, 0, 4) == 'text' || substr($mime, 0, 15) == "application/xml";
             if (!$is_text) {
                 throw new UnprocessableEntityHttpException("Bad file");
             }
@@ -244,11 +245,13 @@ class BuilderController extends Controller {
         $sideoctgnids = [];
 
         $cardcrawler = $crawler->filter('deck > section[name!="Sideboard"] > card');
+        /** @var \DOMElement $domElement */
         foreach ($cardcrawler as $domElement) {
             $octgnids[$domElement->getAttribute('id')] = intval($domElement->getAttribute('qty'));
         }
 
         $cardcrawler = $crawler->filter('deck > section[name="Sideboard"] > card');
+        /** @var \DOMElement $domElement */
         foreach ($cardcrawler as $domElement) {
             $sideoctgnids[$domElement->getAttribute('id')] = intval($domElement->getAttribute('qty'));
         }
@@ -256,6 +259,7 @@ class BuilderController extends Controller {
         // read desc
         $desccrawler = $crawler->filter('deck > notes');
         $descriptions = [];
+        /** @var \DOMElement $domElement */
         foreach ($desccrawler as $domElement) {
             $descriptions[] = $domElement->nodeValue;
         }
@@ -707,7 +711,7 @@ class BuilderController extends Controller {
     }
 
     /**
-     * @return mixed
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function octgnexportListAction(Request $request) {
         $list_id = $request->get('ids');
@@ -716,7 +720,7 @@ class BuilderController extends Controller {
     }
 
     /**
-     * @return mixed
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function textexportListAction(Request $request) {
         $list_id = $request->get('ids');
@@ -803,9 +807,10 @@ class BuilderController extends Controller {
         if (function_exists("finfo_open")) {
             // return mime type ala mimetype extension
             $finfo = finfo_open(FILEINFO_MIME);
+            $mime = $finfo !== false ? (string) finfo_file($finfo, $filename) : '';
 
             // check to see if the mime-type is 'zip'
-            if (substr(finfo_file($finfo, $filename), 0, 15) !== 'application/zip') {
+            if (substr($mime, 0, 15) !== 'application/zip') {
                 throw new UnprocessableEntityHttpException("Bad file");
             }
         }
@@ -814,7 +819,7 @@ class BuilderController extends Controller {
         $res = $zip->open($filename);
         if ($res === true) {
             for ($i = 0; $i < $zip->numFiles; $i++) {
-                $name = $zip->getNameIndex($i);
+                $name = (string) $zip->getNameIndex($i);
 
                 if (pathinfo($name, PATHINFO_EXTENSION) == 'o8d') {
                     $parse = $this->parseOctgnImport($zip->getFromIndex($i));
@@ -874,7 +879,7 @@ class BuilderController extends Controller {
             /* @var $change \AppBundle\Entity\Deckchange */
             $change = new Deckchange();
             $change->setDeck($deck);
-            $change->setVariation(json_encode($diff));
+            $change->setVariation((string) json_encode($diff));
             $change->setIsSaved(false);
             $em->persist($change);
             $em->flush();

@@ -97,7 +97,7 @@ class DecklistManager {
 	}
 
 	/**
-	 * @return mixed
+	 * @return int
 	 */
 	public function getMaxCount() {
 		return $this->maxcount;
@@ -143,7 +143,7 @@ class DecklistManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findDecklistsByPopularity() {
         $qb = $this->getQueryBuilder();
@@ -157,7 +157,7 @@ class DecklistManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findDecklistsByAge() {
         $qb = $this->getQueryBuilder();
@@ -171,7 +171,7 @@ class DecklistManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findDecklistsByRecentDiscussion() {
         $qb = $this->getQueryBuilder();
@@ -185,7 +185,7 @@ class DecklistManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findDecklistsByFavorite(User $user) {
         $qb = $this->getQueryBuilder();
@@ -202,7 +202,7 @@ class DecklistManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findDecklistsByAuthor(User $user) {
         $qb = $this->getQueryBuilder();
@@ -218,7 +218,7 @@ class DecklistManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findDecklistsInHallOfFame() {
         $qb = $this->getQueryBuilder();
@@ -233,7 +233,7 @@ class DecklistManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findDecklistsInHotTopic() {
         $qb = $this->getQueryBuilder();
@@ -249,7 +249,7 @@ class DecklistManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findDecklistsWithComplexSearch() {
         $request = $this->request_stack->getCurrentRequest();

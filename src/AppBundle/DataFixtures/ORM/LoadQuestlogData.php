@@ -60,7 +60,7 @@ class LoadQuestlogData extends AbstractFixture implements DependentFixtureInterf
             $questlog_decklist = new QuestlogDeck();
             $questlog_decklist->setDecklist($decklist);
             $questlog_decklist->setDeck($decklist->getParent());
-            $questlog_decklist->setContent(json_encode($decklist->getContent()));
+            $questlog_decklist->setContent((string) json_encode($decklist->getContent()));
             $questlog_decklist->setDeckNumber($i);
             $questlog_decklist->setQuestlog($questlog);
             $questlog_decklist->setPlayer('Player ' . $i);

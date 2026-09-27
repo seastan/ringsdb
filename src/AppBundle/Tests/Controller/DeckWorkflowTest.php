@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  * keep seeing the fixtures only.
  */
 class DeckWorkflowTest extends WebTestCase {
+    use \AppBundle\Tests\TemporaryFileTrait;
+
     /** @var int[] */
     private $deckIds = [];
 
@@ -61,7 +63,7 @@ class DeckWorkflowTest extends WebTestCase {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\DBAL\Connection
      */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
@@ -452,9 +454,9 @@ class DeckWorkflowTest extends WebTestCase {
         $client = $this->createAuthenticatedClient();
         $maxId = $this->maxDeckId($client);
 
-        $path = tempnam(sys_get_temp_dir(), 'import');
+        $path = self::temporaryFile('import');
         file_put_contents($path, $fileContent);
-        $file = new UploadedFile($path, $filename, 'text/plain', filesize($path), null, true);
+        $file = new UploadedFile($path, $filename, 'text/plain', (int) filesize($path), null, true);
         $client->request('POST', '/deck/fileimport', ['type' => 'auto'], ['upfile' => $file]);
         unlink($path);
 
@@ -500,9 +502,9 @@ class DeckWorkflowTest extends WebTestCase {
         $export = $client->getResponse()->getContent();
         $maxId = $this->maxDeckId($client);
 
-        $path = tempnam(sys_get_temp_dir(), 'import');
+        $path = self::temporaryFile('import');
         file_put_contents($path, $export);
-        $file = new UploadedFile($path, 'PHPUnit Roundtrip.txt', 'text/plain', filesize($path), null, true);
+        $file = new UploadedFile($path, 'PHPUnit Roundtrip.txt', 'text/plain', (int) filesize($path), null, true);
         $client->request('POST', '/deck/fileimport', ['type' => 'auto'], ['upfile' => $file]);
         unlink($path);
 
@@ -533,7 +535,7 @@ class DeckWorkflowTest extends WebTestCase {
      * Copy a decklist into a new deck (GET /deck/copy/{decklist_id}, "Copy" button of the
      * decklist toolbar). Returns the new deck id.
      * @param mixed $decklistId
-     * @return mixed
+     * @return int
      */
     private function copyDecklist(Client $client, $decklistId) {
         $maxId = $this->maxDeckId($client);
@@ -592,6 +594,7 @@ class DeckWorkflowTest extends WebTestCase {
         $location = $client->getResponse()->headers->get('Location');
         $this->assertRegExp('#^/decklist/view/\d+/phpunitdwarvesremix-1\.0$#', $location);
         $decklist = $this->db($client)->fetchAssoc('SELECT id, name, parent_deck_id, precedent_decklist_id FROM decklist WHERE parent_deck_id = ?', [$deckId]);
+        $this->assertNotFalse($decklist);
         $this->assertSame(['PHPUnit Dwarves Remix', (string) $deckId, '1'], [$decklist['name'], $decklist['parent_deck_id'], $decklist['precedent_decklist_id']]);
         $this->assertSame($edited, $this->fetchSlots($client, 'decklistslot', 'decklist_id', $decklist['id']));
 

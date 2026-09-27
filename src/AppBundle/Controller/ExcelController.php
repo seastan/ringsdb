@@ -22,7 +22,7 @@ class ExcelController extends Controller {
 	}
 
 	/**
-	 * @return mixed
+	 * @return \Symfony\Component\HttpFoundation\StreamedResponse
 	 */
 	public function downloadProcessAction(Request $request) {
 		$ignoredFields = ['id', 'dateCreation', 'dateUpdate'];
@@ -209,6 +209,7 @@ class ExcelController extends Controller {
 					$associationMapping = $associationMappings[$colName];
 
 					$associationRepository = $em->getRepository($associationMapping['targetEntity']);
+					/** @var \AppBundle\Entity\Type|\AppBundle\Entity\Sphere|null $associationEntity */
 					$associationEntity = $associationRepository->findOneBy(['name' => $value]);
 					if (!$associationEntity) {
 						throw new \Exception("cannot find entity [$colName] of name [$value]");
@@ -221,7 +222,7 @@ class ExcelController extends Controller {
 					}
 				} else {
 					if (in_array($colName, $fieldNames)) {
-						$type = $metaData->getTypeOfField($colName);
+						$type = $metaData->getTypeOfField((string) $colName);
 						if ($type === 'boolean') {
 							$value = (boolean)$value;
 						}

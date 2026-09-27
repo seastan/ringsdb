@@ -69,6 +69,7 @@ class CardStatsCalculatorTest extends KernelTestCase {
      */
     private function insertDeck(array $values, array $main, array $side = []) {
         $row = $this->connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
+        $this->assertNotFalse($row);
         unset($row['id']);
         $this->connection->insert('deck', $values + ['last_pack_id' => self::WAR_OF_DALE, 'problem' => null] + $row);
         $id = (int) $this->connection->lastInsertId();
@@ -88,6 +89,7 @@ class CardStatsCalculatorTest extends KernelTestCase {
      */
     private function insertDecklist(array $values, array $main) {
         $row = $this->connection->fetchAssoc('SELECT * FROM decklist WHERE id = 2');
+        $this->assertNotFalse($row);
         unset($row['id']);
         $this->connection->insert('decklist', $values + ['last_pack_id' => self::WAR_OF_DALE] + $row);
         $id = (int) $this->connection->lastInsertId();
@@ -230,7 +232,7 @@ class CardStatsCalculatorTest extends KernelTestCase {
     /* ----------------------------------------------------------- command */
 
     /**
-     * @return array<int, int|string>
+     * @return array{int, string}
      */
     private function runCommand(array $input) {
         $application = new Application(static::$kernel);

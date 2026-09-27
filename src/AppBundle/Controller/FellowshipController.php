@@ -302,7 +302,7 @@ class FellowshipController extends Controller {
             $fellowship->setNbDecks(0);
         }
 
-        $name = trim(filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = "Untitled Fellowship";
@@ -392,6 +392,8 @@ class FellowshipController extends Controller {
             $fellowship->setNbDecks($nb_decks);
         }
 
+        // BUG, pinned by the tests (see MIGRATION.md, "Fellowships"): a collection is never empty()
+        /** @phpstan-ignore-next-line */
         if ($auto_publish && empty($fellowship->getDecks())) {
             $fellowship->setIsPublic(true);
             $fellowship->setDatePublish(new \DateTime());
@@ -481,7 +483,7 @@ class FellowshipController extends Controller {
             ];
 
             $this_content = json_encode($content);
-            $this_signature = md5($this_content);
+            $this_signature = md5((string) $this_content);
 
             $old_decklists = $this->getDoctrine()->getRepository('AppBundle:Decklist')->findBy([ 'signature' => $this_signature ]);
 
@@ -542,7 +544,7 @@ class FellowshipController extends Controller {
             return $this->redirect($this->generateUrl('fellowship_view', [ 'fellowship_id' => $fellowship->getId() ]));
         }
 
-        $name = trim(filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = "Untitled Fellowship";
@@ -901,7 +903,7 @@ class FellowshipController extends Controller {
 
     /**
      * @param mixed $fellowship_id
-     * @return mixed
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function octgnexportAction($fellowship_id) {
         return $this->downloadFromSelection($fellowship_id, true);
@@ -909,7 +911,7 @@ class FellowshipController extends Controller {
 
     /**
      * @param mixed $fellowship_id
-     * @return mixed
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function textexportAction($fellowship_id) {
         return $this->downloadFromSelection($fellowship_id, false);

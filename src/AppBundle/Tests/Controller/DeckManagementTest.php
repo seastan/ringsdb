@@ -17,6 +17,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * everything is removed or restored in tearDown().
  */
 class DeckManagementTest extends WebTestCase {
+    use \AppBundle\Tests\TemporaryFileTrait;
+
     /** @var int[] */
     private $maxIds = [];
     /** @var array */
@@ -60,7 +62,7 @@ class DeckManagementTest extends WebTestCase {
     /* ------------------------------------------------------------ helpers */
 
     /**
-     * @return mixed
+     * @return \Doctrine\DBAL\Connection
      */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
@@ -87,6 +89,7 @@ class DeckManagementTest extends WebTestCase {
     private function insertDeck(Client $client, $name, array $values = []) {
         $connection = $this->db($client);
         $row = $connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
+        $this->assertNotFalse($row);
         unset($row['id']);
         $connection->insert('deck', $values + ['name' => $name] + $row);
         $id = (int) $connection->lastInsertId();
@@ -392,7 +395,7 @@ class DeckManagementTest extends WebTestCase {
      * @return \Symfony\Component\HttpFoundation\Response|null
      */
     private function uploadArchive(Client $client, array $entries) {
-        $file = tempnam(sys_get_temp_dir(), 'archive');
+        $file = self::temporaryFile('archive');
         $zip = new \ZipArchive();
         $zip->open($file, \ZipArchive::OVERWRITE);
         foreach ($entries as $name => $content) {
@@ -400,7 +403,7 @@ class DeckManagementTest extends WebTestCase {
         }
         $zip->close();
 
-        $client->request('POST', '/deck/import/all', [], ['uparchive' => new \Symfony\Component\HttpFoundation\File\UploadedFile($file, 'decks.zip', null, filesize($file), null, true)]);
+        $client->request('POST', '/deck/import/all', [], ['uparchive' => new \Symfony\Component\HttpFoundation\File\UploadedFile($file, 'decks.zip', null, (int) filesize($file), null, true)]);
         unlink($file);
 
         return $client->getResponse();
@@ -452,10 +455,10 @@ class DeckManagementTest extends WebTestCase {
 
     public function testImportSomethingElseThanAnArchive(): void {
         $client = $this->createAuthenticatedClient();
-        $file = tempnam(sys_get_temp_dir(), 'archive');
+        $file = self::temporaryFile('archive');
         file_put_contents($file, "1x Aragorn\n");
 
-        $client->request('POST', '/deck/import/all', [], ['uparchive' => new \Symfony\Component\HttpFoundation\File\UploadedFile($file, 'decks.zip', null, filesize($file), null, true)]);
+        $client->request('POST', '/deck/import/all', [], ['uparchive' => new \Symfony\Component\HttpFoundation\File\UploadedFile($file, 'decks.zip', null, (int) filesize($file), null, true)]);
         unlink($file);
 
         $this->assertSame(422, $client->getResponse()->getStatusCode());

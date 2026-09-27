@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  * The cards of the Core Set, and any card created, are restored / deleted in tearDown().
  */
 class AdminExcelTest extends WebTestCase {
+    use \AppBundle\Tests\TemporaryFileTrait;
+
     const HEADER = ['type', 'sphere', 'position', 'code', 'name', 'traits', 'text', 'flavor', 'isUnique', 'cost', 'threat',
         'willpower', 'attack', 'defense', 'health', 'victory', 'quest', 'deckLimit', 'hasErrata'];
 
@@ -49,7 +51,7 @@ class AdminExcelTest extends WebTestCase {
     /* ------------------------------------------------------------ helpers */
 
     /**
-     * @return mixed
+     * @return \Doctrine\DBAL\Connection
      */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
@@ -78,7 +80,7 @@ class AdminExcelTest extends WebTestCase {
         $content = ob_get_clean();
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $file = tempnam(sys_get_temp_dir(), 'excel') . '.xlsx';
+        $file = self::temporaryFile('excel') . '.xlsx';
         $this->files[] = $file;
         file_put_contents($file, $content);
 
@@ -91,8 +93,8 @@ class AdminExcelTest extends WebTestCase {
      */
     private function upload(Client $client, $file, array $parameters = []) {
         ob_start();
-        $client->request('POST', '/admin/excel/upload', $parameters, ['upfile' => new UploadedFile($file, 'cards.xlsx', null, filesize($file), null, true)]);
-        $report = ob_get_clean();
+        $client->request('POST', '/admin/excel/upload', $parameters, ['upfile' => new UploadedFile($file, 'cards.xlsx', null, (int) filesize($file), null, true)]);
+        $report = (string) ob_get_clean();
 
         return [$client->getResponse()->getContent(), strip_tags(str_replace(['</h4>', '</p>'], [': ', '; '], $report))];
     }
@@ -114,8 +116,6 @@ class AdminExcelTest extends WebTestCase {
         $sheet = $excel->getActiveSheet();
         foreach ($changes as $row => $values) {
             foreach ($values as $column => $value) {
-                // PHPExcel documents the column index as a string, it is an int
-                /** @phpstan-ignore-next-line */
                 $sheet->setCellValueExplicitByColumnAndRow((int) array_search($column, self::HEADER), $row, $value,
                     is_int($value) ? \PHPExcel_Cell_DataType::TYPE_NUMERIC : \PHPExcel_Cell_DataType::TYPE_STRING);
             }

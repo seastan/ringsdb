@@ -141,7 +141,7 @@ class ApiController extends Controller {
 
         // build the response
         /* @var $card \AppBundle\Entity\Card */
-        $card = $this->get('cards_data')->getCardInfo($card, true, "en");
+        $card = $this->get('cards_data')->getCardInfo($card, true);
 
         $content = json_encode($card);
         if (isset($jsonp)) {
@@ -218,7 +218,7 @@ class ApiController extends Controller {
         $cards = [];
         /* @var $card \AppBundle\Entity\Card */
         foreach ($list_cards as $card) {
-            $cards[] = $this->get('cards_data')->getCardInfo($card, true, "en");
+            $cards[] = $this->get('cards_data')->getCardInfo($card, true);
         }
 
         $content = json_encode($cards);
@@ -304,7 +304,7 @@ class ApiController extends Controller {
                 return $response;
             }
             for ($rowindex = 0; $rowindex < count($rows); $rowindex++) {
-                $card = $this->get('cards_data')->getCardInfo($rows[$rowindex], true, "en");
+                $card = $this->get('cards_data')->getCardInfo($rows[$rowindex], true);
                 $cards[] = $card;
             }
         }
@@ -446,7 +446,7 @@ class ApiController extends Controller {
         $cardRepo = $em->getRepository('AppBundle:Card');
         $userRepo = $em->getRepository('AppBundle:User');
 
-        $decklists = json_decode(json_encode($decklists), true);
+        $decklists = json_decode((string) json_encode($decklists), true);
         foreach ($decklists as &$decklist) {
             $decklist['heroes_details'] = [];
             $username = '';
@@ -691,7 +691,7 @@ class ApiController extends Controller {
                 return $response;
             }
             for ($rowindex = 0; $rowindex < count($rows); $rowindex++) {
-                $card = $this->get('cards_data')->getCardInfo($rows[$rowindex], true, "en");
+                $card = $this->get('cards_data')->getCardInfo($rows[$rowindex], true);
                 $cards[] = $card;
             }
         }

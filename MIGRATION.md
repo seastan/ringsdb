@@ -522,6 +522,8 @@ access rule, the `/oauth/v2/*` and `/api/oauth2/*` routes (`routing.yml`, `routi
 `AppBundle:Security:login.html.twig` (only used by the `oauth_server_auth_login*` routes), the 4
 entities and their mappings, and the `oauth2_*` tables.
 
+`Oauth2Controller` and `CreateClientCommand` are excluded from phpstan until then.
+
 ## Quest logs
 
 Covered by `src/AppBundle/Tests/Controller/QuestlogWorkflowTest.php`. The deck picker fills the
@@ -878,6 +880,9 @@ Decisions needed before removing:
   and an OCTGN id `mapping` of the reprints, probably used by the external report that consumes
   them (see "Card statistics").
 
+`UpdateOctgnCommand` still uses a `Faction` entity (ThronesDB) and `Card::setOctgnid()`, which no
+longer exist: it cannot run. It is excluded from phpstan, with `ScrapOctgnCardDataCommand`.
+
 ## Card search
 
 Covered by `src/AppBundle/Tests/Controller/CardSearchTest.php` (public API
@@ -907,6 +912,9 @@ removed before the migration so that it does not have to be ported:
   user and of the whole site. Their routes were reused for the user admin panel on 2016-04-01
   (commit `497ccf27`); the admin pages `/admin/user/comments/{user_id}`
   (`UserAdminController::commentsAction`) replace them.
+- `app:twig` (`TwigCacheCommand`): called `Twig_Environment::getCacheFilename()`, removed in
+  Twig 2, so it crashed (found by phpstan).
+- `Decklist::$is_simple_export` and its accessors: never used.
 - `AppBundle\DQL\BinaryFunction` and the `BINARY(c.name) LIKE '%SOG%'` condition of the acronym
   search (`CardsData`, name search): a case-sensitive search of the acronym in the name, which
   matches no RingsDB card (no card name has 2 capitals in a row). The initials condition

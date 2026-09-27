@@ -33,7 +33,7 @@ class FixSignaturesCommand extends ContainerAwareCommand {
                 'side' => $decklist->getSideslots()->getContent(),
             ];
             $this_content = json_encode($content);
-            $this_signature = md5($this_content);
+            $this_signature = md5((string) $this_content);
 
             if ($this_signature !== $decklist->getSignature()) {
                 $decklist->setSignature($this_signature);

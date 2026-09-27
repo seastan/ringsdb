@@ -50,12 +50,12 @@ class UserCustomPack {
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getId() { return $this->id; }
 
     /**
-     * @return mixed
+     * @return \AppBundle\Entity\User
      */
     public function getUser() { return $this->user; }
     /**
@@ -65,7 +65,7 @@ class UserCustomPack {
     public function setUser($user) { $this->user = $user; return $this; }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getName() { return $this->name; }
     /**
@@ -75,7 +75,7 @@ class UserCustomPack {
     public function setName($name) { $this->name = $name; return $this; }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getCode() { return $this->code; }
     /**
@@ -85,7 +85,7 @@ class UserCustomPack {
     public function setCode($code) { $this->code = $code; return $this; }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getIsEnabled() { return $this->isEnabled; }
     /**
@@ -95,7 +95,7 @@ class UserCustomPack {
     public function setIsEnabled($isEnabled) { $this->isEnabled = (bool)$isEnabled; return $this; }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getIsPublished() { return $this->isPublished; }
     /**
@@ -105,7 +105,7 @@ class UserCustomPack {
     public function setIsPublished($isPublished) { $this->isPublished = (bool)$isPublished; return $this; }
 
     /**
-     * @return mixed
+     * @return \DateTime
      */
     public function getCreatedAt() { return $this->createdAt; }
     /**
@@ -115,7 +115,7 @@ class UserCustomPack {
     public function setCreatedAt($createdAt) { $this->createdAt = $createdAt; return $this; }
 
     /**
-     * @return mixed
+     * @return \DateTime
      */
     public function getUpdatedAt() { return $this->updatedAt; }
     /**
@@ -125,7 +125,7 @@ class UserCustomPack {
     public function setUpdatedAt($updatedAt) { $this->updatedAt = $updatedAt; return $this; }
 
     /**
-     * @return mixed
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getCards() { return $this->cards; }
 

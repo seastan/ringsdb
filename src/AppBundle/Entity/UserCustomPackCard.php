@@ -22,12 +22,12 @@ class UserCustomPackCard {
     private $quantity = 1;
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getId() { return $this->id; }
 
     /**
-     * @return mixed
+     * @return \AppBundle\Entity\UserCustomPack
      */
     public function getCustomPack() { return $this->customPack; }
     /**
@@ -36,7 +36,7 @@ class UserCustomPackCard {
     public function setCustomPack(UserCustomPack $customPack) { $this->customPack = $customPack; return $this; }
 
     /**
-     * @return mixed
+     * @return \AppBundle\Entity\Card
      */
     public function getCard() { return $this->card; }
     /**
@@ -45,7 +45,7 @@ class UserCustomPackCard {
     public function setCard(Card $card) { $this->card = $card; return $this; }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getQuantity() { return $this->quantity; }
     /**

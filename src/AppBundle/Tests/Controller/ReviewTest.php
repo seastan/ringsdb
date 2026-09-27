@@ -33,7 +33,9 @@ class ReviewTest extends WebTestCase {
         foreach (['review', 'reviewcomment'] as $table) {
             $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
         }
-        $this->fixtureReview = $connection->fetchAssoc('SELECT * FROM review WHERE id = 1');
+        $review = $connection->fetchAssoc('SELECT * FROM review WHERE id = 1');
+        $this->assertNotFalse($review);
+        $this->fixtureReview = $review;
         $this->fixtureUsers = $connection->fetchAll('SELECT id, reputation, roles FROM user');
     }
 
@@ -56,7 +58,7 @@ class ReviewTest extends WebTestCase {
     /* ------------------------------------------------------------ helpers */
 
     /**
-     * @return mixed
+     * @return \Doctrine\DBAL\Connection
      */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();

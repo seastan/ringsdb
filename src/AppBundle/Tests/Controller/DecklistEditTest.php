@@ -57,7 +57,7 @@ class DecklistEditTest extends WebTestCase {
     /* ------------------------------------------------------------ helpers */
 
     /**
-     * @return mixed
+     * @return \Doctrine\DBAL\Connection
      */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
@@ -92,6 +92,7 @@ class DecklistEditTest extends WebTestCase {
     private function insertDecklist(Client $client, $name, array $values = []) {
         $connection = $this->db($client);
         $row = $connection->fetchAssoc('SELECT * FROM decklist WHERE id = 2');
+        $this->assertNotFalse($row);
         unset($row['id']);
         $connection->insert('decklist', $values + ['name' => $name] + $row);
         $id = (int) $connection->lastInsertId();
@@ -266,6 +267,7 @@ class DecklistEditTest extends WebTestCase {
         $id = $this->insertDecklist($client, 'PHPUnit To Delete', ['precedent_decklist_id' => 1]);
         $successor = $this->insertDecklist($client, 'PHPUnit Successor', ['precedent_decklist_id' => $id]);
         $deck = $this->db($client)->fetchAssoc('SELECT * FROM deck WHERE id = 3');
+        $this->assertNotFalse($deck);
         unset($deck['id']);
         $this->db($client)->insert('deck', ['name' => 'PHPUnit Child', 'parent_decklist_id' => $id] + $deck);
         $child = (int) $this->db($client)->lastInsertId();

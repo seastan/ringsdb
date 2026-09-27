@@ -55,7 +55,7 @@ class AdminWriteTest extends WebTestCase {
     /* ------------------------------------------------------------ helpers */
 
     /**
-     * @return mixed
+     * @return \Doctrine\DBAL\Connection
      */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
@@ -198,8 +198,10 @@ class AdminWriteTest extends WebTestCase {
         $form = $crawler->filter('form[action="/admin/scenario/create"]')->form(self::prefixed('appbundle_scenario', [
             'code' => 'PHPUnit Scenario', 'name' => 'PHPUnit Scenario', 'position' => '999', 'pack' => '1',
         ]));
-        $form['appbundle_scenario[encounters]'][0]->tick();
-        $form['appbundle_scenario[encounters]'][2]->tick();
+        /** @var \Symfony\Component\DomCrawler\Field\ChoiceFormField[] $encounters */
+        $encounters = $form['appbundle_scenario[encounters]'];
+        $encounters[0]->tick();
+        $encounters[2]->tick();
         $client->submit($form);
 
         $id = (int) explode('/', $client->getResponse()->headers->get('Location'))[3];
@@ -319,12 +321,14 @@ class AdminWriteTest extends WebTestCase {
         $connection = $this->db($client);
         // a copy of decklist 1, derived from it, with a deck copied from the copy
         $row = $connection->fetchAssoc('SELECT * FROM decklist WHERE id = 1');
+        $this->assertNotFalse($row);
         unset($row['id']);
         $connection->insert('decklist', ['name' => 'PHPUnit Copy', 'precedent_decklist_id' => null] + $row);
         $copyId = (int) $connection->lastInsertId();
         $connection->insert('decklist', ['name' => 'PHPUnit Successor', 'precedent_decklist_id' => $copyId] + $row);
         $successorId = (int) $connection->lastInsertId();
         $deck = $connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
+        $this->assertNotFalse($deck);
         unset($deck['id']);
         $connection->insert('deck', ['name' => 'PHPUnit Child', 'parent_decklist_id' => $copyId] + $deck);
         $childId = (int) $connection->lastInsertId();

@@ -82,7 +82,7 @@ class SocialController extends Controller {
             'side' => $deck->getSideslots()->getContent(),
         ];
 
-        $new_content = json_encode($content);
+        $new_content = (string) json_encode($content);
         $new_signature = md5($new_content);
         $old_decklists = $this->getDoctrine()->getRepository('AppBundle:Decklist')->findBy([ 'signature' => $new_signature ]);
 
@@ -248,7 +248,7 @@ class SocialController extends Controller {
             throw $this->createAccessDeniedException("Access denied");
         }
 
-        $name = trim(filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = "Untitled";

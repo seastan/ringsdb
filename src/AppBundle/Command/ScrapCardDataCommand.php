@@ -28,6 +28,8 @@ function file_get_contents_retry($url, $attemptsRemaining = 3) {
 }
 
 class ScrapCardDataCommand extends ContainerAwareCommand {
+    use StringInputTrait;
+
 
     /**
      * @return void
@@ -60,10 +62,10 @@ class ScrapCardDataCommand extends ContainerAwareCommand {
         /* @var $allTypes \AppBundle\Entity\Type[] */
         $allTypes = $em->getRepository('AppBundle:Type')->findAll();
         
-        $filename = $input->getArgument('filename');
+        $filename = self::stringArgument($input, 'filename');
         
         $file = file_get_contents("http://www.cardgamedb.com/deckbuilders/thelordoftherings/database/$filename.jgz");
-        if(!preg_match('/^cardsHero = (.*);$/', $file, $matches)) {
+        if(!preg_match('/^cardsHero = (.*);$/', (string) $file, $matches)) {
           $output->writeln("<error>Error while parsing js file</error>");
         }
 
@@ -131,7 +133,7 @@ class ScrapCardDataCommand extends ContainerAwareCommand {
 
           $position = intval($data['num']);
           
-          $text = $data['text'];
+          $text = (string) $data['text'];
           $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', '\'', '\''], $text);
           $text = str_replace(['<br />'], ["\n"], $text);
           $text = preg_replace('/<SPAN  style="font-weight: bold" >([^<]+)<\/SPAN>/', '<b>\\1</b>', $text);
@@ -140,7 +142,7 @@ class ScrapCardDataCommand extends ContainerAwareCommand {
           $text = str_replace("</b>: ", ":</b> ", $text);
           $text = preg_replace("/ +/", " ", $text);
           $text = preg_replace("/\n+/", "\n", $text);
-          $text = trim($text);
+          $text = trim((string) $text);
 
 
           $card = new Card();

@@ -16,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 class WebsiteBrowsingTest extends WebTestCase {
     use PageSnapshotTrait;
+    use \AppBundle\Tests\TemporaryFileTrait;
 
     /* ------------------------------------------------------------ helpers */
 
@@ -354,10 +355,11 @@ class WebsiteBrowsingTest extends WebTestCase {
         $this->assertSame(200, $response->getStatusCode(), "GET $uri");
         $this->assertSame('application/zip', $response->headers->get('Content-Type'));
 
-        $file = tempnam(sys_get_temp_dir(), 'zip');
+        $file = self::temporaryFile('zip');
         file_put_contents($file, $response->getContent());
         $zip = new \ZipArchive();
-        $this->assertTrue($zip->open($file));
+        // true, or an error code
+        $this->assertSame(true, $zip->open($file));
         $actual = [];
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $actual[$zip->getNameIndex($i)] = $zip->getFromIndex($i);

@@ -234,7 +234,7 @@ class Pack {
     /**
      * Get dateRelease
      *
-     * @return \DateTime
+     * @return \DateTime|null
      */
     public function getDateRelease() {
         return $this->dateRelease;
@@ -295,7 +295,7 @@ class Pack {
     /**
      * Get cycle
      *
-     * @return \AppBundle\Entity\Cycle
+     * @return \AppBundle\Entity\Cycle|null
      */
     public function getCycle() {
         return $this->cycle;

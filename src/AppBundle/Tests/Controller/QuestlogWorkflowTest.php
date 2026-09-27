@@ -69,7 +69,7 @@ class QuestlogWorkflowTest extends WebTestCase {
     /* ------------------------------------------------------------ helpers */
 
     /**
-     * @return mixed
+     * @return \Doctrine\DBAL\Connection
      */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
@@ -112,7 +112,7 @@ class QuestlogWorkflowTest extends WebTestCase {
 
     /**
      * @param string $uri
-     * @return array<int, \Symfony\Component\DomCrawler\Crawler|\Symfony\Component\DomCrawler\Form>
+     * @return array{\Symfony\Component\DomCrawler\Crawler, \Symfony\Component\DomCrawler\Form}
      */
     private function newForm(Client $client, $uri = '/questlog/new/0/0/0/0/0') {
         $crawler = $client->request('GET', $uri);
@@ -225,7 +225,9 @@ class QuestlogWorkflowTest extends WebTestCase {
 
         $deck3 = $this->deckContent($client, 3);
         $form['victory'] = 'yes';
-        $form['public']->tick();
+        /** @var \Symfony\Component\DomCrawler\Field\ChoiceFormField $public */
+        $public = $form['public'];
+        $public->tick();
         $form['questlogdeck3_player_name'] = 'Carol';
         self::selectDecks($form, [1 => [1, false, $deck1], 3 => [3, true, $deck3]]);
         $client->submit($form);

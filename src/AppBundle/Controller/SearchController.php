@@ -415,12 +415,10 @@ class SearchController extends Controller {
             $first += 1;
 
             // si on a des cartes on affiche une bande de navigation/pagination
-            if (count($rows)) {
-                if (count($rows) == 1) {
-                    $pagination = $this->setnavigation($rows[0], $selected_pack_code);
-                } else {
-                    $pagination = $this->pagination($nb_per_page, count($rows), $first, $q, $view, $sort);
-                }
+            if (count($rows) == 1) {
+                $pagination = $this->setnavigation($rows[0], $selected_pack_code);
+            } else {
+                $pagination = $this->pagination($nb_per_page, count($rows), $first, $q, $view, $sort);
             }
 
             // si on est en vue "short" on casse la liste par tri

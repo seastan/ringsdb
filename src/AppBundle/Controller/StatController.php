@@ -398,7 +398,7 @@ ON c.cycle = u.cycle";
 	}
 
 	/**
-	 * @return mixed
+	 * @return array
 	 */
 	function getPacks() {
 		$dbh = $this->getDoctrine()->getConnection();
@@ -430,7 +430,7 @@ ORDER BY date_release";
 	}
 
 	/**
-	 * @return mixed
+	 * @return array
 	 */
 	function getQuests() {
 		$dbh = $this->getDoctrine()->getConnection();

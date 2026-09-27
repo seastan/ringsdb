@@ -286,7 +286,7 @@ class CustomPackController extends Controller {
 
     /**
      * @param mixed $id
-     * @return object|null
+     * @return \AppBundle\Entity\UserCustomPack|null
      */
     private function loadOwnedPack($id) {
         $pack = $this->getDoctrine()
@@ -308,7 +308,7 @@ class CustomPackController extends Controller {
         $cardRepo = $this->getDoctrine()->getRepository('AppBundle:Card');
         $seen = [];
         foreach ($cardEntries as $entry) {
-            $code = isset($entry['card_code']) ? preg_replace('/[^0-9]/', '', $entry['card_code']) : '';
+            $code = isset($entry['card_code']) ? (string) preg_replace('/[^0-9]/', '', $entry['card_code']) : '';
             $qty = isset($entry['quantity']) ? (int)$entry['quantity'] : 1;
             if ($code === '' || $qty < 1 || $qty > 9 || isset($seen[$code])) {
                 continue;

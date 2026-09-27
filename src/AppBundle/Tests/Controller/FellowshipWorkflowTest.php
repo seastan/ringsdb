@@ -87,7 +87,7 @@ class FellowshipWorkflowTest extends WebTestCase {
     /* ------------------------------------------------------------ helpers */
 
     /**
-     * @return mixed
+     * @return \Doctrine\DBAL\Connection
      */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
@@ -235,6 +235,7 @@ class FellowshipWorkflowTest extends WebTestCase {
 
         // deck 1 was published as a new decklist, the fellowship now only references decklists
         $newDecklist = $this->db($client)->fetchAssoc('SELECT id, name, version FROM decklist WHERE id > ? AND parent_deck_id = 1', [$this->maxIds['decklist']]);
+        $this->assertNotFalse($newDecklist);
         $this->assertSame(['Dwarf Lore/Leadership/Tactics', '2.0'], [$newDecklist['name'], $newDecklist['version']]);
         $this->assertSame([1 => 'decklist:' . $newDecklist['id'], 2 => 'decklist:3'], $this->fetchFellowshipDecks($client, $id));
 
@@ -350,6 +351,7 @@ class FellowshipWorkflowTest extends WebTestCase {
         $cloneId = (int) substr($decks[1], strlen('deck:'));
         $this->assertGreaterThan($this->maxIds['deck'], $cloneId);
         $clone = $this->db($client)->fetchAssoc('SELECT d.name, u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$cloneId]);
+        $this->assertNotFalse($clone);
         $this->assertSame(['Dwarf Lore/Leadership/Tactics', 'admin'], [$clone['name'], $clone['username']]);
     }
 

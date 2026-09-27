@@ -71,7 +71,7 @@ class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
             $json = file_get_contents("http://hallofbeorn.com/Export/Cards");
             file_put_contents('beorn.json', $json);
         }
-        $beorn = json_decode($json);
+        $beorn = json_decode((string) $json);
 
         $i = 0;
         foreach ($beorn as $data) {

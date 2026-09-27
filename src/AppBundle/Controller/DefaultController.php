@@ -203,7 +203,9 @@ class DefaultController extends Controller {
                     continue;
                 }
             }
-            $all_comments[] = $comment;
+            if ($comment) {
+                $all_comments[] = $comment;
+            }
         }
         // Recent fellowship comments
         $fellowship_manager->setLimit($num_comments);
@@ -224,7 +226,9 @@ class DefaultController extends Controller {
                     continue;
                 }
             }
-            $all_comments[] = $comment;
+            if ($comment) {
+                $all_comments[] = $comment;
+            }
         }
         // Get recent card reviews
         $dql = "SELECT DISTINCT r FROM AppBundle:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC, r.id DESC";
@@ -241,7 +245,9 @@ class DefaultController extends Controller {
                 $comment['dateCreation'] = $review->getDateCreation();
                 $comment['text'] = $review->getTextHtml();
             }
-            $all_comments[] = $comment;
+            if ($comment) {
+                $all_comments[] = $comment;
+            }
         }
         // Recent review comments
         $em = $this->getDoctrine()->getManager();
@@ -264,7 +270,9 @@ class DefaultController extends Controller {
                     continue;
                 }
             }
-            $all_comments[] = $comment;
+            if ($comment) {
+                $all_comments[] = $comment;
+            }
         }
 
         // Sort all comments by date
@@ -291,7 +299,7 @@ class DefaultController extends Controller {
                 foreach ($body->childNodes as $child) {
                     $mock->appendChild($mock->importNode($child, true));
                 }
-                $text = trim($mock->saveHTML());
+                $text = trim((string) $mock->saveHTML());
                 $text = preg_replace('/\n$/','',$text);
             }
             $all_comments[$i]['text'] = $text;

@@ -13,6 +13,8 @@ use Symfony\Component\VarDumper\VarDumper;
 
 
 class ScrapBeornCardDataCommand extends ContainerAwareCommand {
+    use StringInputTrait;
+
 
     /**
      * @return void
@@ -68,7 +70,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
         $allSpheres = $em->getRepository('AppBundle:Sphere')->findAll();
         $allTypes = $em->getRepository('AppBundle:Type')->findAll();
 
-        $setname = $input->getArgument('beornset');
+        $setname = self::stringArgument($input, 'beornset');
         $skip = (int) $input->getOption('skip');
         $forceData = $input->getOption('force-data');
         $forceImage = $input->getOption('force-image');
@@ -180,7 +182,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
                 if ($c->filter('img')->count() > 0) {
                     $sphere = basename($c->filter('img')->attr('src'), '.png');
-		    $sphere = substr( $sphere, 0, strrpos( $sphere, '-' ) );
+		    $sphere = substr( $sphere, 0, (int) strrpos( $sphere, '-' ) );
                 } else {
                     $sphere = 'Neutral';
                 }

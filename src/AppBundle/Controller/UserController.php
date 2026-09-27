@@ -277,6 +277,7 @@ class UserController extends Controller {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function remindAction($username) {
+        /** @var \AppBundle\Entity\User|null $user */
         $user = $this->get('fos_user.user_manager')->findUserByUsername($username);
         if (!$user) {
             throw new NotFoundHttpException("Cannot find user from username [$username]");

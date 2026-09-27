@@ -44,7 +44,7 @@ class DecklistCommentTest extends WebTestCase {
     /* ------------------------------------------------------------ helpers */
 
     /**
-     * @return mixed
+     * @return \Doctrine\DBAL\Connection
      */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
@@ -118,6 +118,7 @@ class DecklistCommentTest extends WebTestCase {
         ]], $this->newComments($client));
 
         $decklist = $this->db($client)->fetchAssoc('SELECT nb_comments, date_update, date_last_comment FROM decklist WHERE id = 1');
+        $this->assertNotFalse($decklist);
         $this->assertSame('2', $decklist['nb_comments']);
         $this->assertSame($decklist['date_update'], $decklist['date_last_comment']);
         $this->assertGreaterThan('2015-08-16 00:00:00', $decklist['date_update']);

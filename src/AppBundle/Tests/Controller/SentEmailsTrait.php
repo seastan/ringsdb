@@ -14,8 +14,10 @@ trait SentEmailsTrait {
      * @return \Swift_Message[]
      */
     private function sentMessages(Client $client) {
+        $profile = $client->getProfile();
+        self::assertNotFalse($profile, 'the profiler is not enabled');
         /** @var MessageDataCollector $collector */
-        $collector = $client->getProfile()->getCollector('swiftmailer');
+        $collector = $profile->getCollector('swiftmailer');
 
         return $collector->getMessages();
     }

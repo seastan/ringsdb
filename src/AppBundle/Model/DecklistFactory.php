@@ -75,7 +75,7 @@ class DecklistFactory {
             'main' => $deck->getSlots()->getContent(),
             'side' => $deck->getSideslots()->getContent(),
         ];
-        $new_content = json_encode($content);
+        $new_content = (string) json_encode($content);
         $new_signature = md5($new_content);
 
         $decklist = new Decklist();

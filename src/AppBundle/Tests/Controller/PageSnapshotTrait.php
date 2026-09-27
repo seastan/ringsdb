@@ -25,6 +25,7 @@ trait PageSnapshotTrait {
         });
 
         $lines = [];
+        /** @var \DOMNode $textNode */
         foreach ($crawler->filterXPath('//body//text()') as $textNode) {
             $line = trim(preg_replace('/\s+/u', ' ', $textNode->nodeValue));
             if ($line !== '') {

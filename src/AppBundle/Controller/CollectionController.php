@@ -133,8 +133,8 @@ class CollectionController extends Controller {
             return new Response(json_encode(['success' => false, 'error' => 'not logged in']), 403, ['Content-Type' => 'application/json']);
         }
 
-        $cardCode = preg_replace('/[^0-9]/', '', $request->get('card_code'));
-        $packCode = preg_replace('/[^A-Za-z0-9_-]/', '', $request->get('pack_code'));
+        $cardCode = (string) preg_replace('/[^0-9]/', '', $request->get('card_code'));
+        $packCode = (string) preg_replace('/[^A-Za-z0-9_-]/', '', $request->get('pack_code'));
         if (!$cardCode) {
             return new Response(json_encode(['success' => false, 'error' => 'missing card_code']), 400, ['Content-Type' => 'application/json']);
         }

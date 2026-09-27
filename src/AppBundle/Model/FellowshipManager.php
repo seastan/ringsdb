@@ -85,7 +85,7 @@ class FellowshipManager {
 	}
 
 	/**
-	 * @return mixed
+	 * @return int
 	 */
 	public function getMaxCount() {
 		return $this->maxcount;
@@ -130,7 +130,7 @@ class FellowshipManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findFellowshipsByPopularity() {
         $qb = $this->getQueryBuilder();
@@ -144,7 +144,7 @@ class FellowshipManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findFellowshipsByAge() {
         $qb = $this->getQueryBuilder();
@@ -158,7 +158,7 @@ class FellowshipManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findFellowshipsByRecentDiscussion() {
         $qb = $this->getQueryBuilder();
@@ -173,7 +173,7 @@ class FellowshipManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findFellowshipsByFavorite(User $user) {
         $qb = $this->getQueryBuilder();
@@ -190,7 +190,7 @@ class FellowshipManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findFellowshipsByAuthor(User $user) {
         $qb = $this->getQueryBuilder();
@@ -206,7 +206,7 @@ class FellowshipManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findFellowshipsInHallOfFame() {
         $qb = $this->getQueryBuilder();
@@ -221,7 +221,7 @@ class FellowshipManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findFellowshipsInHotTopic() {
         $qb = $this->getQueryBuilder();
@@ -237,7 +237,7 @@ class FellowshipManager {
     }
 
     /**
-     * @return mixed
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function findFellowshipsWithComplexSearch() {
         $request = $this->request_stack->getCurrentRequest();

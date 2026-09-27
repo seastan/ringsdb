@@ -57,7 +57,7 @@ class DeckCompareTest extends WebTestCase {
     /* ------------------------------------------------------------ helpers */
 
     /**
-     * @return mixed
+     * @return \Doctrine\DBAL\Connection
      */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
@@ -84,6 +84,7 @@ class DeckCompareTest extends WebTestCase {
     private function insertDeck($name, array $main, array $side) {
         $connection = $this->db(static::createClient());
         $row = $connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
+        $this->assertNotFalse($row);
         unset($row['id']);
         $connection->insert('deck', ['name' => $name] + $row);
         $id = (int) $connection->lastInsertId();

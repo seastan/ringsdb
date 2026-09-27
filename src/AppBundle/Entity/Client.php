@@ -13,7 +13,7 @@ class Client extends BaseClient {
     protected $name;
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getName() {
         return $this->name;

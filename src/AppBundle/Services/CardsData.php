@@ -78,7 +78,7 @@ class CardsData {
 
 		return implode(array_map(function($l) {
 			return "<p>$l</p>";
-		}, preg_split('/[\r?\n]+/', $text)));
+		}, preg_split('/[\r?\n]+/', $text) ?: []));
 	}
 
 	/**
