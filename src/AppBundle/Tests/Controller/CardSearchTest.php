@@ -8,9 +8,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * Card search by name (CardsData::get_search_rows), through the public API
  * (/api/public/cards/search/{q}) and the site search (/find?q=...).
  *
- * A term in capitals (2 letters or more) is also searched as an acronym: case-sensitively in the
- * name (BINARY, AppBundle\DQL\BinaryFunction), and as the initials of the words of the name, dashes
- * counting as spaces (REPLACE, AppBundle\DQL\ReplaceFunction).
+ * A term in capitals (2 letters or more) is also searched as an acronym: the initials of the words
+ * of the name, dashes counting as spaces (REPLACE, AppBundle\DQL\ReplaceFunction).
  */
 class CardSearchTest extends WebTestCase {
 

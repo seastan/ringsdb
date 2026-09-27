@@ -722,14 +722,13 @@ Covered by `src/AppBundle/Tests/Controller/CardSearchTest.php` (public API
 `/api/public/cards/search/{q}` and site search `/find`).
 
 - Fixed: a search term in capitals (2 letters or more) is also searched as an acronym
-  (`CardsData`, name search): case-sensitively in the name (`BINARY(...)`,
-  `AppBundle\DQL\BinaryFunction`) and as the initials of the words, dashes counting as spaces
+  (`CardsData`, name search): as the initials of the words, dashes counting as spaces
   (`REPLACE(c.name, '-', ' ') LIKE 'S% O% G%'`, `AppBundle\DQL\ReplaceFunction`). The `replace`
   DQL function had never been registered (since the conversion from ThronesDB), so every such
   search failed with a `500` ("Expected known function, got 'REPLACE'"). Registered in
   `config.yml`: "SOG" finds "Steward of Gondor" (and "Soldier of Gondor"), "LOS" "Longbeard Orc
   Slayer".
-- The custom DQL functions (`binary`, `replace`, `power`) are MySQL-specific; Doctrine ORM 2.x
+- The custom DQL functions (`replace`, `power`) are MySQL-specific; Doctrine ORM 2.x
   has no built-in equivalent (DoctrineExtensions provides them).
 
 ## Removed dead code
@@ -746,6 +745,10 @@ removed before the migration so that it does not have to be ported:
   user and of the whole site. Their routes were reused for the user admin panel on 2016-04-01
   (commit `497ccf27`); the admin pages `/admin/user/comments/{user_id}`
   (`UserAdminController::commentsAction`) replace them.
+- `AppBundle\DQL\BinaryFunction` and the `BINARY(c.name) LIKE '%SOG%'` condition of the acronym
+  search (`CardsData`, name search): a case-sensitive search of the acronym in the name, which
+  matches no RingsDB card (no card name has 2 capitals in a row). The initials condition
+  (`REPLACE`) finds all the results.
 
 ## After the migration
 
