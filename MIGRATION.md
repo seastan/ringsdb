@@ -173,6 +173,10 @@ field). Everything the tests create is deleted in `tearDown()`.
 - An invalid deck cannot be published: the publish form redirects to the deck page with a
   flash error.
 - Another user's deck cannot be edited, saved, or published (`403`).
+- Deck comparison (`/deck/compare/{deck1}/{deck2}`, `DeckCompareTest`): cards in common with
+  the minimum quantity, then what is left in each deck, for heroes, draw deck and sideboard;
+  the decks are not modified (the slots are detached before `Diff::getSlotsDiff()` changes them);
+  another user's decks require them to share their decks.
 - `GET /deck/copy/{decklist_id}` copies a decklist into a new deck (version 0.1) whose parent is
   the decklist; publishing that deck creates a decklist whose predecessor is the original one
   ("Derived from" / "Inspiration for").
@@ -403,13 +407,17 @@ GET page as the fixture `admin` (ROLE_ADMIN): text snapshots in
 printing lists (1300+ rows), JSON snapshots for the statistics (`?month=2015-08`, in
 `snapshots/api/admin/`).
 
+The Excel export / import is covered by `src/AppBundle/Tests/Controller/AdminExcelTest.php`, by
+round trip: download a pack (or all the cards), change the file with PHPExcel, upload it back
+(field and association changes, card creation only with `create`, unknown association).
+
 The write forms are covered by `src/AppBundle/Tests/Controller/AdminWriteTest.php`, on records
 created by the test only: the generated CRUD of the 8 reference entities (create → show,
 edit → edit, delete → list, through the real forms, CSRF tokens included), scenario encounters,
 card force delete, user search, comment hide/delete, decklist delete. Not covered yet: the card
 image upload (unused, see below), the scenario import command
 (`/admin/command/`, downloads from hallofbeorn.com unless a custom JSON is given) and the
-Excel / CSV imports.
+CSV import.
 
 ### Pending: import tests, waiting for sample files
 
@@ -423,9 +431,6 @@ To be written once representative files are available (to be stored under
   victory, quest, quantity, deckLimit, illustrator, octgnid, hasErrata`. Creates or renames the
   pack (new packs go to the `ALeP` cycle, or the last one), creates or updates cards and
   printings. Needed: a real CSV for a new pack, and one updating an existing pack.
-- **Excel import** (`POST /admin/excel/upload`, `ExcelController`, PHPExcel): file `upfile`,
-  first row = column names, then one card per row. Answers "N cards changed or added". Needed: a
-  real file (ideally one produced by `/admin/excel/download`, to test the round trip).
 - **Scenario import** (`POST /admin/command/`, `command=scenario`,
   `ScrapBeornScenarioDataCommand`): downloads `http://hallofbeorn.com/LotR/ScenarioDetails/...`
   unless `customjson` is given. Needed: a saved Hall of Beorn scenario JSON, so the test never
@@ -446,6 +451,16 @@ To be written once representative files are available (to be stored under
 - `/admin/stat` and `/admin/stat_packs` default to last month (`date()`): the tests pass a month.
   `/admin/stat_cards` reads `stat_cards_cache`, filled by the `app:stats:precompute-cards` cron,
   and answers `503` when it is empty.
+- Excel import: the card texts are stored with CRLF line endings, the Excel file gives them back
+  with LF, so uploading an unchanged download "changes" every card with a line break in its text
+  or flavor (292 cards; their `date_update` changes too). An unknown type / sphere name stops the
+  import with a generic exception (`500`, nothing saved). The upload `echo`es its report before
+  returning its response.
+- The Excel download is a `StreamedResponse`: Symfony's `StreamedResponseListener` sends it as
+  soon as the controller returns it, so the test client gets an empty body (the tests capture it
+  with an output buffer). The export file names come from `slugify()`, which drops the spaces
+  (`lotrlcgcards.xlsx`).
+- PHPExcel (`liuggio/ExcelBundle`) is abandoned: replace it with PhpSpreadsheet.
 - Moderation actions are GET routes that write: `/admin/user/toggle_locked/{id}`,
   `/admin/decklist/delete/{id}`, `/admin/comment/toggle_hidden/{id}`,
   `/admin/comment/delete/{id}`.
