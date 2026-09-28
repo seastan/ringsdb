@@ -38,12 +38,45 @@ friendsofsymfony/user-bundle:
 - 3.1.0 requires symfony/security-bundle: ^4.4 || ^5.0 || ^6.0
 - 4.0.0 requires symfony/security-bundle: ^6.4 || ^7.0
 
+symfony/framework-bundle:
+- 5.4.0 requires php: >=7.2.5
+- 6.0.0 requires php: >=8.0.2
+- 6.1.0 requires php: >=8.1
+- 6.2.0 requires php: >=8.1
+- 6.3.0 requires php: >=8.1
+- 6.4.0 requires php: >=8.1
+- 7.0.0 requires php: >=8.2
+- 7.1.0 requires php: >=8.2
+- 7.2.0 requires php: >=8.2
+- 7.3.0 requires php: >=8.2
+- 7.4.0 requires php: >=8.2
+- 8.0.0 requires php: >=8.4
+- 8.1.0 requires php: >=8.4.1
+
 1. Symfony 3.0
 2. Doctrine ORM 2.13
-3. PHP 7.4
+3. PHP 7.4 (local; prod is already there)
 4. composer 2.10
 4. phpstan/phpstan 2.2
 5. phpoffice/phpspreadsheet 1.30
 6. Symfony 3.4
 7. doctrine/doctrine-bundle 1.12
 8. DEPLOYMENT TO PRODUCTION : PHP 7.4, Symfony 3.4
+9. Symfony 4.0
+9. Symfony 4.4
+10. Symfony 5.0
+10. Symfony 5.4
+14. DEPLOYMENT TO PRODUCTION : PHP 7.4, Symfony 5.4
+12. PHP 8.4
+15. Remove friendsofsymfony/user-bundle
+14. DEPLOYMENT TO PRODUCTION : PHP 8.4, Symfony 5.4
+13. Symfony 6.0
+12. PHP 8.1
+11. Symfony 6.4
+12. PHP 8.2
+11. Symfony 7.0
+11. Symfony 7.4
+15. PHP 8.4
+12. Symfony 8.0
+12. Symfony 8.1
+14. DEPLOYMENT TO PRODUCTION : PHP 8.4, Symfony 8.1

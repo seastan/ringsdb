@@ -1,6 +1,7 @@
 -- RingsDB bootstrap dump
 -- Full schema for all tables (structure only) + reference data for card/set/cycle/printing tables.
--- Contains NO user data (no users, decks, decklists, comments, votes, oauth, etc.).
+-- Contains NO user data (no users, decks, decklists, comments, votes, etc.).
+-- The oauth2_* tables of the removed OAuth2 server were taken out of the dump.
 -- Generated: 2026-09-25T04:21:13Z from ringsdb.com prod DB.
 -- Restore into an empty database, e.g.: mysql <dbname> < ringsdb_bootstrap.sql
 
@@ -406,74 +407,6 @@ CREATE TABLE `follow` (
   KEY `IDX_68344470AC24F853` (`follower_id`),
   CONSTRAINT `FK_683444701816E3A3` FOREIGN KEY (`following_id`) REFERENCES `user` (`id`),
   CONSTRAINT `FK_68344470AC24F853` FOREIGN KEY (`follower_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `oauth2_access_token`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `oauth2_access_token` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `client_id` int DEFAULT NULL,
-  `user_id` int DEFAULT NULL,
-  `token` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `expires_at` int DEFAULT NULL,
-  `scope` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `UNIQ_454D96735F37A13B` (`token`),
-  KEY `IDX_454D967319EB6921` (`client_id`),
-  KEY `IDX_454D9673A76ED395` (`user_id`),
-  CONSTRAINT `FK_454D967319EB6921` FOREIGN KEY (`client_id`) REFERENCES `oauth2_client` (`id`),
-  CONSTRAINT `FK_454D9673A76ED395` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `oauth2_auth_code`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `oauth2_auth_code` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `client_id` int DEFAULT NULL,
-  `user_id` int DEFAULT NULL,
-  `token` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `redirect_uri` longtext CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `expires_at` int DEFAULT NULL,
-  `scope` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `UNIQ_1D2905B55F37A13B` (`token`),
-  KEY `IDX_1D2905B519EB6921` (`client_id`),
-  KEY `IDX_1D2905B5A76ED395` (`user_id`),
-  CONSTRAINT `FK_1D2905B519EB6921` FOREIGN KEY (`client_id`) REFERENCES `oauth2_client` (`id`),
-  CONSTRAINT `FK_1D2905B5A76ED395` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `oauth2_client`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `oauth2_client` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `random_id` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `redirect_uris` longtext CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL COMMENT '(DC2Type:array)',
-  `secret` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `allowed_grant_types` longtext CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL COMMENT '(DC2Type:array)',
-  `name` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `oauth2_refresh_token`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `oauth2_refresh_token` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `client_id` int DEFAULT NULL,
-  `user_id` int DEFAULT NULL,
-  `token` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `expires_at` int DEFAULT NULL,
-  `scope` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `UNIQ_4DD907325F37A13B` (`token`),
-  KEY `IDX_4DD9073219EB6921` (`client_id`),
-  KEY `IDX_4DD90732A76ED395` (`user_id`),
-  CONSTRAINT `FK_4DD9073219EB6921` FOREIGN KEY (`client_id`) REFERENCES `oauth2_client` (`id`),
-  CONSTRAINT `FK_4DD90732A76ED395` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `pack`;

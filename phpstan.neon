@@ -3,11 +3,9 @@ parameters:
     paths:
         - src
     excludePaths:
-        # to be removed before the migration (MIGRATION.md: "OCTGN features", "OAuth2 server")
+        # to be removed before the migration (MIGRATION.md: "OCTGN features")
         - src/AppBundle/Command/ScrapOctgnCardDataCommand.php
         - src/AppBundle/Command/UpdateOctgnCommand.php
-        - src/AppBundle/Command/CreateClientCommand.php
-        - src/AppBundle/Controller/Oauth2Controller.php
     ignoreErrors:
         # PHPExcel documents the column and row indexes as strings, they are ints
         - '#^Parameter \#[12] \$p(Column|Row) of method PHPExcel_Worksheet::\w+\(\) expects string, int(<0, max>)? given\.$#'
