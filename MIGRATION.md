@@ -73,7 +73,7 @@ Each removal reduces what has to be ported.
 
 ## 4. Open test gaps
 
-- CSV import and scenario import: waiting for sample files (see "Admin area").
+- Scenario import: waiting for a sample file (see "Admin area").
 - `app/Resources/FOSUserBundle/views/Registration/checkEmail.html.twig`: probably ignored by
   FOSUserBundle 2.0 (not verified, see "Removing FOSUserBundle").
 - The merging of reprints by `source_code()` in the card statistics (see "Card statistics").
@@ -616,22 +616,41 @@ The write forms are covered by `src/AppBundle/Tests/Controller/AdminWriteTest.ph
 created by the test only: the generated CRUD of the 8 reference entities (create → show,
 edit → edit, delete → list, through the real forms, CSRF tokens included), scenario encounters,
 card force delete, user search, comment hide/delete, decklist delete. Not covered yet: the card
-image upload (unused, see below), the scenario import command
-(`/admin/command/`, downloads from hallofbeorn.com unless a custom JSON is given) and the
-CSV import.
+image upload (unused, see below) and the scenario import command (`/admin/command/`, downloads
+from hallofbeorn.com unless a custom JSON is given).
 
-### Pending: import tests, waiting for sample files
+The Excel import is also tested with a download made in production
+(`src/AppBundle/Tests/Resources/fixtures/import/core-set.xlsx`), and the CSV import by
+`src/AppBundle/Tests/Controller/AdminCsvTest.php`, with the CSV of the ALeP pack "The Hobbit"
+(`fixtures/import/alep-the-hobbit.csv`, 21 cards, already in the database): upload of an
+unchanged pack, of a new pack, cards missing from the CSV, renaming with the old code, a CSV
+without cards. The samples are stored without line ending conversion (`.gitattributes`): the
+CSV import tells the rows (CRLF) from the line breaks of the texts (LF).
 
-To be written once representative files are available (to be stored under
-`src/AppBundle/Tests/Resources/fixtures/`):
+### CSV import (`POST /admin/csv/upload`, `CSVController`)
 
-- **CSV import** (`POST /admin/csv/upload`, `CSVController`): fields `code`, `old_code`, `name`
-  (the pack) and the file `upfile`. Header line + one card per line, in the format produced by
-  `BeornJSONtoRingsDBcsv.py` from a Hall of Beorn JSON export: `pack, type, sphere, position,
-  code, name, traits, text, flavor, isUnique, cost, threat, willpower, attack, defense, health,
-  victory, quest, quantity, deckLimit, illustrator, octgnid, hasErrata`. Creates or renames the
-  pack (new packs go to the `ALeP` cycle, or the last one), creates or updates cards and
-  printings. Needed: a real CSV for a new pack, and one updating an existing pack.
+Fields `code`, `old_code`, `name` (the pack) and the file `upfile`. Header line + one card per
+line, in the format produced by `BeornJSONtoRingsDBcsv.py` from a Hall of Beorn JSON export:
+`pack, type, sphere, position, code, name, traits, text, flavor, isUnique, cost, threat,
+willpower, attack, defense, health, victory, quest, quantity, deckLimit, illustrator, octgnid,
+hasErrata`. Pinned by `AdminCsvTest`:
+
+- The pack is found by code, then by old code (it is then renamed); otherwise it is created in
+  the `ALeP` cycle, or the last one as there is no such cycle, released on 2030-02-01.
+- The printings are found by `octgnid` in the pack; otherwise the card is found by code (a
+  reprint: new printing of the existing card) or created.
+- The cards of the pack missing from the CSV are not deleted: their name is prefixed with
+  "[deleted]" and their code gets a unique suffix.
+- BUG, not fixed: the card fields of the CSV (code, position, texts...) are written to the
+  canonical card, even when the printing is a reprint. Uploading "The Hobbit" again gives Beorn
+  (card 131005, from another pack) the code, position, text and flavor of its ALeP printing
+  (503991). The card-level fields should only be written when the card was created by the
+  import, or the printing is its first one.
+- Only the rows ending with CRLF are rows: a CSV saved with LF line endings is read as a single
+  row ("No cards found in the CSV file").
+
+### Pending: scenario import test, waiting for a sample file
+
 - **Scenario import** (`POST /admin/command/`, `command=scenario`,
   `ScrapBeornScenarioDataCommand`): downloads `http://hallofbeorn.com/LotR/ScenarioDetails/...`
   unless `customjson` is given. Needed: a saved Hall of Beorn scenario JSON, so the test never
