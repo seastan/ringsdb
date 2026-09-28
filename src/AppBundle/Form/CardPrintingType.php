@@ -5,7 +5,9 @@ namespace AppBundle\Form;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class CardPrintingType extends AbstractType {
     /**
@@ -15,9 +17,9 @@ class CardPrintingType extends AbstractType {
         $filterPack = $options['filter_pack'];
 
         $builder
-            ->add('card', 'entity', array(
+            ->add('card', EntityType::class, array(
                 'class'         => 'AppBundle:Card',
-                'property'      => 'adminLabel',
+                'choice_label'  => 'adminLabel',
                 'query_builder' => function(EntityRepository $er) use ($filterPack) {
                     $qb = $er->createQueryBuilder('c')
                         ->join('c.sphere', 's')
@@ -31,14 +33,14 @@ class CardPrintingType extends AbstractType {
                     return $qb;
                 },
             ))
-            ->add('pack', 'entity', array('class' => 'AppBundle:Pack', 'property' => 'name'))
+            ->add('pack', EntityType::class, array('class' => 'AppBundle:Pack', 'choice_label' => 'name'))
             ->add('position')
             ->add('quantity')
             ->add('imageCode')
             ->add('illustrator', null, array('required' => false))
             ->add('octgnid', null, array('required' => false))
             ->add('traits', null, array('required' => false, 'label' => 'Traits override (leave blank = use card value)'))
-            ->add('text', 'textarea', array('required' => false, 'label' => 'Text override (leave blank = use card value)'))
+            ->add('text', TextareaType::class, array('required' => false, 'label' => 'Text override (leave blank = use card value)'))
             ->add('cost', null, array('required' => false, 'label' => 'Cost override'))
             ->add('threat', null, array('required' => false, 'label' => 'Threat override'))
             ->add('willpower', null, array('required' => false, 'label' => 'Willpower override'))
@@ -52,14 +54,14 @@ class CardPrintingType extends AbstractType {
     /**
      * @return void
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver) {
+    public function configureOptions(OptionsResolver $resolver) {
         $resolver->setDefaults([
             'data_class'  => 'AppBundle\Entity\CardPrinting',
             'filter_pack' => null,
         ]);
     }
 
-    public function getName() {
+    public function getBlockPrefix() {
         return 'appbundle_cardprintingtype';
     }
 }

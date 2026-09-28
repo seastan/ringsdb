@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use AppBundle\Entity\CardPrinting;
 use AppBundle\Form\CardPrintingType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class CardPrintingController extends Controller {
 
@@ -73,7 +74,7 @@ class CardPrintingController extends Controller {
         $em         = $this->getDoctrine()->getManager();
         $filterPack = $this->resolveFilterPack($request, $em);
         $entity     = new CardPrinting();
-        $form       = $this->createForm(new CardPrintingType(), $entity, ['filter_pack' => $filterPack]);
+        $form       = $this->createForm(CardPrintingType::class, $entity, ['filter_pack' => $filterPack]);
 
         return $this->render('AppBundle:CardPrinting:new.html.twig', [
             'entity'      => $entity,
@@ -90,7 +91,7 @@ class CardPrintingController extends Controller {
         $em         = $this->getDoctrine()->getManager();
         $filterPack = $this->resolveFilterPack($request, $em);
         $entity     = new CardPrinting();
-        $form       = $this->createForm(new CardPrintingType(), $entity, ['filter_pack' => $filterPack]);
+        $form       = $this->createForm(CardPrintingType::class, $entity, ['filter_pack' => $filterPack]);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
@@ -121,7 +122,7 @@ class CardPrintingController extends Controller {
         }
 
         $filterPack = $this->resolveFilterPack($request, $em);
-        $editForm   = $this->createForm(new CardPrintingType(), $entity, ['filter_pack' => $filterPack, 'method' => 'PUT']);
+        $editForm   = $this->createForm(CardPrintingType::class, $entity, ['filter_pack' => $filterPack, 'method' => 'PUT']);
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('AppBundle:CardPrinting:edit.html.twig', [
@@ -147,7 +148,7 @@ class CardPrintingController extends Controller {
 
         $filterPack = $this->resolveFilterPack($request, $em);
         $deleteForm = $this->createDeleteForm($id);
-        $editForm   = $this->createForm(new CardPrintingType(), $entity, ['filter_pack' => $filterPack, 'method' => 'PUT']);
+        $editForm   = $this->createForm(CardPrintingType::class, $entity, ['filter_pack' => $filterPack, 'method' => 'PUT']);
         $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
@@ -207,7 +208,7 @@ class CardPrintingController extends Controller {
      */
     private function createDeleteForm($id) {
         return $this->createFormBuilder(['id' => $id])
-            ->add('id', 'hidden')
+            ->add('id', HiddenType::class)
             ->setMethod('DELETE')
             ->getForm();
     }

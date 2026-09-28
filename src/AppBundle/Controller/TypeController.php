@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use AppBundle\Entity\Type;
 use AppBundle\Form\TypeType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 /**
  * Type controller.
@@ -60,7 +61,7 @@ class TypeController extends Controller {
      * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createCreateForm(Type $entity) {
-        $form = $this->createForm(new TypeType(), $entity, [
+        $form = $this->createForm(TypeType::class, $entity, [
             'action' => $this->generateUrl('admin_type_create'),
             'method' => 'POST',
         ]);
@@ -139,12 +140,12 @@ class TypeController extends Controller {
      * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createEditForm(Type $entity) {
-        $form = $this->createForm(new TypeType(), $entity, [
+        $form = $this->createForm(TypeType::class, $entity, [
             'action' => $this->generateUrl('admin_type_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
         ]);
 
-        $form->add('submit', 'submit', ['label' => 'Update']);
+        $form->add('submit', SubmitType::class, ['label' => 'Update']);
 
         return $form;
     }

@@ -4,7 +4,8 @@ namespace AppBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 class CycleType extends AbstractType {
     /**
@@ -15,21 +16,21 @@ class CycleType extends AbstractType {
             ->add('code')
             ->add('name')
             ->add('position')
-            ->add('isBox', 'checkbox', array('required'  => false))
-            ->add('isSaga', 'checkbox', array('required'  => false))
+            ->add('isBox', CheckboxType::class, array('required'  => false))
+            ->add('isSaga', CheckboxType::class, array('required'  => false))
         ;
     }
 
     /**
      * @return void
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver) {
+    public function configureOptions(OptionsResolver $resolver) {
         $resolver->setDefaults([
             'data_class' => 'AppBundle\Entity\Cycle'
         ]);
     }
 
-    public function getName() {
+    public function getBlockPrefix() {
         return 'appbundle_cycletype';
     }
 }

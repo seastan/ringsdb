@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use AppBundle\Entity\Encounter;
 use AppBundle\Form\EncounterType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 /**
  * Encounter controller.
@@ -35,7 +36,7 @@ class EncounterController extends Controller {
      */
     public function createAction(Request $request) {
         $entity = new Encounter();
-        $form = $this->createForm(new EncounterType(), $entity);
+        $form = $this->createForm(EncounterType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
@@ -59,7 +60,7 @@ class EncounterController extends Controller {
      */
     public function newAction() {
         $entity = new Encounter();
-        $form = $this->createForm(new EncounterType(), $entity);
+        $form = $this->createForm(EncounterType::class, $entity);
 
         return $this->render('AppBundle:Encounter:new.html.twig', array(
             'entity' => $entity,
@@ -105,7 +106,7 @@ class EncounterController extends Controller {
             throw $this->createNotFoundException('Unable to find Encounter entity.');
         }
 
-        $editForm = $this->createForm(new EncounterType(), $entity, ['method' => 'PUT']);
+        $editForm = $this->createForm(EncounterType::class, $entity, ['method' => 'PUT']);
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('AppBundle:Encounter:edit.html.twig', [
@@ -131,7 +132,7 @@ class EncounterController extends Controller {
         }
 
         $deleteForm = $this->createDeleteForm($id);
-        $editForm = $this->createForm(new EncounterType(), $entity, ['method' => 'PUT']);
+        $editForm = $this->createForm(EncounterType::class, $entity, ['method' => 'PUT']);
         $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
@@ -182,7 +183,7 @@ class EncounterController extends Controller {
      */
     private function createDeleteForm($id) {
         return $this->createFormBuilder(array('id' => $id))
-            ->add('id', 'hidden')
+            ->add('id', HiddenType::class)
             ->setMethod('DELETE')
             ->getForm();
     }

@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use AppBundle\Entity\Sphere;
 use AppBundle\Form\SphereType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 /**
  * Sphere controller.
@@ -61,7 +62,7 @@ class SphereController extends Controller {
      * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createCreateForm(Sphere $entity) {
-        $form = $this->createForm(new SphereType(), $entity, array(
+        $form = $this->createForm(SphereType::class, $entity, array(
             'action' => $this->generateUrl('admin_sphere_create'),
             'method' => 'POST',
         ));
@@ -140,12 +141,12 @@ class SphereController extends Controller {
     * @return \Symfony\Component\Form\FormInterface The form
     */
     private function createEditForm(Sphere $entity) {
-        $form = $this->createForm(new SphereType(), $entity, array(
+        $form = $this->createForm(SphereType::class, $entity, array(
             'action' => $this->generateUrl('admin_sphere_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));
 
-        $form->add('submit', 'submit', array('label' => 'Update'));
+        $form->add('submit', SubmitType::class, array('label' => 'Update'));
 
         return $form;
     }

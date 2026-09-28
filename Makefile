@@ -42,3 +42,6 @@ phpstan:
 	docker compose exec -it -u www-data symfony php bin/simple-phpunit install
 	docker compose exec -it -u www-data symfony php app/console cache:warmup --env=test
 	docker compose exec -it -u www-data symfony php bin/phpstan
+
+deprecations:
+	docker compose exec -it -u www-data -e SYMFONY_DEPRECATIONS_HELPER=verbose=max[total]=999999 symfony php bin/simple-phpunit
