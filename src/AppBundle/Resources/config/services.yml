@@ -25,7 +25,7 @@ services:
 
     cards_data:
         class: AppBundle\Services\CardsData
-        arguments: ["@doctrine", "@request_stack", "@router", "@templating.helper.assets", "%kernel.root_dir%"]
+        arguments: ["@doctrine", "@router", "@templating.helper.assets", "%kernel.root_dir%"]
 
     app.card_stats:
         class: AppBundle\Stats\CardStatsCalculator
@@ -34,7 +34,7 @@ services:
     decklist_manager:
         class: AppBundle\Model\DecklistManager
         shared: false
-        arguments: ["@doctrine.orm.entity_manager", "@request_stack", "@router", "@logger"]
+        arguments: ["@doctrine.orm.entity_manager", "@request_stack", "@router"]
 
     decklist_factory:
         class: AppBundle\Model\DecklistFactory
@@ -51,9 +51,9 @@ services:
     fellowship_manager:
         class: AppBundle\Model\FellowshipManager
         shared: false
-        arguments: ["@doctrine.orm.entity_manager", "@request_stack", "@router", "@logger"]
+        arguments: ["@doctrine.orm.entity_manager", "@request_stack", "@router"]
 
     questlog_manager:
         class: AppBundle\Model\QuestLogManager
         shared: false
-        arguments: ["@doctrine.orm.entity_manager", "@request_stack", "@router", "@logger"]
+        arguments: ["@doctrine.orm.entity_manager", "@request_stack", "@router"]

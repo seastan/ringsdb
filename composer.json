@@ -46,7 +46,8 @@
   "require-dev": {
     "sensio/generator-bundle": "~2.3",
     "symfony/phpunit-bridge": "4.4",
-    "doctrine/doctrine-fixtures-bundle": "^2.4.1"
+    "doctrine/doctrine-fixtures-bundle": "^2.4.1",
+    "phpstan/phpstan": "^1.4"
   },
   "scripts": {
     "post-root-package-install": [

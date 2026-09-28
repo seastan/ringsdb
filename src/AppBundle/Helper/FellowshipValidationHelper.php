@@ -6,6 +6,10 @@ class FellowshipValidationHelper {
     public function __construct() {
     }
 
+    /**
+     * @param mixed $fellowship
+     * @return string|null
+     */
     public function findProblem($fellowship) {
         $heroes = [];
         $count = 0;
@@ -49,6 +53,10 @@ class FellowshipValidationHelper {
         return null;
     }
 
+    /**
+     * @param mixed $problem
+     * @return string
+     */
     public function getProblemLabel($problem) {
         if (!$problem) {
             return '';

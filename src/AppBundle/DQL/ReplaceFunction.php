@@ -14,8 +14,17 @@ use Doctrine\ORM\Query\Lexer;
  * @author  Igor Aleksejev
  */
 class ReplaceFunction extends FunctionNode {
+    /**
+     * @var \Doctrine\ORM\Query\AST\Node
+     */
     public $stringPrimary;
+    /**
+     * @var \Doctrine\ORM\Query\AST\Node
+     */
     public $stringSecondary;
+    /**
+     * @var \Doctrine\ORM\Query\AST\Node
+     */
     public $stringThird;
 
     /**

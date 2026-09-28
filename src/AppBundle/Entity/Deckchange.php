@@ -113,7 +113,7 @@ class Deckchange {
      *
      * @return Deckchange
      */
-    public function setDeck(\AppBundle\Entity\Deck $deck = null) {
+    public function setDeck(\AppBundle\Entity\Deck $deck) {
         $this->deck = $deck;
 
         return $this;

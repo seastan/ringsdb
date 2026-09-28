@@ -217,6 +217,7 @@ class Review {
      * Remove comment
      *
      * @param \AppBundle\Entity\Reviewcomment $comment
+     * @return void
      */
     public function removeComment(\AppBundle\Entity\Reviewcomment $comment) {
         $this->comments->removeElement($comment);
@@ -238,7 +239,7 @@ class Review {
      *
      * @return Review
      */
-    public function setCard(\AppBundle\Entity\Card $card = null) {
+    public function setCard(\AppBundle\Entity\Card $card) {
         $this->card = $card;
 
         return $this;
@@ -260,7 +261,7 @@ class Review {
      *
      * @return Review
      */
-    public function setUser(\AppBundle\Entity\User $user = null) {
+    public function setUser(\AppBundle\Entity\User $user) {
         $this->user = $user;
 
         return $this;
@@ -292,6 +293,7 @@ class Review {
      * Remove vote
      *
      * @param \AppBundle\Entity\User $vote
+     * @return void
      */
     public function removeVote(\AppBundle\Entity\User $vote) {
         $this->votes->removeElement($vote);

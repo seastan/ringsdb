@@ -113,7 +113,7 @@ class QuestlogComment {
      *
      * @return QuestlogComment
      */
-    public function setUser(\AppBundle\Entity\User $user = null) {
+    public function setUser(\AppBundle\Entity\User $user) {
         $this->user = $user;
 
         return $this;
@@ -135,7 +135,7 @@ class QuestlogComment {
      *
      * @return QuestlogComment
      */
-    public function setQuestlog(\AppBundle\Entity\Questlog $questlog = null) {
+    public function setQuestlog(\AppBundle\Entity\Questlog $questlog) {
         $this->questlog = $questlog;
 
         return $this;

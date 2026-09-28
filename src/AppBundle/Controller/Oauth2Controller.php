@@ -18,6 +18,7 @@ class Oauth2Controller extends Controller {
 	 *  description="All the Decks",
 	 * )
 	 * @param Request $request
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function listDecksAction(Request $request) {
 		$response = new Response();
@@ -59,7 +60,8 @@ class Oauth2Controller extends Controller {
 	 *      },
 	 *  },
 	 * )
-	 * @param Request $request
+	 * @param mixed $id
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function loadDeckAction($id) {
 		$response = new Response();
@@ -216,7 +218,9 @@ class Oauth2Controller extends Controller {
 	 *      {"name"="precedent_id", "dataType"="integer", "required"=false, "description"="Identifier of the Predecessor of the Decklist"},
 	 *  },
 	 * )
+	 * @param mixed $id
 	 * @param Request $request
+	 * @return void
 	 */
 	public function publishDeckAction($id, Request $request) {
 		throw $this->createAccessDeniedException("Publishing via API has been disabled.");		

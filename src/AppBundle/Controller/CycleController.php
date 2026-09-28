@@ -16,6 +16,7 @@ class CycleController extends Controller {
     /**
      * Lists all Cycle entities.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction() {
         $em = $this->getDoctrine()->getManager();
@@ -30,11 +31,12 @@ class CycleController extends Controller {
     /**
      * Creates a new Cycle entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function createAction(Request $request) {
         $entity = new Cycle();
         $form = $this->createForm(new CycleType(), $entity);
-        $form->bind($request);
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
@@ -53,6 +55,7 @@ class CycleController extends Controller {
     /**
      * Displays a form to create a new Cycle entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function newAction() {
         $entity = new Cycle();
@@ -67,6 +70,8 @@ class CycleController extends Controller {
     /**
      * Finds and displays a Cycle entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -88,6 +93,8 @@ class CycleController extends Controller {
     /**
      * Displays a form to edit an existing Cycle entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -98,7 +105,7 @@ class CycleController extends Controller {
             throw $this->createNotFoundException('Unable to find Cycle entity.');
         }
 
-        $editForm = $this->createForm(new CycleType(), $entity);
+        $editForm = $this->createForm(new CycleType(), $entity, ['method' => 'PUT']);
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('AppBundle:Cycle:edit.html.twig', [
@@ -111,6 +118,8 @@ class CycleController extends Controller {
     /**
      * Edits an existing Cycle entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
@@ -122,8 +131,8 @@ class CycleController extends Controller {
         }
 
         $deleteForm = $this->createDeleteForm($id);
-        $editForm = $this->createForm(new CycleType(), $entity);
-        $editForm->bind($request);
+        $editForm = $this->createForm(new CycleType(), $entity, ['method' => 'PUT']);
+        $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
             $em->persist($entity);
@@ -142,10 +151,12 @@ class CycleController extends Controller {
     /**
      * Deletes a Cycle entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, $id) {
         $form = $this->createDeleteForm($id);
-        $form->bind($request);
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
@@ -167,9 +178,9 @@ class CycleController extends Controller {
      *
      * @param mixed $id The entity id
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createDeleteForm($id) {
-        return $this->createFormBuilder(['id' => $id])->add('id', 'hidden')->getForm();
+        return $this->createFormBuilder(['id' => $id])->add('id', 'hidden')->setMethod('DELETE')->getForm();
     }
 }

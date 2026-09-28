@@ -58,7 +58,7 @@ class Deckslot implements \AppBundle\Model\SlotInterface {
      *
      * @return Deckslot
      */
-    public function setDeck(\AppBundle\Entity\Deck $deck = null) {
+    public function setDeck(\AppBundle\Entity\Deck $deck) {
         $this->deck = $deck;
 
         return $this;
@@ -80,7 +80,7 @@ class Deckslot implements \AppBundle\Model\SlotInterface {
      *
      * @return Deckslot
      */
-    public function setCard(\AppBundle\Entity\Card $card = null) {
+    public function setCard(\AppBundle\Entity\Card $card) {
         $this->card = $card;
 
         return $this;

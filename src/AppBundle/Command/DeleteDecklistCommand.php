@@ -10,6 +10,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 class DeleteDecklistCommand extends ContainerAwareCommand {
+    /**
+     * @return void
+     */
     protected function configure() {
         $this
             ->setName('app:decklist:delete')
@@ -26,6 +29,10 @@ class DeleteDecklistCommand extends ContainerAwareCommand {
         
         $decklist_id = $input->getArgument('decklist_id');
         $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
+        if (!$decklist) {
+            $output->writeln("Decklist not found");
+            return 1;
+        }
         
         $successors = $em->getRepository('AppBundle:Decklist')->findBy(array(
             'precedent' => $decklist
@@ -50,5 +57,7 @@ class DeleteDecklistCommand extends ContainerAwareCommand {
         $em->flush();
         
         $output->writeln("Decklist deleted");
+
+        return 0;
     }
 }

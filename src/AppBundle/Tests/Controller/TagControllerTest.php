@@ -17,11 +17,11 @@ class TagControllerTest extends WebTestCase {
     /** @var array */
     private $fixtureDecks;
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->fixtureDecks = $this->db(static::createClient())->fetchAll('SELECT id, user_id, tags, date_update FROM deck ORDER BY id');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $connection = $this->db(static::createClient());
         foreach ($this->fixtureDecks as $deck) {
             $connection->update('deck', $deck, ['id' => $deck['id']]);
@@ -31,10 +31,17 @@ class TagControllerTest extends WebTestCase {
 
     /* ------------------------------------------------------------ helpers */
 
+    /**
+     * @return \Doctrine\DBAL\Connection
+     */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
     }
 
+    /**
+     * @param string $username
+     * @return \Symfony\Bundle\FrameworkBundle\Client
+     */
     private function createAuthenticatedClient($username = 'test') {
         $client = static::createClient();
         $crawler = $client->request('GET', '/login');
@@ -46,6 +53,7 @@ class TagControllerTest extends WebTestCase {
 
     /**
      * @return array the decoded JSON answer
+     * @param mixed $action
      */
     private function post(Client $client, $action, array $parameters) {
         $client->request('POST', "/tag/$action", $parameters, [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
@@ -54,13 +62,16 @@ class TagControllerTest extends WebTestCase {
         return json_decode($client->getResponse()->getContent(), true);
     }
 
+    /**
+     * @return array<int|string, mixed>
+     */
     private function tags(Client $client) {
         return array_column($this->db($client)->fetchAll('SELECT id, tags FROM deck ORDER BY id'), 'tags', 'id');
     }
 
     /* -------------------------------------------------------------- tests */
 
-    public function testAddTags() {
+    public function testAddTags(): void {
         $client = $this->createAuthenticatedClient();
 
         $answer = $this->post($client, 'add', ['ids' => ['1', '4'], 'tags' => ['dwarf', 'tactics']]);
@@ -75,7 +86,7 @@ class TagControllerTest extends WebTestCase {
         $this->assertSame('text/html; charset=UTF-8', $client->getResponse()->headers->get('Content-Type'));
     }
 
-    public function testAddTagsToADeckWithoutTags() {
+    public function testAddTagsToADeckWithoutTags(): void {
         $client = $this->createAuthenticatedClient();
         $this->db($client)->update('deck', ['tags' => ''], ['id' => 2]);
 
@@ -89,7 +100,7 @@ class TagControllerTest extends WebTestCase {
      * The page splits the typed text on spaces, so it can send empty tags: they are ignored, and
      * the stored tags are cleaned up.
      */
-    public function testEmptyAndSpacedTagsAreIgnored() {
+    public function testEmptyAndSpacedTagsAreIgnored(): void {
         $client = $this->createAuthenticatedClient();
         $this->db($client)->update('deck', ['tags' => ' tactics  lore '], ['id' => 4]);
 
@@ -103,7 +114,7 @@ class TagControllerTest extends WebTestCase {
         $this->assertSame('tactics', $this->tags($client)['4']);
     }
 
-    public function testRemoveTags() {
+    public function testRemoveTags(): void {
         $client = $this->createAuthenticatedClient();
 
         $answer = $this->post($client, 'remove', ['ids' => ['1', '2', '3'], 'tags' => ['lore', 'unknown']]);
@@ -116,7 +127,7 @@ class TagControllerTest extends WebTestCase {
         $this->assertSame(['1' => 'tactics leadership', '2' => 'leadership spirit', '3' => 'spirit', '4' => 'tactics'], $this->tags($client));
     }
 
-    public function testClearTags() {
+    public function testClearTags(): void {
         $client = $this->createAuthenticatedClient();
 
         $answer = $this->post($client, 'clear', ['ids' => ['1', '3']]);
@@ -129,8 +140,9 @@ class TagControllerTest extends WebTestCase {
      * Unknown decks and other users' decks are skipped silently.
      *
      * @dataProvider actionProvider
+     * @param mixed $action
      */
-    public function testForeignAndUnknownDecksAreSkipped($action) {
+    public function testForeignAndUnknownDecksAreSkipped($action): void {
         $client = $this->createAuthenticatedClient('admin');
 
         $answer = $this->post($client, $action, ['ids' => ['1', '999'], 'tags' => ['hacked']]);
@@ -139,6 +151,9 @@ class TagControllerTest extends WebTestCase {
         $this->assertSame(array_column($this->fixtureDecks, 'tags', 'id'), $this->tags($client));
     }
 
+    /**
+     * @return array
+     */
     public function actionProvider() {
         return ['add' => ['add'], 'remove' => ['remove'], 'clear' => ['clear']];
     }
@@ -148,8 +163,9 @@ class TagControllerTest extends WebTestCase {
      * CoreExceptionListener). Nothing is changed.
      *
      * @dataProvider actionProvider
+     * @param mixed $action
      */
-    public function testAnonymousAjaxIsDenied($action) {
+    public function testAnonymousAjaxIsDenied($action): void {
         $client = static::createClient();
         $client->request('POST', "/tag/$action", ['ids' => ['1'], 'tags' => ['hacked']], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
@@ -160,8 +176,9 @@ class TagControllerTest extends WebTestCase {
 
     /**
      * @dataProvider actionProvider
+     * @param mixed $action
      */
-    public function testAnonymousIsRedirectedToLogin($action) {
+    public function testAnonymousIsRedirectedToLogin($action): void {
         $client = static::createClient();
         $client->request('POST', "/tag/$action", ['ids' => ['1'], 'tags' => ['hacked']]);
 
@@ -170,7 +187,7 @@ class TagControllerTest extends WebTestCase {
         $this->assertSame(array_column($this->fixtureDecks, 'tags', 'id'), $this->tags($client));
     }
 
-    public function testGetIsNotAllowed() {
+    public function testGetIsNotAllowed(): void {
         $client = $this->createAuthenticatedClient();
         $client->request('GET', '/tag/add');
 

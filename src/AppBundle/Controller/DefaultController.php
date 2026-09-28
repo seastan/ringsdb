@@ -14,10 +14,20 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 
 class DefaultController extends Controller {
+    /**
+     * Newest first
+     *
+     * @param array $a
+     * @param array $b
+     * @return int
+     */
     function orderNew($a, $b) {
-        return ($a['dateCreation'] < $b['dateCreation']);
+        return $b['dateCreation'] <=> $a['dateCreation'];
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function indexAction() {
         $response = new Response();
         $response->setPublic();
@@ -193,7 +203,9 @@ class DefaultController extends Controller {
                     continue;
                 }
             }
-            $all_comments[] = $comment;
+            if ($comment) {
+                $all_comments[] = $comment;
+            }
         }
         // Recent fellowship comments
         $fellowship_manager->setLimit($num_comments);
@@ -214,7 +226,9 @@ class DefaultController extends Controller {
                     continue;
                 }
             }
-            $all_comments[] = $comment;
+            if ($comment) {
+                $all_comments[] = $comment;
+            }
         }
         // Get recent card reviews
         $dql = "SELECT DISTINCT r FROM AppBundle:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC, r.id DESC";
@@ -231,7 +245,9 @@ class DefaultController extends Controller {
                 $comment['dateCreation'] = $review->getDateCreation();
                 $comment['text'] = $review->getTextHtml();
             }
-            $all_comments[] = $comment;
+            if ($comment) {
+                $all_comments[] = $comment;
+            }
         }
         // Recent review comments
         $em = $this->getDoctrine()->getManager();
@@ -254,7 +270,9 @@ class DefaultController extends Controller {
                     continue;
                 }
             }
-            $all_comments[] = $comment;
+            if ($comment) {
+                $all_comments[] = $comment;
+            }
         }
 
         // Sort all comments by date
@@ -267,9 +285,9 @@ class DefaultController extends Controller {
             $comment = $all_comments[$i];
             $text = $comment['text'];
             if (strlen($text) > 300) {
-                $text = preg_replace('/\s+?(\S+)?$/', '', substr($text . ' ', 0, 301));
+                $text = (string) preg_replace('/\s+?(\S+)?$/', '', substr($text . ' ', 0, 301));
                 if (strrpos($text, '<') > strrpos($text, '>')) $text = substr($text . ' ', 0, strrpos($text, '<')); 
-                $text = preg_replace('/\s+?(\S+)?$/', '', $text);
+                $text = (string) preg_replace('/\s+?(\S+)?$/', '', $text);
                 $text = $text . '...';
                 // Fix unclosed html tags
                 libxml_use_internal_errors(true);
@@ -278,10 +296,12 @@ class DefaultController extends Controller {
                 // Strip wrapping <html> and <body> tags
                 $mock = new \DOMDocument;
                 $body = $dom->getElementsByTagName('body')->item(0);
-                foreach ($body->childNodes as $child) {
-                    $mock->appendChild($mock->importNode($child, true));
+                if ($body) {
+                    foreach ($body->childNodes as $child) {
+                        $mock->appendChild($mock->importNode($child, true));
+                    }
                 }
-                $text = trim($mock->saveHTML());
+                $text = trim((string) $mock->saveHTML());
                 $text = preg_replace('/\n$/','',$text);
             }
             $all_comments[$i]['text'] = $text;
@@ -302,6 +322,9 @@ class DefaultController extends Controller {
         ], $response);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     function rulesAction() {
         $response = new Response();
         $response->setPublic();
@@ -318,6 +341,9 @@ class DefaultController extends Controller {
         return $response;
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     function aboutAction() {
         $response = new Response();
         $response->setPublic();
@@ -329,6 +355,9 @@ class DefaultController extends Controller {
         ], $response);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     function apiIntroAction() {
         $response = new Response();
         $response->setPublic();

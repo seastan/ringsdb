@@ -21,6 +21,8 @@ class SocialController extends Controller {
     /**
      * Checks to see if a deck can be published in its current saved state
      * If it is, displays the decklist edit form for initial publication of a deck
+     * @param mixed $deck_id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function publishFormAction($deck_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
@@ -80,7 +82,7 @@ class SocialController extends Controller {
             'side' => $deck->getSideslots()->getContent(),
         ];
 
-        $new_content = json_encode($content);
+        $new_content = (string) json_encode($content);
         $new_signature = md5($new_content);
         $old_decklists = $this->getDoctrine()->getRepository('AppBundle:Decklist')->findBy([ 'signature' => $new_signature ]);
 
@@ -113,6 +115,7 @@ class SocialController extends Controller {
 
     /**
      * creates a new decklist from a deck (publish action)
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function createAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
@@ -191,6 +194,8 @@ class SocialController extends Controller {
 
     /**
      * Displays the decklist edit form
+     * @param mixed $decklist_id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function editFormAction($decklist_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
@@ -221,6 +226,10 @@ class SocialController extends Controller {
     /*
      * save the name and description of a decklist by its publisher
      */
+    /**
+     * @param mixed $decklist_id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function saveAction($decklist_id, Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -239,7 +248,7 @@ class SocialController extends Controller {
             throw $this->createAccessDeniedException("Access denied");
         }
 
-        $name = trim(filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = "Untitled";
@@ -274,6 +283,8 @@ class SocialController extends Controller {
 
     /**
      * deletes a decklist if it has no comment, no vote, no favorite
+     * @param mixed $decklist_id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($decklist_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
@@ -315,6 +326,9 @@ class SocialController extends Controller {
         ]));
     }
 
+    /**
+     * @return string
+     */
     private function searchForm(Request $request) {
         $dbh = $this->getDoctrine()->getConnection();
 
@@ -438,6 +452,10 @@ class SocialController extends Controller {
         return $this->renderView('AppBundle:Search:form.html.twig', $params);
     }
 
+    /**
+     * @param mixed $username
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function byauthorAction($username) {
         return $this->redirect($this->generateUrl('decklists_list', ['type' => 'find', 'author' => $username]));
     }
@@ -445,13 +463,18 @@ class SocialController extends Controller {
     /*
 	 * displays the lists of decklists
 	 */
+    /**
+     * @param mixed $type
+     * @param int $page
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function listAction($type, $page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
 
         /**
-         * @var $decklist_manager DecklistManager
+         * @var DecklistManager $decklist_manager
          */
         $decklist_manager = $this->get('decklist_manager');
         $decklist_manager->setLimit(30);
@@ -490,7 +513,7 @@ class SocialController extends Controller {
                 break;
 
             case 'recent':
-                $paginator = $decklist_manager->findDecklistsByAge(false);
+                $paginator = $decklist_manager->findDecklistsByAge();
                 $pagetitle = "Recent Decklists";
                 break;
 
@@ -527,6 +550,10 @@ class SocialController extends Controller {
     /*
 	 * displays the content of a decklist along with comments, siblings, similar, etc.
 	 */
+    /**
+     * @param mixed $decklist_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function viewAction($decklist_id) {
         $response = new Response();
         $response->setPublic();
@@ -538,7 +565,7 @@ class SocialController extends Controller {
         }
 
         $duplicate = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->findOneBy(['signature' => $decklist->getSignature()]);
-        if ($duplicate->getDateCreation() >= $decklist->getDateCreation() || $duplicate->getId() === $decklist->getId()) {
+        if (!$duplicate || $duplicate->getDateCreation() >= $decklist->getDateCreation() || $duplicate->getId() === $decklist->getId()) {
             $duplicate = null;
         }
 
@@ -563,6 +590,9 @@ class SocialController extends Controller {
     /*
 	 * adds a decklist to a user's list of favorites
 	 */
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function favoriteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -615,6 +645,9 @@ class SocialController extends Controller {
     /*
 	 * records a user's comment
 	 */
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function commentAction(Request $request) {
         /* @var $user User */
         $user = $this->getUser();
@@ -630,7 +663,7 @@ class SocialController extends Controller {
 
         $comment_text = trim($request->get('comment'));
         if (!empty($comment_text)) {
-            $comment_text = preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $comment_text);
+            $comment_text = (string) preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $comment_text);
 
             $mentionned_usernames = [];
             $matches = [];
@@ -659,9 +692,7 @@ class SocialController extends Controller {
             // send emails
             $spool = [];
             if ($decklist->getUser()->getIsNotifAuthor()) {
-                if (!isset($spool[$decklist->getUser()->getEmail()])) {
-                    $spool[$decklist->getUser()->getEmail()] = 'AppBundle:Emails:newcomment_author.html.twig';
-                }
+                $spool[$decklist->getUser()->getEmail()] = 'AppBundle:Emails:newcomment_author.html.twig';
             }
             foreach ($decklist->getComments() as $comment) {
                 /* @var $comment Comment */
@@ -705,6 +736,11 @@ class SocialController extends Controller {
     /*
      * hides a comment, or if $hidden is false, unhide a comment
      */
+    /**
+     * @param mixed $comment_id
+     * @param mixed $hidden
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function hidecommentAction($comment_id, $hidden) {
         /* @var $user User */
         $user = $this->getUser();
@@ -733,6 +769,9 @@ class SocialController extends Controller {
     /*
 	 * records a user's vote
 	 */
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function voteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -781,6 +820,10 @@ class SocialController extends Controller {
     /*
 	 * returns a text file with the content of a decklist
 	 */
+    /**
+     * @param mixed $decklist_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function textexportAction($decklist_id) {
         $response = new Response();
         $response->setPublic();
@@ -813,6 +856,10 @@ class SocialController extends Controller {
     /*
 	 * returns a octgn file with the content of a decklist
 	 */
+    /**
+     * @param mixed $decklist_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function octgnexportAction($decklist_id) {
         $response = new Response();
         $response->setPublic();
@@ -841,6 +888,9 @@ class SocialController extends Controller {
         return $response;
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function searchAction(Request $request) {
         $response = new Response();
         $response->setPublic();
@@ -947,6 +997,9 @@ class SocialController extends Controller {
         ], $response);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function patronsAction() {
         $response = new Response();
         $response->setPublic();

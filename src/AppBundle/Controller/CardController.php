@@ -16,6 +16,7 @@ class CardController extends Controller {
     /**
      * Lists all Card entities.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction() {
         $em = $this->getDoctrine()->getManager();
@@ -30,11 +31,12 @@ class CardController extends Controller {
     /**
      * Creates a new Card entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function createAction(Request $request) {
         $entity = new Card();
         $form = $this->createForm(new CardType(), $entity);
-        $form->bind($request);
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
@@ -53,6 +55,7 @@ class CardController extends Controller {
     /**
      * Displays a form to create a new Card entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function newAction() {
         $entity = new Card();
@@ -67,6 +70,8 @@ class CardController extends Controller {
     /**
      * Finds and displays a Card entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -88,6 +93,8 @@ class CardController extends Controller {
     /**
      * Displays a form to edit an existing Card entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -98,7 +105,7 @@ class CardController extends Controller {
             throw $this->createNotFoundException('Unable to find Card entity.');
         }
 
-        $editForm = $this->createForm(new CardType(), $entity);
+        $editForm = $this->createForm(new CardType(), $entity, ['method' => 'PUT']);
         $deleteForm = $this->createDeleteForm($id);
         $forceDeleteForm = $this->createForceDeleteForm($id);
 
@@ -113,6 +120,8 @@ class CardController extends Controller {
     /**
      * Edits an existing Card entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
@@ -125,8 +134,8 @@ class CardController extends Controller {
 
         $deleteForm = $this->createDeleteForm($id);
         $forceDeleteForm = $this->createForceDeleteForm($id);
-        $editForm = $this->createForm(new CardType(), $entity);
-        $editForm->bind($request);
+        $editForm = $this->createForm(new CardType(), $entity, ['method' => 'PUT']);
+        $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
             $em->persist($entity);
@@ -155,10 +164,12 @@ class CardController extends Controller {
     /**
      * Deletes a Card entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, $id) {
         $form = $this->createDeleteForm($id);
-        $form->bind($request);
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
@@ -178,10 +189,12 @@ class CardController extends Controller {
     /**
      * Forcibly deletes a Card entity and all its deck/decklist slot references.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function forceDeleteAction(Request $request, $id) {
         $form = $this->createForceDeleteForm($id);
-        $form->bind($request);
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
@@ -220,10 +233,10 @@ class CardController extends Controller {
      *
      * @param mixed $id The entity id
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createDeleteForm($id) {
-        return $this->createFormBuilder(['id' => $id])->add('id', 'hidden')->getForm();
+        return $this->createFormBuilder(['id' => $id])->add('id', 'hidden')->setMethod('DELETE')->getForm();
     }
 
     /**
@@ -231,9 +244,9 @@ class CardController extends Controller {
      *
      * @param mixed $id The entity id
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createForceDeleteForm($id) {
-        return $this->createFormBuilder(['id' => $id])->add('id', 'hidden')->getForm();
+        return $this->createFormBuilder(['id' => $id])->add('id', 'hidden')->setMethod('DELETE')->getForm();
     }
 }

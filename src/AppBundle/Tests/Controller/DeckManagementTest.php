@@ -17,6 +17,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * everything is removed or restored in tearDown().
  */
 class DeckManagementTest extends WebTestCase {
+    use \AppBundle\Tests\TemporaryFileTrait;
+
     /** @var int[] */
     private $maxIds = [];
     /** @var array */
@@ -24,7 +26,7 @@ class DeckManagementTest extends WebTestCase {
     /** @var array */
     private $fixtureUsers;
 
-    protected function setUp() {
+    protected function setUp(): void {
         $connection = $this->db(static::createClient());
         foreach (['deck', 'deckchange', 'fellowship', 'questlog'] as $table) {
             $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
@@ -33,7 +35,7 @@ class DeckManagementTest extends WebTestCase {
         $this->fixtureUsers = $connection->fetchAll('SELECT id, is_share_decks FROM user');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $connection = $this->db(static::createClient());
         $max = $this->maxIds;
         foreach ($this->fixtureDecklists as $decklist) {
@@ -59,10 +61,17 @@ class DeckManagementTest extends WebTestCase {
 
     /* ------------------------------------------------------------ helpers */
 
+    /**
+     * @return \Doctrine\DBAL\Connection
+     */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
     }
 
+    /**
+     * @param string $username
+     * @return \Symfony\Bundle\FrameworkBundle\Client
+     */
     private function createAuthenticatedClient($username = 'test') {
         $client = static::createClient();
         $crawler = $client->request('GET', '/login');
@@ -74,10 +83,13 @@ class DeckManagementTest extends WebTestCase {
 
     /**
      * A copy of fixture deck 2 (cards included), plus 2 Feint in the sideboard, returns its id.
+     * @param mixed $name
+     * @return int
      */
     private function insertDeck(Client $client, $name, array $values = []) {
         $connection = $this->db($client);
         $row = $connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
+        $this->assertNotFalse($row);
         unset($row['id']);
         $connection->insert('deck', $values + ['name' => $name] + $row);
         $id = (int) $connection->lastInsertId();
@@ -87,18 +99,33 @@ class DeckManagementTest extends WebTestCase {
         return $id;
     }
 
+    /**
+     * @param mixed $table
+     * @param mixed $deckId
+     * @return array<int|string, mixed>
+     */
     private function slots(Client $client, $table, $deckId) {
         return array_column($this->db($client)->fetchAll("SELECT card_id, quantity FROM $table WHERE deck_id = ? ORDER BY card_id", [$deckId]), 'quantity', 'card_id');
     }
 
+    /**
+     * @param mixed $id
+     * @return bool
+     */
     private function deckExists(Client $client, $id) {
         return (bool) $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deck WHERE id = ?', [$id]);
     }
 
+    /**
+     * @return array<int, int>
+     */
     private function newDeckIds(Client $client) {
         return array_map('intval', array_column($this->db($client)->fetchAll('SELECT id FROM deck WHERE id > ? ORDER BY id', [$this->maxIds['deck']]), 'id'));
     }
 
+    /**
+     * @return array
+     */
     private function flashMessages(Client $client) {
         preg_match_all("/insert_alert_message\\('(\\w+)', (\"[^\"]*\")\\)/", $client->getResponse()->getContent(), $matches, PREG_SET_ORDER);
 
@@ -109,7 +136,7 @@ class DeckManagementTest extends WebTestCase {
 
     /* -------------------------------------------------------------- clone */
 
-    public function testCloneOwnDeck() {
+    public function testCloneOwnDeck(): void {
         $client = $this->createAuthenticatedClient();
         $source = $this->insertDeck($client, 'PHPUnit Source', ['parent_decklist_id' => 2]);
 
@@ -126,7 +153,7 @@ class DeckManagementTest extends WebTestCase {
         $this->assertSame([34 => '2'], $this->slots($client, 'decksideslot', $clone[0]));
     }
 
-    public function testCloneAnotherUsersDeck() {
+    public function testCloneAnotherUsersDeck(): void {
         $client = $this->createAuthenticatedClient('admin');
         $source = $this->insertDeck($client, 'PHPUnit Shared');
 
@@ -143,7 +170,7 @@ class DeckManagementTest extends WebTestCase {
         $this->assertSame('admin', $this->db($client)->fetchColumn('SELECT u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$clone]));
     }
 
-    public function testCloneUnknownDeck() {
+    public function testCloneUnknownDeck(): void {
         $client = $this->createAuthenticatedClient();
         $client->request('GET', '/deck/clone/999');
 
@@ -152,7 +179,7 @@ class DeckManagementTest extends WebTestCase {
 
     /* ------------------------------------------------------------- delete */
 
-    public function testDelete() {
+    public function testDelete(): void {
         $client = $this->createAuthenticatedClient();
         $id = $this->insertDeck($client, 'PHPUnit Delete');
         // a decklist published from it
@@ -173,7 +200,7 @@ class DeckManagementTest extends WebTestCase {
         $this->assertSame([['success', 'Deck deleted.']], $this->flashMessages($client));
     }
 
-    public function testDeckOfAFellowshipCannotBeDeleted() {
+    public function testDeckOfAFellowshipCannotBeDeleted(): void {
         $client = $this->createAuthenticatedClient();
         $id = $this->insertDeck($client, 'PHPUnit In A Fellowship');
         $this->addToFellowship($client, $id);
@@ -186,6 +213,10 @@ class DeckManagementTest extends WebTestCase {
         $this->assertSame([['danger', "You can't delete a deck that is member of a fellowship."]], $this->flashMessages($client));
     }
 
+    /**
+     * @param mixed $deckId
+     * @return int
+     */
     private function addToFellowship(Client $client, $deckId) {
         $connection = $this->db($client);
         $connection->insert('fellowship', ['user_id' => 1, 'name' => 'PHPUnit', 'name_canonical' => 'phpunit', 'is_public' => 0,
@@ -197,7 +228,7 @@ class DeckManagementTest extends WebTestCase {
         return $fellowshipId;
     }
 
-    public function testDeleteAnotherUsersDeck() {
+    public function testDeleteAnotherUsersDeck(): void {
         $client = $this->createAuthenticatedClient('admin');
         $id = $this->insertDeck($client, 'PHPUnit Not Yours');
 
@@ -207,7 +238,7 @@ class DeckManagementTest extends WebTestCase {
         $this->assertTrue($this->deckExists($client, $id));
     }
 
-    public function testDeleteAnUnknownDeck() {
+    public function testDeleteAnUnknownDeck(): void {
         $client = $this->createAuthenticatedClient();
         $client->request('POST', '/deck/delete', ['deck_id' => 999]);
 
@@ -219,7 +250,7 @@ class DeckManagementTest extends WebTestCase {
     /**
      * Other users' and unknown decks are skipped silently.
      */
-    public function testDeleteList() {
+    public function testDeleteList(): void {
         $client = $this->createAuthenticatedClient();
         $first = $this->insertDeck($client, 'PHPUnit Delete 1');
         $second = $this->insertDeck($client, 'PHPUnit Delete 2');
@@ -239,7 +270,7 @@ class DeckManagementTest extends WebTestCase {
      * deleted and silently removed from its fellowship (cascade remove on Deck.fellowships), which
      * keeps the same nb_decks.
      */
-    public function testDeleteListIgnoresFellowships() {
+    public function testDeleteListIgnoresFellowships(): void {
         $client = $this->createAuthenticatedClient();
         $id = $this->insertDeck($client, 'PHPUnit In A Fellowship');
         $fellowship = $this->addToFellowship($client, $id);
@@ -259,7 +290,7 @@ class DeckManagementTest extends WebTestCase {
      * [main added, main removed, side added, side removed]; they are stored as an unsaved history
      * entry, replaced by a saved one when the deck is saved.
      */
-    public function testAutosaveThenSave() {
+    public function testAutosaveThenSave(): void {
         $client = $this->createAuthenticatedClient();
         $id = $this->insertDeck($client, 'PHPUnit Autosave');
         $diff = [['01001' => 1], ['01013' => 3], [], []];
@@ -277,7 +308,7 @@ class DeckManagementTest extends WebTestCase {
         // saving the deck replaces the unsaved entries by a saved one
         $crawler = $client->request('GET', "/deck/edit/$id");
         $form = $crawler->filter('#save_form')->form();
-        $form['content'] = json_encode(['main' => ['01001' => 1, '01002' => 1, '01003' => 1], 'side' => new \stdClass()]);
+        $form['content'] = (string) json_encode(['main' => ['01001' => 1, '01002' => 1, '01003' => 1], 'side' => new \stdClass()]);
         $client->submit($form);
         $changes = $this->db($client)->fetchAll('SELECT is_saved FROM deckchange WHERE deck_id = ?', [$id]);
         $this->assertSame([['is_saved' => '1']], $changes);
@@ -288,7 +319,7 @@ class DeckManagementTest extends WebTestCase {
      * TypeError in PHP 8): an empty diff still creates a history entry. The builder does not send
      * empty diffs.
      */
-    public function testAutosaveEmptyDiff() {
+    public function testAutosaveEmptyDiff(): void {
         $client = $this->createAuthenticatedClient();
         $id = $this->insertDeck($client, 'PHPUnit Autosave');
 
@@ -298,7 +329,7 @@ class DeckManagementTest extends WebTestCase {
         $this->assertSame('1', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
     }
 
-    public function testAutosaveDiffInTwoParts() {
+    public function testAutosaveDiffInTwoParts(): void {
         $client = $this->createAuthenticatedClient();
         $id = $this->insertDeck($client, 'PHPUnit Autosave');
 
@@ -310,8 +341,13 @@ class DeckManagementTest extends WebTestCase {
 
     /**
      * @dataProvider invalidAutosaveProvider
+     * @param mixed $username
+     * @param mixed $deckId
+     * @param mixed $diff
+     * @param mixed $status
+     * @param mixed $message
      */
-    public function testInvalidAutosave($username, $deckId, $diff, $status, $message) {
+    public function testInvalidAutosave($username, $deckId, $diff, $status, $message): void {
         $client = $this->createAuthenticatedClient($username);
         $id = $this->insertDeck($client, 'PHPUnit Autosave');
 
@@ -323,6 +359,9 @@ class DeckManagementTest extends WebTestCase {
         $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
     }
 
+    /**
+     * @return array
+     */
     public function invalidAutosaveProvider() {
         return [
             'unknown deck' => ['test', 999, '[[],[],[],[]]', 500, 'Cannot find deck 999'],
@@ -339,6 +378,9 @@ class DeckManagementTest extends WebTestCase {
 
     /**
      * Downloads an export of a fixture deck ("text" or "octgn").
+     * @param mixed $format
+     * @param mixed $deckId
+     * @return string
      */
     private function export(Client $client, $format, $deckId) {
         $client->request('GET', "/deck/export/$format/$deckId");
@@ -350,9 +392,10 @@ class DeckManagementTest extends WebTestCase {
     /**
      * Posts a zip archive of [name => content] to POST /deck/import/all ("Import from an archive"
      * modal of My Decks).
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     private function uploadArchive(Client $client, array $entries) {
-        $file = tempnam(sys_get_temp_dir(), 'archive');
+        $file = self::temporaryFile('archive');
         $zip = new \ZipArchive();
         $zip->open($file, \ZipArchive::OVERWRITE);
         foreach ($entries as $name => $content) {
@@ -360,7 +403,7 @@ class DeckManagementTest extends WebTestCase {
         }
         $zip->close();
 
-        $client->request('POST', '/deck/import/all', [], ['uparchive' => new \Symfony\Component\HttpFoundation\File\UploadedFile($file, 'decks.zip', null, filesize($file), null, true)]);
+        $client->request('POST', '/deck/import/all', [], ['uparchive' => new \Symfony\Component\HttpFoundation\File\UploadedFile($file, 'decks.zip', null, (int) filesize($file), null, true)]);
         unlink($file);
 
         return $client->getResponse();
@@ -369,7 +412,7 @@ class DeckManagementTest extends WebTestCase {
     /**
      * One deck per file of the archive, named after the file (without folder nor extension).
      */
-    public function testImportAnArchive() {
+    public function testImportAnArchive(): void {
         $client = $this->createAuthenticatedClient();
 
         $response = $this->uploadArchive($client, [
@@ -397,7 +440,7 @@ class DeckManagementTest extends WebTestCase {
      * printings refactor: an archive with a .o8d file fails, and nothing is imported (a single
      * flush at the end).
      */
-    public function testImportAnArchiveWithAnOctgnFile() {
+    public function testImportAnArchiveWithAnOctgnFile(): void {
         $client = $this->createAuthenticatedClient();
 
         $response = $this->uploadArchive($client, [
@@ -410,12 +453,12 @@ class DeckManagementTest extends WebTestCase {
         $this->assertSame([], $this->newDeckIds($client));
     }
 
-    public function testImportSomethingElseThanAnArchive() {
+    public function testImportSomethingElseThanAnArchive(): void {
         $client = $this->createAuthenticatedClient();
-        $file = tempnam(sys_get_temp_dir(), 'archive');
+        $file = self::temporaryFile('archive');
         file_put_contents($file, "1x Aragorn\n");
 
-        $client->request('POST', '/deck/import/all', [], ['uparchive' => new \Symfony\Component\HttpFoundation\File\UploadedFile($file, 'decks.zip', null, filesize($file), null, true)]);
+        $client->request('POST', '/deck/import/all', [], ['uparchive' => new \Symfony\Component\HttpFoundation\File\UploadedFile($file, 'decks.zip', null, (int) filesize($file), null, true)]);
         unlink($file);
 
         $this->assertSame(422, $client->getResponse()->getStatusCode());
@@ -429,8 +472,10 @@ class DeckManagementTest extends WebTestCase {
 
     /**
      * @dataProvider anonymousRouteProvider
+     * @param mixed $method
+     * @param mixed $uri
      */
-    public function testAnonymousIsRedirectedToLogin($method, $uri) {
+    public function testAnonymousIsRedirectedToLogin($method, $uri): void {
         $client = static::createClient();
         $client->request($method, $uri, ['deck_id' => 1, 'ids' => '1', 'diff' => '[[],[],[],[]]']);
 
@@ -439,6 +484,9 @@ class DeckManagementTest extends WebTestCase {
         $this->assertTrue($this->deckExists($client, 1));
     }
 
+    /**
+     * @return array
+     */
     public function anonymousRouteProvider() {
         return [
             'clone' => ['GET', '/deck/clone/1'],

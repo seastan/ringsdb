@@ -14,6 +14,9 @@ use Symfony\Component\VarDumper\VarDumper;
 
 class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
 
+    /**
+     * @return void
+     */
     protected function configure() {
         $this->setName('app:beorn:json')
              ->setDescription('Download new card data from Hall of Beorn JSON Export')
@@ -55,7 +58,7 @@ class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
         $allSpheres = $em->getRepository('AppBundle:Sphere')->findAll();
         $allTypes = $em->getRepository('AppBundle:Type')->findAll();
 
-        $skip = $input->getOption('skip') ?: 0;
+        $skip = (int) $input->getOption('skip');
         $forceData = $input->getOption('force-data');
         $forceImage = $input->getOption('force-image');
         $showTexts = $input->getOption('show-texts');
@@ -68,7 +71,7 @@ class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
             $json = file_get_contents("http://hallofbeorn.com/Export/Cards");
             file_put_contents('beorn.json', $json);
         }
-        $beorn = json_decode($json);
+        $beorn = json_decode((string) $json);
 
         $i = 0;
         foreach ($beorn as $data) {
@@ -163,5 +166,7 @@ class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
 
         $em->flush();
         $output->writeln("Done.");
+
+        return 0;
     }
 }

@@ -358,6 +358,7 @@ class Fellowship {
      * Remove deck
      *
      * @param \AppBundle\Entity\FellowshipDeck $deck
+     * @return void
      */
     public function removeDeck(\AppBundle\Entity\FellowshipDeck $deck) {
         $this->decks->removeElement($deck);
@@ -389,6 +390,7 @@ class Fellowship {
      * Remove decklist
      *
      * @param \AppBundle\Entity\FellowshipDecklist $decklist
+     * @return void
      */
     public function removeDecklist(\AppBundle\Entity\FellowshipDecklist $decklist) {
         $this->decklists->removeElement($decklist);
@@ -420,6 +422,7 @@ class Fellowship {
      * Remove comment
      *
      * @param \AppBundle\Entity\FellowshipComment $comment
+     * @return void
      */
     public function removeComment(\AppBundle\Entity\FellowshipComment $comment) {
         $this->comments->removeElement($comment);
@@ -441,7 +444,7 @@ class Fellowship {
      *
      * @return Fellowship
      */
-    public function setUser(\AppBundle\Entity\User $user = null) {
+    public function setUser(\AppBundle\Entity\User $user) {
         $this->user = $user;
 
         return $this;
@@ -473,6 +476,7 @@ class Fellowship {
      * Remove favorite
      *
      * @param \AppBundle\Entity\User $favorite
+     * @return void
      */
     public function removeFavorite(\AppBundle\Entity\User $favorite) {
         $this->favorites->removeElement($favorite);
@@ -504,6 +508,7 @@ class Fellowship {
      * Remove vote
      *
      * @param \AppBundle\Entity\User $vote
+     * @return void
      */
     public function removeVote(\AppBundle\Entity\User $vote) {
         $this->votes->removeElement($vote);

@@ -12,8 +12,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LoadReviewData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
+    /**
+     * @var \Symfony\Component\DependencyInjection\ContainerInterface|null
+     */
     private $container;
 
+    /**
+     * @return void
+     */
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
@@ -26,11 +32,17 @@ class LoadReviewData extends AbstractFixture implements ContainerAwareInterface,
         ];
     }
 
+    /**
+     * @return void
+     */
     public function load(ObjectManager $manager)
     {
         /** @var User $user */
         $user = $this->getReference('test-user');
         $card = $manager->getRepository('AppBundle:Card')->findOneBy(['code' => '01001']);
+        if ($card === null || $this->container === null) {
+            throw new \LogicException('Card 01001 or the container is missing.');
+        }
 
         $textMd = "Aragorn is a **great** leader.\n\nHe readies after committing to the quest.";
 

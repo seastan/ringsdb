@@ -9,7 +9,13 @@ use Doctrine\ORM\Query\Lexer;
  * "POWER" "(" IntegerPrimary "," IntegerPrimary ")"
  */
 class PowerFunction extends FunctionNode {
+    /**
+     * @var \Doctrine\ORM\Query\AST\Node
+     */
     public $basePrimary;
+    /**
+     * @var \Doctrine\ORM\Query\AST\Node
+     */
     public $exponentPrimary;
 
     /**

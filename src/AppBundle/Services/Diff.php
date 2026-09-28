@@ -12,9 +12,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  *
  * @author AWOPM
- * @property $em EntityManager
  */
 class Diff {
+    /**
+     * @var EntityManager
+     */
+    private $em;
+
     public function __construct(EntityManager $doctrine) {
         $this->em = $doctrine;
     }
@@ -96,6 +100,10 @@ class Diff {
         return new SlotCollectionDecorator($intersection);
     }
 
+    /**
+     * @param mixed $decks
+     * @return array
+     */
     public function diffContents($decks) {
 
         // n flat lists of the cards of each decklist

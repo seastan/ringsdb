@@ -10,6 +10,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 class FixThreatCommand extends ContainerAwareCommand {
+    /**
+     * @return void
+     */
     protected function configure() {
         $this->setName('app:fix-threat')
              ->setDescription('Fix starting threat for decklists');
@@ -31,5 +34,7 @@ class FixThreatCommand extends ContainerAwareCommand {
 
         $em->flush();
         $output->writeln(date('c') . " Fixed $count starting threats.");
+
+        return 0;
     }
 }

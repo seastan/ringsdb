@@ -19,6 +19,9 @@ Each removal reduces what has to be ported.
   `/oauth/v2/`: `deck/load` works without a token). Inventory in "OAuth2 server".
 - **OCTGN features**: two decisions first (see "OCTGN features"): the `octgnid` of the public API,
   and the `octgnid` / reprint `mapping` of the card statistics.
+- Until then, `Oauth2Controller`, `CreateClientCommand`, `UpdateOctgnCommand` and
+  `ScrapOctgnCardDataCommand` are excluded from phpstan (`excludePaths` in `phpstan.neon`): remove
+  them from the list with the code.
 - **GregwarCaptchaBundle**: registered in `AppKernel`, configured (`gregwar_captcha: ~` in
   `config.yml`), required in `composer.json` (`gregwar/captcha-bundle` 2.0.7), but no form uses
   the `captcha` type: added on 2020-09-14 (commit `a07a2fd4`, "added captcha and vendor
@@ -47,6 +50,11 @@ Each removal reduces what has to be ported.
   Reimplement it with a `UserChecker` or drop it, with the `locked` column (see "Admin area").
 - **JSONP on the public API**: the callback is echoed unsanitised (XSS vector). Validate it or
   drop JSONP; dropping it changes the public API (see "Public API").
+- **Card scraping commands**: `app:beorn:html` (`ScrapBeornCardDataCommand`, scrapes the Hall of
+  Beorn HTML pages, still full of debug output), `app:beorn:json`, `app:cgdb:cards`,
+  `app:cards:octgn` (OCTGN, see above) and `app:download-images`. The CSV import
+  (`BeornJSONtoRingsDBcsv.py`, see "Admin area") seems to have replaced them; `app:beorn:scenario`
+  is still used by the admin scenario import. Keep only what the maintainers still run.
 - **`/api/doc` (NelmioApiDocBundle 2.x)**: the public API documentation, generated from the
   `@ApiDoc` annotations of `ApiController` (8) and `Oauth2Controller` (4). No page links to it and
   no test covers it. Porting it means NelmioApiDocBundle 4+, which is a rewrite (OpenAPI
@@ -88,6 +96,8 @@ Each removal reduces what has to be ported.
 - **Line endings of the text exports** (CRLF → LF) after the migration: see "After the
   migration".
 - **Time in tests** (`ClockInterface`): see "Tests and time".
+- **Static analysis** (`make phpstan`, level 8 of phpstan 1.4, see "Static analysis"): level 9,
+  the value types of arrays and collections, and the official extensions instead of ours.
 
 # Migration plan
 
@@ -116,6 +126,7 @@ FOSOAuthServerBundle are removed (decided), preferably before the first step.
 | `gedmo/doctrine-extensions` 2.x | maintained (3.x) | upgrade; the timestampable listener is declared by hand (`doctrine_extensions.yml`), or use `stof/doctrine-extensions-bundle` |
 | `doctrine/orm` 2.x, `doctrine/dbal` 2.x | | ORM 3 / DBAL 4; the custom DQL functions `replace` and `power` (see "Card search") |
 | `ezyang/htmlpurifier`, `erusev/parsedown` | maintained | upgrade |
+| `phpstan/phpstan` 1.4 (dev) | maintained (2.x) | upgrade, with `phpstan-symfony`, `phpstan-doctrine` and `phpstan-phpunit` (see "Static analysis") |
 
 ## Front-end assets
 
@@ -131,12 +142,31 @@ current stack:
 
 - the `KernelTestCase` tests (managers, commands, card statistics): service ids
   (`static::$kernel->getContainer()->get('cards_data')`, `'doctrine'`), `getRootDir()`;
-- PHPUnit 6.5 APIs: `assertContains()` on strings, `assertRegExp()`, `setUp()` / `tearDown()`
-  without `: void`. On PHP 7.1, PHPUnit cannot go past 7.5;
+- PHPUnit 6.5 APIs: `assertContains()` on strings, `assertRegExp()`. On PHP 7.1, PHPUnit cannot
+  go past 7.5. The test methods, `setUp()` and `tearDown()` already declare `: void` (required from
+  PHPUnit 8);
 - the fixtures (`DoctrineFixturesBundle` 2.x) and the `make test-fixtures` loading.
 
 To plan with the strategy: with LTS steps, the suite is upgraded as PHP goes up; with a new
 skeleton, it is ported first, then run against the new application.
+
+## Static analysis
+
+`make phpstan` runs phpstan 1.4 at level 8 on `src/` (configuration in `phpstan.neon`). The
+official extensions need Composer 2, so `src/AppBundle/PHPStan/` has small replacements, to drop
+for `phpstan-symfony`, `phpstan-doctrine` and `phpstan-phpunit` once Composer 2 is available:
+
+- the service types, read from the container dumped in `app/cache/test` (hence the
+  `cache:warmup` of `make phpstan`); the Doctrine registry, entity managers and
+  `getRepository('AppBundle:Card')` (an `EntityRepository<Card>`, with a stub);
+- the PHPUnit assertions narrowing types, the non-null response / request / container of the test
+  client, `HeaderBag::get()`, the entities' `$id` written by Doctrine;
+- stubs and ignored errors for wrong vendor docblocks (DBAL, PHPUnit 6.5, PHPExcel).
+
+Left for later: level 9 (1136 errors, all about `mixed`: request parameters, query results,
+untyped collections, the `mixed` parameters of the level 6 docblocks) and the value types of
+arrays and collections (`checkMissingIterableValueType` and
+`checkGenericClassInNonGenericObjectType` are off). Both are cheaper on the rewritten code.
 
 ## Environment
 
@@ -251,7 +281,8 @@ The OAuth2 API (`/api/oauth2`) is to be removed before migrating: see "OAuth2 se
 - `/cards/{pack_code}.xml|xls|xlsx` returns `200` with the plain text body
   `<format> format not supported. Only json is supported.` (`text/xml` for xml, `text/html`
   for xls/xlsx). `/card/{code}.xml` is a `404` (route requirement).
-- `/cards/search/{q}` ignores the `jsonp` parameter.
+- Fixed: `/cards/search/{q}` ignored the `jsonp` parameter (the action tested `isset($jsonp)` but
+  never read it from the request). It now supports JSONP like the other endpoints.
 - `/cards/` `Last-Modified` is the most recent `dateUpdate` of the cards **and** of their
   printings.
 - `/custom-packs/published` and `/user/info` are not in `ApiController`: they return a
@@ -457,6 +488,9 @@ fixture decks: the tests restore them in `tearDown()`.
   `empty($fellowship->getDecks())`, and a Doctrine collection object is never `empty()`.
 - No CSRF protection on `/fellowship/save`, `/fellowship/publish`, `/fellowship/delete`,
   `/fellowship/delete_list`.
+- Fixed (found by phpstan): commenting on or voting for an unknown fellowship
+  (`/user/fellowship_comment`, `/user/fellowship_like`) crashed on `null`; it now answers `400`,
+  like the decklists.
 - The fixture fellowship 1 is public but references decks (not decklists): a state the
   application itself does not produce. (It had no `date_publish` either, which Twig displayed as
   the current date: fixed in `LoadFellowshipData`.)
@@ -521,6 +555,8 @@ access rule, the `/oauth/v2/*` and `/api/oauth2/*` routes (`routing.yml`, `routi
 `AppBundle:Security:login.html.twig` (only used by the `oauth_server_auth_login*` routes), the 4
 entities and their mappings, and the `oauth2_*` tables.
 
+`Oauth2Controller` and `CreateClientCommand` are excluded from phpstan until then.
+
 ## Quest logs
 
 Covered by `src/AppBundle/Tests/Controller/QuestlogWorkflowTest.php`. The deck picker fills the
@@ -555,6 +591,11 @@ directly.
 - The deck contents are decoded with `(array) json_decode(...)` (objects inside), like the deck
   builder does: `{"main": {}}` passes the "empty deck" guard.
 - No CSRF protection on `/questlog/save`, `/questlog/delete`, `/questlog/delete_list`.
+- Fixed (found by phpstan): commenting on or voting for an unknown quest log
+  (`/user/questlog_comment`, `/user/questlog_like`) crashed on `null`; it now answers `400`.
+- Fixed: the quest log list of a decklist page (`Decklist::getAllQuestlogs()`) was meant to include
+  the quest logs of its parent deck, but they were assigned to a misspelled variable
+  (`$parentlogs`) and never listed (found by phpstan).
 
 ## Card reviews
 
@@ -653,6 +694,13 @@ To be written once representative files are available (to be stored under
   with an output buffer). The export file names come from `slugify()`, which drops the spaces
   (`lotrlcgcards.xlsx`).
 - PHPExcel (`liuggio/ExcelBundle`) is abandoned: replace it with PhpSpreadsheet.
+- Fixed: the "Delete" button of an admin pack page (`Pack/show.html.twig`) posted to
+  `admin_cycle_delete`; the delete forms share their CSRF token, so it deleted the cycle with the
+  same id as the pack (`testPackPageDeletesThePack`).
+- The generated CRUD controllers of card, cycle, card printing, pack, encounter and scenario used
+  the Symfony 2 `$form->bind($request)`, which ignores the request method. They now use
+  `handleRequest()`; their edit and delete forms declare the `PUT` / `DELETE` methods that the
+  templates send with the `_method` field (found by phpstan).
 - Moderation actions are GET routes that write: `/admin/user/toggle_locked/{id}`,
   `/admin/decklist/delete/{id}`, `/admin/comment/toggle_hidden/{id}`,
   `/admin/comment/delete/{id}`.
@@ -665,9 +713,8 @@ To be written once representative files are available (to be stored under
   printings, `CardsData`): uploaded images are never displayed. It also keeps the `.png` name
   whatever the actual format. Not tested.
 - The generated CRUD controllers use the Symfony 2 form API (`createForm(new XxxType())`,
-  `$form->bind($request)`, `'entity'` / `'checkbox'` type names, `getName()`), which is gone in
-  recent versions (`createForm(XxxType::class)`, `handleRequest()`, FQCN types,
-  `getBlockPrefix()`).
+  `'entity'` / `'checkbox'` type names, `getName()`), which is gone in recent versions
+  (`createForm(XxxType::class)`, FQCN types, `getBlockPrefix()`).
 - Deleting reference data still in use (e.g. a cycle with packs, a card in decks) fails on the
   foreign keys with a `500` instead of an error message. `Card` has a "force delete" that
   removes its slots, printings and reviews, with SQL built by concatenation (the id comes from
@@ -800,8 +847,8 @@ name, number of decks, cards, packs, custom packs, number of Core Sets, sort ord
   ignored for anonymous users).
 - The "number of Core Sets" filters (fellowships only) are only applied with a card or pack
   filter; without a value they filter nothing.
-- The `$ignoreEmptyDescriptions` parameter of the `ByAge` / `ByRecentDiscussion` methods is
-  ignored.
+- Removed: the `$ignoreEmptyDescriptions` parameter of the `ByAge` / `ByRecentDiscussion` methods,
+  which was ignored (found by phpstan).
 
 ### To look at during the migration
 
@@ -825,6 +872,11 @@ name, number of decks, cards, packs, custom packs, number of Core Sets, sort ord
   to the name, `/patrons` page, extra buttons in the play simulator through
   `/api/public/user/info`). Without an amount (or with 0) it shows the total. The amount is not
   checked (a negative one is subtracted); an unknown user is reported but exits with code 0.
+
+- Card scraping commands (`app:beorn:html`, `app:beorn:json`, `app:cgdb:cards`,
+  `app:download-images`): candidates for removal, see the roadmap.
+- `app:remove-user` and `app:decklist:delete` now exit with code 1 when the user or decklist is
+  not found (the latter crashed).
 
 ## OCTGN features (to be removed)
 
@@ -861,6 +913,9 @@ Decisions needed before removing:
   and an OCTGN id `mapping` of the reprints, probably used by the external report that consumes
   them (see "Card statistics").
 
+`UpdateOctgnCommand` still uses a `Faction` entity (ThronesDB) and `Card::setOctgnid()`, which no
+longer exist: it cannot run. It is excluded from phpstan, with `ScrapOctgnCardDataCommand`.
+
 ## Card search
 
 Covered by `src/AppBundle/Tests/Controller/CardSearchTest.php` (public API
@@ -890,6 +945,9 @@ removed before the migration so that it does not have to be ported:
   user and of the whole site. Their routes were reused for the user admin panel on 2016-04-01
   (commit `497ccf27`); the admin pages `/admin/user/comments/{user_id}`
   (`UserAdminController::commentsAction`) replace them.
+- `app:twig` (`TwigCacheCommand`): called `Twig_Environment::getCacheFilename()`, removed in
+  Twig 2, so it crashed (found by phpstan).
+- `Decklist::$is_simple_export` and its accessors: never used.
 - `AppBundle\DQL\BinaryFunction` and the `BINARY(c.name) LIKE '%SOG%'` condition of the acronym
   search (`CardsData`, name search): a case-sensitive search of the acronym in the name, which
   matches no RingsDB card (no card name has 2 capitals in a row). The initials condition

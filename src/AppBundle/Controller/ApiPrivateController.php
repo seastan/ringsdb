@@ -7,6 +7,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
 class ApiPrivateController extends Controller {
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function listDecksAction(Request $request) {
 		$response = new Response();
 
@@ -49,6 +52,10 @@ class ApiPrivateController extends Controller {
 		return $response;
 	}
 
+	/**
+	 * @param mixed $username
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function listUserDecksAction($username, Request $request) {
 		$response = new Response();
 
@@ -112,6 +119,10 @@ class ApiPrivateController extends Controller {
 
 	/*
 	 * Get the description of one Deck of the authenticated user
+	 */
+	/**
+	 * @param mixed $id
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function loadDeckAction($id, Request $request) {
 		$response = new Response();

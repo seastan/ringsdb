@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Loader;
 class AppExtension extends Extension {
     /**
      * {@inheritdoc}
+     * @return void
      */
     public function load(array $configs, ContainerBuilder $container) {
         $configuration = new Configuration();

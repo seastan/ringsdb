@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  * The cards of the Core Set, and any card created, are restored / deleted in tearDown().
  */
 class AdminExcelTest extends WebTestCase {
+    use \AppBundle\Tests\TemporaryFileTrait;
+
     const HEADER = ['type', 'sphere', 'position', 'code', 'name', 'traits', 'text', 'flavor', 'isUnique', 'cost', 'threat',
         'willpower', 'attack', 'defense', 'health', 'victory', 'quest', 'deckLimit', 'hasErrata'];
 
@@ -28,13 +30,13 @@ class AdminExcelTest extends WebTestCase {
     /** @var string[] */
     private $files = [];
 
-    protected function setUp() {
+    protected function setUp(): void {
         $connection = $this->db(static::createClient());
         $this->maxCardId = (int) $connection->fetchColumn('SELECT MAX(id) FROM card');
         $this->coreCards = $connection->fetchAll('SELECT c.* FROM card c JOIN card_printing cp ON cp.card_id = c.id WHERE cp.pack_id = 1');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $connection = $this->db(static::createClient());
         $connection->exec("DELETE FROM card WHERE id > {$this->maxCardId}");
         foreach ($this->coreCards as $card) {
@@ -48,10 +50,16 @@ class AdminExcelTest extends WebTestCase {
 
     /* ------------------------------------------------------------ helpers */
 
+    /**
+     * @return \Doctrine\DBAL\Connection
+     */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
     }
 
+    /**
+     * @return \Symfony\Bundle\FrameworkBundle\Client
+     */
     private function createAdminClient() {
         $client = static::createClient();
         $crawler = $client->request('GET', '/login');
@@ -63,6 +71,8 @@ class AdminExcelTest extends WebTestCase {
 
     /**
      * Downloads the cards of a pack (0 = all the cards), returns the path of the saved file.
+     * @param mixed $packId
+     * @return string
      */
     private function download(Client $client, $packId) {
         ob_start();
@@ -70,7 +80,7 @@ class AdminExcelTest extends WebTestCase {
         $content = ob_get_clean();
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $file = tempnam(sys_get_temp_dir(), 'excel') . '.xlsx';
+        $file = self::temporaryFile('excel') . '.xlsx';
         $this->files[] = $file;
         file_put_contents($file, $content);
 
@@ -79,41 +89,51 @@ class AdminExcelTest extends WebTestCase {
 
     /**
      * @return array [response content, echoed report]
+     * @param mixed $file
      */
     private function upload(Client $client, $file, array $parameters = []) {
         ob_start();
-        $client->request('POST', '/admin/excel/upload', $parameters, ['upfile' => new UploadedFile($file, 'cards.xlsx', null, filesize($file), null, true)]);
-        $report = ob_get_clean();
+        $client->request('POST', '/admin/excel/upload', $parameters, ['upfile' => new UploadedFile($file, 'cards.xlsx', null, (int) filesize($file), null, true)]);
+        $report = (string) ob_get_clean();
 
         return [$client->getResponse()->getContent(), strip_tags(str_replace(['</h4>', '</p>'], [': ', '; '], $report))];
     }
 
+    /**
+     * @param mixed $file
+     * @return array
+     */
     private static function rows($file) {
         return \PHPExcel_IOFactory::load($file)->getActiveSheet()->toArray(null, false, false, false);
     }
 
     /**
      * Changes the file with PHPExcel: [row (1 = header) => [column name => value]].
+     * @param mixed $file
      */
-    private static function edit($file, array $changes) {
+    private static function edit($file, array $changes): void {
         $excel = \PHPExcel_IOFactory::load($file);
         $sheet = $excel->getActiveSheet();
         foreach ($changes as $row => $values) {
             foreach ($values as $column => $value) {
-                $sheet->setCellValueExplicitByColumnAndRow(array_search($column, self::HEADER), $row, $value,
+                $sheet->setCellValueExplicitByColumnAndRow((int) array_search($column, self::HEADER), $row, $value,
                     is_int($value) ? \PHPExcel_Cell_DataType::TYPE_NUMERIC : \PHPExcel_Cell_DataType::TYPE_STRING);
             }
         }
         \PHPExcel_IOFactory::createWriter($excel, 'Excel2007')->save($file);
     }
 
+    /**
+     * @param mixed $code
+     * @return mixed
+     */
     private function fetchCard(Client $client, $code) {
         return $this->db($client)->fetchAssoc('SELECT c.name, c.cost, c.text, t.name AS type, s.name AS sphere FROM card c JOIN type t ON t.id = c.type_id JOIN sphere s ON s.id = c.sphere_id WHERE c.code = ?', [$code]);
     }
 
     /* ----------------------------------------------------------- download */
 
-    public function testDownloadAPack() {
+    public function testDownloadAPack(): void {
         $client = $this->createAdminClient();
         $file = $this->download($client, 1);
 
@@ -130,7 +150,7 @@ class AdminExcelTest extends WebTestCase {
         $this->assertSame(1.0, $rows[1][2]);
     }
 
-    public function testDownloadAllCards() {
+    public function testDownloadAllCards(): void {
         $client = $this->createAdminClient();
         $file = $this->download($client, 0);
 
@@ -146,7 +166,7 @@ class AdminExcelTest extends WebTestCase {
      * flavor (7 cards of the Core Set, 292 in the whole database): their line endings are
      * normalized and their date_update changes. A second upload changes nothing.
      */
-    public function testUploadAnUnchangedDownload() {
+    public function testUploadAnUnchangedDownload(): void {
         $client = $this->createAdminClient();
         $file = $this->download($client, 1);
 
@@ -159,7 +179,7 @@ class AdminExcelTest extends WebTestCase {
         $this->assertSame('0 cards changed or added', $response);
     }
 
-    public function testUploadChanges() {
+    public function testUploadChanges(): void {
         $client = $this->createAdminClient();
         $file = $this->download($client, 1);
         $this->upload($client, $file);
@@ -174,7 +194,7 @@ class AdminExcelTest extends WebTestCase {
             array_diff_key($this->fetchCard($client, '01001'), ['text' => 0]));
     }
 
-    public function testUnknownCardsAreOnlyCreatedOnRequest() {
+    public function testUnknownCardsAreOnlyCreatedOnRequest(): void {
         $client = $this->createAdminClient();
         $file = $this->download($client, 1);
         $this->upload($client, $file);
@@ -195,7 +215,7 @@ class AdminExcelTest extends WebTestCase {
      * An unknown type or sphere name stops the import with a generic exception (500); the
      * changes of the previous rows are not saved (a single flush at the end).
      */
-    public function testUnknownAssociationStopsTheImport() {
+    public function testUnknownAssociationStopsTheImport(): void {
         $client = $this->createAdminClient();
         $file = $this->download($client, 1);
         $this->upload($client, $file);

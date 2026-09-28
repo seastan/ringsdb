@@ -7,6 +7,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class CardType extends AbstractType {
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder
             ->add('position')
@@ -31,6 +34,9 @@ class CardType extends AbstractType {
             ->add('file', 'file', array('label' => 'Image File', 'mapped' => false, 'required' => false));
     }
 
+    /**
+     * @return void
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver) {
         $resolver->setDefaults([
             'data_class' => 'AppBundle\Entity\Card'

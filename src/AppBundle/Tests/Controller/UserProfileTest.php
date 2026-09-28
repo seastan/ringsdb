@@ -4,6 +4,8 @@ namespace AppBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
+use Symfony\Component\DomCrawler\Form;
 
 /**
  * Profile forms:
@@ -14,14 +16,16 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * The users' rows are restored in tearDown() (passwords included).
  */
 class UserProfileTest extends WebTestCase {
+    use SentEmailsTrait;
+
     /** @var array */
     private $fixtureUsers;
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->fixtureUsers = $this->db(static::createClient())->fetchAll('SELECT * FROM user ORDER BY id');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $connection = $this->db(static::createClient());
         foreach ($this->fixtureUsers as $user) {
             $connection->update('user', $user, ['id' => $user['id']]);
@@ -31,10 +35,18 @@ class UserProfileTest extends WebTestCase {
 
     /* ------------------------------------------------------------ helpers */
 
+    /**
+     * @return \Doctrine\DBAL\Connection
+     */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
     }
 
+    /**
+     * @param mixed $username
+     * @param mixed $password
+     * @return bool
+     */
     private function login(Client $client, $username, $password) {
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $password]));
@@ -42,6 +54,10 @@ class UserProfileTest extends WebTestCase {
         return $client->getResponse()->isRedirect() && $client->getResponse()->headers->get('Location') !== 'http://localhost/login';
     }
 
+    /**
+     * @param string $username
+     * @return \Symfony\Bundle\FrameworkBundle\Client
+     */
     private function createAuthenticatedClient($username = 'test') {
         $client = static::createClient();
         $this->assertTrue($this->login($client, $username, $username), "Login as $username failed");
@@ -49,10 +65,29 @@ class UserProfileTest extends WebTestCase {
         return $client;
     }
 
+    /**
+     * @param int $id
+     * @return mixed
+     */
     private function fetchUser(Client $client, $id = 1) {
         return $this->db($client)->fetchAssoc('SELECT * FROM user WHERE id = ?', [$id]);
     }
 
+    /**
+     * @return \Symfony\Component\DomCrawler\Field\ChoiceFormField
+     */
+    private static function checkbox(Form $form, string $name) {
+        $field = $form[$name];
+        if (!$field instanceof ChoiceFormField) {
+            throw new \UnexpectedValueException("$name is not a checkbox");
+        }
+
+        return $field;
+    }
+
+    /**
+     * @return \Symfony\Component\DomCrawler\Form
+     */
     private function profileForm(Client $client) {
         $crawler = $client->request('GET', '/user/profile_edit');
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -62,7 +97,7 @@ class UserProfileTest extends WebTestCase {
 
     /* ---------------------------------------------- site's profile form */
 
-    public function testProfileFormIsPrefilled() {
+    public function testProfileFormIsPrefilled(): void {
         $client = $this->createAuthenticatedClient();
         $form = $this->profileForm($client);
 
@@ -77,20 +112,21 @@ class UserProfileTest extends WebTestCase {
         $this->assertFalse($form['user_sphere_code']->hasValue());
     }
 
-    public function testEditProfile() {
+    public function testEditProfile(): void {
         $client = $this->createAuthenticatedClient();
         $form = $this->profileForm($client);
         $form['resume'] = 'I play <b>Dwarves</b>.';
         $form['user_sphere_code'] = 'lore';
-        $form['notif_author']->untick();
-        $form['notif_mention']->untick();
-        $form['share_decks']->tick();
-        $form['dark_mode']->tick();
+        self::checkbox($form, 'notif_author')->untick();
+        self::checkbox($form, 'notif_mention')->untick();
+        self::checkbox($form, 'share_decks')->tick();
+        self::checkbox($form, 'dark_mode')->tick();
         $client->submit($form);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/user/profile_edit', $client->getResponse()->headers->get('Location'));
         $cookie = $client->getCookieJar()->get('dark_mode');
+        $this->assertNotNull($cookie);
         $this->assertSame('1', $cookie->getValue());
         $this->assertFalse($cookie->isHttpOnly());
 
@@ -111,13 +147,15 @@ class UserProfileTest extends WebTestCase {
 
         // unticked checkboxes are not posted: they become false
         $form = $this->profileForm($client);
-        $form['dark_mode']->untick();
+        self::checkbox($form, 'dark_mode')->untick();
         $client->submit($form);
         $this->assertSame('0', $this->fetchUser($client)['dark_mode']);
-        $this->assertSame('0', $client->getCookieJar()->get('dark_mode')->getValue());
+        $cookie = $client->getCookieJar()->get('dark_mode');
+        $this->assertNotNull($cookie);
+        $this->assertSame('0', $cookie->getValue());
     }
 
-    public function testRenameUser() {
+    public function testRenameUser(): void {
         $client = $this->createAuthenticatedClient();
         $form = $this->profileForm($client);
         $form['username'] = 'phpunit_renamed';
@@ -129,7 +167,7 @@ class UserProfileTest extends WebTestCase {
         $this->assertTrue($this->login(static::createClient(), 'phpunit_renamed', 'test'));
     }
 
-    public function testUsernameAlreadyTaken() {
+    public function testUsernameAlreadyTaken(): void {
         $client = $this->createAuthenticatedClient();
         $form = $this->profileForm($client);
         $form['username'] = 'admin';
@@ -146,7 +184,7 @@ class UserProfileTest extends WebTestCase {
     /**
      * Unlike the username, the email is neither validated nor checked for uniqueness.
      */
-    public function testEmailIsNotValidated() {
+    public function testEmailIsNotValidated(): void {
         $client = $this->createAuthenticatedClient();
         $form = $this->profileForm($client);
         $form['email'] = 'not-an-email';
@@ -160,7 +198,7 @@ class UserProfileTest extends WebTestCase {
     /**
      * BUG: a duplicated email is only stopped by the database's unique index (500).
      */
-    public function testDuplicatedEmail() {
+    public function testDuplicatedEmail(): void {
         $client = $this->createAuthenticatedClient();
         $form = $this->profileForm($client);
         $form['email'] = 'admin@example.com';
@@ -172,7 +210,7 @@ class UserProfileTest extends WebTestCase {
 
     /* ------------------------------------------------ FOSUser: account */
 
-    public function testFosProfileEditRequiresTheCurrentPassword() {
+    public function testFosProfileEditRequiresTheCurrentPassword(): void {
         $client = $this->createAuthenticatedClient();
         $crawler = $client->request('GET', '/profile/edit');
         $form = $crawler->filter('form[action="/profile/edit"]')->form([
@@ -197,8 +235,12 @@ class UserProfileTest extends WebTestCase {
 
     /**
      * @dataProvider invalidPasswordChangeProvider
+     * @param mixed $current
+     * @param mixed $first
+     * @param mixed $second
+     * @param mixed $error
      */
-    public function testInvalidPasswordChange($current, $first, $second, $error) {
+    public function testInvalidPasswordChange($current, $first, $second, $error): void {
         $client = $this->createAuthenticatedClient();
         $crawler = $client->request('GET', '/profile/change-password');
         $crawler = $client->submit($crawler->filter('form[action="/profile/change-password"]')->form([
@@ -212,6 +254,9 @@ class UserProfileTest extends WebTestCase {
         $this->assertSame($this->fixtureUsers[0]['password'], $this->fetchUser($client)['password']);
     }
 
+    /**
+     * @return array
+     */
     public function invalidPasswordChangeProvider() {
         return [
             'wrong current password' => ['wrong', 'secret123', 'secret123', 'The entered password is invalid.'],
@@ -219,7 +264,7 @@ class UserProfileTest extends WebTestCase {
         ];
     }
 
-    public function testChangePassword() {
+    public function testChangePassword(): void {
         $client = $this->createAuthenticatedClient();
         $crawler = $client->request('GET', '/profile/change-password');
         $client->submit($crawler->filter('form[action="/profile/change-password"]')->form([
@@ -236,7 +281,7 @@ class UserProfileTest extends WebTestCase {
 
     /* -------------------------------------------- FOSUser: reset password */
 
-    public function testResetPassword() {
+    public function testResetPassword(): void {
         $client = static::createClient();
 
         // 1. request: an email with a reset link is sent
@@ -247,7 +292,7 @@ class UserProfileTest extends WebTestCase {
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/resetting/check-email?username=test', $client->getResponse()->headers->get('Location'));
-        $messages = $client->getProfile()->getCollector('swiftmailer')->getMessages();
+        $messages = $this->sentMessages($client);
         $this->assertCount(1, $messages);
         $this->assertSame(['test@example.com'], array_keys($messages[0]->getTo()));
         $token = $this->fetchUser($client)['confirmation_token'];
@@ -257,7 +302,7 @@ class UserProfileTest extends WebTestCase {
         // 2. a second request is ignored while the first one is recent (no second email)
         $client->enableProfiler();
         $client->submit($form);
-        $this->assertCount(0, $client->getProfile()->getCollector('swiftmailer')->getMessages());
+        $this->assertCount(0, $this->sentMessages($client));
         $this->assertSame($token, $this->fetchUser($client)['confirmation_token']);
 
         // 3. the link opens the reset form; the new password logs the user in
@@ -279,7 +324,7 @@ class UserProfileTest extends WebTestCase {
         $this->assertTrue($this->login(static::createClient(), 'test', 'secret123'));
     }
 
-    public function testResetPasswordOfUnknownUser() {
+    public function testResetPasswordOfUnknownUser(): void {
         $client = static::createClient();
         $client->enableProfiler();
         $client->request('POST', '/resetting/send-email', ['username' => 'nobody']);
@@ -287,10 +332,10 @@ class UserProfileTest extends WebTestCase {
         // no hint that the user does not exist, and no email
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/resetting/check-email?username=nobody', $client->getResponse()->headers->get('Location'));
-        $this->assertCount(0, $client->getProfile()->getCollector('swiftmailer')->getMessages());
+        $this->assertCount(0, $this->sentMessages($client));
     }
 
-    public function testUnknownResetToken() {
+    public function testUnknownResetToken(): void {
         $client = static::createClient();
         $client->request('GET', '/resetting/reset/unknown-token');
 

@@ -234,12 +234,15 @@ class Pack {
     /**
      * Get dateRelease
      *
-     * @return \DateTime
+     * @return \DateTime|null
      */
     public function getDateRelease() {
         return $this->dateRelease;
     }
 
+    /**
+     * @return \Doctrine\Common\Collections\Collection<(int|string), mixed>
+     */
     public function getCards() {
         return $this->printings->map(function($p) { return $p->getCard(); });
     }
@@ -261,6 +264,7 @@ class Pack {
      * Remove printing
      *
      * @param \AppBundle\Entity\CardPrinting $printing
+     * @return void
      */
     public function removePrinting(\AppBundle\Entity\CardPrinting $printing) {
         $this->printings->removeElement($printing);
@@ -282,7 +286,7 @@ class Pack {
      *
      * @return Pack
      */
-    public function setCycle(\AppBundle\Entity\Cycle $cycle = null) {
+    public function setCycle(\AppBundle\Entity\Cycle $cycle) {
         $this->cycle = $cycle;
 
         return $this;

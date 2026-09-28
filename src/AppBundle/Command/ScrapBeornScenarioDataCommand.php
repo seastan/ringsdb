@@ -13,6 +13,9 @@ use Symfony\Component\VarDumper\VarDumper;
 
 class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
 
+    /**
+     * @return void
+     */
     protected function configure() {
         $this->setName('app:beorn:scenario')
             ->setDescription('Download scenario statistics data from Hall of Beorn')
@@ -46,9 +49,18 @@ class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
 
         $this->command($em, $name, $skip, $customjson);
         $output->writeln("Done.");
+
+        return 0;
     }
 
-	function command($em, $name, $skip, $customjson) {
+	/**
+	 * @param mixed $em
+	 * @param mixed $name
+	 * @param mixed $skip
+	 * @param mixed $customjson
+	 * @return string
+	 */
+	public static function command($em, $name, $skip, $customjson) {
 		$res = '';
 		$name = $name ?: null;
 		$skip = $skip ?: 0;
@@ -69,8 +81,7 @@ class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
 				continue;
 			}
 
-			$beornscenario = str_replace('ALeP - ', '', $scenario->getName());
-			$beornscenario = str_replace([' ', 'ú', 'î', 'û', ','], ['-', '%C3%BA', '%C3%AE', '%C3%BB', ''], $beornscenario);
+			$beornscenario = strtr($scenario->getName(), ['ALeP - ' => '', ' ' => '-', 'ú' => '%C3%BA', 'î' => '%C3%AE', 'û' => '%C3%BB', ',' => '']);
 			$output_line = $beornscenario;
 			VarDumper::dump($output_line);
 			$res .= $output_line . "\n<br>";

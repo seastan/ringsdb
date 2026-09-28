@@ -11,12 +11,32 @@ use AppBundle\Entity\Decklistslot;
 use AppBundle\Entity\Decklistsideslot;
 
 class DecklistFactory {
+    /**
+     * @var EntityManager
+     */
+    private $doctrine;
+
+    /**
+     * @var DeckValidationHelper
+     */
+    private $deckValidationHelper;
+
+    /**
+     * @var Texts
+     */
+    private $texts;
+
     public function __construct(EntityManager $doctrine, DeckValidationHelper $deckValidationHelper, Texts $texts) {
         $this->doctrine = $doctrine;
         $this->deckValidationHelper = $deckValidationHelper;
         $this->texts = $texts;
     }
 
+    /**
+     * @param mixed $name
+     * @param mixed $descriptionMd
+     * @return \AppBundle\Entity\Decklist
+     */
     public function createDecklistFromDeck(Deck $deck, $name = null, $descriptionMd = null) {
         /* @var $lastPack \AppBundle\Entity\Pack */
         $lastPack = $deck->getLastPack();
@@ -55,7 +75,7 @@ class DecklistFactory {
             'main' => $deck->getSlots()->getContent(),
             'side' => $deck->getSideslots()->getContent(),
         ];
-        $new_content = json_encode($content);
+        $new_content = (string) json_encode($content);
         $new_signature = md5($new_content);
 
         $decklist = new Decklist();

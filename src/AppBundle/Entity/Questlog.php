@@ -461,6 +461,7 @@ class Questlog {
      * Remove deck
      *
      * @param \AppBundle\Entity\QuestlogDeck $deck
+     * @return void
      */
     public function removeDeck(\AppBundle\Entity\QuestlogDeck $deck) {
         $this->decks->removeElement($deck);
@@ -492,6 +493,7 @@ class Questlog {
      * Remove comment
      *
      * @param \AppBundle\Entity\QuestlogComment $comment
+     * @return void
      */
     public function removeComment(\AppBundle\Entity\QuestlogComment $comment) {
         $this->comments->removeElement($comment);
@@ -513,7 +515,7 @@ class Questlog {
      *
      * @return Questlog
      */
-    public function setUser(\AppBundle\Entity\User $user = null) {
+    public function setUser(\AppBundle\Entity\User $user) {
         $this->user = $user;
 
         return $this;
@@ -535,7 +537,7 @@ class Questlog {
      *
      * @return Questlog
      */
-    public function setScenario(\AppBundle\Entity\Scenario $scenario = null) {
+    public function setScenario(\AppBundle\Entity\Scenario $scenario) {
         $this->scenario = $scenario;
 
         return $this;
@@ -567,6 +569,7 @@ class Questlog {
      * Remove favorite
      *
      * @param \AppBundle\Entity\User $favorite
+     * @return void
      */
     public function removeFavorite(\AppBundle\Entity\User $favorite) {
         $this->favorites->removeElement($favorite);
@@ -598,6 +601,7 @@ class Questlog {
      * Remove vote
      *
      * @param \AppBundle\Entity\User $vote
+     * @return void
      */
     public function removeVote(\AppBundle\Entity\User $vote) {
         $this->votes->removeElement($vote);

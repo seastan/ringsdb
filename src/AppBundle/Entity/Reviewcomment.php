@@ -113,7 +113,7 @@ class Reviewcomment {
      *
      * @return Reviewcomment
      */
-    public function setUser(\AppBundle\Entity\User $user = null) {
+    public function setUser(\AppBundle\Entity\User $user) {
         $this->user = $user;
 
         return $this;
@@ -135,7 +135,7 @@ class Reviewcomment {
      *
      * @return Reviewcomment
      */
-    public function setReview(\AppBundle\Entity\Review $review = null) {
+    public function setReview(\AppBundle\Entity\Review $review) {
         $this->review = $review;
 
         return $this;

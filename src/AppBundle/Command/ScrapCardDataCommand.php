@@ -11,6 +11,11 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use AppBundle\Entity\Card;
 use AppBundle\Entity\CardPrinting;
 
+/**
+ * @param string $url
+ * @param int $attemptsRemaining
+ * @return string|false
+ */
 function file_get_contents_retry($url, $attemptsRemaining = 3) {
     $content = @file_get_contents($url);
     $attemptsRemaining--;
@@ -23,7 +28,12 @@ function file_get_contents_retry($url, $attemptsRemaining = 3) {
 }
 
 class ScrapCardDataCommand extends ContainerAwareCommand {
+    use StringInputTrait;
 
+
+    /**
+     * @return void
+     */
     protected function configure() {
         $this->setName('app:cgdb:cards')
              ->setDescription('Download new card data from CGDB')
@@ -52,10 +62,10 @@ class ScrapCardDataCommand extends ContainerAwareCommand {
         /* @var $allTypes \AppBundle\Entity\Type[] */
         $allTypes = $em->getRepository('AppBundle:Type')->findAll();
         
-        $filename = $input->getArgument('filename');
+        $filename = self::stringArgument($input, 'filename');
         
         $file = file_get_contents("http://www.cardgamedb.com/deckbuilders/thelordoftherings/database/$filename.jgz");
-        if(!preg_match('/^cardsHero = (.*);$/', $file, $matches)) {
+        if(!preg_match('/^cardsHero = (.*);$/', (string) $file, $matches)) {
           $output->writeln("<error>Error while parsing js file</error>");
         }
 
@@ -104,7 +114,7 @@ class ScrapCardDataCommand extends ContainerAwareCommand {
 
           if (!$sphere) {
           	$output->writeln("<error>Cannot find sphere [" . $data['sphere'] . "] for this card</error>");
-          	dump($data);
+          	print_r($data);
           	die();
           }
           
@@ -117,22 +127,22 @@ class ScrapCardDataCommand extends ContainerAwareCommand {
 
           if (!$type) {
           	$output->writeln("<error>Cannot find type [" . $data['type'] . "] for this card</error>");
-          	dump($data);
+          	print_r($data);
           	die();
           }
 
           $position = intval($data['num']);
           
-          $text = $data['text'];
+          $text = (string) $data['text'];
           $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', '\'', '\''], $text);
           $text = str_replace(['<br />'], ["\n"], $text);
-          $text = preg_replace('/<SPAN  style="font-weight: bold" >([^<]+)<\/SPAN>/', '<b>\\1</b>', $text);
-          $text = preg_replace('/<SPAN  style=\"font-weight: bold;font-style:italic\" >([^<]+)<\/SPAN>/', '<b><em>\\1</em></b>', $text);
-          $text = preg_replace('/<SPAN STYLE="" >([^<]+)<\/SPAN>/', '\\1', $text);
+          $text = (string) preg_replace('/<SPAN  style="font-weight: bold" >([^<]+)<\/SPAN>/', '<b>\\1</b>', $text);
+          $text = (string) preg_replace('/<SPAN  style=\"font-weight: bold;font-style:italic\" >([^<]+)<\/SPAN>/', '<b><em>\\1</em></b>', $text);
+          $text = (string) preg_replace('/<SPAN STYLE="" >([^<]+)<\/SPAN>/', '\\1', $text);
           $text = str_replace("</b>: ", ":</b> ", $text);
-          $text = preg_replace("/ +/", " ", $text);
-          $text = preg_replace("/\n+/", "\n", $text);
-          $text = trim($text);
+          $text = (string) preg_replace("/ +/", " ", $text);
+          $text = (string) preg_replace("/\n+/", "\n", $text);
+          $text = trim((string) $text);
 
 
           $card = new Card();
@@ -199,5 +209,7 @@ class ScrapCardDataCommand extends ContainerAwareCommand {
 
         $em->flush();
         $output->writeln("Done.");
+
+        return 0;
     }
 }

@@ -12,6 +12,9 @@ use AppBundle\Entity\Cycle;
 use AppBundle\Entity\Pack;
 
 class CommandController extends Controller {
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function formAction() {
         $em = $this->getDoctrine()->getManager();
 
@@ -22,6 +25,9 @@ class CommandController extends Controller {
         ]);
 	}
 
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function runAction(Request $request) {
 		$command = $request->request->get('command');
 		$scenario = $request->request->get('scenario');

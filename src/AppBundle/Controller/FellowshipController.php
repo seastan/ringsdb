@@ -18,6 +18,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FellowshipController extends Controller {
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function mylistAction() {
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
@@ -39,13 +42,18 @@ class FellowshipController extends Controller {
         }
     }
 
+    /**
+     * @param mixed $type
+     * @param int $page
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function listAction($type, $page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
 
         /**
-         * @var $fellowship_manager \AppBundle\Model\FellowshipManager
+         * @var \AppBundle\Model\FellowshipManager $fellowship_manager
          */
         $fellowship_manager = $this->get('fellowship_manager');
         $fellowship_manager->setLimit(30);
@@ -84,7 +92,7 @@ class FellowshipController extends Controller {
                 break;
 
             case 'recent':
-                $paginator = $fellowship_manager->findFellowshipsByAge(false);
+                $paginator = $fellowship_manager->findFellowshipsByAge();
                 $pagetitle = "Recent Fellowships";
                 break;
 
@@ -118,6 +126,13 @@ class FellowshipController extends Controller {
         ], $response);
     }
 
+    /**
+     * @param mixed $deck1_id
+     * @param mixed $deck2_id
+     * @param mixed $deck3_id
+     * @param mixed $deck4_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function newAction($deck1_id, $deck2_id, $deck3_id, $deck4_id) {
         $response = new Response();
 
@@ -152,6 +167,10 @@ class FellowshipController extends Controller {
         ], $response);
     }
 
+    /**
+     * @param mixed $fellowship_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function editAction($fellowship_id) {
         $response = new Response();
 
@@ -194,6 +213,10 @@ class FellowshipController extends Controller {
         return $this->render('AppBundle:Fellowship:edit.html.twig', $data, $response);
     }
 
+    /**
+     * @param mixed $fellowship_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function viewAction($fellowship_id) {
         /* @var $fellowship \AppBundle\Entity\Fellowship */
         $fellowship = $this->getDoctrine()->getManager()->getRepository('AppBundle:Fellowship')->find($fellowship_id);
@@ -247,6 +270,9 @@ class FellowshipController extends Controller {
         return $this->render('AppBundle:Fellowship:view.html.twig', $data);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function saveAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -276,7 +302,7 @@ class FellowshipController extends Controller {
             $fellowship->setNbDecks(0);
         }
 
-        $name = trim(filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = "Untitled Fellowship";
@@ -366,6 +392,8 @@ class FellowshipController extends Controller {
             $fellowship->setNbDecks($nb_decks);
         }
 
+        // BUG, pinned by the tests (see MIGRATION.md, "Fellowships"): a collection is never empty()
+        /** @phpstan-ignore-next-line */
         if ($auto_publish && empty($fellowship->getDecks())) {
             $fellowship->setIsPublic(true);
             $fellowship->setDatePublish(new \DateTime());
@@ -380,6 +408,10 @@ class FellowshipController extends Controller {
         ]));
     }
 
+    /**
+     * @param mixed $fellowship_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function publishFormAction($fellowship_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -451,13 +483,13 @@ class FellowshipController extends Controller {
             ];
 
             $this_content = json_encode($content);
-            $this_signature = md5($this_content);
+            $this_signature = md5((string) $this_content);
 
             $old_decklists = $this->getDoctrine()->getRepository('AppBundle:Decklist')->findBy([ 'signature' => $this_signature ]);
 
             foreach ($old_decklists as $decklist) {
                 /* @var $decklist \AppBundle\Entity\Decklist */
-                if ($decklist->getParent()->getId() == $deck->getId()) {
+                if ($decklist->getParent() && $decklist->getParent()->getId() == $deck->getId()) {
                     continue;
                 }
 
@@ -485,6 +517,9 @@ class FellowshipController extends Controller {
     }
 
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function publishAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -509,7 +544,7 @@ class FellowshipController extends Controller {
             return $this->redirect($this->generateUrl('fellowship_view', [ 'fellowship_id' => $fellowship->getId() ]));
         }
 
-        $name = trim(filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = "Untitled Fellowship";
@@ -570,6 +605,9 @@ class FellowshipController extends Controller {
         ]));
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function deleteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -588,7 +626,7 @@ class FellowshipController extends Controller {
             return $this->redirect($this->generateUrl('myfellowships_list'));
         }
 
-        if (!$fellowship || $fellowship->getUser()->getId() != $user->getId()) {
+        if ($fellowship->getUser()->getId() != $user->getId()) {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
 
@@ -614,6 +652,9 @@ class FellowshipController extends Controller {
         return $this->redirect($this->generateUrl('myfellowships_list'));
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function deleteListAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -663,6 +704,9 @@ class FellowshipController extends Controller {
         return $this->redirect($this->generateUrl('myfellowships_list'));
     }
 
+    /**
+     * @return string
+     */
     private function searchForm(Request $request) {
         $dbh = $this->getDoctrine()->getConnection();
 
@@ -752,6 +796,9 @@ class FellowshipController extends Controller {
         return $this->renderView('AppBundle:Fellowship:form.html.twig', $params);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function searchAction(Request $request) {
         $response = new Response();
         $response->setPublic();
@@ -854,14 +901,27 @@ class FellowshipController extends Controller {
         ], $response);
     }
 
+    /**
+     * @param mixed $fellowship_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function octgnexportAction($fellowship_id) {
         return $this->downloadFromSelection($fellowship_id, true);
     }
 
+    /**
+     * @param mixed $fellowship_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function textexportAction($fellowship_id) {
         return $this->downloadFromSelection($fellowship_id, false);
     }
 
+    /**
+     * @param mixed $fellowship_id
+     * @param mixed $octgn
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function downloadFromSelection($fellowship_id, $octgn) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -934,7 +994,7 @@ class FellowshipController extends Controller {
         }
         $response = new Response();
         $response->headers->set('Content-Type', 'application/zip');
-        $response->headers->set('Content-Length', filesize($file));
+        $response->headers->set('Content-Length', (string) filesize($file));
         $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->get('texts')->slugify('RingsDB - Fellowship ' . $fellowship_id) . '.zip'));
 
         $response->setContent(file_get_contents($file));
@@ -943,6 +1003,9 @@ class FellowshipController extends Controller {
         return $response;
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function favoriteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -1001,6 +1064,9 @@ class FellowshipController extends Controller {
     /*
 	 * records a user's comment
 	 */
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function commentAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -1014,10 +1080,13 @@ class FellowshipController extends Controller {
 
         $fellowship_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+        if (!$fellowship) {
+            throw new BadRequestHttpException('Wrong fellowship id');
+        }
 
         $comment_text = trim($request->get('comment'));
-        if ($fellowship && !empty($comment_text)) {
-            $comment_text = preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $comment_text);
+        if (!empty($comment_text)) {
+            $comment_text = (string) preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $comment_text);
 
             $mentionned_usernames = [];
             $matches = [];
@@ -1047,9 +1116,7 @@ class FellowshipController extends Controller {
             // send emails
             $spool = [];
             if ($fellowship->getUser()->getIsNotifAuthor()) {
-                if (!isset($spool[$fellowship->getUser()->getEmail()])) {
-                    $spool[$fellowship->getUser()->getEmail()] = 'AppBundle:Emails:newfellowshipcomment_author.html.twig';
-                }
+                $spool[$fellowship->getUser()->getEmail()] = 'AppBundle:Emails:newfellowshipcomment_author.html.twig';
             }
 
             foreach ($fellowship->getComments() as $comment) {
@@ -1095,6 +1162,11 @@ class FellowshipController extends Controller {
     /*
      * hides a comment, or if $hidden is false, unhide a comment
      */
+    /**
+     * @param mixed $comment_id
+     * @param mixed $hidden
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function hidecommentAction($comment_id, $hidden) {
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
@@ -1123,6 +1195,9 @@ class FellowshipController extends Controller {
     /*
 	 * records a user's vote
 	 */
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function voteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -1136,6 +1211,9 @@ class FellowshipController extends Controller {
 
         /* @var $fellowship \AppBundle\Entity\Fellowship */
         $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+        if (!$fellowship) {
+            throw new BadRequestHttpException('Unable to find fellowship');
+        }
 
         if ($fellowship->getUser()->getId() != $user->getId()) {
             $query = $em->getRepository('AppBundle:Fellowship')
@@ -1162,6 +1240,10 @@ class FellowshipController extends Controller {
         return new Response($fellowship->getNbVotes());
     }
 
+    /**
+     * @param mixed $username
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function byauthorAction($username) {
         return $this->redirect($this->generateUrl('fellowships_list', ['type' => 'find', 'author' => $username]));
     }

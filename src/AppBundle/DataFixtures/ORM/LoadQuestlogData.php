@@ -9,17 +9,9 @@ use AppBundle\Entity\User;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class LoadQuestlogData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
+class LoadQuestlogData extends AbstractFixture implements DependentFixtureInterface
 {
-    private $container;
-
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
 
     public function getDependencies()
     {
@@ -29,6 +21,9 @@ class LoadQuestlogData extends AbstractFixture implements ContainerAwareInterfac
         ];
     }
 
+    /**
+     * @return void
+     */
     public function load(ObjectManager $manager)
     {
         /** @var User $user */
@@ -44,6 +39,9 @@ class LoadQuestlogData extends AbstractFixture implements ContainerAwareInterfac
         $questlog->setDatePublish(new \DateTime('2015-08-16'));
 
         $scenario = $manager->getRepository('AppBundle:Scenario')->find(1);
+        if ($scenario === null) {
+            throw new \LogicException('Scenario 1 is missing.');
+        }
 
         $questlog->setUser($user);
         $questlog->setName("Untitled Questlog");
@@ -65,7 +63,7 @@ class LoadQuestlogData extends AbstractFixture implements ContainerAwareInterfac
             $questlog_decklist = new QuestlogDeck();
             $questlog_decklist->setDecklist($decklist);
             $questlog_decklist->setDeck($decklist->getParent());
-            $questlog_decklist->setContent(json_encode($decklist->getContent()));
+            $questlog_decklist->setContent((string) json_encode($decklist->getContent()));
             $questlog_decklist->setDeckNumber($i);
             $questlog_decklist->setQuestlog($questlog);
             $questlog_decklist->setPlayer('Player ' . $i);

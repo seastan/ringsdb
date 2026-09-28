@@ -67,7 +67,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      */
     private $freezeComments;
     /**
-     * @var integer
+     * @var string
      */
     private $version;
     /**
@@ -95,15 +95,15 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      */
     private $user;
     /**
-     * @var \AppBundle\Entity\Pack
+     * @var \AppBundle\Entity\Pack|null
      */
     private $lastPack;
     /**
-     * @var \AppBundle\Entity\Deck
+     * @var \AppBundle\Entity\Deck|null
      */
     private $parent;
     /**
-     * @var \AppBundle\Entity\Decklist
+     * @var \AppBundle\Entity\Decklist|null
      */
     private $precedent;
     /**
@@ -384,7 +384,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Set freezeComments
      *
-     * @param integer $freezeComments
+     * @param bool $freezeComments
      *
      * @return Decklist
      */
@@ -397,7 +397,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get freezeComments
      *
-     * @return integer
+     * @return bool
      */
     public function getFreezeComments() {
         return $this->freezeComments;
@@ -420,6 +420,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      * Remove slot
      *
      * @param \AppBundle\Entity\Decklistslot $slot
+     * @return void
      */
     public function removeSlot(\AppBundle\Entity\Decklistslot $slot) {
         $this->slots->removeElement($slot);
@@ -437,7 +438,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Add sideslot
      *
-     * @param \AppBundle\Entity\Decklistsideslot $slot
+     * @param \AppBundle\Entity\Decklistsideslot $sideslots
      *
      * @return Decklist
      */
@@ -450,9 +451,10 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Remove sideslot
      *
-     * @param \AppBundle\Entity\Decklistsideslot $slot
+     * @param \AppBundle\Entity\Decklistsideslot $sideslots
+     * @return void
      */
-    public function removeSideslot(\AppBundle\Entity\Decklistslot $sideslots) {
+    public function removeSideslot(\AppBundle\Entity\Decklistsideslot $sideslots) {
         $this->sideslots->removeElement($sideslots);
     }
 
@@ -482,6 +484,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      * Remove comment
      *
      * @param \AppBundle\Entity\Comment $comment
+     * @return void
      */
     public function removeComment(\AppBundle\Entity\Comment $comment) {
         $this->comments->removeElement($comment);
@@ -513,6 +516,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      * Remove successor
      *
      * @param \AppBundle\Entity\Decklist $successor
+     * @return void
      */
     public function removeSuccessor(\AppBundle\Entity\Decklist $successor) {
         $this->successors->removeElement($successor);
@@ -544,6 +548,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      * Remove child
      *
      * @param \AppBundle\Entity\Deck $child
+     * @return void
      */
     public function removeChild(\AppBundle\Entity\Deck $child) {
         $this->children->removeElement($child);
@@ -565,7 +570,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      *
      * @return Decklist
      */
-    public function setUser(\AppBundle\Entity\User $user = null) {
+    public function setUser(\AppBundle\Entity\User $user) {
         $this->user = $user;
 
         return $this;
@@ -596,7 +601,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get lastPack
      *
-     * @return \AppBundle\Entity\Pack
+     * @return \AppBundle\Entity\Pack|null
      */
     public function getLastPack() {
         return $this->lastPack;
@@ -618,7 +623,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get parent
      *
-     * @return \AppBundle\Entity\Deck
+     * @return \AppBundle\Entity\Deck|null
      */
     public function getParent() {
         return $this->parent;
@@ -640,7 +645,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get precedent
      *
-     * @return \AppBundle\Entity\Decklist
+     * @return \AppBundle\Entity\Decklist|null
      */
     public function getPrecedent() {
         return $this->precedent;
@@ -663,6 +668,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      * Remove favorite
      *
      * @param \AppBundle\Entity\User $favorite
+     * @return void
      */
     public function removeFavorite(\AppBundle\Entity\User $favorite) {
         $this->favorites->removeElement($favorite);
@@ -694,6 +700,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      * Remove vote
      *
      * @param \AppBundle\Entity\User $vote
+     * @return void
      */
     public function removeVote(\AppBundle\Entity\User $vote) {
         $this->votes->removeElement($vote);
@@ -754,6 +761,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      * Remove sphere
      *
      * @param \AppBundle\Entity\Sphere $sphere
+     * @return void
      */
     public function removeSphere(\AppBundle\Entity\Sphere $sphere) {
         $this->spheres->removeElement($sphere);
@@ -769,7 +777,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     }
 
     /**
-     * @var \AppBundle\Entity\Sphere
+     * @var \AppBundle\Entity\Sphere|null
      */
     private $predominantSphere;
 
@@ -789,7 +797,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get predominantSphere
      *
-     * @return \AppBundle\Entity\Sphere
+     * @return \AppBundle\Entity\Sphere|null
      */
     public function getPredominantSphere() {
         return $this->predominantSphere;
@@ -817,6 +825,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      * Remove fellowship
      *
      * @param \AppBundle\Entity\FellowshipDeck $fellowship
+     * @return void
      */
     public function removeFellowship(\AppBundle\Entity\FellowshipDeck $fellowship) {
         $this->fellowships->removeElement($fellowship);
@@ -834,7 +843,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get allFellowships
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return array
      */
     public function getAllFellowships() {
         $allFellowships = $this->getFellowships()->toArray();
@@ -842,19 +851,6 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
         return array_filter($allFellowships, function($k) {
             return $k->getFellowship()->getIsPublic();
         });
-    }
-
-    // Used to reduce json export data
-    private $is_simple_export;
-
-    public function setIsSimpleExport($is_simple_export) {
-        $this->is_simple_export = $is_simple_export;
-
-        return $this;
-    }
-
-    public function getIsSimpleExport() {
-        return $this->is_simple_export;
     }
 
     /**
@@ -905,6 +901,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      * Remove questlog
      *
      * @param \AppBundle\Entity\QuestlogDeck $questlog
+     * @return void
      */
     public function removeQuestlog(\AppBundle\Entity\QuestlogDeck $questlog) {
         $this->questlogs->removeElement($questlog);
@@ -922,18 +919,21 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get allQuestlogs
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return array
      */
     public function getAllQuestlogs() {
         $theseLogs = $this->getQuestlogs()->toArray();
         $parentLogs = [];
-        if ($this->getParent()) $parentlogs = $this->getParent()->getQuestlogs()->toArray();
+        if ($this->getParent()) $parentLogs = $this->getParent()->getQuestlogs()->toArray();
         $allQuestlogs = array_unique(array_merge($theseLogs, $parentLogs), SORT_REGULAR);
         return array_filter($allQuestlogs, function($k) {
             return $k->getQuestlog()->getIsPublic();
         });
     }
 
+    /**
+     * @return array
+     */
     public function getContent()
     {
         $content = [

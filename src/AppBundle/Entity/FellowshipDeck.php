@@ -61,7 +61,7 @@ class FellowshipDeck {
      *
      * @return FellowshipDeck
      */
-    public function setFellowship(\AppBundle\Entity\Fellowship $fellowship = null) {
+    public function setFellowship(\AppBundle\Entity\Fellowship $fellowship) {
         $this->fellowship = $fellowship;
 
         return $this;
@@ -83,7 +83,7 @@ class FellowshipDeck {
      *
      * @return FellowshipDeck
      */
-    public function setDeck(\AppBundle\Entity\Deck $deck = null) {
+    public function setDeck(\AppBundle\Entity\Deck $deck) {
         $this->deck = $deck;
 
         return $this;

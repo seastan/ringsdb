@@ -10,6 +10,9 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class ScrapOctgnCardDataCommand extends ContainerAwareCommand {
 
+    /**
+     * @return void
+     */
     protected function configure() {
         $this->setName('app:cards:octgn')
              ->setDescription('Load Card Data from OCTGN sets')
@@ -30,7 +33,7 @@ class ScrapOctgnCardDataCommand extends ContainerAwareCommand {
         if (!is_dir($path)) {
             die("Invalid directory $path");
         }
-        dump("Loading Sets from $path");
+        $output->writeln("Loading Sets from $path");
 
         $fixedNames = [
             'The Hobbit - On the Doorstep' => 'On the Doorstep',
@@ -133,5 +136,7 @@ class ScrapOctgnCardDataCommand extends ContainerAwareCommand {
 
         $em->flush();
         $output->writeln("Done.");
+
+        return 0;
     }
 }

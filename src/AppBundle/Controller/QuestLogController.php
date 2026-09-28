@@ -20,6 +20,10 @@ use DateTime;
 class QuestLogController extends Controller {
 
     // Set the deck content to the QuestlogDeck snapshot
+    /**
+     * @param mixed $questlog
+     * @return void
+     */
     public function setSnapshot($questlog) {
         $questlog_decks = $questlog->getDecks();
         $decks_service = $this->get('decks');
@@ -34,12 +38,21 @@ class QuestLogController extends Controller {
             $decks_service->setSlots($deck,$questlogdeck_content);
         }
     }
+    /**
+     * @param mixed $questlogs
+     * @return void
+     */
     public function setSnapshots($questlogs) {
         foreach ($questlogs as $questlog) {
             $this->setSnapshot($questlog);
         }
     }
 
+    /**
+     * @param mixed $scenario_name_canonical
+     * @param mixed $quest_mode
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function mylistAction($scenario_name_canonical, $quest_mode) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -134,6 +147,9 @@ class QuestLogController extends Controller {
     }
 
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function myCompleteListAction() {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -180,13 +196,18 @@ class QuestLogController extends Controller {
     }
 
 
+    /**
+     * @param mixed $type
+     * @param int $page
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function listAction($type, $page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
 
         /**
-         * @var $questlog_manager \AppBundle\Model\QuestLogManager
+         * @var \AppBundle\Model\QuestLogManager $questlog_manager
          */
         $questlog_manager = $this->get('questlog_manager');
         $questlog_manager->setLimit(30);
@@ -225,7 +246,7 @@ class QuestLogController extends Controller {
                 break;
 
             case 'recent':
-                $paginator = $questlog_manager->findQuestLogsByAge(false);
+                $paginator = $questlog_manager->findQuestLogsByAge();
                 $pagetitle = "Recent Quest Logs";
                 break;
 
@@ -260,6 +281,14 @@ class QuestLogController extends Controller {
         ], $response);
     }
 
+    /**
+     * @param mixed $deck1_id
+     * @param mixed $deck2_id
+     * @param mixed $deck3_id
+     * @param mixed $deck4_id
+     * @param mixed $public
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function newAction($deck1_id, $deck2_id, $deck3_id, $deck4_id, $public) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -320,6 +349,10 @@ class QuestLogController extends Controller {
         ], $response);
     }
 
+    /**
+     * @param mixed $questlog_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function editAction($questlog_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -376,6 +409,10 @@ class QuestLogController extends Controller {
         return $this->render('AppBundle:QuestLog:edit.html.twig', $data, $response);
     }
 
+    /**
+     * @param mixed $questlog_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function viewAction($questlog_id) {
         /* @var $questlog \AppBundle\Entity\Questlog */
         $questlog = $this->getDoctrine()->getManager()->getRepository('AppBundle:Questlog')->find($questlog_id);
@@ -436,6 +473,9 @@ class QuestLogController extends Controller {
         return $this->render('AppBundle:QuestLog:view.html.twig', $data);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function saveAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -464,7 +504,7 @@ class QuestLogController extends Controller {
             $questlog->setNbDecks(0);
         }
 
-        $name = trim(filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
         $name = substr($name, 0, 250);
         if (empty($name)) {
             $name = "Untitled Questlog";
@@ -474,9 +514,9 @@ class QuestLogController extends Controller {
         $descriptionHtml = $this->get('texts')->markdown($descriptionMd);
 
         $quest = intval(filter_var($request->request->get('quest'), FILTER_SANITIZE_NUMBER_INT));
-        $date = trim(filter_var($request->request->get('date'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
-        $difficulty = trim(filter_var($request->request->get('difficulty'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
-        $victory = trim(filter_var($request->request->get('victory'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $date = trim((string) filter_var($request->request->get('date'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $difficulty = trim((string) filter_var($request->request->get('difficulty'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $victory = trim((string) filter_var($request->request->get('victory'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
         $score = intval(filter_var($request->request->get('score'), FILTER_SANITIZE_NUMBER_INT));
         $public = boolval(filter_var($request->request->get('public'), FILTER_SANITIZE_NUMBER_INT));
 
@@ -522,7 +562,7 @@ class QuestLogController extends Controller {
             for ($i = 1; $i <= 4; $i++) {
                 $deck_id = intval(filter_var($request->request->get("deck".$i."_id"), FILTER_SANITIZE_NUMBER_INT));
                 $is_decklist = filter_var($request->get("deck".$i."_is_decklist"), FILTER_SANITIZE_STRING) == 'true';
-                $player = trim(filter_var($request->get("questlogdeck".$i."_player_name"), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+                $player = trim((string) filter_var($request->get("questlogdeck".$i."_player_name"), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
                 $content = (array) json_decode($request->get("questlogdeck".$i."_content"));
 
                 if ($deck_id) {
@@ -552,7 +592,7 @@ class QuestLogController extends Controller {
 
                         $questlog_deck = new QuestlogDeck();
                         $questlog_deck->setDeck($deck);
-                        $questlog_deck->setContent(json_encode($content));
+                        $questlog_deck->setContent((string) json_encode($content));
                         $questlog_deck->setDeckNumber($i - $skip);
                         $questlog_deck->setQuestlog($questlog);
                         $questlog_deck->setPlayer($player);
@@ -575,7 +615,7 @@ class QuestLogController extends Controller {
                         $questlog_decklist = new QuestlogDeck();
                         $questlog_decklist->setDecklist($decklist);
                         $questlog_decklist->setDeck($decklist->getParent());
-                        $questlog_decklist->setContent(json_encode($content));
+                        $questlog_decklist->setContent((string) json_encode($content));
                         $questlog_decklist->setDeckNumber($i - $skip);
                         $questlog_decklist->setQuestlog($questlog);
                         $questlog_decklist->setPlayer($player);
@@ -583,7 +623,7 @@ class QuestLogController extends Controller {
                         $questlog->addDeck($questlog_decklist);
                     }
                     $nb_decks++;
-                } elseif ($deck_id == 0) {
+                } else {
                     // deck_id == 0 occurs if:
                     // 1. the deck slot in the builder is empty
                     // 2. the deck being referenced was deleted
@@ -597,15 +637,13 @@ class QuestLogController extends Controller {
 
                     // Reference deck was deleted
                     $questlog_deck = new QuestlogDeck();
-                    $questlog_deck->setContent(json_encode($content));
+                    $questlog_deck->setContent((string) json_encode($content));
                     $questlog_deck->setDeckNumber($i - $skip);
                     $questlog_deck->setQuestlog($questlog);
                     $questlog_deck->setPlayer($player);
 
                     $questlog->addDeck($questlog_deck);
                     $nb_decks++;
-                } else {
-                    $skip++;
                 }
             }
 
@@ -625,6 +663,9 @@ class QuestLogController extends Controller {
         ]));
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function deleteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -643,7 +684,7 @@ class QuestLogController extends Controller {
             return $this->redirect($this->generateUrl('myquestlogs_list'));
         }
 
-        if (!$questlog || $questlog->getUser()->getId() != $user->getId()) {
+        if ($questlog->getUser()->getId() != $user->getId()) {
             throw new AccessDeniedHttpException("You don't have access to this quest log.");
         }
 
@@ -663,6 +704,9 @@ class QuestLogController extends Controller {
         return $this->redirect($this->generateUrl('myquestlogs_list'));
     }
 
+    /**
+     * @return string
+     */
     private function searchForm(Request $request) {
         $dbh = $this->getDoctrine()->getConnection();
 
@@ -750,6 +794,9 @@ class QuestLogController extends Controller {
         return $this->renderView('AppBundle:QuestLog:form.html.twig', $params);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function searchAction(Request $request) {
         $response = new Response();
         $response->setPublic();
@@ -852,6 +899,9 @@ class QuestLogController extends Controller {
     }
 
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function deleteListAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -895,14 +945,27 @@ class QuestLogController extends Controller {
         return $this->redirect($this->generateUrl('myquestlogs_list'));
     }
 
+    /**
+     * @param mixed $questlog_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function octgnexportAction($questlog_id) {
         return $this->downloadFromSelection($questlog_id, true);
     }
 
+    /**
+     * @param mixed $questlog_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function textexportAction($questlog_id) {
         return $this->downloadFromSelection($questlog_id, false);
     }
 
+    /**
+     * @param mixed $questlog_id
+     * @param mixed $octgn
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function downloadFromSelection($questlog_id, $octgn) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -972,7 +1035,7 @@ class QuestLogController extends Controller {
         }
         $response = new Response();
         $response->headers->set('Content-Type', 'application/zip');
-        $response->headers->set('Content-Length', filesize($file));
+        $response->headers->set('Content-Length', (string) filesize($file));
         $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->get('texts')->slugify('RingsDB - Quest Log ' . $questlog_id) . '.zip'));
 
         $response->setContent(file_get_contents($file));
@@ -981,6 +1044,9 @@ class QuestLogController extends Controller {
         return $response;
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function favoriteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -1036,6 +1102,9 @@ class QuestLogController extends Controller {
         return new Response($questlog->getNbFavorites());
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function commentAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -1049,10 +1118,13 @@ class QuestLogController extends Controller {
 
         $questlog_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
+        if (!$questlog) {
+            throw new BadRequestHttpException('Wrong quest log id');
+        }
 
         $comment_text = trim($request->get('comment'));
-        if ($questlog && !empty($comment_text)) {
-            $comment_text = preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $comment_text);
+        if (!empty($comment_text)) {
+            $comment_text = (string) preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $comment_text);
 
             $mentionned_usernames = [];
             $matches = [];
@@ -1081,9 +1153,7 @@ class QuestLogController extends Controller {
             // send emails
             $spool = [];
             if ($questlog->getUser()->getIsNotifAuthor()) {
-                if (!isset($spool[$questlog->getUser()->getEmail()])) {
-                    $spool[$questlog->getUser()->getEmail()] = 'AppBundle:Emails:newquestlogcomment_author.html.twig';
-                }
+                $spool[$questlog->getUser()->getEmail()] = 'AppBundle:Emails:newquestlogcomment_author.html.twig';
             }
 
             foreach ($questlog->getComments() as $comment) {
@@ -1129,6 +1199,11 @@ class QuestLogController extends Controller {
     /*
      * hides a comment, or if $hidden is false, unhide a comment
      */
+    /**
+     * @param mixed $comment_id
+     * @param mixed $hidden
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function hidecommentAction($comment_id, $hidden) {
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
@@ -1157,6 +1232,9 @@ class QuestLogController extends Controller {
     /*
 	 * records a user's vote
 	 */
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function voteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -1170,6 +1248,9 @@ class QuestLogController extends Controller {
 
         /* @var $questlog \AppBundle\Entity\QuestLog */
         $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
+        if (!$questlog) {
+            throw new BadRequestHttpException('Unable to find quest log');
+        }
 
         if ($questlog->getUser()->getId() != $user->getId()) {
             $query = $em->getRepository('AppBundle:Questlog')
@@ -1196,6 +1277,10 @@ class QuestLogController extends Controller {
         return new Response($questlog->getNbVotes());
     }
 
+    /**
+     * @param mixed $username
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function byauthorAction($username) {
         return $this->redirect($this->generateUrl('questlogs_list', ['type' => 'find', 'author' => $username]));
     }
