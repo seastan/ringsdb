@@ -3,7 +3,7 @@
 {% block content -%}
 <h1>Encounter creation</h1>
 
-    <form action="{{ path('admin_encounter_create') }}" method="post" {{ form_enctype(form) }}>
+    <form action="{{ path('admin_encounter_create') }}" method="post" {% if form.vars.multipart %}enctype="multipart/form-data"{% endif %}>
         {{ form_widget(form) }}
         <button type="submit" class="btn btn-success">Create</button>
         <a href="{{ path('admin_encounter') }}" class="btn btn-default">

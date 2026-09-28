@@ -45,3 +45,6 @@ phpstan:
 
 deprecations:
 	docker compose exec -it -u www-data -e SYMFONY_DEPRECATIONS_HELPER=verbose=max[total]=999999 symfony php bin/simple-phpunit
+
+lint-twig:
+	docker compose exec -it -u www-data symfony php app/console lint:twig src/AppBundle/Resources/views app/Resources
