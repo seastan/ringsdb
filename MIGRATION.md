@@ -16,10 +16,8 @@ The functional tests (`make phpunit`) are the safety net: they must stay green a
 Each removal reduces what has to be ported.
 
 - Done: the **OAuth2 server** and **GregwarCaptchaBundle** (see "OAuth2 server (removed)").
-- **OCTGN features**: two decisions first (see "OCTGN features"): the `octgnid` of the public API,
-  and the `octgnid` / reprint `mapping` of the card statistics.
-  Until then, `UpdateOctgnCommand` and `ScrapOctgnCardDataCommand` are excluded from phpstan
-  (`excludePaths` in `phpstan.neon`): remove them from the list with the code.
+- Done: the broken OCTGN commands (`app:octgn`, `app:cards:octgn`). The OCTGN imports and exports
+  are kept (see "OCTGN features").
 - **twig/extensions**: required in `composer.json` but none of its extensions is registered in the
   configuration: probably unused (abandoned package). To remove with `composer remove`.
 - **Dead code found by the tests, not removed yet**:
@@ -37,20 +35,20 @@ Each removal reduces what has to be ported.
 
 - **`/admin/stat_cards` and the `app:stats:precompute-cards` cron**: nothing in the repository
   consumes that JSON, probably an external report. Ask the maintainers / check the nginx logs
-  (see "Card statistics"). Linked to the OCTGN decision above.
+  (see "Card statistics").
 - **User blocking**: the "Block" button of the admin has had no effect since FOSUserBundle 2.
   Reimplement it with a `UserChecker` or drop it, with the `locked` column (see "Admin area").
 - **JSONP on the public API**: the callback is echoed unsanitised (XSS vector). Validate it or
   drop JSONP; dropping it changes the public API (see "Public API").
 - **Card scraping commands**: `app:beorn:html` (`ScrapBeornCardDataCommand`, scrapes the Hall of
-  Beorn HTML pages, still full of debug output), `app:beorn:json`, `app:cgdb:cards`,
-  `app:cards:octgn` (OCTGN, see above) and `app:download-images`. The CSV import
+  Beorn HTML pages, still full of debug output), `app:beorn:json`, `app:cgdb:cards` and
+  `app:download-images`. The CSV import
   (`BeornJSONtoRingsDBcsv.py`, see "Admin area") seems to have replaced them; `app:beorn:scenario`
   is still used by the admin scenario import. Keep only what the maintainers still run.
-- **`/api/doc` (NelmioApiDocBundle 2.x)**: the public API documentation, generated from the
-  `@ApiDoc` annotations of `ApiController` (8). No page links to it and
-  no test covers it. Porting it means NelmioApiDocBundle 4+, which is a rewrite (OpenAPI
-  attributes). Keep, drop, or replace with a static page?
+- Decided: **`/api/doc` (NelmioApiDocBundle 2.x)** is kept. It is the public API documentation,
+  generated from the `@ApiDoc` annotations of `ApiController` (8), and linked from the API
+  introduction page (`/api/`, `Default/apiIntro.html.twig`). No test covers it. Porting it means
+  NelmioApiDocBundle 4+, which is a rewrite (OpenAPI attributes).
 
 ## 3. Fixes cheaper to make now, with the tests
 
@@ -77,7 +75,7 @@ Each removal reduces what has to be ported.
 - `app/Resources/FOSUserBundle/views/Registration/checkEmail.html.twig`: probably ignored by
   FOSUserBundle 2.0 (not verified, see "Removing FOSUserBundle").
 - The merging of reprints by `source_code()` in the card statistics (see "Card statistics").
-- `/api/doc`, if kept (see above).
+- `/api/doc` (see above).
 
 ## 5. Left for during or after the migration
 
@@ -392,10 +390,10 @@ field). Everything the tests create is deleted in `tearDown()`.
   - `POST /deck/import/all` (zip archive, "uparchive"): one deck per file, named after the file
     (without folder nor extension); text files through the text import parser, `.o8d` through the
     OCTGN one; a file without any card gives an empty deck; a non-zip file or no file is a `422`.
-    BUG: the OCTGN parser (`BuilderController::parseOctgnImport`, also used by the single file
-    import of a `.o8d`, `/deck/fileimport`) still looks cards up by `Card.octgnid`, moved to
+    Fixed: the OCTGN parser (`BuilderController::parseOctgnImport`, also used by the single file
+    import of a `.o8d`, `/deck/fileimport`) looked cards up by `Card.octgnid`, moved to
     `CardPrinting` by the card printings refactor ("Unrecognized field: octgnid", `500`, nothing
-    imported).
+    imported). See "OCTGN features".
 - Decklist edit / save / delete (`/decklist/edit|save|delete/{id}`, `DecklistEditTest`): no
   `access_control` rule for `/decklist/`, the controllers check the user; anonymous users are
   redirected to the login page on edit / save but get a `403` on delete (different exception
@@ -866,43 +864,39 @@ name, number of decks, cards, packs, custom packs, number of Core Sets, sort ord
 - `app:remove-user` and `app:decklist:delete` now exit with code 1 when the user or decklist is
   not found (the latter crashed).
 
-## OCTGN features (to be removed)
+## OCTGN features
 
-Plan: drop every OCTGN feature (OCTGN is a desktop client for the game) before the migration, so
-they do not have to be ported. Do not fix the OCTGN bugs found by the tests, remove the features
-instead.
+OCTGN is a desktop client for the game. Its deck files (`.o8d`, XML listing the cards by their
+OCTGN id) can be exported and imported: these features are kept (decided on 2026-09-28, after
+an earlier plan to drop them). The broken OCTGN commands were removed.
 
-What there is today:
-
-- Exports as `.o8d` (template `Export/octgn.xml.twig`): routes `deck_export_octgn`,
-  `deck_export_octgn_list`, `decklist_export_octgn`, `fellowship_export_octgn`,
-  `questlog_export_octgn`, with their buttons in the toolbars (`Builder/`, `Decklist/`,
-  `Fellowship/`, `Quest/`, `QuestLog/toolbar.html.twig`), the My Decks page
-  (`Builder/decks.html.twig`, `no-decks.html.twig`) and the scripts `ui.decklist.js`,
-  `ui.decks.js`, `ui.fellowshipview.js`, `ui.questlogview.js`.
+- Exports as `.o8d` (template `Export/octgn.xml.twig`, the `octgnid` of each card's primary
+  printing): routes `deck_export_octgn`, `deck_export_octgn_list`, `decklist_export_octgn`,
+  `fellowship_export_octgn`, `questlog_export_octgn`, with their buttons in the toolbars
+  (`Builder/`, `Decklist/`, `Fellowship/`, `Quest/`, `QuestLog/toolbar.html.twig`), the My Decks
+  page (`Builder/decks.html.twig`, `no-decks.html.twig`) and the scripts `ui.decklist.js`,
+  `ui.decks.js`, `ui.fellowshipview.js`, `ui.questlogview.js`. Covered by the download snapshots
+  (`WebsiteBrowsingTest`).
 - Imports of `.o8d`: `BuilderController::parseOctgnImport()`, used by the single file import
   (`/deck/fileimport`, `Modale/file.html.twig`) and the archive import (`/deck/import/all`).
-  BUG, not to be fixed: the parser looks cards up by `Card.octgnid`, moved to `CardPrinting` by
-  the card printings refactor, so both imports fail on a `.o8d` (pinned by
-  `DeckManagementTest::testImportAnArchiveWithAnOctgnFile`).
+  Fixed: the parser looked the cards up by `Card.octgnid`, moved to `CardPrinting` by the card
+  printings refactor, so both imports failed on a `.o8d`. The cards are now found by the octgnid
+  of any of their printings (quantities of several printings of a card add up). Covered by an
+  export → import round trip of the fixture decks (`DeckWorkflowTest`,
+  `testOctgnExportCanBeImportedBack`) and by `DeckManagementTest::testImportAnArchiveWithAnOctgnFile`.
+- The octgnid is not unique: 100 of them are shared by a hero and its Messenger of the King
+  version ("(MotK) Guthlaf" has the octgnid of Guthlaf). OCTGN cannot tell them apart: the import
+  chooses the original card (the lowest id, as before the refactor), so a MotK hero exported to
+  OCTGN comes back as the original hero. 74 printings have no octgnid.
 - Data: `CardPrinting.octgnid` and `Sphere.octgnid` (mappings, forms `CardPrintingType`,
   `SphereType`, admin templates `Card/`, `CardPrinting/`, `Sphere/`), filled by the CSV import
-  (`CSVController`) and `BeornJSONtoRingsDBcsv.py`.
-- Commands: `UpdateOctgnCommand`, `ScrapOctgnCardDataCommand`, and the OCTGN parts of
-  `ScrapBeornCardDataCommand`.
+  (`CSVController`) and `BeornJSONtoRingsDBcsv.py`; returned by the public API for each card and
+  printing, and by the card statistics (with an OCTGN id `mapping` of the reprints).
 - The "about" page mentions OCTGN (`Default/about.html.twig`).
-
-Decisions needed before removing:
-
-- The public API returns `octgnid` for each card and each printing (`CardsData`, served by
-  `/api/public/card(s)`): removing it changes the public API (its snapshots) for its external
-  consumers.
-- The card statistics (`CardStatsCalculator`, `StatController`) return the cards' `octgnid`
-  and an OCTGN id `mapping` of the reprints, probably used by the external report that consumes
-  them (see "Card statistics").
-
-`UpdateOctgnCommand` still uses a `Faction` entity (ThronesDB) and `Card::setOctgnid()`, which no
-longer exist: it cannot run. It is excluded from phpstan, with `ScrapOctgnCardDataCommand`.
+- Removed: `UpdateOctgnCommand` (`app:octgn`), which still used a `Faction` entity (ThronesDB)
+  and `Card::setOctgnid()`, so it could not run, and `ScrapOctgnCardDataCommand`
+  (`app:cards:octgn`). The OCTGN parts of `ScrapBeornCardDataCommand` remain (see the roadmap,
+  card scraping commands).
 
 ## Card search
 

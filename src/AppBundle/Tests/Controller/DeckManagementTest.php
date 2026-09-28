@@ -435,10 +435,8 @@ class DeckManagementTest extends WebTestCase {
     }
 
     /**
-     * BUG: the OCTGN parser (BuilderController::parseOctgnImport, also used by the single file
-     * import of a .o8d) still looks cards up by Card.octgnid, moved to CardPrinting by the card
-     * printings refactor: an archive with a .o8d file fails, and nothing is imported (a single
-     * flush at the end).
+     * The .o8d files of an archive are read by the OCTGN parser. Fixed: it looked the cards up by
+     * Card.octgnid, moved to CardPrinting by the card printings refactor (500, nothing imported).
      */
     public function testImportAnArchiveWithAnOctgnFile(): void {
         $client = $this->createAuthenticatedClient();
@@ -448,9 +446,11 @@ class DeckManagementTest extends WebTestCase {
             'Noldor.o8d' => $this->export($client, 'octgn', 3),
         ]);
 
-        $this->assertSame(500, $response->getStatusCode());
-        $this->assertContains('Unrecognized field: octgnid', $response->getContent());
-        $this->assertSame([], $this->newDeckIds($client));
+        $this->assertSame(302, $response->getStatusCode());
+        $decks = $this->db($client)->fetchAll('SELECT id, name FROM deck WHERE id > ? ORDER BY id', [$this->maxIds['deck']]);
+        $this->assertSame(['Dwarves', 'Noldor'], array_column($decks, 'name'));
+        $this->assertSame($this->slots($client, 'deckslot', 1), $this->slots($client, 'deckslot', $decks[0]['id']));
+        $this->assertSame($this->slots($client, 'deckslot', 3), $this->slots($client, 'deckslot', $decks[1]['id']));
     }
 
     public function testImportSomethingElseThanAnArchive(): void {
