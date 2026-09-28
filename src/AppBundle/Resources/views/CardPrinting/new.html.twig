@@ -19,7 +19,7 @@
     </form>
 </div>
 
-<form action="{{ path('admin_card_printing_create') }}{% if filter_pack %}?filter_pack={{ filter_pack }}{% endif %}" method="post" {{ form_enctype(form) }}>
+<form action="{{ path('admin_card_printing_create') }}{% if filter_pack %}?filter_pack={{ filter_pack }}{% endif %}" method="post" {% if form.vars.multipart %}enctype="multipart/form-data"{% endif %}>
     {{ form_widget(form) }}
     <button type="submit" class="btn btn-success">Create</button>
 </form>

@@ -41,8 +41,8 @@ Each removal reduces what has to be ported.
 - **JSONP on the public API**: the callback is echoed unsanitised (XSS vector). Validate it or
   drop JSONP; dropping it changes the public API (see "Public API").
 - **Card scraping commands**: `app:beorn:html` (`ScrapBeornCardDataCommand`, scrapes the Hall of
-  Beorn HTML pages, still full of debug output), `app:beorn:json`, `app:cgdb:cards` and
-  `app:download-images`. The CSV import
+  Beorn HTML pages, still full of debug output), `app:beorn:json` and `app:download-images`
+  (`app:cgdb:cards` was removed). The CSV import
   (`BeornJSONtoRingsDBcsv.py`, see "Admin area") seems to have replaced them; `app:beorn:scenario`
   is still used by the admin scenario import. Keep only what the maintainers still run.
 - Decided: **`/api/doc` (NelmioApiDocBundle 2.x)** is kept. It is the public API documentation,
@@ -161,9 +161,8 @@ arrays and collections (`checkMissingIterableValueType` and
 - **Production database**: the tests run on MySQL 8.4 with `ONLY_FULL_GROUP_BY` (several queries
   had to be fixed for it, see "Card statistics", "Lists and search managers"). Check the version
   and `sql_mode` of production, so that the tests run on the same settings.
-- **Composer**: the lock is Composer 1 era and `vendor/` is copied from the server (Composer 2
-  drifts Symfony 2.7 → 2.8 and breaks FOSUserBundle, see `CLAUDE.md`). The migration needs
-  Composer 2 and a clean `composer install`.
+- **Composer**: the lock is Composer 1 era. From the Symfony 3.0 step on, the lock is updated with
+  Composer 2 and production runs a normal `composer install` (decided on 2026-09-28).
 
 # Reference
 
@@ -859,8 +858,9 @@ name, number of decks, cards, packs, custom packs, number of Core Sets, sort ord
   `/api/public/user/info`). Without an amount (or with 0) it shows the total. The amount is not
   checked (a negative one is subtracted); an unknown user is reported but exits with code 0.
 
-- Card scraping commands (`app:beorn:html`, `app:beorn:json`, `app:cgdb:cards`,
-  `app:download-images`): candidates for removal, see the roadmap.
+- Card scraping commands (`app:beorn:html`, `app:beorn:json`, `app:download-images`): candidates
+  for removal, see the roadmap. Removed: `app:cgdb:cards` (`ScrapCardDataCommand`, scraped
+  cardgamedb.com), which used the console `DialogHelper` removed in Symfony 3.0.
 - `app:remove-user` and `app:decklist:delete` now exit with code 1 when the user or decklist is
   not found (the latter crashed).
 
@@ -927,6 +927,8 @@ removed before the migration so that it does not have to be ported:
   user and of the whole site. Their routes were reused for the user admin panel on 2016-04-01
   (commit `497ccf27`); the admin pages `/admin/user/comments/{user_id}`
   (`UserAdminController::commentsAction`) replace them.
+- The FOSUserBundle group templates (`app/Resources/FOSUserBundle/views/Group/`): the groups are
+  not used.
 - `app:twig` (`TwigCacheCommand`): called `Twig_Environment::getCacheFilename()`, removed in
   Twig 2, so it crashed (found by phpstan).
 - `Decklist::$is_simple_export` and its accessors: never used.
