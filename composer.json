@@ -27,7 +27,7 @@
     "sensio/distribution-bundle": "~4.0",
     "sensio/framework-extra-bundle": "~3.0,>=3.0.2",
     "incenteev/composer-parameter-handler": "~2.0",
-    "friendsofsymfony/user-bundle": "2.0.*@dev",
+    "friendsofsymfony/user-bundle": "^2.1.0",
     "gedmo/doctrine-extensions": "^2.4",
     "doctrine/dbal": "^2.5",
     "doctrine/orm": "^2.5",

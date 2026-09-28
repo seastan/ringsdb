@@ -756,7 +756,8 @@ which have to be reimplemented when FOSUserBundle is removed.
   invalid."); password confirmation must match.
 - Password reset: an email with a `/resetting/reset/{token}` link; a second request is ignored
   while the first one is recent (`retry_ttl`); no hint when the user does not exist; the token
-  is single-use, an unknown or used token is a `404`; after the reset the user is logged in.
+  is single-use, an unknown or used token redirects to the login page (a `404` before
+  FOSUserBundle 2.1); after the reset the user is logged in.
 
 ### To look at during the migration
 

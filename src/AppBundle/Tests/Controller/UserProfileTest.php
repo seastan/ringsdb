@@ -320,7 +320,8 @@ class UserProfileTest extends WebTestCase {
         // 4. the token is consumed, and the new password works
         $this->assertNull($this->fetchUser($client)['confirmation_token']);
         $client->request('GET', "/resetting/reset/$token");
-        $this->assertSame(404, $client->getResponse()->getStatusCode());
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertSame('/login', $client->getResponse()->headers->get('Location'));
         $this->assertTrue($this->login(static::createClient(), 'test', 'secret123'));
     }
 
@@ -339,6 +340,8 @@ class UserProfileTest extends WebTestCase {
         $client = static::createClient();
         $client->request('GET', '/resetting/reset/unknown-token');
 
-        $this->assertSame(404, $client->getResponse()->getStatusCode());
+        // redirect to the login page (a 404 before FOSUserBundle 2.1)
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertSame('/login', $client->getResponse()->headers->get('Location'));
     }
 }
