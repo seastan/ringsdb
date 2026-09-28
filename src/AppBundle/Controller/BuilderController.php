@@ -7,11 +7,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Request;
+use AppBundle\Entity\Card;
 use AppBundle\Entity\Deck;
 use AppBundle\Entity\Deckchange;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Doctrine\ORM\EntityManager;
 
 class BuilderController extends Controller {
 
@@ -230,6 +232,28 @@ class BuilderController extends Controller {
     }
 
     /**
+     * The card of a printing, by its octgnid. The Messenger of the King version of a hero has the
+     * octgnid of the hero: the original card (the lowest id) is chosen, as before the printings
+     * refactor.
+     *
+     * @param string $octgnid
+     */
+    private function findCardByOctgnid(EntityManager $em, $octgnid): ?Card {
+        $printing = $em->createQueryBuilder()
+            ->select('cp')
+            ->from('AppBundle:CardPrinting', 'cp')
+            ->join('cp.card', 'c')
+            ->where('cp.octgnid = :octgnid')
+            ->setParameter('octgnid', $octgnid)
+            ->orderBy('c.id', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $printing ? $printing->getCard() : null;
+    }
+
+    /**
      * @param mixed $octgn
      * @return array
      */
@@ -266,21 +290,20 @@ class BuilderController extends Controller {
 
         $content = [];
         foreach ($octgnids as $octgnid => $qty) {
-            /* @var $pack \AppBundle\Entity\Card */
-            $card = $em->getRepository('AppBundle:Card')->findOneBy(['octgnid' => $octgnid]);
+            $card = $this->findCardByOctgnid($em, $octgnid);
 
             if ($card) {
-                $content[$card->getCode()] = $qty;
+                // several printings of a card can have their own octgnid
+                $content[$card->getCode()] = ($content[$card->getCode()] ?? 0) + $qty;
             }
         }
 
         $sidecontent = [];
         foreach ($sideoctgnids as $octgnid => $qty) {
-            /* @var $pack \AppBundle\Entity\Card */
-            $card = $em->getRepository('AppBundle:Card')->findOneBy(['octgnid' => $octgnid]);
+            $card = $this->findCardByOctgnid($em, $octgnid);
 
             if ($card) {
-                $sidecontent[$card->getCode()] = $qty;
+                $sidecontent[$card->getCode()] = ($sidecontent[$card->getCode()] ?? 0) + $qty;
             }
         }
 

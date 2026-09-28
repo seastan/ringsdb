@@ -519,6 +519,36 @@ class DeckWorkflowTest extends WebTestCase {
     }
 
     /**
+     * A deck exported for OCTGN (.o8d, the octgnid of each card's primary printing) can be
+     * imported back as is.
+     *
+     * @dataProvider fixtureDeckProvider
+     * @param mixed $deckId
+     */
+    public function testOctgnExportCanBeImportedBack($deckId): void {
+        $client = $this->createAuthenticatedClient();
+        $client->request('GET', "/deck/export/octgn/$deckId");
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $export = $client->getResponse()->getContent();
+        $maxId = $this->maxDeckId($client);
+
+        $path = self::temporaryFile('import');
+        file_put_contents($path, $export);
+        $file = new UploadedFile($path, 'PHPUnit Roundtrip.o8d', 'application/xml', (int) filesize($path), null, true);
+        $client->request('POST', '/deck/fileimport', ['type' => 'auto'], ['upfile' => $file]);
+        unlink($path);
+
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $ids = $this->newDeckIds($client, $maxId);
+        $this->assertCount(1, $ids);
+        $this->assertSame('PHPUnit Roundtrip', $this->fetchDeck($client, $ids[0])['name']);
+        $this->assertSame(
+            $this->fetchSlots($client, 'deckslot', 'deck_id', $deckId),
+            $this->fetchSlots($client, 'deckslot', 'deck_id', $ids[0])
+        );
+    }
+
+    /**
      * @return array
      */
     public function fixtureDeckProvider() {

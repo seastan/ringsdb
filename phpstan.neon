@@ -2,10 +2,6 @@ parameters:
     level: 8
     paths:
         - src
-    excludePaths:
-        # to be removed before the migration (MIGRATION.md: "OCTGN features")
-        - src/AppBundle/Command/ScrapOctgnCardDataCommand.php
-        - src/AppBundle/Command/UpdateOctgnCommand.php
     ignoreErrors:
         # PHPExcel documents the column and row indexes as strings, they are ints
         - '#^Parameter \#[12] \$p(Column|Row) of method PHPExcel_Worksheet::\w+\(\) expects string, int(<0, max>)? given\.$#'
