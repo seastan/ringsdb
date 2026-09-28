@@ -19,6 +19,9 @@ Each removal reduces what has to be ported.
   `/oauth/v2/`: `deck/load` works without a token). Inventory in "OAuth2 server".
 - **OCTGN features**: two decisions first (see "OCTGN features"): the `octgnid` of the public API,
   and the `octgnid` / reprint `mapping` of the card statistics.
+- Until then, `Oauth2Controller`, `CreateClientCommand`, `UpdateOctgnCommand` and
+  `ScrapOctgnCardDataCommand` are excluded from phpstan (`excludePaths` in `phpstan.neon`): remove
+  them from the list with the code.
 - **GregwarCaptchaBundle**: registered in `AppKernel`, configured (`gregwar_captcha: ~` in
   `config.yml`), required in `composer.json` (`gregwar/captcha-bundle` 2.0.7), but no form uses
   the `captcha` type: added on 2020-09-14 (commit `a07a2fd4`, "added captcha and vendor
@@ -47,6 +50,11 @@ Each removal reduces what has to be ported.
   Reimplement it with a `UserChecker` or drop it, with the `locked` column (see "Admin area").
 - **JSONP on the public API**: the callback is echoed unsanitised (XSS vector). Validate it or
   drop JSONP; dropping it changes the public API (see "Public API").
+- **Card scraping commands**: `app:beorn:html` (`ScrapBeornCardDataCommand`, scrapes the Hall of
+  Beorn HTML pages, still full of debug output), `app:beorn:json`, `app:cgdb:cards`,
+  `app:cards:octgn` (OCTGN, see above) and `app:download-images`. The CSV import
+  (`BeornJSONtoRingsDBcsv.py`, see "Admin area") seems to have replaced them; `app:beorn:scenario`
+  is still used by the admin scenario import. Keep only what the maintainers still run.
 - **`/api/doc` (NelmioApiDocBundle 2.x)**: the public API documentation, generated from the
   `@ApiDoc` annotations of `ApiController` (8) and `Oauth2Controller` (4). No page links to it and
   no test covers it. Porting it means NelmioApiDocBundle 4+, which is a rewrite (OpenAPI
@@ -88,6 +96,8 @@ Each removal reduces what has to be ported.
 - **Line endings of the text exports** (CRLF → LF) after the migration: see "After the
   migration".
 - **Time in tests** (`ClockInterface`): see "Tests and time".
+- **Static analysis** (`make phpstan`, level 8 of phpstan 1.4, see "Static analysis"): level 9,
+  the value types of arrays and collections, and the official extensions instead of ours.
 
 # Migration plan
 
@@ -116,6 +126,7 @@ FOSOAuthServerBundle are removed (decided), preferably before the first step.
 | `gedmo/doctrine-extensions` 2.x | maintained (3.x) | upgrade; the timestampable listener is declared by hand (`doctrine_extensions.yml`), or use `stof/doctrine-extensions-bundle` |
 | `doctrine/orm` 2.x, `doctrine/dbal` 2.x | | ORM 3 / DBAL 4; the custom DQL functions `replace` and `power` (see "Card search") |
 | `ezyang/htmlpurifier`, `erusev/parsedown` | maintained | upgrade |
+| `phpstan/phpstan` 1.4 (dev) | maintained (2.x) | upgrade, with `phpstan-symfony`, `phpstan-doctrine` and `phpstan-phpunit` (see "Static analysis") |
 
 ## Front-end assets
 
@@ -131,12 +142,31 @@ current stack:
 
 - the `KernelTestCase` tests (managers, commands, card statistics): service ids
   (`static::$kernel->getContainer()->get('cards_data')`, `'doctrine'`), `getRootDir()`;
-- PHPUnit 6.5 APIs: `assertContains()` on strings, `assertRegExp()`, `setUp()` / `tearDown()`
-  without `: void`. On PHP 7.1, PHPUnit cannot go past 7.5;
+- PHPUnit 6.5 APIs: `assertContains()` on strings, `assertRegExp()`. On PHP 7.1, PHPUnit cannot
+  go past 7.5. The test methods, `setUp()` and `tearDown()` already declare `: void` (required from
+  PHPUnit 8);
 - the fixtures (`DoctrineFixturesBundle` 2.x) and the `make test-fixtures` loading.
 
 To plan with the strategy: with LTS steps, the suite is upgraded as PHP goes up; with a new
 skeleton, it is ported first, then run against the new application.
+
+## Static analysis
+
+`make phpstan` runs phpstan 1.4 at level 8 on `src/` (configuration in `phpstan.neon`). The
+official extensions need Composer 2, so `src/AppBundle/PHPStan/` has small replacements, to drop
+for `phpstan-symfony`, `phpstan-doctrine` and `phpstan-phpunit` once Composer 2 is available:
+
+- the service types, read from the container dumped in `app/cache/test` (hence the
+  `cache:warmup` of `make phpstan`); the Doctrine registry, entity managers and
+  `getRepository('AppBundle:Card')` (an `EntityRepository<Card>`, with a stub);
+- the PHPUnit assertions narrowing types, the non-null response / request / container of the test
+  client, `HeaderBag::get()`, the entities' `$id` written by Doctrine;
+- stubs and ignored errors for wrong vendor docblocks (DBAL, PHPUnit 6.5, PHPExcel).
+
+Left for later: level 9 (1136 errors, all about `mixed`: request parameters, query results,
+untyped collections, the `mixed` parameters of the level 6 docblocks) and the value types of
+arrays and collections (`checkMissingIterableValueType` and
+`checkGenericClassInNonGenericObjectType` are off). Both are cheaper on the rewritten code.
 
 ## Environment
 
@@ -843,11 +873,8 @@ name, number of decks, cards, packs, custom packs, number of Core Sets, sort ord
   `/api/public/user/info`). Without an amount (or with 0) it shows the total. The amount is not
   checked (a negative one is subtracted); an unknown user is reported but exits with code 0.
 
-- Card scraping commands, candidates for removal: `app:beorn:html` (`ScrapBeornCardDataCommand`,
-  scrapes the Hall of Beorn HTML pages, still full of debug output), `app:beorn:json`,
-  `app:cgdb:cards`, `app:cards:octgn` (OCTGN, see below) and `app:download-images`. The CSV import
-  (`BeornJSONtoRingsDBcsv.py`, see "Admin area") seems to have replaced them; `app:beorn:scenario`
-  is still used by the admin scenario import. Keep only what the maintainers still run.
+- Card scraping commands (`app:beorn:html`, `app:beorn:json`, `app:cgdb:cards`,
+  `app:download-images`): candidates for removal, see the roadmap.
 - `app:remove-user` and `app:decklist:delete` now exit with code 1 when the user or decklist is
   not found (the latter crashed).
 
