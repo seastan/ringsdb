@@ -179,6 +179,25 @@ class AdminExcelTest extends WebTestCase {
         $this->assertSame('0 cards changed or added', $response);
     }
 
+    /**
+     * The sample is a download of the Core Set made in production: it is read like a download of
+     * the test database (the same 7 cards "changed" by their line endings).
+     */
+    public function testUploadAProductionExport(): void {
+        $client = $this->createAdminClient();
+        $file = self::temporaryFile('excel') . '.xlsx';
+        $this->files[] = $file;
+        copy(__DIR__ . '/../Resources/fixtures/import/core-set.xlsx', $file);
+        $this->assertSame(self::HEADER, self::rows($file)[0]);
+
+        list($response, $report) = $this->upload($client, $file);
+        $this->assertSame('7 cards changed or added', $response);
+        $this->assertContains('Legolas: field [text] changed; field [flavor] changed;', $report);
+
+        list($response) = $this->upload($client, $file);
+        $this->assertSame('0 cards changed or added', $response);
+    }
+
     public function testUploadChanges(): void {
         $client = $this->createAdminClient();
         $file = $this->download($client, 1);

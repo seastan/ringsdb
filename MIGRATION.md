@@ -15,21 +15,13 @@ The functional tests (`make phpunit`) are the safety net: they must stay green a
 
 Each removal reduces what has to be ported.
 
-- **OAuth2 server**: check first that nothing calls it (nginx logs for `/api/oauth2/` and
-  `/oauth/v2/`: `deck/load` works without a token). Inventory in "OAuth2 server".
+- Done: the **OAuth2 server** and **GregwarCaptchaBundle** (see "OAuth2 server (removed)").
 - **OCTGN features**: two decisions first (see "OCTGN features"): the `octgnid` of the public API,
   and the `octgnid` / reprint `mapping` of the card statistics.
-- Until then, `Oauth2Controller`, `CreateClientCommand`, `UpdateOctgnCommand` and
-  `ScrapOctgnCardDataCommand` are excluded from phpstan (`excludePaths` in `phpstan.neon`): remove
-  them from the list with the code.
-- **GregwarCaptchaBundle**: registered in `AppKernel`, configured (`gregwar_captcha: ~` in
-  `config.yml`), required in `composer.json` (`gregwar/captcha-bundle` 2.0.7), but no form uses
-  the `captcha` type: added on 2020-09-14 (commit `a07a2fd4`, "added captcha and vendor
-  directory") and never wired. To remove: the bundle registration and the configuration now;
-  the `composer.json` / `composer.lock` entry with the next dependency update (the lock is
-  Composer 1 era, see "Environment").
+  Until then, `UpdateOctgnCommand` and `ScrapOctgnCardDataCommand` are excluded from phpstan
+  (`excludePaths` in `phpstan.neon`): remove them from the list with the code.
 - **twig/extensions**: required in `composer.json` but none of its extensions is registered in the
-  configuration: probably unused (abandoned package). Same removal as the captcha bundle.
+  configuration: probably unused (abandoned package). To remove with `composer remove`.
 - **Dead code found by the tests, not removed yet**:
   - the `/deck/can_publish/{id}` route (`deck_publish`), pointing to the missing
     `SocialController::publishAction` (see "Website browsing");
@@ -56,7 +48,7 @@ Each removal reduces what has to be ported.
   (`BeornJSONtoRingsDBcsv.py`, see "Admin area") seems to have replaced them; `app:beorn:scenario`
   is still used by the admin scenario import. Keep only what the maintainers still run.
 - **`/api/doc` (NelmioApiDocBundle 2.x)**: the public API documentation, generated from the
-  `@ApiDoc` annotations of `ApiController` (8) and `Oauth2Controller` (4). No page links to it and
+  `@ApiDoc` annotations of `ApiController` (8). No page links to it and
   no test covers it. Porting it means NelmioApiDocBundle 4+, which is a rewrite (OpenAPI
   attributes). Keep, drop, or replace with a static page?
 
@@ -81,7 +73,7 @@ Each removal reduces what has to be ported.
 
 ## 4. Open test gaps
 
-- CSV import and scenario import: waiting for sample files (see "Admin area").
+- Scenario import: waiting for a sample file (see "Admin area").
 - `app/Resources/FOSUserBundle/views/Registration/checkEmail.html.twig`: probably ignored by
   FOSUserBundle 2.0 (not verified, see "Removing FOSUserBundle").
 - The merging of reprints by `source_code()` in the card statistics (see "Card statistics").
@@ -105,16 +97,14 @@ Each removal reduces what has to be ported.
 
 Step through the LTS versions (3.4 → 4.4 → 5.4 → 6.4 → 7.4, fixing deprecations at each step) or
 start from a Symfony 7.4 skeleton and port the code into it. The choice decides when the test
-suite has to be ported (see "Porting the test suite"). Whatever the choice, FOSUserBundle and
-FOSOAuthServerBundle are removed (decided), preferably before the first step.
+suite has to be ported (see "Porting the test suite"). Whatever the choice, FOSUserBundle is
+replaced (decided), preferably before the first step.
 
 ## Dependencies
 
 | Package | Status | Replacement / action |
 |---|---|---|
 | `friendsofsymfony/user-bundle` 2.0 | to be replaced (decided) | Symfony Security, see "Removing FOSUserBundle" |
-| `friendsofsymfony/oauth-server-bundle` | depends on FOSUser | remove, see "OAuth2 server" |
-| `gregwar/captcha-bundle` | unused | remove, see roadmap |
 | `twig/extensions` | abandoned, probably unused | remove, see roadmap |
 | `symfony/assetic-bundle`, `leafo/scssphp`, `patchwork/jsqueeze` | dropped in Symfony 4 | see "Front-end assets" |
 | `symfony/swiftmailer-bundle` | abandoned | Symfony Mailer (`\Swift_Message::newInstance()` in the comment notifications, FOSUser emails) |
@@ -273,7 +263,7 @@ quest logs, in `app.deck.js` / `app.deck_selection.js`; `api_private_custom_pack
 `app.ui.js`). Covered by `src/AppBundle/Tests/Controller/ApiPrivateControllerTest.php` (see
 "Private API" below).
 
-The OAuth2 API (`/api/oauth2`) is to be removed before migrating: see "OAuth2 server" below.
+The OAuth2 API (`/api/oauth2`) has been removed: see "OAuth2 server (removed)" below.
 
 ### Current behaviour pinned by the tests (quirks to keep or fix on purpose)
 
@@ -516,46 +506,24 @@ sent with AJAX after logging in, like the site's JavaScript does.
 - Anonymous: `403` `{"success": false, "message": "Access Denied."}` for AJAX requests (through
   `CoreExceptionListener`), redirect to the login page otherwise.
 
-## OAuth2 server (to be removed)
+## OAuth2 server (removed)
 
-`FOSOAuthServerBundle` makes RingsDB an OAuth2 server, so that third-party applications can act
-on behalf of a user through `/api/oauth2/*`. Inherited from ThronesDB. Plan: remove it before
-the migration (the bundle depends on FOSUserBundle and is not maintained for recent Symfony
-versions).
+`FOSOAuthServerBundle` made RingsDB an OAuth2 server, so that third-party applications could act
+on behalf of a user through `/api/oauth2/*` (inherited from ThronesDB). Token checking had been
+disabled (the `api_oauth2` firewall was commented out), and the API had 4 routes: the session
+user's decks, loading any shared deck (to anyone), and deck save / publish (both disabled).
+Nothing called it any more: it was removed, with `GregwarCaptchaBundle`, which no form used.
 
-What is there today:
+Removed: the bundles (`AppKernel`, `composer.json`, `config.yml`), the `oauth_token` /
+`oauth_authorize` firewalls and the `^/api/oauth2` access rule, the `/oauth/v2/*` and
+`/api/oauth2/*` routes, `Oauth2Controller`, `CreateClientCommand`, `SecurityController` and its
+template (the login form of the authorization endpoint), the templates overriding the bundle's,
+the entities `Client`, `AccessToken`, `RefreshToken`, `AuthCode` and their mappings, the OAuth2
+section of the API introduction page (`/api/`).
 
-- Config: `fos_oauth_server` in `config.yml` (entities `Client`, `AccessToken`, `RefreshToken`,
-  `AuthCode`, tables `oauth2_*`; user provider `fos_user.user_manager`), bundle registered in
-  `AppKernel`.
-- Token endpoints, still active: `/oauth/v2/token` (firewall `oauth_token`, `security: false`)
-  and `/oauth/v2/auth` (firewall `oauth_authorize`, with its own login form: routes
-  `oauth_server_auth_login` / `oauth_server_auth_login_check`, `SecurityController`). Tokens can
-  still be issued if clients are registered in `oauth2_client`.
-- Token checking is disabled: the `api_oauth2` firewall (`fos_oauth: true`) is commented out, so
-  `/api/oauth2/*` goes through the regular `default` firewall and `access_control` lets
-  anonymous users in. Tokens are ignored.
-- `Oauth2Controller`:
-  - `GET /api/oauth2/decks`: decks of the session user (empty without a session);
-  - `GET /api/oauth2/deck/load/{id}`: any deck whose owner shares their decks, to anyone
-    (owner check commented out), with `Access-Control-Allow-Origin: *`;
-  - `PUT /api/oauth2/deck/save/{id}`: the action is commented out (route to a missing method,
-    `500`);
-  - `PUT /api/oauth2/deck/publish/{id}`: always `403` "Publishing via API has been disabled.".
-
-Before removing it, check whether anything still calls it: `oauth2_client` /
-`oauth2_access_token` rows (`SELECT COUNT(*), FROM_UNIXTIME(MAX(expires_at)) FROM
-oauth2_access_token`) and, more reliably, the nginx logs for `/api/oauth2/` and `/oauth/v2/`
-(`deck/load` works without a token). If `deck/load` has to survive, move it to `/api/public`.
-
-To remove: the bundle (`AppKernel`, `composer.json`, `config.yml`), the `oauth_token` /
-`oauth_authorize` firewalls and the commented `api_oauth2` one, the `^/api/oauth2`
-access rule, the `/oauth/v2/*` and `/api/oauth2/*` routes (`routing.yml`, `routing_api.yml`,
-`routing_api_oauth2.yml`), `Oauth2Controller`, `SecurityController` and its template
-`AppBundle:Security:login.html.twig` (only used by the `oauth_server_auth_login*` routes), the 4
-entities and their mappings, and the `oauth2_*` tables.
-
-`Oauth2Controller` and `CreateClientCommand` are excluded from phpstan until then.
+In production, drop the `oauth2_*` tables once the application is deployed:
+`migrations/oauth2-removal/01_drop_tables.sql` (they were also taken out of
+`ringsdb_bootstrap.sql`).
 
 ## Quest logs
 
@@ -648,22 +616,41 @@ The write forms are covered by `src/AppBundle/Tests/Controller/AdminWriteTest.ph
 created by the test only: the generated CRUD of the 8 reference entities (create → show,
 edit → edit, delete → list, through the real forms, CSRF tokens included), scenario encounters,
 card force delete, user search, comment hide/delete, decklist delete. Not covered yet: the card
-image upload (unused, see below), the scenario import command
-(`/admin/command/`, downloads from hallofbeorn.com unless a custom JSON is given) and the
-CSV import.
+image upload (unused, see below) and the scenario import command (`/admin/command/`, downloads
+from hallofbeorn.com unless a custom JSON is given).
 
-### Pending: import tests, waiting for sample files
+The Excel import is also tested with a download made in production
+(`src/AppBundle/Tests/Resources/fixtures/import/core-set.xlsx`), and the CSV import by
+`src/AppBundle/Tests/Controller/AdminCsvTest.php`, with the CSV of the ALeP pack "The Hobbit"
+(`fixtures/import/alep-the-hobbit.csv`, 21 cards, already in the database): upload of an
+unchanged pack, of a new pack, cards missing from the CSV, renaming with the old code, a CSV
+without cards. The samples are stored without line ending conversion (`.gitattributes`): the
+CSV import tells the rows (CRLF) from the line breaks of the texts (LF).
 
-To be written once representative files are available (to be stored under
-`src/AppBundle/Tests/Resources/fixtures/`):
+### CSV import (`POST /admin/csv/upload`, `CSVController`)
 
-- **CSV import** (`POST /admin/csv/upload`, `CSVController`): fields `code`, `old_code`, `name`
-  (the pack) and the file `upfile`. Header line + one card per line, in the format produced by
-  `BeornJSONtoRingsDBcsv.py` from a Hall of Beorn JSON export: `pack, type, sphere, position,
-  code, name, traits, text, flavor, isUnique, cost, threat, willpower, attack, defense, health,
-  victory, quest, quantity, deckLimit, illustrator, octgnid, hasErrata`. Creates or renames the
-  pack (new packs go to the `ALeP` cycle, or the last one), creates or updates cards and
-  printings. Needed: a real CSV for a new pack, and one updating an existing pack.
+Fields `code`, `old_code`, `name` (the pack) and the file `upfile`. Header line + one card per
+line, in the format produced by `BeornJSONtoRingsDBcsv.py` from a Hall of Beorn JSON export:
+`pack, type, sphere, position, code, name, traits, text, flavor, isUnique, cost, threat,
+willpower, attack, defense, health, victory, quest, quantity, deckLimit, illustrator, octgnid,
+hasErrata`. Pinned by `AdminCsvTest`:
+
+- The pack is found by code, then by old code (it is then renamed); otherwise it is created in
+  the `ALeP` cycle, or the last one as there is no such cycle, released on 2030-02-01.
+- The printings are found by `octgnid` in the pack; otherwise the card is found by code (a
+  reprint: new printing of the existing card) or created.
+- The cards of the pack missing from the CSV are not deleted: their name is prefixed with
+  "[deleted]" and their code gets a unique suffix.
+- BUG, not fixed: the card fields of the CSV (code, position, texts...) are written to the
+  canonical card, even when the printing is a reprint. Uploading "The Hobbit" again gives Beorn
+  (card 131005, from another pack) the code, position, text and flavor of its ALeP printing
+  (503991). The card-level fields should only be written when the card was created by the
+  import, or the printing is its first one.
+- Only the rows ending with CRLF are rows: a CSV saved with LF line endings is read as a single
+  row ("No cards found in the CSV file").
+
+### Pending: scenario import test, waiting for a sample file
+
 - **Scenario import** (`POST /admin/command/`, `command=scenario`,
   `ScrapBeornScenarioDataCommand`): downloads `http://hallofbeorn.com/LotR/ScenarioDetails/...`
   unless `customjson` is given. Needed: a saved Hall of Beorn scenario JSON, so the test never
@@ -756,7 +743,8 @@ which have to be reimplemented when FOSUserBundle is removed.
   invalid."); password confirmation must match.
 - Password reset: an email with a `/resetting/reset/{token}` link; a second request is ignored
   while the first one is recent (`retry_ttl`); no hint when the user does not exist; the token
-  is single-use, an unknown or used token is a `404`; after the reset the user is logged in.
+  is single-use, an unknown or used token redirects to the login page (a `404` before
+  FOSUserBundle 2.1); after the reset the user is logged in.
 
 ### To look at during the migration
 
