@@ -4,6 +4,151 @@ Migration notes. Starting point: Symfony 2.8.52, FOSUserBundle 2.0.2, PHP 7.1.33
 
 The functional tests (`make phpunit`) are the safety net: they must stay green at every step.
 
+- **Roadmap**: what is left to do before the migration, by priority.
+- **Migration plan**: what the migration itself involves (dependencies, assets, tests, environment).
+- **Reference**: the behaviour pinned by the tests, area by area, with the bugs and quirks found.
+  The roadmap links to it by section name.
+
+# Roadmap
+
+## 1. Removals (decided, to do first)
+
+Each removal reduces what has to be ported.
+
+- **OAuth2 server**: check first that nothing calls it (nginx logs for `/api/oauth2/` and
+  `/oauth/v2/`: `deck/load` works without a token). Inventory in "OAuth2 server".
+- **OCTGN features**: two decisions first (see "OCTGN features"): the `octgnid` of the public API,
+  and the `octgnid` / reprint `mapping` of the card statistics.
+- **GregwarCaptchaBundle**: registered in `AppKernel`, configured (`gregwar_captcha: ~` in
+  `config.yml`), required in `composer.json` (`gregwar/captcha-bundle` 2.0.7), but no form uses
+  the `captcha` type: added on 2020-09-14 (commit `a07a2fd4`, "added captcha and vendor
+  directory") and never wired. To remove: the bundle registration and the configuration now;
+  the `composer.json` / `composer.lock` entry with the next dependency update (the lock is
+  Composer 1 era, see "Environment").
+- **twig/extensions**: required in `composer.json` but none of its extensions is registered in the
+  configuration: probably unused (abandoned package). Same removal as the captcha bundle.
+- **Dead code found by the tests, not removed yet**:
+  - the `/deck/can_publish/{id}` route (`deck_publish`), pointing to the missing
+    `SocialController::publishAction` (see "Website browsing");
+  - `src/AppBundle/Resources/public/js/directimport.js`, loaded by no template (see "Deck
+    workflow");
+  - `QuestLogManager::findQuestLogsByRecentDiscussion()`, whose query cannot work (see "Lists and
+    search managers");
+  - `app.suggestions-statistics.js` and `app.suggestions-heuristics.js`, loaded by no template
+    (see "Console commands").
+- Kept for now (decision taken): the admin card image upload (see "Admin area").
+
+## 2. Decisions to take (keep or drop)
+
+- **`/admin/stat_cards` and the `app:stats:precompute-cards` cron**: nothing in the repository
+  consumes that JSON, probably an external report. Ask the maintainers / check the nginx logs
+  (see "Card statistics"). Linked to the OCTGN decision above.
+- **User blocking**: the "Block" button of the admin has had no effect since FOSUserBundle 2.
+  Reimplement it with a `UserChecker` or drop it, with the `locked` column (see "Admin area").
+- **JSONP on the public API**: the callback is echoed unsanitised (XSS vector). Validate it or
+  drop JSONP; dropping it changes the public API (see "Public API").
+- **`/api/doc` (NelmioApiDocBundle 2.x)**: the public API documentation, generated from the
+  `@ApiDoc` annotations of `ApiController` (8) and `Oauth2Controller` (4). No page links to it and
+  no test covers it. Porting it means NelmioApiDocBundle 4+, which is a rewrite (OpenAPI
+  attributes). Keep, drop, or replace with a static page?
+
+## 3. Fixes cheaper to make now, with the tests
+
+- **PHP 8 breakers**:
+  - `POST /deck/autosave` calls `count()` on a decoded object: always 1 in PHP 7.1, a `TypeError`
+    in PHP 8 (see "Deck workflow").
+  - The deck contents are decoded with `(array) json_decode(...)` (objects inside) in the builder
+    and in quest logs; the rewrite must keep the `{}` vs `[]` distinction of the empty deck guard
+    (see "Deck workflow", "Quest logs").
+- **SQL built by concatenation**: `StatController` (`month`, SQL injection, admin only),
+  `listDecklistsByDateAction` (safe only thanks to the route requirement), the card force delete,
+  the month of `CardStatsCalculator`. Small, safe fixes: use parameters.
+- **To decide**: the `CoreExceptionListener` status code bug (every HTTP exception is a `500` for
+  AJAX requests, see "Decklist comments"), set aside so far. Fixing it now, while the tests are
+  there, shows every status that changes; it would have to be fixed anyway when the error
+  handling is rewritten.
+- Optional, functional bugs pinned by the tests: "Save and Publish" of fellowships never
+  publishes (see "Fellowships"); the "deleted deck" branch of the quest log save reads the wrong
+  field (see "Quest logs"); review comments are escaped twice (see "Card reviews").
+
+## 4. Open test gaps
+
+- CSV import and scenario import: waiting for sample files (see "Admin area").
+- `app/Resources/FOSUserBundle/views/Registration/checkEmail.html.twig`: probably ignored by
+  FOSUserBundle 2.0 (not verified, see "Removing FOSUserBundle").
+- The merging of reprints by `source_code()` in the card statistics (see "Card statistics").
+- `/api/doc`, if kept (see above).
+
+## 5. Left for during or after the migration
+
+- **CSRF protection** is missing on almost every form and AJAX action, and several **GET routes
+  write** (`/deck/new`, `/deck/clone`, `/deck/copy`, `/fellowship/publish`, the admin moderation
+  actions, `/review/remove`). Symfony 7's forms and security make both easy; doing it now would
+  mean doing it twice. Listed in each section of the reference.
+- **Line endings of the text exports** (CRLF → LF) after the migration: see "After the
+  migration".
+- **Time in tests** (`ClockInterface`): see "Tests and time".
+
+# Migration plan
+
+## Strategy (to decide)
+
+Step through the LTS versions (3.4 → 4.4 → 5.4 → 6.4 → 7.4, fixing deprecations at each step) or
+start from a Symfony 7.4 skeleton and port the code into it. The choice decides when the test
+suite has to be ported (see "Porting the test suite"). Whatever the choice, FOSUserBundle and
+FOSOAuthServerBundle are removed (decided), preferably before the first step.
+
+## Dependencies
+
+| Package | Status | Replacement / action |
+|---|---|---|
+| `friendsofsymfony/user-bundle` 2.0 | to be replaced (decided) | Symfony Security, see "Removing FOSUserBundle" |
+| `friendsofsymfony/oauth-server-bundle` | depends on FOSUser | remove, see "OAuth2 server" |
+| `gregwar/captcha-bundle` | unused | remove, see roadmap |
+| `twig/extensions` | abandoned, probably unused | remove, see roadmap |
+| `symfony/assetic-bundle`, `leafo/scssphp`, `patchwork/jsqueeze` | dropped in Symfony 4 | see "Front-end assets" |
+| `symfony/swiftmailer-bundle` | abandoned | Symfony Mailer (`\Swift_Message::newInstance()` in the comment notifications, FOSUser emails) |
+| `liuggio/excelbundle` (PHPExcel) | abandoned | PhpSpreadsheet (admin Excel export / import) |
+| `sensio/framework-extra-bundle` | abandoned | native attributes (`#[Route]`, `#[IsGranted]`, `#[MapEntity]`) |
+| `sensio/distribution-bundle`, `sensio/generator-bundle`, `incenteev/composer-parameter-handler` | Symfony 2 tooling | Symfony Flex, `.env`, MakerBundle |
+| `nelmio/api-doc-bundle` 2.x | major rewrite in 4.x | see roadmap ("`/api/doc`") |
+| `friendsofsymfony/jsrouting-bundle` 1.x | maintained (3.x) | upgrade; `routes_to_expose: ['.*']` exposes every route, admin included: restrict it |
+| `gedmo/doctrine-extensions` 2.x | maintained (3.x) | upgrade; the timestampable listener is declared by hand (`doctrine_extensions.yml`), or use `stof/doctrine-extensions-bundle` |
+| `doctrine/orm` 2.x, `doctrine/dbal` 2.x | | ORM 3 / DBAL 4; the custom DQL functions `replace` and `power` (see "Card search") |
+| `ezyang/htmlpurifier`, `erusev/parsedown` | maintained | upgrade |
+
+## Front-end assets
+
+Assetic (SCSS compiled by scssphp, JS minified by jsqueeze, `assetic:dump` in the Composer
+scripts, `assetic.use_controller` in the local config) was dropped in Symfony 4 and has no
+drop-in replacement: AssetMapper (with a Sass bundle) or Webpack Encore. Probably the largest
+item not covered by the tests (they check the visible text of the pages, not the assets).
+
+## Porting the test suite
+
+Most tests go through HTTP and compare snapshots, so they survive the migration. Coupled to the
+current stack:
+
+- the `KernelTestCase` tests (managers, commands, card statistics): service ids
+  (`static::$kernel->getContainer()->get('cards_data')`, `'doctrine'`), `getRootDir()`;
+- PHPUnit 6.5 APIs: `assertContains()` on strings, `assertRegExp()`, `setUp()` / `tearDown()`
+  without `: void`. On PHP 7.1, PHPUnit cannot go past 7.5;
+- the fixtures (`DoctrineFixturesBundle` 2.x) and the `make test-fixtures` loading.
+
+To plan with the strategy: with LTS steps, the suite is upgraded as PHP goes up; with a new
+skeleton, it is ported first, then run against the new application.
+
+## Environment
+
+- **Production database**: the tests run on MySQL 8.4 with `ONLY_FULL_GROUP_BY` (several queries
+  had to be fixed for it, see "Card statistics", "Lists and search managers"). Check the version
+  and `sql_mode` of production, so that the tests run on the same settings.
+- **Composer**: the lock is Composer 1 era and `vendor/` is copied from the server (Composer 2
+  drifts Symfony 2.7 → 2.8 and breaks FOSUserBundle, see `CLAUDE.md`). The migration needs
+  Composer 2 and a clean `composer install`.
+
+# Reference
+
 ## Removing FOSUserBundle / rewriting the Security layer
 
 Covered by `src/AppBundle/Tests/Controller/SecurityControllerTest.php` (registration, email
