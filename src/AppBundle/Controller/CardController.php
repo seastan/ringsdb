@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use AppBundle\Entity\Card;
 use AppBundle\Form\CardType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 /**
  * Card controller.
@@ -35,7 +36,7 @@ class CardController extends Controller {
      */
     public function createAction(Request $request) {
         $entity = new Card();
-        $form = $this->createForm(new CardType(), $entity);
+        $form = $this->createForm(CardType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
@@ -59,7 +60,7 @@ class CardController extends Controller {
      */
     public function newAction() {
         $entity = new Card();
-        $form = $this->createForm(new CardType(), $entity);
+        $form = $this->createForm(CardType::class, $entity);
 
         return $this->render('AppBundle:Card:new.html.twig', [
             'entity' => $entity,
@@ -105,7 +106,7 @@ class CardController extends Controller {
             throw $this->createNotFoundException('Unable to find Card entity.');
         }
 
-        $editForm = $this->createForm(new CardType(), $entity, ['method' => 'PUT']);
+        $editForm = $this->createForm(CardType::class, $entity, ['method' => 'PUT']);
         $deleteForm = $this->createDeleteForm($id);
         $forceDeleteForm = $this->createForceDeleteForm($id);
 
@@ -134,7 +135,7 @@ class CardController extends Controller {
 
         $deleteForm = $this->createDeleteForm($id);
         $forceDeleteForm = $this->createForceDeleteForm($id);
-        $editForm = $this->createForm(new CardType(), $entity, ['method' => 'PUT']);
+        $editForm = $this->createForm(CardType::class, $entity, ['method' => 'PUT']);
         $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
@@ -236,7 +237,7 @@ class CardController extends Controller {
      * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createDeleteForm($id) {
-        return $this->createFormBuilder(['id' => $id])->add('id', 'hidden')->setMethod('DELETE')->getForm();
+        return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }
 
     /**
@@ -247,6 +248,6 @@ class CardController extends Controller {
      * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createForceDeleteForm($id) {
-        return $this->createFormBuilder(['id' => $id])->add('id', 'hidden')->setMethod('DELETE')->getForm();
+        return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }
 }

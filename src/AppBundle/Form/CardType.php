@@ -4,7 +4,11 @@ namespace AppBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class CardType extends AbstractType {
     /**
@@ -15,12 +19,12 @@ class CardType extends AbstractType {
             ->add('position')
             ->add('deck_limit')
             ->add('code')
-            ->add('type', 'entity', array('class' => 'AppBundle:Type', 'property' => 'name'))
-            ->add('sphere', 'entity', array('class' => 'AppBundle:Sphere', 'property' => 'name'))
+            ->add('type', EntityType::class, array('class' => 'AppBundle:Type', 'choice_label' => 'name'))
+            ->add('sphere', EntityType::class, array('class' => 'AppBundle:Sphere', 'choice_label' => 'name'))
             ->add('name')
             ->add('traits')
-            ->add('text', 'textarea', array('required' => false))
-            ->add('flavor', 'textarea', array('required' => false))
+            ->add('text', TextareaType::class, array('required' => false))
+            ->add('flavor', TextareaType::class, array('required' => false))
             ->add('cost')
             ->add('threat')
             ->add('willpower')
@@ -29,21 +33,21 @@ class CardType extends AbstractType {
             ->add('health')
             ->add('victory')
             ->add('quest')
-            ->add('is_unique', 'checkbox', array('required' => false))
-            ->add('has_errata', 'checkbox', array('required' => false))
-            ->add('file', 'file', array('label' => 'Image File', 'mapped' => false, 'required' => false));
+            ->add('is_unique', CheckboxType::class, array('required' => false))
+            ->add('has_errata', CheckboxType::class, array('required' => false))
+            ->add('file', FileType::class, array('label' => 'Image File', 'mapped' => false, 'required' => false));
     }
 
     /**
      * @return void
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver) {
+    public function configureOptions(OptionsResolver $resolver) {
         $resolver->setDefaults([
             'data_class' => 'AppBundle\Entity\Card'
         ]);
     }
 
-    public function getName() {
+    public function getBlockPrefix() {
         return 'appbundle_cardtype';
     }
 }

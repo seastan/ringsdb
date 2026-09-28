@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use AppBundle\Entity\Pack;
 use AppBundle\Form\PackType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 /**
  * Pack controller.
@@ -35,7 +36,7 @@ class PackController extends Controller {
      */
     public function createAction(Request $request) {
         $entity = new Pack();
-        $form = $this->createForm(new PackType(), $entity);
+        $form = $this->createForm(PackType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
@@ -59,7 +60,7 @@ class PackController extends Controller {
      */
     public function newAction() {
         $entity = new Pack();
-        $form = $this->createForm(new PackType(), $entity);
+        $form = $this->createForm(PackType::class, $entity);
 
         return $this->render('AppBundle:Pack:new.html.twig', array(
             'entity' => $entity,
@@ -105,7 +106,7 @@ class PackController extends Controller {
             throw $this->createNotFoundException('Unable to find Pack entity.');
         }
 
-        $editForm = $this->createForm(new PackType(), $entity, ['method' => 'PUT']);
+        $editForm = $this->createForm(PackType::class, $entity, ['method' => 'PUT']);
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('AppBundle:Pack:edit.html.twig', [
@@ -131,7 +132,7 @@ class PackController extends Controller {
         }
 
         $deleteForm = $this->createDeleteForm($id);
-        $editForm = $this->createForm(new PackType(), $entity, ['method' => 'PUT']);
+        $editForm = $this->createForm(PackType::class, $entity, ['method' => 'PUT']);
         $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
@@ -182,7 +183,7 @@ class PackController extends Controller {
      */
     private function createDeleteForm($id) {
         return $this->createFormBuilder(array('id' => $id))
-            ->add('id', 'hidden')
+            ->add('id', HiddenType::class)
             ->setMethod('DELETE')
             ->getForm();
     }

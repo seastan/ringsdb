@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use AppBundle\Entity\Cycle;
 use AppBundle\Form\CycleType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 /**
  * Cycle controller.
@@ -35,7 +36,7 @@ class CycleController extends Controller {
      */
     public function createAction(Request $request) {
         $entity = new Cycle();
-        $form = $this->createForm(new CycleType(), $entity);
+        $form = $this->createForm(CycleType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
@@ -59,7 +60,7 @@ class CycleController extends Controller {
      */
     public function newAction() {
         $entity = new Cycle();
-        $form = $this->createForm(new CycleType(), $entity);
+        $form = $this->createForm(CycleType::class, $entity);
 
         return $this->render('AppBundle:Cycle:new.html.twig', [
             'entity' => $entity,
@@ -105,7 +106,7 @@ class CycleController extends Controller {
             throw $this->createNotFoundException('Unable to find Cycle entity.');
         }
 
-        $editForm = $this->createForm(new CycleType(), $entity, ['method' => 'PUT']);
+        $editForm = $this->createForm(CycleType::class, $entity, ['method' => 'PUT']);
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('AppBundle:Cycle:edit.html.twig', [
@@ -131,7 +132,7 @@ class CycleController extends Controller {
         }
 
         $deleteForm = $this->createDeleteForm($id);
-        $editForm = $this->createForm(new CycleType(), $entity, ['method' => 'PUT']);
+        $editForm = $this->createForm(CycleType::class, $entity, ['method' => 'PUT']);
         $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
@@ -181,6 +182,6 @@ class CycleController extends Controller {
      * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createDeleteForm($id) {
-        return $this->createFormBuilder(['id' => $id])->add('id', 'hidden')->setMethod('DELETE')->getForm();
+        return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }
 }

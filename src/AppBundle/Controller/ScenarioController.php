@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use AppBundle\Entity\Scenario;
 use AppBundle\Form\ScenarioType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 /**
  * Scenario controller.
@@ -35,7 +36,7 @@ class ScenarioController extends Controller {
      */
     public function createAction(Request $request) {
         $entity = new Scenario();
-        $form = $this->createForm(new ScenarioType(), $entity);
+        $form = $this->createForm(ScenarioType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
@@ -99,7 +100,7 @@ class ScenarioController extends Controller {
      */
     public function newAction() {
         $entity = new Scenario();
-        $form = $this->createForm(new ScenarioType(), $entity);
+        $form = $this->createForm(ScenarioType::class, $entity);
 
         return $this->render('AppBundle:Scenario:new.html.twig', array(
             'entity' => $entity,
@@ -145,7 +146,7 @@ class ScenarioController extends Controller {
             throw $this->createNotFoundException('Unable to find Scenario entity.');
         }
 
-        $editForm = $this->createForm(new ScenarioType(), $entity, ['method' => 'PUT']);
+        $editForm = $this->createForm(ScenarioType::class, $entity, ['method' => 'PUT']);
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('AppBundle:Scenario:edit.html.twig', [
@@ -171,7 +172,7 @@ class ScenarioController extends Controller {
         }
 
         $deleteForm = $this->createDeleteForm($id);
-        $editForm = $this->createForm(new ScenarioType(), $entity, ['method' => 'PUT']);
+        $editForm = $this->createForm(ScenarioType::class, $entity, ['method' => 'PUT']);
         $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
@@ -225,7 +226,7 @@ class ScenarioController extends Controller {
      */
     private function createDeleteForm($id) {
         return $this->createFormBuilder(array('id' => $id))
-            ->add('id', 'hidden')
+            ->add('id', HiddenType::class)
             ->setMethod('DELETE')
             ->getForm();
     }
