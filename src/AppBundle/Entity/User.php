@@ -1075,4 +1075,38 @@ class User extends BaseUser {
      * @var \DateTime|null
      */
     protected $credentialsExpireAt;
+
+    /*
+     * FOSUserBundle 2.x hardcodes the three checks below to true, so the
+     * locked/expired columns above would otherwise be ignored at login.
+     * These restore the 1.x behavior the Symfony UserChecker relies on.
+     */
+
+    public function isAccountNonLocked() {
+        return !$this->locked;
+    }
+
+    public function isAccountNonExpired() {
+        if (true === $this->expired) {
+            return false;
+        }
+
+        if (null !== $this->expiresAt && $this->expiresAt->getTimestamp() < time()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function isCredentialsNonExpired() {
+        if (true === $this->credentialsExpired) {
+            return false;
+        }
+
+        if (null !== $this->credentialsExpireAt && $this->credentialsExpireAt->getTimestamp() < time()) {
+            return false;
+        }
+
+        return true;
+    }
 }
