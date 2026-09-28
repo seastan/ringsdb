@@ -147,6 +147,9 @@ class SocialController extends Controller {
 
         /* @var $deck \AppBundle\Entity\Deck */
         $deck = $this->getDoctrine()->getRepository('AppBundle:Deck')->find($deck_id);
+        if (!$deck) {
+            throw new BadRequestHttpException("Invalid deck_id.");
+        }
         if ($user->getId() !== $deck->getUser()->getId()) {
             throw $this->createAccessDeniedException("Access denied to this object.");
         }
@@ -546,7 +549,7 @@ class SocialController extends Controller {
 
         $commenters[] = $decklist->getUser()->getUsername();
 
-        $versions = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->findBy(['parent' => $decklist->getParent()], ['version' => 'DESC']);
+        $versions = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->findBy(['parent' => $decklist->getParent()], ['version' => 'DESC', 'id' => 'DESC']);
 
         return $this->render('AppBundle:Decklist:decklist.html.twig', [
             'pagetitle' => $decklist->getName(),
@@ -621,9 +624,12 @@ class SocialController extends Controller {
 
         $decklist_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         $decklist = $this->getDoctrine()->getRepository('AppBundle:Decklist')->find($decklist_id);
+        if (!$decklist instanceof Decklist) {
+            throw new BadRequestHttpException('Wrong decklist id');
+        }
 
         $comment_text = trim($request->get('comment'));
-        if ($decklist && !empty($comment_text)) {
+        if (!empty($comment_text)) {
             $comment_text = preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $comment_text);
 
             $mentionned_usernames = [];
@@ -741,6 +747,10 @@ class SocialController extends Controller {
         /* @var $decklist \AppBundle\Entity\Decklist */
         $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
 
+        if (!$decklist instanceof Decklist) {
+            throw new BadRequestHttpException('Unable to find deck');
+        }
+
         if ($decklist->getUser()->getId() != $user->getId()) {
             $query = $em->getRepository('AppBundle:Decklist')
                 ->createQueryBuilder('d')
@@ -766,64 +776,6 @@ class SocialController extends Controller {
         }
 
         return new Response($decklist->getNbVotes());
-    }
-
-    /*
-	 * (unused) returns an ordered list of decklists similar to the one given
-	 */
-    public function findSimilarDecklists($decklist_id, $number) {
-        $dbh = $this->getDoctrine()->getConnection();
-
-        $list = $dbh->executeQuery("SELECT
-    			l.id,
-    			(
-    				SELECT COUNT(s.id)
-    				FROM decklistslot s
-    				WHERE (
-    					s.decklist_id = l.id
-    					AND s.card_id NOT IN (
-    						SELECT t.card_id
-    						FROM decklistslot t
-    						WHERE t.decklist_id = ?
-    					)
-    				) OR (
-    					s.decklist_id = ?
-    					AND s.card_id NOT IN (
-    						SELECT t.card_id
-    						FROM decklistslot t
-    						WHERE t.decklist_id=l.id
-    					)
-			    	)
-    			) difference
-     			FROM decklist l
-    			WHERE l.id != ?
-    			ORDER BY difference ASC
-    			LIMIT 0, $number", [
-            $decklist_id,
-            $decklist_id,
-            $decklist_id
-        ])->fetchAll();
-
-        $arr = [];
-        foreach ($list as $item) {
-            $dbh = $this->getDoctrine()->getConnection();
-            $rows = $dbh->executeQuery("SELECT
-					d.id,
-					d.name,
-					d.name_canonical,
-					d.nb_votes,
-					d.nb_favorites,
-					d.nb_comments
-					FROM decklist d
-					WHERE d.id = ?", [
-                $item["id"]
-            ])->fetchAll();
-
-            $decklist = $rows[0];
-            $arr[] = $decklist;
-        }
-
-        return $arr;
     }
 
     /*
@@ -887,141 +839,6 @@ class SocialController extends Controller {
         $response->setContent($content);
 
         return $response;
-    }
-
-    public function usercommentsAction($page, Request $request) {
-        $response = new Response();
-        $response->setPrivate();
-
-        /* @var $user \AppBundle\Entity\User */
-        $user = $this->getUser();
-
-        $limit = 100;
-        if ($page < 1) {
-            $page = 1;
-        }
-        $start = ($page - 1) * $limit;
-
-        /* @var $dbh \Doctrine\DBAL\Connection */
-        $dbh = $this->getDoctrine()->getConnection();
-
-        $comments = $dbh->executeQuery("SELECT SQL_CALC_FOUND_ROWS
-				c.id,
-				c.text,
-				c.date_creation,
-				d.id decklist_id,
-				d.name decklist_name,
-				d.name_canonical decklist_name_canonical
-				FROM comment c
-				JOIN decklist d ON c.decklist_id = d.id
-				WHERE c.user_id = ?
-				ORDER BY date_creation DESC
-				LIMIT $start, $limit", [
-            $user->getId()
-        ])->fetchAll(\PDO::FETCH_ASSOC);
-
-        $maxcount = $dbh->executeQuery("SELECT FOUND_ROWS()")->fetch(\PDO::FETCH_NUM)[0];
-
-        // pagination : calcul de nbpages // currpage // prevpage // nextpage
-        // à partir de $start, $limit, $count, $maxcount, $page
-
-        $currpage = $page;
-        $prevpage = max(1, $currpage - 1);
-        $nbpages = min(10, ceil($maxcount / $limit));
-        $nextpage = min($nbpages, $currpage + 1);
-
-        $route = $request->get('_route');
-
-        $pages = [];
-        for ($page = 1; $page <= $nbpages; $page++) {
-            $pages[] = [
-                "numero" => $page,
-                "url" => $this->generateUrl($route, [
-                    "page" => $page
-                ]),
-                "current" => $page == $currpage
-            ];
-        }
-
-        return $this->render('AppBundle:Default:usercomments.html.twig', [
-            'user' => $user,
-            'comments' => $comments,
-            'url' => $request->getRequestUri(),
-            'route' => $route,
-            'pages' => $pages,
-            'prevurl' => $currpage == 1 ? null : $this->generateUrl($route, [
-                "page" => $prevpage
-            ]),
-            'nexturl' => $currpage == $nbpages ? null : $this->generateUrl($route, [
-                "page" => $nextpage
-            ])
-        ], $response);
-    }
-
-    public function commentsAction($page, Request $request) {
-        $response = new Response();
-        $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
-
-        $limit = 100;
-        if ($page < 1) {
-            $page = 1;
-        }
-        $start = ($page - 1) * $limit;
-
-        /* @var $dbh \Doctrine\DBAL\Connection */
-        $dbh = $this->getDoctrine()->getConnection();
-
-        $comments = $dbh->executeQuery("SELECT SQL_CALC_FOUND_ROWS
-				c.id,
-				c.text,
-				c.date_creation,
-				d.id decklist_id,
-				d.name decklist_name,
-				d.name_canonical decklist_name_canonical,
-				u.id user_id,
-				u.username author
-				FROM comment c
-				JOIN decklist d on c.decklist_id = d.id
-				JOIN user u on c.user_id = u.id
-				ORDER BY date_creation DESC
-				LIMIT $start, $limit", [])->fetchAll(\PDO::FETCH_ASSOC);
-
-        $maxcount = $dbh->executeQuery("SELECT FOUND_ROWS()")->fetch(\PDO::FETCH_NUM)[0];
-
-        // pagination : calcul de nbpages // currpage // prevpage // nextpage
-        // à partir de $start, $limit, $count, $maxcount, $page
-
-        $currpage = $page;
-        $prevpage = max(1, $currpage - 1);
-        $nbpages = min(10, ceil($maxcount / $limit));
-        $nextpage = min($nbpages, $currpage + 1);
-
-        $route = $request->get('_route');
-
-        $pages = [];
-        for ($page = 1; $page <= $nbpages; $page++) {
-            $pages[] = [
-                "numero" => $page,
-                "url" => $this->generateUrl($route, [
-                    "page" => $page
-                ]),
-                "current" => $page == $currpage
-            ];
-        }
-
-        return $this->render('AppBundle:Default:allcomments.html.twig', [
-            'comments' => $comments,
-            'url' => $request->getRequestUri(),
-            'route' => $route,
-            'pages' => $pages,
-            'prevurl' => $currpage == 1 ? null : $this->generateUrl($route, [
-                "page" => $prevpage
-            ]),
-            'nexturl' => $currpage == $nbpages ? null : $this->generateUrl($route, [
-                "page" => $nextpage
-            ])
-        ], $response);
     }
 
     public function searchAction(Request $request) {

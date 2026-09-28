@@ -1,0 +1,821 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Browse by set
+Core Set
+Revised Core Set
+Shadows of Mirkwood
+The Hunt for Gollum
+Conflict at the Carrock
+A Journey to Rhosgobel
+The Hills of Emyn Muil
+The Dead Marshes
+Return to Mirkwood
+Khazad-dûm
+Dwarrowdelf
+The Redhorn Gate
+Road to Rivendell
+The Watcher in the Water
+The Long Dark
+Foundations of Stone
+Shadow and Flame
+Heirs of Númenor
+Against the Shadow
+The Steward's Fear
+The Drúadan Forest
+Encounter at Amon Dîn
+Assault on Osgiliath
+The Blood of Gondor
+The Morgul Vale
+The Voice of Isengard
+The Ring-maker
+The Dunland Trap
+The Three Trials
+Trouble in Tharbad
+The Nîn-in-Eilph
+Celebrimbor's Secret
+The Antlered Crown
+The Lost Realm
+Angmar Awakened
+The Wastes of Eriador
+Escape from Mount Gram
+Across the Ettenmoors
+The Treachery of Rhudaur
+The Battle of Carn Dûm
+The Dread Realm
+Angmar Awakened Campaign Expansion
+The Grey Havens
+Dream-chaser
+Flight of the Stormcaller
+The Thing in the Depths
+Temple of the Deceived
+The Drowned Ruins
+A Storm on Cobas Haven
+The City of Corsairs
+Dream-chaser Campaign Expansion
+The Sands of Harad
+The Haradrim
+The Mûmakil
+Race Across Harad
+Beneath the Sands
+The Black Serpent
+The Dungeons of Cirith Gurat
+The Crossings of Poros
+The Wilds of Rhovanion
+Ered Mithrin
+The Withered Heath
+Roam Across Rhovanion
+Fire in the Night
+The Ghost of Framsburg
+Mount Gundabad
+The Fate of Wilderland
+Ered Mithrin Campaign Expansion
+A Shadow in the East
+The Vengeance of Mordor
+Wrath and Ruin
+The City of Ulfast
+Challenge of the Wainriders
+Under the Ash Mountains
+The Land of Sorrow
+The Fortress of Nurn
+ALeP - Children of Eorl
+ALeP - Oaths of the Rohirrim
+ALeP - The Aldburg Plot
+ALeP - Fire on the Eastemnet
+ALeP - The Gap of Rohan
+ALeP - The Glittering Caves
+ALeP - Mustering of the Rohirrim
+ALeP - Blood in the Isen
+ALeP - The Shire's Reckoning
+ALeP - Fell Summer
+ALeP - Strange News in Bree
+ALeP - Fangs in the Dark
+ALeP - The Brandywine Pursuit
+The Hobbit
+Over Hill and Under Hill
+On the Doorstep
+The Lord of the Rings
+The Black Riders
+The Road Darkens
+The Treason of Saruman
+The Land of Shadow
+The Flame of the West
+The Mountain of Fire
+Standalone Scenarios
+The Old Forest
+Fog on the Barrow-downs
+The Hunt for the Dreadnaught
+The Dark of Mirkwood
+ALeP - The Scouring of the Shire
+ALeP - The Nine are Abroad
+ALeP - The Siege of Erebor
+ALeP - The Hobbit
+ALeP - The Mirror of Galadriel
+Two-Player Limited Edition Starter
+Starter Decks
+Dwarves of Durin
+Elves of Lórien
+Defenders of Gondor
+Riders of Rohan
+Messenger of the King Allies
+Messenger of the King Allies
+ALeP - Messenger of the King Allies
+Card Search
+Name and texts
+Name
+Text
+Flavor Text
+Spheres
+Attributes
+Cycle
+any
+Core Set
+Revised Core Set
+Shadows of Mirkwood
+Khazad-dûm
+Dwarrowdelf
+Heirs of Númenor
+Against the Shadow
+The Voice of Isengard
+The Ring-maker
+The Lost Realm
+Angmar Awakened
+Angmar Awakened Campaign Expansion
+The Grey Havens
+Dream-chaser
+Dream-chaser Campaign Expansion
+The Sands of Harad
+The Haradrim
+The Wilds of Rhovanion
+Ered Mithrin
+Ered Mithrin Campaign Expansion
+A Shadow in the East
+The Vengeance of Mordor
+ALeP - Children of Eorl
+ALeP - Oaths of the Rohirrim
+ALeP - The Shire's Reckoning
+ALeP - Fell Summer
+The Hobbit
+The Lord of the Rings
+Standalone Scenarios
+Two-Player Limited Edition Starter
+Starter Decks
+Messenger of the King Allies
+Set
+any
+Core Set
+The Dark of Mirkwood
+The Hunt for Gollum
+Conflict at the Carrock
+A Journey to Rhosgobel
+The Massing at Osgiliath
+The Hills of Emyn Muil
+The Dead Marshes
+Return to Mirkwood
+Khazad-dûm
+The Redhorn Gate
+Road to Rivendell
+The Watcher in the Water
+The Long Dark
+Foundations of Stone
+Shadow and Flame
+Over Hill and Under Hill
+The Battle of Lake-town
+Heirs of Númenor
+On the Doorstep
+The Steward's Fear
+The Drúadan Forest
+Encounter at Amon Dîn
+Assault on Osgiliath
+The Black Riders
+The Blood of Gondor
+The Stone of Erech
+The Morgul Vale
+The Voice of Isengard
+The Dunland Trap
+The Three Trials
+Trouble in Tharbad
+The Road Darkens
+The Nîn-in-Eilph
+The Old Forest
+Celebrimbor's Secret
+The Antlered Crown
+Fog on the Barrow-downs
+The Lost Realm
+The Treason of Saruman
+The Wastes of Eriador
+Escape from Mount Gram
+Across the Ettenmoors
+The Treachery of Rhudaur
+The Battle of Carn Dûm
+The Land of Shadow
+The Dread Realm
+Angmar Awakened Campaign Expansion
+The Grey Havens
+The Ruins of Belegost
+Murder at the Prancing Pony
+Flight of the Stormcaller
+The Thing in the Depths
+Temple of the Deceived
+The Flame of the West
+The Drowned Ruins
+A Storm on Cobas Haven
+The City of Corsairs
+The Sands of Harad
+The Mûmakil
+The Siege of Annúminas
+Race Across Harad
+Beneath the Sands
+Two-Player Limited Edition Starter
+The Black Serpent
+The Mountain of Fire
+The Dungeons of Cirith Gurat
+The Crossings of Poros
+Attack on Dol Guldur
+The Wilds of Rhovanion
+The Withered Heath
+Roam Across Rhovanion
+Fire in the Night
+The Ghost of Framsburg
+Mount Gundabad
+The Fate of Wilderland
+The Wizard's Quest
+The Woodland Realm
+A Shadow in the East
+Wrath and Ruin
+The City of Ulfast
+Challenge of the Wainriders
+Under the Ash Mountains
+The Mines of Moria
+Escape from Khazad-dûm
+Messenger of the King Allies
+The Land of Sorrow
+The Fortress of Nurn
+The Hunt for the Dreadnaught
+ALeP - Messenger of the King Allies
+ALeP - Children of Eorl
+ALeP - The Aldburg Plot
+ALeP - The Scouring of the Shire
+ALeP - Fire on the Eastemnet
+ALeP - The Gap of Rohan
+ALeP - The Glittering Caves
+ALeP - Mustering of the Rohirrim
+ALeP - Blood in the Isen
+ALeP - The Nine are Abroad
+Revised Core Set
+Dwarves of Durin
+Elves of Lórien
+Defenders of Gondor
+Riders of Rohan
+ALeP - The Siege of Erebor
+ALeP - The Shire's Reckoning
+Dream-chaser Campaign Expansion
+Ered Mithrin Campaign Expansion
+ALeP - The Hobbit
+ALeP - Strange News in Bree
+ALeP - Fangs in the Dark
+ALeP - The Mirror of Galadriel
+ALeP - The Brandywine Pursuit
+Type
+any
+Ally
+Attachment
+Campaign
+Contract
+Event
+Hero
+Player Objective
+Player Side Quest
+Traits
+any
+Accolade
+Adaptation
+Advice
+Archer
+Armor
+Artifact
+Balchoth
+Beorning
+Boon
+Bree
+Burglar
+Condition
+Corruption
+Corsair
+Craftsman
+Creature
+Dale
+Dark
+Despair
+Doom
+Dragon
+Dunedain
+Dwarf
+Dúnedain
+Eagle
+Easterling
+Elite
+Enchantment
+Ent
+Erebor
+Esgaroth
+Favor
+Fear
+Fellowship
+Gift
+Goblin
+Gollum
+Gondor
+Harad
+Hazard
+Healer
+Hobbit
+Instrument
+Isengard
+Istari
+Item
+Khand
+Legend
+Master
+Mathom
+Mearas
+Menacing
+Minstrel
+Modification
+Mount
+Nazgûl
+Noble
+Noldor
+Oathbreaker
+Orc
+Outlands
+Pipe
+Pipeweed
+Pony
+Providence
+Raider
+Ranger
+Record
+Rhûn
+Ring
+Ring-bearer
+Rohan
+Scout
+Servant
+Service
+Ship
+Shirriff
+Signal
+Silvan
+Skill
+Song
+Spell
+Spider
+Spirit
+Staff
+Steward
+Tactic
+Tale
+Thaurdir
+Tier 1
+Tier 2
+Title
+Trap
+Treasure
+Undead
+Underground
+Wall
+Warrior
+Weapon
+Woodman
+Woodsman
+Wose
+Wound
+Unique
+any
+Yes
+No
+Errata'd
+any
+Yes
+No
+Numerics
+Cost
+=
+<
+>
+Threat
+=
+<
+>
+Willpower
+=
+<
+>
+Attack
+=
+<
+>
+Defense
+=
+<
+>
+Hit Points
+=
+<
+>
+Other
+Previews
+Yes
+No
+Only
+Illustrator
+any
+A. M. Sartor
+Aaron B. Miller
+Adam Lane
+Adam Schumpert
+Adrián Prado
+Agni Interactive
+AI
+Alan Lee
+Aleksander Karcz
+Aleksander Karez
+Aleksandra Wojtas
+Alex Boca
+Alexander Gustafson
+Alexander Kozachenko
+Alexandr Elichev
+Alexandr Shaldin
+Alexandre Dainche
+Alexandru Sabo
+Allen Douglas
+Allison Theus
+Álvaro Calvo Escudero
+Alyn Spiller
+Anato Finnstark
+Anders Finer
+Andrea Piparo
+Andreas Zafiratos
+Andreia Ugrai
+Andrew Johanson
+Andrew Ryan
+Andrew Silver
+Angela Sung
+Angus McBride
+Anna Christenson
+Anna Mohrbacher
+Anna Steinbauer
+Anne-Louise P.
+Anthony Devine
+Anthony Palumbo
+Antonio José Manzanedo
+Arden Beckwith
+Audrey Hotte
+Aurelien Hubert
+Ben Zweifel
+Beth Sobel
+Bethesda Softworks
+Blake Henriksen
+Borja Pindado
+Brendan C. Murphy
+Brian Valenzuela
+Brothers Hildebrandt
+Carlos Palma Cruchaga
+Carly Janine Mazur
+Carmen Cianelli
+Carmen Cianelti
+Carolina Eade
+Cassandre Bolan
+Charles Urbach
+Charmaine Zoe
+ChatGPT
+Chris Grun
+Chris Metcalf
+Chris Rahn
+Chris Stanford
+Christina Davis
+Christine Bian
+Christine Griffin
+Claudio Pozas
+Colin Boyer
+Craig Maher
+Cris Griffin
+Cristi Balanescu
+Cristina Vela
+Cubicle 7
+Cynthia Sheppard
+Daarken
+Damian Audino
+Dan Masso
+Dan Pilla
+Dan Scott
+Dani Hartel
+Daniel Eskridge
+Daniel Zrom
+Darek Zabrocki
+David A. Nash
+David Demaret
+David Gaillet
+David Horne
+David Keen
+David Kegg
+David Lecossu
+David T. Wenzel
+David Vargo
+Davis Engel
+Derek D. Edgell
+Detlef Ott
+Diego Gisbert Llorens
+Dimitri Bielak
+Dinodrawing
+Dleoblack
+Dmitry Burmak
+Dmitry Prosvirnin
+Donato Giancola
+Drazenka Kimpel
+Drew Whitmore
+e-laureanar
+Echo Chernik
+Ed Mattinian
+Edward Beard Jr.
+Ekaterina Burmak
+Emile Denis
+Emilio Rodriguez
+Empty Room Studios
+Emrah Elmasli
+Epic Games
+Erfian Asafat
+Eric Braddock
+Eva Maria Toker
+Even Mehl Amundsen
+Federico Musetti
+Felicia Cano
+Florian Stitz
+Francesco Amadio
+Franco Rivolli
+Frank Walls
+Fredrik Dahl Tyskerud
+Gabriel Verdon
+Gabriela Birchal
+Gabrielle Portal
+Gal Or
+Garret DeChellis
+Glen Osterberger
+Greg Bobrowski
+Greg Opalinski
+Guillaume Ducos
+Gus Hunter
+Henning Ludvigsen
+Howard Lyon
+Igor Artyomenko
+Igor Kieryluk
+Ijur
+Ilich Henriquez
+Ilya Nazarov
+Imad Awan
+Incantata
+Ivan Dixon
+Jake Murray
+Jan Pospíšil
+Jarreau Wimberly
+Jason Cheeseman Meyer
+Jason Jenicke
+Jason Ward
+Javier Charro Martinez
+JB Casacop
+Jeff Himmelman
+Jeff Lee Johnson
+Jen Zee
+Jenn Tran
+Joe Bosco
+John Gravato
+John Howe
+John Matson
+John Pacer
+John Stanko
+Joko Mulyono
+Jon Bosco
+Jon Hodgson
+Jordan Saia
+Jordy Lakiere
+Jorge Borrero
+José Derivaldo Júnior
+Jose Vega
+Joshua Cairós
+Joshua Viers
+Juan Carlos Barquet
+Julepe
+Julian Bauer
+Justin Gerard
+K. R. Harris
+Kamila Tzutenberg
+Kara Williams
+Katayanagi
+Katerina Poliakova
+Katherine Dinger
+Katy Grierson
+Kaya
+Ken McCuen
+Kevin Zamir Goeke
+Kieran Yanner
+Kim Sokil
+Kim Sokol
+Kip Ayers
+Kristina Carroll
+Kristina Gehrmann
+Lane Brown
+Leanna Crossan
+Leanna Teneycke
+Leonardo Borazio
+Leone Fabio
+Līga Kļaviņa
+Lin Bo
+Lin Hsiang
+Lindsey Messecar
+Lius Lasahido
+Loren Fetterman
+Lorraine Schleter
+Louis Green
+Lucas Durham
+Lucas Graciano
+Lucas Staniec
+lucife56
+Lukasz Jaskolski
+Magali Villeneuve
+Marcia George-Bogdan
+Margaret Hardy
+Marius Bota
+Mariusz Gandzel
+Mark Behm
+Mark Bulahao
+Mark Tarrisse
+Mark Winters
+Martin de Diego SÃ¡daba
+Martin de Diego Sádaba
+Martin Diego Sadaba
+Matt Smith
+Matt Stawicki
+Matt Stewart
+Matthew Cowdery
+Matthew Starbuck
+Melanie Maier
+Melanie Stanford
+Melissa Findley
+Micah Epstein
+Michael Komarck
+Michael Rasmussen
+Michael Whelan
+Michele Frigo
+Midjourney
+Mike Capprotti
+Mike Nash
+Mila Pesic
+Milek Jakubiec
+Monztre
+Mysilvergreen
+Nacho Molina
+Nathália Gomes
+Nia Kovalevski
+Nicholas Gregory
+Nico Rigobello
+Nikolas Hagialas
+Nino Vecia
+Nora Brisotti
+Oleg Saakyan
+Oscar Perez
+Oscar Römer
+Owen William Weber
+Paul Guzenko
+Paul Lasaine
+Paul Scott Canavan
+Paulo Puggioni
+Peter Polach
+Piya Wannachaiwong
+Preston Stone
+Rafał Hrynkiewicz
+Ralph Damiani
+Raymond Bonilla
+Rick Price
+Rio Sabda
+Rob Joseph
+Romana Kendelic
+Rovina Cai
+Ryan Barger
+Ryan Valle
+S. C. Watson
+Sabin Boykinov
+Sacha Diener
+Salvador Trakal
+Sam Lamont
+Sam White
+Sandara Tang
+Sansiia
+Sara Betsy
+Sara Biddle
+Sara K. Diesel
+Sara Winters
+Sarel Theron
+Sasha Jones
+Sebastian Giacobino
+Sebastian Zakrzewski
+Sergey Glushakov
+Simone De Salvatore
+Smirtouille
+Snowblind Studios
+Soul Core
+Stacey Diana Clark
+Stanislav Dikolenko
+Stas Dikolenko
+steamey
+Stephanie M. Brown
+Steven Shan
+Stu Barnes
+Surya Prasetya
+Suzanne Helmigh
+Tamires Para
+Taufiq
+Tawny Fritzinger
+Taylor Ingvarsson
+Ted Nasmith
+Tim Löchner
+Titus Lunter
+Tiziano Baracchi
+Tom Garden
+Tom Romain
+Tomasz Jedruszek
+Toni Justamante Jacobs
+Tony Foti
+Torbj”rn K„llstr”m
+Torbjörn Källström
+Tristan Delgado
+Tristan Denecke
+Tropa Entertainment
+Trudi Castle
+Turbine
+Tyler Edlin
+Unknown
+Unknown Artist
+Uriah Voth
+Uwe Jarling
+Victor Maury
+Vilius Petrauskas
+Vincent Van Gogh
+Vladimir Rikowski
+Winona Nelson
+Wouter Florusse
+Yang Zhao
+yangzheyy
+Yoann Boissonnet
+Submit
+Sort by Name
+Sort by Set
+Sort by Sphere
+Sort by Type
+Sort by Cost/Threat
+Sort by Willpower
+Sort by Attack
+Sort by Defense
+Sort by Hit Points
+View as a Checklist
+View as a Spoiler
+View as Full Cards
+View as Scans only
+View as Simple List
+Search
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

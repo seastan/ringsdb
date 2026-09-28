@@ -1028,4 +1028,51 @@ class User extends BaseUser {
     public function getQuestlogVotes() {
         return $this->questlog_votes;
     }
+
+    /**
+     * @var bool
+     */
+    protected $locked = false;
+
+    /**
+     * Set locked
+     *
+     * @param boolean $locked
+     *
+     * @return User
+     */
+    public function setLocked($locked) {
+        $this->locked = (bool) $locked;
+
+        return $this;
+    }
+
+    /**
+     * Get locked
+     *
+     * @return boolean
+     */
+    public function isLocked() {
+        return $this->locked;
+    }
+
+    /**
+     * @var bool
+     */
+    protected $expired = false;
+
+    /**
+     * @var \DateTime|null
+     */
+    protected $expiresAt;
+
+    /**
+     * @var bool
+     */
+    protected $credentialsExpired = false;
+
+    /**
+     * @var \DateTime|null
+     */
+    protected $credentialsExpireAt;
 }

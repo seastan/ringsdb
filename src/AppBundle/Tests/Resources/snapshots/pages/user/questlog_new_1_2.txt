@@ -1,0 +1,254 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Deck Selection
+Show cards
+Hide cards
+No deck selected
+Select deck
+Remove deck
+No deck selected
+Select deck
+Remove deck
+No deck selected
+Select deck
+Remove deck
+No deck selected
+Select deck
+Remove deck
+Quest Details
+Quest
+Randomize
+Passage Through Mirkwood
+Journey Along the Anduin
+Escape from Dol Guldur
+The Hunt for Gollum
+Conflict at the Carrock
+A Journey to Rhosgobel
+The Hills of Emyn Muil
+The Dead Marshes
+Return to Mirkwood
+Into the Pit
+The Seventh Level
+Flight from Moria
+The Redhorn Gate
+Road to Rivendell
+The Watcher in the Water
+The Long Dark
+Foundations of Stone
+Shadow and Flame
+Peril in Pelargir
+Into Ithilien
+The Siege of Cair Andros
+The Steward's Fear
+The Drúadan Forest
+Encounter at Amon Dîn
+Assault on Osgiliath
+The Blood of Gondor
+The Morgul Vale
+The Fords of Isen
+To Catch an Orc
+Into Fangorn
+The Dunland Trap
+The Three Trials
+Trouble in Tharbad
+The Nîn-in-Eilph
+Celebrimbor's Secret
+The Antlered Crown
+Intruders in Chetwood
+The Weather Hills
+Deadmen's Dike
+The Wastes of Eriador
+Escape from Mount Gram
+Across the Ettenmoors
+The Treachery of Rhudaur
+The Battle of Carn Dûm
+The Dread Realm
+Voyage Across Belegaer
+The Fate of Númenor
+Raid on the Grey Havens
+Flight of the Stormcaller
+The Thing in the Depths
+Temple of the Deceived
+The Drowned Ruins
+A Storm on Cobas Haven
+The City of Corsairs
+Escape from Umbar
+Desert Crossing
+The Long Arm of Mordor
+The Mûmakil
+Race Across Harad
+Beneath the Sands
+The Black Serpent
+The Dungeons of Cirith Gurat
+The Crossings of Poros
+Journey Up the Anduin
+Lost in Mirkwood
+The King's Quest
+The Withered Heath
+Roam Across Rhovanion
+Fire in the Night
+The Ghost of Framsburg
+Mount Gundabad
+The Fate of Wilderland
+The River Running
+Danger in Dorwinion
+The Temple of Doom
+Wrath and Ruin
+The City of Ulfast
+Challenge of the Wainriders
+Under the Ash Mountains
+The Land of Sorrow
+The Fortress of Nurn
+ALeP - Ambush at Erelas
+ALeP - The Battle for the Beacon
+ALeP - The Horse Lord's Ire
+ALeP - The Aldburg Plot
+ALeP - Fire on the Eastemnet
+ALeP - The Gap of Rohan
+ALeP - The Glittering Caves
+ALeP - Mustering of the Rohirrim
+ALeP - Blood in the Isen
+ALeP - Pies for the Party
+ALeP - Sundown on the Shire
+ALeP - Secrets of the Old Forest
+ALeP - Strange News in Bree
+ALeP - Fangs in the Dark
+ALeP - The Brandywine Pursuit
+We Must Away, Ere Break of Day
+Over the Misty Mountains Grim
+Dungeons Deep and Caverns Dim
+Flies and Spiders
+The Lonely Mountain
+The Battle of Five Armies
+A Shadow of the Past
+A Knife in the Dark
+Flight to the Ford
+The Ring Goes South
+Journey in the Dark
+Breaking of the Fellowship
+The Uruk-hai
+Helm's Deep
+The Road to Isengard
+The Passage of the Marshes
+Journey to the Cross-roads
+Shelob's Lair
+The Passing of the Grey Company
+The Siege of Gondor
+The Battle of the Pelennor Fields
+The Tower of Cirith Ungol
+The Black Gate Opens
+Mount Doom
+The Massing at Osgiliath
+The Battle of Lake-town
+The Stone of Erech
+The Old Forest
+Fog on the Barrow-downs
+The Ruins of Belegost
+Murder at the Prancing Pony
+The Siege of Annúminas
+Attack on Dol Guldur
+The Wizard's Quest
+The Woodland Realm
+The Mines of Moria
+Escape from Khazad-dûm
+The Hunt for the Dreadnaught
+The Oath
+The Caves of Nibin-Dûm
+ALeP - The Scouring of the Shire
+ALeP - The Nine are Abroad
+ALeP - The Siege of Erebor
+ALeP - The Hobbit
+ALeP - The Mirror of Galadriel
+The Oath
+The Caves of Nibin-Dûm
+Player 1
+Player 2
+Player 3
+Player 4
+Date
+Quest Mode
+Normal
+Easy
+Nightmare
+Result
+Success
+Failure
+Score
+Quest Log Title
+Quest Notes
+Allow other players to see this quest log.
+They will be able to see the cards in your unpublished decks, but not it's name or description. Also, you won't be able to make it private again after there are likes, favorites or comments in this questlog.
+Log this Quest
+×
+Select a Deck
+My Decks
+Another Player's Decks
+Type any username or a deck url and click search
+Search
+You can select any published decklist.
+×
+Swap cards
+Filter help
+Sets
+Options
+Show unusable cards
+Show only used cards (bypasses filters)
+Compact mode
+Display on 1 column
+Display on 2 columns
+Display on 3 columns
+Use 1 Core Set
+Use 2 Core Sets
+Use 3 Core Sets
+Show no suggestion
+Show 3 suggestions
+Show 10 suggestions
+Sphere/type cumulative
+Sphere/type exclusive
+Sort
+by Type
+by Pack
+by Sphere
+by Name
+Quantity
+Name
+S.
+T.
+C.
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

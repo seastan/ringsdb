@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<deck game="a21af4e8-be4b-4cda-a6b6-534f9717391f">
+  <section name="Hero" shared="False">
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801200c9005">Legolas</card>
+    <card qty="1" id="4823aae3-46ef-4a75-89f9-cbd3aa1b9005">Beregond</card>
+    <card qty="1" id="29d5feef-6165-4077-bb80-692526a8a924">Théoden</card>
+  </section>
+  <section name="Ally" shared="False">
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801200c9029">Gondorian Spearman</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801200c9030">Horseback Archer</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801201c9010">Winged Guardian</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801205c9022">Vassal of the Windlord</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801206c9009">Eagles of the Misty Mountains</card>
+    <card qty="3" id="4823aae3-46ef-4a75-89f9-cbd3aa1b9014">Defender of Rammas</card>
+    <card qty="3" id="237b31e7-d0b0-4c1e-bd4a-40a175f7d7d1">Knight of Minas Tirith</card>
+    <card qty="2" id="06baca74-330a-4038-9387-32ce8657dd8f">Guthlaf</card>
+  </section>
+  <section name="Attachment" shared="False">
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801200c9040">Citadel Plate</card>
+    <card qty="2" id="51223bd0-ffd1-11df-a976-0801200c9042">Horn of Gondor</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801209c9023">Rivendell Blade</card>
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801210c9013">Rivendell Bow</card>
+    <card qty="1" id="4823aae3-46ef-4a75-89f9-cbd3aa1b9078">Spear of the Citadel</card>
+    <card qty="3" id="09134509-191b-4903-b4b5-5e650f8143c1">Gondorian Shield</card>
+    <card qty="2" id="a7f12d87-5f28-46ca-a301-0ac48ca5e471">Gondorian Fire</card>
+    <card qty="3" id="66d8e628-8ca8-4605-9017-aece027f054f">Spear of the Mark</card>
+  </section>
+  <section name="Event" shared="False">
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801200c9034">Feint</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801201c9008">The Eagles Are Coming!</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801213c9007">Hands Upon the Bow</card>
+    <card qty="3" id="4823aae3-46ef-4a75-89f9-cbd3aa1b9004">Behind Strong Walls</card>
+  </section>
+  <section name="Side Quest" shared="False">
+  </section>
+  <section name="Sideboard" shared="False">
+  </section>
+  <section name="Quest" shared="True" />
+  <section name="Encounter" shared="True" />
+  <section name="Special" shared="True" />
+  <section name="Setup" shared="True" />
+  <notes><![CDATA[]]></notes>
+</deck>

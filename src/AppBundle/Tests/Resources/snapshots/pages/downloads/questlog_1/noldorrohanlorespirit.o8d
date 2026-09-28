@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<deck game="a21af4e8-be4b-4cda-a6b6-534f9717391f">
+  <section name="Hero" shared="False">
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801200c9007">Éowyn</card>
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801212c9016">Glorfindel</card>
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801213c9004">Elrond</card>
+  </section>
+  <section name="Ally" shared="False">
+    <card qty="2" id="51223bd0-ffd1-11df-a976-0801200c9062">Gléowine</card>
+    <card qty="2" id="51223bd0-ffd1-11df-a976-0801202c9009">Éomund</card>
+    <card qty="2" id="51223bd0-ffd1-11df-a976-0801203c9002">Haldir of Lórien</card>
+    <card qty="2" id="51223bd0-ffd1-11df-a976-0801204c9005">Gildor Inglorion</card>
+    <card qty="2" id="51223bd0-ffd1-11df-a976-0801205c9005">Elfhelm</card>
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801206c9026">West Road Traveller</card>
+    <card qty="2" id="51223bd0-ffd1-11df-a976-0801206c9016">Mirkwood Runner</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801207c9088">Zigil Miner</card>
+    <card qty="2" id="51223bd0-ffd1-11df-a976-0801210c9002">Arwen Undómiel</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801211c9026">Warden of Healing</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801212c9019">Imladris Stargazer</card>
+    <card qty="2" id="51223bd0-ffd1-11df-a976-0801213c9015">Master of the Forge</card>
+  </section>
+  <section name="Attachment" shared="False">
+    <card qty="2" id="51223bd0-ffd1-11df-a976-0801200c9057">Unexpected Courage</card>
+    <card qty="2" id="51223bd0-ffd1-11df-a976-0801200c9070">Protector of Lórien</card>
+    <card qty="2" id="51223bd0-ffd1-11df-a976-0801202c9010">A Burning Brand</card>
+    <card qty="2" id="51223bd0-ffd1-11df-a976-0801209c9026">Song of Eärendil</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801212c9020">Light of Valinor</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801212c9001">Asfaloth</card>
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801213c9027">Vilya</card>
+    <card qty="3" id="4823aae3-46ef-4a75-89f9-cbd3aa1b9071">Ranger Spikes</card>
+  </section>
+  <section name="Event" shared="False">
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801200c9066">Secret Paths</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801210c9005">Elrond&#039;s Counsel</card>
+  </section>
+  <section name="Side Quest" shared="False">
+  </section>
+  <section name="Sideboard" shared="False">
+  </section>
+  <section name="Quest" shared="True" />
+  <section name="Encounter" shared="True" />
+  <section name="Special" shared="True" />
+  <section name="Setup" shared="True" />
+  <notes><![CDATA[]]></notes>
+</deck>

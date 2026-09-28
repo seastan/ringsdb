@@ -1,0 +1,706 @@
+{
+    "decks_created": [
+        {
+            "month": "2015-08",
+            "cycle": "Core Set",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Shadows of Mirkwood",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Dwarrowdelf",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Against the Shadow",
+            "number_decks": "4",
+            "number_users": "1"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "The Ring-maker",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Angmar Awakened",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Dream-chaser",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Haradrim",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Ered Mithrin",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Vengeance of Mordor",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "ALeP - Oaths of the Rohirrim",
+            "number_decks": "0",
+            "number_users": "0"
+        }
+    ],
+    "decks_played": [
+        {
+            "month": "2015-08",
+            "cycle": "Core Set",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Shadows of Mirkwood",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Dwarrowdelf",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Against the Shadow",
+            "number_decks": "4",
+            "number_users": "1"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "The Ring-maker",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Angmar Awakened",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Dream-chaser",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Haradrim",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Ered Mithrin",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Vengeance of Mordor",
+            "number_decks": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "ALeP - Oaths of the Rohirrim",
+            "number_decks": "0",
+            "number_users": "0"
+        }
+    ],
+    "quests_played": [
+        {
+            "month": "2015-08",
+            "cycle": "Core Set",
+            "number_quests": "1",
+            "number_users": "1"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Shadows of Mirkwood",
+            "number_quests": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Dwarrowdelf",
+            "number_quests": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Against the Shadow",
+            "number_quests": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "The Ring-maker",
+            "number_quests": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Angmar Awakened",
+            "number_quests": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Dream-chaser",
+            "number_quests": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Haradrim",
+            "number_quests": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Ered Mithrin",
+            "number_quests": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "Vengeance of Mordor",
+            "number_quests": "0",
+            "number_users": "0"
+        },
+        {
+            "month": "2015-08",
+            "cycle": "ALeP - Oaths of the Rohirrim",
+            "number_quests": "0",
+            "number_users": "0"
+        }
+    ],
+    "packs": [
+        {
+            "name": "Core Set",
+            "date_release": "2011-04-20"
+        },
+        {
+            "name": "The Dark of Mirkwood",
+            "date_release": "2011-04-22"
+        },
+        {
+            "name": "The Hunt for Gollum",
+            "date_release": "2011-07-21"
+        },
+        {
+            "name": "Conflict at the Carrock",
+            "date_release": "2011-08-10"
+        },
+        {
+            "name": "A Journey to Rhosgobel",
+            "date_release": "2011-09-01"
+        },
+        {
+            "name": "The Massing at Osgiliath",
+            "date_release": "2011-09-15"
+        },
+        {
+            "name": "The Hills of Emyn Muil",
+            "date_release": "2011-09-30"
+        },
+        {
+            "name": "The Dead Marshes",
+            "date_release": "2011-11-02"
+        },
+        {
+            "name": "Return to Mirkwood",
+            "date_release": "2011-11-23"
+        },
+        {
+            "name": "Khazad-dûm",
+            "date_release": "2012-01-06"
+        },
+        {
+            "name": "The Redhorn Gate",
+            "date_release": "2012-03-01"
+        },
+        {
+            "name": "Road to Rivendell",
+            "date_release": "2012-03-21"
+        },
+        {
+            "name": "The Watcher in the Water",
+            "date_release": "2012-04-25"
+        },
+        {
+            "name": "The Long Dark",
+            "date_release": "2012-05-16"
+        },
+        {
+            "name": "Foundations of Stone",
+            "date_release": "2012-06-20"
+        },
+        {
+            "name": "Shadow and Flame",
+            "date_release": "2012-08-08"
+        },
+        {
+            "name": "Over Hill and Under Hill",
+            "date_release": "2012-08-17"
+        },
+        {
+            "name": "The Battle of Lake-town",
+            "date_release": "2012-10-01"
+        },
+        {
+            "name": "Heirs of Númenor",
+            "date_release": "2012-11-26"
+        },
+        {
+            "name": "On the Doorstep",
+            "date_release": "2013-02-22"
+        },
+        {
+            "name": "The Steward's Fear",
+            "date_release": "2013-05-09"
+        },
+        {
+            "name": "The Drúadan Forest",
+            "date_release": "2013-05-31"
+        },
+        {
+            "name": "Encounter at Amon Dîn",
+            "date_release": "2013-07-05"
+        },
+        {
+            "name": "Assault on Osgiliath",
+            "date_release": "2013-08-09"
+        },
+        {
+            "name": "The Black Riders",
+            "date_release": "2013-09-01"
+        },
+        {
+            "name": "The Blood of Gondor",
+            "date_release": "2013-10-17"
+        },
+        {
+            "name": "The Stone of Erech",
+            "date_release": "2013-10-30"
+        },
+        {
+            "name": "The Morgul Vale",
+            "date_release": "2013-11-15"
+        },
+        {
+            "name": "The Voice of Isengard",
+            "date_release": "2014-02-21"
+        },
+        {
+            "name": "The Dunland Trap",
+            "date_release": "2014-06-26"
+        },
+        {
+            "name": "The Three Trials",
+            "date_release": "2014-07-24"
+        },
+        {
+            "name": "Trouble in Tharbad",
+            "date_release": "2014-08-21"
+        },
+        {
+            "name": "The Road Darkens",
+            "date_release": "2014-10-03"
+        },
+        {
+            "name": "The Nîn-in-Eilph",
+            "date_release": "2014-10-23"
+        },
+        {
+            "name": "The Old Forest",
+            "date_release": "2014-11-01"
+        },
+        {
+            "name": "Celebrimbor's Secret",
+            "date_release": "2014-11-13"
+        },
+        {
+            "name": "The Antlered Crown",
+            "date_release": "2014-12-23"
+        },
+        {
+            "name": "Fog on the Barrow-downs",
+            "date_release": "2015-01-01"
+        },
+        {
+            "name": "The Lost Realm",
+            "date_release": "2015-04-03"
+        },
+        {
+            "name": "The Treason of Saruman",
+            "date_release": "2015-04-23"
+        },
+        {
+            "name": "The Wastes of Eriador",
+            "date_release": "2015-07-02"
+        },
+        {
+            "name": "Escape from Mount Gram",
+            "date_release": "2015-07-30"
+        },
+        {
+            "name": "Across the Ettenmoors",
+            "date_release": "2015-09-03"
+        },
+        {
+            "name": "The Treachery of Rhudaur",
+            "date_release": "2015-09-24"
+        },
+        {
+            "name": "The Battle of Carn Dûm",
+            "date_release": "2015-11-06"
+        },
+        {
+            "name": "The Land of Shadow",
+            "date_release": "2015-11-19"
+        },
+        {
+            "name": "The Dread Realm",
+            "date_release": "2015-12-17"
+        },
+        {
+            "name": "Angmar Awakened Campaign Expansion",
+            "date_release": "2015-12-18"
+        },
+        {
+            "name": "The Grey Havens",
+            "date_release": "2016-02-11"
+        },
+        {
+            "name": "The Ruins of Belegost",
+            "date_release": "2016-02-15"
+        },
+        {
+            "name": "Murder at the Prancing Pony",
+            "date_release": "2016-02-20"
+        },
+        {
+            "name": "Flight of the Stormcaller",
+            "date_release": "2016-05-05"
+        },
+        {
+            "name": "The Thing in the Depths",
+            "date_release": "2016-06-02"
+        },
+        {
+            "name": "Temple of the Deceived",
+            "date_release": "2016-06-30"
+        },
+        {
+            "name": "The Flame of the West",
+            "date_release": "2016-08-03"
+        },
+        {
+            "name": "The Drowned Ruins",
+            "date_release": "2016-09-01"
+        },
+        {
+            "name": "A Storm on Cobas Haven",
+            "date_release": "2016-09-29"
+        },
+        {
+            "name": "The City of Corsairs",
+            "date_release": "2016-10-27"
+        },
+        {
+            "name": "The Sands of Harad",
+            "date_release": "2016-11-23"
+        },
+        {
+            "name": "The Mûmakil",
+            "date_release": "2017-01-30"
+        },
+        {
+            "name": "The Siege of Annúminas",
+            "date_release": "2017-03-01"
+        },
+        {
+            "name": "Race Across Harad",
+            "date_release": "2017-04-01"
+        },
+        {
+            "name": "Beneath the Sands",
+            "date_release": "2017-05-01"
+        },
+        {
+            "name": "Two-Player Limited Edition Starter",
+            "date_release": "2017-07-06"
+        },
+        {
+            "name": "The Black Serpent",
+            "date_release": "2017-07-20"
+        },
+        {
+            "name": "The Mountain of Fire",
+            "date_release": "2017-08-16"
+        },
+        {
+            "name": "The Dungeons of Cirith Gurat",
+            "date_release": "2017-12-07"
+        },
+        {
+            "name": "The Crossings of Poros",
+            "date_release": "2018-02-08"
+        },
+        {
+            "name": "Attack on Dol Guldur",
+            "date_release": "2018-02-15"
+        },
+        {
+            "name": "The Wilds of Rhovanion",
+            "date_release": "2018-06-14"
+        },
+        {
+            "name": "The Withered Heath",
+            "date_release": "2018-08-16"
+        },
+        {
+            "name": "Roam Across Rhovanion",
+            "date_release": "2018-10-18"
+        },
+        {
+            "name": "Fire in the Night",
+            "date_release": "2018-12-07"
+        },
+        {
+            "name": "The Ghost of Framsburg",
+            "date_release": "2019-02-07"
+        },
+        {
+            "name": "Mount Gundabad",
+            "date_release": "2019-04-04"
+        },
+        {
+            "name": "The Fate of Wilderland",
+            "date_release": "2019-06-06"
+        },
+        {
+            "name": "The Wizard's Quest",
+            "date_release": "2019-06-15"
+        },
+        {
+            "name": "The Woodland Realm",
+            "date_release": "2019-06-16"
+        },
+        {
+            "name": "A Shadow in the East",
+            "date_release": "2019-08-02"
+        },
+        {
+            "name": "Wrath and Ruin",
+            "date_release": "2019-11-15"
+        },
+        {
+            "name": "The City of Ulfast",
+            "date_release": "2020-01-10"
+        },
+        {
+            "name": "Challenge of the Wainriders",
+            "date_release": "2020-02-07"
+        },
+        {
+            "name": "Under the Ash Mountains",
+            "date_release": "2020-06-01"
+        },
+        {
+            "name": "The Mines of Moria",
+            "date_release": "2020-07-01"
+        },
+        {
+            "name": "Escape from Khazad-dûm",
+            "date_release": "2020-07-02"
+        },
+        {
+            "name": "Messenger of the King Allies",
+            "date_release": "2020-07-30"
+        },
+        {
+            "name": "The Land of Sorrow",
+            "date_release": "2020-08-01"
+        },
+        {
+            "name": "The Fortress of Nurn",
+            "date_release": "2020-10-01"
+        },
+        {
+            "name": "The Hunt for the Dreadnaught",
+            "date_release": "2020-12-01"
+        },
+        {
+            "name": "ALeP - Messenger of the King Allies",
+            "date_release": "2021-03-21"
+        },
+        {
+            "name": "ALeP - Children of Eorl",
+            "date_release": "2021-03-22"
+        },
+        {
+            "name": "ALeP - The Aldburg Plot",
+            "date_release": "2021-06-28"
+        },
+        {
+            "name": "ALeP - The Scouring of the Shire",
+            "date_release": "2021-08-06"
+        },
+        {
+            "name": "ALeP - Fire on the Eastemnet",
+            "date_release": "2021-09-09"
+        },
+        {
+            "name": "ALeP - The Gap of Rohan",
+            "date_release": "2021-12-07"
+        },
+        {
+            "name": "ALeP - The Glittering Caves",
+            "date_release": "2022-02-22"
+        },
+        {
+            "name": "ALeP - Mustering of the Rohirrim",
+            "date_release": "2022-06-13"
+        },
+        {
+            "name": "ALeP - Blood in the Isen",
+            "date_release": "2022-09-09"
+        },
+        {
+            "name": "ALeP - The Nine are Abroad",
+            "date_release": "2022-10-18"
+        },
+        {
+            "name": "Revised Core Set",
+            "date_release": "2022-11-03"
+        },
+        {
+            "name": "Dwarves of Durin",
+            "date_release": "2022-11-04"
+        },
+        {
+            "name": "Elves of Lórien",
+            "date_release": "2022-11-04"
+        },
+        {
+            "name": "Defenders of Gondor",
+            "date_release": "2022-11-04"
+        },
+        {
+            "name": "Riders of Rohan",
+            "date_release": "2022-11-04"
+        },
+        {
+            "name": "ALeP - The Siege of Erebor",
+            "date_release": "2023-09-06"
+        },
+        {
+            "name": "ALeP - The Shire's Reckoning",
+            "date_release": "2024-02-29"
+        },
+        {
+            "name": "Dream-chaser Campaign Expansion",
+            "date_release": "2024-08-14"
+        },
+        {
+            "name": "Ered Mithrin Campaign Expansion",
+            "date_release": "2024-08-14"
+        },
+        {
+            "name": "ALeP - The Hobbit",
+            "date_release": "2024-11-07"
+        },
+        {
+            "name": "ALeP - Strange News in Bree",
+            "date_release": "2025-01-30"
+        },
+        {
+            "name": "ALeP - Fangs in the Dark",
+            "date_release": "2025-06-30"
+        },
+        {
+            "name": "ALeP - The Mirror of Galadriel",
+            "date_release": "2025-11-04"
+        },
+        {
+            "name": "ALeP - The Brandywine Pursuit",
+            "date_release": "2026-03-25"
+        }
+    ],
+    "pack_rules": {
+        "Core Set": [
+            "2000-01-01",
+            "2011-07-21"
+        ],
+        "Shadows of Mirkwood": [
+            "2011-07-21",
+            "2012-01-06"
+        ],
+        "Dwarrowdelf": [
+            "2012-01-06",
+            "2012-08-17"
+        ],
+        "Against the Shadow": [
+            "2012-08-17",
+            "2014-02-21"
+        ],
+        "The Ring-maker": [
+            "2014-02-21",
+            "2015-04-03"
+        ],
+        "Angmar Awakened": [
+            "2015-04-03",
+            "2016-02-11"
+        ],
+        "Dream-chaser": [
+            "2016-02-11",
+            "2016-11-23"
+        ],
+        "Haradrim": [
+            "2016-11-23",
+            "2018-06-14"
+        ],
+        "Ered Mithrin": [
+            "2018-06-14",
+            "2019-08-02"
+        ],
+        "Vengeance of Mordor": [
+            "2019-08-02",
+            "2021-03-21"
+        ],
+        "ALeP - Oaths of the Rohirrim": [
+            "2021-03-21",
+            "2099-12-31"
+        ]
+    }
+}

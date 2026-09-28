@@ -60,6 +60,7 @@ security:
         - { path: ^/js/, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/user/, role: ROLE_USER }
         - { path: ^/collection/, role: ROLE_USER }
+        - { path: ^/tag/, role: ROLE_USER }
         - { path: ^/questlog/, role: ROLE_USER }
         - { path: ^/deck/view/, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/deck/, role: ROLE_USER }

@@ -1,0 +1,153 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Dwarf Lore/Leadership/Tactics
+1.0
+Versions
+1.0
+published:
+Aug 16, 2015
+0
+0
+1
+1.0
+Questlogs using this decklist
+Untitled Questlog
+0
+0
+0
+Fellowships using this decklist
+None.
+Derived from
+None. Self-made deck here.
+Inspiration for
+None yet.
+Card draw simulator
+Draw:
+1
+2
+6
+all
+Reshuffle Selected
+Discard Selected
+Reset
+Odds:
+0
+% –
+0
+% –
+0
+%
+more
+The gameplay simulator is an experimental feature and is currently only available for those that support RingsDB development on
+Patreon
+.
+Gameplay simulator
+Refresh
+New Round
+Reset Game
+Round
+0
+Threat
+0
+Hand
+Draw
+Other...
+Discard random
+Shuffle into deck and redraw equal number
+In Play
+Deck
+Shuffle
+Reveal...
+None
+Top 1
+Top 5
+Top 10
+All
+Discard Pile
+Edit
+Delete
+Copy
+Log a Quest
+Download
+Text file
+Octgn file
+Play on DragnCards
+Export
+bbCode
+Markdown (Reddit)
+plain text
+HTML (WordPress)
+Sort
+by Type
+by Pack
+by Sphere
+by Name
+test
+1
+Hello World
+1 comments
+Aug 16, 2015
+test
+1
+Comment test
+×
+Export decklist
+×
+Delete decklist
+Are you sure you want to delete this decklist?
+Yes, delete
+Cancel
+×
+Odds Calculator
+Number of cards in deck
+Number of
+desired
+cards in deck
+Number of cards drawn
+Number of
+desired
+cards in draw (at least)
+Probability of such an outcome
+%
+×
+Compare with another decklist
+Link or ID of the other decklist
+Go
+Cancel
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

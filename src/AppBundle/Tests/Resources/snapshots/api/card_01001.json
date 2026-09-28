@@ -1,0 +1,61 @@
+{
+    "type_code": "hero",
+    "type_name": "Hero",
+    "sphere_code": "leadership",
+    "sphere_name": "Leadership",
+    "position": 1,
+    "code": "01001",
+    "name": "Aragorn",
+    "traits": "Dúnedain. Noble. Ranger.",
+    "text": "Sentinel.\n<b>Response:</b> After Aragorn commits to a quest, spend 1 resource from his resource pool to ready him.",
+    "flavor": "\"I am Aragorn son of Arathorn; and if by life or death I can save you, I will.\"\n<cite>The Fellowship of the Ring</cite>",
+    "is_unique": true,
+    "threat": 12,
+    "willpower": 2,
+    "attack": 3,
+    "defense": 2,
+    "health": 5,
+    "deck_limit": 1,
+    "has_errata": false,
+    "pack_code": "Core",
+    "pack_name": "Core Set",
+    "illustrator": "John Stanko",
+    "octgnid": "51223bd0-ffd1-11df-a976-0801200c9001",
+    "quantity": 1,
+    "url": "http://localhost/card/01001",
+    "packs": [
+        {
+            "pack_code": "Core",
+            "pack_name": "Core Set",
+            "position": 1,
+            "quantity": 1,
+            "image_code": "01001",
+            "illustrator": "John Stanko",
+            "octgnid": "51223bd0-ffd1-11df-a976-0801200c9001",
+            "imagesrc": null,
+            "date_release": "2011-04-20"
+        },
+        {
+            "pack_code": "Starter",
+            "pack_name": "Two-Player Limited Edition Starter",
+            "position": 1,
+            "quantity": 1,
+            "image_code": "20001",
+            "illustrator": "John Stanko",
+            "octgnid": "cf2f9186-27ff-4d04-95da-5dc6e96a009d",
+            "imagesrc": null,
+            "date_release": "2017-07-06"
+        },
+        {
+            "pack_code": "RevCore",
+            "pack_name": "Revised Core Set",
+            "position": 1,
+            "quantity": 3,
+            "image_code": "01001",
+            "illustrator": "John Stanko",
+            "octgnid": null,
+            "imagesrc": null,
+            "date_release": "2022-11-03"
+        }
+    ]
+}

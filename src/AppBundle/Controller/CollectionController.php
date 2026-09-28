@@ -84,7 +84,7 @@ class CollectionController extends Controller {
 
         $customPacks = $this->getDoctrine()
             ->getRepository('AppBundle:UserCustomPack')
-            ->findBy(['user' => $this->getUser()], ['createdAt' => 'ASC']);
+            ->findBy(['user' => $this->getUser()], ['createdAt' => 'ASC', 'id' => 'ASC']);
 
         return $this->render('AppBundle:Collection:packs.html.twig', [
             'pagetitle' =>  "My Collection",

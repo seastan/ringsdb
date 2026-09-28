@@ -161,3 +161,18 @@ AppBundle\Entity\User:
             type: text
             nullable: true
             column: art_preferences
+        locked:
+            type: boolean
+        expired:
+            type: boolean
+        expiresAt:
+            type: datetime
+            nullable: true
+            column: expires_at
+        credentialsExpired:
+            type: boolean
+            column: credentials_expired
+        credentialsExpireAt:
+            type: datetime
+            nullable: true
+            column: credentials_expire_at

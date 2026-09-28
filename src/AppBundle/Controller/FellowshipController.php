@@ -885,7 +885,11 @@ class FellowshipController extends Controller {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
 
-        $file = tempnam("tmp", "zip");
+        $tmpDir = $this->getParameter('kernel.cache_dir');
+        $file = tempnam($tmpDir, "zip");
+        if ($file === false) {
+            throw new \RuntimeException("Cannot create a temporary file in $tmpDir");
+        }
         $zip = new \ZipArchive();
         $res = $zip->open($file, \ZipArchive::OVERWRITE);
 

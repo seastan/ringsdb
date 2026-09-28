@@ -1,0 +1,61 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Profile
+Reputation
+1
+Username
+Email
+Something about you
+Be notified when a user comments one of your decklists
+Be notified when a user also comments a decklist you commented
+Be notified when a user mentions you in a comment
+Share my decks
+If you check this box, the "View" page of your decks will be public instead of private. You can then send the link to your friends and players will be able to create fellowships using your decks. Be warned though, that you will not be able to delete decks that were used to create fellowships, even if they were created by other users. If you uncheck the box, all your decks become private immediately.
+Dark mode
+Use a dark color theme across the site. The setting follows your account, so it will apply on any device where you are logged in.
+Select a sphere color for your username
+Tactics
+Spirit
+Leadership
+Lore
+Neutral
+Baggins
+Fellowship
+Save
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

@@ -5,12 +5,10 @@ namespace AppBundle\Model;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
-use AppBundle\Services\DeckInterface;
 use Psr\Log\LoggerInterface;
 use AppBundle\Entity\User;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use AppBundle\Entity\Sphere;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
@@ -88,6 +86,9 @@ class FellowshipManager {
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.datePublish), 2)) AS HIDDEN popularity');
         $qb->orderBy('popularity', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -95,6 +96,9 @@ class FellowshipManager {
         $qb = $this->getQueryBuilder();
 
         $qb->orderBy('d.datePublish', 'DESC');
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -104,6 +108,9 @@ class FellowshipManager {
 
         $qb->andWhere('d.nbComments > 0');
         $qb->orderBy('d.dateLastComment', 'DESC');
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -116,6 +123,9 @@ class FellowshipManager {
         $qb->setParameter('user', $user);
         $qb->orderBy('d.datePublish', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -126,6 +136,9 @@ class FellowshipManager {
         $qb->setParameter('user', $user);
         $qb->orderBy('d.datePublish', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -135,6 +148,9 @@ class FellowshipManager {
         $qb->andWhere('d.nbVotes > 10');
         $qb->orderBy('d.nbVotes', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
@@ -143,7 +159,10 @@ class FellowshipManager {
 
         $qb->addSelect('(SELECT count(c) FROM AppBundle:FellowshipComment c WHERE c.fellowship=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
         $qb->orderBy('nbRecentComments', 'DESC');
-        $qb->orderBy('d.nbComments', 'DESC');
+        $qb->addOrderBy('d.nbComments', 'DESC');
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -251,7 +270,7 @@ class FellowshipManager {
             $sub->innerJoin('AppBundle:Decklistslot', 'dls', 'WITH', 'dls.card = j');
             $sub->innerJoin('AppBundle:FellowshipDecklist', 'fdl', 'WITH', 'fdl.decklist = dls.decklist');
             $sub->where('fdl.fellowship = d');
-            $sub->groupBy('d.id,dls.card');
+            $sub->groupBy('d.id, dls.card, jp.quantity');
             $sub->having('SUM(dls.quantity) > :numcores * jp.quantity');
             $qb->setParameter("numcores", $numcores);
             $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
@@ -263,7 +282,7 @@ class FellowshipManager {
             $sub->innerJoin('AppBundle:Decklistslot', 'dls2', 'WITH', 'dls2.card = j2');
             $sub->innerJoin('AppBundle:FellowshipDecklist', 'fdl2', 'WITH', 'fdl2.decklist = dls2.decklist');
             $sub->where('fdl2.fellowship = d');
-            $sub->groupBy('d.id,dls2.card');
+            $sub->groupBy('d.id, dls2.card, jp2.quantity');
             $sub->having('SUM(dls2.quantity) > :numplaysets * jp2.quantity');
             $qb->setParameter("numplaysets", $numplaysets);
             $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
@@ -283,7 +302,9 @@ class FellowshipManager {
                 if (!in_array('d.user', $joinTables)) {
                     $qb->innerJoin('d.user', 'u');
                 }
-                $qb->orderBy('u.reputation', 'DESC');
+                // with DISTINCT, MySQL 5.7+ only sorts on selected columns
+                $qb->addSelect('u.reputation AS HIDDEN reputation');
+                $qb->orderBy('reputation', 'DESC');
                 break;
 
             case 'popularity':
@@ -292,6 +313,9 @@ class FellowshipManager {
                 $qb->orderBy('popularity', 'DESC');
                 break;
         }
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }

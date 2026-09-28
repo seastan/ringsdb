@@ -14,7 +14,22 @@ Login with `tester` / `test1234` (or a prod account).
 
 ### First-time setup (new machine / fresh volume)
 
-1. **DB**: Import the prod dump then apply migrations:
+1. **DB**: two options.
+
+   **(a) Public bootstrap (recommended, no prod data / no PII).** `ringsdb_bootstrap.sql`
+   (committed at repo root) is the full schema for every table plus reference data for the
+   card/set/cycle/printing tables only (`card`, `card_printing`, `cycle`, `pack`, `sphere`,
+   `type`, `encounter`, `scenario`, `scenario_encounter`). Every other table (users, decks,
+   decklists, comments, votes, …) is created empty. It already reflects the current prod
+   schema, so **do not** re-run the `migrations/` scripts on top of it — they are baked in.
+   Register a fresh account once the app is up (the seeded `tester` login only exists in the
+   prod dump).
+   ```bash
+   docker exec -i ringsdb-db-1 mysql -uroot -pringsdb symfony < ringsdb_bootstrap.sql
+   ```
+
+   **(b) Full prod dump (maintainers with data access only).** Import the prod dump then
+   apply the migrations it predates:
    ```bash
    docker exec -i ringsdb-db-1 mysql -uroot -pringsdb symfony < ringsdb_daily.sql
    docker exec -i ringsdb-db-1 mysql -uroot -pringsdb symfony < migrations/card-printings/01_schema.sql
@@ -58,6 +73,8 @@ Login with `tester` / `test1234` (or a prod account).
 
 - No Composer reinstalls. See vendor/ note above.
 - Validate migration SQL by parsing `ringsdb_daily.sql` with Python (the SQL dump is ~695 MB at
-  repo root; `card-data.sql` / `packs-data.sql` are stale 2016 snapshots, ignore them).
+  repo root). Current card/set reference data lives in the committed `ringsdb_bootstrap.sql`
+  (see first-time setup); the old `card-data.sql` / `packs-data.sql` / `scenario-data.sql`
+  snapshots were stale and have been removed.
 - Deploy by pushing to the feature branch; pull on `ringsdb.com` test server over SSH
   (`rings@ringsdb.com`).

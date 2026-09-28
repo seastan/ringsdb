@@ -14,3 +14,13 @@ web_profiler:
 
 swiftmailer:
     disable_delivery: true
+
+doctrine:
+    dbal:
+        driver: pdo_mysql
+        host: mysql_test
+        port: 3306
+        dbname: ringsdb_test
+        user: symfony
+        password: passwd
+        charset: UTF8

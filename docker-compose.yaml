@@ -1,0 +1,84 @@
+services:
+    mysql:
+        image: "mysql:8"
+        volumes:
+          - type: bind
+            source: ./docker/dev/mysql/init.sql
+            target: /docker-entrypoint-initdb.d/init.sql
+            read_only: true
+          - type: bind
+            source: ./docker/dev/mysql/my.cnf
+            target: /etc/mysql/conf.d/my.cnf
+            read_only: true
+          - type: volume
+            source: mysql_data
+            target: /var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: passwd
+            MYSQL_DATABASE: ringsdb
+            MYSQL_USER: symfony
+            MYSQL_PASSWORD: passwd
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "symfony", "-ppasswd"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+
+    mysql_test:
+        image: "mysql:8"
+        volumes:
+          - type: bind
+            source: ./docker/dev/mysql/init.sql
+            target: /docker-entrypoint-initdb.d/init.sql
+            read_only: true
+          - type: bind
+            source: ./docker/dev/mysql/my.cnf
+            target: /etc/mysql/conf.d/my.cnf
+            read_only: true
+          - type: volume
+            source: mysql_test_data
+            target: /var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: passwd
+            MYSQL_DATABASE: ringsdb_test
+            MYSQL_USER: symfony
+            MYSQL_PASSWORD: passwd
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "symfony", "-ppasswd"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+
+    symfony:
+        build:
+            context: .
+            dockerfile: ./docker/dev/symfony/Dockerfile
+        volumes:
+            - .:/var/www/html
+        ports:
+            - 8080:8000
+        user: www-data
+        depends_on:
+            mysql:
+                condition: service_healthy
+        entrypoint: '/var/www/html/docker/dev/symfony/entrypoint.sh'
+
+#    mailer:
+#        image: axllent/mailpit
+#        ports:
+#            - 127.0.0.1:1025:1025
+#            - 127.0.0.1:8025:8025
+#        environment:
+#            MP_SMTP_AUTH_ACCEPT_ANY: 1
+#            MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+    adminer:
+        image: adminer
+        ports:
+            - 8081:8080
+
+volumes:
+    mysql_data:
+        driver: local
+    mysql_test_data:
+        driver: local
