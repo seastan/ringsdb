@@ -30,7 +30,6 @@
     "doctrine/dbal": "^2.5",
     "doctrine/orm": "^2.5",
     "doctrine/doctrine-bundle": "^1.5",
-    "liuggio/excelbundle": "^2.0",
     "friendsofsymfony/jsrouting-bundle": "^1.5",
     "ezyang/htmlpurifier": "^4.6",
     "leafo/scssphp": "^0.2.0",
@@ -38,13 +37,14 @@
     "nelmio/api-doc-bundle": "^2.9",
     "erusev/parsedown": "^1.6",
     "symfony/twig-bundle": "^3.4",
-    "symfony/asset": "^3.4"
+    "symfony/asset": "^3.4",
+    "phpoffice/phpspreadsheet": "^1.30.7"
   },
   "require-dev": {
     "sensio/generator-bundle": "~3.0",
     "symfony/phpunit-bridge": "4.4",
     "doctrine/doctrine-fixtures-bundle": "^2.4.1",
-    "phpstan/phpstan": "^1.4"
+    "phpstan/phpstan": "^2.2"
   },
   "scripts": {
     "post-root-package-install": [

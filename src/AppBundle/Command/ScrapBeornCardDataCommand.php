@@ -203,8 +203,8 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
                 $t = $c->filter('span')->last()->text();
                 preg_match('/^#(\d+) \(x(\d+)\)$/', $t, $matches);
-                $position = $matches[1];
-                $quantity = $matches[2];
+                $position = $matches[1] ?? '';
+                $quantity = $matches[2] ?? '';
 		$output->writeln("7");
 
                 // Image URL

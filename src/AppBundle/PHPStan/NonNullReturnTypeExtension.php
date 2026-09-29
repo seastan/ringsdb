@@ -17,13 +17,14 @@ use PHPStan\Type\TypeCombinator;
  * the container of a booted kernel, the content of a response (false for streamed responses).
  */
 class NonNullReturnTypeExtension implements DynamicMethodReturnTypeExtension {
-    /** @var string */
+    /** @var class-string */
     private $className;
 
     /** @var string[] */
     private $methods;
 
     /**
+     * @param class-string $className
      * @param string[] $methods
      */
     public function __construct(string $className, array $methods) {
@@ -40,7 +41,7 @@ class NonNullReturnTypeExtension implements DynamicMethodReturnTypeExtension {
     }
 
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): Type {
-        $type = ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
+        $type = ParametersAcceptorSelector::selectFromArgs($scope, $methodCall->getArgs(), $methodReflection->getVariants())->getReturnType();
 
         return TypeCombinator::remove(TypeCombinator::removeNull($type), new ConstantBooleanType(false));
     }

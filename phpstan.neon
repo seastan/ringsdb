@@ -3,14 +3,10 @@ parameters:
     paths:
         - src
     ignoreErrors:
-        # PHPExcel documents the column and row indexes as strings, they are ints
-        - '#^Parameter \#[12] \$p(Column|Row) of method PHPExcel_Worksheet::\w+\(\) expects string, int(<0, max>)? given\.$#'
-        # PHPExcel_Worksheet::getCellByColumnAndRow() creates the cell when it does not exist
-        - '#^Cannot call method setValue(Explicit)?\(\) on PHPExcel_Cell\|null\.$#'
-    # legacy code: arrays are untyped structures and Doctrine collections have no generic types;
-    # to revisit after the migration
-    checkMissingIterableValueType: false
-    checkGenericClassInNonGenericObjectType: false
+        # legacy code: arrays are untyped structures and Doctrine collections have no generic types;
+        # to revisit after the migration
+        - identifier: missingType.iterableValue
+        - identifier: missingType.generics
     bootstrapFiles:
         # PHPUnit is installed by simple-phpunit (SYMFONY_PHPUNIT_VERSION in phpunit.xml), outside
         # Composer's autoloader: KernelTestCase / WebTestCase extend its TestCase

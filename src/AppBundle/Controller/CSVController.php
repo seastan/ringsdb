@@ -44,7 +44,7 @@ class CSVController extends Controller {
 			$row = str_getcsv($row);
 
 			for ($i = 0; $i < count($row); $i++) {
-				$card[$columns[$i]] = (string) str_replace('<br/>', "\n", $row[$i]);
+				$card[$columns[$i]] = (string) str_replace('<br/>', "\n", (string) $row[$i]);
 			}
 
 			$newIds[$card['octgnid']] = 1;

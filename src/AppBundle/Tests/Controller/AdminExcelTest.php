@@ -2,13 +2,15 @@
 
 namespace AppBundle\Tests\Controller;
 
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Excel export / import of the cards (ExcelController, admin only): the tests download a pack,
- * change the file with PHPExcel, and upload it back.
+ * change the file with PhpSpreadsheet, and upload it back.
  *
  * - the download is a StreamedResponse, sent by Symfony's StreamedResponseListener as soon as
  *   the controller returns it: it is captured with an output buffer around the request;
@@ -104,23 +106,24 @@ class AdminExcelTest extends WebTestCase {
      * @return array
      */
     private static function rows($file) {
-        return \PHPExcel_IOFactory::load($file)->getActiveSheet()->toArray(null, false, false, false);
+        return IOFactory::load($file)->getActiveSheet()->toArray(null, false, false, false);
     }
 
     /**
-     * Changes the file with PHPExcel: [row (1 = header) => [column name => value]].
+     * Changes the file with PhpSpreadsheet: [row (1 = header) => [column name => value]].
      * @param mixed $file
      */
     private static function edit($file, array $changes): void {
-        $excel = \PHPExcel_IOFactory::load($file);
-        $sheet = $excel->getActiveSheet();
+        $spreadsheet = IOFactory::load($file);
+        $sheet = $spreadsheet->getActiveSheet();
         foreach ($changes as $row => $values) {
             foreach ($values as $column => $value) {
-                $sheet->setCellValueExplicitByColumnAndRow((int) array_search($column, self::HEADER), $row, $value,
-                    is_int($value) ? \PHPExcel_Cell_DataType::TYPE_NUMERIC : \PHPExcel_Cell_DataType::TYPE_STRING);
+                // PhpSpreadsheet columns start at 1
+                $sheet->setCellValueExplicit([(int) array_search($column, self::HEADER) + 1, $row], $value,
+                    is_int($value) ? DataType::TYPE_NUMERIC : DataType::TYPE_STRING);
             }
         }
-        \PHPExcel_IOFactory::createWriter($excel, 'Excel2007')->save($file);
+        IOFactory::createWriter($spreadsheet, 'Xlsx')->save($file);
     }
 
     /**
@@ -145,9 +148,10 @@ class AdminExcelTest extends WebTestCase {
         $this->assertCount(1 + count($this->coreCards), $rows);
         $this->assertSame(['Hero', 'Leadership'], array_slice($rows[1], 0, 2));
         $this->assertSame(['01001', 'Aragorn', 'Dúnedain. Noble. Ranger.'], array_slice($rows[1], 3, 3));
-        // numbers are read back as floats; booleans are "1" or empty, null values are empty
-        $this->assertEquals([1, null, 12, 2, 3, 2, 5, null, null, 1, null], array_slice($rows[1], 8));
-        $this->assertSame(1.0, $rows[1][2]);
+        // whole numbers are read back as ints (floats with PHPExcel); booleans are "1" or empty,
+        // null values are empty
+        $this->assertSame([1, null, 12, 2, 3, 2, 5, null, null, 1, null], array_slice($rows[1], 8));
+        $this->assertSame(1, $rows[1][2]);
     }
 
     public function testDownloadAllCards(): void {

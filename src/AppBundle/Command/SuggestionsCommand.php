@@ -84,7 +84,7 @@ class SuggestionsCommand extends ContainerAwareCommand {
         }
 
         foreach ($cardsByIndex as $index => $card) {
-            $matrix[$index] = $index ? array_fill(0, $index, 0) : [];
+            $matrix[$index] = $index ? (array_fill(0, $index, 0) ?: []) : [];
         }
 
         $decks = $dbh->executeQuery("SELECT d.id FROM deck d ORDER BY d.id")->fetchAll();

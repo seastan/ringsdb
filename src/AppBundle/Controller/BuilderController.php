@@ -185,10 +185,8 @@ class BuilderController extends Controller {
 
             if (preg_match('/^\s*([\pLl\pLu\pN\-\.\'\!\: ]+)\(?([^\)]*)\)?/u', $line, $matches)) {
                 $name = trim($matches[1]);
-
-                if (isset($matches[2])) {
-                    $pack_name = trim($matches[2]);
-                }
+                // the pack name, empty when absent
+                $pack_name = trim($matches[2]);
             }
 
             $card = null;
@@ -892,13 +890,18 @@ class BuilderController extends Controller {
             throw new AccessDeniedHttpException("You don't have access to this deck.");
         }
 
-        $diff = (array) json_decode($request->get('diff'));
-        if (count($diff) != 4 && count($diff) != 2) {
-            $this->get('logger')->error("cannot use diff", $diff);
+        // decoded as arrays: count() of an object is a warning since PHP 7.2
+        $diff = json_decode((string) $request->get('diff'), true);
+        if (!is_array($diff) || (count($diff) != 4 && count($diff) != 2)) {
+            $this->get('logger')->error("cannot use diff", (array) $diff);
             throw new UnprocessableEntityHttpException("Wrong content " . json_encode($diff));
         }
 
-        if (count($diff[0]) || count($diff[1]) || count($diff[2]) || count($diff[3])) {
+        // [main added, main removed, side added, side removed], the side parts may be missing
+        $parts = array_map(function ($part) {
+            return is_array($part) ? count($part) : 0;
+        }, $diff);
+        if (array_sum($parts) > 0) {
             /* @var $change \AppBundle\Entity\Deckchange */
             $change = new Deckchange();
             $change->setDeck($deck);

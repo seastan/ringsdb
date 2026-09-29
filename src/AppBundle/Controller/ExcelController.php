@@ -2,8 +2,12 @@
 
 namespace AppBundle\Controller;
 
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\Card;
@@ -55,15 +59,16 @@ class ExcelController extends Controller {
 			}
 		}
 
-		$phpExcelObject = $this->get('phpexcel')->createPHPExcelObject();
-		$phpExcelObject->getProperties()->setCreator("Sydtrack")->setLastModifiedBy($lastModified ? $lastModified->format('Y-m-d') : '')->setTitle($pack_name);
-		$phpActiveSheet = $phpExcelObject->setActiveSheetIndex(0);
+		$spreadsheet = new Spreadsheet();
+		$spreadsheet->getProperties()->setCreator("Sydtrack")->setLastModifiedBy($lastModified ? $lastModified->format('Y-m-d') : '')->setTitle($pack_name);
+		$phpActiveSheet = $spreadsheet->setActiveSheetIndex(0);
 		$phpActiveSheet->setTitle(mb_substr($pack_name, 0, 31));
 
-		$col_index = 0;
+		// PhpSpreadsheet columns start at 1
+		$col_index = 1;
 		foreach ($associationMappings as $fieldName => $associationMapping) {
 			if ($associationMapping['isOwningSide']) {
-				$phpCell = $phpActiveSheet->getCellByColumnAndRow($col_index++, 1);
+				$phpCell = $phpActiveSheet->getCell([$col_index++, 1]);
 				$phpCell->setValue($fieldName);
 			}
 		}
@@ -71,18 +76,18 @@ class ExcelController extends Controller {
 			if (in_array($fieldName, $ignoredFields)) {
 				continue;
 			}
-			$phpCell = $phpActiveSheet->getCellByColumnAndRow($col_index++, 1);
+			$phpCell = $phpActiveSheet->getCell([$col_index++, 1]);
 			$phpCell->setValue($fieldName);
 		}
 
 		foreach ($cards as $row_index => $card) {
-			$col_index = 0;
+			$col_index = 1;
 			foreach ($associationMappings as $fieldName => $associationMapping) {
 				if ($associationMapping['isOwningSide']) {
 					$getter = str_replace(' ', '', ucwords(str_replace('_', ' ', "get_$fieldName")));
 					$value = $card->$getter() ? $card->$getter()->getName() : '';
 
-					$phpCell = $phpActiveSheet->getCellByColumnAndRow($col_index++, $row_index + 2);
+					$phpCell = $phpActiveSheet->getCell([$col_index++, $row_index + 2]);
 					$phpCell->setValue($value);
 				}
 			}
@@ -98,9 +103,9 @@ class ExcelController extends Controller {
 				}
 				$type = $em->getClassMetadata('AppBundle:Card')->getTypeOfField($fieldName);
 
-				$phpCell = $phpActiveSheet->getCellByColumnAndRow($col_index++, $row_index + 2);
+				$phpCell = $phpActiveSheet->getCell([$col_index++, $row_index + 2]);
 				if ($fieldName == 'code') {
-					$phpCell->setValueExplicit($value, 's');
+					$phpCell->setValueExplicit($value, DataType::TYPE_STRING);
 				} else {
 					if ($type == 'boolean') {
 						$phpCell->setValue($value ? "1" : "");
@@ -111,8 +116,10 @@ class ExcelController extends Controller {
 			}
 		}
 
-		$writer = $this->get('phpexcel')->createWriter($phpExcelObject, 'Excel2007');
-		$response = $this->get('phpexcel')->createStreamedResponse($writer);
+		$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+		$response = new StreamedResponse(function () use ($writer) {
+			$writer->save('php://output');
+		});
 		$response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
 		$response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->get('texts')->slugify($pack_name) . '.xlsx'));
 		$response->headers->add(['Access-Control-Allow-Origin' => '*']);
@@ -134,12 +141,10 @@ class ExcelController extends Controller {
 		/* @var $uploadedFile \Symfony\Component\HttpFoundation\File\UploadedFile */
 		$uploadedFile = $request->files->get('upfile');
 		$inputFileName = $uploadedFile->getPathname();
-		$inputFileType = \PHPExcel_IOFactory::identify($inputFileName);
-		/** @var \PHPExcel_Reader_Abstract $objReader */
-		$objReader = \PHPExcel_IOFactory::createReader($inputFileType);
+		$objReader = IOFactory::createReaderForFile($inputFileName);
 		$objReader->setReadDataOnly(true);
-		$objPHPExcel = $objReader->load($inputFileName);
-		$objWorksheet = $objPHPExcel->getActiveSheet();
+		$spreadsheet = $objReader->load($inputFileName);
+		$objWorksheet = $spreadsheet->getActiveSheet();
 
 		$enableCardCreation = $request->request->has('create');
 
@@ -154,7 +159,6 @@ class ExcelController extends Controller {
 				$firstRow = false;
 
 				// analysis of first row
-				/** @var \PHPExcel_Worksheet_RowCellIterator $cellIterator */
 				$cellIterator = $row->getCellIterator();
 				foreach ($cellIterator as $cell) {
 					$colNames[$cell->getColumn()] = $cell->getValue();
@@ -164,7 +168,6 @@ class ExcelController extends Controller {
 
 			$card = [];
 
-			/** @var \PHPExcel_Worksheet_RowCellIterator $cellIterator */
 			$cellIterator = $row->getCellIterator();
 			foreach ($cellIterator as $cell) {
 				$col = $cell->getColumn();

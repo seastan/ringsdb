@@ -1,4 +1,4 @@
-FROM php:7.1-alpine
+FROM php:7.4-alpine
 
 RUN apk update && apk add --no-cache \
     libzip-dev \
@@ -13,6 +13,6 @@ RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     && docker-php-ext-enable xdebug \
     && apk del .build-deps
 
-COPY --from=composer:2.2 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.10 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html

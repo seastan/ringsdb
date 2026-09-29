@@ -6,7 +6,6 @@ use PhpParser\Node\Expr\MethodCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\ParametersAcceptorSelector;
-use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\NullType;
 use PHPStan\Type\StringType;
@@ -30,8 +29,8 @@ class HeaderBagGetReturnTypeExtension implements DynamicMethodReturnTypeExtensio
         $args = $methodCall->getArgs();
         if (isset($args[2])) {
             $first = $scope->getType($args[2]->value);
-            if (!$first instanceof ConstantBooleanType || !$first->getValue()) {
-                return ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
+            if (!$first->isTrue()->yes()) {
+                return ParametersAcceptorSelector::selectFromArgs($scope, $methodCall->getArgs(), $methodReflection->getVariants())->getReturnType();
             }
         }
         $default = isset($args[1]) ? $scope->getType($args[1]->value) : new NullType();

@@ -49,6 +49,7 @@ class CardsData {
 	 * @return string
 	 */
 	public function replaceSymbols($text) {
+		/** @var array<string, string> $displayTextReplacements */
 		static $displayTextReplacements = [
 			'[willpower]' => '<span class="icon-willpower"></span>',
 			'[attack]' => '<span class="icon-attack"></span>',

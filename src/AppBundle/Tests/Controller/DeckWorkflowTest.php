@@ -245,7 +245,7 @@ class DeckWorkflowTest extends WebTestCase {
         $location = self::location($client->getResponse());
         $this->assertRegExp('#^/decklist/view/(\d+)/phpunitpublished-1\.0$#', $location);
         preg_match('#/view/(\d+)/#', $location, $matches);
-        $decklistId = (int) $matches[1];
+        $decklistId = (int) ($matches[1] ?? 0);
 
         $decklist = $this->db($client)->fetchAssoc(
             'SELECT name, name_canonical, version, description_md, description_html, user_id, parent_deck_id, precedent_decklist_id, nb_votes, nb_favorites, nb_comments
