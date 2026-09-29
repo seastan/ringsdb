@@ -10,6 +10,9 @@ down:
 sh:
 	docker compose exec -it -u www-data symfony sh
 
+sql:
+	docker compose exec -it mysql mysql -u root -ppasswd
+
 fixtures:
 	docker compose exec -it -u www-data symfony php app/console doctrine:database:drop --force
 	docker compose exec -it -u www-data symfony php app/console doctrine:database:create

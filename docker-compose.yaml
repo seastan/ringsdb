@@ -1,15 +1,16 @@
 services:
     mysql:
-        image: "mysql:8"
+        image: "mysql:8.0"
         volumes:
-          - type: bind
-            source: ./docker/dev/mysql/init.sql
-            target: /docker-entrypoint-initdb.d/init.sql
-            read_only: true
-          - type: bind
-            source: ./docker/dev/mysql/my.cnf
-            target: /etc/mysql/conf.d/my.cnf
-            read_only: true
+            # Used by MySQL 8.4
+#          - type: bind
+#            source: ./docker/dev/mysql/init.sql
+#            target: /docker-entrypoint-initdb.d/init.sql
+#            read_only: true
+#          - type: bind
+#            source: ./docker/dev/mysql/my.cnf
+#            target: /etc/mysql/conf.d/my.cnf
+#            read_only: true
           - type: volume
             source: mysql_data
             target: /var/lib/mysql
@@ -25,16 +26,17 @@ services:
             retries: 10
 
     mysql_test:
-        image: "mysql:8"
+        image: "mysql:8.0"
         volumes:
-          - type: bind
-            source: ./docker/dev/mysql/init.sql
-            target: /docker-entrypoint-initdb.d/init.sql
-            read_only: true
-          - type: bind
-            source: ./docker/dev/mysql/my.cnf
-            target: /etc/mysql/conf.d/my.cnf
-            read_only: true
+            # Used by MySQL 8.4
+#          - type: bind
+#            source: ./docker/dev/mysql/init.sql
+#            target: /docker-entrypoint-initdb.d/init.sql
+#            read_only: true
+#          - type: bind
+#            source: ./docker/dev/mysql/my.cnf
+#            target: /etc/mysql/conf.d/my.cnf
+#            read_only: true
           - type: volume
             source: mysql_test_data
             target: /var/lib/mysql

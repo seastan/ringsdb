@@ -156,9 +156,11 @@ arrays and collections (`checkMissingIterableValueType` and
 
 ## Environment
 
-- **Production database**: the tests run on MySQL 8.4 with `ONLY_FULL_GROUP_BY` (several queries
-  had to be fixed for it, see "Card statistics", "Lists and search managers"). Check the version
-  and `sql_mode` of production, so that the tests run on the same settings.
+- **Production database**: the tests run on MySQL 8.0, the version of production, with the
+  default `sql_mode`, which includes `ONLY_FULL_GROUP_BY` (several queries had to be fixed for
+  it, see "Card statistics", "Lists and search managers"). Check that the `sql_mode` of
+  production includes it too (`SELECT @@GLOBAL.sql_mode;`), so that the tests run on the same
+  settings.
 - **Composer**: the lock is Composer 1 era. From the Symfony 3.0 step on, the lock is updated with
   Composer 2 and production runs a normal `composer install` (decided on 2026-09-28).
 - **Schema changes**: from now on they go through `doctrine/doctrine-migrations-bundle` (2.2), in
