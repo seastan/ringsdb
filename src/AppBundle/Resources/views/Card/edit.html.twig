@@ -3,11 +3,10 @@
 {% block content -%}
     <h1>Card edit</h1>
 
-    <form action="{{ path('admin_card_update', { 'id': entity.id }) }}" method="post" {% if edit_form.vars.multipart %}enctype="multipart/form-data"{% endif %}>
-        <input type="hidden" name="_method" value="PUT"/>
+    {{ form_start(edit_form, {'action': path('admin_card_update', { 'id': entity.id })}) }}
         {{ form_widget(edit_form) }}
         <button type="submit" class="btn btn-success">Edit</button>
-    </form>
+    {{ form_end(edit_form) }}
     <br>
     <a href="{{ path('admin_card') }}" class="btn btn-default">
         Back to the list
@@ -15,14 +14,12 @@
     <a href="{{ path('admin_card_printing', { 'card': entity.name }) }}" class="btn btn-default">
         Manage printings (pack, quantity, illustrator, OCTGN ID)
     </a>
-    <form action="{{ path('admin_card_delete', { 'id': entity.id }) }}" method="post" style="display:inline-block">
-        <input type="hidden" name="_method" value="DELETE"/>
+    {{ form_start(delete_form, {'action': path('admin_card_delete', { 'id': entity.id }), 'attr': {'style': 'display:inline-block'}}) }}
         {{ form_widget(delete_form) }}
         <button type="submit" class="btn btn-danger">Delete</button>
-    </form>
-    <form action="{{ path('admin_card_force_delete', { 'id': entity.id }) }}" method="post" style="display:inline-block">
-        <input type="hidden" name="_method" value="DELETE"/>
+    {{ form_end(delete_form) }}
+    {{ form_start(force_delete_form, {'action': path('admin_card_force_delete', { 'id': entity.id }), 'attr': {'style': 'display:inline-block'}}) }}
         {{ form_widget(force_delete_form) }}
         <button type="submit" class="btn btn-danger">Force Delete</button>
-    </form>
+    {{ form_end(force_delete_form) }}
 {% endblock %}

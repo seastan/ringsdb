@@ -31,7 +31,7 @@ class DefaultController extends Controller {
     public function indexAction() {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         // Managers
         $decklist_manager = $this->get('decklist_manager');
@@ -307,8 +307,8 @@ class DefaultController extends Controller {
             $all_comments[$i]['text'] = $text;
         }
 
-        $game_name = $this->container->getParameter('game_name');
-        $publisher_name = $this->container->getParameter('publisher_name');
+        $game_name = $this->getParameter('game_name');
+        $publisher_name = $this->getParameter('publisher_name');
         
         return $this->render('AppBundle:Default:index.html.twig', [
             'pagetitle' =>  "$game_name Deckbuilder",
@@ -328,7 +328,7 @@ class DefaultController extends Controller {
     function rulesAction() {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         $render = $this->renderView('AppBundle:Default:rules.html.twig', [
             "pagetitle" => "Rules",
@@ -347,11 +347,11 @@ class DefaultController extends Controller {
     function aboutAction() {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         return $this->render('AppBundle:Default:about.html.twig', [
             "pagetitle" => "About",
-            "game_name" => $this->container->getParameter('game_name'),
+            "game_name" => $this->getParameter('game_name'),
         ], $response);
     }
 
@@ -361,12 +361,12 @@ class DefaultController extends Controller {
     function apiIntroAction() {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         return $this->render('AppBundle:Default:apiIntro.html.twig', [
             "pagetitle" => "API",
-            "game_name" => $this->container->getParameter('game_name'),
-            "publisher_name" => $this->container->getParameter('publisher_name'),
+            "game_name" => $this->getParameter('game_name'),
+            "publisher_name" => $this->getParameter('publisher_name'),
         ], $response);
     }
 }

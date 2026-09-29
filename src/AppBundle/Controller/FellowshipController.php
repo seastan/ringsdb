@@ -17,13 +17,15 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FellowshipController extends Controller {
+    use CurrentUserTrait;
+
 
     /**
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function mylistAction() {
         /* @var $user \AppBundle\Entity\User */
-        $user = $this->getUser();
+        $user = $this->currentUser();
 
         /* @var $fellowships \AppBundle\Entity\Fellowship[] */
         $fellowships = $user->getFellowships();
@@ -50,7 +52,7 @@ class FellowshipController extends Controller {
     public function listAction($type, $page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         /**
          * @var \AppBundle\Model\FellowshipManager $fellowship_manager
@@ -150,7 +152,7 @@ class FellowshipController extends Controller {
                     /* @var $user \AppBundle\Entity\User */
                     $user = $decks[$i]->getUser();
 
-                    if (!$user->getIsShareDecks() && $user->getId() != $this->getUser()->getId()) {
+                    if (!$user->getIsShareDecks() && $user->getId() != $this->currentUser()->getId()) {
                         $decks[$i] = null;
                     }
                 }
@@ -175,7 +177,7 @@ class FellowshipController extends Controller {
         $response = new Response();
 
         /* @var $user \AppBundle\Entity\User */
-        $user = $this->getUser();
+        $user = $this->currentUser();
 
         /* @var $fellowship \AppBundle\Entity\Fellowship */
         $fellowship = $this->getDoctrine()->getRepository('AppBundle:Fellowship')->find($fellowship_id);
@@ -278,7 +280,7 @@ class FellowshipController extends Controller {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $user \AppBundle\Entity\User */
-        $user = $this->getUser();
+        $user = $this->currentUser();
 
         $fellowship_id = intval(filter_var($request->request->get('fellowship_id'), FILTER_SANITIZE_NUMBER_INT));
 
@@ -802,7 +804,7 @@ class FellowshipController extends Controller {
     public function searchAction(Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         $dbh = $this->getDoctrine()->getConnection();
         $spheres = $dbh->executeQuery("SELECT s.name, s.code FROM sphere s ORDER BY s.name ASC")->fetchAll();

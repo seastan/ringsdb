@@ -30,7 +30,7 @@ class ApiController extends Controller {
     public function listPacksAction(Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $request->query->get('jsonp');
@@ -116,7 +116,7 @@ class ApiController extends Controller {
     public function getCardAction($card_code, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $request->query->get('jsonp');
@@ -172,7 +172,7 @@ class ApiController extends Controller {
     public function listCardsAction(Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $request->query->get('jsonp');
@@ -264,7 +264,7 @@ class ApiController extends Controller {
     public function listCardsByPackAction($pack_code, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $request->query->get('jsonp');
@@ -353,7 +353,7 @@ class ApiController extends Controller {
     public function getDecklistAction($decklist_id, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $request->query->get('jsonp');
@@ -425,7 +425,7 @@ class ApiController extends Controller {
     public function listDecklistsByDateAction($date, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $request->query->get('jsonp');
@@ -514,7 +514,7 @@ class ApiController extends Controller {
     public function listTopDecklistsByCardAction($card_code, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $request->query->get('jsonp');
@@ -628,7 +628,7 @@ class ApiController extends Controller {
     public function getScenarioAction($scenario_id, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $request->query->get('jsonp');
@@ -670,7 +670,7 @@ class ApiController extends Controller {
     public function searchCardsAction($q, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $request->query->get('jsonp');

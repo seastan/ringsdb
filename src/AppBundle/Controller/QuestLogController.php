@@ -18,6 +18,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use DateTime;
 
 class QuestLogController extends Controller {
+    use CurrentUserTrait;
+
 
     // Set the deck content to the QuestlogDeck snapshot
     /**
@@ -158,7 +160,7 @@ class QuestLogController extends Controller {
         $quests = $em->getRepository('AppBundle:Scenario')->findBy([], ['position' => 'ASC']);
 
         /* @var $user \AppBundle\Entity\User */
-        $user = $this->getUser();
+        $user = $this->currentUser();
 
         // Count played scenarios
         $playedEasy = [];
@@ -204,7 +206,7 @@ class QuestLogController extends Controller {
     public function listAction($type, $page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         /**
          * @var \AppBundle\Model\QuestLogManager $questlog_manager
@@ -318,7 +320,7 @@ class QuestLogController extends Controller {
                 if ($decks[$i]) {
                     $user = $decks[$i]->getUser();
                     $author_names[$i] = $user->getUsername();
-                    if (!$public && !$user->getIsShareDecks() && $user->getId() != $this->getUser()->getId()) {
+                    if (!$public && !$user->getIsShareDecks() && $user->getId() != $this->currentUser()->getId()) {
                         $decks[$i] = null;
                     }
                 }
@@ -360,7 +362,7 @@ class QuestLogController extends Controller {
         $response = new Response();
 
         /* @var $user \AppBundle\Entity\User */
-        $user = $this->getUser();
+        $user = $this->currentUser();
 
         /* @var $questlog \AppBundle\Entity\Questlog */
         $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
@@ -481,7 +483,7 @@ class QuestLogController extends Controller {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $user \AppBundle\Entity\User */
-        $user = $this->getUser();
+        $user = $this->currentUser();
 
         $questlog_id = intval(filter_var($request->request->get('questlog_id'), FILTER_SANITIZE_NUMBER_INT));
 
@@ -800,7 +802,7 @@ class QuestLogController extends Controller {
     public function searchAction(Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         $dbh = $this->getDoctrine()->getConnection();
         $spheres = $dbh->executeQuery("SELECT s.name, s.code FROM sphere s ORDER BY s.name ASC")->fetchAll();

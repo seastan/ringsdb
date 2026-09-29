@@ -18,6 +18,7 @@ use Symfony\Component\DomCrawler\Form;
  */
 class QuestlogWorkflowTest extends WebTestCase {
     use \AppBundle\Tests\LocationTrait;
+    use \AppBundle\Tests\FormFieldTrait;
 
     /** @var int[] max ids before the test, by table */
     private $maxIds = [];
@@ -165,12 +166,12 @@ class QuestlogWorkflowTest extends WebTestCase {
         // 1. the form opened from 2 decks is prefilled with the player names
         list($crawler, $form) = $this->newForm($client, '/questlog/new/0/1/2/0/0');
         $this->assertSame('Log a Quest · RingsDB', trim($crawler->filter('title')->text()));
-        $this->assertSame('', $form['questlog_id']->getValue());
-        $this->assertSame('test', $form['questlogdeck1_player_name']->getValue());
-        $this->assertSame('test', $form['questlogdeck2_player_name']->getValue());
-        $this->assertSame('', $form['questlogdeck3_player_name']->getValue());
-        $this->assertSame('yes', $form['victory']->getValue());
-        $this->assertFalse($form['public']->hasValue());
+        $this->assertSame('', self::field($form, 'questlog_id')->getValue());
+        $this->assertSame('test', self::field($form, 'questlogdeck1_player_name')->getValue());
+        $this->assertSame('test', self::field($form, 'questlogdeck2_player_name')->getValue());
+        $this->assertSame('', self::field($form, 'questlogdeck3_player_name')->getValue());
+        $this->assertSame('yes', self::field($form, 'victory')->getValue());
+        $this->assertFalse(self::field($form, 'public')->hasValue());
 
         $form['quest'] = '2';
         $form['date'] = '2020-05-17';
@@ -213,17 +214,17 @@ class QuestlogWorkflowTest extends WebTestCase {
         // 2. edit: the form is prefilled; publish it, and log decklist 3 in slot 3 instead of deck 2
         list($crawler, $form) = $this->newForm($client, "/questlog/edit/$id");
         $this->assertSame('Edit Quest Log · RingsDB', trim($crawler->filter('title')->text()));
-        $this->assertSame((string) $id, $form['questlog_id']->getValue());
-        $this->assertSame('2', $form['quest']->getValue());
-        $this->assertSame('2020-05-17', $form['date']->getValue());
-        $this->assertSame('nightmare', $form['difficulty']->getValue());
-        $this->assertSame('no', $form['victory']->getValue());
-        $this->assertSame('142', $form['score']->getValue());
-        $this->assertSame('PHPUnit Quest', $form['name']->getValue());
-        $this->assertSame('We *lost*', $form['descriptionMd']->getValue());
-        $this->assertSame('Alice', $form['questlogdeck1_player_name']->getValue());
-        $this->assertSame($deck1, $form['questlogdeck1_content']->getValue());
-        $this->assertSame($deck2, $form['questlogdeck2_content']->getValue());
+        $this->assertSame((string) $id, self::field($form, 'questlog_id')->getValue());
+        $this->assertSame('2', self::field($form, 'quest')->getValue());
+        $this->assertSame('2020-05-17', self::field($form, 'date')->getValue());
+        $this->assertSame('nightmare', self::field($form, 'difficulty')->getValue());
+        $this->assertSame('no', self::field($form, 'victory')->getValue());
+        $this->assertSame('142', self::field($form, 'score')->getValue());
+        $this->assertSame('PHPUnit Quest', self::field($form, 'name')->getValue());
+        $this->assertSame('We *lost*', self::field($form, 'descriptionMd')->getValue());
+        $this->assertSame('Alice', self::field($form, 'questlogdeck1_player_name')->getValue());
+        $this->assertSame($deck1, self::field($form, 'questlogdeck1_content')->getValue());
+        $this->assertSame($deck2, self::field($form, 'questlogdeck2_content')->getValue());
 
         $deck3 = $this->deckContent($client, 3);
         $form['victory'] = 'yes';
@@ -345,7 +346,7 @@ class QuestlogWorkflowTest extends WebTestCase {
         $decks = $this->fetchQuestlogDecks($client, 1);
 
         list($crawler, $form) = $this->newForm($client, '/questlog/edit/1');
-        $this->assertTrue($form['public']->isDisabled());
+        $this->assertTrue(self::field($form, 'public')->isDisabled());
         $form['name'] = 'PHPUnit Renamed';
         self::selectDecks($form, [1 => [4, false, $this->deckContent($client, 4)]]);
         $client->submit($form);

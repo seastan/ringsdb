@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class CustomPackController extends Controller {
+    use CurrentUserTrait;
+
 
     /**
      * @return \Symfony\Component\HttpFoundation\Response
@@ -293,7 +295,7 @@ class CustomPackController extends Controller {
             ->getRepository('AppBundle:UserCustomPack')
             ->find($id);
 
-        if (!$pack || $pack->getUser()->getId() !== $this->getUser()->getId()) {
+        if (!$pack || $pack->getUser()->getId() !== $this->currentUser()->getId()) {
             return null;
         }
 

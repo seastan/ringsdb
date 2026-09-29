@@ -7,6 +7,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class CollectionController extends Controller {
+    use CurrentUserTrait;
+
 
     /**
      * @param bool $reloaduser
@@ -20,7 +22,7 @@ class CollectionController extends Controller {
 
         // owned_packs is a per-pack COUNT map encoded as "id" / "id:count" tokens
         // (legacy "id-2"/"id-3" core copies each count as +1).
-        $owned_packs = $this->getUser()->getOwnedPacks();
+        $owned_packs = $this->currentUser()->getOwnedPacks();
         $hasCollection = !empty($owned_packs);
         $countById = [];
         if ($hasCollection) {
@@ -111,7 +113,7 @@ class CollectionController extends Controller {
 
         $em = $this->getDoctrine()->getManager();
 
-        $user = $this->getUser();
+        $user = $this->currentUser();
         $user->setOwnedPacks($selectedPacks);
         $em->persist($user);
         $em->flush();
@@ -150,7 +152,7 @@ class CollectionController extends Controller {
         }
 
         $em = $this->getDoctrine()->getManager();
-        $user->setArtPreferences(empty($prefs) ? null : json_encode($prefs));
+        $user->setArtPreferences(empty($prefs) ? null : (string) json_encode($prefs));
         $em->persist($user);
         $em->flush();
 

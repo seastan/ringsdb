@@ -7,6 +7,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
 class ApiPrivateController extends Controller {
+    use CurrentUserTrait;
+
 	/**
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
@@ -77,7 +79,7 @@ class ApiPrivateController extends Controller {
             return $response;
         }
 
-        $show_private_decks = /*$user->getIsShareDecks() ||*/ $user->getId() == $this->getUser()->getId();
+        $show_private_decks = /*$user->getIsShareDecks() ||*/ $user->getId() == $this->currentUser()->getId();
 
         /* @var $decklists \AppBundle\Entity\Decklist[] */
         $decklists = $em->getRepository('AppBundle:Decklist')->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);

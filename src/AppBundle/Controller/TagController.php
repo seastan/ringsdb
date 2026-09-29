@@ -7,6 +7,8 @@ use AppBundle\Entity\Deck;
 use Symfony\Component\HttpFoundation\Response;
 
 class TagController extends Controller {
+    use CurrentUserTrait;
+
     /**
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -27,7 +29,7 @@ class TagController extends Controller {
                 continue;
             }
 
-            if ($this->getUser()->getId() != $deck->getUser()->getId()) {
+            if ($this->currentUser()->getId() != $deck->getUser()->getId()) {
                 continue;
             }
 
@@ -60,7 +62,7 @@ class TagController extends Controller {
                 continue;
             }
 
-            if ($this->getUser()->getId() != $deck->getUser()->getId()) {
+            if ($this->currentUser()->getId() != $deck->getUser()->getId()) {
                 continue;
             }
 
@@ -92,7 +94,7 @@ class TagController extends Controller {
                 continue;
             }
 
-            if ($this->getUser()->getId() != $deck->getUser()->getId()) {
+            if ($this->currentUser()->getId() != $deck->getUser()->getId()) {
                 continue;
             }
 

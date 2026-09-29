@@ -54,19 +54,23 @@ class ApiPrivateControllerTest extends WebTestCase {
     }
 
     /**
-     * Responses with data carry a Last-Modified header and are cacheable by the browser only.
+     * Responses with data carry a Last-Modified header, to be revalidated by the browser (304).
+     *
+     * Since Symfony 3.4, the session listener makes every response of a request that used the
+     * session "max-age=0, must-revalidate, private" (it was "private, must-revalidate" with data,
+     * "no-cache" without).
      */
     private function assertCacheableJson(Response $response): void {
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
-        $this->assertSame('private, must-revalidate', $response->headers->get('Cache-Control'));
+        $this->assertSame('max-age=0, must-revalidate, private', $response->headers->get('Cache-Control'));
         $this->assertSame(self::LAST_MODIFIED, $response->headers->get('Last-Modified'));
     }
 
     private function assertUncachedJson(Response $response): void {
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
-        $this->assertSame('no-cache', $response->headers->get('Cache-Control'));
+        $this->assertSame('max-age=0, must-revalidate, private', $response->headers->get('Cache-Control'));
         $this->assertNull($response->headers->get('Last-Modified'));
     }
 

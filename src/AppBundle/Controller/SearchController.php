@@ -60,7 +60,7 @@ class SearchController extends Controller {
     public function formAction() {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         $dbh = $this->getDoctrine()->getConnection();
 
@@ -122,8 +122,8 @@ class SearchController extends Controller {
             throw $this->createNotFoundException('Sorry, this card is not in the database (yet?)');
         }
 
-        $game_name = $this->container->getParameter('game_name');
-        $publisher_name = $this->container->getParameter('publisher_name');
+        $game_name = $this->getParameter('game_name');
+        $publisher_name = $this->getParameter('publisher_name');
 
         $meta = $card->getName() . ", a " . $card->getSphere()->getName() . " " . $card->getType()->getName() . " card for $game_name from the set " . $card->getPack()->getName() . " published by $publisher_name.";
 
@@ -155,8 +155,8 @@ class SearchController extends Controller {
             throw $this->createNotFoundException('This pack does not exist');
         }
 
-        $game_name = $this->container->getParameter('game_name');
-        $publisher_name = $this->container->getParameter('publisher_name');
+        $game_name = $this->getParameter('game_name');
+        $publisher_name = $this->getParameter('publisher_name');
 
         $meta = $pack->getName() . ", a set of cards for $game_name" . ($pack->getDateRelease() ? " published on " . $pack->getDateRelease()->format('Y/m/d') : "") . " by $publisher_name.";
 
@@ -188,8 +188,8 @@ class SearchController extends Controller {
             throw $this->createNotFoundException('This cycle does not exist');
         }
 
-        $game_name = $this->container->getParameter('game_name');
-        $publisher_name = $this->container->getParameter('publisher_name');
+        $game_name = $this->getParameter('game_name');
+        $publisher_name = $this->getParameter('publisher_name');
 
         $meta = $cycle->getName() . ", a cycle of adventure packs for $game_name published by $publisher_name.";
 
@@ -317,7 +317,7 @@ class SearchController extends Controller {
     public function displayAction($q, $view = 'card', $sort, $page = 1, $pagetitle = '', $meta = '', $selected_pack_code = null) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         static $availability = [];
 

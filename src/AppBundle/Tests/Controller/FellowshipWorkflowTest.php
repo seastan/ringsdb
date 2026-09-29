@@ -19,6 +19,7 @@ use Symfony\Component\DomCrawler\Form;
  */
 class FellowshipWorkflowTest extends WebTestCase {
     use \AppBundle\Tests\LocationTrait;
+    use \AppBundle\Tests\FormFieldTrait;
 
     /** @var int[] max ids before the test, by table */
     private $maxIds = [];
@@ -195,9 +196,9 @@ class FellowshipWorkflowTest extends WebTestCase {
         $crawler = $client->request('GET', "/fellowship/edit/$id");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $form = $crawler->filter('form[action="/fellowship/save"]')->form();
-        $this->assertSame((string) $id, $form['fellowship_id']->getValue());
-        $this->assertSame('PHPUnit Fellowship', $form['name']->getValue());
-        $this->assertSame('Two *decks*', $form['descriptionMd']->getValue());
+        $this->assertSame((string) $id, self::field($form, 'fellowship_id')->getValue());
+        $this->assertSame('PHPUnit Fellowship', self::field($form, 'name')->getValue());
+        $this->assertSame('Two *decks*', self::field($form, 'descriptionMd')->getValue());
         $form['name'] = 'PHPUnit Fellowship Edited';
         self::selectDecks($form, [1 => [1, false], 3 => [3, true]]);
         $client->submit($form);
@@ -213,7 +214,7 @@ class FellowshipWorkflowTest extends WebTestCase {
         $crawler = $client->request('GET', "/fellowship/publish/$id");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $form = $crawler->filter('form[action="/fellowship/publish"]')->form();
-        $this->assertSame('1', $form['deck_selection_1']->getValue());
+        $this->assertSame('1', self::field($form, 'deck_selection_1')->getValue());
         /** @var \Symfony\Component\DomCrawler\Field\ChoiceFormField $selection */
         $selection = $form['deck_selection_1'];
         $this->assertSame(['0', '1'], $selection->availableOptionValues());

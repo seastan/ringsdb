@@ -2,6 +2,7 @@
 
 namespace AppBundle\DataFixtures\ORM;
 
+use AppBundle\Entity\Scenario;
 use AppBundle\Entity\Decklist;
 use AppBundle\Entity\Questlog;
 use AppBundle\Entity\QuestlogDeck;
@@ -39,7 +40,7 @@ class LoadQuestlogData extends AbstractFixture implements DependentFixtureInterf
         $questlog->setDatePublish(new \DateTime('2015-08-16'));
 
         $scenario = $manager->getRepository('AppBundle:Scenario')->find(1);
-        if ($scenario === null) {
+        if (!$scenario instanceof Scenario) {
             throw new \LogicException('Scenario 1 is missing.');
         }
 
