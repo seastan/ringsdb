@@ -38,7 +38,10 @@
     "erusev/parsedown": "^1.6",
     "symfony/twig-bundle": "^3.4",
     "symfony/asset": "^3.4",
-    "phpoffice/phpspreadsheet": "^1.30.7"
+    "phpoffice/phpspreadsheet": "^1.30.7",
+    "doctrine/doctrine-migrations-bundle": "~2.2.0",
+    "doctrine/migrations": "~2.2.0",
+    "ocramius/proxy-manager": "~2.2.0"
   },
   "require-dev": {
     "sensio/generator-bundle": "~3.0",
