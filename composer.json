@@ -29,7 +29,7 @@
     "gedmo/doctrine-extensions": "^2.4",
     "doctrine/dbal": "^2.5",
     "doctrine/orm": "^2.5",
-    "doctrine/doctrine-bundle": "^1.5",
+    "doctrine/doctrine-bundle": "^1.12",
     "friendsofsymfony/jsrouting-bundle": "^1.5",
     "ezyang/htmlpurifier": "^4.6",
     "leafo/scssphp": "^0.2.0",
