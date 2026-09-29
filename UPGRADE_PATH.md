@@ -61,6 +61,7 @@ symfony/framework-bundle:
 5. phpoffice/phpspreadsheet 1.30
 6. Symfony 3.4
 7. doctrine/doctrine-bundle 1.12
+8. doctrine/doctrine-migrations-bundle 2.2.3
 8. DEPLOYMENT TO PRODUCTION : PHP 7.4, Symfony 3.4
 9. Symfony 4.4
 10. Symfony 5.4
