@@ -4,12 +4,12 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\UserCustomPack;
 use AppBundle\Entity\UserCustomPackCard;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CustomPackController extends Controller {
+class CustomPackController extends AbstractController {
     use CurrentUserTrait;
 
 

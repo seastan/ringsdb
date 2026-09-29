@@ -3,7 +3,7 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use AppBundle\Entity\Encounter;
 use AppBundle\Form\EncounterType;
@@ -13,7 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
  * Encounter controller.
  *
  */
-class EncounterController extends Controller {
+class EncounterController extends AbstractController {
     /**
      * Lists all Encounter entities.
      *

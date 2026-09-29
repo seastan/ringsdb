@@ -3,7 +3,7 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use AppBundle\Entity\Scenario;
 use AppBundle\Form\ScenarioType;
@@ -13,7 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
  * Scenario controller.
  *
  */
-class ScenarioController extends Controller {
+class ScenarioController extends AbstractController {
     /**
      * Lists all Scenario entities.
      *

@@ -38,8 +38,8 @@ twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
     globals:
-        cards_data:             "@cards_data"
-        deck_validation_helper: "@deck_validation_helper"
+        cards_data:             '@AppBundle\Services\CardsData'
+        deck_validation_helper: '@AppBundle\Helper\DeckValidationHelper'
         dragncards_room:        "%dragncards_room%"
         noindex:                "%noindex%"
     form_themes:

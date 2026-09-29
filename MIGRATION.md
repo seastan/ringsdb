@@ -1,11 +1,14 @@
 # Migration Symfony 2.8 → 7.4 / PHP 8.5
 
-Migration notes. Starting point: Symfony 2.8.52, FOSUserBundle 2.0.2, PHP 7.1.33.
+Migration notes. Starting point: Symfony 2.8.52, FOSUserBundle 2.0.2, PHP 7.1.33. Current state:
+Symfony 3.4.49, FOSUserBundle 2.1.2, PHP 7.4.33, the same PHP version as production (see
+"Progress").
 
 The functional tests (`make phpunit`) are the safety net: they must stay green at every step.
 
 - **Roadmap**: what is left to do before the migration, by priority.
-- **Migration plan**: what the migration itself involves (dependencies, assets, tests, environment).
+- **Migration plan**: what the migration itself involves (steps done, dependencies, assets, tests,
+  environment).
 - **Reference**: the behaviour pinned by the tests, area by area, with the bugs and quirks found.
   The roadmap links to it by section name.
 
@@ -18,8 +21,7 @@ Each removal reduces what has to be ported.
 - Done: the **OAuth2 server** and **GregwarCaptchaBundle** (see "OAuth2 server (removed)").
 - Done: the broken OCTGN commands (`app:octgn`, `app:cards:octgn`). The OCTGN imports and exports
   are kept (see "OCTGN features").
-- **twig/extensions**: required in `composer.json` but none of its extensions is registered in the
-  configuration: probably unused (abandoned package). To remove with `composer remove`.
+- Done: **twig/extensions** (abandoned, none of its extensions was registered).
 - **Dead code found by the tests, not removed yet**:
   - the `/deck/can_publish/{id}` route (`deck_publish`), pointing to the missing
     `SocialController::publishAction` (see "Website browsing");
@@ -53,8 +55,7 @@ Each removal reduces what has to be ported.
 ## 3. Fixes cheaper to make now, with the tests
 
 - **PHP 8 breakers**:
-  - `POST /deck/autosave` calls `count()` on a decoded object: always 1 in PHP 7.1, a `TypeError`
-    in PHP 8 (see "Deck workflow").
+  - Fixed: `POST /deck/autosave` called `count()` on a decoded object (see "Deck workflow").
   - The deck contents are decoded with `(array) json_decode(...)` (objects inside) in the builder
     and in quest logs; the rewrite must keep the `{}` vs `[]` distinction of the empty deck guard
     (see "Deck workflow", "Quest logs").
@@ -84,35 +85,85 @@ Each removal reduces what has to be ported.
 - **Line endings of the text exports** (CRLF → LF) after the migration: see "After the
   migration".
 - **Time in tests** (`ClockInterface`): see "Tests and time".
-- **Static analysis** (`make phpstan`, level 8 of phpstan 1.4, see "Static analysis"): level 9,
+- **Static analysis** (`make phpstan`, level 8 of phpstan 2.2, see "Static analysis"): level 9,
   the value types of arrays and collections, and the official extensions instead of ours.
 
 # Migration plan
 
-## Strategy (to decide)
+## Strategy
 
-Step through the LTS versions (3.4 → 4.4 → 5.4 → 6.4 → 7.4, fixing deprecations at each step) or
-start from a Symfony 7.4 skeleton and port the code into it. The choice decides when the test
-suite has to be ported (see "Porting the test suite"). Whatever the choice, FOSUserBundle is
-replaced (decided), preferably before the first step.
+Decided: step through the LTS versions (3.4 → 4.4 → 5.4 → 6.4 → 7.4), fixing the deprecations at
+each step, and deploy each step to production (the detailed plan is in `UPGRADE_PATH.md`). PHP
+is only upgraded where a step needs it, to limit the production upgrades: it stays 7.4 until
+Symfony 5.4. FOSUserBundle is replaced (decided) with the Symfony 5.4 step, before PHP 8.4.
+
+## Progress
+
+### Symfony 3.4 (with PHP 7.4)
+
+Symfony 3.4.49 (the 2.x directory structure is kept: `app/`, `web/`, `app/console`), Twig 2,
+FOSUserBundle 2.1, Doctrine ORM 2.7 / DBAL 2.13, DoctrineBundle 1.12,
+doctrine-migrations-bundle 2.2 (see "Environment"), PHP 7.4 (the local stack, aligned with
+production), phpstan 2.2, PhpSpreadsheet 1.30 instead of PHPExcel (see "Admin area"). The lock
+is now a Composer 2 lock. Symfony 3.0 was skipped: 3.0.9 calls Twig's `getExtension('core')`,
+which Twig 2 no longer has.
+
+Code changes: `form_start()` / `form_end()` instead of `form_enctype()` (admin CRUD, FOSUser
+templates), `assets.packages` instead of the removed `templating.helper.assets`,
+`WebServerBundle` for `server:run` (dev / test), the `_configurator` route removed. Behaviour
+changes pinned by the tests:
+
+- The session listener makes every response of a request that used the session
+  `max-age=0, must-revalidate, private`: the private API responses lose their
+  `private, must-revalidate` / `no-cache` headers (see "Private API"). `Last-Modified` and the
+  `304` answers are unchanged.
+- `hide_user_not_found` also hides the account status errors since 3.4, so the login page could
+  no longer show "Account is disabled." (and its confirmation email link). It is now `false`,
+  and an unknown username still reads "Invalid credentials." through the
+  `security.en.yml` translation (see "Removing FOSUserBundle").
+- The date fields of the admin pack form have hidden (`sr-only`) Year / Month / Day labels.
+
+The Composer scripts of `sensio/distribution-bundle` failed with Composer 2 (they pass a string
+to `Process`): they were replaced by the commands themselves (`symfony-scripts`: parameters,
+`cache:clear`, `assets:install`, `assetic:dump`), and the bundle was removed with its
+environment check files (`web/config.php`, `app/check.php`, `app/SymfonyRequirements.php`).
+
+### Services and dependency injection
+
+Needed before Symfony 4, where services are private and `Controller` / `ContainerAwareCommand`
+are deprecated. Done by hand (no Rector):
+
+- `services.yml` registers every class of the bundle as a service, identified by its class
+  name, with autowiring and autoconfiguration. The services receive interfaces
+  (`EntityManagerInterface`, `UrlGeneratorInterface`, `LoggerInterface`). The parameters are
+  bound by name in `_defaults` (`$rootDir`, `$cacheDir`, `$cacheExpiration`, `$gameName`,
+  `$publisherName`). The historical ids (`texts`, `decks`, `fellowship_manager`...) are only
+  kept as aliases for the fixtures and the tests.
+- The commands extend `Command` and receive their dependencies in their constructor.
+- The controllers extend `AbstractController`: the services used by several methods and the
+  parameters are injected in the constructor, the services used by one action are arguments of
+  that action (`controller.service_arguments`). Left: `$this->get('session')` (one of the
+  services `AbstractController` still provides, to replace with `$request->getSession()` before
+  Symfony 6) and `getDoctrine()` (deprecated in Symfony 5.4).
+- Left: the fixtures (`ContainerAwareInterface`, DoctrineFixturesBundle 2.x) and the tests
+  still fetch services from the container by id.
 
 ## Dependencies
 
 | Package | Status | Replacement / action |
 |---|---|---|
 | `friendsofsymfony/user-bundle` 2.0 | to be replaced (decided) | Symfony Security, see "Removing FOSUserBundle" |
-| `twig/extensions` | abandoned, probably unused | remove, see roadmap |
 | `symfony/assetic-bundle`, `leafo/scssphp`, `patchwork/jsqueeze` | dropped in Symfony 4 | see "Front-end assets" |
 | `symfony/swiftmailer-bundle` | abandoned | Symfony Mailer (`\Swift_Message::newInstance()` in the comment notifications, FOSUser emails) |
-| `liuggio/excelbundle` (PHPExcel) | abandoned | PhpSpreadsheet (admin Excel export / import) |
+| `liuggio/excelbundle` (PHPExcel) | done | replaced by PhpSpreadsheet (admin Excel export / import) |
 | `sensio/framework-extra-bundle` | abandoned | native attributes (`#[Route]`, `#[IsGranted]`, `#[MapEntity]`) |
-| `sensio/distribution-bundle`, `sensio/generator-bundle`, `incenteev/composer-parameter-handler` | Symfony 2 tooling | Symfony Flex, `.env`, MakerBundle |
+| `sensio/generator-bundle`, `incenteev/composer-parameter-handler` | Symfony 2 tooling | Symfony Flex, `.env`, MakerBundle (`sensio/distribution-bundle` removed, see "Progress") |
 | `nelmio/api-doc-bundle` 2.x | major rewrite in 4.x | see roadmap ("`/api/doc`") |
 | `friendsofsymfony/jsrouting-bundle` 1.x | maintained (3.x) | upgrade; `routes_to_expose: ['.*']` exposes every route, admin included: restrict it |
 | `gedmo/doctrine-extensions` 2.x | maintained (3.x) | upgrade; the timestampable listener is declared by hand (`doctrine_extensions.yml`), or use `stof/doctrine-extensions-bundle` |
 | `doctrine/orm` 2.x, `doctrine/dbal` 2.x | | ORM 3 / DBAL 4; the custom DQL functions `replace` and `power` (see "Card search") |
 | `ezyang/htmlpurifier`, `erusev/parsedown` | maintained | upgrade |
-| `phpstan/phpstan` 1.4 (dev) | maintained (2.x) | upgrade, with `phpstan-symfony`, `phpstan-doctrine` and `phpstan-phpunit` (see "Static analysis") |
+| `phpstan/phpstan` 2.2 (dev) | maintained | add `phpstan-symfony`, `phpstan-doctrine` and `phpstan-phpunit` (see "Static analysis") |
 
 ## Front-end assets
 
@@ -127,9 +178,10 @@ Most tests go through HTTP and compare snapshots, so they survive the migration.
 current stack:
 
 - the `KernelTestCase` tests (managers, commands, card statistics): service ids
-  (`static::$kernel->getContainer()->get('cards_data')`, `'doctrine'`), `getRootDir()`;
-- PHPUnit 6.5 APIs: `assertContains()` on strings, `assertRegExp()`. On PHP 7.1, PHPUnit cannot
-  go past 7.5. The test methods, `setUp()` and `tearDown()` already declare `: void` (required from
+  (`static::$kernel->getContainer()->get('fellowship_manager')`, `'doctrine'`), public until
+  Symfony 4.1 brings `test.service_container`; `getRootDir()`;
+- PHPUnit 6.5 APIs: `assertContains()` on strings, `assertRegExp()`. PHP 7.4 allows up to
+  PHPUnit 9.6. The test methods, `setUp()` and `tearDown()` already declare `: void` (required from
   PHPUnit 8);
 - the fixtures (`DoctrineFixturesBundle` 2.x) and the `make test-fixtures` loading.
 
@@ -138,21 +190,22 @@ skeleton, it is ported first, then run against the new application.
 
 ## Static analysis
 
-`make phpstan` runs phpstan 1.4 at level 8 on `src/` (configuration in `phpstan.neon`). The
-official extensions need Composer 2, so `src/AppBundle/PHPStan/` has small replacements, to drop
-for `phpstan-symfony`, `phpstan-doctrine` and `phpstan-phpunit` once Composer 2 is available:
+`make phpstan` runs phpstan 2.2 at level 8 on `src/` (configuration in `phpstan.neon`). The
+official extensions could not be installed with Composer 1, so `src/AppBundle/PHPStan/` has
+small replacements, to drop for `phpstan-symfony`, `phpstan-doctrine` and `phpstan-phpunit` now
+that Composer 2 is used:
 
 - the service types, read from the container dumped in `app/cache/test` (hence the
   `cache:warmup` of `make phpstan`); the Doctrine registry, entity managers and
   `getRepository('AppBundle:Card')` (an `EntityRepository<Card>`, with a stub);
 - the PHPUnit assertions narrowing types, the non-null response / request / container of the test
   client, `HeaderBag::get()`, the entities' `$id` written by Doctrine;
-- stubs and ignored errors for wrong vendor docblocks (DBAL, PHPUnit 6.5, PHPExcel).
+- stubs and ignored errors for wrong vendor docblocks (DBAL, PHPUnit 6.5).
 
-Left for later: level 9 (1136 errors, all about `mixed`: request parameters, query results,
-untyped collections, the `mixed` parameters of the level 6 docblocks) and the value types of
-arrays and collections (`checkMissingIterableValueType` and
-`checkGenericClassInNonGenericObjectType` are off). Both are cheaper on the rewritten code.
+Left for later: level 9 (1136 errors with phpstan 1.4, all about `mixed`: request parameters,
+query results, untyped collections, the `mixed` parameters of the level 6 docblocks) and the
+value types of arrays and collections (the `missingType.iterableValue` and
+`missingType.generics` errors are ignored). Both are cheaper on the rewritten code.
 
 ## Environment
 
@@ -161,8 +214,9 @@ arrays and collections (`checkMissingIterableValueType` and
   it, see "Card statistics", "Lists and search managers"). Check that the `sql_mode` of
   production includes it too (`SELECT @@GLOBAL.sql_mode;`), so that the tests run on the same
   settings.
-- **Composer**: the lock is Composer 1 era. From the Symfony 3.0 step on, the lock is updated with
-  Composer 2 and production runs a normal `composer install` (decided on 2026-09-28).
+- **Composer**: since the Symfony 3.4 step, the lock is updated with Composer 2 and production
+  runs a normal `composer install` (decided on 2026-09-28), with `SYMFONY_ENV=prod` (read by
+  the `app/console` calls of the Composer scripts).
 - **Schema changes**: from now on they go through `doctrine/doctrine-migrations-bundle` (2.2), in
   `app/DoctrineMigrations/` (namespace `Application\Migrations`, table `migration_versions`).
   `ringsdb_bootstrap.sql` stays the production schema before the first Doctrine migration, so
@@ -251,6 +305,10 @@ In Symfony 7.4:
 
 ### Configuration issues found
 
+- `hide_user_not_found: false` (`security.yml`, since Symfony 3.4, see "Progress") keeps the
+  "Account is disabled." message; the translation of "Username could not be found." into
+  "Invalid credentials." (`app/Resources/translations/security.en.yml`) keeps unknown usernames
+  indistinguishable from wrong passwords. Both are to reproduce in the new login.
 - `config.yml` declares `fos_user.firewall_name: main`, but the firewall is named `default`.
   It works today (automatic login after confirmation is tested), but it should be fixed in the
   new configuration.
@@ -397,10 +455,10 @@ field). Everything the tests create is deleted in `tearDown()`.
     check: the deck is deleted and silently removed from its fellowship (cascade remove on
     `Deck.fellowships`, the fellowship keeps its `nb_decks`).
   - `POST /deck/autosave` stores the builder's diff as an unsaved `deckchange`, replaced by a
-    saved one on the next save. The diff is decoded as objects and tested with `count()`, which
-    is always 1 for an object in PHP 7.1 (an empty diff still creates an entry) and a `TypeError`
-    in PHP 8: to rewrite with `json_decode(..., true)`. A 2-part diff with its first two parts
-    empty reads undefined offsets 2 and 3 (`500` in debug mode).
+    saved one on the next save. Fixed: the diff was decoded as objects and tested with
+    `count()`, always 1 for an object (an empty diff still created an entry; a warning since
+    PHP 7.2, a `TypeError` in PHP 8), and a 2-part diff with empty parts read undefined offsets.
+    It is now decoded as arrays: an empty diff, in 4 or 2 parts, creates no entry.
   - Unknown deck, another user's deck, wrong diff: HTTP exceptions, `500` for AJAX requests
     (`CoreExceptionListener`).
   - `POST /deck/import/all` (zip archive, "uparchive"): one deck per file, named after the file
@@ -515,8 +573,10 @@ sent with AJAX after logging in, like the site's JavaScript does.
 - `/custom-packs`: the user's custom packs.
 - Errors (unknown user or deck, deck not shared) are `200` with
   `{"success": false, "error": ...}`.
-- With data: `Cache-Control: private, must-revalidate` + `Last-Modified`, and `304` on
-  `If-Modified-Since`; without data: `no-cache`, no `Last-Modified`.
+- With data: `Last-Modified`, and `304` on `If-Modified-Since`; without data, no
+  `Last-Modified`. `Cache-Control` is `max-age=0, must-revalidate, private` in both cases, set
+  by the session listener since Symfony 3.4 (it was `private, must-revalidate` with data,
+  `no-cache` without).
 - Anonymous: `403` `{"success": false, "message": "Access Denied."}` for AJAX requests (through
   `CoreExceptionListener`), redirect to the login page otherwise.
 
@@ -623,7 +683,7 @@ printing lists (1300+ rows), JSON snapshots for the statistics (`?month=2015-08`
 `snapshots/api/admin/`).
 
 The Excel export / import is covered by `src/AppBundle/Tests/Controller/AdminExcelTest.php`, by
-round trip: download a pack (or all the cards), change the file with PHPExcel, upload it back
+round trip: download a pack (or all the cards), change the file with PhpSpreadsheet, upload it back
 (field and association changes, card creation only with `create`, unknown association).
 
 The write forms are covered by `src/AppBundle/Tests/Controller/AdminWriteTest.php`, on records
@@ -694,7 +754,8 @@ hasErrata`. Pinned by `AdminCsvTest`:
   soon as the controller returns it, so the test client gets an empty body (the tests capture it
   with an output buffer). The export file names come from `slugify()`, which drops the spaces
   (`lotrlcgcards.xlsx`).
-- PHPExcel (`liuggio/ExcelBundle`) is abandoned: replace it with PhpSpreadsheet.
+- Done: PHPExcel (`liuggio/ExcelBundle`, abandoned) was replaced by PhpSpreadsheet. The files are
+  same columns and values; whole numbers are read back as ints (floats with PHPExcel).
 - Fixed: the "Delete" button of an admin pack page (`Pack/show.html.twig`) posted to
   `admin_cycle_delete`; the delete forms share their CSRF token, so it deleted the cycle with the
   same id as the pack (`testPackPageDeletesThePack`).

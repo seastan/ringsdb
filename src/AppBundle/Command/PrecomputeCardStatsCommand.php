@@ -2,11 +2,13 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Stats\CardStatsCalculator;
+use Doctrine\DBAL\Connection;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 /**
  * Precomputes the heavy per-card monthly stats into stat_cards_cache so the
@@ -18,8 +20,24 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
  *   php app/console app:stats:precompute-cards 2024-03      # a specific month
  *   php app/console app:stats:precompute-cards --months=3   # last 3 months
  */
-class PrecomputeCardStatsCommand extends ContainerAwareCommand {
+class PrecomputeCardStatsCommand extends Command {
     use StringInputTrait;
+
+    /**
+     * @var Connection
+     */
+    private $connection;
+
+    /**
+     * @var CardStatsCalculator
+     */
+    private $cardStats;
+
+    public function __construct(Connection $connection, CardStatsCalculator $cardStats) {
+        parent::__construct();
+        $this->connection = $connection;
+        $this->cardStats = $cardStats;
+    }
 
     /**
      * @return void
@@ -36,8 +54,8 @@ class PrecomputeCardStatsCommand extends ContainerAwareCommand {
         set_time_limit(0);
         ini_set('memory_limit', '1G');
 
-        $calc = $this->getContainer()->get('app.card_stats');
-        $dbh = $this->getContainer()->get('doctrine')->getConnection();
+        $calc = $this->cardStats;
+        $dbh = $this->connection;
 
         $month = self::stringArgument($input, 'month') ?: date('Y-m', strtotime('first day of last month'));
         if (!preg_match('/^\d{4}-\d{2}$/', $month)) {

@@ -2,8 +2,9 @@
 
 namespace AppBundle\Command;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Command\Command;
 use AppBundle\Entity\Card;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -11,7 +12,17 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\VarDumper\VarDumper;
 
-class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
+class ScrapBeornScenarioDataCommand extends Command {
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    public function __construct(EntityManagerInterface $em) {
+        parent::__construct();
+        $this->em = $em;
+    }
 
     /**
      * @return void
@@ -45,7 +56,7 @@ class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
         $customjson = $input->getOption('customjson');
 
         /* @var $em \Doctrine\ORM\EntityManager */
-        $em = $this->getContainer()->get('doctrine')->getManager();
+        $em = $this->em;
 
         $this->command($em, $name, $skip, $customjson);
         $output->writeln("Done.");

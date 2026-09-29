@@ -2,11 +2,11 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
-class ApiPrivateController extends Controller {
+class ApiPrivateController extends AbstractController {
     use CurrentUserTrait;
 
 	/**

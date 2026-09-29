@@ -4,7 +4,6 @@
 namespace AppBundle\Services;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -18,7 +17,7 @@ class CardsData {
 	private $doctrine;
 
 	/**
-	 * @var Router
+	 * @var UrlGeneratorInterface
 	 */
 	private $router;
 
@@ -35,7 +34,7 @@ class CardsData {
 	/**
 	 * @param mixed $rootDir
 	 */
-	public function __construct(Registry $doctrine, Router $router, Packages $assets_packages, $rootDir) {
+	public function __construct(Registry $doctrine, UrlGeneratorInterface $router, Packages $assets_packages, $rootDir) {
 		$this->doctrine = $doctrine;
 		$this->router = $router;
 		$this->assets_packages = $assets_packages;

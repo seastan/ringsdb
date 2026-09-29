@@ -2,17 +2,18 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Services\Texts;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\Card;
 
-class ExcelController extends Controller {
+class ExcelController extends AbstractController {
 	/**
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
@@ -28,7 +29,7 @@ class ExcelController extends Controller {
 	/**
 	 * @return \Symfony\Component\HttpFoundation\StreamedResponse
 	 */
-	public function downloadProcessAction(Request $request) {
+	public function downloadProcessAction(Request $request, Texts $texts) {
 		$ignoredFields = ['id', 'dateCreation', 'dateUpdate'];
 
 		$em = $this->getDoctrine()->getManager();
@@ -121,7 +122,7 @@ class ExcelController extends Controller {
 			$writer->save('php://output');
 		});
 		$response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
-		$response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->get('texts')->slugify($pack_name) . '.xlsx'));
+		$response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $texts->slugify($pack_name) . '.xlsx'));
 		$response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
 		return $response;

@@ -3,17 +3,17 @@
 namespace AppBundle\Services;
 
 use AppBundle\Entity\Deck;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use AppBundle\Entity\Deckslot;
 use AppBundle\Entity\Decksideslot;
-use Symfony\Bridge\Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use AppBundle\Entity\Deckchange;
 use AppBundle\Helper\DeckValidationHelper;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Decks {
     /**
-     * @var EntityManager
+     * @var EntityManagerInterface
      */
     private $doctrine;
 
@@ -28,11 +28,11 @@ class Decks {
     private $diff;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
-    public function __construct(EntityManager $doctrine, DeckValidationHelper $deck_validation_helper, Diff $diff, Logger $logger) {
+    public function __construct(EntityManagerInterface $doctrine, DeckValidationHelper $deck_validation_helper, Diff $diff, LoggerInterface $logger) {
         $this->doctrine = $doctrine;
         $this->deck_validation_helper = $deck_validation_helper;
         $this->diff = $diff;

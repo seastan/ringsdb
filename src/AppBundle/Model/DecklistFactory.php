@@ -4,7 +4,7 @@ namespace AppBundle\Model;
 
 use AppBundle\Entity\Decklist;
 use AppBundle\Entity\Deck;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use AppBundle\Helper\DeckValidationHelper;
 use AppBundle\Services\Texts;
 use AppBundle\Entity\Decklistslot;
@@ -12,7 +12,7 @@ use AppBundle\Entity\Decklistsideslot;
 
 class DecklistFactory {
     /**
-     * @var EntityManager
+     * @var EntityManagerInterface
      */
     private $doctrine;
 
@@ -26,7 +26,7 @@ class DecklistFactory {
      */
     private $texts;
 
-    public function __construct(EntityManager $doctrine, DeckValidationHelper $deckValidationHelper, Texts $texts) {
+    public function __construct(EntityManagerInterface $doctrine, DeckValidationHelper $deckValidationHelper, Texts $texts) {
         $this->doctrine = $doctrine;
         $this->deckValidationHelper = $deckValidationHelper;
         $this->texts = $texts;

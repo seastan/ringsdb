@@ -2,14 +2,31 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Services\Texts;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-class FixCanonicalNamesCommand extends ContainerAwareCommand {
+class FixCanonicalNamesCommand extends Command {
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    /**
+     * @var Texts
+     */
+    private $texts;
+
+    public function __construct(EntityManagerInterface $em, Texts $texts) {
+        parent::__construct();
+        $this->em = $em;
+        $this->texts = $texts;
+    }
+
     /**
      * @return void
      */
@@ -19,9 +36,9 @@ class FixCanonicalNamesCommand extends ContainerAwareCommand {
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
-        $em = $this->getContainer()->get('doctrine')->getManager();
+        $em = $this->em;
 
-        $texts = $this->getContainer()->get('texts');
+        $texts = $this->texts;
         $count = 0;
 
         $scenarios = $em->getRepository('AppBundle:Scenario')->findAll();

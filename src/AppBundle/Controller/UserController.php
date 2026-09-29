@@ -2,14 +2,25 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use FOS\UserBundle\Model\UserManagerInterface;
+use FOS\UserBundle\Mailer\MailerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class UserController extends Controller {
+class UserController extends AbstractController {
     use CurrentUserTrait;
+
+    /**
+     * @var int
+     */
+    private $cacheExpiration;
+
+    public function __construct(int $cacheExpiration) {
+        $this->cacheExpiration = $cacheExpiration;
+    }
 
     /*
 	 * displays details about a user and the list of decklists he published
@@ -23,7 +34,7 @@ class UserController extends Controller {
     public function publicProfileAction($user_id, $user_name, $page, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -127,7 +138,7 @@ class UserController extends Controller {
             $user = $this->currentUser();
             $user_id = $user->getId();
 
-            $public_profile_url = $this->get('router')->generate('user_profile_public', [
+            $public_profile_url = $this->generateUrl('user_profile_public', [
                 'user_id' => $user_id,
                 'user_name' => urlencode($user->getUsername())
             ]);
@@ -277,9 +288,9 @@ class UserController extends Controller {
      * @param mixed $username
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function remindAction($username) {
+    public function remindAction($username, MailerInterface $userMailer, UserManagerInterface $userManager) {
         /** @var \AppBundle\Entity\User|null $user */
-        $user = $this->get('fos_user.user_manager')->findUserByUsername($username);
+        $user = $userManager->findUserByUsername($username);
         if (!$user) {
             throw new NotFoundHttpException("Cannot find user from username [$username]");
         }
@@ -287,11 +298,11 @@ class UserController extends Controller {
             return $this->render('AppBundle:User:remind-no-token.html.twig');
         }
 
-        $this->get('fos_user.mailer')->sendConfirmationEmailMessage($user);
+        $userMailer->sendConfirmationEmailMessage($user);
 
         $this->get('session')->set('fos_user_send_confirmation_email/email', $user->getEmail());
 
-        $url = $this->get('router')->generate('fos_user_registration_check_email');
+        $url = $this->generateUrl('fos_user_registration_check_email');
 
         return $this->redirect($url);
     }

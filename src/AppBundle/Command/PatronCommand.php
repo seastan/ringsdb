@@ -2,17 +2,27 @@
 
 namespace AppBundle\Command;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use AppBundle\Entity\Review;
 use AppBundle\Entity\Reviewcomment;
 
-class PatronCommand extends ContainerAwareCommand {
+class PatronCommand extends Command {
     use StringInputTrait;
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    public function __construct(EntityManagerInterface $em) {
+        parent::__construct();
+        $this->em = $em;
+    }
 
     /**
      * @return void
@@ -37,7 +47,7 @@ class PatronCommand extends ContainerAwareCommand {
         $email = self::stringArgument($input, 'email');
         $donation = (int) $input->getArgument('donation');
 
-        $em = $this->getContainer()->get('doctrine')->getManager();
+        $em = $this->em;
         $repo = $em->getRepository('AppBundle:User');
         $user = $repo->findOneBy(['email' => $email]);
 

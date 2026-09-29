@@ -2,7 +2,9 @@
 
 namespace AppBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Asset\Packages;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,8 +14,30 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\VarDumper\VarDumper;
 
 
-class ScrapBeornCardDataCommand extends ContainerAwareCommand {
+class ScrapBeornCardDataCommand extends Command {
     use StringInputTrait;
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    /**
+     * @var Packages
+     */
+    private $packages;
+
+    /**
+     * @var string
+     */
+    private $rootDir;
+
+    public function __construct(EntityManagerInterface $em, Packages $packages, string $rootDir) {
+        parent::__construct();
+        $this->em = $em;
+        $this->packages = $packages;
+        $this->rootDir = $rootDir;
+    }
 
 
     /**
@@ -60,12 +84,12 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
-        $em = $this->getContainer()->get('doctrine')->getManager();
+        $em = $this->em;
 
         $questionHelper = $this->getHelper('question');
 
-        $assets_helper = $this->getContainer()->get('assets.packages');
-        $rootDir = $this->getContainer()->get('kernel')->getRootDir();
+        $assets_helper = $this->packages;
+        $rootDir = $this->rootDir;
 
         $allSpheres = $em->getRepository('AppBundle:Sphere')->findAll();
         $allTypes = $em->getRepository('AppBundle:Type')->findAll();

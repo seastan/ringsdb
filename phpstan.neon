@@ -40,7 +40,7 @@ services:
             - phpstan.broker.dynamicMethodReturnTypeExtension
     -
         class: AppBundle\PHPStan\SymfonyContainerReturnTypeExtension
-        arguments: [Symfony\Bundle\FrameworkBundle\Controller\Controller, %currentWorkingDirectory%/app/cache/test/appTestDebugProjectContainer.xml]
+        arguments: [Symfony\Bundle\FrameworkBundle\Controller\AbstractController, %currentWorkingDirectory%/app/cache/test/appTestDebugProjectContainer.xml]
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension
     -
