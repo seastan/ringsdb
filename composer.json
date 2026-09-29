@@ -21,7 +21,7 @@
     "symfony/symfony": "^3.4",
     "symfony/assetic-bundle": "^2.8",
     "symfony/swiftmailer-bundle": "~2.3",
-    "symfony/monolog-bundle": "~2.8",
+    "symfony/monolog-bundle": "^3.6",
     "sensio/framework-extra-bundle": "~3.0,>=3.0.2",
     "incenteev/composer-parameter-handler": "~2.0",
     "friendsofsymfony/user-bundle": "^2.1.0",
