@@ -6,7 +6,6 @@ use PhpParser\Node\Expr\MethodCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\ParametersAcceptorSelector;
-use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
@@ -17,7 +16,7 @@ use PHPStan\Type\Type;
  * tests or "app/console cache:warmup --env=test" first).
  */
 class SymfonyContainerReturnTypeExtension implements DynamicMethodReturnTypeExtension {
-    /** @var string */
+    /** @var class-string */
     private $className;
 
     /** @var string */
@@ -25,6 +24,12 @@ class SymfonyContainerReturnTypeExtension implements DynamicMethodReturnTypeExte
 
     /** @var array<string, string>|null service id => class */
     private $services;
+
+    /**
+
+     * @param class-string $className
+
+     */
 
     public function __construct(string $className, string $containerXml) {
         $this->className = $className;
@@ -40,17 +45,17 @@ class SymfonyContainerReturnTypeExtension implements DynamicMethodReturnTypeExte
     }
 
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): Type {
-        $default = ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
+        $default = ParametersAcceptorSelector::selectFromArgs($scope, $methodCall->getArgs(), $methodReflection->getVariants())->getReturnType();
         $args = $methodCall->getArgs();
         if (!isset($args[0])) {
             return $default;
         }
-        $id = $scope->getType($args[0]->value);
-        if (!$id instanceof ConstantStringType) {
+        $ids = $scope->getType($args[0]->value)->getConstantStrings();
+        if (count($ids) !== 1) {
             return $default;
         }
         $services = $this->services();
-        $class = $services[strtolower($id->getValue())] ?? null;
+        $class = $services[strtolower($ids[0]->getValue())] ?? null;
 
         return $class !== null ? new ObjectType($class) : $default;
     }

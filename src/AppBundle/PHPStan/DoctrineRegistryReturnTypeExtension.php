@@ -5,7 +5,6 @@ namespace AppBundle\PHPStan;
 use PhpParser\Node\Expr\MethodCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
-use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\Generic\GenericObjectType;
 use PHPStan\Type\ObjectType;
@@ -32,8 +31,14 @@ class DoctrineRegistryReturnTypeExtension implements DynamicMethodReturnTypeExte
         'find' => 'object',
     ];
 
-    /** @var string */
+    /** @var class-string */
     private $className;
+
+    /**
+
+     * @param class-string $className
+
+     */
 
     public function __construct(string $className) {
         $this->className = $className;
@@ -52,7 +57,8 @@ class DoctrineRegistryReturnTypeExtension implements DynamicMethodReturnTypeExte
         $args = $methodCall->getArgs();
         $entity = isset($args[0]) ? $scope->getType($args[0]->value) : null;
         // "AppBundle:Card" or "AppBundle\Entity\Card"
-        $class = $entity instanceof ConstantStringType ? preg_replace('/^AppBundle:/', 'AppBundle\\Entity\\', $entity->getValue()) : null;
+        $strings = $entity !== null ? $entity->getConstantStrings() : [];
+        $class = count($strings) === 1 ? preg_replace('/^AppBundle:/', 'AppBundle\\Entity\\', $strings[0]->getValue()) : null;
         if ($name === 'getRepository' && $class !== null) {
             return new GenericObjectType(self::RETURN_TYPES[$name], [new ObjectType($class)]);
         }

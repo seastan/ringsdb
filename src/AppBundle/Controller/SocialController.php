@@ -18,6 +18,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class SocialController extends Controller {
+    use CurrentUserTrait;
+
     /**
      * Checks to see if a deck can be published in its current saved state
      * If it is, displays the decklist edit form for initial publication of a deck
@@ -122,7 +124,7 @@ class SocialController extends Controller {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $user \AppBundle\Entity\User */
-        $user = $this->getUser();
+        $user = $this->currentUser();
 
         /*
         $yesterday = (new \DateTime())->modify('-24 hours');
@@ -471,7 +473,7 @@ class SocialController extends Controller {
     public function listAction($type, $page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         /**
          * @var DecklistManager $decklist_manager
@@ -557,7 +559,7 @@ class SocialController extends Controller {
     public function viewAction($decklist_id) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         $decklist = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->find($decklist_id);
         if (!$decklist) {
@@ -827,7 +829,7 @@ class SocialController extends Controller {
     public function textexportAction($decklist_id) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -863,7 +865,7 @@ class SocialController extends Controller {
     public function octgnexportAction($decklist_id) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -894,7 +896,7 @@ class SocialController extends Controller {
     public function searchAction(Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         $dbh = $this->getDoctrine()->getConnection();
         $spheres = $dbh->executeQuery("SELECT s.name, s.code FROM sphere s ORDER BY s.name ASC")->fetchAll();
@@ -1003,7 +1005,7 @@ class SocialController extends Controller {
     public function patronsAction() {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         $dbh = $this->getDoctrine()->getConnection();
 

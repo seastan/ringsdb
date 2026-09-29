@@ -145,7 +145,7 @@ class CardController extends Controller {
             /* @var $file \Symfony\Component\HttpFoundation\File\UploadedFile */
             $file = $editForm['file']->getData();
             if ($file) {
-                $imagedirurl = $this->get('templating.helper.assets')->getUrl('/bundles/app/images/cards');
+                $imagedirurl = $this->get('assets.packages')->getUrl('/bundles/app/images/cards');
                 $imagedirpath = $this->get('kernel')->getRootDir() . '/../web' . preg_replace('/\?.*/', '', $imagedirurl);
                 $imagefilename = $entity->getCode() . '.png';
                 $file->move($imagedirpath, $imagefilename);

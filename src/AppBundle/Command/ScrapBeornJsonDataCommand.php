@@ -52,7 +52,7 @@ class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
 
         $questionHelper = $this->getHelper('question');
 
-        $assets_helper = $this->getContainer()->get('templating.helper.assets');
+        $assets_helper = $this->getContainer()->get('assets.packages');
         $rootDir = $this->getContainer()->get('kernel')->getRootDir();
 
         $allSpheres = $em->getRepository('AppBundle:Sphere')->findAll();

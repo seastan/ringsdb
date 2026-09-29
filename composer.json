@@ -18,13 +18,11 @@
     "ext-json": "*",
     "ext-pdo": "*",
     "ext-zip": "*",
-    "symfony/symfony": "^2.7",
-    "symfony/css-selector": "^2.7",
-    "symfony/dom-crawler": "^2.7",
-    "symfony/assetic-bundle": "~2.7",
+    "symfony/symfony": "^3.4",
+    "symfony/assetic-bundle": "^2.8",
     "symfony/swiftmailer-bundle": "~2.3",
-    "symfony/monolog-bundle": "~2.4",
-    "sensio/distribution-bundle": "~4.0",
+    "symfony/monolog-bundle": "~2.8",
+    "sensio/distribution-bundle": "^5.0",
     "sensio/framework-extra-bundle": "~3.0,>=3.0.2",
     "incenteev/composer-parameter-handler": "~2.0",
     "friendsofsymfony/user-bundle": "^2.1.0",
@@ -32,20 +30,21 @@
     "doctrine/dbal": "^2.5",
     "doctrine/orm": "^2.5",
     "doctrine/doctrine-bundle": "^1.5",
-    "liuggio/excelbundle": "^2.0",
     "friendsofsymfony/jsrouting-bundle": "^1.5",
-    "twig/extensions": "^1.2",
     "ezyang/htmlpurifier": "^4.6",
     "leafo/scssphp": "^0.2.0",
     "patchwork/jsqueeze": "~1.0",
     "nelmio/api-doc-bundle": "^2.9",
-    "erusev/parsedown": "^1.6"
+    "erusev/parsedown": "^1.6",
+    "symfony/twig-bundle": "^3.4",
+    "symfony/asset": "^3.4",
+    "phpoffice/phpspreadsheet": "^1.30.7"
   },
   "require-dev": {
-    "sensio/generator-bundle": "~2.3",
+    "sensio/generator-bundle": "~3.0",
     "symfony/phpunit-bridge": "4.4",
     "doctrine/doctrine-fixtures-bundle": "^2.4.1",
-    "phpstan/phpstan": "^1.4"
+    "phpstan/phpstan": "^2.2"
   },
   "scripts": {
     "post-root-package-install": [

@@ -22,6 +22,9 @@ Pack edit
 Code
 Name
 Date release
+Year
+Month
+Day
 2010
 2011
 2012

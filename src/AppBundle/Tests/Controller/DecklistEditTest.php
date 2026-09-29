@@ -14,6 +14,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * decklists inserted by the test; everything is restored in tearDown().
  */
 class DecklistEditTest extends WebTestCase {
+    use \AppBundle\Tests\FormFieldTrait;
+
     /** @var array */
     private $fixtureDecklists;
     /** @var array */
@@ -122,11 +124,11 @@ class DecklistEditTest extends WebTestCase {
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $form = $crawler->filter('form[action="/decklist/save/1"]')->form();
-        $this->assertSame('Dwarf Lore/Leadership/Tactics', $form['name']->getValue());
-        $this->assertSame('Hello World', $form['descriptionMd']->getValue());
-        $this->assertSame('3', $form['precedent']->getValue());
+        $this->assertSame('Dwarf Lore/Leadership/Tactics', self::field($form, 'name')->getValue());
+        $this->assertSame('Hello World', self::field($form, 'descriptionMd')->getValue());
+        $this->assertSame('3', self::field($form, 'precedent')->getValue());
         // no deck: this is not the publish form
-        $this->assertSame('', $form['deck_id']->getValue());
+        $this->assertSame('', self::field($form, 'deck_id')->getValue());
     }
 
     public function testSave(): void {

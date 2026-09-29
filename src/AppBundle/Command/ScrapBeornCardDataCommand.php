@@ -64,7 +64,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
         $questionHelper = $this->getHelper('question');
 
-        $assets_helper = $this->getContainer()->get('templating.helper.assets');
+        $assets_helper = $this->getContainer()->get('assets.packages');
         $rootDir = $this->getContainer()->get('kernel')->getRootDir();
 
         $allSpheres = $em->getRepository('AppBundle:Sphere')->findAll();
@@ -152,7 +152,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
             $html = file_get_contents("http://hallofbeorn.com/LotR?Sort=Set_Number&CardSet=$beornset");
             $output->writeln("a");
 
-            $crawler = new Crawler($html);
+            $crawler = new Crawler((string) $html);
             $output->writeln("b");
 
             $cardsUrls = $crawler->filter('a[href^="/LotR/Details"][style]')->extract(['href']);
@@ -171,7 +171,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                     continue;
                 }
 
-                $cardCrawler = new Crawler(file_get_contents("http://hallofbeorn.com$url"));
+                $cardCrawler = new Crawler((string) file_get_contents("http://hallofbeorn.com$url"));
 		$output->writeln("1");
 
                 // Type and Sphere
@@ -203,8 +203,8 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
                 $t = $c->filter('span')->last()->text();
                 preg_match('/^#(\d+) \(x(\d+)\)$/', $t, $matches);
-                $position = $matches[1];
-                $quantity = $matches[2];
+                $position = $matches[1] ?? '';
+                $quantity = $matches[2] ?? '';
 		$output->writeln("7");
 
                 // Image URL

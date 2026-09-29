@@ -6,23 +6,25 @@ use PhpParser\Node\Expr\MethodCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\ParametersAcceptorSelector;
+use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
 
 /**
- * Methods documented as nullable that never return null in this application (see phpstan.neon):
- * the response, request and container of the test client once a request is made, the container
- * of a booted kernel or of a command run by the console.
+ * Methods documented as nullable (or returning false) that never do in this application (see
+ * phpstan.neon): the response, request and container of the test client once a request is made,
+ * the container of a booted kernel, the content of a response (false for streamed responses).
  */
 class NonNullReturnTypeExtension implements DynamicMethodReturnTypeExtension {
-    /** @var string */
+    /** @var class-string */
     private $className;
 
     /** @var string[] */
     private $methods;
 
     /**
+     * @param class-string $className
      * @param string[] $methods
      */
     public function __construct(string $className, array $methods) {
@@ -39,6 +41,8 @@ class NonNullReturnTypeExtension implements DynamicMethodReturnTypeExtension {
     }
 
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): Type {
-        return TypeCombinator::removeNull(ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType());
+        $type = ParametersAcceptorSelector::selectFromArgs($scope, $methodCall->getArgs(), $methodReflection->getVariants())->getReturnType();
+
+        return TypeCombinator::remove(TypeCombinator::removeNull($type), new ConstantBooleanType(false));
     }
 }

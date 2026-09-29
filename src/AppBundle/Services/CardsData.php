@@ -5,7 +5,7 @@ namespace AppBundle\Services;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /*
@@ -23,9 +23,9 @@ class CardsData {
 	private $router;
 
 	/**
-	 * @var AssetsHelper
+	 * @var Packages
 	 */
-	private $assets_helper;
+	private $assets_packages;
 
 	/**
 	 * @var string
@@ -35,10 +35,10 @@ class CardsData {
 	/**
 	 * @param mixed $rootDir
 	 */
-	public function __construct(Registry $doctrine, Router $router, AssetsHelper $assets_helper, $rootDir) {
+	public function __construct(Registry $doctrine, Router $router, Packages $assets_packages, $rootDir) {
 		$this->doctrine = $doctrine;
 		$this->router = $router;
-		$this->assets_helper = $assets_helper;
+		$this->assets_packages = $assets_packages;
 		$this->rootDir = $rootDir;
 	}
 
@@ -49,6 +49,7 @@ class CardsData {
 	 * @return string
 	 */
 	public function replaceSymbols($text) {
+		/** @var array<string, string> $displayTextReplacements */
 		static $displayTextReplacements = [
 			'[willpower]' => '<span class="icon-willpower"></span>',
 			'[attack]' => '<span class="icon-attack"></span>',
@@ -482,7 +483,7 @@ class CardsData {
 					$value = (boolean)$value;
 					break;
 			}
-			$fieldName = ltrim(strtolower(preg_replace('/[A-Z]/', '_$0', $fieldName)), '_');
+			$fieldName = ltrim(strtolower((string) preg_replace('/[A-Z]/', '_$0', $fieldName)), '_');
 			$cardinfo[$fieldName] = $value;
 		}
 
@@ -496,7 +497,7 @@ class CardsData {
 		$cardinfo['quantity']    = $primaryPrinting ? intval($primaryPrinting->getQuantity()) : null;
 
 		$cardinfo['url'] = $this->router->generate('cards_zoom', ['card_code' => $card->getCode()], UrlGeneratorInterface::ABSOLUTE_URL);
-		$imageurl = $this->assets_helper->getUrl('bundles/cards/' . $card->getCode() . '.png');
+		$imageurl = $this->assets_packages->getUrl('bundles/cards/' . $card->getCode() . '.png');
 		$imagepath = $this->rootDir . '/../web' . preg_replace('/\?.*/', '', $imageurl);
 
 		if (file_exists($imagepath)) {
@@ -514,7 +515,7 @@ class CardsData {
 				continue;
 			}
 
-			$prImageUrl = $this->assets_helper->getUrl('bundles/cards/' . $printing->getImageCode() . '.png');
+			$prImageUrl = $this->assets_packages->getUrl('bundles/cards/' . $printing->getImageCode() . '.png');
 			$prImagePath = $this->rootDir . '/../web' . preg_replace('/\?.*/', '', $prImageUrl);
 			$dateRelease = $pack->getDateRelease();
 

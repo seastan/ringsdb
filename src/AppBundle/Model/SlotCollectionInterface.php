@@ -60,7 +60,7 @@ interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \Array
     /**
      * Get all slot counts sorted by sphere code
      *
-     * @return array
+     * @return non-empty-array<string, int>
      */
     public function getCountBySphere();
 

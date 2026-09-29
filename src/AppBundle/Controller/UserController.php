@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserController extends Controller {
+    use CurrentUserTrait;
+
     /*
 	 * displays details about a user and the list of decklists he published
 	 */
@@ -21,7 +23,7 @@ class UserController extends Controller {
     public function publicProfileAction($user_id, $user_name, $page, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -56,11 +58,11 @@ class UserController extends Controller {
      */
     public function saveProfileAction(Request $request) {
         /* @var $user \AppBundle\Entity\User */
-        $user = $this->getUser();
+        $user = $this->currentUser();
 
         $em = $this->getDoctrine()->getManager();
 
-        $username = filter_var($request->get('username'), FILTER_SANITIZE_STRING);
+        $username = (string) filter_var($request->get('username'), FILTER_SANITIZE_STRING);
         if ($username !== $user->getUsername()) {
             $user_existing = $em->getRepository('AppBundle:User')->findOneBy(['username' => $username]);
 
@@ -73,13 +75,13 @@ class UserController extends Controller {
             $user->setUsername($username);
         }
 
-        $email = filter_var($request->get('email'), FILTER_SANITIZE_STRING);
+        $email = (string) filter_var($request->get('email'), FILTER_SANITIZE_STRING);
         if ($email !== $user->getEmail()) {
             $user->setEmail($email);
         }
 
-        $resume = filter_var($request->get('resume'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
-        $sphere_code = filter_var($request->get('user_sphere_code'), FILTER_SANITIZE_STRING);
+        $resume = (string) filter_var($request->get('resume'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+        $sphere_code = (string) filter_var($request->get('user_sphere_code'), FILTER_SANITIZE_STRING);
         $notifAuthor = $request->get('notif_author') ? true : false;
         $notifCommenter = $request->get('notif_commenter') ? true : false;
         $notifMention = $request->get('notif_mention') ? true : false;
@@ -122,7 +124,7 @@ class UserController extends Controller {
         $content = null;
 
         if ($this->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            $user = $this->getUser();
+            $user = $this->currentUser();
             $user_id = $user->getId();
 
             $public_profile_url = $this->get('router')->generate('user_profile_public', [

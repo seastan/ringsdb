@@ -72,8 +72,6 @@ Each removal reduces what has to be ported.
 ## 4. Open test gaps
 
 - Scenario import: waiting for a sample file (see "Admin area").
-- `app/Resources/FOSUserBundle/views/Registration/checkEmail.html.twig`: probably ignored by
-  FOSUserBundle 2.0 (not verified, see "Removing FOSUserBundle").
 - The merging of reprints by `source_code()` in the card statistics (see "Card statistics").
 - `/api/doc` (see above).
 
@@ -238,9 +236,10 @@ In Symfony 7.4:
 - `config.yml` declares `fos_user.firewall_name: main`, but the firewall is named `default`.
   It works today (automatic login after confirmation is tested), but it should be fixed in the
   new configuration.
-- `app/Resources/FOSUserBundle/views/Registration/checkEmail.html.twig` uses the FOSUser 1.x
-  file name; FOSUser 2.0 looks for `check_email.html.twig`. This override is probably ignored
-  today (not verified).
+- Removed: the FOSUserBundle overrides named after FOSUser 1.x templates, which FOSUser 2 does not
+  load (it renders `check_email`, `change_password`...): `Registration/checkEmail.html.twig`,
+  `Resetting/checkEmail.html.twig`, `Resetting/passwordAlreadyRequested.html.twig` and
+  `ChangePassword/changePassword*.html.twig`. The pages already used FOSUser's templates.
 
 ## Public API (`/api/public/*`)
 

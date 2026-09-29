@@ -17,6 +17,7 @@ use Symfony\Component\DomCrawler\Form;
  */
 class UserProfileTest extends WebTestCase {
     use SentEmailsTrait;
+    use \AppBundle\Tests\FormFieldTrait;
 
     /** @var array */
     private $fixtureUsers;
@@ -101,15 +102,15 @@ class UserProfileTest extends WebTestCase {
         $client = $this->createAuthenticatedClient();
         $form = $this->profileForm($client);
 
-        $this->assertSame('test', $form['username']->getValue());
-        $this->assertSame('test@example.com', $form['email']->getValue());
-        $this->assertSame('', $form['resume']->getValue());
-        $this->assertTrue($form['notif_author']->hasValue());
-        $this->assertTrue($form['notif_commenter']->hasValue());
-        $this->assertTrue($form['notif_mention']->hasValue());
-        $this->assertFalse($form['share_decks']->hasValue());
-        $this->assertFalse($form['dark_mode']->hasValue());
-        $this->assertFalse($form['user_sphere_code']->hasValue());
+        $this->assertSame('test', self::field($form, 'username')->getValue());
+        $this->assertSame('test@example.com', self::field($form, 'email')->getValue());
+        $this->assertSame('', self::field($form, 'resume')->getValue());
+        $this->assertTrue(self::field($form, 'notif_author')->hasValue());
+        $this->assertTrue(self::field($form, 'notif_commenter')->hasValue());
+        $this->assertTrue(self::field($form, 'notif_mention')->hasValue());
+        $this->assertFalse(self::field($form, 'share_decks')->hasValue());
+        $this->assertFalse(self::field($form, 'dark_mode')->hasValue());
+        $this->assertFalse(self::field($form, 'user_sphere_code')->hasValue());
     }
 
     public function testEditProfile(): void {

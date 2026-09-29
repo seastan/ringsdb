@@ -315,18 +315,31 @@ class DeckManagementTest extends WebTestCase {
     }
 
     /**
-     * The diff is decoded as objects, and count() of an object is always 1 in PHP 7.1 (a
-     * TypeError in PHP 8): an empty diff still creates a history entry. The builder does not send
-     * empty diffs.
+     * An empty diff creates no history entry (the builder does not send empty diffs). It did
+     * before PHP 7.4: the diff was decoded as objects, and count() of an object was always 1; an
+     * empty diff in 2 parts read the missing parts 3 and 4 (undefined offset).
+     *
+     * @dataProvider emptyDiffProvider
      */
-    public function testAutosaveEmptyDiff(): void {
+    public function testAutosaveEmptyDiff(string $diff): void {
         $client = $this->createAuthenticatedClient();
         $id = $this->insertDeck($client, 'PHPUnit Autosave');
 
-        $client->request('POST', '/deck/autosave', ['deck_id' => $id, 'diff' => '[{},{},{},{}]'], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
+        $client->request('POST', '/deck/autosave', ['deck_id' => $id, 'diff' => $diff], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
+        $this->assertSame('', $client->getResponse()->getContent());
+        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
+    }
+
+    /**
+     * @return array
+     */
+    public function emptyDiffProvider() {
+        return [
+            'in 4 parts' => ['[{},{},{},{}]'],
+            'in 2 parts' => ['[[],[]]'],
+        ];
     }
 
     public function testAutosaveDiffInTwoParts(): void {
@@ -367,10 +380,6 @@ class DeckManagementTest extends WebTestCase {
             'unknown deck' => ['test', 999, '[[],[],[],[]]', 500, 'Cannot find deck 999'],
             'another user\'s deck' => ['admin', null, '[{"01001":1},[],[],[]]', 500, "You don't have access to this deck."],
             'wrong diff' => ['test', null, '[{"01001":1}]', 500, 'Wrong content [{"01001":1}]'],
-            // 2 parts are accepted by the check, but when the first two are empty parts 2 and 3
-            // are read: undefined offset (a notice turned into an exception in debug mode, a
-            // warning in production)
-            'empty diff in 2 parts' => ['test', null, '[[],[]]', 500, 'Undefined offset: 2'],
         ];
     }
 

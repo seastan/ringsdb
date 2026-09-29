@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class DeckWorkflowTest extends WebTestCase {
     use \AppBundle\Tests\TemporaryFileTrait;
     use \AppBundle\Tests\LocationTrait;
+    use \AppBundle\Tests\FormFieldTrait;
 
     /** @var int[] */
     private $deckIds = [];
@@ -108,7 +109,7 @@ class DeckWorkflowTest extends WebTestCase {
         $this->assertSame(200, $client->getResponse()->getStatusCode());
 
         $form = $crawler->filter('#save_form')->form();
-        $this->assertSame((string) $deckId, $form['id']->getValue());
+        $this->assertSame((string) $deckId, self::field($form, 'id')->getValue());
         $form['name'] = $name;
         $form['description'] = $description;
         $form['tags'] = $tags;
@@ -231,10 +232,10 @@ class DeckWorkflowTest extends WebTestCase {
         $crawler = $client->request('GET', "/deck/publish/$deckId");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $form = $crawler->filter('form[action="/decklist/create"]')->form();
-        $this->assertSame((string) $deckId, $form['deck_id']->getValue());
-        $this->assertSame('PHPUnit Leadership Tactics', $form['name']->getValue());
-        $this->assertSame('Second version', $form['descriptionMd']->getValue());
-        $this->assertSame('', $form['precedent']->getValue());
+        $this->assertSame((string) $deckId, self::field($form, 'deck_id')->getValue());
+        $this->assertSame('PHPUnit Leadership Tactics', self::field($form, 'name')->getValue());
+        $this->assertSame('Second version', self::field($form, 'descriptionMd')->getValue());
+        $this->assertSame('', self::field($form, 'precedent')->getValue());
 
         $form['name'] = 'PHPUnit Published';
         $form['descriptionMd'] = "Published **deck**";
@@ -244,7 +245,7 @@ class DeckWorkflowTest extends WebTestCase {
         $location = self::location($client->getResponse());
         $this->assertRegExp('#^/decklist/view/(\d+)/phpunitpublished-1\.0$#', $location);
         preg_match('#/view/(\d+)/#', $location, $matches);
-        $decklistId = (int) $matches[1];
+        $decklistId = (int) ($matches[1] ?? 0);
 
         $decklist = $this->db($client)->fetchAssoc(
             'SELECT name, name_canonical, version, description_md, description_html, user_id, parent_deck_id, precedent_decklist_id, nb_votes, nb_favorites, nb_comments

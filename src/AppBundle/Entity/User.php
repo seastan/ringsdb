@@ -718,14 +718,14 @@ class User extends BaseUser {
     }
 
     /**
-     * @var string
+     * @var string|null
      */
     private $artPreferences;
 
     /**
      * Set artPreferences (JSON map of card code => preferred pack code)
      *
-     * @param string $artPreferences
+     * @param string|null $artPreferences
      *
      * @return User
      */
@@ -738,7 +738,7 @@ class User extends BaseUser {
     /**
      * Get artPreferences
      *
-     * @return string
+     * @return string|null
      */
     public function getArtPreferences() {
         return $this->artPreferences;

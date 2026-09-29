@@ -16,6 +16,8 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Doctrine\ORM\EntityManager;
 
 class BuilderController extends Controller {
+    use CurrentUserTrait;
+
 
     /**
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
@@ -31,7 +33,7 @@ class BuilderController extends Controller {
         $deck->setLastPack(null);
         $deck->setProblem('too_few_heroes');
         $deck->setTags('');
-        $deck->setUser($this->getUser());
+        $deck->setUser($this->currentUser());
 
         $em->persist($deck);
         $em->flush();
@@ -54,7 +56,7 @@ class BuilderController extends Controller {
             throw new NotFoundHttpException("This deck doesn't exist.");
         }
 
-        if ($this->getUser()->getId() != $deck->getUser()->getId()) {
+        if ($this->currentUser()->getId() != $deck->getUser()->getId()) {
             throw new AccessDeniedHttpException("You are not allowed to view this deck.");
         }
 
@@ -99,7 +101,7 @@ class BuilderController extends Controller {
     public function importAction() {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         return $this->render('AppBundle:Builder:directimport.html.twig', [
             'pagetitle' => "Import a deck",
@@ -183,10 +185,8 @@ class BuilderController extends Controller {
 
             if (preg_match('/^\s*([\pLl\pLu\pN\-\.\'\!\: ]+)\(?([^\)]*)\)?/u', $line, $matches)) {
                 $name = trim($matches[1]);
-
-                if (isset($matches[2])) {
-                    $pack_name = trim($matches[2]);
-                }
+                // the pack name, empty when absent
+                $pack_name = trim($matches[2]);
             }
 
             $card = null;
@@ -438,7 +438,7 @@ class BuilderController extends Controller {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $user \AppBundle\Entity\User */
-        $user = $this->getUser();
+        $user = $this->currentUser();
         if (count($user->getDecks()) > $user->getMaxNbDecks()) {
             throw new UnprocessableEntityHttpException('You have reached the maximum number of decks allowed. Delete some decks or increase your reputation.');
         }
@@ -501,7 +501,7 @@ class BuilderController extends Controller {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $user \AppBundle\Entity\User */
-        $user = $this->getUser();
+        $user = $this->currentUser();
         if (count($user->getDecks()) > $user->getMaxNbDecks()) {
             return new JsonResponse(['success' => false, 'error' => 'You have reached the maximum number of decks allowed.'], 422);
         }
@@ -558,7 +558,7 @@ class BuilderController extends Controller {
             return $this->redirect($this->generateUrl('decks_list'));
         }
 
-        if ($this->getUser()->getId() != $deck->getUser()->getId()) {
+        if ($this->currentUser()->getId() != $deck->getUser()->getId()) {
             throw new AccessDeniedHttpException("You don't have access to this deck.");
         }
 
@@ -593,7 +593,7 @@ class BuilderController extends Controller {
                 continue;
             }
 
-            if ($this->getUser()->getId() != $deck->getUser()->getId()) {
+            if ($this->currentUser()->getId() != $deck->getUser()->getId()) {
                 continue;
             }
 
@@ -657,7 +657,7 @@ class BuilderController extends Controller {
      */
     public function listAction(Request $request) {
         /* @var $user \AppBundle\Entity\User */
-        $user = $this->getUser();
+        $user = $this->currentUser();
         $decksService = $this->get('decks');
 
         $showAll = (bool) $request->query->get('all', false);
@@ -775,7 +775,7 @@ class BuilderController extends Controller {
                     continue;
                 }
 
-                if ($this->getUser()->getId() != $deck->getUser()->getId()) {
+                if ($this->currentUser()->getId() != $deck->getUser()->getId()) {
                     continue;
                 }
 
@@ -875,7 +875,7 @@ class BuilderController extends Controller {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $user \AppBundle\Entity\User */
-        $user = $this->getUser();
+        $user = $this->currentUser();
 
         $deck_id = $request->get('deck_id');
 
@@ -890,13 +890,18 @@ class BuilderController extends Controller {
             throw new AccessDeniedHttpException("You don't have access to this deck.");
         }
 
-        $diff = (array) json_decode($request->get('diff'));
-        if (count($diff) != 4 && count($diff) != 2) {
-            $this->get('logger')->error("cannot use diff", $diff);
+        // decoded as arrays: count() of an object is a warning since PHP 7.2
+        $diff = json_decode((string) $request->get('diff'), true);
+        if (!is_array($diff) || (count($diff) != 4 && count($diff) != 2)) {
+            $this->get('logger')->error("cannot use diff", (array) $diff);
             throw new UnprocessableEntityHttpException("Wrong content " . json_encode($diff));
         }
 
-        if (count($diff[0]) || count($diff[1]) || count($diff[2]) || count($diff[3])) {
+        // [main added, main removed, side added, side removed], the side parts may be missing
+        $parts = array_map(function ($part) {
+            return is_array($part) ? count($part) : 0;
+        }, $diff);
+        if (array_sum($parts) > 0) {
             /* @var $change \AppBundle\Entity\Deckchange */
             $change = new Deckchange();
             $change->setDeck($deck);

@@ -211,7 +211,7 @@ class ReviewController extends Controller {
     public function listAction($page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         $limit = 5;
         if ($page < 1) {
@@ -282,7 +282,7 @@ class ReviewController extends Controller {
     public function byauthorAction($user_id, $page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->getParameter('cache_expiration'));
 
         $limit = 5;
         if ($page < 1) {
