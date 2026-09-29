@@ -6,6 +6,9 @@ use AppBundle\Entity\Deck;
 use AppBundle\Entity\Decklist;
 
 class TwigExtension extends \Twig_Extension {
+    /**
+     * @return string
+     */
     public function getName() {
         return "Twig instance of";
     }

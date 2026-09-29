@@ -34,7 +34,7 @@ class Decklistsideslot implements \AppBundle\Model\SlotInterface {
      *
      * @param integer $quantity
      *
-     * @return Decklistslot
+     * @return Decklistsideslot
      */
     public function setQuantity($quantity) {
         $this->quantity = $quantity;
@@ -56,9 +56,9 @@ class Decklistsideslot implements \AppBundle\Model\SlotInterface {
      *
      * @param \AppBundle\Entity\Decklist $decklist
      *
-     * @return Decklistslot
+     * @return Decklistsideslot
      */
-    public function setDecklist(\AppBundle\Entity\Decklist $decklist = null) {
+    public function setDecklist(\AppBundle\Entity\Decklist $decklist) {
         $this->decklist = $decklist;
 
         return $this;
@@ -78,9 +78,9 @@ class Decklistsideslot implements \AppBundle\Model\SlotInterface {
      *
      * @param \AppBundle\Entity\Card $card
      *
-     * @return Decklistslot
+     * @return Decklistsideslot
      */
-    public function setCard(\AppBundle\Entity\Card $card = null) {
+    public function setCard(\AppBundle\Entity\Card $card) {
         $this->card = $card;
 
         return $this;

@@ -10,6 +10,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 class SuggestionsCommand extends ContainerAwareCommand {
+    /**
+     * @return void
+     */
     protected function configure() {
         $this
             ->setName('app:suggestions')
@@ -24,8 +27,14 @@ class SuggestionsCommand extends ContainerAwareCommand {
         file_put_contents($webdir . "/suggestions.json", json_encode($suggestions));
 
         $output->writeln('done');
+
+        return 0;
     }
 
+    /**
+     * @param mixed $arr
+     * @return array
+     */
     private function getAllPairs($arr) {
         $pairs = [];
         for ($i = 0; $i < count($arr); $i++) {
@@ -43,6 +52,7 @@ class SuggestionsCommand extends ContainerAwareCommand {
      * are seen together in a deck
      * also returns an array of card codes
      * x and y are private indexes, not card.id
+     * @return array
      */
     private function getSuggestions() {
         $matrix = [];

@@ -61,7 +61,7 @@ class FellowshipDecklist {
      *
      * @return FellowshipDecklist
      */
-    public function setFellowship(\AppBundle\Entity\Fellowship $fellowship = null) {
+    public function setFellowship(\AppBundle\Entity\Fellowship $fellowship) {
         $this->fellowship = $fellowship;
 
         return $this;
@@ -74,19 +74,6 @@ class FellowshipDecklist {
      */
     public function getFellowship() {
         return $this->fellowship;
-    }
-
-    /**
-     * Set decklist
-     *
-     * @param \AppBundle\Entity\Decklist $decklist
-     *
-     * @return FellowshipDecklist
-     */
-    public function setDeck(\AppBundle\Entity\Decklist $decklist = null) {
-        $this->decklist = $decklist;
-
-        return $this;
     }
 
     /**
@@ -105,7 +92,7 @@ class FellowshipDecklist {
      *
      * @return FellowshipDecklist
      */
-    public function setDecklist(\AppBundle\Entity\Decklist $decklist = null) {
+    public function setDecklist(\AppBundle\Entity\Decklist $decklist) {
         $this->decklist = $decklist;
 
         return $this;

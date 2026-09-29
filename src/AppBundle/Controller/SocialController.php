@@ -21,6 +21,8 @@ class SocialController extends Controller {
     /**
      * Checks to see if a deck can be published in its current saved state
      * If it is, displays the decklist edit form for initial publication of a deck
+     * @param mixed $deck_id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function publishFormAction($deck_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
@@ -80,7 +82,7 @@ class SocialController extends Controller {
             'side' => $deck->getSideslots()->getContent(),
         ];
 
-        $new_content = json_encode($content);
+        $new_content = (string) json_encode($content);
         $new_signature = md5($new_content);
         $old_decklists = $this->getDoctrine()->getRepository('AppBundle:Decklist')->findBy([ 'signature' => $new_signature ]);
 
@@ -113,6 +115,7 @@ class SocialController extends Controller {
 
     /**
      * creates a new decklist from a deck (publish action)
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function createAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
@@ -147,6 +150,9 @@ class SocialController extends Controller {
 
         /* @var $deck \AppBundle\Entity\Deck */
         $deck = $this->getDoctrine()->getRepository('AppBundle:Deck')->find($deck_id);
+        if (!$deck) {
+            throw new BadRequestHttpException("Invalid deck_id.");
+        }
         if ($user->getId() !== $deck->getUser()->getId()) {
             throw $this->createAccessDeniedException("Access denied to this object.");
         }
@@ -188,6 +194,8 @@ class SocialController extends Controller {
 
     /**
      * Displays the decklist edit form
+     * @param mixed $decklist_id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function editFormAction($decklist_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
@@ -218,6 +226,10 @@ class SocialController extends Controller {
     /*
      * save the name and description of a decklist by its publisher
      */
+    /**
+     * @param mixed $decklist_id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function saveAction($decklist_id, Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -236,7 +248,7 @@ class SocialController extends Controller {
             throw $this->createAccessDeniedException("Access denied");
         }
 
-        $name = trim(filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = "Untitled";
@@ -271,6 +283,8 @@ class SocialController extends Controller {
 
     /**
      * deletes a decklist if it has no comment, no vote, no favorite
+     * @param mixed $decklist_id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($decklist_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
@@ -312,6 +326,9 @@ class SocialController extends Controller {
         ]));
     }
 
+    /**
+     * @return string
+     */
     private function searchForm(Request $request) {
         $dbh = $this->getDoctrine()->getConnection();
 
@@ -435,6 +452,10 @@ class SocialController extends Controller {
         return $this->renderView('AppBundle:Search:form.html.twig', $params);
     }
 
+    /**
+     * @param mixed $username
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function byauthorAction($username) {
         return $this->redirect($this->generateUrl('decklists_list', ['type' => 'find', 'author' => $username]));
     }
@@ -442,13 +463,18 @@ class SocialController extends Controller {
     /*
 	 * displays the lists of decklists
 	 */
+    /**
+     * @param mixed $type
+     * @param int $page
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function listAction($type, $page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
 
         /**
-         * @var $decklist_manager DecklistManager
+         * @var DecklistManager $decklist_manager
          */
         $decklist_manager = $this->get('decklist_manager');
         $decklist_manager->setLimit(30);
@@ -487,7 +513,7 @@ class SocialController extends Controller {
                 break;
 
             case 'recent':
-                $paginator = $decklist_manager->findDecklistsByAge(false);
+                $paginator = $decklist_manager->findDecklistsByAge();
                 $pagetitle = "Recent Decklists";
                 break;
 
@@ -524,6 +550,10 @@ class SocialController extends Controller {
     /*
 	 * displays the content of a decklist along with comments, siblings, similar, etc.
 	 */
+    /**
+     * @param mixed $decklist_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function viewAction($decklist_id) {
         $response = new Response();
         $response->setPublic();
@@ -535,7 +565,7 @@ class SocialController extends Controller {
         }
 
         $duplicate = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->findOneBy(['signature' => $decklist->getSignature()]);
-        if ($duplicate->getDateCreation() >= $decklist->getDateCreation() || $duplicate->getId() === $decklist->getId()) {
+        if (!$duplicate || $duplicate->getDateCreation() >= $decklist->getDateCreation() || $duplicate->getId() === $decklist->getId()) {
             $duplicate = null;
         }
 
@@ -546,7 +576,7 @@ class SocialController extends Controller {
 
         $commenters[] = $decklist->getUser()->getUsername();
 
-        $versions = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->findBy(['parent' => $decklist->getParent()], ['version' => 'DESC']);
+        $versions = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->findBy(['parent' => $decklist->getParent()], ['version' => 'DESC', 'id' => 'DESC']);
 
         return $this->render('AppBundle:Decklist:decklist.html.twig', [
             'pagetitle' => $decklist->getName(),
@@ -560,6 +590,9 @@ class SocialController extends Controller {
     /*
 	 * adds a decklist to a user's list of favorites
 	 */
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function favoriteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -612,6 +645,9 @@ class SocialController extends Controller {
     /*
 	 * records a user's comment
 	 */
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function commentAction(Request $request) {
         /* @var $user User */
         $user = $this->getUser();
@@ -621,10 +657,13 @@ class SocialController extends Controller {
 
         $decklist_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         $decklist = $this->getDoctrine()->getRepository('AppBundle:Decklist')->find($decklist_id);
+        if (!$decklist instanceof Decklist) {
+            throw new BadRequestHttpException('Wrong decklist id');
+        }
 
         $comment_text = trim($request->get('comment'));
-        if ($decklist && !empty($comment_text)) {
-            $comment_text = preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $comment_text);
+        if (!empty($comment_text)) {
+            $comment_text = (string) preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $comment_text);
 
             $mentionned_usernames = [];
             $matches = [];
@@ -653,9 +692,7 @@ class SocialController extends Controller {
             // send emails
             $spool = [];
             if ($decklist->getUser()->getIsNotifAuthor()) {
-                if (!isset($spool[$decklist->getUser()->getEmail()])) {
-                    $spool[$decklist->getUser()->getEmail()] = 'AppBundle:Emails:newcomment_author.html.twig';
-                }
+                $spool[$decklist->getUser()->getEmail()] = 'AppBundle:Emails:newcomment_author.html.twig';
             }
             foreach ($decklist->getComments() as $comment) {
                 /* @var $comment Comment */
@@ -699,6 +736,11 @@ class SocialController extends Controller {
     /*
      * hides a comment, or if $hidden is false, unhide a comment
      */
+    /**
+     * @param mixed $comment_id
+     * @param mixed $hidden
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function hidecommentAction($comment_id, $hidden) {
         /* @var $user User */
         $user = $this->getUser();
@@ -727,6 +769,9 @@ class SocialController extends Controller {
     /*
 	 * records a user's vote
 	 */
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function voteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -740,6 +785,10 @@ class SocialController extends Controller {
 
         /* @var $decklist \AppBundle\Entity\Decklist */
         $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
+
+        if (!$decklist instanceof Decklist) {
+            throw new BadRequestHttpException('Unable to find deck');
+        }
 
         if ($decklist->getUser()->getId() != $user->getId()) {
             $query = $em->getRepository('AppBundle:Decklist')
@@ -769,66 +818,12 @@ class SocialController extends Controller {
     }
 
     /*
-	 * (unused) returns an ordered list of decklists similar to the one given
-	 */
-    public function findSimilarDecklists($decklist_id, $number) {
-        $dbh = $this->getDoctrine()->getConnection();
-
-        $list = $dbh->executeQuery("SELECT
-    			l.id,
-    			(
-    				SELECT COUNT(s.id)
-    				FROM decklistslot s
-    				WHERE (
-    					s.decklist_id = l.id
-    					AND s.card_id NOT IN (
-    						SELECT t.card_id
-    						FROM decklistslot t
-    						WHERE t.decklist_id = ?
-    					)
-    				) OR (
-    					s.decklist_id = ?
-    					AND s.card_id NOT IN (
-    						SELECT t.card_id
-    						FROM decklistslot t
-    						WHERE t.decklist_id=l.id
-    					)
-			    	)
-    			) difference
-     			FROM decklist l
-    			WHERE l.id != ?
-    			ORDER BY difference ASC
-    			LIMIT 0, $number", [
-            $decklist_id,
-            $decklist_id,
-            $decklist_id
-        ])->fetchAll();
-
-        $arr = [];
-        foreach ($list as $item) {
-            $dbh = $this->getDoctrine()->getConnection();
-            $rows = $dbh->executeQuery("SELECT
-					d.id,
-					d.name,
-					d.name_canonical,
-					d.nb_votes,
-					d.nb_favorites,
-					d.nb_comments
-					FROM decklist d
-					WHERE d.id = ?", [
-                $item["id"]
-            ])->fetchAll();
-
-            $decklist = $rows[0];
-            $arr[] = $decklist;
-        }
-
-        return $arr;
-    }
-
-    /*
 	 * returns a text file with the content of a decklist
 	 */
+    /**
+     * @param mixed $decklist_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function textexportAction($decklist_id) {
         $response = new Response();
         $response->setPublic();
@@ -861,6 +856,10 @@ class SocialController extends Controller {
     /*
 	 * returns a octgn file with the content of a decklist
 	 */
+    /**
+     * @param mixed $decklist_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function octgnexportAction($decklist_id) {
         $response = new Response();
         $response->setPublic();
@@ -889,141 +888,9 @@ class SocialController extends Controller {
         return $response;
     }
 
-    public function usercommentsAction($page, Request $request) {
-        $response = new Response();
-        $response->setPrivate();
-
-        /* @var $user \AppBundle\Entity\User */
-        $user = $this->getUser();
-
-        $limit = 100;
-        if ($page < 1) {
-            $page = 1;
-        }
-        $start = ($page - 1) * $limit;
-
-        /* @var $dbh \Doctrine\DBAL\Connection */
-        $dbh = $this->getDoctrine()->getConnection();
-
-        $comments = $dbh->executeQuery("SELECT SQL_CALC_FOUND_ROWS
-				c.id,
-				c.text,
-				c.date_creation,
-				d.id decklist_id,
-				d.name decklist_name,
-				d.name_canonical decklist_name_canonical
-				FROM comment c
-				JOIN decklist d ON c.decklist_id = d.id
-				WHERE c.user_id = ?
-				ORDER BY date_creation DESC
-				LIMIT $start, $limit", [
-            $user->getId()
-        ])->fetchAll(\PDO::FETCH_ASSOC);
-
-        $maxcount = $dbh->executeQuery("SELECT FOUND_ROWS()")->fetch(\PDO::FETCH_NUM)[0];
-
-        // pagination : calcul de nbpages // currpage // prevpage // nextpage
-        // à partir de $start, $limit, $count, $maxcount, $page
-
-        $currpage = $page;
-        $prevpage = max(1, $currpage - 1);
-        $nbpages = min(10, ceil($maxcount / $limit));
-        $nextpage = min($nbpages, $currpage + 1);
-
-        $route = $request->get('_route');
-
-        $pages = [];
-        for ($page = 1; $page <= $nbpages; $page++) {
-            $pages[] = [
-                "numero" => $page,
-                "url" => $this->generateUrl($route, [
-                    "page" => $page
-                ]),
-                "current" => $page == $currpage
-            ];
-        }
-
-        return $this->render('AppBundle:Default:usercomments.html.twig', [
-            'user' => $user,
-            'comments' => $comments,
-            'url' => $request->getRequestUri(),
-            'route' => $route,
-            'pages' => $pages,
-            'prevurl' => $currpage == 1 ? null : $this->generateUrl($route, [
-                "page" => $prevpage
-            ]),
-            'nexturl' => $currpage == $nbpages ? null : $this->generateUrl($route, [
-                "page" => $nextpage
-            ])
-        ], $response);
-    }
-
-    public function commentsAction($page, Request $request) {
-        $response = new Response();
-        $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
-
-        $limit = 100;
-        if ($page < 1) {
-            $page = 1;
-        }
-        $start = ($page - 1) * $limit;
-
-        /* @var $dbh \Doctrine\DBAL\Connection */
-        $dbh = $this->getDoctrine()->getConnection();
-
-        $comments = $dbh->executeQuery("SELECT SQL_CALC_FOUND_ROWS
-				c.id,
-				c.text,
-				c.date_creation,
-				d.id decklist_id,
-				d.name decklist_name,
-				d.name_canonical decklist_name_canonical,
-				u.id user_id,
-				u.username author
-				FROM comment c
-				JOIN decklist d on c.decklist_id = d.id
-				JOIN user u on c.user_id = u.id
-				ORDER BY date_creation DESC
-				LIMIT $start, $limit", [])->fetchAll(\PDO::FETCH_ASSOC);
-
-        $maxcount = $dbh->executeQuery("SELECT FOUND_ROWS()")->fetch(\PDO::FETCH_NUM)[0];
-
-        // pagination : calcul de nbpages // currpage // prevpage // nextpage
-        // à partir de $start, $limit, $count, $maxcount, $page
-
-        $currpage = $page;
-        $prevpage = max(1, $currpage - 1);
-        $nbpages = min(10, ceil($maxcount / $limit));
-        $nextpage = min($nbpages, $currpage + 1);
-
-        $route = $request->get('_route');
-
-        $pages = [];
-        for ($page = 1; $page <= $nbpages; $page++) {
-            $pages[] = [
-                "numero" => $page,
-                "url" => $this->generateUrl($route, [
-                    "page" => $page
-                ]),
-                "current" => $page == $currpage
-            ];
-        }
-
-        return $this->render('AppBundle:Default:allcomments.html.twig', [
-            'comments' => $comments,
-            'url' => $request->getRequestUri(),
-            'route' => $route,
-            'pages' => $pages,
-            'prevurl' => $currpage == 1 ? null : $this->generateUrl($route, [
-                "page" => $prevpage
-            ]),
-            'nexturl' => $currpage == $nbpages ? null : $this->generateUrl($route, [
-                "page" => $nextpage
-            ])
-        ], $response);
-    }
-
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function searchAction(Request $request) {
         $response = new Response();
         $response->setPublic();
@@ -1130,6 +997,9 @@ class SocialController extends Controller {
         ], $response);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function patronsAction() {
         $response = new Response();
         $response->setPublic();

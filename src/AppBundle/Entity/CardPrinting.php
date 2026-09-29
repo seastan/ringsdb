@@ -474,7 +474,7 @@ class CardPrinting {
      *
      * @return CardPrinting
      */
-    public function setCard(\AppBundle\Entity\Card $card = null) {
+    public function setCard(\AppBundle\Entity\Card $card) {
         $this->card = $card;
 
         return $this;
@@ -496,7 +496,7 @@ class CardPrinting {
      *
      * @return CardPrinting
      */
-    public function setPack(\AppBundle\Entity\Pack $pack = null) {
+    public function setPack(\AppBundle\Entity\Pack $pack) {
         $this->pack = $pack;
 
         return $this;

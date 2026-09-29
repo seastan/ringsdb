@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use AppBundle\Entity\Type;
 use AppBundle\Form\TypeType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 /**
  * Type controller.
@@ -16,6 +17,7 @@ class TypeController extends Controller {
     /**
      * Lists all Type entities.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction() {
         $em = $this->getDoctrine()->getManager();
@@ -30,6 +32,7 @@ class TypeController extends Controller {
     /**
      * Creates a new Type entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function createAction(Request $request) {
         $entity = new Type();
@@ -55,10 +58,10 @@ class TypeController extends Controller {
      *
      * @param Type $entity The entity
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createCreateForm(Type $entity) {
-        $form = $this->createForm(new TypeType(), $entity, [
+        $form = $this->createForm(TypeType::class, $entity, [
             'action' => $this->generateUrl('admin_type_create'),
             'method' => 'POST',
         ]);
@@ -69,6 +72,7 @@ class TypeController extends Controller {
     /**
      * Displays a form to create a new Type entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function newAction() {
         $entity = new Type();
@@ -83,6 +87,8 @@ class TypeController extends Controller {
     /**
      * Finds and displays a Type entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -104,6 +110,8 @@ class TypeController extends Controller {
     /**
      * Displays a form to edit an existing Type entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -129,15 +137,15 @@ class TypeController extends Controller {
      *
      * @param Type $entity The entity
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createEditForm(Type $entity) {
-        $form = $this->createForm(new TypeType(), $entity, [
+        $form = $this->createForm(TypeType::class, $entity, [
             'action' => $this->generateUrl('admin_type_update', ['id' => $entity->getId()]),
             'method' => 'PUT',
         ]);
 
-        $form->add('submit', 'submit', ['label' => 'Update']);
+        $form->add('submit', SubmitType::class, ['label' => 'Update']);
 
         return $form;
     }
@@ -145,6 +153,8 @@ class TypeController extends Controller {
     /**
      * Edits an existing Type entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
@@ -175,6 +185,8 @@ class TypeController extends Controller {
     /**
      * Deletes a Type entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, $id) {
         $form = $this->createDeleteForm($id);
@@ -200,7 +212,7 @@ class TypeController extends Controller {
      *
      * @param mixed $id The entity id
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createDeleteForm($id) {
         return $this->createFormBuilder()

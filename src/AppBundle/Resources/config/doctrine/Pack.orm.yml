@@ -63,3 +63,6 @@ AppBundle\Entity\Pack:
     uniqueConstraints:
         pack_code_idx:
             columns: [ code ]
+    indexes:
+        idx_pack_date_release:
+            columns: [date_release]

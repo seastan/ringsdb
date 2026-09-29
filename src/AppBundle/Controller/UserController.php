@@ -12,6 +12,12 @@ class UserController extends Controller {
     /*
 	 * displays details about a user and the list of decklists he published
 	 */
+    /**
+     * @param mixed $user_id
+     * @param mixed $user_name
+     * @param mixed $page
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function publicProfileAction($user_id, $user_name, $page, Request $request) {
         $response = new Response();
         $response->setPublic();
@@ -31,6 +37,9 @@ class UserController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function editProfileAction() {
         $user = $this->getUser();
 
@@ -42,6 +51,9 @@ class UserController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function saveProfileAction(Request $request) {
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
@@ -96,6 +108,9 @@ class UserController extends Controller {
         return $response;
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function infoAction(Request $request) {
         $jsonp = $request->query->get('jsonp');
 
@@ -106,8 +121,7 @@ class UserController extends Controller {
 
         $content = null;
 
-        $securityContext = $this->container->get('security.context');
-        if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+        if ($this->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $user = $this->getUser();
             $user_id = $user->getId();
 
@@ -257,7 +271,12 @@ class UserController extends Controller {
         return $response;
     }
 
+    /**
+     * @param mixed $username
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function remindAction($username) {
+        /** @var \AppBundle\Entity\User|null $user */
         $user = $this->get('fos_user.user_manager')->findUserByUsername($username);
         if (!$user) {
             throw new NotFoundHttpException("Cannot find user from username [$username]");

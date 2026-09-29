@@ -1,0 +1,5 @@
+# Test snapshots are compared byte for byte (the text exports use CRLF line endings):
+# store them as is, without line ending conversion.
+src/AppBundle/Tests/Resources/snapshots/** -text
+# Import samples: the CSV import tells rows (CRLF) from line breaks in the texts (LF)
+src/AppBundle/Tests/Resources/fixtures/** -text

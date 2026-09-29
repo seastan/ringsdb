@@ -7,14 +7,19 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Request;
+use AppBundle\Entity\Card;
 use AppBundle\Entity\Deck;
 use AppBundle\Entity\Deckchange;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Doctrine\ORM\EntityManager;
 
 class BuilderController extends Controller {
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function newAction() {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -34,6 +39,10 @@ class BuilderController extends Controller {
         return $this->redirect($this->get('router')->generate('deck_edit', ['deck_id' => $deck->getId()]));
     }
 
+    /**
+     * @param mixed $deck_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function editAction($deck_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -55,6 +64,10 @@ class BuilderController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $deck_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function viewAction($deck_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -80,6 +93,9 @@ class BuilderController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function importAction() {
         $response = new Response();
         $response->setPublic();
@@ -90,6 +106,9 @@ class BuilderController extends Controller {
         ], $response);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function fileimportAction(Request $request) {
         $filetype = filter_var($request->get('type'), FILTER_SANITIZE_STRING);
         $uploadedFile = $request->files->get('upfile');
@@ -105,9 +124,10 @@ class BuilderController extends Controller {
         if (function_exists("finfo_open")) {
             // return mime type ala mimetype extension
             $finfo = finfo_open(FILEINFO_MIME);
+            $mime = $finfo !== false ? (string) finfo_file($finfo, $filename) : '';
 
             // check to see if the mime-type starts with 'text'
-            $is_text = substr(finfo_file($finfo, $filename), 0, 4) == 'text' || substr(finfo_file($finfo, $filename), 0, 15) == "application/xml";
+            $is_text = substr($mime, 0, 4) == 'text' || substr($mime, 0, 15) == "application/xml";
             if (!$is_text) {
                 throw new UnprocessableEntityHttpException("Bad file");
             }
@@ -126,6 +146,10 @@ class BuilderController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $text
+     * @return array
+     */
     public function parseTextImport($text) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -178,11 +202,13 @@ class BuilderController extends Controller {
             }
 
             if ($pack) {
-                /* @var $pack \AppBundle\Entity\Card */
-                $card = $em->getRepository('AppBundle:Card')->findOneBy([
-                    'name' => $name,
-                    'pack' => $pack
-                ]);
+                // a card belongs to its packs through its printings
+                /* @var $card \AppBundle\Entity\Card */
+                $card = $em->createQuery('SELECT c FROM AppBundle:Card c JOIN c.printings p WHERE c.name = :name AND p.pack = :pack ORDER BY c.code')
+                    ->setParameter('name', $name)
+                    ->setParameter('pack', $pack)
+                    ->setMaxResults(1)
+                    ->getOneOrNullResult();
             } else {
                 /* @var $pack \AppBundle\Entity\Card */
                 $card = $em->getRepository('AppBundle:Card')->findOneBy([
@@ -205,6 +231,32 @@ class BuilderController extends Controller {
         ];
     }
 
+    /**
+     * The card of a printing, by its octgnid. The Messenger of the King version of a hero has the
+     * octgnid of the hero: the original card (the lowest id) is chosen, as before the printings
+     * refactor.
+     *
+     * @param string $octgnid
+     */
+    private function findCardByOctgnid(EntityManager $em, $octgnid): ?Card {
+        $printing = $em->createQueryBuilder()
+            ->select('cp')
+            ->from('AppBundle:CardPrinting', 'cp')
+            ->join('cp.card', 'c')
+            ->where('cp.octgnid = :octgnid')
+            ->setParameter('octgnid', $octgnid)
+            ->orderBy('c.id', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $printing ? $printing->getCard() : null;
+    }
+
+    /**
+     * @param mixed $octgn
+     * @return array
+     */
     public function parseOctgnImport($octgn) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -217,11 +269,13 @@ class BuilderController extends Controller {
         $sideoctgnids = [];
 
         $cardcrawler = $crawler->filter('deck > section[name!="Sideboard"] > card');
+        /** @var \DOMElement $domElement */
         foreach ($cardcrawler as $domElement) {
             $octgnids[$domElement->getAttribute('id')] = intval($domElement->getAttribute('qty'));
         }
 
         $cardcrawler = $crawler->filter('deck > section[name="Sideboard"] > card');
+        /** @var \DOMElement $domElement */
         foreach ($cardcrawler as $domElement) {
             $sideoctgnids[$domElement->getAttribute('id')] = intval($domElement->getAttribute('qty'));
         }
@@ -229,27 +283,27 @@ class BuilderController extends Controller {
         // read desc
         $desccrawler = $crawler->filter('deck > notes');
         $descriptions = [];
+        /** @var \DOMElement $domElement */
         foreach ($desccrawler as $domElement) {
             $descriptions[] = $domElement->nodeValue;
         }
 
         $content = [];
         foreach ($octgnids as $octgnid => $qty) {
-            /* @var $pack \AppBundle\Entity\Card */
-            $card = $em->getRepository('AppBundle:Card')->findOneBy(['octgnid' => $octgnid]);
+            $card = $this->findCardByOctgnid($em, $octgnid);
 
             if ($card) {
-                $content[$card->getCode()] = $qty;
+                // several printings of a card can have their own octgnid
+                $content[$card->getCode()] = ($content[$card->getCode()] ?? 0) + $qty;
             }
         }
 
         $sidecontent = [];
         foreach ($sideoctgnids as $octgnid => $qty) {
-            /* @var $pack \AppBundle\Entity\Card */
-            $card = $em->getRepository('AppBundle:Card')->findOneBy(['octgnid' => $octgnid]);
+            $card = $this->findCardByOctgnid($em, $octgnid);
 
             if ($card) {
-                $sidecontent[$card->getCode()] = $qty;
+                $sidecontent[$card->getCode()] = ($sidecontent[$card->getCode()] ?? 0) + $qty;
             }
         }
 
@@ -264,6 +318,10 @@ class BuilderController extends Controller {
         ];
     }
 
+    /**
+     * @param mixed $deck_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function textexportAction($deck_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -296,6 +354,10 @@ class BuilderController extends Controller {
         return $response;
     }
 
+    /**
+     * @param mixed $deck_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function octgnexportAction($deck_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -327,6 +389,10 @@ class BuilderController extends Controller {
         return $response;
     }
 
+    /**
+     * @param mixed $deck_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function cloneAction($deck_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -364,6 +430,9 @@ class BuilderController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function saveAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -424,6 +493,9 @@ class BuilderController extends Controller {
         return $this->redirect($this->generateUrl('decks_list'));
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function saveAjaxAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -447,9 +519,7 @@ class BuilderController extends Controller {
             }
 
             $source_deck = $deck;
-        }
-
-        if (!$id) {
+        } else {
             $deck = new Deck();
         }
 
@@ -473,6 +543,9 @@ class BuilderController extends Controller {
         return new JsonResponse(['success' => true, 'id' => $deck->getId()]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function deleteAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -504,6 +577,9 @@ class BuilderController extends Controller {
         return $this->redirect($this->generateUrl('decks_list'));
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function deleteListAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -533,6 +609,11 @@ class BuilderController extends Controller {
         return $this->redirect($this->generateUrl('decks_list'));
     }
 
+    /**
+     * @param mixed $deck1_id
+     * @param mixed $deck2_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function compareAction($deck1_id, $deck2_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -571,6 +652,9 @@ class BuilderController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function listAction(Request $request) {
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
@@ -612,6 +696,10 @@ class BuilderController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $decklist_id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function copyAction($decklist_id) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -643,23 +731,38 @@ class BuilderController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function octgnexportListAction(Request $request) {
         $list_id = $request->get('ids');
 
         return $this->downloadFromSelection($list_id, true);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function textexportListAction(Request $request) {
         $list_id = $request->get('ids');
 
         return $this->downloadFromSelection($list_id, false);
     }
 
+    /**
+     * @param mixed $list_id
+     * @param mixed $octgn
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function downloadFromSelection($list_id, $octgn) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
-        $file = tempnam("tmp", "zip");
+        $tmpDir = $this->getParameter('kernel.cache_dir');
+        $file = tempnam($tmpDir, "zip");
+        if ($file === false) {
+            throw new \RuntimeException("Cannot create a temporary file in $tmpDir");
+        }
         $zip = new \ZipArchive();
         $res = $zip->open($file, \ZipArchive::OVERWRITE);
 
@@ -696,7 +799,7 @@ class BuilderController extends Controller {
         }
         $response = new Response();
         $response->headers->set('Content-Type', 'application/zip');
-        $response->headers->set('Content-Length', filesize($file));
+        $response->headers->set('Content-Length', (string) filesize($file));
         $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->get('texts')->slugify('ringsdb') . '.zip'));
 
         $response->setContent(file_get_contents($file));
@@ -705,12 +808,15 @@ class BuilderController extends Controller {
         return $response;
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function uploadallAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
         // time-consuming task
-        ini_set('max_execution_time', 300);
+        ini_set('max_execution_time', '300');
 
         $uploadedFile = $request->files->get('uparchive');
         if (!isset($uploadedFile)) {
@@ -722,9 +828,10 @@ class BuilderController extends Controller {
         if (function_exists("finfo_open")) {
             // return mime type ala mimetype extension
             $finfo = finfo_open(FILEINFO_MIME);
+            $mime = $finfo !== false ? (string) finfo_file($finfo, $filename) : '';
 
             // check to see if the mime-type is 'zip'
-            if (substr(finfo_file($finfo, $filename), 0, 15) !== 'application/zip') {
+            if (substr($mime, 0, 15) !== 'application/zip') {
                 throw new UnprocessableEntityHttpException("Bad file");
             }
         }
@@ -733,7 +840,7 @@ class BuilderController extends Controller {
         $res = $zip->open($filename);
         if ($res === true) {
             for ($i = 0; $i < $zip->numFiles; $i++) {
-                $name = $zip->getNameIndex($i);
+                $name = (string) $zip->getNameIndex($i);
 
                 if (pathinfo($name, PATHINFO_EXTENSION) == 'o8d') {
                     $parse = $this->parseOctgnImport($zip->getFromIndex($i));
@@ -760,6 +867,9 @@ class BuilderController extends Controller {
         return $this->redirect($this->generateUrl('decks_list'));
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function autosaveAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -790,7 +900,7 @@ class BuilderController extends Controller {
             /* @var $change \AppBundle\Entity\Deckchange */
             $change = new Deckchange();
             $change->setDeck($deck);
-            $change->setVariation(json_encode($diff));
+            $change->setVariation((string) json_encode($diff));
             $change->setIsSaved(false);
             $em->persist($change);
             $em->flush();

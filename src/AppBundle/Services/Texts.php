@@ -2,11 +2,28 @@
 
 namespace AppBundle\Services;
 
-use Symfony\Component\Debug\Exception\ContextErrorException;
-
 class Texts {
-    public function __construct($root_dir) {
-        $config = \HTMLPurifier_Config::create(['Cache.SerializerPath' => $root_dir]);
+    /**
+     * @var \HTMLPurifier
+     */
+    private $purifier_service;
+
+    /**
+     * @var \Parsedown
+     */
+    private $markdown_service;
+
+    /**
+     * @param string $cache_dir where HTMLPurifier caches its definitions
+     */
+    public function __construct($cache_dir) {
+        // HTMLPurifier does not create its base cache directory, and warns if it is missing
+        if (!is_dir($cache_dir)) {
+            mkdir($cache_dir, 0775, true);
+        }
+        $config = \HTMLPurifier_Config::create(['Cache.SerializerPath' => $cache_dir]);
+        // raw definition: never null
+        /** @var \HTMLPurifier_HTMLDefinition $def */
         $def = $config->getHTMLDefinition(true);
         $def->addAttribute('a', 'data-code', 'Text');
         $this->purifier_service = new \HTMLPurifier($config);
@@ -15,41 +32,9 @@ class Texts {
     }
 
     /**
-     * Returns a substring of $string that is $max_length length max and doesn't split
-     * a word or a html tag
-     */
-    public function truncate($string, $max_length) {
-        $response = '';
-        $token = '';
-
-        $string = preg_replace('/\s+/', ' ', $string);
-
-        while (strlen($token . $string) > 0 && strlen($response . $token) < $max_length) {
-            $response = $response . $token;
-            $matches = [];
-
-            if (preg_match('/^(<.+?>)(.*)/', $string, $matches)) {
-                $token = $matches[1];
-                $string = $matches[2];
-            } else {
-                if (preg_match('/^([^\s]+\s*)(.*)/', $string, $matches)) {
-                    $token = $matches[1];
-                    $string = $matches[2];
-                } else {
-                    $token = $string;
-                    $string = '';
-                }
-            }
-        }
-        if (strlen($token) > 0) {
-            $response = $response . '[&hellip;]';
-        }
-
-        return $response;
-    }
-
-    /**
      * Returns the processed version of a markdown text
+     * @param mixed $string
+     * @return string
      */
     public function markdown($string) {
         return $this->purify($this->img_responsive($this->transform($string)));
@@ -58,7 +43,7 @@ class Texts {
     /**
      * removes any dangerous code from a HTML string
      *
-     * @param unknown $string
+     * @param mixed $string
      * @return string
      */
     public function purify($string) {
@@ -68,7 +53,7 @@ class Texts {
     /**
      * turns a Markdown string into a HTML string
      *
-     * @param unknown $string
+     * @param mixed $string
      * @return string
      */
     public function transform($string) {
@@ -78,7 +63,7 @@ class Texts {
     /**
      * adds class="img-responsive" to every <img> tag
      *
-     * @param unknown $string
+     * @param mixed $string
      * @return string
      */
     public function img_responsive($string) {
@@ -92,14 +77,12 @@ class Texts {
      * @return string
      */
     public function slugify($filename) {
-        $filename = preg_replace('[^\w\-]', '-', $filename);
-        try {
-            $filename = iconv('utf-8', 'us-ascii//TRANSLIT', $filename);
-        } catch (ContextErrorException $e)  {
-            $filename = iconv('utf-8', 'us-ascii//IGNORE', $filename);
-        }
-        $filename = preg_replace('/[^\w\-]/', '', $filename);
-        $filename = preg_replace('/\-+/', '-', $filename);
+        $filename = (string) preg_replace('[^\w\-]', '-', $filename);
+        // //TRANSLIT is not supported by every iconv implementation (e.g. musl on Alpine)
+        $ascii = @iconv('utf-8', 'us-ascii//TRANSLIT', $filename);
+        $filename = $ascii !== false ? $ascii : (string) preg_replace('/[^\x00-\x7F]/', '', $filename);
+        $filename = (string) preg_replace('/[^\w\-]/', '', $filename);
+        $filename = (string) preg_replace('/\-+/', '-', $filename);
         $filename = trim($filename, '-');
         $filename = strtolower($filename);
 

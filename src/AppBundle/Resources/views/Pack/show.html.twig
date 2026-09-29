@@ -42,7 +42,7 @@
         <a href="{{ path('admin_pack_edit', { 'id': entity.id }) }}" class="btn btn-default">
             Edit
         </a>
-        <form action="{{ path('admin_cycle_delete', { 'id': entity.id }) }}" method="post" style="display:inline-block">
+        <form action="{{ path('admin_pack_delete', { 'id': entity.id }) }}" method="post" style="display:inline-block">
             <input type="hidden" name="_method" value="DELETE" />
             {{ form_widget(delete_form) }}
             <button type="submit" class="btn btn-danger">Delete</button>

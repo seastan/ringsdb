@@ -227,6 +227,7 @@ class Cycle {
      * Remove pack
      *
      * @param \AppBundle\Entity\Pack $pack
+     * @return void
      */
     public function removePack(\AppBundle\Entity\Pack $pack) {
         $this->packs->removeElement($pack);

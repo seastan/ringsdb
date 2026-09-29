@@ -16,12 +16,14 @@ AppBundle\Entity\CardPrinting:
             joinColumn:
                 name: card_id
                 referencedColumnName: id
+                nullable: false
         pack:
             targetEntity: Pack
             inversedBy: printings
             joinColumn:
                 name: pack_id
                 referencedColumnName: id
+                nullable: false
     fields:
         id:
             type: integer

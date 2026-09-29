@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use AppBundle\Entity\Encounter;
 use AppBundle\Form\EncounterType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 /**
  * Encounter controller.
@@ -16,6 +17,7 @@ class EncounterController extends Controller {
     /**
      * Lists all Encounter entities.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction() {
         $em = $this->getDoctrine()->getManager();
@@ -30,11 +32,12 @@ class EncounterController extends Controller {
     /**
      * Creates a new Encounter entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function createAction(Request $request) {
         $entity = new Encounter();
-        $form = $this->createForm(new EncounterType(), $entity);
-        $form->bind($request);
+        $form = $this->createForm(EncounterType::class, $entity);
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
@@ -53,10 +56,11 @@ class EncounterController extends Controller {
     /**
      * Displays a form to create a new Encounter entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function newAction() {
         $entity = new Encounter();
-        $form = $this->createForm(new EncounterType(), $entity);
+        $form = $this->createForm(EncounterType::class, $entity);
 
         return $this->render('AppBundle:Encounter:new.html.twig', array(
             'entity' => $entity,
@@ -67,6 +71,8 @@ class EncounterController extends Controller {
     /**
      * Finds and displays a Encounter entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -88,6 +94,8 @@ class EncounterController extends Controller {
     /**
      * Displays a form to edit an existing Encounter entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -98,7 +106,7 @@ class EncounterController extends Controller {
             throw $this->createNotFoundException('Unable to find Encounter entity.');
         }
 
-        $editForm = $this->createForm(new EncounterType(), $entity);
+        $editForm = $this->createForm(EncounterType::class, $entity, ['method' => 'PUT']);
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('AppBundle:Encounter:edit.html.twig', [
@@ -111,6 +119,8 @@ class EncounterController extends Controller {
     /**
      * Edits an existing Encounter entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
@@ -122,8 +132,8 @@ class EncounterController extends Controller {
         }
 
         $deleteForm = $this->createDeleteForm($id);
-        $editForm = $this->createForm(new EncounterType(), $entity);
-        $editForm->bind($request);
+        $editForm = $this->createForm(EncounterType::class, $entity, ['method' => 'PUT']);
+        $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
             $em->persist($entity);
@@ -142,10 +152,12 @@ class EncounterController extends Controller {
     /**
      * Deletes a Encounter entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, $id) {
         $form = $this->createDeleteForm($id);
-        $form->bind($request);
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
@@ -167,11 +179,12 @@ class EncounterController extends Controller {
      *
      * @param mixed $id The entity id
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createDeleteForm($id) {
         return $this->createFormBuilder(array('id' => $id))
-            ->add('id', 'hidden')
+            ->add('id', HiddenType::class)
+            ->setMethod('DELETE')
             ->getForm();
     }
 }

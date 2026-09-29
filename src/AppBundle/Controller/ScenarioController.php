@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use AppBundle\Entity\Scenario;
 use AppBundle\Form\ScenarioType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 /**
  * Scenario controller.
@@ -16,6 +17,7 @@ class ScenarioController extends Controller {
     /**
      * Lists all Scenario entities.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction() {
         $em = $this->getDoctrine()->getManager();
@@ -30,19 +32,20 @@ class ScenarioController extends Controller {
     /**
      * Creates a new Scenario entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function createAction(Request $request) {
         $entity = new Scenario();
-        $form = $this->createForm(new ScenarioType(), $entity);
-        $form->bind($request);
+        $form = $this->createForm(ScenarioType::class, $entity);
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
 #            $texts = $this->getContainer()->get('texts');
 #            $entity->setCanonicalName($texts->slugify($entity->getName()));
             # Set defaults
             $entity->setNameCanonical('');
-            $entity->setHasEasy(1);
-            $entity->setHasNightmare(0);
+            $entity->setHasEasy(true);
+            $entity->setHasNightmare(false);
             
             $entity->setEasyCards(0);
 	        $entity->setEasyEnemies(0);
@@ -93,10 +96,11 @@ class ScenarioController extends Controller {
     /**
      * Displays a form to create a new Scenario entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function newAction() {
         $entity = new Scenario();
-        $form = $this->createForm(new ScenarioType(), $entity);
+        $form = $this->createForm(ScenarioType::class, $entity);
 
         return $this->render('AppBundle:Scenario:new.html.twig', array(
             'entity' => $entity,
@@ -107,6 +111,8 @@ class ScenarioController extends Controller {
     /**
      * Finds and displays a Scenario entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -128,6 +134,8 @@ class ScenarioController extends Controller {
     /**
      * Displays a form to edit an existing Scenario entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -138,7 +146,7 @@ class ScenarioController extends Controller {
             throw $this->createNotFoundException('Unable to find Scenario entity.');
         }
 
-        $editForm = $this->createForm(new ScenarioType(), $entity);
+        $editForm = $this->createForm(ScenarioType::class, $entity, ['method' => 'PUT']);
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('AppBundle:Scenario:edit.html.twig', [
@@ -151,6 +159,8 @@ class ScenarioController extends Controller {
     /**
      * Edits an existing Scenario entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
@@ -162,8 +172,8 @@ class ScenarioController extends Controller {
         }
 
         $deleteForm = $this->createDeleteForm($id);
-        $editForm = $this->createForm(new ScenarioType(), $entity);
-        $editForm->bind($request);
+        $editForm = $this->createForm(ScenarioType::class, $entity, ['method' => 'PUT']);
+        $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
 #            $texts = $this->getContainer()->get('texts');
@@ -185,10 +195,12 @@ class ScenarioController extends Controller {
     /**
      * Deletes a Scenario entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, $id) {
         $form = $this->createDeleteForm($id);
-        $form->bind($request);
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
@@ -210,11 +222,12 @@ class ScenarioController extends Controller {
      *
      * @param mixed $id The entity id
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createDeleteForm($id) {
         return $this->createFormBuilder(array('id' => $id))
-            ->add('id', 'hidden')
+            ->add('id', HiddenType::class)
+            ->setMethod('DELETE')
             ->getForm();
     }
 }

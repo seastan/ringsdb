@@ -117,6 +117,7 @@ class Card {
      * Remove printing
      *
      * @param \AppBundle\Entity\CardPrinting $printing
+     * @return void
      */
     public function removePrinting(\AppBundle\Entity\CardPrinting $printing) {
         $this->printings->removeElement($printing);
@@ -131,6 +132,9 @@ class Card {
         return $this->printings;
     }
 
+    /**
+     * @return mixed
+     */
     public function getPrimaryPrinting() {
         $primary = null;
         foreach ($this->printings as $p) {
@@ -240,11 +244,11 @@ class Card {
         return $this->name;
     }
 
+    /**
+     * @return string
+     */
     public function getAdminLabel() {
-        $parts = [];
-        if ($this->sphere) $parts[] = $this->sphere->getName();
-        if ($this->type)   $parts[] = $this->type->getName();
-        return $this->name . ($parts ? ' (' . implode(', ', $parts) . ')' : '');
+        return $this->name . ' (' . $this->sphere->getName() . ', ' . $this->type->getName() . ')';
     }
 
     /**
@@ -489,6 +493,9 @@ class Card {
         return $this->victory;
     }
 
+    /**
+     * @return mixed
+     */
     public function getQuantity() {
         $p = $this->getPrimaryPrinting();
         return $p ? $p->getQuantity() : null;
@@ -516,11 +523,17 @@ class Card {
         return $this->deckLimit;
     }
 
+    /**
+     * @return mixed
+     */
     public function getIllustrator() {
         $p = $this->getPrimaryPrinting();
         return $p ? $p->getIllustrator() : null;
     }
 
+    /**
+     * @return mixed
+     */
     public function getOctgnid() {
         $p = $this->getPrimaryPrinting();
         return $p ? $p->getOctgnid() : null;
@@ -587,6 +600,7 @@ class Card {
      * Remove review
      *
      * @param \AppBundle\Entity\Review $review
+     * @return void
      */
     public function removeReview(\AppBundle\Entity\Review $review) {
         $this->reviews->removeElement($review);
@@ -601,6 +615,9 @@ class Card {
         return $this->reviews;
     }
 
+    /**
+     * @return mixed
+     */
     public function getPack() {
         $p = $this->getPrimaryPrinting();
         return $p ? $p->getPack() : null;
@@ -613,7 +630,7 @@ class Card {
      *
      * @return Card
      */
-    public function setType(\AppBundle\Entity\Type $type = null) {
+    public function setType(\AppBundle\Entity\Type $type) {
         $this->type = $type;
 
         return $this;
@@ -635,7 +652,7 @@ class Card {
      *
      * @return Card
      */
-    public function setSphere(\AppBundle\Entity\Sphere $sphere = null) {
+    public function setSphere(\AppBundle\Entity\Sphere $sphere) {
         $this->sphere = $sphere;
 
         return $this;

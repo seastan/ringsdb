@@ -12,6 +12,11 @@ use AppBundle\Entity\Review;
 use AppBundle\Entity\Reviewcomment;
 
 class PatronCommand extends ContainerAwareCommand {
+    use StringInputTrait;
+
+    /**
+     * @return void
+     */
     protected function configure() {
         $this
             ->setName('app:patron')
@@ -29,8 +34,8 @@ class PatronCommand extends ContainerAwareCommand {
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
-        $email = $input->getArgument('email');
-        $donation = $input->getArgument('donation');
+        $email = self::stringArgument($input, 'email');
+        $donation = (int) $input->getArgument('donation');
 
         $em = $this->getContainer()->get('doctrine')->getManager();
         $repo = $em->getRepository('AppBundle:User');
@@ -51,5 +56,7 @@ class PatronCommand extends ContainerAwareCommand {
         } else {
             $output->writeln(date('c') . " " . "Cannot find user [$email]");
         }
+
+        return 0;
     }
 }

@@ -4,26 +4,29 @@ namespace AppBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 class ScenarioType extends AbstractType {
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
+     * @return void
      */
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder
             ->add('code')
             ->add('name')
             ->add('position')
-            ->add('pack', 'entity', array('class' => 'AppBundle:Pack', 'property' => 'name'))
-            ->add('encounters', 'entity', array('class' => 'AppBundle:Encounter', 'property' => 'name', 'expanded' => true, 'multiple' => true));
+            ->add('pack', EntityType::class, array('class' => 'AppBundle:Pack', 'choice_label' => 'name'))
+            ->add('encounters', EntityType::class, array('class' => 'AppBundle:Encounter', 'choice_label' => 'name', 'expanded' => true, 'multiple' => true));
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
+     * @return void
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver) {
+    public function configureOptions(OptionsResolver $resolver) {
         $resolver->setDefaults([
             'data_class' => 'AppBundle\Entity\Scenario'
         ]);
@@ -32,7 +35,7 @@ class ScenarioType extends AbstractType {
     /**
      * @return string
      */
-    public function getName() {
+    public function getBlockPrefix() {
         return 'appbundle_scenario';
     }
 }

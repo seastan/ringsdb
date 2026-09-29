@@ -3,7 +3,6 @@
 
 namespace AppBundle\Services;
 
-use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper;
@@ -13,9 +12,31 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  */
 class CardsData {
-	public function __construct(Registry $doctrine, RequestStack $request_stack, Router $router, AssetsHelper $assets_helper, $rootDir) {
+	/**
+	 * @var Registry
+	 */
+	private $doctrine;
+
+	/**
+	 * @var Router
+	 */
+	private $router;
+
+	/**
+	 * @var AssetsHelper
+	 */
+	private $assets_helper;
+
+	/**
+	 * @var string
+	 */
+	private $rootDir;
+
+	/**
+	 * @param mixed $rootDir
+	 */
+	public function __construct(Registry $doctrine, Router $router, AssetsHelper $assets_helper, $rootDir) {
 		$this->doctrine = $doctrine;
-		$this->request_stack = $request_stack;
 		$this->router = $router;
 		$this->assets_helper = $assets_helper;
 		$this->rootDir = $rootDir;
@@ -46,6 +67,10 @@ class CardsData {
 		return str_replace(array_keys($displayTextReplacements), array_values($displayTextReplacements), $text);
 	}
 
+	/**
+	 * @param mixed $text
+	 * @return string
+	 */
 	public function splitInParagraphs($text) {
 		if (empty($text)) {
 			return '';
@@ -53,9 +78,12 @@ class CardsData {
 
 		return implode(array_map(function($l) {
 			return "<p>$l</p>";
-		}, preg_split('/[\r?\n]+/', $text)));
+		}, preg_split('/[\r?\n]+/', $text) ?: []));
 	}
 
+	/**
+	 * @return array
+	 */
 	public function allSetsData() {
 		$list_cycles = $this->doctrine->getRepository('AppBundle:Cycle')->findBy([], ["position" => "ASC"]);
 		$cycles = [];
@@ -103,15 +131,24 @@ class CardsData {
 		return $cycles;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getPrimarySpheres() {
 		$spheres = $this->doctrine->getRepository('AppBundle:Sphere')->findBy(["is_primary" => true], ["code" => "ASC"]);
 
 		return $spheres;
 	}
 
+    /**
+     * @param mixed $conditions
+     * @param mixed $sortorder
+     * @param bool $forceempty
+     * @return array
+     */
     public function get_search_rows($conditions, $sortorder, $forceempty = false) {
         $i = 0;
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var \Doctrine\ORM\EntityManager $em */
         $em = $this->doctrine;
 
         $qb = $em->getRepository('AppBundle:Card')->createQueryBuilder('c');
@@ -253,8 +290,6 @@ class CardsData {
                                     $qb->setParameter($i++, $arg);
                                 } else {
                                     if ($acronym) {
-                                        $or[] = "(BINARY(c.name) like ?$i)";
-                                        $qb->setParameter($i++, "%$arg%");
                                         $like = implode('% ', str_split($arg));
                                         $or[] = "(REPLACE(c.name, '-', ' ') like ?$i)";
                                         $qb->setParameter($i++, "$like%");
@@ -413,8 +448,8 @@ class CardsData {
 	/**
 	 *
 	 * @param \AppBundle\Entity\Card $card
-	 * @param string $api
-	 * @return multitype:multitype: string number mixed NULL unknown
+	 * @param bool $api
+	 * @return array
 	 */
 	public function getCardInfo($card, $api = false) {
 		$cardinfo = [];
@@ -443,7 +478,6 @@ class CardsData {
 				case 'datetime':
 				case 'date':
 					continue 2;
-					break;
 				case 'boolean':
 					$value = (boolean)$value;
 					break;
@@ -517,6 +551,10 @@ class CardsData {
 		return $cardinfo;
 	}
 
+	/**
+	 * @param mixed $query
+	 * @return array
+	 */
 	public function syntax($query) {
 		// renvoie une liste de conditions (array)
 		// chaque condition est un tableau à n>1 éléments
@@ -526,7 +564,8 @@ class CardsData {
 		$query = preg_replace('/\s+/u', ' ', trim($query));
 
 		$list = [];
-		$cond = null;
+		// an empty condition, never kept
+		$cond = ["", ":"];
 		// l'automate a 3 états :
 		// 1:recherche de type
 		// 2:recherche d'argument principal
@@ -536,7 +575,7 @@ class CardsData {
 		$etat = 1;
 		while ($query != "") {
 			if ($etat == 1) {
-				if (isset($cond) && $etat != 4 && count($cond) > 2) {
+				if (count($cond) > 2) {
 					$list[] = $cond;
 				}
 				// on commence par rechercher un type de condition
@@ -584,13 +623,17 @@ class CardsData {
 				}
 			}
 		}
-		if (isset($cond) && $etat != 4 && count($cond) > 2) {
+		if ($etat != 4 && count($cond) > 2) {
 			$list[] = $cond;
 		}
 
 		return $list;
 	}
 
+    /**
+     * @param mixed $conditions
+     * @return array<int, mixed>
+     */
     public function validateConditions($conditions) {
 		// suppression des conditions invalides
 		$numeric = ['<', '>'];
@@ -608,6 +651,10 @@ class CardsData {
 		return array_values($conditions);
 	}
 
+	/**
+	 * @param mixed $conditions
+	 * @return string
+	 */
 	public function buildQueryFromConditions($conditions) {
 		return implode(" ", array_map(function($l) {
 			return ($l[0] ? $l[0] . $l[1] : "") . implode("|", array_map(function($s) {
@@ -616,17 +663,24 @@ class CardsData {
 		}, $conditions));
 	}
 
+	/**
+	 * @param mixed $card
+	 * @return array
+	 */
 	public function get_reviews($card) {
-		$reviews = $this->doctrine->getRepository('AppBundle:Review')->findBy(['card' => $card], ['nbVotes' => 'DESC']);
+		$reviews = $this->doctrine->getRepository('AppBundle:Review')->findBy(['card' => $card], ['nbVotes' => 'DESC', 'id' => 'ASC']);
 
 		$response = $reviews;
 
 		return $response;
 	}
 
+	/**
+	 * @return array<string, int>
+	 */
 	public function getDistinctTraits() {
 		/**
-		 * @var $em \Doctrine\ORM\EntityManager
+		 * @var \Doctrine\ORM\EntityManager $em
 		 */
 		$em = $this->doctrine->getManager();
 		$qb = $em->createQueryBuilder();

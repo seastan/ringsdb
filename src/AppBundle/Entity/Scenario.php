@@ -80,7 +80,7 @@ class Scenario implements \JsonSerializable {
      */
     private $dateUpdate;
     /**
-     * @var \AppBundle\Entity\Pack
+     * @var \AppBundle\Entity\Pack|null
      */
     private $pack;
     /**
@@ -208,7 +208,7 @@ class Scenario implements \JsonSerializable {
     /**
      * Get pack
      *
-     * @return \AppBundle\Entity\Pack
+     * @return \AppBundle\Entity\Pack|null
      */
     public function getPack() {
         return $this->pack;
@@ -231,6 +231,7 @@ class Scenario implements \JsonSerializable {
      * Remove encounter
      *
      * @param \AppBundle\Entity\Encounter $encounter
+     * @return void
      */
     public function removeEncounter(\AppBundle\Entity\Encounter $encounter) {
         $this->encounters->removeElement($encounter);
@@ -1128,6 +1129,7 @@ class Scenario implements \JsonSerializable {
      * Remove questlog
      *
      * @param \AppBundle\Entity\Questlog $questlog
+     * @return void
      */
     public function removeQuestlog(\AppBundle\Entity\Questlog $questlog) {
         $this->questlogs->removeElement($questlog);

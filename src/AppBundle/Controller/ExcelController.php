@@ -9,6 +9,9 @@ use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\Card;
 
 class ExcelController extends Controller {
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function downloadFormAction() {
 		$em = $this->getDoctrine()->getManager();
 		$packs = $em->getRepository('AppBundle:Pack')->findBy([], ['dateRelease' => 'ASC', 'name' => 'ASC']);
@@ -18,6 +21,9 @@ class ExcelController extends Controller {
 		]);
 	}
 
+	/**
+	 * @return \Symfony\Component\HttpFoundation\StreamedResponse
+	 */
 	public function downloadProcessAction(Request $request) {
 		$ignoredFields = ['id', 'dateCreation', 'dateUpdate'];
 
@@ -29,6 +35,9 @@ class ExcelController extends Controller {
 			$pack_name = 'LotR LCG Cards';
 		} else {
 			$pack = $em->getRepository('AppBundle:Pack')->find($pack_id);
+			if (!$pack) {
+				throw $this->createNotFoundException('Pack not found.');
+			}
 			$printings = $em->getRepository('AppBundle:CardPrinting')->findBy(['pack' => $pack], ['position' => 'ASC']);
 			$cards = array_values(array_unique(array_map(function($p) { return $p->getCard(); }, $printings), SORT_REGULAR));
 			$pack_name = $pack->getName();
@@ -38,6 +47,7 @@ class ExcelController extends Controller {
 
 		$associationMappings = $em->getClassMetadata('AppBundle:Card')->getAssociationMappings();
 
+		$lastModified = null;
 		/* @var $card \AppBundle\Entity\Card */
 		foreach ($cards as $card) {
 			if (empty($lastModified) || $lastModified < $card->getDateUpdate()) {
@@ -46,7 +56,7 @@ class ExcelController extends Controller {
 		}
 
 		$phpExcelObject = $this->get('phpexcel')->createPHPExcelObject();
-		$phpExcelObject->getProperties()->setCreator("Sydtrack")->setLastModifiedBy($lastModified->format('Y-m-d'))->setTitle($pack_name);
+		$phpExcelObject->getProperties()->setCreator("Sydtrack")->setLastModifiedBy($lastModified ? $lastModified->format('Y-m-d') : '')->setTitle($pack_name);
 		$phpActiveSheet = $phpExcelObject->setActiveSheetIndex(0);
 		$phpActiveSheet->setTitle(mb_substr($pack_name, 0, 31));
 
@@ -110,15 +120,22 @@ class ExcelController extends Controller {
 		return $response;
 	}
 
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function uploadFormAction() {
 		return $this->render('AppBundle:Excel:upload_form.html.twig');
 	}
 
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function uploadProcessAction(Request $request) {
 		/* @var $uploadedFile \Symfony\Component\HttpFoundation\File\UploadedFile */
 		$uploadedFile = $request->files->get('upfile');
 		$inputFileName = $uploadedFile->getPathname();
 		$inputFileType = \PHPExcel_IOFactory::identify($inputFileName);
+		/** @var \PHPExcel_Reader_Abstract $objReader */
 		$objReader = \PHPExcel_IOFactory::createReader($inputFileType);
 		$objReader->setReadDataOnly(true);
 		$objPHPExcel = $objReader->load($inputFileName);
@@ -137,7 +154,9 @@ class ExcelController extends Controller {
 				$firstRow = false;
 
 				// analysis of first row
-				foreach ($row->getCellIterator() as $cell) {
+				/** @var \PHPExcel_Worksheet_RowCellIterator $cellIterator */
+				$cellIterator = $row->getCellIterator();
+				foreach ($cellIterator as $cell) {
 					$colNames[$cell->getColumn()] = $cell->getValue();
 				}
 				continue;
@@ -145,6 +164,7 @@ class ExcelController extends Controller {
 
 			$card = [];
 
+			/** @var \PHPExcel_Worksheet_RowCellIterator $cellIterator */
 			$cellIterator = $row->getCellIterator();
 			foreach ($cellIterator as $cell) {
 				$col = $cell->getColumn();
@@ -192,6 +212,7 @@ class ExcelController extends Controller {
 					$associationMapping = $associationMappings[$colName];
 
 					$associationRepository = $em->getRepository($associationMapping['targetEntity']);
+					/** @var \AppBundle\Entity\Type|\AppBundle\Entity\Sphere|null $associationEntity */
 					$associationEntity = $associationRepository->findOneBy(['name' => $value]);
 					if (!$associationEntity) {
 						throw new \Exception("cannot find entity [$colName] of name [$value]");
@@ -204,7 +225,7 @@ class ExcelController extends Controller {
 					}
 				} else {
 					if (in_array($colName, $fieldNames)) {
-						$type = $metaData->getTypeOfField($colName);
+						$type = $metaData->getTypeOfField((string) $colName);
 						if ($type === 'boolean') {
 							$value = (boolean)$value;
 						}

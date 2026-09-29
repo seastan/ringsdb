@@ -10,6 +10,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 class RemoveUserCommand extends ContainerAwareCommand {
+    /**
+     * @return void
+     */
     protected function configure() {
         $this
             ->setName('app:user:remove')
@@ -29,7 +32,7 @@ class RemoveUserCommand extends ContainerAwareCommand {
 
         if (!$user) {
             $output->writeln("User not found");
-            return;
+            return 1;
         }
 
         $output->writeln("User " . $user->getUsername());
@@ -86,5 +89,7 @@ class RemoveUserCommand extends ContainerAwareCommand {
         $output->writeln("User locked");
 
         $em->flush();
+
+        return 0;
     }
 }

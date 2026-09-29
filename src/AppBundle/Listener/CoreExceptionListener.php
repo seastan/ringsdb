@@ -7,6 +7,7 @@ class CoreExceptionListener {
      * Handles security related exceptions.
      *
      * @param \Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent $event An GetResponseForExceptionEvent instance
+     * @return void
      */
     public function onCoreException(\Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent $event) {
         $exception = $event->getException();

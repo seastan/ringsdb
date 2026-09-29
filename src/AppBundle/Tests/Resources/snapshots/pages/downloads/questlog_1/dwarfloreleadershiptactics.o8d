@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<deck game="a21af4e8-be4b-4cda-a6b6-534f9717391f">
+  <section name="Hero" shared="False">
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801200c9004">Gimli</card>
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801206c9005">Dáin Ironfoot</card>
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801207c9008">Bifur</card>
+  </section>
+  <section name="Ally" shared="False">
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801200c9028">Veteran Axehand</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801200c9059">Erebor Hammersmith</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801200c9061">Miner of the Iron Hills</card>
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801202c9014">Longbeard Map-Maker</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801207c9085">Veteran of Nanduhirion</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801207c9030">Erebor Record Keeper</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801211c9007">Erebor Battle Master</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801212c9021">Longbeard Elder</card>
+    <card qty="3" id="3eb1141f-bf1f-401e-a69d-e4df0af2a8ab">Ered Nimrais Prospector</card>
+  </section>
+  <section name="Attachment" shared="False">
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801200c9041">Dwarven Axe</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801207c9050">Narvi&#039;s Belt</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801207c9026">Dwarrowdelf Axe</card>
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801210c9009">Legacy of Durin</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801211c9021">Ring Mail</card>
+    <card qty="1" id="51223bd0-ffd1-11df-a976-0801213c9008">Hardy Leadership</card>
+  </section>
+  <section name="Event" shared="False">
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801207c9024">Durin&#039;s Song</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801207c9044">Khazâd! Khazâd!</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801209c9015">Lure of Moria</card>
+    <card qty="3" id="51223bd0-ffd1-11df-a976-0801213c9028">We Are Not Idle</card>
+  </section>
+  <section name="Side Quest" shared="False">
+  </section>
+  <section name="Sideboard" shared="False">
+  </section>
+  <section name="Quest" shared="True" />
+  <section name="Encounter" shared="True" />
+  <section name="Special" shared="True" />
+  <section name="Setup" shared="True" />
+  <notes><![CDATA[]]></notes>
+</deck>

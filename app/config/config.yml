@@ -44,7 +44,6 @@ twig:
         noindex:                "%noindex%"
     form_themes:
         - 'bootstrap_3_layout.html.twig'
-        - 'AppBundle::form_widgets.html.twig'
 
 # Assetic Configuration
 assetic:
@@ -76,7 +75,7 @@ doctrine:
         auto_mapping:                true
         dql:
             string_functions:
-                binary: AppBundle\DQL\BinaryFunction
+                replace: AppBundle\DQL\ReplaceFunction
             numeric_functions:
                 power: AppBundle\DQL\PowerFunction
 
@@ -108,18 +107,6 @@ fos_js_routing:
 # NelmioApiDocBundle Configuration
 nelmio_api_doc: ~
 
-# FOSOAuthServerBundle Configuration
-fos_oauth_server:
-    db_driver:           orm       # Driver availables: orm, mongodb, or propel
-    client_class:        AppBundle\Entity\Client
-    access_token_class:  AppBundle\Entity\AccessToken
-    refresh_token_class: AppBundle\Entity\RefreshToken
-    auth_code_class:     AppBundle\Entity\AuthCode
-    service:
-        user_provider:   fos_user.user_manager
-
 services:
     fos_user.doctrine_registry:
         alias: doctrine
-
-gregwar_captcha: ~

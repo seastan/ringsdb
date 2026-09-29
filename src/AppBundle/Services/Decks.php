@@ -12,6 +12,26 @@ use AppBundle\Helper\DeckValidationHelper;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Decks {
+    /**
+     * @var EntityManager
+     */
+    private $doctrine;
+
+    /**
+     * @var DeckValidationHelper
+     */
+    private $deck_validation_helper;
+
+    /**
+     * @var Diff
+     */
+    private $diff;
+
+    /**
+     * @var Logger
+     */
+    private $logger;
+
     public function __construct(EntityManager $doctrine, DeckValidationHelper $deck_validation_helper, Diff $diff, Logger $logger) {
         $this->doctrine = $doctrine;
         $this->deck_validation_helper = $deck_validation_helper;
@@ -19,6 +39,10 @@ class Decks {
         $this->logger = $logger;
     }
 
+    /**
+     * @param mixed $user
+     * @return array<int, mixed>
+     */
     public function getByUser($user) {
         /* @var $user \AppBundle\Entity\User */
         $decks = $user->getDecks();
@@ -31,12 +55,17 @@ class Decks {
         return $list;
     }
 
+    /**
+     * @param mixed $user
+     * @param mixed $limit
+     * @return array
+     */
     public function getDecksWithSlotsForUser($user, $limit = null) {
         // Step 1: get the right deck IDs with no collection join so LIMIT works correctly
         $idQuery = $this->doctrine->createQuery(
             'SELECT d.id FROM AppBundle\Entity\Deck d
              WHERE d.user = :user
-             ORDER BY d.dateUpdate DESC'
+             ORDER BY d.dateUpdate DESC, d.id ASC'
         )->setParameter('user', $user);
 
         if ($limit !== null) {
@@ -130,12 +159,21 @@ class Decks {
         return array_values($decks);
     }
 
+    /**
+     * @param mixed $user
+     * @return int
+     */
     public function countDecksForUser($user) {
         return (int) $this->doctrine->createQuery(
             'SELECT COUNT(d.id) FROM AppBundle\Entity\Deck d WHERE d.user = :user'
         )->setParameter('user', $user)->getSingleScalarResult();
     }
 
+    /**
+     * @param mixed $deck
+     * @param mixed $user
+     * @return \AppBundle\Entity\Deck
+     */
     public function cloneDeck($deck, $user) {
         /* @var $deck \AppBundle\Entity\Deck */
         if (!$deck) {
@@ -171,6 +209,30 @@ class Decks {
         return $deck;
     }
 
+    /**
+     * Normalizes deck tags: a space-separated string or an array of tags becomes a list of
+     * distinct, trimmed, non-empty tags.
+     *
+     * @param string|string[]|null $tags
+     * @return string[]
+     */
+    public function normalizeTags($tags) {
+        $tags = preg_split('/\s+/', trim(implode(' ', (array) $tags)), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+
+        return array_values(array_unique($tags));
+    }
+
+    /**
+     * @param mixed $user
+     * @param mixed $deck
+     * @param mixed $decklist_id
+     * @param mixed $name
+     * @param mixed $description
+     * @param mixed $tags
+     * @param mixed $content
+     * @param mixed $source_deck
+     * @return mixed
+     */
     public function saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, $source_deck) {
         /* @var $deck \AppBundle\Entity\Deck */
         /* @var $source_deck \AppBundle\Entity\Deck */
@@ -255,17 +317,13 @@ class Decks {
         }
 
         $deck->setLastPack($latestPack);
-        if (empty ($tags)) {
+        $tags = $this->normalizeTags($tags);
+        if (empty($tags)) {
             // tags can never be empty. if it is we put spheres in
-            $tags = $spheres;
+            $tags = $this->normalizeTags($spheres);
         }
 
-        if (is_string($tags)) {
-            $tags = preg_split('/\s+/', $tags);
-        }
-
-        $tags = implode(' ', array_unique(array_values($tags)));
-        $deck->setTags($tags);
+        $deck->setTags(implode(' ', $tags));
         $this->doctrine->persist($deck);
 
         // on the deck content
@@ -295,7 +353,7 @@ class Decks {
             if (count($listings[0]) || count($listings[1]) || count($listings[2]) || count($listings[3])) {
                 $change = new Deckchange();
                 $change->setDeck($deck);
-                $change->setVariation(json_encode($listings));
+                $change->setVariation((string) json_encode($listings));
                 $change->setIsSaved(true);
                 $change->setVersion($deck->getVersion());
                 $this->doctrine->persist($change);
@@ -341,6 +399,11 @@ class Decks {
     }
 
 
+    /**
+     * @param mixed $deck
+     * @param mixed $content
+     * @return void
+     */
     public function setSlots(&$deck, $content) {
         /* @var $deck \AppBundle\Entity\Deck */
         /* @var $latestPack \AppBundle\Entity\Pack */
@@ -417,6 +480,10 @@ class Decks {
         }
     }
 
+    /**
+     * @param mixed $deck
+     * @return void
+     */
     public function revertDeck($deck) {
         /* @var $deck \AppBundle\Entity\Deck */
         $changes = $this->getUnsavedChanges($deck);
@@ -432,6 +499,10 @@ class Decks {
         $this->doctrine->flush();
     }
 
+    /**
+     * @param mixed $deck
+     * @return array
+     */
     public function getUnsavedChanges($deck) {
         return $this->doctrine->getRepository('AppBundle:Deckchange')->findBy([
             'deck' => $deck,

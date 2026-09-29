@@ -91,3 +91,8 @@ AppBundle\Entity\Deck:
             type: integer
             nullable: false
             column: minor_version
+    indexes:
+        idx_deck_date_creation:
+            columns: [date_creation]
+        idx_deck_date_update:
+            columns: [date_update]

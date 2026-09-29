@@ -10,6 +10,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 class FixCanonicalNamesCommand extends ContainerAwareCommand {
+    /**
+     * @return void
+     */
     protected function configure() {
         $this->setName('app:fix-canonical-names')
              ->setDescription('Fix canonical names for scenarios');
@@ -33,5 +36,7 @@ class FixCanonicalNamesCommand extends ContainerAwareCommand {
 
         $em->flush();
         $output->writeln(date('c') . " Fixed $count scenario canonical names.");
+
+        return 0;
     }
 }

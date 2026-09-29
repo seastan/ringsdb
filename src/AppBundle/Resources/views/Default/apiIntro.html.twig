@@ -10,13 +10,7 @@
         <p>This API is provided for use in deckbuilders, card databases, tournament managers, and other tools that are a complement to playing {{ game_name }}.</p>
         <p>All texts are copyrighted by {{ publisher_name }}.</p>
 
-        <h3>Public and OAuth2</h3>
-
-        <p>
-            There are two kinds of API endpoints: Public and OAuth2.
-            Public API endpoints are available to everyone, while OAuth2 API endpoints are only available to registered clients (applications).
-            If you need such an access, please send me an email describing your project and I'll send you credentials.
-        <p>
+        <p>The API endpoints of the documentation below are public: they are available to everyone.</p>
 
         <h3>Documentation</h3>
 
@@ -34,8 +28,7 @@
         <h3>Caching</h3>
 
         <ul>
-            <li>Public API responses use both HTTP cache expiration (max-age) and cache validation (last-modified).</li>
-            <li>OAuth2 API responses use HTTP cache validation (last-modified).</li>
+            <li>API responses use both HTTP cache expiration (max-age) and cache validation (last-modified).</li>
         </ul>
         <p><b>Please conform to HTTP Caching best practices when building your queries.</b></p>
 

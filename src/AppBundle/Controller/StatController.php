@@ -7,6 +7,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
 class StatController extends Controller {
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function getStatAction(Request $request) {
 		$month = $request->query->get('month');
 		if (!$month) {
@@ -340,6 +343,9 @@ ON c.cycle = u.cycle";
 		return $response;
 	}
 
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function getStatCardsAction(Request $request) {
 		// Per-card stats are too heavy to compute on a request worker (they scan a
 		// whole month of decklistslot/deckslot and would saturate the shared
@@ -374,6 +380,9 @@ ON c.cycle = u.cycle";
 		return $response;
 	}
 
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function getStatPacksAction(Request $request) {
         /* @var $dbh \Doctrine\DBAL\Connection */
 		$packs = $this->getPacks();
@@ -388,6 +397,9 @@ ON c.cycle = u.cycle";
 		return $response;
 	}
 
+	/**
+	 * @return array
+	 */
 	function getPacks() {
 		$dbh = $this->getDoctrine()->getConnection();
 
@@ -399,6 +411,9 @@ ORDER BY date_release";
 		return $packs;
 	}
 
+	/**
+	 * @return array
+	 */
 	function getPackRuless() {
 		$pack_rules = ['Core Set' => ['2000-01-01', '2011-07-21'],
 						'Shadows of Mirkwood' => ['2011-07-21', '2012-01-06'],
@@ -414,6 +429,9 @@ ORDER BY date_release";
 		return $pack_rules;
 	}
 
+	/**
+	 * @return array
+	 */
 	function getQuests() {
 		$dbh = $this->getDoctrine()->getConnection();
 
@@ -430,6 +448,9 @@ ORDER BY p.name";
 		return $quests;
 	}
 
+	/**
+	 * @return array<int|string, mixed>
+	 */
 	function getOctgnIdMapping() {
 		$dbh = $this->getDoctrine()->getConnection();
 

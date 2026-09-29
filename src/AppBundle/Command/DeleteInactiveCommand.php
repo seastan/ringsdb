@@ -10,6 +10,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 class DeleteInactiveCommand extends ContainerAwareCommand {
+    /**
+     * @return void
+     */
     protected function configure() {
         $this
             ->setName('app:inactive-users')
@@ -32,5 +35,7 @@ class DeleteInactiveCommand extends ContainerAwareCommand {
         }
         $em->flush();
         $output->writeln(date('c') . " Delete $count inactive users.");
+
+        return 0;
     }
 }

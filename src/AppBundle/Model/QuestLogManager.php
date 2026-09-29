@@ -3,14 +3,12 @@
 namespace AppBundle\Model;
 
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
-use AppBundle\Services\DeckInterface;
-use Psr\Log\LoggerInterface;
 use AppBundle\Entity\User;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use AppBundle\Entity\Sphere;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
@@ -20,43 +18,100 @@ use Doctrine\Common\Collections\ArrayCollection;
  *
  */
 class QuestLogManager {
+	/**
+	 * @var int
+	 */
 	protected $page = 1;
+	/**
+	 * @var int
+	 */
 	protected $start = 0;
+	/**
+	 * @var int
+	 */
 	protected $limit = 30;
+	/**
+	 * @var int
+	 */
 	protected $maxcount = 0;
+	/**
+	 * @var \AppBundle\Entity\User|null
+	 */
 	protected $user = null;
 
-	public function __construct(EntityManager $doctrine, RequestStack $request_stack, Router $router, LoggerInterface $logger) {
+	/**
+	 * @var EntityManager
+	 */
+	private $doctrine;
+
+	/**
+	 * @var RequestStack
+	 */
+	private $request_stack;
+
+	/**
+	 * @var Router
+	 */
+	private $router;
+
+	public function __construct(EntityManager $doctrine, RequestStack $request_stack, Router $router) {
 		$this->doctrine = $doctrine;
 		$this->request_stack = $request_stack;
 		$this->router = $router;
-		$this->logger = $logger;
 	}
 
+	/**
+	 * The current request: the searches and the pagination read its parameters.
+	 */
+	private function currentRequest(): Request {
+		$request = $this->request_stack->getCurrentRequest();
+		if ($request === null) {
+			throw new \LogicException('No current request.');
+		}
+
+		return $request;
+	}
+
+	/**
+	 * @param mixed $user
+	 * @return void
+	 */
 	public function setUser($user) {
 		$this->user = $user;
 	}
 
+	/**
+	 * @param mixed $limit
+	 * @return void
+	 */
 	public function setLimit($limit) {
 		$this->limit = $limit;
 	}
 
+	/**
+	 * @param mixed $page
+	 * @return void
+	 */
 	public function setPage($page) {
 		$this->page = max($page, 1);
 		$this->start = ($this->page - 1) * $this->limit;
 	}
 
+	/**
+	 * @return int
+	 */
 	public function getMaxCount() {
 		return $this->maxcount;
 	}
 
 	/**
 	 * creates the basic query builder and initializes it
+	 * @return \Doctrine\ORM\QueryBuilder
 	 */
 	private function getQueryBuilder() {
 		$qb = $this->doctrine->createQueryBuilder();
 		$qb->select('d');
-		$qb->from('AppBundle:QuestLog', 'd');
+		$qb->from('AppBundle:Questlog', 'd');
         $qb->andWhere('d.isPublic = 1');
         $qb->setFirstResult($this->start);
 		$qb->setMaxResults($this->limit);
@@ -69,6 +124,7 @@ class QuestLogManager {
      * creates the paginator around the query
      *
      * @param Query $query
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     private function getPaginator(Query $query) {
         $paginator = new Paginator($query, $fetchJoinCollection = false);
@@ -77,37 +133,61 @@ class QuestLogManager {
         return $paginator;
     }
 
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
     public function getEmptyList() {
         $this->maxcount = 0;
 
         return new ArrayCollection([]);
     }
 
+    /**
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
     public function findQuestLogsByPopularity() {
         $qb = $this->getQueryBuilder();
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.datePublish), 2)) AS HIDDEN popularity');
         $qb->orderBy('popularity', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
-    public function findQuestLogsByAge($ignoreEmptyDescriptions = false) {
+    /**
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
+    public function findQuestLogsByAge() {
         $qb = $this->getQueryBuilder();
 
         $qb->orderBy('d.datePublish', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
-    public function findQuestLogsByRecentDiscussion($ignoreEmptyDescriptions = false) {
+    /**
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
+    public function findQuestLogsByRecentDiscussion() {
         $qb = $this->getQueryBuilder();
 
         $qb->andWhere('d.nbComments > 0');
         $qb->orderBy('d.dateLastComment', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
+    /**
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
     public function findQuestLogsByFavorite(User $user) {
         $qb = $this->getQueryBuilder();
 
@@ -116,9 +196,15 @@ class QuestLogManager {
         $qb->setParameter('user', $user);
         $qb->orderBy('d.datePublish', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
+    /**
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
     public function findQuestLogsByAuthor(User $user) {
         $qb = $this->getQueryBuilder();
 
@@ -126,30 +212,48 @@ class QuestLogManager {
         $qb->setParameter('user', $user);
         $qb->orderBy('d.datePublish', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
+    /**
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
     public function findQuestLogsInHallOfFame() {
         $qb = $this->getQueryBuilder();
 
         $qb->andWhere('d.nbVotes > 10');
         $qb->orderBy('d.nbVotes', 'DESC');
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
+    /**
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
     public function findQuestLogsInHotTopic() {
         $qb = $this->getQueryBuilder();
 
         $qb->addSelect('(SELECT count(c) FROM AppBundle:QuestlogComment c WHERE c.questlog=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
         $qb->orderBy('nbRecentComments', 'DESC');
-        $qb->orderBy('d.nbComments', 'DESC');
+        $qb->addOrderBy('d.nbComments', 'DESC');
+
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
 
         return $this->getPaginator($qb->getQuery());
     }
 
+    /**
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
     public function findQuestLogsWithComplexSearch() {
-        $request = $this->request_stack->getCurrentRequest();
+        $request = $this->currentRequest();
 
         $cards_code = $request->query->get('cards');
         if (!is_array($cards_code)) {
@@ -252,7 +356,9 @@ class QuestLogManager {
                 if (!in_array('d.user', $joinTables)) {
                     $qb->innerJoin('d.user', 'u');
                 }
-                $qb->orderBy('u.reputation', 'DESC');
+                // with DISTINCT, MySQL 5.7+ only sorts on selected columns
+                $qb->addSelect('u.reputation AS HIDDEN reputation');
+                $qb->orderBy('reputation', 'DESC');
                 break;
 
             case 'popularity':
@@ -262,15 +368,24 @@ class QuestLogManager {
                 break;
         }
 
+        // tie-breaker, for a stable order and pagination
+        $qb->addOrderBy('d.id', 'DESC');
+
         return $this->getPaginator($qb->getQuery());
     }
 
+    /**
+     * @return int
+     */
     public function getNumberOfPages() {
         return intval(ceil($this->maxcount / $this->limit));
     }
 
+    /**
+     * @return array
+     */
     public function getAllPages() {
-        $request = $this->request_stack->getCurrentRequest();
+        $request = $this->currentRequest();
         $route = $request->get('_route');
         $route_params = $request->get('_route_params');
         $query = $request->query->all();
@@ -290,6 +405,9 @@ class QuestLogManager {
         return $pages;
     }
 
+    /**
+     * @return array<int, mixed>
+     */
     public function getClosePages() {
         $allPages = $this->getAllPages();
         $numero_courant = $this->page - 1;
@@ -303,12 +421,15 @@ class QuestLogManager {
         return $pages;
     }
 
+    /**
+     * @return string|null
+     */
     public function getPreviousUrl() {
         if ($this->page === 1) {
             return null;
         }
 
-        $request = $this->request_stack->getCurrentRequest();
+        $request = $this->currentRequest();
         $route = $request->get('_route');
         $route_params = $request->get('_route_params');
 
@@ -321,12 +442,15 @@ class QuestLogManager {
         return $this->router->generate($route, $params);
     }
 
+    /**
+     * @return string|null
+     */
     public function getNextUrl() {
         if ($this->page === $this->getNumberOfPages()) {
             return null;
         }
 
-        $request = $this->request_stack->getCurrentRequest();
+        $request = $this->currentRequest();
         $route = $request->get('_route');
         $route_params = $request->get('_route_params');
 

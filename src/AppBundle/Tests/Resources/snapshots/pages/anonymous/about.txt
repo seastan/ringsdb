@@ -1,0 +1,170 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+About
+This website is dedicated to providing a fast, powerful and exhaustive deck builder and search engine for cards, along with card descriptions and card images.
+This website is optimized for mobile browsing (WebKit).
+Credits
+I would like to thank especially:
+Alsciende for developing
+NetrunnerDB
+and
+ThronesDB
+, providing the base work for this deck builder;
+Beorn from
+Hall of Beorn
+for keeping an amazing and complete pool of cards in his
+Hall of Beorn Card Search
+page;
+TheChad for helping me manage this website;
+GeckoTH and memetix for their Lord of the Rings LCG OCTGN plugin;
+The Beta Testers: James, Seastan, sappidus and Delphinidae;
+Fantasy Flight Games for providing us with amazing Living Card Games.
+Search syntax
+a search string is a conjunction of one or more
+conditions
+separated by one or more spaces
+a
+condition
+is either:
+a
+word
+or
+expression
+or
+disjunction
+a
+criteria
+followed by an
+operator
+followed by a
+word
+or
+expression
+or
+disjunction
+a
+word
+must match
+/[\w\-]/
+: letters, digits, dash
+an
+expression
+is any text between
+"
+a
+disjunction
+is several
+words
+or
+expressions
+separated by
+|
+a
+criteria
+is a single letter:
+b
+– threat
+o
+– cost
+w
+– willpower
+a
+– attack
+d
+– defense
+h
+– hit points
+c
+– cycle
+e
+– adventure pack
+t
+– type
+s
+– sphere
+u
+– unique
+k
+– traits
+x
+– text
+f
+– flavor text
+i
+– illustrator
+y
+– quantity in pack
+r
+– release date
+an
+operator
+is either:
+:
+– equals
+!
+– different from
+<
+– less than
+>
+– more than
+Special case
+r
+(release date) uses only the operators
+<
+(inclusive) and
+>
+(exclusive) and only understands the arguments
+now
+or a date YYYY-MM-DD
+Search examples
+t:ally
+searches for all Allies
+t:attachment k:trap
+searches for every Attachment that has the trait Trap
+x:"enemy in play"
+searches for all cards with the text "enemy in play"
+t:attachment|event s:lore
+searches for all Attachments and Events from Lore Sphere
+s:lore|spirit w>3
+searches for all Lore and Spirit cards with Willpower greater than 3
+t:attachment k!item|weapon
+searches for all Attachments that are neither item or nor weapon
+r<2012-01-01
+searches for all cards released up to Jan 1, 2012
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

@@ -10,6 +10,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 class FixSignaturesCommand extends ContainerAwareCommand {
+    /**
+     * @return void
+     */
     protected function configure() {
         $this->setName('app:fix-signatures')
              ->setDescription('Fix canonical names for decklists');
@@ -30,7 +33,7 @@ class FixSignaturesCommand extends ContainerAwareCommand {
                 'side' => $decklist->getSideslots()->getContent(),
             ];
             $this_content = json_encode($content);
-            $this_signature = md5($this_content);
+            $this_signature = md5((string) $this_content);
 
             if ($this_signature !== $decklist->getSignature()) {
                 $decklist->setSignature($this_signature);
@@ -40,5 +43,7 @@ class FixSignaturesCommand extends ContainerAwareCommand {
 
         $em->flush();
         $output->writeln(date('c') . " Fixed $count decklist signatures.");
+
+        return 0;
     }
 }

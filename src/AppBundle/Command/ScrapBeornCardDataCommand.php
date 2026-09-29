@@ -2,7 +2,6 @@
 
 namespace AppBundle\Command;
 
-use AppBundle\Entity\Card;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,7 +13,12 @@ use Symfony\Component\VarDumper\VarDumper;
 
 
 class ScrapBeornCardDataCommand extends ContainerAwareCommand {
+    use StringInputTrait;
 
+
+    /**
+     * @return void
+     */
     protected function configure() {
         $this->setName('app:beorn:html')
              ->setDescription('Download new card data from Hall of Beorn')
@@ -66,8 +70,8 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
         $allSpheres = $em->getRepository('AppBundle:Sphere')->findAll();
         $allTypes = $em->getRepository('AppBundle:Type')->findAll();
 
-        $setname = $input->getArgument('beornset');
-        $skip = $input->getOption('skip') ?: 0;
+        $setname = self::stringArgument($input, 'beornset');
+        $skip = (int) $input->getOption('skip');
         $forceData = $input->getOption('force-data');
         $forceImage = $input->getOption('force-image');
         $showTexts = $input->getOption('show-texts');
@@ -151,7 +155,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
             $crawler = new Crawler($html);
             $output->writeln("b");
 
-            $cardsUrls = $crawler->filter('a[href^="/LotR/Details"][style]')->extract('href');
+            $cardsUrls = $crawler->filter('a[href^="/LotR/Details"][style]')->extract(['href']);
             $output->writeln("c");
 
             $i = 0;
@@ -177,8 +181,8 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 		$output->writeln("2");
 
                 if ($c->filter('img')->count() > 0) {
-                    $sphere = basename($c->filter('img')->attr('src'), '.png');
-		    $sphere = substr( $sphere, 0, strrpos( $sphere, '-' ) );
+                    $sphere = basename((string) $c->filter('img')->attr('src'), '.png');
+		    $sphere = substr( $sphere, 0, (int) strrpos( $sphere, '-' ) );
                 } else {
                     $sphere = 'Neutral';
                 }
@@ -204,7 +208,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 		$output->writeln("7");
 
                 // Image URL
-                $imageurl = $cardCrawler->filter('div.titleBox > img')->last()->attr('src');
+                $imageurl = (string) $cardCrawler->filter('div.titleBox > img')->last()->attr('src');
 		$output->writeln("8");
 
                 // Threat, Willpower, Attack, Defense, Hit Points
@@ -248,7 +252,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
                 // Traits, text and flavor
                 $c = $cardCrawler->filter('div.statTextBox')->first();
-                $traits = $c->filter('a[title="Trait Search"] i')->extract('_text');
+                $traits = $c->filter('a[title="Trait Search"] i')->extract(['_text']);
                 $traits = implode(' ', $traits);
 		$output->writeln("11");
 
@@ -286,13 +290,13 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 		   continue;
 		}
 		$output->writeln("15b");		
-                if ($card && !$forceData && !$forceImage) {
+                if (!$forceData && !$forceImage) {
                     // shortcut: we already know this card
                     continue;
                 }
 		$output->writeln("16");
 
-                if ($card && $forceData) {
+                if ($forceData) {
 
                     $objSphere = null;
                     foreach ($allSpheres as $oneSphere) {
@@ -323,16 +327,16 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
     		$output->writeln("20");
     
                     $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', '\'', '\''], $text);
-                    $text = preg_replace('/<a title="Search:.*?>(.*?)<\/a>/', '\\1', $text);
-                    $text = preg_replace('/<a title="Keyword:.*?>(.*?)<\/a>/', '\\1', $text);
-                    $text = preg_replace_callback('/<img .*?src="\/Images\/(.*?)\..*?>/', function($m) {
+                    $text = (string) preg_replace('/<a title="Search:.*?>(.*?)<\/a>/', '\\1', $text);
+                    $text = (string) preg_replace('/<a title="Keyword:.*?>(.*?)<\/a>/', '\\1', $text);
+                    $text = (string) preg_replace_callback('/<img .*?src="\/Images\/(.*?)\..*?>/', function($m) {
                         return strtolower("[$m[1]]");
                     }, $text);
                     $text = str_replace(['<br />', '<br>'], ["\n", "\n"], $text);
                     $text = str_replace("</b><b>", " ", $text);
                     $text = str_replace("</b>: ", ":</b> ", $text);
-                    $text = preg_replace("/ +/", " ", $text);
-                    $text = preg_replace("/\n+/", "\n", $text);
+                    $text = (string) preg_replace("/ +/", " ", $text);
+                    $text = (string) preg_replace("/\n+/", "\n", $text);
                     $text = trim($text);
     		$output->writeln("21");
     
@@ -343,10 +347,10 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
     		$output->writeln("22");
     
                     $flavor = str_replace(['<br />', '<br>'], ["\n", "\n"], $flavor);
-                    $flavor = preg_replace('/([a-z])–/s', '\\1-', $flavor);
-                    $flavor = preg_replace('/–(.*)$/s', '<cite>\\1</cite>', $flavor);
-                    $flavor = preg_replace("/ +/", " ", $flavor);
-                    $flavor = preg_replace("/\n+/", "\n", $flavor);
+                    $flavor = (string) preg_replace('/([a-z])–/s', '\\1-', $flavor);
+                    $flavor = (string) preg_replace('/–(.*)$/s', '<cite>\\1</cite>', $flavor);
+                    $flavor = (string) preg_replace("/ +/", " ", $flavor);
+                    $flavor = (string) preg_replace("/\n+/", "\n", $flavor);
     		$output->writeln("23");
     
     
@@ -362,9 +366,6 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                     }
     		$output->writeln("25");
     
-                    if (!$card) {
-                        $card = new Card();
-                    }
     		$output->writeln("26");
     
                     $card->setPosition($position);
@@ -400,7 +401,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
                     $card->setAttack($attack !== '' ? $attack : null);
                     $card->setDefense($defense !== '' ? $defense : null);
                     $card->setHealth($health !== '' ? $health : null);
-                    $card->setVictory($victory !== '' ? $victory : null);
+                    $card->setVictory($victory);
                     $card->setQuest($quest !== '' ? $quest : null);
     
                     $card->setQuantity($quantity);
@@ -425,7 +426,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 		$output->writeln("32");
                 if (!file_exists($outputfile) || $forceImage) {
  		    $output->writeln("33");
-                    $imageurl = preg_replace('/û/', '%C3%BB', $imageurl);
+                    $imageurl = (string) preg_replace('/û/', '%C3%BB', $imageurl);
                     $u = dirname($imageurl) . '/' . urlencode(basename($imageurl, '.jpg')) . '.jpg';
 		    $output->writeln("34");
 
@@ -449,5 +450,7 @@ class ScrapBeornCardDataCommand extends ContainerAwareCommand {
 
         $em->flush();
         $output->writeln("Done.");
+
+        return 0;
     }
 }

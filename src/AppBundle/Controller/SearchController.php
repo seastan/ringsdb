@@ -7,6 +7,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
 class SearchController extends Controller {
+    /**
+     * @var array<string, string>
+     */
     public static $searchKeys = [
         '' => 'code',
         'a' => 'attack',
@@ -27,6 +30,9 @@ class SearchController extends Controller {
         'y' => 'quantity',
         'z' => 'hasErrata',
     ];
+    /**
+     * @var array<string, string>
+     */
     public static $searchTypes = [
         '' => 'string',
         'f' => 'string',
@@ -48,6 +54,9 @@ class SearchController extends Controller {
         'z' => 'boolean',
     ];
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function formAction() {
         $response = new Response();
         $response->setPublic();
@@ -103,6 +112,10 @@ class SearchController extends Controller {
         ], $response);
     }
 
+    /**
+     * @param mixed $card_code
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function zoomAction($card_code, Request $request) {
         $card = $this->getDoctrine()->getRepository('AppBundle:Card')->findOneBy(["code" => $card_code]);
         if (!$card) {
@@ -128,6 +141,13 @@ class SearchController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $pack_code
+     * @param mixed $view
+     * @param mixed $sort
+     * @param mixed $page
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function listAction($pack_code, $view, $sort, $page, Request $request) {
         $pack = $this->getDoctrine()->getRepository('AppBundle:Pack')->findOneBy(['code' => $pack_code]);
 
@@ -154,6 +174,13 @@ class SearchController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $cycle_code
+     * @param mixed $view
+     * @param mixed $sort
+     * @param mixed $page
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function cycleAction($cycle_code, $view, $sort, $page, Request $request) {
         $cycle = $this->getDoctrine()->getRepository('AppBundle:Cycle')->findOneBy(["code" => $cycle_code]);
 
@@ -277,6 +304,16 @@ class SearchController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $q
+     * @param string $view
+     * @param mixed $sort
+     * @param int $page
+     * @param string $pagetitle
+     * @param string $meta
+     * @param mixed $selected_pack_code
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function displayAction($q, $view = 'card', $sort, $page = 1, $pagetitle = '', $meta = '', $selected_pack_code = null) {
         $response = new Response();
         $response->setPublic();
@@ -347,6 +384,7 @@ class SearchController extends Controller {
                 $card = $rows[$rowindex];
                 /* @var $pack \AppBundle\Entity\Pack */
                 $pack = $card->getPack();
+                /** @var array $cardinfo */
                 $cardinfo = $this->get('cards_data')->getCardInfo($card, false);
 
                 if (empty($availability[$pack->getCode()])) {
@@ -377,12 +415,10 @@ class SearchController extends Controller {
             $first += 1;
 
             // si on a des cartes on affiche une bande de navigation/pagination
-            if (count($rows)) {
-                if (count($rows) == 1) {
-                    $pagination = $this->setnavigation($card, $selected_pack_code);
-                } else {
-                    $pagination = $this->pagination($nb_per_page, count($rows), $first, $q, $view, $sort);
-                }
+            if (count($rows) == 1) {
+                $pagination = $this->setnavigation($rows[0], $selected_pack_code);
+            } else {
+                $pagination = $this->pagination($nb_per_page, count($rows), $first, $q, $view, $sort);
             }
 
             // si on est en vue "short" on casse la liste par tri
@@ -439,6 +475,11 @@ class SearchController extends Controller {
         ], $response);
     }
 
+    /**
+     * @param mixed $card
+     * @param mixed $selectedPackCode
+     * @return string
+     */
     public function setnavigation($card, $selectedPackCode = null) {
         $em = $this->getDoctrine();
 
@@ -488,6 +529,15 @@ class SearchController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $q
+     * @param mixed $v
+     * @param mixed $s
+     * @param mixed $ps
+     * @param mixed $pi
+     * @param mixed $total
+     * @return string
+     */
     public function paginationItem($q = null, $v, $s, $ps, $pi, $total) {
         return $this->renderView('AppBundle:Search:paginationitem.html.twig', [
             "href" => $q == null ? "" : $this->get('router')->generate('cards_find', ['q' => $q, 'view' => $v, 'sort' => $s, 'page' => $pi]),
@@ -498,6 +548,15 @@ class SearchController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $pagesize
+     * @param mixed $total
+     * @param mixed $current
+     * @param mixed $q
+     * @param mixed $view
+     * @param mixed $sort
+     * @return string
+     */
     public function pagination($pagesize, $total, $current, $q, $view, $sort) {
         if ($total < $pagesize) {
             $pagesize = $total;

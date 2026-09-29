@@ -8,6 +8,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CollectionController extends Controller {
 
+    /**
+     * @param bool $reloaduser
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function packsAction($reloaduser = false) {
         $categories = [];
         $categories[] = ["label" => "Core / Deluxe", "packs" => []];
@@ -84,7 +88,7 @@ class CollectionController extends Controller {
 
         $customPacks = $this->getDoctrine()
             ->getRepository('AppBundle:UserCustomPack')
-            ->findBy(['user' => $this->getUser()], ['createdAt' => 'ASC']);
+            ->findBy(['user' => $this->getUser()], ['createdAt' => 'ASC', 'id' => 'ASC']);
 
         return $this->render('AppBundle:Collection:packs.html.twig', [
             'pagetitle' =>  "My Collection",
@@ -94,6 +98,9 @@ class CollectionController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function savePacksAction(Request $request) {
         $selectedPacks = $request->get('selected-packs');
 
@@ -118,6 +125,7 @@ class CollectionController extends Controller {
     /**
      * Save the user's preferred art (printing) for a card.
      * POST card_code + pack_code; pack_code empty/"default" clears the preference.
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function saveArtPreferenceAction(Request $request) {
         $user = $this->getUser();
@@ -125,8 +133,8 @@ class CollectionController extends Controller {
             return new Response(json_encode(['success' => false, 'error' => 'not logged in']), 403, ['Content-Type' => 'application/json']);
         }
 
-        $cardCode = preg_replace('/[^0-9]/', '', $request->get('card_code'));
-        $packCode = preg_replace('/[^A-Za-z0-9_-]/', '', $request->get('pack_code'));
+        $cardCode = (string) preg_replace('/[^0-9]/', '', $request->get('card_code'));
+        $packCode = (string) preg_replace('/[^A-Za-z0-9_-]/', '', $request->get('pack_code'));
         if (!$cardCode) {
             return new Response(json_encode(['success' => false, 'error' => 'missing card_code']), 400, ['Content-Type' => 'application/json']);
         }

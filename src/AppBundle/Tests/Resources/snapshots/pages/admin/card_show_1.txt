@@ -1,0 +1,63 @@
+RingsDB
+My Collection
+Decks
+Fellowships
+Quest Logs
+Adventure Packs
+My Decks
+My Fellowships
+My Quest Logs
+My Adventure Packs
+Decklists
+Fellowships
+Quest Logs
+Cards
+Search
+Reviews
+Cards
+Index
+Admin
+admin_card_show
+Card
+Id
+1
+Code
+01001
+Sphere
+Leadership
+Type
+Hero
+Name
+Aragorn
+Traits
+Dúnedain. Noble. Ranger.
+Text
+Sentinel. <b>Response:</b> After Aragorn commits to a quest, spend 1 resource from his resource pool to ready him.
+OCTGN ID
+51223bd0-ffd1-11df-a976-0801200c9001
+Image
+Back to the list
+Edit
+Delete
+About
+API
+Patrons
+Original
+ThronesDB
+and
+NetrunnerDB
+code designed and built by Alsciende. Adapted to The Lord of the Rings: The Card Game by Sydtrack. Maintained by Seastan. Contact:
+RingsDB card images and data kindly supplied by
+Hall of Beorn
+.
+Please post bug reports and feature requests on
+GitHub
+.
+You may contribute by becoming a
+Patron
+.
+The information presented on this site about The Lord of the Rings: The Card Game, both literal and graphical, is copyrighted by Fantasy Flight Games. This website is not produced, endorsed, supported, or affiliated with Fantasy Flight Games.
+×
+Modal title
+Go to card page
+Close

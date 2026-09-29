@@ -113,7 +113,7 @@ class Comment {
      *
      * @return Comment
      */
-    public function setUser(\AppBundle\Entity\User $user = null) {
+    public function setUser(\AppBundle\Entity\User $user) {
         $this->user = $user;
 
         return $this;
@@ -135,7 +135,7 @@ class Comment {
      *
      * @return Comment
      */
-    public function setDecklist(\AppBundle\Entity\Decklist $decklist = null) {
+    public function setDecklist(\AppBundle\Entity\Decklist $decklist) {
         $this->decklist = $decklist;
 
         return $this;

@@ -2,11 +2,14 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Card;
+use AppBundle\Entity\Scenario;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Collections\Criteria;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ApiController extends Controller {
@@ -61,7 +64,7 @@ class ApiController extends Controller {
                 "name" => $pack->getName(),
                 "code" => $pack->getCode(),
                 "position" => $pack->getPosition(),
-                "cycle_position" => $pack->getCycle() ? $pack->getCycle()->getPosition() : 0,
+                "cycle_position" => $pack->getCycle()->getPosition(),
                 "available" => $pack->getDateRelease() ? $pack->getDateRelease()->format('Y-m-d') : '',
                 "known" => intval($real),
                 "total" => $max,
@@ -108,6 +111,7 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $card_code
      */
     public function getCardAction($card_code, Request $request) {
         $response = new Response();
@@ -123,11 +127,12 @@ class ApiController extends Controller {
         /* @var $card \AppBundle\Entity\Card */
         $card = $em->getRepository('AppBundle:Card')->findOneBy(["code" => $card_code]);
 
-        // check the last-modified-since header
-        $lastModified = null;
-        if (!$lastModified || $lastModified < $card->getDateUpdate()) {
-            $lastModified = $card->getDateUpdate();
+        if (!$card instanceof Card) {
+            throw $this->createNotFoundException('Card not found');
         }
+
+        // check the last-modified-since header
+        $lastModified = $card->getDateUpdate();
 
         $response->setLastModified($lastModified);
         if ($response->isNotModified($request)) {
@@ -136,7 +141,7 @@ class ApiController extends Controller {
 
         // build the response
         /* @var $card \AppBundle\Entity\Card */
-        $card = $this->get('cards_data')->getCardInfo($card, true, "en");
+        $card = $this->get('cards_data')->getCardInfo($card, true);
 
         $content = json_encode($card);
         if (isset($jsonp)) {
@@ -213,7 +218,7 @@ class ApiController extends Controller {
         $cards = [];
         /* @var $card \AppBundle\Entity\Card */
         foreach ($list_cards as $card) {
-            $cards[] = $this->get('cards_data')->getCardInfo($card, true, "en");
+            $cards[] = $this->get('cards_data')->getCardInfo($card, true);
         }
 
         $content = json_encode($cards);
@@ -254,6 +259,7 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $pack_code
      */
     public function listCardsByPackAction($pack_code, Request $request) {
         $response = new Response();
@@ -276,7 +282,7 @@ class ApiController extends Controller {
         /* @var $pack \AppBundle\Entity\Pack */
         $pack = $em->getRepository('AppBundle:Pack')->findOneBy(['code' => $pack_code]);
         if (!$pack) {
-            die();
+            throw $this->createNotFoundException('Pack not found');
         }
 
         $conditions = $this->get('cards_data')->syntax("e:$pack_code");
@@ -298,7 +304,7 @@ class ApiController extends Controller {
                 return $response;
             }
             for ($rowindex = 0; $rowindex < count($rows); $rowindex++) {
-                $card = $this->get('cards_data')->getCardInfo($rows[$rowindex], true, "en");
+                $card = $this->get('cards_data')->getCardInfo($rows[$rowindex], true);
                 $cards[] = $card;
             }
         }
@@ -342,6 +348,7 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $decklist_id
      */
     public function getDecklistAction($decklist_id, Request $request) {
         $response = new Response();
@@ -364,7 +371,7 @@ class ApiController extends Controller {
         /* @var $decklist \AppBundle\Entity\Decklist */
         $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
         if (!$decklist) {
-            die();
+            throw $this->createNotFoundException('Decklist not found');
         }
 
         $response->setLastModified($decklist->getDateUpdate());
@@ -413,6 +420,7 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $date
      */
     public function listDecklistsByDateAction($date, Request $request) {
         $response = new Response();
@@ -438,7 +446,7 @@ class ApiController extends Controller {
         $cardRepo = $em->getRepository('AppBundle:Card');
         $userRepo = $em->getRepository('AppBundle:User');
 
-        $decklists = json_decode(json_encode($decklists), true);
+        $decklists = json_decode((string) json_encode($decklists), true);
         foreach ($decklists as &$decklist) {
             $decklist['heroes_details'] = [];
             $username = '';
@@ -450,6 +458,9 @@ class ApiController extends Controller {
             $codes = array_keys($decklist['heroes']);
             foreach ($codes as $code) {
                 $card = $cardRepo->findOneBy(['code' => $code]);
+                if (!$card) {
+                    continue;
+                }
                 $decklist['heroes_details'][] = [
                     'name' => $card->getName(),
                     'sphere' => $card->getSphere()->getName(),
@@ -498,6 +509,7 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $card_code
      */
     public function listTopDecklistsByCardAction($card_code, Request $request) {
         $response = new Response();
@@ -532,6 +544,7 @@ class ApiController extends Controller {
         // high popularity
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
         $qb->orderBy('popularity', 'DESC');
+        $qb->addOrderBy('d.id', 'DESC');
 
         // containing the card
         $qb->innerJoin('d.slots', "s");
@@ -610,6 +623,7 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $scenario_id
      */
     public function getScenarioAction($scenario_id, Request $request) {
         $response = new Response();
@@ -625,11 +639,12 @@ class ApiController extends Controller {
         /* @var $scenario \AppBundle\Entity\Scenario */
         $scenario = $em->getRepository('AppBundle:Scenario')->findOneBy(['id' => $scenario_id]);
 
-        // check the last-modified-since header
-        $lastModified = null;
-        if (!$lastModified || $lastModified < $scenario->getDateUpdate()) {
-            $lastModified = $scenario->getDateUpdate();
+        if (!$scenario instanceof Scenario) {
+            throw $this->createNotFoundException('Scenario not found.');
         }
+
+        // check the last-modified-since header
+        $lastModified = $scenario->getDateUpdate();
 
         $response->setLastModified($lastModified);
         if ($response->isNotModified($request)) {
@@ -648,18 +663,24 @@ class ApiController extends Controller {
         return $response;
     }
 
+    /**
+     * @param mixed $q
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function searchCardsAction($q, Request $request) {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->container->getParameter('cache_expiration'));
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        static $availability = [];
+        $jsonp = $request->query->get('jsonp');
 
         $cards = [];
 
         $conditions = $this->get('cards_data')->syntax(urldecode($q));
         $conditions = $this->get('cards_data')->validateConditions($conditions);
+
+        $last_modified = null;
 
         $query = $this->get('cards_data')->buildQueryFromConditions($conditions);
         if ($query && $rows = $this->get('cards_data')->get_search_rows($conditions, "set")) {
@@ -673,7 +694,7 @@ class ApiController extends Controller {
                 return $response;
             }
             for ($rowindex = 0; $rowindex < count($rows); $rowindex++) {
-                $card = $this->get('cards_data')->getCardInfo($rows[$rowindex], true, "en");
+                $card = $this->get('cards_data')->getCardInfo($rows[$rowindex], true);
                 $cards[] = $card;
             }
         }
