@@ -210,10 +210,12 @@ value types of arrays and collections (the `missingType.iterableValue` and
 ## Environment
 
 - **Production database**: the tests run on MySQL 8.0, the version of production, with the
-  default `sql_mode`, which includes `ONLY_FULL_GROUP_BY` (several queries had to be fixed for
-  it, see "Card statistics", "Lists and search managers"). Check that the `sql_mode` of
-  production includes it too (`SELECT @@GLOBAL.sql_mode;`), so that the tests run on the same
-  settings.
+  default `sql_mode`. Production runs without `ONLY_FULL_GROUP_BY` (checked on 2026-09-29:
+  `STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION`),
+  the other modes are the same. The tests stay stricter on purpose: a query accepted with
+  `ONLY_FULL_GROUP_BY` works the same without it, and the mode catches the ambiguous
+  `GROUP BY`s, which return an arbitrary row of the group in production (several queries were
+  fixed for it, see "Card statistics", "Lists and search managers").
 - **Composer**: since the Symfony 3.4 step, the lock is updated with Composer 2 and production
   runs a normal `composer install` (decided on 2026-09-28), with `SYMFONY_ENV=prod` (read by
   the `app/console` calls of the Composer scripts).
@@ -226,9 +228,10 @@ value types of arrays and collections (the `missingType.iterableValue` and
   - `Version20260929134447`: aligns `user` with the FOSUserBundle 2 mappings (`username`,
     `email` and their canonical versions shortened to 180 characters, nullable `salt`, unique
     `confirmation_token`) and `user_custom_pack_card.quantity` (`TINYINT UNSIGNED` →
-    `SMALLINT UNSIGNED`: DBAL 2 maps `TINYINT` to a boolean). Before running it in production,
-    run the two queries of its docblock: it fails if a value is longer than 180 characters or
-    if a confirmation token is duplicated.
+    `SMALLINT UNSIGNED`: DBAL 2 maps `TINYINT` to a boolean). It fails if a value is longer
+    than 180 characters or if a confirmation token is duplicated (queries in its docblock):
+    checked on production on 2026-09-29, the values are under 50 characters and no confirmation
+    token is duplicated.
   - `Version20260929135555`: drops the `oauth2_*` tables (see "OAuth2 server (removed)").
   - `stat_cards_cache` has no entity (filled by SQL, see "Card statistics"): the
     `schema_filter` of the DBAL connection hides it from Doctrine, which would drop it
@@ -870,7 +873,7 @@ heroes counted as the card they copy and implying the contract 22134, sideboards
 - Fixed: the step 1 query did `GROUP BY c.code` while selecting non-aggregated columns
   (`cprim.octgnid`, from a derived table), rejected by MySQL 8's default `ONLY_FULL_GROUP_BY`.
   The selected columns were added to the `GROUP BY` (same result, one primary printing per
-  card); production presumably runs without `ONLY_FULL_GROUP_BY`.
+  card); production runs without `ONLY_FULL_GROUP_BY` (see "Environment").
 - It relies on the `source_code()` MySQL stored function (`function-source-code.sql`), which
   `ringsdb_bootstrap.sql` does not contain: `make fixtures` / `make test-fixtures` now load it,
   as root (with binary logging, creating a function requires SUPER).

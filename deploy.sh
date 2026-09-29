@@ -5,23 +5,55 @@
 # any of the three forks: ./deploy.sh from /var/www/ringsdb_test redeploys test,
 # from /var/www/ringsdb redeploys production, etc.
 #
-# Steps: fast-forward the branch, then clear the prod cache and recompile assets.
-# It deliberately does NOT auto-apply DB migrations or run composer — it stops
-# and tells you when the pull brings those in, so you can snapshot the DB first.
+# Steps: snapshot the database, fast-forward the branch, install the
+# dependencies (the Composer scripts clear the cache and build the assets),
+# apply the Doctrine migrations, refresh the cache/log ACLs.
 #
 # Env toggles:
-#   SKIP_PULL=1             skip git fetch/fast-forward (cache+assets only)
-#   SKIP_MIGRATION_CHECK=1  proceed even though new migration files were pulled
-#                           (set this after you've applied them by hand)
+#   SKIP_PULL=1    skip git fetch/fast-forward
+#   SNAPSHOT_DIR   where the database snapshots go (default: ~/db-snapshots)
 set -euo pipefail
 
 cd "$(dirname "$0")"
 ROOT="$(pwd)"
 CONSOLE="php app/console"
 
+# read by app/console, including in the Composer scripts (the dev bundles are
+# not installed)
+export SYMFONY_ENV=prod
+
 echo "==> Redeploying $ROOT"
 
-# --- 1. Update code (fast-forward only; never clobber local commits) ----------
+# --- 1. Snapshot the database -------------------------------------------------
+# The connection comes from app/config/parameters.yml; the password goes
+# through a defaults file, not the command line.
+SNAPSHOT_DIR="${SNAPSHOT_DIR:-$HOME/db-snapshots}"
+# the snapshots hold the users' data (emails, password hashes): owner only
+mkdir -p "$SNAPSHOT_DIR"
+chmod 700 "$SNAPSHOT_DIR"
+
+db_parameter() {
+    php -r 'require "vendor/autoload.php";
+        $p = Symfony\Component\Yaml\Yaml::parse(file_get_contents("app/config/parameters.yml"))["parameters"];
+        echo $p[$argv[1]] ?? "";' "$1"
+}
+DB_HOST="$(db_parameter database_host)"
+DB_PORT="$(db_parameter database_port)"
+DB_NAME="$(db_parameter database_name)"
+DB_USER="$(db_parameter database_user)"
+DB_PASSWORD="$(db_parameter database_password)"
+
+SNAPSHOT="$SNAPSHOT_DIR/${DB_NAME}_$(date +%Y%m%d-%H%M%S).sql.gz"
+echo "==> Snapshotting $DB_NAME to $SNAPSHOT..."
+# Without the tablespaces (they need the PROCESS privilege) nor the routines:
+# the source_code() stored function was created by root, the application user
+# cannot dump it. To restore, load the snapshot then function-source-code.sql
+# (as root).
+mysqldump --defaults-extra-file=<(printf '[client]\nuser=%s\npassword=%s\nhost=%s\nport=%s\n' \
+        "$DB_USER" "$DB_PASSWORD" "${DB_HOST:-127.0.0.1}" "${DB_PORT:-3306}") \
+    --single-transaction --no-tablespaces "$DB_NAME" | gzip > "$SNAPSHOT"
+
+# --- 2. Update code (fast-forward only; never clobber local commits) ----------
 OLD_HEAD="$(git rev-parse HEAD)"
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 
@@ -29,26 +61,6 @@ if [ "${SKIP_PULL:-0}" != "1" ]; then
     echo "==> Fetching origin and fast-forwarding $BRANCH..."
     git fetch origin
     if git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
-        # vendor/ is populated via rsync, not composer install, and is meant to
-        # stay on disk untouched by deploys. But if it's still *tracked* here
-        # while the upstream commit we're about to fast-forward to has stopped
-        # tracking it, the fast-forward's checkout will delete it from disk
-        # (git removes anything absent from the new tree, even when the file
-        # content itself never changed). Refuse and tell the operator to
-        # untrack it locally first, which is a no-op for the working tree.
-        if git ls-files --error-unmatch vendor >/dev/null 2>&1 \
-            && ! git diff --quiet HEAD '@{u}' -- vendor; then
-            echo "!! @{u} stops tracking vendor/, but it's still tracked in this checkout." >&2
-            echo "   Fast-forwarding now would DELETE vendor/ from disk." >&2
-            echo "   One-time fix — untrack it locally, then merge (not fast-forward;" >&2
-            echo "   both sides remove the same paths so this resolves with no conflicts" >&2
-            echo "   and never touches the files on disk):" >&2
-            echo "     git rm -r --cached vendor && git commit -m 'Untrack vendor/'" >&2
-            echo "     git merge '@{u}'" >&2
-            echo "   Then re-run this script (SKIP_PULL=1 if it's already up to date)." >&2
-            exit 1
-        fi
-
         # --ff-only refuses to merge if the branch has diverged: fail loudly
         # rather than create a merge commit or rewrite history.
         git merge --ff-only '@{u}'
@@ -64,29 +76,15 @@ else
     echo "    $OLD_HEAD -> $NEW_HEAD"
 fi
 
-# --- 2. Stop if the pull brought in deps / migrations that need a human -------
-if [ "$OLD_HEAD" != "$NEW_HEAD" ]; then
-    if ! git diff --quiet "$OLD_HEAD" "$NEW_HEAD" -- composer.lock; then
-        echo "!! composer.lock changed — run 'composer install' before continuing." >&2
-    fi
+# --- 3. Install the dependencies ----------------------------------------------
+# The Composer scripts then build parameters.yml, clear the cache, install and
+# dump the assets.
+echo "==> Installing the dependencies..."
+composer install --no-dev --optimize-autoloader --no-interaction
 
-    NEW_MIGRATIONS="$(git diff --name-only --diff-filter=A "$OLD_HEAD" "$NEW_HEAD" -- migrations/ | grep '\.sql$' || true)"
-    if [ -n "$NEW_MIGRATIONS" ] && [ "${SKIP_MIGRATION_CHECK:-0}" != "1" ]; then
-        echo "!! New migration files were pulled in:" >&2
-        echo "$NEW_MIGRATIONS" | sed 's/^/     /' >&2
-        echo "   Snapshot the DB first:  mysqldump ringsdb > /tmp/ringsdb_before.sql" >&2
-        echo "   Apply them, then re-run with SKIP_MIGRATION_CHECK=1 to finish." >&2
-        exit 1
-    fi
-fi
-
-# --- 3. Clear prod cache ------------------------------------------------------
-echo "==> Clearing prod cache..."
-$CONSOLE cache:clear --env=prod --no-debug
-
-# --- 4. Recompile assets ------------------------------------------------------
-echo "==> Dumping assets..."
-$CONSOLE assetic:dump --env=prod
+# --- 4. Apply the database migrations -----------------------------------------
+echo "==> Applying the migrations (snapshot: $SNAPSHOT)..."
+$CONSOLE doctrine:migrations:migrate --no-interaction --allow-no-migration
 
 # --- 5. Refresh cache/log ACLs (best-effort, no sudo) -------------------------
 # New files already inherit the right ACLs from the parent dirs' *default* ACL
