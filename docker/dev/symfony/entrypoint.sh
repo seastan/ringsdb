@@ -4,6 +4,8 @@ if [ ! -f vendor/autoload.php ]; then
     composer install
 fi
 
+ln -sfn /var/card_images web/bundles/cards
+
 php app/console server:run 0.0.0.0
 
 # the server could not start (e.g. the kernel does not boot): keep the container up, so that

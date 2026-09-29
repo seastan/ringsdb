@@ -219,11 +219,45 @@ value types of arrays and collections (the `missingType.iterableValue` and
 - **Composer**: since the Symfony 3.4 step, the lock is updated with Composer 2 and production
   runs a normal `composer install` (decided on 2026-09-28), with `SYMFONY_ENV=prod` (read by
   the `app/console` calls of the Composer scripts).
+- **Deployment**: `./deploy.sh`, run on the server from the checkout to update (it works on its
+  own directory, so the same script serves the production and test checkouts; the previous
+  script is kept as `deploy_old.sh`). Steps:
+  0. checks the card images (see below) and stops before any change if they are not set up;
+  1. switches to maintenance mode: creates `maintenance.flag` at the root of the checkout, then
+     waits 10 seconds for the requests in progress. While the flag exists, `web/app.php` and
+     `web/app_dev.php` answer `503` with `web/maintenance.html` before loading anything, so
+     nothing writes to the database or the cache during the update;
+  2. snapshots the database (`mysqldump --single-transaction --no-tablespaces`, connection from
+     `parameters.yml`) to `$SNAPSHOT_DIR` (default `~/db-snapshots`, mode 700: the snapshots hold
+     the users' data). The snapshot has no stored function (created by root, the application user
+     cannot dump it): to restore, load it then `function-source-code.sql` as root;
+  3. fast-forwards the branch (`git merge --ff-only`, skipped with `SKIP_PULL=1`);
+  4. removes the prod cache (renamed first) and runs `composer install --no-dev
+     --optimize-autoloader --no-interaction`, whose scripts clear the cache and build the assets.
+     The prod kernel uses its cached container without checking it: without the removal, the
+     `cache:clear` would boot the container of the previous code. Then links the card images;
+  5. applies the Doctrine migrations (`doctrine:migrations:migrate --allow-no-migration`);
+  6. refreshes the ACLs of `app/cache` and `app/logs` (`setfacl`, best-effort);
+  7. leaves maintenance mode.
+
+  If a step fails, the site stays in maintenance mode and the script prints the snapshot path;
+  `rm maintenance.flag` once fixed. `MAINTENANCE=0` keeps the site up (trivial redeploys).
+- **Card images** (about 832 MB, not in git): they live outside the checkout, in
+  `$CARD_IMAGES_DIR` (to set in the environment of the deploying user, e.g. in `~/.profile`; the
+  three checkouts can share it), served as `/bundles/cards/<code>.png` through the symlink
+  `web/bundles/cards`, that `deploy.sh` recreates. Since Symfony 3.4, `assets:install` (a
+  Composer script) deletes every directory of `web/bundles/` that is not a bundle's: a real
+  `web/bundles/cards` directory would be lost, a symlink is only unlinked (its target is kept).
+  `deploy.sh` refuses to run while `web/bundles/cards` is a directory. Once per server, before
+  the first deployment: `mv web/bundles/cards <dir>` and `export CARD_IMAGES_DIR=<dir>`. The web
+  server must follow symlinks (Apache in production: `FollowSymLinks` or
+  `SymLinksIfOwnerMatch`). Same trap locally: link `web/bundles/cards` to the images, never copy
+  them there.
 - **Schema changes**: from now on they go through `doctrine/doctrine-migrations-bundle` (2.2), in
   `app/DoctrineMigrations/` (namespace `Application\Migrations`, table `migration_versions`).
   `ringsdb_bootstrap.sql` stays the production schema before the first Doctrine migration, so
   `make fixtures` / `make test-fixtures` run `doctrine:migrations:migrate` after loading it; in
-  production, run it after each deployment. The older hand-written scripts of `migrations/` are
+  production, `deploy.sh` runs it (see "Deployment"). The older hand-written scripts of `migrations/` are
   already applied in production (and part of the bootstrap).
   - `Version20260929134447`: aligns `user` with the FOSUserBundle 2 mappings (`username`,
     `email` and their canonical versions shortened to 180 characters, nullable `salt`, unique
@@ -599,7 +633,7 @@ the entities `Client`, `AccessToken`, `RefreshToken`, `AuthCode` and their mappi
 section of the API introduction page (`/api/`).
 
 The `oauth2_*` tables are dropped by the Doctrine migration `Version20260929135555` (see
-"Environment"), run after the deployment; `ringsdb_bootstrap.sql` still contains them, as the
+"Environment"), run by `deploy.sh`; `ringsdb_bootstrap.sql` still contains them, as the
 production schema before the migrations.
 
 ## Quest logs
@@ -775,7 +809,8 @@ hasErrata`. Pinned by `AdminCsvTest`:
   of the admin card form (unmapped `file` field in `CardType`, file move in
   `CardController::updateAction`). It writes `web/bundles/app/images/cards/<code>.png`, but the
   site reads card images from `web/bundles/cards/<code>.png` (and `<image_code>.png` for
-  printings, `CardsData`): uploaded images are never displayed. It also keeps the `.png` name
+  printings, `CardsData`; a symlink to `$CARD_IMAGES_DIR`, see "Environment"): uploaded images
+  are never displayed. It also keeps the `.png` name
   whatever the actual format. Not tested.
 - The generated CRUD controllers use the Symfony 2 form API (`createForm(new XxxType())`,
   `'entity'` / `'checkbox'` type names, `getName()`), which is gone in recent versions
