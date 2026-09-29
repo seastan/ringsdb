@@ -5,11 +5,12 @@
 # any of the three forks: ./deploy.sh from /var/www/ringsdb_test redeploys test,
 # from /var/www/ringsdb redeploys production, etc.
 #
-# Steps: switch to maintenance mode, snapshot the database, fast-forward the
-# branch, install the dependencies (the Composer scripts clear the cache and
-# build the assets), link the card images, apply the Doctrine migrations,
-# refresh the cache/log ACLs, leave maintenance mode. If a step fails, the site
-# stays in maintenance mode.
+# Steps: check the card images, Composer and the PHP extensions needed by the
+# version to deploy (before any change), switch to maintenance mode, snapshot
+# the database, fast-forward the branch, back up vendor/, install the
+# dependencies (the Composer scripts clear the cache and build the assets), link
+# the card images, apply the Doctrine migrations, refresh the cache/log ACLs,
+# leave maintenance mode. If a step fails, the site stays in maintenance mode.
 #
 # Env:
 #   CARD_IMAGES_DIR  (required) the card images, outside the checkout: served
@@ -29,7 +30,8 @@ export SYMFONY_ENV=prod
 
 echo "==> Redeploying $ROOT"
 
-# --- 0. Check the card images -------------------------------------------------
+# --- 0. Checks, before any change ---------------------------------------------
+# The card images.
 # assets:install (a Composer script) deletes every directory of web/bundles/
 # that is not a bundle's: a real web/bundles/cards directory would be lost. A
 # symlink is only unlinked, its target is kept.
@@ -47,6 +49,59 @@ fi
 # absolute, so that the symlink does not depend on where it is
 CARD_IMAGES_DIR="$(cd "$CARD_IMAGES_DIR" && pwd)"
 
+# Composer: the lock is a Composer 2 lock, and check-platform-reqs --lock needs
+# Composer 2.2.
+COMPOSER_MIN_VERSION=2.2.0
+COMPOSER_VERSION="$(composer --version --no-ansi 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)"
+if [ -z "$COMPOSER_VERSION" ] \
+    || ! php -r 'exit(version_compare($argv[1], $argv[2], ">=") ? 0 : 1);' "$COMPOSER_VERSION" "$COMPOSER_MIN_VERSION"; then
+    echo "!! Composer >= $COMPOSER_MIN_VERSION is needed (found: ${COMPOSER_VERSION:-none})." >&2
+    exit 1
+fi
+
+# The version to deploy: the upstream branch, fetched now so that its PHP
+# requirements are checked before the site is touched.
+OLD_HEAD="$(git rev-parse HEAD)"
+BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+TARGET="$OLD_HEAD"
+if [ "${SKIP_PULL:-0}" != "1" ]; then
+    echo "==> Fetching origin..."
+    git fetch origin
+    if git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
+        TARGET="$(git rev-parse '@{u}')"
+        # the fast-forward of step 3 must be possible: fail now, not halfway
+        if ! git merge-base --is-ancestor HEAD "$TARGET"; then
+            echo "!! $BRANCH has diverged from its upstream: no fast-forward possible." >&2
+            exit 1
+        fi
+    else
+        echo "    (no upstream configured for $BRANCH; deploying the current commit)"
+    fi
+fi
+
+# The fast-forward of step 3 must not trip over local changes (a tracked file
+# changed on the server that the merge changes too, an untracked file the merge
+# adds): dry run of the same checkout, nothing is changed.
+# (update-index only refreshes the file stats: a file merely touched, e.g. by
+# rsync, is not a change)
+git update-index -q --refresh || true
+if [ "$TARGET" != "$OLD_HEAD" ] && ! git read-tree -mun HEAD "$TARGET"; then
+    echo "!! Local changes would be overwritten by the update (see above): nothing was changed." >&2
+    exit 1
+fi
+
+# The PHP version and extensions required by the lock file of that version.
+echo "==> Checking the PHP requirements of $TARGET..."
+PLATFORM_DIR="$(mktemp -d)"
+git show "$TARGET:composer.json" > "$PLATFORM_DIR/composer.json"
+git show "$TARGET:composer.lock" > "$PLATFORM_DIR/composer.lock"
+if ! COMPOSER="$PLATFORM_DIR/composer.json" composer check-platform-reqs --lock --no-dev --no-ansi; then
+    rm -rf "$PLATFORM_DIR"
+    echo "!! The PHP requirements of $TARGET are not met (see above): nothing was changed." >&2
+    exit 1
+fi
+rm -rf "$PLATFORM_DIR"
+
 # --- 1. Maintenance mode -----------------------------------------------------
 # web/app.php answers 503 with web/maintenance.html while the flag exists, so
 # nothing writes to the database or the cache during the update.
@@ -57,8 +112,10 @@ if [ "${MAINTENANCE:-1}" != "0" ]; then
     touch "$MAINTENANCE_FLAG"
     trap 'if [ $? -ne 0 ]; then
               echo "!! The deploy failed: the site stays in maintenance mode." >&2
-              echo "   Database snapshot: ${SNAPSHOT:-none}" >&2
-              echo "   Once fixed, leave maintenance mode: rm $MAINTENANCE_FLAG" >&2
+              echo "   To roll back: git reset --hard $OLD_HEAD, restore vendor.bak/" >&2
+              echo "   (if any) as vendor/, rm -rf app/cache/prod, and if the migrations ran," >&2
+              echo "   restore the database snapshot: ${SNAPSHOT:-none}" >&2
+              echo "   Then leave maintenance mode: rm $MAINTENANCE_FLAG" >&2
           fi' EXIT
     # the requests in progress finish
     sleep 10
@@ -94,19 +151,12 @@ mysqldump --defaults-extra-file=<(printf '[client]\nuser=%s\npassword=%s\nhost=%
     --single-transaction --no-tablespaces "$DB_NAME" | gzip > "$SNAPSHOT"
 
 # --- 3. Update code (fast-forward only; never clobber local commits) ----------
-OLD_HEAD="$(git rev-parse HEAD)"
-BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-
-if [ "${SKIP_PULL:-0}" != "1" ]; then
-    echo "==> Fetching origin and fast-forwarding $BRANCH..."
-    git fetch origin
-    if git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
-        # --ff-only refuses to merge if the branch has diverged: fail loudly
-        # rather than create a merge commit or rewrite history.
-        git merge --ff-only '@{u}'
-    else
-        echo "    (no upstream configured for $BRANCH; skipping merge)"
-    fi
+# The commit checked in step 0, not a newer push.
+if [ "$TARGET" != "$OLD_HEAD" ]; then
+    echo "==> Fast-forwarding $BRANCH..."
+    # --ff-only refuses to merge if the branch has diverged: fail loudly rather
+    # than create a merge commit or rewrite history.
+    git merge --ff-only "$TARGET"
 fi
 NEW_HEAD="$(git rev-parse HEAD)"
 
@@ -123,6 +173,11 @@ fi
 # to date: remove it, or the cache:clear of the Composer scripts would boot the
 # container of the previous code. Renamed first: the move is instant, even if
 # requests still write to the cache.
+# vendor/ is backed up first, for a rollback (the previous backup is replaced).
+echo "==> Backing up vendor/ to vendor.bak/..."
+rm -rf vendor.bak
+cp -a vendor vendor.bak
+
 echo "==> Installing the dependencies..."
 if [ -d app/cache/prod ]; then
     mv app/cache/prod "app/cache/prod.old.$(date +%s)"

@@ -222,7 +222,11 @@ value types of arrays and collections (the `missingType.iterableValue` and
 - **Deployment**: `./deploy.sh`, run on the server from the checkout to update (it works on its
   own directory, so the same script serves the production and test checkouts; the previous
   script is kept as `deploy_old.sh`). Steps:
-  0. checks the card images (see below) and stops before any change if they are not set up;
+  0. checks, before any change: the card images (see below); Composer (>= 2.2); fetches the
+     upstream branch, checks that it can be fast-forwarded without overwriting local changes
+     (`git read-tree -mun`, a dry run of the checkout), and checks the PHP version and
+     extensions its `composer.lock` requires (`composer check-platform-reqs --lock --no-dev`,
+     on a copy of its `composer.json` / `composer.lock`);
   1. switches to maintenance mode: creates `maintenance.flag` at the root of the checkout, then
      waits 10 seconds for the requests in progress. While the flag exists, `web/app.php` and
      `web/app_dev.php` answer `503` with `web/maintenance.html` before loading anything, so
@@ -231,8 +235,9 @@ value types of arrays and collections (the `missingType.iterableValue` and
      `parameters.yml`) to `$SNAPSHOT_DIR` (default `~/db-snapshots`, mode 700: the snapshots hold
      the users' data). The snapshot has no stored function (created by root, the application user
      cannot dump it): to restore, load it then `function-source-code.sql` as root;
-  3. fast-forwards the branch (`git merge --ff-only`, skipped with `SKIP_PULL=1`);
-  4. removes the prod cache (renamed first) and runs `composer install --no-dev
+  3. fast-forwards the branch to the commit checked in step 0 (`git merge --ff-only`; with
+     `SKIP_PULL=1`, no fetch and the current commit is redeployed);
+  4. backs up `vendor/` to `vendor.bak/` (replacing the previous backup), removes the prod cache (renamed first) and runs `composer install --no-dev
      --optimize-autoloader --no-interaction`, whose scripts clear the cache and build the assets.
      The prod kernel uses its cached container without checking it: without the removal, the
      `cache:clear` would boot the container of the previous code. Then links the card images;
@@ -240,8 +245,15 @@ value types of arrays and collections (the `missingType.iterableValue` and
   6. refreshes the ACLs of `app/cache` and `app/logs` (`setfacl`, best-effort);
   7. leaves maintenance mode.
 
-  If a step fails, the site stays in maintenance mode and the script prints the snapshot path;
-  `rm maintenance.flag` once fixed. `MAINTENANCE=0` keeps the site up (trivial redeploys).
+  If a step fails, the site stays in maintenance mode and the script prints how to roll back
+  (previous commit, `vendor.bak/`, the database snapshot); `rm maintenance.flag` once fixed.
+
+  **First deployment** (once per checkout): the checkout still has the previous `deploy.sh`,
+  which would clear the cache with the new code and the old `vendor/`. Pull first, and switch to
+  maintenance mode by hand at once (the pulled `web/app.php` honours the flag):
+  `git pull --ff-only && touch maintenance.flag && ./deploy.sh`. The script then finds the
+  checkout up to date and deploys the current commit. If one of its checks fails, the site stays
+  in maintenance mode: `git reset --hard ORIG_HEAD` and `rm maintenance.flag` to go back. `MAINTENANCE=0` keeps the site up (trivial redeploys).
 - **Card images** (about 832 MB, not in git): they live outside the checkout, in
   `$CARD_IMAGES_DIR` (to set in the environment of the deploying user, e.g. in `~/.profile`; the
   three checkouts can share it), served as `/bundles/cards/<code>.png` through the symlink
