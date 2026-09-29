@@ -71,11 +71,11 @@ class Questlog {
      */
     private $dateUpdate;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\QuestlogDeck>
      */
     private $decks;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\QuestlogComment>
      */
     private $comments;
     /**
@@ -87,11 +87,11 @@ class Questlog {
      */
     private $scenario;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     private $favorites;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     private $votes;
 

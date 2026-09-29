@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Entity\Decklist;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -34,7 +35,7 @@ class FixSignaturesCommand extends Command {
         $count = 0;
 
         /* @var $decklists \AppBundle\Entity\Decklist[] */
-        $decklists = $em->getRepository('AppBundle:Decklist')->findAll();
+        $decklists = $em->getRepository(Decklist::class)->findAll();
         foreach ($decklists as $decklist) {
             /* @var $decklist \AppBundle\Entity\Decklist */
 

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -35,7 +36,7 @@ class DeleteInactiveCommand extends Command {
         $limit->sub(new \DateInterval('PT48H'));
         $count = 0;
 
-        $users = $em->getRepository('AppBundle:User')->findBy(array('enabled' => false));
+        $users = $em->getRepository(User::class)->findBy(array('enabled' => false));
         foreach($users as $user) {
             /* @var $user AppBundle\Entity\User */
             if ($user->getDateCreation() < $limit) {

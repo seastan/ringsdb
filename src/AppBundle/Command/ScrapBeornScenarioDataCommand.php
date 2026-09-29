@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Entity\Scenario;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use AppBundle\Entity\Card;
@@ -79,11 +80,11 @@ class ScrapBeornScenarioDataCommand extends Command {
 
 		if ($name) {
 			/* @var $allScenarios \AppBundle\Entity\Scenario[] */
-			$allScenarios = [$em->getRepository('AppBundle:Scenario')->findOneBy(['name' => $name])];
+			$allScenarios = [$em->getRepository(Scenario::class)->findOneBy(['name' => $name])];
 		}
 		else {
 			/* @var $allScenarios \AppBundle\Entity\Scenario[] */
-			$allScenarios = $em->getRepository('AppBundle:Scenario')->findAll();
+			$allScenarios = $em->getRepository(Scenario::class)->findAll();
 		}
 
 		$i = 0;

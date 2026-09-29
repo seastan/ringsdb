@@ -22,7 +22,7 @@ class CycleController extends AbstractController {
     public function indexAction() {
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('AppBundle:Cycle')->findAll();
+        $entities = $em->getRepository(Cycle::class)->findAll();
 
         return $this->render('AppBundle:Cycle:index.html.twig', [
             'entities' => $entities,
@@ -77,7 +77,7 @@ class CycleController extends AbstractController {
     public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Cycle')->find($id);
+        $entity = $em->getRepository(Cycle::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Cycle entity.');
@@ -100,7 +100,7 @@ class CycleController extends AbstractController {
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Cycle')->find($id);
+        $entity = $em->getRepository(Cycle::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Cycle entity.');
@@ -125,7 +125,7 @@ class CycleController extends AbstractController {
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Cycle')->find($id);
+        $entity = $em->getRepository(Cycle::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Cycle entity.');
@@ -161,7 +161,7 @@ class CycleController extends AbstractController {
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('AppBundle:Cycle')->find($id);
+            $entity = $em->getRepository(Cycle::class)->find($id);
 
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Cycle entity.');

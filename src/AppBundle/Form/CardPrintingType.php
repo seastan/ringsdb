@@ -24,7 +24,9 @@ class CardPrintingType extends AbstractType {
                     $qb = $er->createQueryBuilder('c')
                         ->join('c.sphere', 's')
                         ->join('c.type', 't')
-                        ->orderBy('c.name');
+                        ->orderBy('c.name')
+                        // tie-breaker: several cards share a name (a hero and its ally, reprints)
+                        ->addOrderBy('c.id');
                     if ($filterPack) {
                         $qb->join('c.printings', 'cp')
                             ->andWhere('cp.pack = :pack')

@@ -2,6 +2,10 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Entity\Type;
+use AppBundle\Entity\Sphere;
+use AppBundle\Entity\Pack;
+use AppBundle\Entity\CardPrinting;
 use Symfony\Component\Asset\Packages;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -79,8 +83,8 @@ class ScrapBeornJsonDataCommand extends Command {
         $assets_helper = $this->packages;
         $rootDir = $this->rootDir;
 
-        $allSpheres = $em->getRepository('AppBundle:Sphere')->findAll();
-        $allTypes = $em->getRepository('AppBundle:Type')->findAll();
+        $allSpheres = $em->getRepository(Sphere::class)->findAll();
+        $allTypes = $em->getRepository(Type::class)->findAll();
 
         $skip = (int) $input->getOption('skip');
         $forceData = $input->getOption('force-data');
@@ -109,7 +113,7 @@ class ScrapBeornJsonDataCommand extends Command {
             $cardset = str_replace('The Hobbit: ', '', $cardset);
 
             /* @var $pack \AppBundle\Entity\Pack */
-            $pack = $em->getRepository('AppBundle:Pack')->findOneBy(['name' => $cardset]);
+            $pack = $em->getRepository(Pack::class)->findOneBy(['name' => $cardset]);
 
             if (!$pack) {
                 VarDumper::dump('Could not find pack ' . $data->CardSet);
@@ -117,7 +121,7 @@ class ScrapBeornJsonDataCommand extends Command {
             }
 
             /* @var $card \AppBundle\Entity\Card */
-            $bjPrinting = $em->getRepository('AppBundle:CardPrinting')->createQueryBuilder('cp')
+            $bjPrinting = $em->getRepository(CardPrinting::class)->createQueryBuilder('cp')
                 ->join('cp.card', 'c')->where('c.name = :n')->andWhere('cp.pack = :p')
                 ->setParameter('n', $data->Title)->setParameter('p', $pack)->setMaxResults(1)->getQuery()->getOneOrNullResult();
             $card = $bjPrinting ? $bjPrinting->getCard() : null;

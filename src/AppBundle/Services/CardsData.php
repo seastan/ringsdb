@@ -3,6 +3,10 @@
 
 namespace AppBundle\Services;
 
+use AppBundle\Entity\Sphere;
+use AppBundle\Entity\Review;
+use AppBundle\Entity\Cycle;
+use AppBundle\Entity\Card;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -85,7 +89,7 @@ class CardsData {
 	 * @return array
 	 */
 	public function allSetsData() {
-		$list_cycles = $this->doctrine->getRepository('AppBundle:Cycle')->findBy([], ["position" => "ASC"]);
+		$list_cycles = $this->doctrine->getRepository(Cycle::class)->findBy([], ["position" => "ASC"]);
 		$cycles = [];
 
 		foreach ($list_cycles as $cycle) {
@@ -135,7 +139,7 @@ class CardsData {
 	 * @return array
 	 */
 	public function getPrimarySpheres() {
-		$spheres = $this->doctrine->getRepository('AppBundle:Sphere')->findBy(["is_primary" => true], ["code" => "ASC"]);
+		$spheres = $this->doctrine->getRepository(Sphere::class)->findBy(["is_primary" => true], ["code" => "ASC"]);
 
 		return $spheres;
 	}
@@ -151,7 +155,7 @@ class CardsData {
         /* @var \Doctrine\ORM\EntityManager $em */
         $em = $this->doctrine;
 
-        $qb = $em->getRepository('AppBundle:Card')->createQueryBuilder('c');
+        $qb = $em->getRepository(Card::class)->createQueryBuilder('c');
         $qb->leftJoin('c.type', 't')->leftJoin('c.sphere', 's');
         $qb2 = null;
         $qb3 = null;
@@ -454,7 +458,7 @@ class CardsData {
 	public function getCardInfo($card, $api = false) {
 		$cardinfo = [];
 
-		$metadata = $this->doctrine->getManager()->getClassMetadata('AppBundle:Card');
+		$metadata = $this->doctrine->getManager()->getClassMetadata(Card::class);
 		$fieldNames = $metadata->getFieldNames();
 		$associationMappings = $metadata->getAssociationMappings();
 
@@ -668,7 +672,7 @@ class CardsData {
 	 * @return array
 	 */
 	public function get_reviews($card) {
-		$reviews = $this->doctrine->getRepository('AppBundle:Review')->findBy(['card' => $card], ['nbVotes' => 'DESC', 'id' => 'ASC']);
+		$reviews = $this->doctrine->getRepository(Review::class)->findBy(['card' => $card], ['nbVotes' => 'DESC', 'id' => 'ASC']);
 
 		$response = $reviews;
 
@@ -691,7 +695,7 @@ class CardsData {
 
 		$traits = [];
 		foreach ($result as $card) {
-			$subs = explode('.', $card['traits']);
+			$subs = explode('.', (string) $card['traits']);
 			foreach ($subs as $sub) {
 				$traits[trim($sub)] = 1;
 			}

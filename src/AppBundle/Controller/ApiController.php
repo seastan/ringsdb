@@ -2,6 +2,9 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\User;
+use AppBundle\Entity\Pack;
+use AppBundle\Entity\Decklist;
 use AppBundle\Services\CardsData;
 use AppBundle\Entity\Card;
 use AppBundle\Entity\Scenario;
@@ -55,7 +58,7 @@ class ApiController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $list_packs \AppBundle\Entity\Pack[] */
-        $list_packs = $em->getRepository('AppBundle:Pack')->findBy([], ["dateRelease" => "ASC", "position" => "ASC"]);
+        $list_packs = $em->getRepository(Pack::class)->findBy([], ["dateRelease" => "ASC", "position" => "ASC"]);
 
         // check the last-modified-since header
         $lastModified = null;
@@ -141,7 +144,7 @@ class ApiController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $card \AppBundle\Entity\Card */
-        $card = $em->getRepository('AppBundle:Card')->findOneBy(["code" => $card_code]);
+        $card = $em->getRepository(Card::class)->findOneBy(["code" => $card_code]);
 
         if (!$card instanceof Card) {
             throw $this->createNotFoundException('Card not found');
@@ -199,7 +202,7 @@ class ApiController extends AbstractController {
         /* @var $list_cards \AppBundle\Entity\Card[] */
         // Eager-load printings (+ their packs) and the card's pack/type/sphere so
         // getCardInfo doesn't issue N+1 queries while building packs[] for every card.
-        $list_cards = $em->getRepository('AppBundle:Card')->createQueryBuilder('c')
+        $list_cards = $em->getRepository(Card::class)->createQueryBuilder('c')
             ->leftJoin('c.printings', 'cp')->addSelect('cp')
             ->leftJoin('cp.pack', 'cpp')->addSelect('cpp')
             ->leftJoin('c.type', 't')->addSelect('t')
@@ -218,7 +221,7 @@ class ApiController extends AbstractController {
         }
         $printingMax = $em->createQuery('SELECT MAX(cp.dateUpdate) FROM AppBundle:CardPrinting cp')->getSingleScalarResult();
         if ($printingMax) {
-            $printingMax = new \DateTime($printingMax);
+            $printingMax = new \DateTime((string) $printingMax);
             if (!$lastModified || $lastModified < $printingMax) {
                 $lastModified = $printingMax;
             }
@@ -296,7 +299,7 @@ class ApiController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $pack \AppBundle\Entity\Pack */
-        $pack = $em->getRepository('AppBundle:Pack')->findOneBy(['code' => $pack_code]);
+        $pack = $em->getRepository(Pack::class)->findOneBy(['code' => $pack_code]);
         if (!$pack) {
             throw $this->createNotFoundException('Pack not found');
         }
@@ -385,7 +388,7 @@ class ApiController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $decklist \AppBundle\Entity\Decklist */
-        $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
+        $decklist = $em->getRepository(Decklist::class)->find($decklist_id);
         if (!$decklist) {
             throw $this->createNotFoundException('Decklist not found');
         }
@@ -455,12 +458,12 @@ class ApiController extends AbstractController {
 
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
-        $qb = $em->getRepository('AppBundle:Decklist')->createQueryBuilder('d');
+        $qb = $em->getRepository(Decklist::class)->createQueryBuilder('d');
         $qb->andWhere("d.dateCreation LIKE '$date%'");
         $decklists = $qb->getQuery()->getResult();
 
-        $cardRepo = $em->getRepository('AppBundle:Card');
-        $userRepo = $em->getRepository('AppBundle:User');
+        $cardRepo = $em->getRepository(Card::class);
+        $userRepo = $em->getRepository(User::class);
 
         $decklists = json_decode((string) json_encode($decklists), true);
         foreach ($decklists as &$decklist) {
@@ -545,7 +548,7 @@ class ApiController extends AbstractController {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
-        $card = $this->getDoctrine()->getRepository('AppBundle:Card')->findOneBy(['code' => $card_code]);
+        $card = $this->getDoctrine()->getRepository(Card::class)->findOneBy(['code' => $card_code]);
         if (!$card) {
             $response->setContent('[]');
 
@@ -653,7 +656,7 @@ class ApiController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $scenario \AppBundle\Entity\Scenario */
-        $scenario = $em->getRepository('AppBundle:Scenario')->findOneBy(['id' => $scenario_id]);
+        $scenario = $em->getRepository(Scenario::class)->findOneBy(['id' => $scenario_id]);
 
         if (!$scenario instanceof Scenario) {
             throw $this->createNotFoundException('Scenario not found.');

@@ -69,31 +69,31 @@ class User extends BaseUser {
      */
     private $darkMode = false;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Deck>
      */
     private $decks;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Decklist>
      */
     private $decklists;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Comment>
      */
     private $comments;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Review>
      */
     private $reviews;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Decklist>
      */
     private $favorites;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Decklist>
      */
     private $votes;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Review>
      */
     private $reviewvotes;
 
@@ -619,11 +619,11 @@ class User extends BaseUser {
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     private $following;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     private $followers;
 
@@ -745,7 +745,7 @@ class User extends BaseUser {
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Fellowship>
      */
     private $fellowships;
 
@@ -798,15 +798,15 @@ class User extends BaseUser {
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\FellowshipComment>
      */
     private $fellowship_comments;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Fellowship>
      */
     private $fellowship_favorites;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Fellowship>
      */
     private $fellowship_votes;
 
@@ -907,11 +907,11 @@ class User extends BaseUser {
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Questlog>
      */
     private $questlogs;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\QuestlogComment>
      */
     private $questlog_comments;
 
@@ -980,11 +980,11 @@ class User extends BaseUser {
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Questlog>
      */
     private $questlog_favorites;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Questlog>
      */
     private $questlog_votes;
 

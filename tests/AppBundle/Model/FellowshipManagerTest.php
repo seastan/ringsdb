@@ -2,6 +2,7 @@
 
 namespace Tests\AppBundle\Model;
 
+use AppBundle\Entity\User;
 use AppBundle\Model\FellowshipManager;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -119,7 +120,7 @@ class FellowshipManagerTest extends KernelTestCase {
         $container->get('request_stack')->push(Request::create('/fellowships/find', 'GET', $query));
         $manager = $container->get('fellowship_manager');
         if ($username) {
-            $manager->setUser($container->get('doctrine')->getRepository('AppBundle:User')->findOneBy(['username' => $username]));
+            $manager->setUser($container->get('doctrine')->getRepository(User::class)->findOneBy(['username' => $username]));
         }
 
         return $manager;
@@ -130,7 +131,7 @@ class FellowshipManagerTest extends KernelTestCase {
      * @return \AppBundle\Entity\User
      */
     private function user($username) {
-        $user = static::$kernel->getContainer()->get('doctrine')->getRepository('AppBundle:User')->findOneBy(['username' => $username]);
+        $user = static::$kernel->getContainer()->get('doctrine')->getRepository(User::class)->findOneBy(['username' => $username]);
         $this->assertNotNull($user);
 
         return $user;

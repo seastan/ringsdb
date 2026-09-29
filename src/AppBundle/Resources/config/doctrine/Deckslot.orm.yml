@@ -4,17 +4,17 @@ AppBundle\Entity\Deckslot:
     manyToOne:
         deck:
             targetEntity: Deck
-            nullable: false
             inversedBy: slots
             joinColumn:
                 name: deck_id
                 referencedColumnName: id
+                nullable: false
         card:
             targetEntity: Card
-            nullable: false
             joinColumn:
                 name: card_id
                 referencedColumnName: id
+                nullable: false
     fields:
         id:
             type: integer

@@ -23,7 +23,7 @@ class SphereController extends AbstractController {
     public function indexAction() {
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('AppBundle:Sphere')->findAll();
+        $entities = $em->getRepository(Sphere::class)->findAll();
 
         return $this->render('AppBundle:Sphere:index.html.twig', array(
             'entities' => $entities,
@@ -94,7 +94,7 @@ class SphereController extends AbstractController {
     public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Sphere')->find($id);
+        $entity = $em->getRepository(Sphere::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Sphere entity.');
@@ -117,7 +117,7 @@ class SphereController extends AbstractController {
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Sphere')->find($id);
+        $entity = $em->getRepository(Sphere::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Sphere entity.');
@@ -160,7 +160,7 @@ class SphereController extends AbstractController {
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Sphere')->find($id);
+        $entity = $em->getRepository(Sphere::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Sphere entity.');
@@ -195,7 +195,7 @@ class SphereController extends AbstractController {
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('AppBundle:Sphere')->find($id);
+            $entity = $em->getRepository(Sphere::class)->find($id);
 
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Sphere entity.');

@@ -55,15 +55,15 @@ class Fellowship {
     */
     private $dateLastComment;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\FellowshipDeck>
      */
     private $decks;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\FellowshipDecklist>
      */
     private $decklists;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\FellowshipComment>
      */
     private $comments;
     /**
@@ -71,11 +71,11 @@ class Fellowship {
      */
     private $user;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     private $favorites;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     private $votes;
 

@@ -2,6 +2,7 @@
 
 namespace Tests\AppBundle\Model;
 
+use AppBundle\Entity\User;
 use AppBundle\Model\QuestLogManager;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -132,7 +133,7 @@ class QuestLogManagerTest extends KernelTestCase {
      * @return \AppBundle\Entity\User
      */
     private function user($username) {
-        $user = static::$kernel->getContainer()->get('doctrine')->getRepository('AppBundle:User')->findOneBy(['username' => $username]);
+        $user = static::$kernel->getContainer()->get('doctrine')->getRepository(User::class)->findOneBy(['username' => $username]);
         $this->assertNotNull($user);
 
         return $user;
@@ -165,16 +166,6 @@ class QuestLogManagerTest extends KernelTestCase {
         $this->assertSame(['Q2'], $this->names($this->manager()->findQuestLogsInHallOfFame()));
         // comments of the day first, then number of comments
         $this->assertSame(['Q3', 'Q2', 'Q5', 'Q1'], $this->names($this->manager()->findQuestLogsInHotTopic()));
-    }
-
-    /**
-     * Dead code: Questlog has no dateLastComment field (quest logs only count their comments), and
-     * nothing calls this method.
-     */
-    public function testFindByRecentDiscussionIsBroken(): void {
-        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
-        $this->expectExceptionMessage('has no field or association named dateLastComment');
-        $this->manager()->findQuestLogsByRecentDiscussion();
     }
 
     public function testPagination(): void {

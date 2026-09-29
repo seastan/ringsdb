@@ -26,7 +26,7 @@ class LoadCustomPackData extends AbstractFixture implements DependentFixtureInte
     {
         /** @var User $user */
         $user = $this->getReference('test-user');
-        $cardRepo = $manager->getRepository('AppBundle:Card');
+        $cardRepo = $manager->getRepository(Card::class);
 
         $pack = new UserCustomPack();
         $pack->setUser($user);

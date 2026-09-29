@@ -4,11 +4,11 @@ AppBundle\Entity\Fellowship:
     manyToOne:
         user:
             targetEntity: User
-            nullable: false
             inversedBy: fellowships
             joinColumn:
                 name: user_id
                 referencedColumnName: id
+                nullable: false
     oneToMany:
         decks:
             targetEntity: FellowshipDeck

@@ -4,18 +4,18 @@ AppBundle\Entity\FellowshipDeck:
     manyToOne:
         fellowship:
             targetEntity: Fellowship
-            nullable: false
             inversedBy: decks
             joinColumn:
                 name: fellowship_id
                 referencedColumnName: id
+                nullable: false
         deck:
             targetEntity: Deck
-            nullable: false
             inversedBy: fellowships
             joinColumn:
                 name: deck_id
                 referencedColumnName: id
+                nullable: false
     fields:
         id:
             type: integer

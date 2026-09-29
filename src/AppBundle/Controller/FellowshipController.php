@@ -1,6 +1,10 @@
 <?php
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\User;
+use AppBundle\Entity\Decklist;
+use AppBundle\Entity\Deck;
+use AppBundle\Entity\Cycle;
 use AppBundle\Services\Texts;
 use AppBundle\Services\Decks;
 use AppBundle\Model\FellowshipManager;
@@ -178,7 +182,7 @@ class FellowshipController extends AbstractController {
 
             if ($deck_ids[$i]) {
                 /* @var $decks \AppBundle\Entity\Deck[] */
-                $decks[$i] = $this->getDoctrine()->getManager()->getRepository('AppBundle:Deck')->find($deck_ids[$i]);
+                $decks[$i] = $this->getDoctrine()->getManager()->getRepository(Deck::class)->find($deck_ids[$i]);
 
                 if ($decks[$i]) {
                     /* @var $user \AppBundle\Entity\User */
@@ -212,7 +216,7 @@ class FellowshipController extends AbstractController {
         $user = $this->currentUser();
 
         /* @var $fellowship \AppBundle\Entity\Fellowship */
-        $fellowship = $this->getDoctrine()->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+        $fellowship = $this->getDoctrine()->getRepository(Fellowship::class)->find($fellowship_id);
 
         if (!$fellowship) {
             throw new NotFoundHttpException("This fellowship does not exists.");
@@ -253,7 +257,7 @@ class FellowshipController extends AbstractController {
      */
     public function viewAction($fellowship_id) {
         /* @var $fellowship \AppBundle\Entity\Fellowship */
-        $fellowship = $this->getDoctrine()->getManager()->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+        $fellowship = $this->getDoctrine()->getManager()->getRepository(Fellowship::class)->find($fellowship_id);
 
         if (!$fellowship) {
             throw new NotFoundHttpException("This fellowship does not exists.");
@@ -318,7 +322,7 @@ class FellowshipController extends AbstractController {
 
         if ($fellowship_id) {
             /* @var $fellowship \AppBundle\Entity\Fellowship */
-            $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+            $fellowship = $em->getRepository(Fellowship::class)->find($fellowship_id);
 
             if (!$fellowship) {
                 throw new NotFoundHttpException("This fellowship does not exists.");
@@ -377,7 +381,7 @@ class FellowshipController extends AbstractController {
                 if ($deck_id) {
                     if (!$is_decklist) {
                         /* @var $deck \AppBundle\Entity\Deck */
-                        $deck = $em->getRepository('AppBundle:Deck')->find($deck_id);
+                        $deck = $em->getRepository(Deck::class)->find($deck_id);
 
                         if (!$deck) {
                             throw new NotFoundHttpException("One of the selected decks does not exists.");
@@ -401,7 +405,7 @@ class FellowshipController extends AbstractController {
                         $fellowship->addDeck($fellowship_deck);
                     } else {
                         /* @var $decklist \AppBundle\Entity\Decklist */
-                        $decklist = $em->getRepository('AppBundle:Decklist')->find($deck_id);
+                        $decklist = $em->getRepository(Decklist::class)->find($deck_id);
 
                         if (!$decklist) {
                             throw new NotFoundHttpException("One of the selected decks does not exists.");
@@ -457,7 +461,7 @@ class FellowshipController extends AbstractController {
         }
 
         /* @var $fellowship \AppBundle\Entity\Fellowship */
-        $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+        $fellowship = $em->getRepository(Fellowship::class)->find($fellowship_id);
         if (!$fellowship || $fellowship->getUser()->getId() != $user->getId()) {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
@@ -519,7 +523,7 @@ class FellowshipController extends AbstractController {
             $this_content = json_encode($content);
             $this_signature = md5((string) $this_content);
 
-            $old_decklists = $this->getDoctrine()->getRepository('AppBundle:Decklist')->findBy([ 'signature' => $this_signature ]);
+            $old_decklists = $this->getDoctrine()->getRepository(Decklist::class)->findBy([ 'signature' => $this_signature ]);
 
             foreach ($old_decklists as $decklist) {
                 /* @var $decklist \AppBundle\Entity\Decklist */
@@ -567,7 +571,7 @@ class FellowshipController extends AbstractController {
         $fellowship_id = intval(filter_var($request->request->get('fellowship_id'), FILTER_SANITIZE_NUMBER_INT));
 
         /* @var $fellowship \AppBundle\Entity\Fellowship */
-        $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+        $fellowship = $em->getRepository(Fellowship::class)->find($fellowship_id);
         if (!$fellowship || $fellowship->getUser()->getId() != $user->getId()) {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
@@ -601,7 +605,7 @@ class FellowshipController extends AbstractController {
             $new_id = intval(filter_var($request->request->get('deck_selection_' . $fellowship_deck->getDeckNumber()), FILTER_SANITIZE_NUMBER_INT));
 
             if ($new_id) {
-                $decklist = $em->getRepository('AppBundle:Decklist')->find($new_id);
+                $decklist = $em->getRepository(Decklist::class)->find($new_id);
 
                 if (!$decklist) {
                     throw new NotFoundHttpException("One of the selected decks does not exists.");
@@ -655,7 +659,7 @@ class FellowshipController extends AbstractController {
         $fellowship_id = filter_var($request->get('fellowship_id'), FILTER_SANITIZE_NUMBER_INT);
 
         /* @var $fellowship \AppBundle\Entity\Fellowship */
-        $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+        $fellowship = $em->getRepository(Fellowship::class)->find($fellowship_id);
         if (!$fellowship) {
             return $this->redirect($this->generateUrl('myfellowships_list'));
         }
@@ -704,7 +708,7 @@ class FellowshipController extends AbstractController {
 
         foreach ($list_id as $id) {
             /* @var $fellowship \AppBundle\Entity\Fellowship */
-            $fellowship = $em->getRepository('AppBundle:Fellowship')->find($id);
+            $fellowship = $em->getRepository(Fellowship::class)->find($id);
             if (!$fellowship) {
                 continue;
             }
@@ -762,7 +766,7 @@ class FellowshipController extends AbstractController {
         $on = 0;
         $off = 0;
         $categories[] = ["label" => "Core / Deluxe", "packs" => []];
-        $list_cycles = $this->getDoctrine()->getRepository('AppBundle:Cycle')->findBy([], ["position" => "ASC"]);
+        $list_cycles = $this->getDoctrine()->getRepository(Cycle::class)->findBy([], ["position" => "ASC"]);
         foreach ($list_cycles as $cycle) {
             /* @var $cycle \AppBundle\Entity\Cycle */
             $size = count($cycle->getPacks());
@@ -865,7 +869,7 @@ class FellowshipController extends AbstractController {
         $on = 0;
         $off = 0;
         $categories[] = ["label" => "Core / Deluxe", "packs" => []];
-        $list_cycles = $this->getDoctrine()->getRepository('AppBundle:Cycle')->findBy([], ["position" => "ASC"]);
+        $list_cycles = $this->getDoctrine()->getRepository(Cycle::class)->findBy([], ["position" => "ASC"]);
 
         foreach ($list_cycles as $cycle) {
             /* @var $cycle \AppBundle\Entity\Cycle */
@@ -967,7 +971,7 @@ class FellowshipController extends AbstractController {
         }
 
         /* @var $fellowship \AppBundle\Entity\Fellowship */
-        $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+        $fellowship = $em->getRepository(Fellowship::class)->find($fellowship_id);
         if (!$fellowship) {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
@@ -1053,7 +1057,7 @@ class FellowshipController extends AbstractController {
         $fellowship_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
 
         /* @var $fellowship \AppBundle\Entity\Fellowship */
-        $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+        $fellowship = $em->getRepository(Fellowship::class)->find($fellowship_id);
         if (!$fellowship) {
             throw new NotFoundHttpException('Wrong id');
         }
@@ -1113,7 +1117,7 @@ class FellowshipController extends AbstractController {
         }
 
         $fellowship_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
-        $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+        $fellowship = $em->getRepository(Fellowship::class)->find($fellowship_id);
         if (!$fellowship) {
             throw new BadRequestHttpException('Wrong fellowship id');
         }
@@ -1165,7 +1169,7 @@ class FellowshipController extends AbstractController {
 
             foreach ($mentionned_usernames as $mentionned_username) {
                 /* @var $mentionned_user \AppBundle\Entity\User */
-                $mentionned_user = $this->getDoctrine()->getRepository('AppBundle:User')->findOneBy(['username' => $mentionned_username]);
+                $mentionned_user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username' => $mentionned_username]);
                 if ($mentionned_user && $mentionned_user->getIsNotifMention()) {
                     if (!isset($spool[$mentionned_user->getEmail()])) {
                         $spool[$mentionned_user->getEmail()] = 'AppBundle:Emails:newfellowshipcomment_mentionned.html.twig';
@@ -1211,7 +1215,7 @@ class FellowshipController extends AbstractController {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
-        $comment = $em->getRepository('AppBundle:FellowshipComment')->find($comment_id);
+        $comment = $em->getRepository(FellowshipComment::class)->find($comment_id);
         if (!$comment) {
             throw new BadRequestHttpException('Unable to find comment');
         }
@@ -1244,13 +1248,13 @@ class FellowshipController extends AbstractController {
         $fellowship_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
 
         /* @var $fellowship \AppBundle\Entity\Fellowship */
-        $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+        $fellowship = $em->getRepository(Fellowship::class)->find($fellowship_id);
         if (!$fellowship) {
             throw new BadRequestHttpException('Unable to find fellowship');
         }
 
         if ($fellowship->getUser()->getId() != $user->getId()) {
-            $query = $em->getRepository('AppBundle:Fellowship')
+            $query = $em->getRepository(Fellowship::class)
                 ->createQueryBuilder('d')
                 ->innerJoin('d.votes', 'u')
                 ->where('d.id = :fellowship_id')

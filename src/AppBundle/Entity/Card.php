@@ -76,11 +76,11 @@ class Card {
      */
     private $dateUpdate;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Review>
      */
     private $reviews;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\CardPrinting>
      */
     private $printings;
     /**
@@ -143,8 +143,9 @@ class Card {
                 continue;
             }
 
-            $pDate = $p->getPack() ? $p->getPack()->getDateRelease() : null;
-            $primaryDate = $primary->getPack() ? $primary->getPack()->getDateRelease() : null;
+            // a printing always has a pack (card_printing.pack_id is NOT NULL)
+            $pDate = $p->getPack()->getDateRelease();
+            $primaryDate = $primary->getPack()->getDateRelease();
 
             // Prefer the earliest-released pack so the canonical printing is the
             // original one (e.g. Core Set over a later reprint or starter). A

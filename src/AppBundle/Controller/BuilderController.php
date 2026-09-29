@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Pack;
+use AppBundle\Entity\Decklist;
 use Psr\Log\LoggerInterface;
 use AppBundle\Services\Texts;
 use AppBundle\Services\Diff;
@@ -81,7 +83,7 @@ class BuilderController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $deck \AppBundle\Entity\Deck */
-        $deck = $em->getRepository('AppBundle:Deck')->find($deck_id);
+        $deck = $em->getRepository(Deck::class)->find($deck_id);
 
         if (!$deck) {
             throw new NotFoundHttpException("This deck doesn't exist.");
@@ -106,7 +108,7 @@ class BuilderController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $deck \AppBundle\Entity\Deck */
-        $deck = $em->getRepository('AppBundle:Deck')->find($deck_id);
+        $deck = $em->getRepository(Deck::class)->find($deck_id);
 
         if (!$deck) {
             throw new NotFoundHttpException("This deck doesn't exist.");
@@ -225,10 +227,10 @@ class BuilderController extends AbstractController {
 
             if ($pack_name) {
                 /* @var $pack \AppBundle\Entity\Pack */
-                $pack = $em->getRepository('AppBundle:Pack')->findOneBy(['name' => $pack_name]);
+                $pack = $em->getRepository(Pack::class)->findOneBy(['name' => $pack_name]);
 
                 if (!$pack) {
-                    $pack = $em->getRepository('AppBundle:Pack')->findOneBy(['code' => $pack_name]);
+                    $pack = $em->getRepository(Pack::class)->findOneBy(['code' => $pack_name]);
                 }
             }
 
@@ -242,7 +244,7 @@ class BuilderController extends AbstractController {
                     ->getOneOrNullResult();
             } else {
                 /* @var $pack \AppBundle\Entity\Card */
-                $card = $em->getRepository('AppBundle:Card')->findOneBy([
+                $card = $em->getRepository(Card::class)->findOneBy([
                     'name' => $name,
                 ]);
             }
@@ -358,7 +360,7 @@ class BuilderController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $deck \AppBundle\Entity\Deck */
-        $deck = $em->getRepository('AppBundle:Deck')->find($deck_id);
+        $deck = $em->getRepository(Deck::class)->find($deck_id);
 
         if (!$deck) {
             throw new NotFoundHttpException("This deck doesn't exist.");
@@ -394,7 +396,7 @@ class BuilderController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $deck \AppBundle\Entity\Deck */
-        $deck = $em->getRepository('AppBundle:Deck')->find($deck_id);
+        $deck = $em->getRepository(Deck::class)->find($deck_id);
 
         if (!$deck) {
             throw new NotFoundHttpException("This deck doesn't exist.");
@@ -429,7 +431,7 @@ class BuilderController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $deck \AppBundle\Entity\Deck */
-        $deck = $em->getRepository('AppBundle:Deck')->find($deck_id);
+        $deck = $em->getRepository(Deck::class)->find($deck_id);
 
         if (!$deck) {
             throw new NotFoundHttpException("This deck doesn't exist.");
@@ -480,7 +482,7 @@ class BuilderController extends AbstractController {
 
         if ($id) {
             /* @var $deck \AppBundle\Entity\Deck */
-            $deck = $em->getRepository('AppBundle:Deck')->find($id);
+            $deck = $em->getRepository(Deck::class)->find($id);
 
             if (!$deck || $user->getId() != $deck->getUser()->getId()) {
                 throw new AccessDeniedHttpException("You don't have access to this deck.");
@@ -543,7 +545,7 @@ class BuilderController extends AbstractController {
 
         if ($id) {
             /* @var $deck \AppBundle\Entity\Deck */
-            $deck = $em->getRepository('AppBundle:Deck')->find($id);
+            $deck = $em->getRepository(Deck::class)->find($id);
 
             if (!$deck || $user->getId() != $deck->getUser()->getId()) {
                 return new JsonResponse(['success' => false, 'error' => "You don't have access to this deck."], 403);
@@ -584,7 +586,7 @@ class BuilderController extends AbstractController {
         $deck_id = filter_var($request->get('deck_id'), FILTER_SANITIZE_NUMBER_INT);
 
         /* @var $deck \AppBundle\Entity\Deck */
-        $deck = $em->getRepository('AppBundle:Deck')->find($deck_id);
+        $deck = $em->getRepository(Deck::class)->find($deck_id);
         if (!$deck) {
             return $this->redirect($this->generateUrl('decks_list'));
         }
@@ -619,7 +621,7 @@ class BuilderController extends AbstractController {
 
         foreach ($list_id as $id) {
             /* @var $deck \AppBundle\Entity\Deck */
-            $deck = $em->getRepository('AppBundle:Deck')->find($id);
+            $deck = $em->getRepository(Deck::class)->find($id);
             if (!$deck) {
                 continue;
             }
@@ -650,10 +652,10 @@ class BuilderController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $deck1 \AppBundle\Entity\Deck */
-        $deck1 = $em->getRepository('AppBundle:Deck')->find($deck1_id);
+        $deck1 = $em->getRepository(Deck::class)->find($deck1_id);
 
         /* @var $deck2 \AppBundle\Entity\Deck */
-        $deck2 = $em->getRepository('AppBundle:Deck')->find($deck2_id);
+        $deck2 = $em->getRepository(Deck::class)->find($deck2_id);
 
         if (!$deck1 || !$deck2) {
             throw new NotFoundHttpException("This deck doesn't exist.");
@@ -736,7 +738,7 @@ class BuilderController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $decklist \AppBundle\Entity\Decklist */
-        $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
+        $decklist = $em->getRepository(Decklist::class)->find($decklist_id);
 
         if (!$decklist) {
             throw new NotFoundHttpException("This deck doesn't exist.");
@@ -800,7 +802,7 @@ class BuilderController extends AbstractController {
         if ($res === true) {
             foreach ($list_id as $id) {
                 /* @var $deck \AppBundle\Entity\Deck */
-                $deck = $em->getRepository('AppBundle:Deck')->find($id);
+                $deck = $em->getRepository(Deck::class)->find($id);
 
                 if (!$deck) {
                     continue;
@@ -911,7 +913,7 @@ class BuilderController extends AbstractController {
         $deck_id = $request->get('deck_id');
 
         /* @var $deck \AppBundle\Entity\Deck */
-        $deck = $em->getRepository('AppBundle:Deck')->find($deck_id);
+        $deck = $em->getRepository(Deck::class)->find($deck_id);
 
         if (!$deck) {
             throw new UnprocessableEntityHttpException("Cannot find deck " . $deck_id);

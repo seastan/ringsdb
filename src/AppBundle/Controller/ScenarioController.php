@@ -22,7 +22,7 @@ class ScenarioController extends AbstractController {
     public function indexAction() {
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('AppBundle:Scenario')->findAll();
+        $entities = $em->getRepository(Scenario::class)->findAll();
 
         return $this->render('AppBundle:Scenario:index.html.twig', [
             'entities' => $entities,
@@ -117,7 +117,7 @@ class ScenarioController extends AbstractController {
     public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Scenario')->find($id);
+        $entity = $em->getRepository(Scenario::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Scenario entity.');
@@ -140,7 +140,7 @@ class ScenarioController extends AbstractController {
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Scenario')->find($id);
+        $entity = $em->getRepository(Scenario::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Scenario entity.');
@@ -165,7 +165,7 @@ class ScenarioController extends AbstractController {
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Scenario')->find($id);
+        $entity = $em->getRepository(Scenario::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Scenario entity.');
@@ -204,7 +204,7 @@ class ScenarioController extends AbstractController {
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('AppBundle:Scenario')->find($id);
+            $entity = $em->getRepository(Scenario::class)->find($id);
 
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Scenario entity.');

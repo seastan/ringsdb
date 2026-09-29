@@ -11,6 +11,7 @@ AppBundle\Entity\Pack:
             joinColumn:
                 name: cycle_id
                 referencedColumnName: id
+                nullable: false
     oneToMany:
         printings:
             targetEntity: CardPrinting

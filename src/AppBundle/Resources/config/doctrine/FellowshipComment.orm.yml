@@ -4,18 +4,18 @@ AppBundle\Entity\FellowshipComment:
     manyToOne:
         user:
             targetEntity: User
-            nullable: false
             inversedBy: fellowship_comments
             joinColumn:
                 name: user_id
                 referencedColumnName: id
+                nullable: false
         fellowship:
             targetEntity: Fellowship
-            nullable: false
             inversedBy: comments
             joinColumn:
                 name: fellowship_id
                 referencedColumnName: id
+                nullable: false
     fields:
         id:
             type: integer

@@ -4,17 +4,17 @@ AppBundle\Entity\Reviewcomment:
     manyToOne:
         user:
             targetEntity: User
-            nullable: false
             joinColumn:
                 name: user_id
                 referencedColumnName: id
+                nullable: false
         review:
             targetEntity: Review
-            nullable: false
             inversedBy: comments
             joinColumn:
                 name: review_id
                 referencedColumnName: id
+                nullable: false
     fields:
         id:
             type: integer

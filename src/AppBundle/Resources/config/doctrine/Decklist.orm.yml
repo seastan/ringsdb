@@ -4,11 +4,11 @@ AppBundle\Entity\Decklist:
     manyToOne:
         user:
             targetEntity: User
-            nullable: false
             inversedBy: decklists
             joinColumn:
                 name: user_id
                 referencedColumnName: id
+                nullable: false
         lastPack:
             targetEntity: Pack
             nullable: false

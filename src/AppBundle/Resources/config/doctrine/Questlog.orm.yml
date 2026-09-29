@@ -4,18 +4,18 @@ AppBundle\Entity\Questlog:
     manyToOne:
         user:
             targetEntity: User
-            nullable: false
             inversedBy: questlogs
             joinColumn:
                 name: user_id
                 referencedColumnName: id
+                nullable: false
         scenario:
             targetEntity: Scenario
-            nullable: false
             inversedBy: questlogs
             joinColumn:
                 name: scenario_id
                 referencedColumnName: id
+                nullable: false
     oneToMany:
         decks:
             targetEntity: QuestlogDeck

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Model;
 
+use AppBundle\Entity\Card;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -278,7 +279,7 @@ class DecklistManager {
 
         $sphere_code = filter_var($request->query->get('sphere'), FILTER_SANITIZE_STRING);
         if ($sphere_code) {
-            $sphere = $this->doctrine->getRepository('AppBundle:Sphere')->findOneBy(['code' => $sphere_code]);
+            $sphere = $this->doctrine->getRepository(Sphere::class)->findOneBy(['code' => $sphere_code]);
         }
 
         $numcores = $request->query->get('numcores');
@@ -358,7 +359,7 @@ class DecklistManager {
             if (!empty($cards_code)) {
                 foreach ($cards_code as $i => $card_code) {
                     /* @var $card \AppBundle\Entity\Card */
-                    $card = $this->doctrine->getRepository('AppBundle:Card')->findOneBy(['code' => $card_code]);
+                    $card = $this->doctrine->getRepository(Card::class)->findOneBy(['code' => $card_code]);
                     if (!$card) {
                         continue;
                     }

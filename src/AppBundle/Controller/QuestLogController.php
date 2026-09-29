@@ -1,6 +1,10 @@
 <?php
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\User;
+use AppBundle\Entity\Scenario;
+use AppBundle\Entity\Decklist;
+use AppBundle\Entity\Cycle;
 use AppBundle\Services\Texts;
 use AppBundle\Model\QuestLogManager;
 use AppBundle\Services\Decks;
@@ -90,7 +94,7 @@ class QuestLogController extends AbstractController {
         #$quest_mode = 'normal';
 
         /* @var $quests \AppBundle\Entity\Scenario[] */
-        $quests = $em->getRepository('AppBundle:Scenario')->findBy([], ['position' => 'ASC']);
+        $quests = $em->getRepository(Scenario::class)->findBy([], ['position' => 'ASC']);
 
         /* @var $user \AppBundle\Entity\User */
         $user = $this->getUser();
@@ -128,7 +132,7 @@ class QuestLogController extends AbstractController {
                 $show_all = true;
             } else {
                 /* @var $scenario \AppBundle\Entity\Scenario */
-                $scenario = $em->getRepository('AppBundle:Scenario')->findOneBy(['nameCanonical' => $scenario_name_canonical]);
+                $scenario = $em->getRepository(Scenario::class)->findOneBy(['nameCanonical' => $scenario_name_canonical]);
                 if ($scenario == null) {
                     throw new NotFoundHttpException("This quest does not exist.");
                 }
@@ -140,9 +144,9 @@ class QuestLogController extends AbstractController {
 
             /* @var $questlogs \AppBundle\Entity\Questlog[] */
             if ($show_all) {
-                $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
+                $questlogs = $em->getRepository(Questlog::class)->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
             } else {
-                $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => 'DESC', 'id' => 'DESC']);
+                $questlogs = $em->getRepository(Questlog::class)->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => 'DESC', 'id' => 'DESC']);
             }
             $this->setSnapshots($questlogs);
 
@@ -186,7 +190,7 @@ class QuestLogController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $quests \AppBundle\Entity\Scenario[] */
-        $quests = $em->getRepository('AppBundle:Scenario')->findBy([], ['position' => 'ASC']);
+        $quests = $em->getRepository(Scenario::class)->findBy([], ['position' => 'ASC']);
 
         /* @var $user \AppBundle\Entity\User */
         $user = $this->currentUser();
@@ -210,7 +214,7 @@ class QuestLogController extends AbstractController {
         }
 
         /* @var $questlogs \AppBundle\Entity\Questlog[] */
-        $questlogs = $em->getRepository('AppBundle:Questlog')->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
+        $questlogs = $em->getRepository(Questlog::class)->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
         $this->setSnapshots($questlogs);
 
         return $this->render('AppBundle:QuestLog:my-questlogs.html.twig', [
@@ -327,7 +331,7 @@ class QuestLogController extends AbstractController {
         $response = new Response();
 
         /* @var $quests \AppBundle\Entity\Scenario[] */
-        $quests = $em->getRepository('AppBundle:Scenario')->findBy([], ['position' => 'ASC']);
+        $quests = $em->getRepository(Scenario::class)->findBy([], ['position' => 'ASC']);
 
         /* @var $decks \AppBundle\Entity\Deck[] */
         $decks = [];
@@ -341,9 +345,9 @@ class QuestLogController extends AbstractController {
             if ($deck_ids[$i]) {
                 /* $public = filter_var($request->get('p'.($i + 1)), FILTER_SANITIZE_NUMBER_INT); */
                 if ($public) {
-                    $decks[$i] = $em->getRepository('AppBundle:Decklist')->find($deck_ids[$i]);
+                    $decks[$i] = $em->getRepository(Decklist::class)->find($deck_ids[$i]);
                  } else {
-                    $decks[$i] = $em->getRepository('AppBundle:Deck')->find($deck_ids[$i]);
+                    $decks[$i] = $em->getRepository(Deck::class)->find($deck_ids[$i]);
                 }
  
                 if ($decks[$i]) {
@@ -394,7 +398,7 @@ class QuestLogController extends AbstractController {
         $user = $this->currentUser();
 
         /* @var $questlog \AppBundle\Entity\Questlog */
-        $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
+        $questlog = $em->getRepository(Questlog::class)->find($questlog_id);
 
         if (!$questlog) {
             throw new NotFoundHttpException("This questlog does not exists.");
@@ -405,7 +409,7 @@ class QuestLogController extends AbstractController {
         }
 
         /* @var $quests \AppBundle\Entity\Scenario[] */
-        $quests = $em->getRepository('AppBundle:Scenario')->findBy([], ['position' => 'ASC']);
+        $quests = $em->getRepository(Scenario::class)->findBy([], ['position' => 'ASC']);
 
         $is_locked_as_public = ($questlog->getNbVotes() > 0 || $questlog->getNbFavorites() > 0 || $questlog->getNbComments() > 0);
 
@@ -446,7 +450,7 @@ class QuestLogController extends AbstractController {
      */
     public function viewAction($questlog_id) {
         /* @var $questlog \AppBundle\Entity\Questlog */
-        $questlog = $this->getDoctrine()->getManager()->getRepository('AppBundle:Questlog')->find($questlog_id);
+        $questlog = $this->getDoctrine()->getManager()->getRepository(Questlog::class)->find($questlog_id);
         //$this->setSnapshot($questlog);
 
         if (!$questlog) {
@@ -518,7 +522,7 @@ class QuestLogController extends AbstractController {
 
         if ($questlog_id) {
             /* @var $questlog \AppBundle\Entity\Questlog */
-            $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
+            $questlog = $em->getRepository(Questlog::class)->find($questlog_id);
 
             if (!$questlog) {
                 throw new NotFoundHttpException("This questlog does not exist.");
@@ -555,7 +559,7 @@ class QuestLogController extends AbstractController {
         $difficulty = in_array($difficulty, ['normal', 'easy', 'nightmare']) ? $difficulty : 'normal';
 
         /* @var $scenario \AppBundle\Entity\Scenario */
-        $scenario = $em->getRepository('AppBundle:Scenario')->find($quest);
+        $scenario = $em->getRepository(Scenario::class)->find($quest);
 
         if (!$scenario) {
             throw new NotFoundHttpException("This scenario does not exists.");
@@ -599,7 +603,7 @@ class QuestLogController extends AbstractController {
                 if ($deck_id) {
                     if (!$is_decklist) {
                         /* @var $deck \AppBundle\Entity\Deck */
-                        $deck = $em->getRepository('AppBundle:Deck')->find($deck_id);
+                        $deck = $em->getRepository(Deck::class)->find($deck_id);
 
                         if (!$deck) {
                             throw new NotFoundHttpException("One of the selected decks does not exist.");
@@ -631,7 +635,7 @@ class QuestLogController extends AbstractController {
                         $questlog->addDeck($questlog_deck);
                     } else {
                         /* @var $decklist \AppBundle\Entity\Decklist */
-                        $decklist = $em->getRepository('AppBundle:Decklist')->find($deck_id);
+                        $decklist = $em->getRepository(Decklist::class)->find($deck_id);
 
                         if (!$decklist) {
                             throw new NotFoundHttpException("One of the selected decks does not exist.");
@@ -710,7 +714,7 @@ class QuestLogController extends AbstractController {
         $questlog_id = filter_var($request->get('questlog_id'), FILTER_SANITIZE_NUMBER_INT);
 
         /* @var $questlog \AppBundle\Entity\Questlog */
-        $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
+        $questlog = $em->getRepository(Questlog::class)->find($questlog_id);
         if (!$questlog) {
             return $this->redirect($this->generateUrl('myquestlogs_list'));
         }
@@ -758,7 +762,7 @@ class QuestLogController extends AbstractController {
         $on = 0;
         $off = 0;
         $categories[] = ["label" => "Core / Deluxe", "packs" => []];
-        $list_cycles = $this->getDoctrine()->getRepository('AppBundle:Cycle')->findBy([], ["position" => "ASC"]);
+        $list_cycles = $this->getDoctrine()->getRepository(Cycle::class)->findBy([], ["position" => "ASC"]);
         foreach ($list_cycles as $cycle) {
             /* @var $cycle \AppBundle\Entity\Cycle */
             $size = count($cycle->getPacks());
@@ -860,7 +864,7 @@ class QuestLogController extends AbstractController {
         $on = 0;
         $off = 0;
         $categories[] = ["label" => "Core / Deluxe", "packs" => []];
-        $list_cycles = $this->getDoctrine()->getRepository('AppBundle:Cycle')->findBy([], ["position" => "ASC"]);
+        $list_cycles = $this->getDoctrine()->getRepository(Cycle::class)->findBy([], ["position" => "ASC"]);
 
         foreach ($list_cycles as $cycle) {
             /* @var $cycle \AppBundle\Entity\Cycle */
@@ -948,7 +952,7 @@ class QuestLogController extends AbstractController {
 
         foreach ($list_id as $id) {
             /* @var $questlog \AppBundle\Entity\Questlog */
-            $questlog = $em->getRepository('AppBundle:Questlog')->find($id);
+            $questlog = $em->getRepository(Questlog::class)->find($id);
             if (!$questlog) {
                 continue;
             }
@@ -1008,7 +1012,7 @@ class QuestLogController extends AbstractController {
         }
 
         /* @var $questlog \AppBundle\Entity\QuestLog */
-        $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
+        $questlog = $em->getRepository(Questlog::class)->find($questlog_id);
         if (!$questlog) {
             throw new AccessDeniedHttpException("You don't have access to this questlog.");
         }
@@ -1091,7 +1095,7 @@ class QuestLogController extends AbstractController {
         $questlog_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
 
         /* @var $questlog \AppBundle\Entity\QuestLog */
-        $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
+        $questlog = $em->getRepository(Questlog::class)->find($questlog_id);
         if (!$questlog) {
             throw new NotFoundHttpException('Wrong id');
         }
@@ -1148,7 +1152,7 @@ class QuestLogController extends AbstractController {
         }
 
         $questlog_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
-        $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
+        $questlog = $em->getRepository(Questlog::class)->find($questlog_id);
         if (!$questlog) {
             throw new BadRequestHttpException('Wrong quest log id');
         }
@@ -1199,7 +1203,7 @@ class QuestLogController extends AbstractController {
 
             foreach ($mentionned_usernames as $mentionned_username) {
                 /* @var $mentionned_user \AppBundle\Entity\User */
-                $mentionned_user = $this->getDoctrine()->getRepository('AppBundle:User')->findOneBy(['username' => $mentionned_username]);
+                $mentionned_user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username' => $mentionned_username]);
                 if ($mentionned_user && $mentionned_user->getIsNotifMention()) {
                     if (!isset($spool[$mentionned_user->getEmail()])) {
                         $spool[$mentionned_user->getEmail()] = 'AppBundle:Emails:newquestlogcomment_mentionned.html.twig';
@@ -1245,7 +1249,7 @@ class QuestLogController extends AbstractController {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
-        $comment = $em->getRepository('AppBundle:QuestlogComment')->find($comment_id);
+        $comment = $em->getRepository(QuestlogComment::class)->find($comment_id);
         if (!$comment) {
             throw new BadRequestHttpException('Unable to find comment');
         }
@@ -1278,13 +1282,13 @@ class QuestLogController extends AbstractController {
         $questlog_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
 
         /* @var $questlog \AppBundle\Entity\QuestLog */
-        $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
+        $questlog = $em->getRepository(Questlog::class)->find($questlog_id);
         if (!$questlog) {
             throw new BadRequestHttpException('Unable to find quest log');
         }
 
         if ($questlog->getUser()->getId() != $user->getId()) {
-            $query = $em->getRepository('AppBundle:Questlog')
+            $query = $em->getRepository(Questlog::class)
                 ->createQueryBuilder('d')
                 ->innerJoin('d.votes', 'u')
                 ->where('d.id = :questlog_id')

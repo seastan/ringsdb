@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -48,7 +49,7 @@ class PatronCommand extends Command {
         $donation = (int) $input->getArgument('donation');
 
         $em = $this->em;
-        $repo = $em->getRepository('AppBundle:User');
+        $repo = $em->getRepository(User::class);
         $user = $repo->findOneBy(['email' => $email]);
 
         if (!$user) {

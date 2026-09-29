@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\User;
 use AppBundle\Services\Texts;
 use DateTime;
 use AppBundle\Entity\Card;
@@ -51,7 +52,7 @@ class ReviewController extends AbstractController {
 
         $card_id = filter_var($request->get('card_id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $card Card */
-        $card = $em->getRepository('AppBundle:Card')->find($card_id);
+        $card = $em->getRepository(Card::class)->find($card_id);
         if (!$card) {
             throw new \Exception("This card does not exist.");
         }
@@ -61,7 +62,7 @@ class ReviewController extends AbstractController {
         }
 
         // checking the user didn't already write a review for that card
-        $review = $em->getRepository('AppBundle:Review')->findOneBy(['card' => $card, 'user' => $user]);
+        $review = $em->getRepository(Review::class)->findOneBy(['card' => $card, 'user' => $user]);
         if ($review) {
             throw new \Exception("You cannot write more than 1 review for a given card.");
         }
@@ -108,7 +109,7 @@ class ReviewController extends AbstractController {
         $review_id = filter_var($request->get('review_id'), FILTER_SANITIZE_NUMBER_INT);
 
         /* @var $review Review */
-        $review = $em->getRepository('AppBundle:Review')->find($review_id);
+        $review = $em->getRepository(Review::class)->find($review_id);
 
         if (!$review) {
             throw new BadRequestHttpException("Unable to find review.");
@@ -152,7 +153,7 @@ class ReviewController extends AbstractController {
         $review_id = filter_var($request->request->get('id'), FILTER_SANITIZE_NUMBER_INT);
 
         /* @var $review Review */
-        $review = $em->getRepository('AppBundle:Review')->find($review_id);
+        $review = $em->getRepository(Review::class)->find($review_id);
         if (!$review) {
             throw new \Exception("Unable to find review.");
         }
@@ -160,7 +161,7 @@ class ReviewController extends AbstractController {
         // a user cannot vote on her own review
         if ($review->getUser()->getId() != $user->getId()) {
             // checking if the user didn't already vote on that review
-            $query = $em->getRepository('AppBundle:Review')
+            $query = $em->getRepository(Review::class)
                 ->createQueryBuilder('r')
                 ->innerJoin('r.votes', 'u')
                 ->where('r.id = :review_id')
@@ -203,7 +204,7 @@ class ReviewController extends AbstractController {
 
         $review_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $review Review */
-        $review = $em->getRepository('AppBundle:Review')->find($review_id);
+        $review = $em->getRepository(Review::class)->find($review_id);
         if (!$review) {
             throw new \Exception("Unable to find review.");
         }
@@ -309,7 +310,7 @@ class ReviewController extends AbstractController {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
-        $user = $em->getRepository('AppBundle:User')->find($user_id);
+        $user = $em->getRepository(User::class)->find($user_id);
         if (!$user) {
             throw $this->createNotFoundException('User not found.');
         }
@@ -387,7 +388,7 @@ class ReviewController extends AbstractController {
         $review_id = filter_var($request->get('comment_review_id'), FILTER_SANITIZE_NUMBER_INT);
 
         /* @var $review Review */
-        $review = $em->getRepository('AppBundle:Review')->find($review_id);
+        $review = $em->getRepository(Review::class)->find($review_id);
         if (!$review) {
             throw new \Exception("Unable to find review.");
         }

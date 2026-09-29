@@ -40,7 +40,7 @@ class Pack {
      */
     private $isRepackaged = false;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\CardPrinting>
      */
     private $printings;
     /**
@@ -241,7 +241,7 @@ class Pack {
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection<(int|string), mixed>
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Card>
      */
     public function getCards() {
         return $this->printings->map(function($p) { return $p->getCard(); });

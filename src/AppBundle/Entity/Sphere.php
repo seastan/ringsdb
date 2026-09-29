@@ -24,7 +24,7 @@ class Sphere {
      */
     private $octgnid;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Card>
      */
     private $cards;
 

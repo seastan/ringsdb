@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Type;
+use AppBundle\Entity\Scenario;
 use AppBundle\Services\CardsData;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -61,7 +63,7 @@ class DefaultController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
         
         $typeNames = [];
-        foreach($this->getDoctrine()->getRepository('AppBundle:Type')->findAll() as $type) {
+        foreach($this->getDoctrine()->getRepository(Type::class)->findAll() as $type) {
         	$typeNames[$type->getCode()] = $type->getName();
         }
 
@@ -69,7 +71,7 @@ class DefaultController extends AbstractController {
         $timesec = time(); // Curent time in seconds
         $timebiday = intdiv($timesec, 24*60*60); // This value will increase by 1 every day
         srand($timebiday);
-        $quests = $em->getRepository('AppBundle:Scenario')->findBy([], ['position' => 'ASC']);
+        $quests = $em->getRepository(Scenario::class)->findBy([], ['position' => 'ASC']);
 	$numquests = count($quests);
 	$randquest = $quests[array_rand($quests)];
         $challenges = array('using a Scout deck with no non-Scout characters',

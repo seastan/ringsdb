@@ -2,6 +2,9 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\User;
+use AppBundle\Entity\Decklist;
+use AppBundle\Entity\Deck;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,14 +22,14 @@ class ApiPrivateController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $decklists \AppBundle\Entity\Decklist[] */
-        $decklists = $em->getRepository('AppBundle:Decklist')->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC', 'id' => 'DESC']);
+        $decklists = $em->getRepository(Decklist::class)->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC', 'id' => 'DESC']);
 
         foreach($decklists as &$decklist) {
             $decklist->setDescriptionMd('');
         }
 
         /* @var $decks \AppBundle\Entity\Deck[] */
-        $decks = $em->getRepository('AppBundle:Deck')->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC', 'id' => 'DESC']);
+        $decks = $em->getRepository(Deck::class)->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC', 'id' => 'DESC']);
 
         foreach($decks as &$deck) {
             $deck->setDescriptionMd('');
@@ -65,7 +68,7 @@ class ApiPrivateController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $user \AppBundle\Entity\User */
-        $user = $em->getRepository('AppBundle:User')->findOneBy(['username' => $username]);
+        $user = $em->getRepository(User::class)->findOneBy(['username' => $username]);
 
         if (!$user) {
             $content = json_encode([
@@ -82,7 +85,7 @@ class ApiPrivateController extends AbstractController {
         $show_private_decks = /*$user->getIsShareDecks() ||*/ $user->getId() == $this->currentUser()->getId();
 
         /* @var $decklists \AppBundle\Entity\Decklist[] */
-        $decklists = $em->getRepository('AppBundle:Decklist')->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
+        $decklists = $em->getRepository(Decklist::class)->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
 
         foreach($decklists as &$decklist) {
             $decklist->setDescriptionMd('');
@@ -90,7 +93,7 @@ class ApiPrivateController extends AbstractController {
 
         if ($show_private_decks) {
             /* @var $decks \AppBundle\Entity\Deck[] */
-            $decks = $em->getRepository('AppBundle:Deck')->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
+            $decks = $em->getRepository(Deck::class)->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
 
             foreach($decks as &$deck) {
                 $deck->setDescriptionMd('');
@@ -133,7 +136,7 @@ class ApiPrivateController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $deck \AppBundle\Entity\Deck */
-		$deck = $em->getRepository('AppBundle:Deck')->find($id);
+		$deck = $em->getRepository(Deck::class)->find($id);
 
         if (!$deck) {
             $content = json_encode([

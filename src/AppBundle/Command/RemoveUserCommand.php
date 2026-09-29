@@ -2,6 +2,9 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Entity\User;
+use AppBundle\Entity\Decklist;
+use AppBundle\Entity\Deck;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -38,7 +41,7 @@ class RemoveUserCommand extends Command {
         $em = $this->em;
 
         $user_id = $input->getArgument('user_id');
-        $user = $em->getRepository('AppBundle:User')->find($user_id);
+        $user = $em->getRepository(User::class)->find($user_id);
 
         if (!$user) {
             $output->writeln("User not found");
@@ -47,14 +50,14 @@ class RemoveUserCommand extends Command {
 
         $output->writeln("User " . $user->getUsername());
 
-        $decks = $em->getRepository('AppBundle:Deck')->findBy([
+        $decks = $em->getRepository(Deck::class)->findBy([
             'user' => $user
         ]);
 
         $output->writeln(count($decks) . " decks");
 
         foreach ($decks as $deck) {
-            $children = $em->getRepository('AppBundle:Decklist')->findBy([
+            $children = $em->getRepository(Decklist::class)->findBy([
                 'parent' => $deck
             ]);
 
@@ -67,21 +70,21 @@ class RemoveUserCommand extends Command {
 
         $output->writeln("Decks deleted");
 
-        $decklists = $em->getRepository('AppBundle:Decklist')->findBy([
+        $decklists = $em->getRepository(Decklist::class)->findBy([
             'user' => $user
         ]);
 
         $output->writeln(count($decklists) . " decklists");
 
         foreach ($decklists as $decklist) {
-            $successors = $em->getRepository('AppBundle:Decklist')->findBy([
+            $successors = $em->getRepository(Decklist::class)->findBy([
                 'precedent' => $decklist
             ]);
             foreach ($successors as $successor) {
                 $successor->setPrecedent(null);
             }
 
-            $children = $em->getRepository('AppBundle:Deck')->findBy([
+            $children = $em->getRepository(Deck::class)->findBy([
                 'parent' => $decklist
             ]);
             foreach ($children as $child) {

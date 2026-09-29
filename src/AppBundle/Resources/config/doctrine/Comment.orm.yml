@@ -4,18 +4,18 @@ AppBundle\Entity\Comment:
     manyToOne:
         user:
             targetEntity: User
-            nullable: false
             inversedBy: comments
             joinColumn:
                 name: user_id
                 referencedColumnName: id
+                nullable: false
         decklist:
             targetEntity: Decklist
-            nullable: false
             inversedBy: comments
             joinColumn:
                 name: decklist_id
                 referencedColumnName: id
+                nullable: false
     fields:
         id:
             type: integer

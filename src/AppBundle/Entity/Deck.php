@@ -227,19 +227,19 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      */
     private $minorVersion;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Deckslot>
      */
     private $slots;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Decksideslot>
      */
     private $sideslots;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Decklist>
      */
     private $children;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Deckchange>
      */
     private $changes;
     /**
@@ -655,7 +655,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\FellowshipDeck>
      */
     private $fellowships;
 
@@ -707,7 +707,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\QuestlogDeck>
      */
     private $questlogs;
 

@@ -40,7 +40,7 @@ class LoadReviewData extends AbstractFixture implements ContainerAwareInterface,
     {
         /** @var User $user */
         $user = $this->getReference('test-user');
-        $card = $manager->getRepository('AppBundle:Card')->findOneBy(['code' => '01001']);
+        $card = $manager->getRepository(Card::class)->findOneBy(['code' => '01001']);
         if (!$card instanceof Card || $this->container === null) {
             throw new \LogicException('Card 01001 or the container is missing.');
         }

@@ -52,12 +52,12 @@ class CSVController extends AbstractController {
 		}
 
 		$em = $this->getDoctrine()->getManager();
-		$packRepo = $em->getRepository('AppBundle:Pack');
+		$packRepo = $em->getRepository(Pack::class);
 		$pack = $packRepo->findOneBy(['code' => $inputCode]);
 		$oldPack = $packRepo->findOneBy(['code' => $inputOldCode]);
 
 		if (!$pack && !$oldPack) {
-			$cycleRepo = $em->getRepository('AppBundle:Cycle');
+			$cycleRepo = $em->getRepository(Cycle::class);
 			// 'ALeP' cycle code doesn't exist; fall back to the most recent cycle.
 			$cycle = $cycleRepo->findOneBy(['code' => 'ALeP'])
 				?? $cycleRepo->findOneBy([], ['id' => 'DESC']);
@@ -116,11 +116,11 @@ class CSVController extends AbstractController {
 			}
 		}
 
-		$printingRepo = $em->getRepository('AppBundle:CardPrinting');
-		$cardMeta = $em->getClassMetadata('AppBundle:Card');
+		$printingRepo = $em->getRepository(CardPrinting::class);
+		$cardMeta = $em->getClassMetadata(Card::class);
 		$cardFieldNames = $cardMeta->getFieldNames();
 		$cardAssocMappings = $cardMeta->getAssociationMappings();
-		$printingMeta = $em->getClassMetadata('AppBundle:CardPrinting');
+		$printingMeta = $em->getClassMetadata(CardPrinting::class);
 		$printingFieldNames = $printingMeta->getFieldNames();
 
 		foreach ($cards as $card) {
@@ -161,7 +161,7 @@ class CSVController extends AbstractController {
 				}
 
 				if (!$cardEntity) {
-					$cardRepo = $em->getRepository('AppBundle:Card');
+					$cardRepo = $em->getRepository(Card::class);
 					$cardEntity = $cardRepo->findOneBy(['code' => $card['code']]);
 				}
 
@@ -201,7 +201,9 @@ class CSVController extends AbstractController {
 				if (key_exists($colName, $cardAssocMappings)) {
 					// Association field on Card (type, sphere).
 					$associationMapping = $cardAssocMappings[$colName];
-					$associationRepository = $em->getRepository($associationMapping['targetEntity']);
+					/** @var class-string<\AppBundle\Entity\Type|\AppBundle\Entity\Sphere> $targetEntity */
+					$targetEntity = $associationMapping['targetEntity'];
+					$associationRepository = $em->getRepository($targetEntity);
 					/** @var \AppBundle\Entity\Type|\AppBundle\Entity\Sphere|null $associationEntity */
 					$associationEntity = $associationRepository->findOneBy(['name' => $value]);
 

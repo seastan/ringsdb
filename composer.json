@@ -54,10 +54,13 @@
         "ocramius/proxy-manager": "~2.2.0"
     },
     "require-dev": {
-        "sensio/generator-bundle": "~3.0",
-        "symfony/phpunit-bridge": "4.4",
         "doctrine/doctrine-fixtures-bundle": "^2.4.1",
-        "phpstan/phpstan": "^2.2"
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.2",
+        "phpstan/phpstan-doctrine": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
+        "sensio/generator-bundle": "~3.0",
+        "symfony/phpunit-bridge": "4.4"
     },
     "scripts": {
         "symfony-scripts": [
@@ -77,7 +80,10 @@
         "platform": {
             "php": "7.4.33"
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
     },
     "extra": {
         "symfony-app-dir": "app",

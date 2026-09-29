@@ -35,7 +35,7 @@ class Review {
      */
     private $nbVotes;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Reviewcomment>
      */
     private $comments;
     /**
@@ -47,7 +47,7 @@ class Review {
      */
     private $user;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     private $votes;
 

@@ -33,7 +33,7 @@ class TagController extends AbstractController {
 
         foreach ($list_id as $id) {
             /* @var $deck Deck */
-            $deck = $em->getRepository('AppBundle:Deck')->find($id);
+            $deck = $em->getRepository(Deck::class)->find($id);
 
             if (!$deck) {
                 continue;
@@ -66,7 +66,7 @@ class TagController extends AbstractController {
 
         foreach ($list_id as $id) {
             /* @var $deck Deck */
-            $deck = $em->getRepository('AppBundle:Deck')->find($id);
+            $deck = $em->getRepository(Deck::class)->find($id);
 
             if (!$deck) {
                 continue;
@@ -98,7 +98,7 @@ class TagController extends AbstractController {
 
         foreach ($list_id as $id) {
             /* @var $deck Deck */
-            $deck = $em->getRepository('AppBundle:Deck')->find($id);
+            $deck = $em->getRepository(Deck::class)->find($id);
 
             if (!$deck) {
                 continue;

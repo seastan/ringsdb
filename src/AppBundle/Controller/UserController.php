@@ -2,6 +2,12 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\User;
+use AppBundle\Entity\Sphere;
+use AppBundle\Entity\Questlog;
+use AppBundle\Entity\Fellowship;
+use AppBundle\Entity\Decklist;
+use AppBundle\Entity\Card;
 use FOS\UserBundle\Model\UserManagerInterface;
 use FOS\UserBundle\Mailer\MailerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -40,7 +46,7 @@ class UserController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $user \AppBundle\Entity\User */
-        $user = $em->getRepository('AppBundle:User')->find($user_id);
+        $user = $em->getRepository(User::class)->find($user_id);
         if (!$user) {
             throw new NotFoundHttpException("No such user.");
         }
@@ -56,7 +62,7 @@ class UserController extends AbstractController {
     public function editProfileAction() {
         $user = $this->getUser();
 
-        $spheres = $this->getDoctrine()->getRepository('AppBundle:Sphere')->findAll();
+        $spheres = $this->getDoctrine()->getRepository(Sphere::class)->findAll();
 
         return $this->render('AppBundle:User:profile_edit.html.twig', [
             'user' => $user,
@@ -75,7 +81,7 @@ class UserController extends AbstractController {
 
         $username = (string) filter_var($request->get('username'), FILTER_SANITIZE_STRING);
         if ($username !== $user->getUsername()) {
-            $user_existing = $em->getRepository('AppBundle:User')->findOneBy(['username' => $username]);
+            $user_existing = $em->getRepository(User::class)->findOneBy(['username' => $username]);
 
             if ($user_existing) {
                 $this->get('session')->getFlashBag()->set('error', "Username $username is already taken.");
@@ -158,7 +164,7 @@ class UserController extends AbstractController {
                 /* @var $em \Doctrine\ORM\EntityManager */
                 $em = $this->getDoctrine()->getManager();
                 /* @var $decklist \AppBundle\Entity\Decklist */
-                $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
+                $decklist = $em->getRepository(Decklist::class)->find($decklist_id);
 
                 if ($decklist) {
                     $decklist_id = $decklist->getId();
@@ -190,7 +196,7 @@ class UserController extends AbstractController {
                 $em = $this->getDoctrine()->getManager();
 
                 /* @var $fellowship \AppBundle\Entity\Fellowship */
-                $fellowship = $em->getRepository('AppBundle:Fellowship')->find($fellowship_id);
+                $fellowship = $em->getRepository(Fellowship::class)->find($fellowship_id);
 
                 if ($fellowship) {
                     $fellowship_id = $fellowship->getId();
@@ -222,7 +228,7 @@ class UserController extends AbstractController {
                 $em = $this->getDoctrine()->getManager();
 
                 /* @var $questlog \AppBundle\Entity\Questlog */
-                $questlog = $em->getRepository('AppBundle:Questlog')->find($questlog_id);
+                $questlog = $em->getRepository(Questlog::class)->find($questlog_id);
 
                 if ($questlog) {
                     $questlog_id = $questlog->getId();
@@ -254,7 +260,7 @@ class UserController extends AbstractController {
                 $em = $this->getDoctrine()->getManager();
 
                 /* @var $card \AppBundle\Entity\Card */
-                $card = $em->getRepository('AppBundle:Card')->find($card_id);
+                $card = $em->getRepository(Card::class)->find($card_id);
 
                 if ($card) {
                     $reviews = $card->getReviews();

@@ -39,7 +39,7 @@ class UserCustomPack {
      */
     private $updatedAt;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\UserCustomPackCard>
      */
     private $cards;
 

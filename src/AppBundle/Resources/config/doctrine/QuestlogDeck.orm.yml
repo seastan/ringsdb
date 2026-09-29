@@ -4,11 +4,11 @@ AppBundle\Entity\QuestlogDeck:
     manyToOne:
         questlog:
             targetEntity: Questlog
-            nullable: false
             inversedBy: decks
             joinColumn:
                 name: questlog_id
                 referencedColumnName: id
+                nullable: false
         deck:
             targetEntity: Deck
             nullable: true

@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Pack;
+use AppBundle\Entity\CardPrinting;
 use AppBundle\Services\Texts;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -19,7 +21,7 @@ class ExcelController extends AbstractController {
 	 */
 	public function downloadFormAction() {
 		$em = $this->getDoctrine()->getManager();
-		$packs = $em->getRepository('AppBundle:Pack')->findBy([], ['dateRelease' => 'ASC', 'name' => 'ASC']);
+		$packs = $em->getRepository(Pack::class)->findBy([], ['dateRelease' => 'ASC', 'name' => 'ASC']);
 
 		return $this->render('AppBundle:Excel:download_form.html.twig', [
 			'packs' => $packs
@@ -36,21 +38,21 @@ class ExcelController extends AbstractController {
 
 		$pack_id = $request->request->get('pack');
 		if ($pack_id == 0) {
-			$cards = $em->getRepository('AppBundle:Card')->findBy([], ['code' => 'ASC']);
+			$cards = $em->getRepository(Card::class)->findBy([], ['code' => 'ASC']);
 			$pack_name = 'LotR LCG Cards';
 		} else {
-			$pack = $em->getRepository('AppBundle:Pack')->find($pack_id);
+			$pack = $em->getRepository(Pack::class)->find($pack_id);
 			if (!$pack) {
 				throw $this->createNotFoundException('Pack not found.');
 			}
-			$printings = $em->getRepository('AppBundle:CardPrinting')->findBy(['pack' => $pack], ['position' => 'ASC']);
+			$printings = $em->getRepository(CardPrinting::class)->findBy(['pack' => $pack], ['position' => 'ASC']);
 			$cards = array_values(array_unique(array_map(function($p) { return $p->getCard(); }, $printings), SORT_REGULAR));
 			$pack_name = $pack->getName();
 		}
 
-		$fieldNames = $em->getClassMetadata('AppBundle:Card')->getFieldNames();
+		$fieldNames = $em->getClassMetadata(Card::class)->getFieldNames();
 
-		$associationMappings = $em->getClassMetadata('AppBundle:Card')->getAssociationMappings();
+		$associationMappings = $em->getClassMetadata(Card::class)->getAssociationMappings();
 
 		$lastModified = null;
 		/* @var $card \AppBundle\Entity\Card */
@@ -102,7 +104,7 @@ class ExcelController extends AbstractController {
 				if (!isset($value)) {
 					$value = '';
 				}
-				$type = $em->getClassMetadata('AppBundle:Card')->getTypeOfField($fieldName);
+				$type = $em->getClassMetadata(Card::class)->getTypeOfField($fieldName);
 
 				$phpCell = $phpActiveSheet->getCell([$col_index++, $row_index + 2]);
 				if ($fieldName == 'code') {
@@ -184,9 +186,9 @@ class ExcelController extends AbstractController {
 
 		/* @var $em \Doctrine\ORM\EntityManager */
 		$em = $this->getDoctrine()->getManager();
-		$repo = $em->getRepository('AppBundle:Card');
+		$repo = $em->getRepository(Card::class);
 
-		$metaData = $em->getClassMetadata('AppBundle:Card');
+		$metaData = $em->getClassMetadata(Card::class);
 		$fieldNames = $metaData->getFieldNames();
 		$associationMappings = $metaData->getAssociationMappings();
 
@@ -215,7 +217,9 @@ class ExcelController extends AbstractController {
 				if (key_exists($colName, $associationMappings)) {
 					$associationMapping = $associationMappings[$colName];
 
-					$associationRepository = $em->getRepository($associationMapping['targetEntity']);
+					/** @var class-string<\AppBundle\Entity\Type|\AppBundle\Entity\Sphere> $targetEntity */
+					$targetEntity = $associationMapping['targetEntity'];
+					$associationRepository = $em->getRepository($targetEntity);
 					/** @var \AppBundle\Entity\Type|\AppBundle\Entity\Sphere|null $associationEntity */
 					$associationEntity = $associationRepository->findOneBy(['name' => $value]);
 					if (!$associationEntity) {

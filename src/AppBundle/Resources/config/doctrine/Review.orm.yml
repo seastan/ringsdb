@@ -8,12 +8,14 @@ AppBundle\Entity\Review:
             joinColumn:
                 name: card_id
                 referencedColumnName: id
+                nullable: false
         user:
             targetEntity: User
             inversedBy: reviews
             joinColumn:
                 name: user_id
                 referencedColumnName: id
+                nullable: false
     oneToMany:
         comments:
             targetEntity: Reviewcomment

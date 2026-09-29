@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Card;
 use AppBundle\Entity\UserCustomPack;
 use AppBundle\Entity\UserCustomPackCard;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -175,7 +176,7 @@ class CustomPackController extends AbstractController {
      */
     public function publishedListAction() {
         $packs = $this->getDoctrine()
-            ->getRepository('AppBundle:UserCustomPack')
+            ->getRepository(UserCustomPack::class)
             ->findBy(['isPublished' => true], ['createdAt' => 'ASC', 'id' => 'ASC']);
 
         $result = [];
@@ -215,7 +216,7 @@ class CustomPackController extends AbstractController {
         }
 
         $source = $this->getDoctrine()
-            ->getRepository('AppBundle:UserCustomPack')
+            ->getRepository(UserCustomPack::class)
             ->findOneBy(['id' => $id, 'isPublished' => true]);
 
         if (!$source) {
@@ -259,7 +260,7 @@ class CustomPackController extends AbstractController {
         }
 
         $packs = $this->getDoctrine()
-            ->getRepository('AppBundle:UserCustomPack')
+            ->getRepository(UserCustomPack::class)
             ->findBy(['user' => $user], ['createdAt' => 'ASC', 'id' => 'ASC']);
 
         $result = [];
@@ -292,7 +293,7 @@ class CustomPackController extends AbstractController {
      */
     private function loadOwnedPack($id) {
         $pack = $this->getDoctrine()
-            ->getRepository('AppBundle:UserCustomPack')
+            ->getRepository(UserCustomPack::class)
             ->find($id);
 
         if (!$pack || $pack->getUser()->getId() !== $this->currentUser()->getId()) {
@@ -307,7 +308,7 @@ class CustomPackController extends AbstractController {
      * @return void
      */
     private function attachCards($em, UserCustomPack $pack, array $cardEntries) {
-        $cardRepo = $this->getDoctrine()->getRepository('AppBundle:Card');
+        $cardRepo = $this->getDoctrine()->getRepository(Card::class);
         $seen = [];
         foreach ($cardEntries as $entry) {
             $code = isset($entry['card_code']) ? (string) preg_replace('/[^0-9]/', '', $entry['card_code']) : '';

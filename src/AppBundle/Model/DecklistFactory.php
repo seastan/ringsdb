@@ -2,6 +2,7 @@
 
 namespace AppBundle\Model;
 
+use AppBundle\Entity\Sphere;
 use AppBundle\Entity\Decklist;
 use AppBundle\Entity\Deck;
 use Doctrine\ORM\EntityManagerInterface;
@@ -67,7 +68,7 @@ class DecklistFactory {
 
         $countBySphere = $deck->getSlots()->getCountBySphere();
         $predominantSphere = array_keys($countBySphere, max($countBySphere))[0];
-        $predominantSphere = $this->doctrine->getRepository('AppBundle:Sphere')->findOneBy(["code" => $predominantSphere]);
+        $predominantSphere = $this->doctrine->getRepository(Sphere::class)->findOneBy(["code" => $predominantSphere]);
 
         $heroes = $deck->getSlots()->getHeroDeck();
 

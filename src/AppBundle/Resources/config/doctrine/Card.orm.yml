@@ -11,12 +11,14 @@ AppBundle\Entity\Card:
             joinColumn:
                 name: type_id
                 referencedColumnName: id
+                nullable: false
         sphere:
             targetEntity: Sphere
             inversedBy: cards
             joinColumn:
                 name: sphere_id
                 referencedColumnName: id
+                nullable: false
     oneToMany:
         reviews:
             targetEntity: Review

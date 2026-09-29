@@ -22,7 +22,7 @@ class PackController extends AbstractController {
     public function indexAction() {
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('AppBundle:Pack')->findAll();
+        $entities = $em->getRepository(Pack::class)->findAll();
 
         return $this->render('AppBundle:Pack:index.html.twig', [
             'entities' => $entities,
@@ -77,7 +77,7 @@ class PackController extends AbstractController {
     public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Pack')->find($id);
+        $entity = $em->getRepository(Pack::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Pack entity.');
@@ -100,7 +100,7 @@ class PackController extends AbstractController {
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Pack')->find($id);
+        $entity = $em->getRepository(Pack::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Pack entity.');
@@ -125,7 +125,7 @@ class PackController extends AbstractController {
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Pack')->find($id);
+        $entity = $em->getRepository(Pack::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Pack entity.');
@@ -161,7 +161,7 @@ class PackController extends AbstractController {
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('AppBundle:Pack')->find($id);
+            $entity = $em->getRepository(Pack::class)->find($id);
 
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Pack entity.');

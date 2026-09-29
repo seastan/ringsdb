@@ -4,18 +4,18 @@ AppBundle\Entity\QuestlogComment:
     manyToOne:
         user:
             targetEntity: User
-            nullable: false
             inversedBy: questlog_comments
             joinColumn:
                 name: user_id
                 referencedColumnName: id
+                nullable: false
         questlog:
             targetEntity: Questlog
-            nullable: false
             inversedBy: comments
             joinColumn:
                 name: questlog_id
                 referencedColumnName: id
+                nullable: false
     fields:
         id:
             type: integer

@@ -2,6 +2,10 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Entity\Type;
+use AppBundle\Entity\Sphere;
+use AppBundle\Entity\Pack;
+use AppBundle\Entity\CardPrinting;
 use Symfony\Component\Asset\Packages;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -91,8 +95,8 @@ class ScrapBeornCardDataCommand extends Command {
         $assets_helper = $this->packages;
         $rootDir = $this->rootDir;
 
-        $allSpheres = $em->getRepository('AppBundle:Sphere')->findAll();
-        $allTypes = $em->getRepository('AppBundle:Type')->findAll();
+        $allSpheres = $em->getRepository(Sphere::class)->findAll();
+        $allTypes = $em->getRepository(Type::class)->findAll();
 
         $setname = self::stringArgument($input, 'beornset');
         $skip = (int) $input->getOption('skip');
@@ -165,7 +169,7 @@ class ScrapBeornCardDataCommand extends Command {
         }
 
         foreach ($sets as $set) {
-            $pack = $em->getRepository('AppBundle:Pack')->findOneBy(['name' => $set]);
+            $pack = $em->getRepository(Pack::class)->findOneBy(['name' => $set]);
 
             if (!$pack) {
                 $output->writeln("<error>Cannot find pack [" . $set . "]</error>");
@@ -305,7 +309,7 @@ class ScrapBeornCardDataCommand extends Command {
                 //$octgn = substr($cardCrawler->filter('img[title^="OCTGN"]')->attr('title'), -36);
 
 		// Get matching RingsDB card
-                $bcPrinting = $em->getRepository('AppBundle:CardPrinting')->createQueryBuilder('cp')
+                $bcPrinting = $em->getRepository(CardPrinting::class)->createQueryBuilder('cp')
                     ->join('cp.card', 'c')->where('c.name = :n')->andWhere('cp.pack = :p')
                     ->setParameter('n', $name)->setParameter('p', $pack)->setMaxResults(1)->getQuery()->getOneOrNullResult();
                 $card = $bcPrinting ? $bcPrinting->getCard() : null;

@@ -84,7 +84,7 @@ class Scenario implements \JsonSerializable {
      */
     private $pack;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Encounter>
      */
     private $encounters;
 
@@ -1108,7 +1108,7 @@ class Scenario implements \JsonSerializable {
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Questlog>
      */
     private $questlogs;
 

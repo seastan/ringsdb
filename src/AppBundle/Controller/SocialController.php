@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Cycle;
 use AppBundle\Services\Texts;
 use AppBundle\Model\DecklistFactory;
 use AppBundle\Helper\DeckValidationHelper;
@@ -60,7 +61,7 @@ class SocialController extends AbstractController {
             throw $this->createAccessDeniedException("You must be logged in for this operation.");
         }
 
-        $deck = $em->getRepository('AppBundle:Deck')->find($deck_id);
+        $deck = $em->getRepository(Deck::class)->find($deck_id);
         if (!$deck || $deck->getUser()->getId() != $user->getId()) {
             throw $this->createAccessDeniedException("You don't have access to this decklist.");
         }
@@ -110,7 +111,7 @@ class SocialController extends AbstractController {
 
         $new_content = (string) json_encode($content);
         $new_signature = md5($new_content);
-        $old_decklists = $this->getDoctrine()->getRepository('AppBundle:Decklist')->findBy([ 'signature' => $new_signature ]);
+        $old_decklists = $this->getDoctrine()->getRepository(Decklist::class)->findBy([ 'signature' => $new_signature ]);
 
         /* @var $decklist \AppBundle\Entity\Decklist */
         foreach ($old_decklists as $decklist) {
@@ -175,7 +176,7 @@ class SocialController extends AbstractController {
         $deck_id = intval(filter_var($request->request->get('deck_id'), FILTER_SANITIZE_NUMBER_INT));
 
         /* @var $deck \AppBundle\Entity\Deck */
-        $deck = $this->getDoctrine()->getRepository('AppBundle:Deck')->find($deck_id);
+        $deck = $this->getDoctrine()->getRepository(Deck::class)->find($deck_id);
         if (!$deck) {
             throw new BadRequestHttpException("Invalid deck_id.");
         }
@@ -196,7 +197,7 @@ class SocialController extends AbstractController {
                 $precedent_id = null;
             }
         }
-        $precedent = $precedent_id ? $em->getRepository('AppBundle:Decklist')->find($precedent_id) : null;
+        $precedent = $precedent_id ? $em->getRepository(Decklist::class)->find($precedent_id) : null;
 
         try {
             /* @var $decklist \AppBundle\Entity\Decklist */
@@ -233,7 +234,7 @@ class SocialController extends AbstractController {
             throw $this->createAccessDeniedException("Anonymous access denied");
         }
 
-        $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
+        $decklist = $em->getRepository(Decklist::class)->find($decklist_id);
         if (!$decklist) {
             throw $this->createNotFoundException("Decklist not found");
         }
@@ -265,7 +266,7 @@ class SocialController extends AbstractController {
             throw $this->createAccessDeniedException("Anonymous access denied");
         }
 
-        $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
+        $decklist = $em->getRepository(Decklist::class)->find($decklist_id);
         if (!$decklist) {
             throw $this->createNotFoundException("Decklist not found");
         }
@@ -291,7 +292,7 @@ class SocialController extends AbstractController {
                 $precedent_id = null;
             }
         }
-        $precedent = ($precedent_id && $precedent_id != $decklist_id) ? $em->getRepository('AppBundle:Decklist')->find($precedent_id) : null;
+        $precedent = ($precedent_id && $precedent_id != $decklist_id) ? $em->getRepository(Decklist::class)->find($precedent_id) : null;
 
         $decklist->setName($name);
         $decklist->setNameCanonical($this->texts->slugify($name) . '-' . $decklist->getVersion());
@@ -321,7 +322,7 @@ class SocialController extends AbstractController {
             throw new AccessDeniedHttpException("You must be logged in for this operation.");
         }
 
-        $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
+        $decklist = $em->getRepository(Decklist::class)->find($decklist_id);
         if (!$decklist || $decklist->getUser()->getId() != $user->getId()) {
             throw new AccessDeniedHttpException("You don't have access to this decklist.");
         }
@@ -381,7 +382,7 @@ class SocialController extends AbstractController {
         $on = 0;
         $off = 0;
         $categories[] = ["label" => "Core / Deluxe", "packs" => []];
-        $list_cycles = $this->getDoctrine()->getRepository('AppBundle:Cycle')->findBy([], ["position" => "ASC"]);
+        $list_cycles = $this->getDoctrine()->getRepository(Cycle::class)->findBy([], ["position" => "ASC"]);
         foreach ($list_cycles as $cycle) {
             /* @var $cycle \AppBundle\Entity\Cycle */
             $size = count($cycle->getPacks());
@@ -585,12 +586,12 @@ class SocialController extends AbstractController {
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
 
-        $decklist = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->find($decklist_id);
+        $decklist = $this->getDoctrine()->getManager()->getRepository(Decklist::class)->find($decklist_id);
         if (!$decklist) {
             throw $this->createNotFoundException("Decklist not found.");
         }
 
-        $duplicate = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->findOneBy(['signature' => $decklist->getSignature()]);
+        $duplicate = $this->getDoctrine()->getManager()->getRepository(Decklist::class)->findOneBy(['signature' => $decklist->getSignature()]);
         if (!$duplicate || $duplicate->getDateCreation() >= $decklist->getDateCreation() || $duplicate->getId() === $decklist->getId()) {
             $duplicate = null;
         }
@@ -602,7 +603,7 @@ class SocialController extends AbstractController {
 
         $commenters[] = $decklist->getUser()->getUsername();
 
-        $versions = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->findBy(['parent' => $decklist->getParent()], ['version' => 'DESC', 'id' => 'DESC']);
+        $versions = $this->getDoctrine()->getManager()->getRepository(Decklist::class)->findBy(['parent' => $decklist->getParent()], ['version' => 'DESC', 'id' => 'DESC']);
 
         return $this->render('AppBundle:Decklist:decklist.html.twig', [
             'pagetitle' => $decklist->getName(),
@@ -631,7 +632,7 @@ class SocialController extends AbstractController {
         $decklist_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
 
         /* @var $decklist \AppBundle\Entity\Decklist */
-        $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
+        $decklist = $em->getRepository(Decklist::class)->find($decklist_id);
         if (!$decklist) {
             throw new NotFoundHttpException('Wrong id');
         }
@@ -682,7 +683,7 @@ class SocialController extends AbstractController {
         }
 
         $decklist_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
-        $decklist = $this->getDoctrine()->getRepository('AppBundle:Decklist')->find($decklist_id);
+        $decklist = $this->getDoctrine()->getRepository(Decklist::class)->find($decklist_id);
         if (!$decklist instanceof Decklist) {
             throw new BadRequestHttpException('Wrong decklist id');
         }
@@ -731,7 +732,7 @@ class SocialController extends AbstractController {
             }
             foreach ($mentionned_usernames as $mentionned_username) {
                 /* @var $mentionned_user User */
-                $mentionned_user = $this->getDoctrine()->getRepository('AppBundle:User')->findOneBy(['username' => $mentionned_username]);
+                $mentionned_user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username' => $mentionned_username]);
                 if ($mentionned_user && $mentionned_user->getIsNotifMention()) {
                     if (!isset($spool[$mentionned_user->getEmail()])) {
                         $spool[$mentionned_user->getEmail()] = 'AppBundle:Emails:newcomment_mentionned.html.twig';
@@ -777,7 +778,7 @@ class SocialController extends AbstractController {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
-        $comment = $em->getRepository('AppBundle:Comment')->find($comment_id);
+        $comment = $em->getRepository(Comment::class)->find($comment_id);
         if (!$comment) {
             throw new BadRequestHttpException('Unable to find comment');
         }
@@ -810,14 +811,14 @@ class SocialController extends AbstractController {
         $decklist_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
 
         /* @var $decklist \AppBundle\Entity\Decklist */
-        $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
+        $decklist = $em->getRepository(Decklist::class)->find($decklist_id);
 
         if (!$decklist instanceof Decklist) {
             throw new BadRequestHttpException('Unable to find deck');
         }
 
         if ($decklist->getUser()->getId() != $user->getId()) {
-            $query = $em->getRepository('AppBundle:Decklist')
+            $query = $em->getRepository(Decklist::class)
                 ->createQueryBuilder('d')
                 ->innerJoin('d.votes', 'u')
                 ->where('d.id = :decklist_id')
@@ -859,7 +860,7 @@ class SocialController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $decklist \AppBundle\Entity\Decklist */
-        $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
+        $decklist = $em->getRepository(Decklist::class)->find($decklist_id);
         if (!$decklist) {
             throw new NotFoundHttpException("Unable to find decklist.");
         }
@@ -895,7 +896,7 @@ class SocialController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
 
         /* @var $decklist \AppBundle\Entity\Decklist */
-        $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
+        $decklist = $em->getRepository(Decklist::class)->find($decklist_id);
         if (!$decklist) {
             throw new NotFoundHttpException("Unable to find decklist.");
         }
@@ -949,7 +950,7 @@ class SocialController extends AbstractController {
         $on = 0;
         $off = 0;
         $categories[] = ["label" => "Core / Deluxe", "packs" => []];
-        $list_cycles = $this->getDoctrine()->getRepository('AppBundle:Cycle')->findBy([], ["position" => "ASC"]);
+        $list_cycles = $this->getDoctrine()->getRepository(Cycle::class)->findBy([], ["position" => "ASC"]);
 
         foreach ($list_cycles as $cycle) {
             /* @var $cycle \AppBundle\Entity\Cycle */

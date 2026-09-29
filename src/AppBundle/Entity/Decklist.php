@@ -71,23 +71,23 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      */
     private $version;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Decklistslot>
      */
     private $slots;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Decklistsideslot>
      */
     private $sideslots;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Comment>
      */
     private $comments;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Decklist>
      */
     private $successors;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Deck>
      */
     private $children;
     /**
@@ -107,11 +107,11 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      */
     private $precedent;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     private $favorites;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     private $votes;
 
@@ -738,7 +738,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Sphere>
      */
     private $spheres;
 
@@ -804,18 +804,18 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\FellowshipDecklist>
      */
     private $fellowships;
 
     /**
      * Add fellowship
      *
-     * @param \AppBundle\Entity\FellowshipDeck $fellowship
+     * @param \AppBundle\Entity\FellowshipDecklist $fellowship
      *
      * @return Decklist
      */
-    public function addFellowship(\AppBundle\Entity\FellowshipDeck $fellowship) {
+    public function addFellowship(\AppBundle\Entity\FellowshipDecklist $fellowship) {
         $this->fellowships[] = $fellowship;
 
         return $this;
@@ -824,10 +824,10 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Remove fellowship
      *
-     * @param \AppBundle\Entity\FellowshipDeck $fellowship
+     * @param \AppBundle\Entity\FellowshipDecklist $fellowship
      * @return void
      */
-    public function removeFellowship(\AppBundle\Entity\FellowshipDeck $fellowship) {
+    public function removeFellowship(\AppBundle\Entity\FellowshipDecklist $fellowship) {
         $this->fellowships->removeElement($fellowship);
     }
 
@@ -880,7 +880,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
         return $this->startingThreat;
     }
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\QuestlogDeck>
      */
     private $questlogs;
 

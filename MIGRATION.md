@@ -27,8 +27,6 @@ Each removal reduces what has to be ported.
     `SocialController::publishAction` (see "Website browsing");
   - `src/AppBundle/Resources/public/js/directimport.js`, loaded by no template (see "Deck
     workflow");
-  - `QuestLogManager::findQuestLogsByRecentDiscussion()`, whose query cannot work (see "Lists and
-    search managers");
   - `app.suggestions-statistics.js` and `app.suggestions-heuristics.js`, loaded by no template
     (see "Console commands").
 - Kept for now (decision taken): the admin card image upload (see "Admin area").
@@ -87,7 +85,8 @@ Each removal reduces what has to be ported.
   migration".
 - **Time in tests** (`ClockInterface`): see "Tests and time".
 - **Static analysis** (`make phpstan`, level 8 of phpstan 2.2, see "Static analysis"): level 9,
-  the value types of arrays and collections, and the official extensions instead of ours.
+  the nullable columns typed non-null, the value types of arrays, and `phpstan-phpunit` instead
+  of our PHPUnit extensions.
 
 # Migration plan
 
@@ -164,7 +163,7 @@ are deprecated. Done by hand (no Rector):
 | `gedmo/doctrine-extensions` 2.x | maintained (3.x) | upgrade; the timestampable listener is declared by hand (`doctrine_extensions.yml`), or use `stof/doctrine-extensions-bundle` |
 | `doctrine/orm` 2.x, `doctrine/dbal` 2.x | | ORM 3 / DBAL 4; the custom DQL functions `replace` and `power` (see "Card search") |
 | `ezyang/htmlpurifier`, `erusev/parsedown` | maintained | upgrade |
-| `phpstan/phpstan` 2.2 (dev) | maintained | add `phpstan-symfony`, `phpstan-doctrine` and `phpstan-phpunit` (see "Static analysis") |
+| `phpstan/phpstan` 2.2 (dev) | maintained | `phpstan-symfony` and `phpstan-doctrine` installed; `phpstan-phpunit` with PHPUnit 9 (see "Static analysis") |
 
 ## Front-end assets
 
@@ -191,22 +190,40 @@ skeleton, it is ported first, then run against the new application.
 
 ## Static analysis
 
-`make phpstan` runs phpstan 2.2 at level 8 on `src/` (configuration in `phpstan.neon`). The
-official extensions could not be installed with Composer 1, so `src/AppBundle/PHPStan/` has
-small replacements, to drop for `phpstan-symfony`, `phpstan-doctrine` and `phpstan-phpunit` now
-that Composer 2 is used:
+`make phpstan` runs phpstan 2.2 at level 8 on `src/` and `tests/` (configuration in
+`phpstan.neon`), with the official extensions (loaded by `phpstan/extension-installer`):
 
-- the service types, read from the container dumped in `var/cache/test` (hence the
-  `cache:warmup` of `make phpstan`); the Doctrine registry, entity managers and
-  `getRepository('AppBundle:Card')` (an `EntityRepository<Card>`, with a stub);
-- the PHPUnit assertions narrowing types, the non-null response / request / container of the test
-  client, `HeaderBag::get()`, the entities' `$id` written by Doctrine;
-- stubs and ignored errors for wrong vendor docblocks (DBAL, PHPUnit 6.5).
+- `phpstan-symfony`: the service types, read from the container dumped in `var/cache/test`
+  (hence the `cache:warmup` of `make phpstan`), and the console helpers
+  (`src/AppBundle/PHPStan/console-application.php`);
+- `phpstan-doctrine`: the entity metadata, from the YAML mappings through the entity manager of the
+  test environment (`src/AppBundle/PHPStan/object-manager.php`): the repositories, the fields,
+  the collections, the DQL. It needs the class names: `getRepository(Card::class)`, the
+  `'AppBundle:Card'` aliases were replaced (they are gone in ORM 3; the aliases inside DQL strings
+  remain, still valid in ORM 2.7). phpstan's result cache does not know the mappings: after
+  changing one, `vendor/bin/phpstan clear-result-cache`.
 
-Left for later: level 9 (1136 errors with phpstan 1.4, all about `mixed`: request parameters,
-query results, untyped collections, the `mixed` parameters of the level 6 docblocks) and the
-value types of arrays and collections (the `missingType.iterableValue` and
-`missingType.generics` errors are ignored). Both are cheaper on the rewritten code.
+`phpstan-phpunit` is not installed (its latest version needs phpstan 2.3 and conflicts with
+PHPUnit < 7): the tests run PHPUnit 6.5. Our own extensions remain in `src/AppBundle/PHPStan/`:
+the PHPUnit assertions narrowing types (until PHPUnit 9 and `phpstan-phpunit`), the Doctrine
+registry (`getManager()` / `getConnection()` return the ORM entity manager / the DBAL connection),
+the logged in user (`getUser()` is an `AppBundle\Entity\User`), the non-null response / request /
+container of the test client, `HeaderBag::get()`; and a stub for a wrong PHPUnit docblock.
+
+Found by `phpstan-doctrine` and fixed:
+- the required associations were nullable: 32 mappings declared `nullable: false` on the
+  association, where Doctrine ignores it, instead of on the join column (migration
+  `Version20260929215538`, see "Environment");
+- `Decklist::addFellowship()` / `removeFellowship()` expected a `FellowshipDeck` instead of a
+  `FellowshipDecklist` (never called);
+- the dead `QuestLogManager::findQuestLogsByRecentDiscussion()` (see "Removed dead code").
+
+Left for later: the 49 columns nullable in the database but typed non-null in the entities
+(`doctrine.columnType`, ignored: making them nullable spreads to every caller of their getters; to
+fix with the typed properties); level 9 (1136 errors with phpstan 1.4, all about `mixed`: request
+parameters, query results, the `mixed` parameters of the level 6 docblocks) and the value types of
+arrays (`missingType.iterableValue` and `missingType.generics` are ignored; the collections of the
+entities are now typed). Both are cheaper on the rewritten code.
 
 ## Environment
 
@@ -280,6 +297,9 @@ value types of arrays and collections (the `missingType.iterableValue` and
     checked on production on 2026-09-29, the values are under 50 characters and no confirmation
     token is duplicated.
   - `Version20260929135555`: drops the `oauth2_*` tables (see "OAuth2 server (removed)").
+  - `Version20260929215538`: makes the foreign keys of the 32 required associations `NOT NULL`
+    (see "Static analysis"). It fails if one of them contains `NULL`: run the query of its
+    docblock on production first (every count must be 0, or `NULL` for an empty table).
   - `stat_cards_cache` has no entity (filled by SQL, see "Card statistics"): the
     `schema_filter` of the DBAL connection hides it from Doctrine, which would drop it
     otherwise. Any other table without an entity must be added to that filter.
@@ -844,8 +864,10 @@ production. An `id` tie-breaker was added (same direction as the main key, or `A
 `QuestLogManager`, the home page lists (`DefaultController`), the review lists
 (`DefaultController`, `ReviewController`, `CardsData::get_reviews`), the top decklists by card
 (`ApiController`), the private API lists, the quest log lists (`QuestLogController`), the user
-comment lists and decklist versions (`SocialController`), custom packs, and
-`Decks::getDecksWithSlotsForUser()`.
+comment lists and decklist versions (`SocialController`), custom packs,
+`Decks::getDecksWithSlotsForUser()`, and the card choice of the admin card printing form
+(`CardPrintingType`, sorted by name: several cards share one; found when the `NOT NULL`
+migration rebuilt the `card` table and MySQL returned the ties in another order).
 
 - Fixed: in the "Hot Topics" lists (`DecklistManager`, `FellowshipManager`, `QuestLogManager`),
   `orderBy('d.nbComments')` replaced `orderBy('nbRecentComments')` instead of adding to it:
@@ -967,11 +989,6 @@ name, number of decks, cards, packs, custom packs, number of Core Sets, sort ord
 - Removed: the `$ignoreEmptyDescriptions` parameter of the `ByAge` / `ByRecentDiscussion` methods,
   which was ignored (found by phpstan).
 
-### To look at during the migration
-
-- `QuestLogManager::findQuestLogsByRecentDiscussion()` is dead code: `Questlog` has no
-  `dateLastComment` field, so the query fails; nothing calls it.
-
 ## Console commands
 
 - `app:suggestions` (`SuggestionsCommand`, still used, `SuggestionsCommandTest`): computes which
@@ -1049,6 +1066,10 @@ Covered by `src/AppBundle/Tests/Controller/CardSearchTest.php` (public API
 
 Code no route, template, script or other code could reach (found with the coverage report),
 removed before the migration so that it does not have to be ported:
+
+- `QuestLogManager::findQuestLogsByRecentDiscussion()`: its query could not work (`Questlog` has no
+  `dateLastComment` field, found by the tests then by phpstan-doctrine's DQL check), and nothing
+  called it.
 
 - `Texts::truncate()`: never called.
 - `SocialController::findSimilarDecklists()`: never called (already marked "(unused)").

@@ -36,7 +36,7 @@ class Cycle {
      */
     private $dateUpdate;
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Pack>
      */
     private $packs;
 

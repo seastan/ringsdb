@@ -39,7 +39,7 @@ class LoadQuestlogData extends AbstractFixture implements DependentFixtureInterf
         $questlog->setIsPublic(true);
         $questlog->setDatePublish(new \DateTime('2015-08-16'));
 
-        $scenario = $manager->getRepository('AppBundle:Scenario')->find(1);
+        $scenario = $manager->getRepository(Scenario::class)->find(1);
         if (!$scenario instanceof Scenario) {
             throw new \LogicException('Scenario 1 is missing.');
         }

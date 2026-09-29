@@ -22,7 +22,7 @@ class EncounterController extends AbstractController {
     public function indexAction() {
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('AppBundle:Encounter')->findAll();
+        $entities = $em->getRepository(Encounter::class)->findAll();
 
         return $this->render('AppBundle:Encounter:index.html.twig', [
             'entities' => $entities,
@@ -77,7 +77,7 @@ class EncounterController extends AbstractController {
     public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Encounter')->find($id);
+        $entity = $em->getRepository(Encounter::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Encounter entity.');
@@ -100,7 +100,7 @@ class EncounterController extends AbstractController {
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Encounter')->find($id);
+        $entity = $em->getRepository(Encounter::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Encounter entity.');
@@ -125,7 +125,7 @@ class EncounterController extends AbstractController {
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Encounter')->find($id);
+        $entity = $em->getRepository(Encounter::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Encounter entity.');
@@ -161,7 +161,7 @@ class EncounterController extends AbstractController {
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('AppBundle:Encounter')->find($id);
+            $entity = $em->getRepository(Encounter::class)->find($id);
 
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Encounter entity.');

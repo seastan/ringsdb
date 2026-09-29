@@ -2,6 +2,7 @@
 
 namespace AppBundle\Model;
 
+use AppBundle\Entity\Card;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -303,7 +304,7 @@ class FellowshipManager {
             if (!empty($cards_code)) {
                 foreach ($cards_code as $i => $card_code) {
                     /* @var $card \AppBundle\Entity\Card */
-                    $card = $this->doctrine->getRepository('AppBundle:Card')->findOneBy(['code' => $card_code]);
+                    $card = $this->doctrine->getRepository(Card::class)->findOneBy(['code' => $card_code]);
                     if (!$card) {
                         continue;
                     }

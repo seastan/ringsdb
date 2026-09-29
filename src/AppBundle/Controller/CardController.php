@@ -32,7 +32,7 @@ class CardController extends AbstractController {
     public function indexAction() {
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('AppBundle:Card')->findAll();
+        $entities = $em->getRepository(Card::class)->findAll();
 
         return $this->render('AppBundle:Card:index.html.twig', [
             'entities' => $entities,
@@ -87,7 +87,7 @@ class CardController extends AbstractController {
     public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Card')->find($id);
+        $entity = $em->getRepository(Card::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Card entity.');
@@ -110,7 +110,7 @@ class CardController extends AbstractController {
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Card')->find($id);
+        $entity = $em->getRepository(Card::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Card entity.');
@@ -137,7 +137,7 @@ class CardController extends AbstractController {
     public function updateAction(Request $request, $id, Packages $packages) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('AppBundle:Card')->find($id);
+        $entity = $em->getRepository(Card::class)->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Card entity.');
@@ -153,7 +153,7 @@ class CardController extends AbstractController {
             $em->flush();
 
             /* @var $file \Symfony\Component\HttpFoundation\File\UploadedFile */
-            $file = $editForm['file']->getData();
+            $file = $editForm->get('file')->getData();
             if ($file) {
                 $imagedirurl = $packages->getUrl('/bundles/app/images/cards');
                 $imagedirpath = $this->rootDir . '/../web' . preg_replace('/\?.*/', '', $imagedirurl);
@@ -184,7 +184,7 @@ class CardController extends AbstractController {
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('AppBundle:Card')->find($id);
+            $entity = $em->getRepository(Card::class)->find($id);
 
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Card entity.');
@@ -209,7 +209,7 @@ class CardController extends AbstractController {
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('AppBundle:Card')->find($id);
+            $entity = $em->getRepository(Card::class)->find($id);
 
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Card entity.');

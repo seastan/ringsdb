@@ -2,6 +2,7 @@
 
 namespace AppBundle\Model;
 
+use AppBundle\Entity\Card;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -173,21 +174,6 @@ class QuestLogManager {
     /**
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function findQuestLogsByRecentDiscussion() {
-        $qb = $this->getQueryBuilder();
-
-        $qb->andWhere('d.nbComments > 0');
-        $qb->orderBy('d.dateLastComment', 'DESC');
-
-        // tie-breaker, for a stable order and pagination
-        $qb->addOrderBy('d.id', 'DESC');
-
-        return $this->getPaginator($qb->getQuery());
-    }
-
-    /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
-     */
     public function findQuestLogsByFavorite(User $user) {
         $qb = $this->getQueryBuilder();
 
@@ -301,7 +287,7 @@ class QuestLogManager {
             if (!empty($cards_code)) {
                 foreach ($cards_code as $i => $card_code) {
                     /* @var $card \AppBundle\Entity\Card */
-                    $card = $this->doctrine->getRepository('AppBundle:Card')->findOneBy(['code' => $card_code]);
+                    $card = $this->doctrine->getRepository(Card::class)->findOneBy(['code' => $card_code]);
                     if (!$card) {
                         continue;
                     }
