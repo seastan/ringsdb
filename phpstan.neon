@@ -2,6 +2,7 @@ parameters:
     level: 8
     paths:
         - src
+        - tests
     ignoreErrors:
         # legacy code: arrays are untyped structures and Doctrine collections have no generic types;
         # to revisit after the migration

@@ -9,7 +9,7 @@
          verbose="true">
     <testsuites>
         <testsuite name="default">
-            <directory suffix="Test.php">src/AppBundle/Tests</directory>
+            <directory suffix="Test.php">tests/AppBundle</directory>
         </testsuite>
     </testsuites>
     <php>
@@ -26,7 +26,6 @@
         <whitelist addUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">src</directory>
             <exclude>
-                <directory>src/AppBundle/Tests</directory>
                 <directory>src/AppBundle/DataFixtures</directory>
                 <directory>src/AppBundle/PHPStan</directory>
             </exclude>
