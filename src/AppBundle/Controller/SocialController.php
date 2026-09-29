@@ -1,6 +1,9 @@
 <?php
 namespace AppBundle\Controller;
 
+use AppBundle\Services\Texts;
+use AppBundle\Model\DecklistFactory;
+use AppBundle\Helper\DeckValidationHelper;
 use AppBundle\Entity\Comment;
 use AppBundle\Entity\Deck;
 use AppBundle\Entity\Decklist;
@@ -8,7 +11,7 @@ use AppBundle\Entity\User;
 use AppBundle\Entity\Pack;
 use AppBundle\Model\DecklistManager;
 use DateTime;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -17,8 +20,29 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class SocialController extends Controller {
+class SocialController extends AbstractController {
     use CurrentUserTrait;
+
+    /**
+     * @var DecklistFactory
+     */
+    private $decklistFactory;
+
+    /**
+     * @var Texts
+     */
+    private $texts;
+
+    /**
+     * @var int
+     */
+    private $cacheExpiration;
+
+    public function __construct(DecklistFactory $decklistFactory, Texts $texts, int $cacheExpiration) {
+        $this->decklistFactory = $decklistFactory;
+        $this->texts = $texts;
+        $this->cacheExpiration = $cacheExpiration;
+    }
 
     /**
      * Checks to see if a deck can be published in its current saved state
@@ -26,7 +50,7 @@ class SocialController extends Controller {
      * @param mixed $deck_id
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function publishFormAction($deck_id) {
+    public function publishFormAction($deck_id, DeckValidationHelper $deckValidationHelper) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
@@ -72,7 +96,7 @@ class SocialController extends Controller {
         }
 	*/
 
-        $problem = $this->get('deck_validation_helper')->findProblem($deck, true);
+        $problem = $deckValidationHelper->findProblem($deck, true);
         if ($problem) {
             $this->get('session')->getFlashBag()->set('error', "This deck cannot be published because it is invalid.");
 
@@ -106,7 +130,7 @@ class SocialController extends Controller {
         }
 
         // decklist for the form ; won't be persisted
-        $decklist = $this->get('decklist_factory')->createDecklistFromDeck($deck, $deck->getName(), $deck->getDescriptionMd());
+        $decklist = $this->decklistFactory->createDecklistFromDeck($deck, $deck->getName(), $deck->getDescriptionMd());
 
         return $this->render('AppBundle:Decklist:decklist_edit.html.twig', [
             'url' => $this->generateUrl('decklist_create'),
@@ -176,7 +200,7 @@ class SocialController extends Controller {
 
         try {
             /* @var $decklist \AppBundle\Entity\Decklist */
-            $decklist = $this->get('decklist_factory')->createDecklistFromDeck($deck, $name, $descriptionMd);
+            $decklist = $this->decklistFactory->createDecklistFromDeck($deck, $name, $descriptionMd);
         } catch (\Exception $e) {
             return $this->render('AppBundle:Default:error.html.twig', [
                 'pagetitle' => "Error",
@@ -214,7 +238,7 @@ class SocialController extends Controller {
             throw $this->createNotFoundException("Decklist not found");
         }
 
-        if (!$this->get('security.authorization_checker')->isGranted('ROLE_SUPER_ADMIN') && $user->getId() !== $decklist->getUser()->getId()) {
+        if (!$this->isGranted('ROLE_SUPER_ADMIN') && $user->getId() !== $decklist->getUser()->getId()) {
             throw $this->createAccessDeniedException("Access denied");
         }
 
@@ -246,7 +270,7 @@ class SocialController extends Controller {
             throw $this->createNotFoundException("Decklist not found");
         }
 
-        if (!$this->get('security.authorization_checker')->isGranted('ROLE_SUPER_ADMIN') && $user->getId() !== $decklist->getUser()->getId()) {
+        if (!$this->isGranted('ROLE_SUPER_ADMIN') && $user->getId() !== $decklist->getUser()->getId()) {
             throw $this->createAccessDeniedException("Access denied");
         }
 
@@ -256,7 +280,7 @@ class SocialController extends Controller {
             $name = "Untitled";
         }
         $descriptionMd = trim($request->request->get('descriptionMd'));
-        $descriptionHtml = $this->get('texts')->markdown($descriptionMd);
+        $descriptionHtml = $this->texts->markdown($descriptionMd);
 
         $precedent_id = trim($request->request->get('precedent'));
         if (!preg_match('/^\d+$/', $precedent_id)) {
@@ -270,7 +294,7 @@ class SocialController extends Controller {
         $precedent = ($precedent_id && $precedent_id != $decklist_id) ? $em->getRepository('AppBundle:Decklist')->find($precedent_id) : null;
 
         $decklist->setName($name);
-        $decklist->setNameCanonical($this->get('texts')->slugify($name) . '-' . $decklist->getVersion());
+        $decklist->setNameCanonical($this->texts->slugify($name) . '-' . $decklist->getVersion());
         $decklist->setDescriptionMd($descriptionMd);
         $decklist->setDescriptionHtml($descriptionHtml);
         $decklist->setPrecedent($precedent);
@@ -470,15 +494,15 @@ class SocialController extends Controller {
      * @param int $page
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function listAction($type, $page = 1, Request $request) {
+    public function listAction($type, $page = 1, Request $request, DecklistManager $decklistManager) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         /**
          * @var DecklistManager $decklist_manager
          */
-        $decklist_manager = $this->get('decklist_manager');
+        $decklist_manager = $decklistManager;
         $decklist_manager->setLimit(30);
         $decklist_manager->setPage($page);
 
@@ -559,7 +583,7 @@ class SocialController extends Controller {
     public function viewAction($decklist_id) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         $decklist = $this->getDoctrine()->getManager()->getRepository('AppBundle:Decklist')->find($decklist_id);
         if (!$decklist) {
@@ -650,7 +674,7 @@ class SocialController extends Controller {
     /**
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function commentAction(Request $request) {
+    public function commentAction(Request $request, \Swift_Mailer $mailer) {
         /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
@@ -673,7 +697,7 @@ class SocialController extends Controller {
                 $mentionned_usernames = array_unique($matches[1]);
             }
 
-            $comment_html = $this->get('texts')->markdown($comment_text);
+            $comment_html = $this->texts->markdown($comment_text);
 
             $now = new DateTime();
 
@@ -725,7 +749,7 @@ class SocialController extends Controller {
             ];
             foreach ($spool as $email => $view) {
                 $message = \Swift_Message::newInstance()->setSubject("[ringsdb] New comment")->setFrom(["seastan@ringsdb.com" => $user->getUsername()])->setTo($email)->setBody($this->renderView($view, $email_data), 'text/html');
-                $this->get('mailer')->send($message);
+                $mailer->send($message);
             }
         }
 
@@ -829,7 +853,7 @@ class SocialController extends Controller {
     public function textexportAction($decklist_id) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -865,7 +889,7 @@ class SocialController extends Controller {
     public function octgnexportAction($decklist_id) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -896,7 +920,7 @@ class SocialController extends Controller {
     public function searchAction(Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         $dbh = $this->getDoctrine()->getConnection();
         $spheres = $dbh->executeQuery("SELECT s.name, s.code FROM sphere s ORDER BY s.name ASC")->fetchAll();
@@ -1005,7 +1029,7 @@ class SocialController extends Controller {
     public function patronsAction() {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         $dbh = $this->getDoctrine()->getConnection();
 

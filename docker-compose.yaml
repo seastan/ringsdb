@@ -57,6 +57,7 @@ services:
             dockerfile: ./docker/dev/symfony/Dockerfile
         volumes:
             - .:/var/www/html
+            - ${CARD_IMAGES_DIR:-../card_images}:/var/card_images
         ports:
             - 8080:8000
         user: www-data

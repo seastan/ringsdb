@@ -2,8 +2,9 @@
 
 namespace AppBundle\Controller;
 
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use AppBundle\Entity\Card;
 use AppBundle\Form\CardType;
@@ -13,7 +14,16 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
  * Card controller.
  *
  */
-class CardController extends Controller {
+class CardController extends AbstractController {
+    /**
+     * @var string
+     */
+    private $rootDir;
+
+    public function __construct(string $rootDir) {
+        $this->rootDir = $rootDir;
+    }
+
     /**
      * Lists all Card entities.
      *
@@ -124,7 +134,7 @@ class CardController extends Controller {
      * @param mixed $id
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function updateAction(Request $request, $id) {
+    public function updateAction(Request $request, $id, Packages $packages) {
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('AppBundle:Card')->find($id);
@@ -145,8 +155,8 @@ class CardController extends Controller {
             /* @var $file \Symfony\Component\HttpFoundation\File\UploadedFile */
             $file = $editForm['file']->getData();
             if ($file) {
-                $imagedirurl = $this->get('assets.packages')->getUrl('/bundles/app/images/cards');
-                $imagedirpath = $this->get('kernel')->getRootDir() . '/../web' . preg_replace('/\?.*/', '', $imagedirurl);
+                $imagedirurl = $packages->getUrl('/bundles/app/images/cards');
+                $imagedirpath = $this->rootDir . '/../web' . preg_replace('/\?.*/', '', $imagedirurl);
                 $imagefilename = $entity->getCode() . '.png';
                 $file->move($imagedirpath, $imagefilename);
             }

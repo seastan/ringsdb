@@ -3,7 +3,7 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use AppBundle\Entity\Pack;
 use AppBundle\Form\PackType;
@@ -13,7 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
  * Pack controller.
  *
  */
-class PackController extends Controller {
+class PackController extends AbstractController {
     /**
      * Lists all Pack entities.
      *

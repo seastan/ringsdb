@@ -3,7 +3,7 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use AppBundle\Entity\Sphere;
 use AppBundle\Form\SphereType;
@@ -13,7 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
  * Sphere controller.
  *
  */
-class SphereController extends Controller {
+class SphereController extends AbstractController {
 
     /**
      * Lists all Sphere entities.

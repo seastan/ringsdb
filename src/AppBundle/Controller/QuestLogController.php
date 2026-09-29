@@ -1,12 +1,14 @@
 <?php
 namespace AppBundle\Controller;
 
+use AppBundle\Services\Texts;
+use AppBundle\Model\QuestLogManager;
 use AppBundle\Services\Decks;
 use AppBundle\Entity\Deck;
 use AppBundle\Entity\Questlog;
 use AppBundle\Entity\QuestlogComment;
 use AppBundle\Entity\QuestlogDeck;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -17,8 +19,35 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use DateTime;
 
-class QuestLogController extends Controller {
+class QuestLogController extends AbstractController {
     use CurrentUserTrait;
+
+    /**
+     * @var Decks
+     */
+    private $decks;
+
+    /**
+     * @var Texts
+     */
+    private $texts;
+
+    /**
+     * @var int
+     */
+    private $cacheExpiration;
+
+    /**
+     * @var string
+     */
+    private $cacheDir;
+
+    public function __construct(Decks $decks, Texts $texts, int $cacheExpiration, string $cacheDir) {
+        $this->decks = $decks;
+        $this->texts = $texts;
+        $this->cacheExpiration = $cacheExpiration;
+        $this->cacheDir = $cacheDir;
+    }
 
 
     // Set the deck content to the QuestlogDeck snapshot
@@ -28,7 +57,7 @@ class QuestLogController extends Controller {
      */
     public function setSnapshot($questlog) {
         $questlog_decks = $questlog->getDecks();
-        $decks_service = $this->get('decks');
+        $decks_service = $this->decks;
         foreach($questlog_decks as $questlog_deck) {
             $deck = $questlog_deck->getDeck();
             if (!$deck) {
@@ -203,15 +232,15 @@ class QuestLogController extends Controller {
      * @param int $page
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function listAction($type, $page = 1, Request $request) {
+    public function listAction($type, $page = 1, Request $request, QuestLogManager $questLogManager) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         /**
          * @var \AppBundle\Model\QuestLogManager $questlog_manager
          */
-        $questlog_manager = $this->get('questlog_manager');
+        $questlog_manager = $questLogManager;
         $questlog_manager->setLimit(30);
         $questlog_manager->setPage($page);
 
@@ -513,7 +542,7 @@ class QuestLogController extends Controller {
         }
 
         $descriptionMd = trim($request->request->get('descriptionMd'));
-        $descriptionHtml = $this->get('texts')->markdown($descriptionMd);
+        $descriptionHtml = $this->texts->markdown($descriptionMd);
 
         $quest = intval(filter_var($request->request->get('quest'), FILTER_SANITIZE_NUMBER_INT));
         $date = trim((string) filter_var($request->request->get('date'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
@@ -536,7 +565,7 @@ class QuestLogController extends Controller {
 
         $questlog->setUser($user);
         $questlog->setName($name);
-        $questlog->setNameCanonical($this->get('texts')->slugify($name));
+        $questlog->setNameCanonical($this->texts->slugify($name));
         $questlog->setDescriptionMd($descriptionMd);
         $questlog->setDescriptionHtml($descriptionHtml);
         $questlog->setScenario($scenario);
@@ -583,7 +612,7 @@ class QuestLogController extends Controller {
                         }
 
                         if (!$is_owner) {
-                            $deck = $this->get('decks')->cloneDeck($deck, $user);
+                            $deck = $this->decks->cloneDeck($deck, $user);
                         }
 
                         //$content = (array) json_decode($request->get("deck".$i."_content"));
@@ -802,7 +831,7 @@ class QuestLogController extends Controller {
     public function searchAction(Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         $dbh = $this->getDoctrine()->getConnection();
         $spheres = $dbh->executeQuery("SELECT s.name, s.code FROM sphere s ORDER BY s.name ASC")->fetchAll();
@@ -991,7 +1020,7 @@ class QuestLogController extends Controller {
             throw new AccessDeniedHttpException("You don't have access to this questlog.");
         }
 
-        $tmpDir = $this->getParameter('kernel.cache_dir');
+        $tmpDir = $this->cacheDir;
         $file = tempnam($tmpDir, "zip");
         if ($file === false) {
             throw new \RuntimeException("Cannot create a temporary file in $tmpDir");
@@ -1006,7 +1035,7 @@ class QuestLogController extends Controller {
             $questlog_decks = $questlog->getDecks();
             foreach ($questlog_decks as $questlog_deck) {
                 $deck = $questlog_deck->getDeck();
-                $this->get('decks')->setSlots($deck, json_decode($questlog_deck->getContent(), true));
+                $this->decks->setSlots($deck, json_decode($questlog_deck->getContent(), true));
 
                 $decks[] = $deck;
             }
@@ -1029,7 +1058,7 @@ class QuestLogController extends Controller {
                     ]);
                 }
 
-                $filename = $this->get('texts')->slugify($deck->getName()) . ' ' . $deck->getVersion() . '.' . $extension;
+                $filename = $this->texts->slugify($deck->getName()) . ' ' . $deck->getVersion() . '.' . $extension;
 
                 $zip->addFromString($filename, $content);
             }
@@ -1038,7 +1067,7 @@ class QuestLogController extends Controller {
         $response = new Response();
         $response->headers->set('Content-Type', 'application/zip');
         $response->headers->set('Content-Length', (string) filesize($file));
-        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->get('texts')->slugify('RingsDB - Quest Log ' . $questlog_id) . '.zip'));
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->texts->slugify('RingsDB - Quest Log ' . $questlog_id) . '.zip'));
 
         $response->setContent(file_get_contents($file));
         unlink($file);
@@ -1107,7 +1136,7 @@ class QuestLogController extends Controller {
     /**
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function commentAction(Request $request) {
+    public function commentAction(Request $request, \Swift_Mailer $mailer) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
@@ -1134,7 +1163,7 @@ class QuestLogController extends Controller {
                 $mentionned_usernames = array_unique($matches[1]);
             }
 
-            $comment_html = $this->get('texts')->markdown($comment_text);
+            $comment_html = $this->texts->markdown($comment_text);
 
             $now = new DateTime();
 
@@ -1188,7 +1217,7 @@ class QuestLogController extends Controller {
             ];
             foreach ($spool as $email => $view) {
                 $message = \Swift_Message::newInstance()->setSubject("[ringsdb] New comment")->setFrom(["seastan@ringsdb.com" => $user->getUsername()])->setTo($email)->setBody($this->renderView($view, $email_data), 'text/html');
-                $this->get('mailer')->send($message);
+                $mailer->send($message);
             }
         }
 

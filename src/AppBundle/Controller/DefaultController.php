@@ -2,7 +2,8 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use AppBundle\Services\CardsData;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Model\DecklistManager;
 use AppBundle\Model\FellowshipManager;
@@ -13,7 +14,28 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 
 
-class DefaultController extends Controller {
+class DefaultController extends AbstractController {
+    /**
+     * @var int
+     */
+    private $cacheExpiration;
+
+    /**
+     * @var string|null
+     */
+    private $gameName;
+
+    /**
+     * @var string|null
+     */
+    private $publisherName;
+
+    public function __construct(int $cacheExpiration, ?string $gameName, ?string $publisherName) {
+        $this->cacheExpiration = $cacheExpiration;
+        $this->gameName = $gameName;
+        $this->publisherName = $publisherName;
+    }
+
     /**
      * Newest first
      *
@@ -28,14 +50,14 @@ class DefaultController extends Controller {
     /**
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction() {
+    public function indexAction(DecklistManager $decklistManager, FellowshipManager $fellowshipManager) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         // Managers
-        $decklist_manager = $this->get('decklist_manager');
-        $fellowship_manager = $this->get('fellowship_manager');
+        $decklist_manager = $decklistManager;
+        $fellowship_manager = $fellowshipManager;
         $em = $this->getDoctrine()->getManager();
         
         $typeNames = [];
@@ -307,8 +329,8 @@ class DefaultController extends Controller {
             $all_comments[$i]['text'] = $text;
         }
 
-        $game_name = $this->getParameter('game_name');
-        $publisher_name = $this->getParameter('publisher_name');
+        $game_name = $this->gameName;
+        $publisher_name = $this->publisherName;
         
         return $this->render('AppBundle:Default:index.html.twig', [
             'pagetitle' =>  "$game_name Deckbuilder",
@@ -325,17 +347,17 @@ class DefaultController extends Controller {
     /**
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    function rulesAction() {
+    function rulesAction(CardsData $cardsData) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         $render = $this->renderView('AppBundle:Default:rules.html.twig', [
             "pagetitle" => "Rules",
             "pagedescription" => "Refer to the official rules of the game."
         ]);
 
-        $page = $this->get('cards_data')->replaceSymbols($render);
+        $page = $cardsData->replaceSymbols($render);
         $response->setContent($page);
 
         return $response;
@@ -347,11 +369,11 @@ class DefaultController extends Controller {
     function aboutAction() {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         return $this->render('AppBundle:Default:about.html.twig', [
             "pagetitle" => "About",
-            "game_name" => $this->getParameter('game_name'),
+            "game_name" => $this->gameName,
         ], $response);
     }
 
@@ -361,12 +383,12 @@ class DefaultController extends Controller {
     function apiIntroAction() {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         return $this->render('AppBundle:Default:apiIntro.html.twig', [
             "pagetitle" => "API",
-            "game_name" => $this->getParameter('game_name'),
-            "publisher_name" => $this->getParameter('publisher_name'),
+            "game_name" => $this->gameName,
+            "publisher_name" => $this->publisherName,
         ], $response);
     }
 }

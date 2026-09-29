@@ -1,12 +1,17 @@
 <?php
 namespace AppBundle\Controller;
 
+use AppBundle\Services\Texts;
+use AppBundle\Services\Decks;
+use AppBundle\Model\FellowshipManager;
+use AppBundle\Model\DecklistFactory;
+use AppBundle\Helper\FellowshipValidationHelper;
 use AppBundle\Entity\Fellowship;
 use AppBundle\Entity\FellowshipComment;
 use AppBundle\Entity\FellowshipDeck;
 use AppBundle\Entity\FellowshipDecklist;
 use DateTime;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -16,8 +21,35 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class FellowshipController extends Controller {
+class FellowshipController extends AbstractController {
     use CurrentUserTrait;
+
+    /**
+     * @var FellowshipValidationHelper
+     */
+    private $fellowshipValidationHelper;
+
+    /**
+     * @var Texts
+     */
+    private $texts;
+
+    /**
+     * @var int
+     */
+    private $cacheExpiration;
+
+    /**
+     * @var string
+     */
+    private $cacheDir;
+
+    public function __construct(FellowshipValidationHelper $fellowshipValidationHelper, Texts $texts, int $cacheExpiration, string $cacheDir) {
+        $this->fellowshipValidationHelper = $fellowshipValidationHelper;
+        $this->texts = $texts;
+        $this->cacheExpiration = $cacheExpiration;
+        $this->cacheDir = $cacheDir;
+    }
 
 
     /**
@@ -49,15 +81,15 @@ class FellowshipController extends Controller {
      * @param int $page
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function listAction($type, $page = 1, Request $request) {
+    public function listAction($type, $page = 1, Request $request, FellowshipManager $fellowshipManager) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         /**
          * @var \AppBundle\Model\FellowshipManager $fellowship_manager
          */
-        $fellowship_manager = $this->get('fellowship_manager');
+        $fellowship_manager = $fellowshipManager;
         $fellowship_manager->setLimit(30);
         $fellowship_manager->setPage($page);
 
@@ -275,7 +307,7 @@ class FellowshipController extends Controller {
     /**
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function saveAction(Request $request) {
+    public function saveAction(Request $request, Decks $decks) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
@@ -314,11 +346,11 @@ class FellowshipController extends Controller {
 
 
         $descriptionMd = trim($request->request->get('descriptionMd'));
-        $descriptionHtml = $this->get('texts')->markdown($descriptionMd);
+        $descriptionHtml = $this->texts->markdown($descriptionMd);
 
         $fellowship->setUser($user);
         $fellowship->setName($name);
-        $fellowship->setNameCanonical($this->get('texts')->slugify($name));
+        $fellowship->setNameCanonical($this->texts->slugify($name));
         $fellowship->setDescriptionMd($descriptionMd);
         $fellowship->setDescriptionHtml($descriptionHtml);
 
@@ -358,7 +390,7 @@ class FellowshipController extends Controller {
                         }
 
                         if (!$is_owner) {
-                            $deck = $this->get('decks')->cloneDeck($deck, $user);
+                            $deck = $decks->cloneDeck($deck, $user);
                         }
 
                         $fellowship_deck = new FellowshipDeck();
@@ -430,7 +462,7 @@ class FellowshipController extends Controller {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
 
-        $problem = $this->get('fellowship_validation_helper')->findProblem($fellowship);
+        $problem = $this->fellowshipValidationHelper->findProblem($fellowship);
         if ($problem) {
             $this->get('session')->getFlashBag()->set('error', "This fellowship cannot be published because it is invalid.");
 
@@ -522,7 +554,7 @@ class FellowshipController extends Controller {
     /**
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function publishAction(Request $request) {
+    public function publishAction(Request $request, DecklistFactory $decklistFactory) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
@@ -553,10 +585,10 @@ class FellowshipController extends Controller {
         }
 
         $descriptionMd = trim($request->request->get('descriptionMd'));
-        $descriptionHtml = $this->get('texts')->markdown($descriptionMd);
+        $descriptionHtml = $this->texts->markdown($descriptionMd);
 
         $fellowship->setName($name);
-        $fellowship->setNameCanonical($this->get('texts')->slugify($name));
+        $fellowship->setNameCanonical($this->texts->slugify($name));
         $fellowship->setDescriptionMd($descriptionMd);
         $fellowship->setDescriptionHtml($descriptionHtml);
         $fellowship->setDateUpdate(new \DateTime());
@@ -576,7 +608,7 @@ class FellowshipController extends Controller {
                 }
             } else {
                 $deck = $fellowship_deck->getDeck();
-                $decklist = $this->get('decklist_factory')->createDecklistFromDeck($deck, $deck->getName(), $deck->getDescriptionMd());
+                $decklist = $decklistFactory->createDecklistFromDeck($deck, $deck->getName(), $deck->getDescriptionMd());
                 $em->persist($decklist);
             }
 
@@ -591,7 +623,7 @@ class FellowshipController extends Controller {
         }
 
         // Validate fellowship
-        $problem = $this->get('fellowship_validation_helper')->findProblem($fellowship);
+        $problem = $this->fellowshipValidationHelper->findProblem($fellowship);
         if ($problem) {
             $this->get('session')->getFlashBag()->set('error', "This fellowship cannot be published because it is invalid.");
 
@@ -804,7 +836,7 @@ class FellowshipController extends Controller {
     public function searchAction(Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         $dbh = $this->getDoctrine()->getConnection();
         $spheres = $dbh->executeQuery("SELECT s.name, s.code FROM sphere s ORDER BY s.name ASC")->fetchAll();
@@ -947,7 +979,7 @@ class FellowshipController extends Controller {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
 
-        $tmpDir = $this->getParameter('kernel.cache_dir');
+        $tmpDir = $this->cacheDir;
         $file = tempnam($tmpDir, "zip");
         if ($file === false) {
             throw new \RuntimeException("Cannot create a temporary file in $tmpDir");
@@ -988,7 +1020,7 @@ class FellowshipController extends Controller {
                     ]);
                 }
 
-                $filename = $this->get('texts')->slugify($deck->getName()) . ' ' . $deck->getVersion() . '.' . $extension;
+                $filename = $this->texts->slugify($deck->getName()) . ' ' . $deck->getVersion() . '.' . $extension;
 
                 $zip->addFromString($filename, $content);
             }
@@ -997,7 +1029,7 @@ class FellowshipController extends Controller {
         $response = new Response();
         $response->headers->set('Content-Type', 'application/zip');
         $response->headers->set('Content-Length', (string) filesize($file));
-        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->get('texts')->slugify('RingsDB - Fellowship ' . $fellowship_id) . '.zip'));
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->texts->slugify('RingsDB - Fellowship ' . $fellowship_id) . '.zip'));
 
         $response->setContent(file_get_contents($file));
         unlink($file);
@@ -1069,7 +1101,7 @@ class FellowshipController extends Controller {
     /**
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function commentAction(Request $request) {
+    public function commentAction(Request $request, \Swift_Mailer $mailer) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
@@ -1096,7 +1128,7 @@ class FellowshipController extends Controller {
                 $mentionned_usernames = array_unique($matches[1]);
             }
 
-            $comment_html = $this->get('texts')->markdown($comment_text);
+            $comment_html = $this->texts->markdown($comment_text);
 
             $now = new DateTime();
 
@@ -1151,7 +1183,7 @@ class FellowshipController extends Controller {
             ];
             foreach ($spool as $email => $view) {
                 $message = \Swift_Message::newInstance()->setSubject("[ringsdb] New comment")->setFrom(["seastan@ringsdb.com" => $user->getUsername()])->setTo($email)->setBody($this->renderView($view, $email_data), 'text/html');
-                $this->get('mailer')->send($message);
+                $mailer->send($message);
             }
         }
 

@@ -2,14 +2,24 @@
 
 namespace AppBundle\Command;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-class RemoveUserCommand extends ContainerAwareCommand {
+class RemoveUserCommand extends Command {
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    public function __construct(EntityManagerInterface $em) {
+        parent::__construct();
+        $this->em = $em;
+    }
+
     /**
      * @return void
      */
@@ -25,7 +35,7 @@ class RemoveUserCommand extends ContainerAwareCommand {
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
-        $em = $this->getContainer()->get('doctrine')->getManager();
+        $em = $this->em;
 
         $user_id = $input->getArgument('user_id');
         $user = $em->getRepository('AppBundle:User')->find($user_id);

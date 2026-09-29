@@ -3,10 +3,10 @@ namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 
-class StatController extends Controller {
+class StatController extends AbstractController {
 	/**
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */

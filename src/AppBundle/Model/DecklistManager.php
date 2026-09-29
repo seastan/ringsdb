@@ -2,10 +2,10 @@
 
 namespace AppBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use AppBundle\Entity\User;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -45,7 +45,7 @@ class DecklistManager {
 	protected $user = null;
 
 	/**
-	 * @var EntityManager
+	 * @var EntityManagerInterface
 	 */
 	private $doctrine;
 
@@ -55,11 +55,11 @@ class DecklistManager {
 	private $request_stack;
 
 	/**
-	 * @var Router
+	 * @var UrlGeneratorInterface
 	 */
 	private $router;
 
-	public function __construct(EntityManager $doctrine, RequestStack $request_stack, Router $router) {
+	public function __construct(EntityManagerInterface $doctrine, RequestStack $request_stack, UrlGeneratorInterface $router) {
 		$this->doctrine = $doctrine;
 		$this->request_stack = $request_stack;
 		$this->router = $router;

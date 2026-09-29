@@ -12,6 +12,9 @@ use Doctrine\Migrations\AbstractMigration;
  *
  * SELECT MAX(CHAR_LENGTH(username_canonical)), MAX(CHAR_LENGTH(email_canonical)), MAX(CHAR_LENGTH(confirmation_token)) FROM user;
  * SELECT confirmation_token, COUNT(*) FROM user WHERE confirmation_token IS NOT NULL GROUP BY 1 HAVING COUNT(*) > 1;
+ *
+ * Checked on production on 2026-09-29: the values are under 50 characters, no confirmation token
+ * is duplicated.
  */
 final class Version20260929134447 extends AbstractMigration
 {

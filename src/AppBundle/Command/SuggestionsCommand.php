@@ -2,14 +2,30 @@
 
 namespace AppBundle\Command;
 
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-class SuggestionsCommand extends ContainerAwareCommand {
+class SuggestionsCommand extends Command {
+    /**
+     * @var Connection
+     */
+    private $connection;
+
+    /**
+     * @var string
+     */
+    private $rootDir;
+
+    public function __construct(Connection $connection, string $rootDir) {
+        parent::__construct();
+        $this->connection = $connection;
+        $this->rootDir = $rootDir;
+    }
+
     /**
      * @return void
      */
@@ -21,7 +37,7 @@ class SuggestionsCommand extends ContainerAwareCommand {
 
     protected function execute(InputInterface $input, OutputInterface $output) {
         ini_set('memory_limit', '512M');
-        $webdir = $this->getContainer()->get('kernel')->getRootDir() . "/../web";
+        $webdir = $this->rootDir . "/../web";
 
         $suggestions = $this->getSuggestions();
         file_put_contents($webdir . "/suggestions.json", json_encode($suggestions));
@@ -57,7 +73,7 @@ class SuggestionsCommand extends ContainerAwareCommand {
     private function getSuggestions() {
         $matrix = [];
 
-        $dbh = $this->getContainer()->get('doctrine')->getConnection();
+        $dbh = $this->connection;
 
         $cardsByIndex = $dbh->executeQuery("SELECT
 				c.id,

@@ -2,10 +2,10 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 
-class UserAdminController extends Controller {
+class UserAdminController extends AbstractController {
 	/**
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */

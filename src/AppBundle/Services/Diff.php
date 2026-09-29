@@ -2,7 +2,7 @@
 
 namespace AppBundle\Services;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use AppBundle\Model\SlotCollectionInterface;
 use AppBundle\Model\SlotInterface;
 use AppBundle\Model\SlotCollectionDecorator;
@@ -15,11 +15,11 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class Diff {
     /**
-     * @var EntityManager
+     * @var EntityManagerInterface
      */
     private $em;
 
-    public function __construct(EntityManager $doctrine) {
+    public function __construct(EntityManagerInterface $doctrine) {
         $this->em = $doctrine;
     }
 

@@ -3,7 +3,7 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use AppBundle\Entity\Cycle;
 use AppBundle\Form\CycleType;
@@ -13,7 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
  * Cycle controller.
  *
  */
-class CycleController extends Controller {
+class CycleController extends AbstractController {
     /**
      * Lists all Cycle entities.
      *

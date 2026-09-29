@@ -1,7 +1,11 @@
 <?php
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Psr\Log\LoggerInterface;
+use AppBundle\Services\Texts;
+use AppBundle\Services\Diff;
+use AppBundle\Services\Decks;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,8 +19,35 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Doctrine\ORM\EntityManager;
 
-class BuilderController extends Controller {
+class BuilderController extends AbstractController {
     use CurrentUserTrait;
+
+    /**
+     * @var Decks
+     */
+    private $decks;
+
+    /**
+     * @var Texts
+     */
+    private $texts;
+
+    /**
+     * @var int
+     */
+    private $cacheExpiration;
+
+    /**
+     * @var string
+     */
+    private $cacheDir;
+
+    public function __construct(Decks $decks, Texts $texts, int $cacheExpiration, string $cacheDir) {
+        $this->decks = $decks;
+        $this->texts = $texts;
+        $this->cacheExpiration = $cacheExpiration;
+        $this->cacheDir = $cacheDir;
+    }
 
 
     /**
@@ -38,7 +69,7 @@ class BuilderController extends Controller {
         $em->persist($deck);
         $em->flush();
 
-        return $this->redirect($this->get('router')->generate('deck_edit', ['deck_id' => $deck->getId()]));
+        return $this->redirect($this->generateUrl('deck_edit', ['deck_id' => $deck->getId()]));
     }
 
     /**
@@ -101,7 +132,7 @@ class BuilderController extends Controller {
     public function importAction() {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         return $this->render('AppBundle:Builder:directimport.html.twig', [
             'pagetitle' => "Import a deck",
@@ -347,7 +378,7 @@ class BuilderController extends Controller {
 
         $response = new Response();
         $response->headers->set('Content-Type', 'text/plain');
-        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->get('texts')->slugify($deck->getName()) . '.txt'));
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->texts->slugify($deck->getName()) . '.txt'));
 
         $response->setContent($content);
 
@@ -382,7 +413,7 @@ class BuilderController extends Controller {
         $response = new Response();
 
         $response->headers->set('Content-Type', 'application/octgn');
-        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->get('texts')->slugify($deck->getName()) . '.o8d'));
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->texts->slugify($deck->getName()) . '.o8d'));
 
         $response->setContent($content);
 
@@ -461,7 +492,7 @@ class BuilderController extends Controller {
         $cancel_edits = (boolean) filter_var($request->get('cancel_edits'), FILTER_SANITIZE_NUMBER_INT);
         if ($cancel_edits) {
             if ($deck) {
-                $this->get('decks')->revertDeck($deck);
+                $this->decks->revertDeck($deck);
             }
 
             return $this->redirect($this->generateUrl('decks_list'));
@@ -487,7 +518,7 @@ class BuilderController extends Controller {
         $description = trim($request->get('description'));
         $tags = filter_var($request->get('tags'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
 
-        $this->get('decks')->saveDeck($this->getUser(), $deck, $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);
+        $this->decks->saveDeck($this->getUser(), $deck, $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);
         $em->flush();
 
         return $this->redirect($this->generateUrl('decks_list'));
@@ -537,7 +568,7 @@ class BuilderController extends Controller {
         $description = trim($request->get('description'));
         $tags = filter_var($request->get('tags'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
 
-        $this->get('decks')->saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);
+        $this->decks->saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);
         $em->flush();
 
         return new JsonResponse(['success' => true, 'id' => $deck->getId()]);
@@ -614,7 +645,7 @@ class BuilderController extends Controller {
      * @param mixed $deck2_id
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function compareAction($deck1_id, $deck2_id) {
+    public function compareAction($deck1_id, $deck2_id, Diff $diffService) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
@@ -638,7 +669,7 @@ class BuilderController extends Controller {
             throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
         }
 
-        $diff = $this->get('diff');
+        $diff = $diffService;
         $heroIntersection = $diff->getSlotsDiff([$deck1->getSlots()->getHeroDeck(), $deck2->getSlots()->getHeroDeck()]);
         $drawIntersection = $diff->getSlotsDiff([$deck1->getSlots()->getDrawDeck(), $deck2->getSlots()->getDrawDeck()]);
         $sideIntersection = $diff->getSlotsDiff([$deck1->getSideSlots(), $deck2->getSideSlots()]);
@@ -658,7 +689,7 @@ class BuilderController extends Controller {
     public function listAction(Request $request) {
         /* @var $user \AppBundle\Entity\User */
         $user = $this->currentUser();
-        $decksService = $this->get('decks');
+        $decksService = $this->decks;
 
         $showAll = (bool) $request->query->get('all', false);
         $limit = $showAll ? null : 10;
@@ -758,7 +789,7 @@ class BuilderController extends Controller {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
-        $tmpDir = $this->getParameter('kernel.cache_dir');
+        $tmpDir = $this->cacheDir;
         $file = tempnam($tmpDir, "zip");
         if ($file === false) {
             throw new \RuntimeException("Cannot create a temporary file in $tmpDir");
@@ -791,7 +822,7 @@ class BuilderController extends Controller {
                     ]);
                 }
 
-                $filename = $this->get('texts')->slugify($deck->getName()) . ' ' . $deck->getVersion() . '.' . $extension;
+                $filename = $this->texts->slugify($deck->getName()) . ' ' . $deck->getVersion() . '.' . $extension;
 
                 $zip->addFromString($filename, $content);
             }
@@ -800,7 +831,7 @@ class BuilderController extends Controller {
         $response = new Response();
         $response->headers->set('Content-Type', 'application/zip');
         $response->headers->set('Content-Length', (string) filesize($file));
-        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->get('texts')->slugify('ringsdb') . '.zip'));
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->texts->slugify('ringsdb') . '.zip'));
 
         $response->setContent(file_get_contents($file));
         unlink($file);
@@ -854,7 +885,7 @@ class BuilderController extends Controller {
                     /* @var $deck \AppBundle\Entity\Deck */
                     $deck = new Deck();
                     $em->persist($deck);
-                    $this->get('decks')->saveDeck($this->getUser(), $deck, null, $deckname, '', '', $parse['content'], null);
+                    $this->decks->saveDeck($this->getUser(), $deck, null, $deckname, '', '', $parse['content'], null);
                 }
             }
         }
@@ -870,7 +901,7 @@ class BuilderController extends Controller {
     /**
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function autosaveAction(Request $request) {
+    public function autosaveAction(Request $request, LoggerInterface $logger) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
@@ -893,7 +924,7 @@ class BuilderController extends Controller {
         // decoded as arrays: count() of an object is a warning since PHP 7.2
         $diff = json_decode((string) $request->get('diff'), true);
         if (!is_array($diff) || (count($diff) != 4 && count($diff) != 2)) {
-            $this->get('logger')->error("cannot use diff", (array) $diff);
+            $logger->error("cannot use diff", (array) $diff);
             throw new UnprocessableEntityHttpException("Wrong content " . json_encode($diff));
         }
 

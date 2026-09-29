@@ -17,7 +17,7 @@ use PHPStan\Type\TypeCombinator;
  */
 class ControllerGetUserReturnTypeExtension implements DynamicMethodReturnTypeExtension {
     public function getClass(): string {
-        return 'Symfony\Bundle\FrameworkBundle\Controller\Controller';
+        return 'Symfony\Bundle\FrameworkBundle\Controller\AbstractController';
     }
 
     public function isMethodSupported(MethodReflection $methodReflection): bool {

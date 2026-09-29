@@ -3,7 +3,7 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use AppBundle\Entity\Type;
 use AppBundle\Form\TypeType;
@@ -13,7 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
  * Type controller.
  *
  */
-class TypeController extends Controller {
+class TypeController extends AbstractController {
     /**
      * Lists all Type entities.
      *

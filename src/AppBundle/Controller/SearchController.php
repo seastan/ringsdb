@@ -2,11 +2,39 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Services\CardsData;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 
-class SearchController extends Controller {
+class SearchController extends AbstractController {
+    /**
+     * @var CardsData
+     */
+    private $cardsData;
+
+    /**
+     * @var int
+     */
+    private $cacheExpiration;
+
+    /**
+     * @var string|null
+     */
+    private $gameName;
+
+    /**
+     * @var string|null
+     */
+    private $publisherName;
+
+    public function __construct(CardsData $cardsData, int $cacheExpiration, ?string $gameName, ?string $publisherName) {
+        $this->cardsData = $cardsData;
+        $this->cacheExpiration = $cacheExpiration;
+        $this->gameName = $gameName;
+        $this->publisherName = $publisherName;
+    }
+
     /**
      * @var array<string, string>
      */
@@ -60,7 +88,7 @@ class SearchController extends Controller {
     public function formAction() {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         $dbh = $this->getDoctrine()->getConnection();
 
@@ -87,7 +115,7 @@ class SearchController extends Controller {
         $types = $this->getDoctrine()->getRepository('AppBundle:Type')->findBy([], ["name" => "ASC"]);
         $spheres = $this->getDoctrine()->getRepository('AppBundle:Sphere')->findBy([], ["id" => "ASC"]);
 
-        $traits = $this->get('cards_data')->getDistinctTraits();
+        $traits = $this->cardsData->getDistinctTraits();
         $traits = array_filter(array_keys($traits));
         sort($traits);
 
@@ -106,7 +134,7 @@ class SearchController extends Controller {
             "traits" => $traits,
             "illustrators" => $illustrators,
             "allsets" => $this->renderView('AppBundle:Default:allsets.html.twig', [
-                "data" => $this->get('cards_data')->allSetsData(),
+                "data" => $this->cardsData->allSetsData(),
             ]),
 
         ], $response);
@@ -122,8 +150,8 @@ class SearchController extends Controller {
             throw $this->createNotFoundException('Sorry, this card is not in the database (yet?)');
         }
 
-        $game_name = $this->getParameter('game_name');
-        $publisher_name = $this->getParameter('publisher_name');
+        $game_name = $this->gameName;
+        $publisher_name = $this->publisherName;
 
         $meta = $card->getName() . ", a " . $card->getSphere()->getName() . " " . $card->getType()->getName() . " card for $game_name from the set " . $card->getPack()->getName() . " published by $publisher_name.";
 
@@ -155,8 +183,8 @@ class SearchController extends Controller {
             throw $this->createNotFoundException('This pack does not exist');
         }
 
-        $game_name = $this->getParameter('game_name');
-        $publisher_name = $this->getParameter('publisher_name');
+        $game_name = $this->gameName;
+        $publisher_name = $this->publisherName;
 
         $meta = $pack->getName() . ", a set of cards for $game_name" . ($pack->getDateRelease() ? " published on " . $pack->getDateRelease()->format('Y/m/d') : "") . " by $publisher_name.";
 
@@ -188,8 +216,8 @@ class SearchController extends Controller {
             throw $this->createNotFoundException('This cycle does not exist');
         }
 
-        $game_name = $this->getParameter('game_name');
-        $publisher_name = $this->getParameter('publisher_name');
+        $game_name = $this->gameName;
+        $publisher_name = $this->publisherName;
 
         $meta = $cycle->getName() . ", a cycle of adventure packs for $game_name published by $publisher_name.";
 
@@ -280,16 +308,16 @@ class SearchController extends Controller {
         $sort = $request->query->get('sort') ?: 'name';
 
         // we may be able to redirect to a better url if the search is on a single set
-        $conditions = $this->get('cards_data')->syntax($q);
+        $conditions = $this->cardsData->syntax($q);
         if (count($conditions) == 1 && count($conditions[0]) == 3 && $conditions[0][1] == ":") {
             if ($conditions[0][0] == array_search('pack', SearchController::$searchKeys)) {
-                $url = $this->get('router')->generate('cards_list', ['pack_code' => $conditions[0][2], 'view' => $view, 'sort' => $sort, 'page' => $page]);
+                $url = $this->generateUrl('cards_list', ['pack_code' => $conditions[0][2], 'view' => $view, 'sort' => $sort, 'page' => $page]);
 
                 return $this->redirect($url);
             }
 
             if ($conditions[0][0] == array_search('cycle', SearchController::$searchKeys)) {
-                $url = $this->get('router')->generate('cards_cycle', ['cycle_code' => $conditions[0][2], 'view' => $view, 'sort' => $sort, 'page' => $page]);
+                $url = $this->generateUrl('cards_cycle', ['cycle_code' => $conditions[0][2], 'view' => $view, 'sort' => $sort, 'page' => $page]);
 
                 return $this->redirect($url);
             }
@@ -317,7 +345,7 @@ class SearchController extends Controller {
     public function displayAction($q, $view = 'card', $sort, $page = 1, $pagetitle = '', $meta = '', $selected_pack_code = null) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         static $availability = [];
 
@@ -339,11 +367,11 @@ class SearchController extends Controller {
             $view = 'list';
         }
 
-        $conditions = $this->get('cards_data')->syntax($q);
-        $conditions = $this->get('cards_data')->validateConditions($conditions);
+        $conditions = $this->cardsData->syntax($q);
+        $conditions = $this->cardsData->validateConditions($conditions);
 
-        $q = $this->get('cards_data')->buildQueryFromConditions($conditions);
-        if ($q && $rows = $this->get('cards_data')->get_search_rows($conditions, $sort)) {
+        $q = $this->cardsData->buildQueryFromConditions($conditions);
+        if ($q && $rows = $this->cardsData->get_search_rows($conditions, $sort)) {
             if (count($rows) == 1) {
                 $view = 'card';
                 $includeReviews = true;
@@ -385,7 +413,7 @@ class SearchController extends Controller {
                 /* @var $pack \AppBundle\Entity\Pack */
                 $pack = $card->getPack();
                 /** @var array $cardinfo */
-                $cardinfo = $this->get('cards_data')->getCardInfo($card, false);
+                $cardinfo = $this->cardsData->getCardInfo($card, false);
 
                 if (empty($availability[$pack->getCode()])) {
                     $availability[$pack->getCode()] = false;
@@ -407,7 +435,7 @@ class SearchController extends Controller {
                 }
 
                 if ($includeReviews) {
-                    $cardinfo['reviews'] = $this->get('cards_data')->get_reviews($card);
+                    $cardinfo['reviews'] = $this->cardsData->get_reviews($card);
                 }
                 $cards[] = $cardinfo;
             }
@@ -517,15 +545,14 @@ class SearchController extends Controller {
         }
 
         $packParam = $selectedPackCode ? ['pack' => $selectedPackCode] : [];
-        $router = $this->get('router');
 
         return $this->renderView('AppBundle:Search:setnavigation.html.twig', [
             "prevtitle" => $prev ? $prev->getName() : "",
-            "prevhref" => $prev ? $router->generate('cards_zoom', array_merge(['card_code' => $prev->getCode()], $packParam)) : "",
+            "prevhref" => $prev ? $this->generateUrl('cards_zoom', array_merge(['card_code' => $prev->getCode()], $packParam)) : "",
             "nexttitle" => $next ? $next->getName() : "",
-            "nexthref" => $next ? $router->generate('cards_zoom', array_merge(['card_code' => $next->getCode()], $packParam)) : "",
+            "nexthref" => $next ? $this->generateUrl('cards_zoom', array_merge(['card_code' => $next->getCode()], $packParam)) : "",
             "settitle" => $selectedPack->getName(),
-            "sethref" => $router->generate('cards_list', ['pack_code' => $selectedPack->getCode()]),
+            "sethref" => $this->generateUrl('cards_list', ['pack_code' => $selectedPack->getCode()]),
         ]);
     }
 
@@ -540,7 +567,7 @@ class SearchController extends Controller {
      */
     public function paginationItem($q = null, $v, $s, $ps, $pi, $total) {
         return $this->renderView('AppBundle:Search:paginationitem.html.twig', [
-            "href" => $q == null ? "" : $this->get('router')->generate('cards_find', ['q' => $q, 'view' => $v, 'sort' => $s, 'page' => $pi]),
+            "href" => $q == null ? "" : $this->generateUrl('cards_find', ['q' => $q, 'view' => $v, 'sort' => $s, 'page' => $pi]),
             "ps" => $ps,
             "pi" => $pi,
             "s" => $ps * ($pi - 1) + 1,

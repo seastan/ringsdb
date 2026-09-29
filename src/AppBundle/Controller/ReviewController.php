@@ -1,19 +1,35 @@
 <?php
 namespace AppBundle\Controller;
 
+use AppBundle\Services\Texts;
 use DateTime;
 use AppBundle\Entity\Card;
 use AppBundle\Entity\Review;
 use AppBundle\Entity\Reviewcomment;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class ReviewController extends Controller {
+class ReviewController extends AbstractController {
+
+    /**
+     * @var Texts
+     */
+    private $texts;
+
+    /**
+     * @var int
+     */
+    private $cacheExpiration;
+
+    public function __construct(Texts $texts, int $cacheExpiration) {
+        $this->texts = $texts;
+        $this->cacheExpiration = $cacheExpiration;
+    }
 
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
@@ -54,7 +70,7 @@ class ReviewController extends Controller {
 
         $review_raw = (string) preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $review_raw);
 
-        $review_html = $this->get('texts')->markdown($review_raw);
+        $review_html = $this->texts->markdown($review_raw);
         if (!$review_html) {
             throw new \Exception("Your review is empty.");
         }
@@ -106,7 +122,7 @@ class ReviewController extends Controller {
 
         $review_raw = (string) preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $review_raw);
 
-        $review_html = $this->get('texts')->markdown($review_raw);
+        $review_html = $this->texts->markdown($review_raw);
         if (!$review_html) {
             return new Response('Your review is empty.');
         }
@@ -211,7 +227,7 @@ class ReviewController extends Controller {
     public function listAction($page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         $limit = 5;
         if ($page < 1) {
@@ -282,7 +298,7 @@ class ReviewController extends Controller {
     public function byauthorAction($user_id, $page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         $limit = 5;
         if ($page < 1) {

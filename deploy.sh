@@ -5,56 +5,158 @@
 # any of the three forks: ./deploy.sh from /var/www/ringsdb_test redeploys test,
 # from /var/www/ringsdb redeploys production, etc.
 #
-# Steps: fast-forward the branch, then clear the prod cache and recompile assets.
-# It deliberately does NOT auto-apply DB migrations or run composer — it stops
-# and tells you when the pull brings those in, so you can snapshot the DB first.
+# Steps: check the card images, Composer and the PHP extensions needed by the
+# version to deploy (before any change), switch to maintenance mode, snapshot
+# the database, fast-forward the branch, back up vendor/, install the
+# dependencies (the Composer scripts clear the cache and build the assets), link
+# the card images, apply the Doctrine migrations, refresh the cache/log ACLs,
+# leave maintenance mode. If a step fails, the site stays in maintenance mode.
 #
-# Env toggles:
-#   SKIP_PULL=1             skip git fetch/fast-forward (cache+assets only)
-#   SKIP_MIGRATION_CHECK=1  proceed even though new migration files were pulled
-#                           (set this after you've applied them by hand)
+# Env:
+#   CARD_IMAGES_DIR  (required) the card images, outside the checkout: served
+#                    as /bundles/cards through a symlink
+#   SKIP_PULL=1      skip git fetch/fast-forward
+#   MAINTENANCE=0    keep the site up during the deploy
+#   SNAPSHOT_DIR     where the database snapshots go (default: ~/db-snapshots)
 set -euo pipefail
 
 cd "$(dirname "$0")"
 ROOT="$(pwd)"
 CONSOLE="php app/console"
 
+# read by app/console, including in the Composer scripts (the dev bundles are
+# not installed)
+export SYMFONY_ENV=prod
+
 echo "==> Redeploying $ROOT"
 
-# --- 1. Update code (fast-forward only; never clobber local commits) ----------
+# --- 0. Checks, before any change ---------------------------------------------
+# The card images.
+# assets:install (a Composer script) deletes every directory of web/bundles/
+# that is not a bundle's: a real web/bundles/cards directory would be lost. A
+# symlink is only unlinked, its target is kept.
+if [ -d web/bundles/cards ] && [ ! -L web/bundles/cards ]; then
+    echo "!! web/bundles/cards is a directory: the deploy would delete it." >&2
+    echo "   Move it out of the checkout first, then set CARD_IMAGES_DIR, e.g.:" >&2
+    echo "     mv web/bundles/cards /var/www/card-images" >&2
+    echo "     export CARD_IMAGES_DIR=/var/www/card-images" >&2
+    exit 1
+fi
+if [ -z "${CARD_IMAGES_DIR:-}" ] || [ ! -d "$CARD_IMAGES_DIR" ]; then
+    echo "!! CARD_IMAGES_DIR must be set to the directory of the card images." >&2
+    exit 1
+fi
+# absolute, so that the symlink does not depend on where it is
+CARD_IMAGES_DIR="$(cd "$CARD_IMAGES_DIR" && pwd)"
+
+# Composer: the lock is a Composer 2 lock, and check-platform-reqs --lock needs
+# Composer 2.2.
+COMPOSER_MIN_VERSION=2.2.0
+COMPOSER_VERSION="$(composer --version --no-ansi 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)"
+if [ -z "$COMPOSER_VERSION" ] \
+    || ! php -r 'exit(version_compare($argv[1], $argv[2], ">=") ? 0 : 1);' "$COMPOSER_VERSION" "$COMPOSER_MIN_VERSION"; then
+    echo "!! Composer >= $COMPOSER_MIN_VERSION is needed (found: ${COMPOSER_VERSION:-none})." >&2
+    exit 1
+fi
+
+# The version to deploy: the upstream branch, fetched now so that its PHP
+# requirements are checked before the site is touched.
 OLD_HEAD="$(git rev-parse HEAD)"
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-
+TARGET="$OLD_HEAD"
 if [ "${SKIP_PULL:-0}" != "1" ]; then
-    echo "==> Fetching origin and fast-forwarding $BRANCH..."
+    echo "==> Fetching origin..."
     git fetch origin
     if git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
-        # vendor/ is populated via rsync, not composer install, and is meant to
-        # stay on disk untouched by deploys. But if it's still *tracked* here
-        # while the upstream commit we're about to fast-forward to has stopped
-        # tracking it, the fast-forward's checkout will delete it from disk
-        # (git removes anything absent from the new tree, even when the file
-        # content itself never changed). Refuse and tell the operator to
-        # untrack it locally first, which is a no-op for the working tree.
-        if git ls-files --error-unmatch vendor >/dev/null 2>&1 \
-            && ! git diff --quiet HEAD '@{u}' -- vendor; then
-            echo "!! @{u} stops tracking vendor/, but it's still tracked in this checkout." >&2
-            echo "   Fast-forwarding now would DELETE vendor/ from disk." >&2
-            echo "   One-time fix — untrack it locally, then merge (not fast-forward;" >&2
-            echo "   both sides remove the same paths so this resolves with no conflicts" >&2
-            echo "   and never touches the files on disk):" >&2
-            echo "     git rm -r --cached vendor && git commit -m 'Untrack vendor/'" >&2
-            echo "     git merge '@{u}'" >&2
-            echo "   Then re-run this script (SKIP_PULL=1 if it's already up to date)." >&2
+        TARGET="$(git rev-parse '@{u}')"
+        # the fast-forward of step 3 must be possible: fail now, not halfway
+        if ! git merge-base --is-ancestor HEAD "$TARGET"; then
+            echo "!! $BRANCH has diverged from its upstream: no fast-forward possible." >&2
             exit 1
         fi
-
-        # --ff-only refuses to merge if the branch has diverged: fail loudly
-        # rather than create a merge commit or rewrite history.
-        git merge --ff-only '@{u}'
     else
-        echo "    (no upstream configured for $BRANCH; skipping merge)"
+        echo "    (no upstream configured for $BRANCH; deploying the current commit)"
     fi
+fi
+
+# The fast-forward of step 3 must not trip over local changes (a tracked file
+# changed on the server that the merge changes too, an untracked file the merge
+# adds): dry run of the same checkout, nothing is changed.
+# (update-index only refreshes the file stats: a file merely touched, e.g. by
+# rsync, is not a change)
+git update-index -q --refresh || true
+if [ "$TARGET" != "$OLD_HEAD" ] && ! git read-tree -mun HEAD "$TARGET"; then
+    echo "!! Local changes would be overwritten by the update (see above): nothing was changed." >&2
+    exit 1
+fi
+
+# The PHP version and extensions required by the lock file of that version.
+echo "==> Checking the PHP requirements of $TARGET..."
+PLATFORM_DIR="$(mktemp -d)"
+git show "$TARGET:composer.json" > "$PLATFORM_DIR/composer.json"
+git show "$TARGET:composer.lock" > "$PLATFORM_DIR/composer.lock"
+if ! COMPOSER="$PLATFORM_DIR/composer.json" composer check-platform-reqs --lock --no-dev --no-ansi; then
+    rm -rf "$PLATFORM_DIR"
+    echo "!! The PHP requirements of $TARGET are not met (see above): nothing was changed." >&2
+    exit 1
+fi
+rm -rf "$PLATFORM_DIR"
+
+# --- 1. Maintenance mode -----------------------------------------------------
+# web/app.php answers 503 with web/maintenance.html while the flag exists, so
+# nothing writes to the database or the cache during the update.
+MAINTENANCE_FLAG="$ROOT/maintenance.flag"
+SNAPSHOT=""
+if [ "${MAINTENANCE:-1}" != "0" ]; then
+    echo "==> Maintenance mode on..."
+    touch "$MAINTENANCE_FLAG"
+    trap 'if [ $? -ne 0 ]; then
+              echo "!! The deploy failed: the site stays in maintenance mode." >&2
+              echo "   To roll back: git reset --hard $OLD_HEAD, restore vendor.bak/" >&2
+              echo "   (if any) as vendor/, rm -rf app/cache/prod, and if the migrations ran," >&2
+              echo "   restore the database snapshot: ${SNAPSHOT:-none}" >&2
+              echo "   Then leave maintenance mode: rm $MAINTENANCE_FLAG" >&2
+          fi' EXIT
+    # the requests in progress finish
+    sleep 10
+fi
+
+# --- 2. Snapshot the database -------------------------------------------------
+# The connection comes from app/config/parameters.yml; the password goes
+# through a defaults file, not the command line.
+SNAPSHOT_DIR="${SNAPSHOT_DIR:-$HOME/db-snapshots}"
+# the snapshots hold the users' data (emails, password hashes): owner only
+mkdir -p "$SNAPSHOT_DIR"
+chmod 700 "$SNAPSHOT_DIR"
+
+db_parameter() {
+    php -r 'require "vendor/autoload.php";
+        $p = Symfony\Component\Yaml\Yaml::parse(file_get_contents("app/config/parameters.yml"))["parameters"];
+        echo $p[$argv[1]] ?? "";' "$1"
+}
+DB_HOST="$(db_parameter database_host)"
+DB_PORT="$(db_parameter database_port)"
+DB_NAME="$(db_parameter database_name)"
+DB_USER="$(db_parameter database_user)"
+DB_PASSWORD="$(db_parameter database_password)"
+
+SNAPSHOT="$SNAPSHOT_DIR/${DB_NAME}_$(date +%Y%m%d-%H%M%S).sql.gz"
+echo "==> Snapshotting $DB_NAME to $SNAPSHOT..."
+# Without the tablespaces (they need the PROCESS privilege) nor the routines:
+# the source_code() stored function was created by root, the application user
+# cannot dump it. To restore, load the snapshot then function-source-code.sql
+# (as root).
+mysqldump --defaults-extra-file=<(printf '[client]\nuser=%s\npassword=%s\nhost=%s\nport=%s\n' \
+        "$DB_USER" "$DB_PASSWORD" "${DB_HOST:-127.0.0.1}" "${DB_PORT:-3306}") \
+    --single-transaction --no-tablespaces "$DB_NAME" | gzip > "$SNAPSHOT"
+
+# --- 3. Update code (fast-forward only; never clobber local commits) ----------
+# The commit checked in step 0, not a newer push.
+if [ "$TARGET" != "$OLD_HEAD" ]; then
+    echo "==> Fast-forwarding $BRANCH..."
+    # --ff-only refuses to merge if the branch has diverged: fail loudly rather
+    # than create a merge commit or rewrite history.
+    git merge --ff-only "$TARGET"
 fi
 NEW_HEAD="$(git rev-parse HEAD)"
 
@@ -64,31 +166,33 @@ else
     echo "    $OLD_HEAD -> $NEW_HEAD"
 fi
 
-# --- 2. Stop if the pull brought in deps / migrations that need a human -------
-if [ "$OLD_HEAD" != "$NEW_HEAD" ]; then
-    if ! git diff --quiet "$OLD_HEAD" "$NEW_HEAD" -- composer.lock; then
-        echo "!! composer.lock changed — run 'composer install' before continuing." >&2
-    fi
+# --- 4. Install the dependencies ----------------------------------------------
+# The Composer scripts then build parameters.yml, clear the cache, install and
+# dump the assets.
+# The prod kernel uses its cached container without checking whether it is up
+# to date: remove it, or the cache:clear of the Composer scripts would boot the
+# container of the previous code. Renamed first: the move is instant, even if
+# requests still write to the cache.
+# vendor/ is backed up first, for a rollback (the previous backup is replaced).
+echo "==> Backing up vendor/ to vendor.bak/..."
+rm -rf vendor.bak
+cp -a vendor vendor.bak
 
-    NEW_MIGRATIONS="$(git diff --name-only --diff-filter=A "$OLD_HEAD" "$NEW_HEAD" -- migrations/ | grep '\.sql$' || true)"
-    if [ -n "$NEW_MIGRATIONS" ] && [ "${SKIP_MIGRATION_CHECK:-0}" != "1" ]; then
-        echo "!! New migration files were pulled in:" >&2
-        echo "$NEW_MIGRATIONS" | sed 's/^/     /' >&2
-        echo "   Snapshot the DB first:  mysqldump ringsdb > /tmp/ringsdb_before.sql" >&2
-        echo "   Apply them, then re-run with SKIP_MIGRATION_CHECK=1 to finish." >&2
-        exit 1
-    fi
+echo "==> Installing the dependencies..."
+if [ -d app/cache/prod ]; then
+    mv app/cache/prod "app/cache/prod.old.$(date +%s)"
 fi
+rm -rf app/cache/prod.old.*
+composer install --no-dev --optimize-autoloader --no-interaction
 
-# --- 3. Clear prod cache ------------------------------------------------------
-echo "==> Clearing prod cache..."
-$CONSOLE cache:clear --env=prod --no-debug
+echo "==> Linking the card images ($CARD_IMAGES_DIR)..."
+ln -sfn "$CARD_IMAGES_DIR" web/bundles/cards
 
-# --- 4. Recompile assets ------------------------------------------------------
-echo "==> Dumping assets..."
-$CONSOLE assetic:dump --env=prod
+# --- 5. Apply the database migrations -----------------------------------------
+echo "==> Applying the migrations (snapshot: $SNAPSHOT)..."
+$CONSOLE doctrine:migrations:migrate --no-interaction --allow-no-migration
 
-# --- 5. Refresh cache/log ACLs (best-effort, no sudo) -------------------------
+# --- 6. Refresh cache/log ACLs (best-effort, no sudo) -------------------------
 # New files already inherit the right ACLs from the parent dirs' *default* ACL
 # entries, so this is only a safety net for files this run just created. The
 # current user owns those, so setfacl works without sudo (rings is not in
@@ -98,6 +202,12 @@ echo "==> Refreshing cache/log ACLs (best-effort)..."
 if command -v setfacl >/dev/null 2>&1; then
     setfacl -R  -m u:rings:rwX -m u:www-data:rwX app/cache app/logs 2>/dev/null || true
     setfacl -dR -m u:rings:rwX -m u:www-data:rwX app/cache app/logs 2>/dev/null || true
+fi
+
+# --- 7. Leave maintenance mode ------------------------------------------------
+if [ -f "$MAINTENANCE_FLAG" ]; then
+    echo "==> Maintenance mode off."
+    rm -f "$MAINTENANCE_FLAG"
 fi
 
 echo "==> Done."

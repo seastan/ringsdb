@@ -3,13 +3,13 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use AppBundle\Entity\CardPrinting;
 use AppBundle\Form\CardPrintingType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
-class CardPrintingController extends Controller {
+class CardPrintingController extends AbstractController {
 
     /**
      * @return \Symfony\Component\HttpFoundation\Response

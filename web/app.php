@@ -3,6 +3,17 @@
 use Symfony\Component\ClassLoader\ApcClassLoader;
 use Symfony\Component\HttpFoundation\Request;
 
+// Maintenance mode, set by deploy.sh during the update: answered before loading anything (code,
+// dependencies and database may be halfway updated).
+if (file_exists(__DIR__.'/../maintenance.flag')) {
+    http_response_code(503);
+    header('Retry-After: 300');
+    header('Content-Type: text/html; charset=utf-8');
+    header('Cache-Control: no-store');
+    readfile(__DIR__.'/maintenance.html');
+    exit;
+}
+
 $loader = require_once __DIR__.'/../app/autoload.php';
 
 // Enable APC for autoloading to improve performance.
