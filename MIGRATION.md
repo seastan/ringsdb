@@ -196,7 +196,7 @@ official extensions could not be installed with Composer 1, so `src/AppBundle/PH
 small replacements, to drop for `phpstan-symfony`, `phpstan-doctrine` and `phpstan-phpunit` now
 that Composer 2 is used:
 
-- the service types, read from the container dumped in `app/cache/test` (hence the
+- the service types, read from the container dumped in `var/cache/test` (hence the
   `cache:warmup` of `make phpstan`); the Doctrine registry, entity managers and
   `getRepository('AppBundle:Card')` (an `EntityRepository<Card>`, with a stub);
 - the PHPUnit assertions narrowing types, the non-null response / request / container of the test
@@ -243,7 +243,7 @@ value types of arrays and collections (the `missingType.iterableValue` and
      The prod kernel uses its cached container without checking it: without the removal, the
      `cache:clear` would boot the container of the previous code. Then links the card images;
   5. applies the Doctrine migrations (`doctrine:migrations:migrate --allow-no-migration`);
-  6. refreshes the ACLs of `app/cache` and `app/logs` (`setfacl`, best-effort);
+  6. refreshes the ACLs of `var/cache` and `var/log` (`setfacl`, best-effort);
   7. leaves maintenance mode.
 
   If a step fails, the site stays in maintenance mode and the script prints how to roll back

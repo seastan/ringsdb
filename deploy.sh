@@ -113,7 +113,7 @@ if [ "${MAINTENANCE:-1}" != "0" ]; then
     trap 'if [ $? -ne 0 ]; then
               echo "!! The deploy failed: the site stays in maintenance mode." >&2
               echo "   To roll back: git reset --hard $OLD_HEAD, restore vendor.bak/" >&2
-              echo "   (if any) as vendor/, rm -rf app/cache/prod, and if the migrations ran," >&2
+              echo "   (if any) as vendor/, rm -rf var/cache/prod, and if the migrations ran," >&2
               echo "   restore the database snapshot: ${SNAPSHOT:-none}" >&2
               echo "   Then leave maintenance mode: rm $MAINTENANCE_FLAG" >&2
           fi' EXIT
@@ -179,10 +179,10 @@ rm -rf vendor.bak
 cp -a vendor vendor.bak
 
 echo "==> Installing the dependencies..."
-if [ -d app/cache/prod ]; then
-    mv app/cache/prod "app/cache/prod.old.$(date +%s)"
+if [ -d var/cache/prod ]; then
+    mv var/cache/prod "var/cache/prod.old.$(date +%s)"
 fi
-rm -rf app/cache/prod.old.*
+rm -rf var/cache/prod.old.*
 composer install --no-dev --optimize-autoloader --no-interaction
 
 echo "==> Linking the card images ($CARD_IMAGES_DIR)..."
@@ -200,8 +200,8 @@ $CONSOLE doctrine:migrations:migrate --no-interaction --allow-no-migration
 # Use setfacl, NOT chown — chown would strip the ACLs the web server needs.
 echo "==> Refreshing cache/log ACLs (best-effort)..."
 if command -v setfacl >/dev/null 2>&1; then
-    setfacl -R  -m u:rings:rwX -m u:www-data:rwX app/cache app/logs 2>/dev/null || true
-    setfacl -dR -m u:rings:rwX -m u:www-data:rwX app/cache app/logs 2>/dev/null || true
+    setfacl -R  -m u:rings:rwX -m u:www-data:rwX var/cache var/logs 2>/dev/null || true
+    setfacl -dR -m u:rings:rwX -m u:www-data:rwX var/cache var/logs 2>/dev/null || true
 fi
 
 # --- 7. Leave maintenance mode ------------------------------------------------

@@ -36,10 +36,10 @@ test-fixtures:
 phpunit: test-fixtures
 	docker compose exec -it -u www-data symfony php bin/simple-phpunit
 
-# Code coverage report in app/cache/coverage/index.html (uses Xdebug)
+# Code coverage report in var/cache/coverage/index.html (uses Xdebug)
 coverage: test-fixtures
-	docker compose exec -it -u www-data symfony php bin/simple-phpunit --coverage-html app/cache/coverage --coverage-text=php://stdout --colors=never
-	@echo "Code coverage report: \033[36mfile://${PWD}/app/cache/coverage/index.html\033[0m"
+	docker compose exec -it -u www-data symfony php bin/simple-phpunit --coverage-html var/cache/coverage --coverage-text=php://stdout --colors=never
+	@echo "Code coverage report: \033[36mfile://${PWD}/var/cache/coverage/index.html\033[0m"
 
 # simple-phpunit install: PHPUnit is needed to analyse the tests; cache:warmup: the service
 # types are read from the dumped container (see phpstan.neon)

@@ -12,7 +12,7 @@ use PHPStan\Type\Type;
 
 /**
  * $container->get('service_id') and $this->get('service_id') in controllers return the class of the
- * service, read from the container dumped by Symfony in debug mode (app/cache/test/*.xml: run the
+ * service, read from the container dumped by Symfony in debug mode (var/cache/test/*.xml: run the
  * tests or "app/console cache:warmup --env=test" first).
  */
 class SymfonyContainerReturnTypeExtension implements DynamicMethodReturnTypeExtension {

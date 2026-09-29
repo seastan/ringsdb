@@ -18,7 +18,7 @@
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
     </php>
     <logging>
-        <log type="junit" target="app/logs/phpunit.xml"/>
+        <log type="junit" target="var/log/phpunit.xml"/>
     </logging>
     <!-- Code coverage: lines executed by the tests are detected automatically (no @covers
          annotations). Files never executed are listed at 0% without being loaded. -->
