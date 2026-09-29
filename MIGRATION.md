@@ -156,11 +156,29 @@ arrays and collections (`checkMissingIterableValueType` and
 
 ## Environment
 
-- **Production database**: the tests run on MySQL 8.4 with `ONLY_FULL_GROUP_BY` (several queries
-  had to be fixed for it, see "Card statistics", "Lists and search managers"). Check the version
-  and `sql_mode` of production, so that the tests run on the same settings.
+- **Production database**: the tests run on MySQL 8.0, the version of production, with the
+  default `sql_mode`, which includes `ONLY_FULL_GROUP_BY` (several queries had to be fixed for
+  it, see "Card statistics", "Lists and search managers"). Check that the `sql_mode` of
+  production includes it too (`SELECT @@GLOBAL.sql_mode;`), so that the tests run on the same
+  settings.
 - **Composer**: the lock is Composer 1 era. From the Symfony 3.0 step on, the lock is updated with
   Composer 2 and production runs a normal `composer install` (decided on 2026-09-28).
+- **Schema changes**: from now on they go through `doctrine/doctrine-migrations-bundle` (2.2), in
+  `app/DoctrineMigrations/` (namespace `Application\Migrations`, table `migration_versions`).
+  `ringsdb_bootstrap.sql` stays the production schema before the first Doctrine migration, so
+  `make fixtures` / `make test-fixtures` run `doctrine:migrations:migrate` after loading it; in
+  production, run it after each deployment. The older hand-written scripts of `migrations/` are
+  already applied in production (and part of the bootstrap).
+  - `Version20260929134447`: aligns `user` with the FOSUserBundle 2 mappings (`username`,
+    `email` and their canonical versions shortened to 180 characters, nullable `salt`, unique
+    `confirmation_token`) and `user_custom_pack_card.quantity` (`TINYINT UNSIGNED` →
+    `SMALLINT UNSIGNED`: DBAL 2 maps `TINYINT` to a boolean). Before running it in production,
+    run the two queries of its docblock: it fails if a value is longer than 180 characters or
+    if a confirmation token is duplicated.
+  - `Version20260929135555`: drops the `oauth2_*` tables (see "OAuth2 server (removed)").
+  - `stat_cards_cache` has no entity (filled by SQL, see "Card statistics"): the
+    `schema_filter` of the DBAL connection hides it from Doctrine, which would drop it
+    otherwise. Any other table without an entity must be added to that filter.
 
 # Reference
 
@@ -517,9 +535,9 @@ template (the login form of the authorization endpoint), the templates overridin
 the entities `Client`, `AccessToken`, `RefreshToken`, `AuthCode` and their mappings, the OAuth2
 section of the API introduction page (`/api/`).
 
-In production, drop the `oauth2_*` tables once the application is deployed:
-`migrations/oauth2-removal/01_drop_tables.sql` (they were also taken out of
-`ringsdb_bootstrap.sql`).
+The `oauth2_*` tables are dropped by the Doctrine migration `Version20260929135555` (see
+"Environment"), run after the deployment; `ringsdb_bootstrap.sql` still contains them, as the
+production schema before the migrations.
 
 ## Quest logs
 
@@ -776,7 +794,8 @@ Covered by `src/AppBundle/Tests/Controller/CollectionTest.php`.
 Per-card monthly usage statistics: for each card, the number of decks using it and the average
 number of copies (capped at 3 per deck), in "full" decks (last pack released on or after
 2019-08-02) and "limited" decks (older), plus sideboards and totals. Precomputed by the
-`app:stats:precompute-cards` command (cron) into `stat_cards_cache`, served as JSON by
+`app:stats:precompute-cards` command (cron) into `stat_cards_cache` (a table without an entity,
+excluded from the Doctrine schema by `schema_filter`), served as JSON by
 `/admin/stat_cards` (admin only). Nothing in the repository consumes that JSON: probably an
 external report made by an admin, to be confirmed (nginx logs, maintainers) before deciding
 whether to keep it.

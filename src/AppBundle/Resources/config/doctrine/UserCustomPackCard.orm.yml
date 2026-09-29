@@ -8,13 +8,15 @@ AppBundle\Entity\UserCustomPackCard:
             joinColumn:
                 name: custom_pack_id
                 referencedColumnName: id
-            nullable: false
+                nullable: false
+                onDelete: CASCADE
         card:
             targetEntity: Card
             joinColumn:
                 name: card_id
                 referencedColumnName: id
-            nullable: false
+                nullable: false
+                onDelete: CASCADE
     fields:
         id:
             type: integer
@@ -26,6 +28,10 @@ AppBundle\Entity\UserCustomPackCard:
             nullable: false
             options:
                 default: 1
+                unsigned: true
     uniqueConstraints:
         ucpc_pack_card_idx:
             columns: [ custom_pack_id, card_id ]
+    indexes:
+        fk_ucpc_card:
+            columns: [ card_id ]
