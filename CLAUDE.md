@@ -42,7 +42,7 @@ Login with `tester` / `test1234` (or a prod account).
    `app/console`) load `vendor/autoload.php` directly, so no bootstrap-build step is needed.
 
    **`symfony-upgrade` branch (and anything based on it):** the lock was regenerated with
-   Composer 2 (FOSUserBundle 2.0.2, Symfony 2.8.52, Twig 2.16). Install it cleanly with
+   Composer 2 (Symfony 3.4, FOSUserBundle 2.1, Doctrine ORM 2.7, Twig 2.16; since PR #214). Install it cleanly with
    Composer 2 inside the web image, as your uid, so versions and ownership match:
    ```bash
    curl -sL https://getcomposer.org/download/latest-2.2.x/composer.phar -o /tmp/composer.phar
