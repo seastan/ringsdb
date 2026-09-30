@@ -16,11 +16,11 @@ class CardPrinting {
      */
     private $quantity;
     /**
-     * @var string
+     * @var string|null
      */
     private $illustrator;
     /**
-     * @var string
+     * @var string|null
      */
     private $octgnid;
     /**
@@ -28,43 +28,43 @@ class CardPrinting {
      */
     private $imageCode;
     /**
-     * @var string
+     * @var string|null
      */
     private $traits;
     /**
-     * @var string
+     * @var string|null
      */
     private $text;
     /**
-     * @var integer
+     * @var string|null
      */
     private $cost;
     /**
-     * @var integer
+     * @var int|null
      */
     private $threat;
     /**
-     * @var integer
+     * @var int|null
      */
     private $willpower;
     /**
-     * @var integer
+     * @var int|null
      */
     private $attack;
     /**
-     * @var integer
+     * @var int|null
      */
     private $defense;
     /**
-     * @var integer
+     * @var int|null
      */
     private $health;
     /**
-     * @var integer
+     * @var int|null
      */
     private $victory;
     /**
-     * @var integer
+     * @var int|null
      */
     private $quest;
     /**
@@ -140,7 +140,7 @@ class CardPrinting {
     /**
      * Set illustrator
      *
-     * @param string $illustrator
+     * @param string|null $illustrator
      *
      * @return CardPrinting
      */
@@ -153,7 +153,7 @@ class CardPrinting {
     /**
      * Get illustrator
      *
-     * @return string
+     * @return string|null
      */
     public function getIllustrator() {
         return $this->illustrator;
@@ -162,7 +162,7 @@ class CardPrinting {
     /**
      * Set octgnid
      *
-     * @param string $octgnid
+     * @param string|null $octgnid
      *
      * @return CardPrinting
      */
@@ -175,7 +175,7 @@ class CardPrinting {
     /**
      * Get octgnid
      *
-     * @return string
+     * @return string|null
      */
     public function getOctgnid() {
         return $this->octgnid;
@@ -206,7 +206,7 @@ class CardPrinting {
     /**
      * Set traits
      *
-     * @param string $traits
+     * @param string|null $traits
      *
      * @return CardPrinting
      */
@@ -219,7 +219,7 @@ class CardPrinting {
     /**
      * Get traits
      *
-     * @return string
+     * @return string|null
      */
     public function getTraits() {
         return $this->traits;
@@ -228,7 +228,7 @@ class CardPrinting {
     /**
      * Set text
      *
-     * @param string $text
+     * @param string|null $text
      *
      * @return CardPrinting
      */
@@ -241,7 +241,7 @@ class CardPrinting {
     /**
      * Get text
      *
-     * @return string
+     * @return string|null
      */
     public function getText() {
         return $this->text;
@@ -250,7 +250,7 @@ class CardPrinting {
     /**
      * Set cost
      *
-     * @param integer $cost
+     * @param string|null $cost
      *
      * @return CardPrinting
      */
@@ -263,7 +263,7 @@ class CardPrinting {
     /**
      * Get cost
      *
-     * @return integer
+     * @return string|null
      */
     public function getCost() {
         return $this->cost;
@@ -272,7 +272,7 @@ class CardPrinting {
     /**
      * Set threat
      *
-     * @param integer $threat
+     * @param int|null $threat
      *
      * @return CardPrinting
      */
@@ -285,7 +285,7 @@ class CardPrinting {
     /**
      * Get threat
      *
-     * @return integer
+     * @return int|null
      */
     public function getThreat() {
         return $this->threat;
@@ -294,7 +294,7 @@ class CardPrinting {
     /**
      * Set willpower
      *
-     * @param integer $willpower
+     * @param int|null $willpower
      *
      * @return CardPrinting
      */
@@ -307,7 +307,7 @@ class CardPrinting {
     /**
      * Get willpower
      *
-     * @return integer
+     * @return int|null
      */
     public function getWillpower() {
         return $this->willpower;
@@ -316,7 +316,7 @@ class CardPrinting {
     /**
      * Set attack
      *
-     * @param integer $attack
+     * @param int|null $attack
      *
      * @return CardPrinting
      */
@@ -329,7 +329,7 @@ class CardPrinting {
     /**
      * Get attack
      *
-     * @return integer
+     * @return int|null
      */
     public function getAttack() {
         return $this->attack;
@@ -338,7 +338,7 @@ class CardPrinting {
     /**
      * Set defense
      *
-     * @param integer $defense
+     * @param int|null $defense
      *
      * @return CardPrinting
      */
@@ -351,7 +351,7 @@ class CardPrinting {
     /**
      * Get defense
      *
-     * @return integer
+     * @return int|null
      */
     public function getDefense() {
         return $this->defense;
@@ -360,7 +360,7 @@ class CardPrinting {
     /**
      * Set health
      *
-     * @param integer $health
+     * @param int|null $health
      *
      * @return CardPrinting
      */
@@ -373,7 +373,7 @@ class CardPrinting {
     /**
      * Get health
      *
-     * @return integer
+     * @return int|null
      */
     public function getHealth() {
         return $this->health;
@@ -382,7 +382,7 @@ class CardPrinting {
     /**
      * Set victory
      *
-     * @param integer $victory
+     * @param int|null $victory
      *
      * @return CardPrinting
      */
@@ -395,7 +395,7 @@ class CardPrinting {
     /**
      * Get victory
      *
-     * @return integer
+     * @return int|null
      */
     public function getVictory() {
         return $this->victory;
@@ -404,7 +404,7 @@ class CardPrinting {
     /**
      * Set quest
      *
-     * @param integer $quest
+     * @param int|null $quest
      *
      * @return CardPrinting
      */
@@ -417,7 +417,7 @@ class CardPrinting {
     /**
      * Get quest
      *
-     * @return integer
+     * @return int|null
      */
     public function getQuest() {
         return $this->quest;

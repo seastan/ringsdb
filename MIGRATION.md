@@ -225,10 +225,12 @@ still ignored): fixed for `Card`, where the reference data of production (the bo
 which columns hold `NULL`: `traits`, `text`, `flavor`, `cost` (a string: `X`...) and the stats
 are nullable (a hero has no cost, an ally no threat...), so the properties became nullable;
 `deck_limit` never is: `NOT NULL`, 3 by default (migration `Version20260930090741`;
-`setDeckLimit(null)`, from an empty field of the admin form or of a CSV import, stores 3). The
-other entities are left (`CardPrinting`: the overrides are nullable by design, "empty = the value
-of the card"; `Pack.dateRelease`: `NULL` means an unreleased pack; `Sphere.octgnid`: never set;
-the user content). Left for later: level 9 (1136 errors with phpstan 1.4, all about `mixed`: request
+`setDeckLimit(null)`, from an empty field of the admin form or of a CSV import, stores 3). Same
+for `CardPrinting`, where no column can become `NOT NULL`: `illustrator` and `octgnid` are
+missing for some printings (70, 74), and the overrides (`traits` ... `quest`) are `NULL` for all
+of them (nullable by design, "empty = the value of the card"); its properties became nullable.
+The other entities are left (`Pack.dateRelease`: `NULL` means an unreleased pack;
+`Sphere.octgnid`: never set; the user content). Left for later: level 9 (1136 errors with phpstan 1.4, all about `mixed`: request
 parameters, query results, the `mixed` parameters of the level 6 docblocks), cheaper on the
 rewritten code.
 

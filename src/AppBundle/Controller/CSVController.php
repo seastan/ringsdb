@@ -94,7 +94,7 @@ class CSVController extends AbstractController {
 		$oldIds = [];
 		foreach ($pack->getPrintings() as $printing) {
 			$oldIds[$printing->getOctgnid()] = 1;
-			if (!array_key_exists($printing->getOctgnid(), $newIds) &&
+			if (!array_key_exists((string) $printing->getOctgnid(), $newIds) &&
 				strpos($printing->getCard()->getName(), '[deleted]') === false) {
 				$card = $printing->getCard();
 				$card->setName('[deleted] ' . $card->getName());
@@ -107,7 +107,7 @@ class CSVController extends AbstractController {
 		$motkPack = $packRepo->findOneBy(['code' => 'ALePMotKA']);
 		if ($motkPack) {
 			foreach ($motkPack->getPrintings() as $printing) {
-				if (array_key_exists($printing->getOctgnid(), $oldIds) &&
+				if (array_key_exists((string) $printing->getOctgnid(), $oldIds) &&
 					strpos($printing->getCard()->getName(), '[deleted]') === false) {
 					$card = $printing->getCard();
 					$card->setName('[deleted] ' . $card->getName());
