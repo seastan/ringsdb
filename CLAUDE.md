@@ -2,96 +2,89 @@
 
 ## Running the local instance
 
+The dev stack is PR #214's `docker-compose.yaml` (MySQL 8.0, same as prod; PHP 7.4 with
+`app/console server:run`, dev environment), plus a local, untracked
+`docker-compose.override.yaml` that builds the `symfony` image from
+`docker/local/symfony.Dockerfile` with `www-data` remapped to the host uid/gid. Repo files are
+mode 640, so without the remap the container cannot read them.
+
 ```bash
-docker compose up -d
+docker compose up -d        # mysql, mysql_test, symfony, adminer
 ```
 
-- App (prod front controller): http://localhost:8080/
-- App (dev front controller, debug toolbar): http://localhost:8080/app_local.php
-- DB port: localhost:3307 (root / `ringsdb`, db `symfony`)
+- App: http://localhost:8080/ (dev env, debug toolbar); adminer: http://localhost:8081/
+- DB: service `mysql`, db `ringsdb`, `symfony` / `passwd` (root: `passwd`); no host port, use
+  `docker compose exec mysql mysql -uroot -ppasswd ringsdb`
+- Test DB: service `mysql_test`, db `ringsdb_test` (`config_test.yml`)
+- `app/config/parameters.yml` (local, untracked) points at `mysql:3306`, `ringsdb`,
+  `symfony` / `passwd`, with `channel: http`.
+- Card images live outside the checkout in `../card_images` (`CARD_IMAGES_DIR`); the
+  entrypoint links `web/bundles/cards` to them. Never make `web/bundles/cards` a real
+  directory: the Composer scripts wipe it.
 
-Login with `tester` / `test1234` (or a prod account).
+Login with `tester` / `test1234`. It is a local account (`fos:user:create`), not in the dumps.
+
+The old MariaDB/Apache stack for `master` is `docker-compose.mariadb.yml` (local, untracked):
+`docker compose -f docker-compose.mariadb.yml up -d`, with its `parameters.yml` saved as
+`app/config/parameters.yml.mariadb.bak`.
 
 ### First-time setup (new machine / fresh volume)
 
-1. **DB**: two options.
+Run the console as the container user: `X="docker compose exec -T -u www-data symfony"`.
 
-   **(a) Public bootstrap (recommended, no prod data / no PII).** `ringsdb_bootstrap.sql`
-   (committed at repo root) is the full schema for every table plus reference data for the
-   card/set/cycle/printing tables only (`card`, `card_printing`, `cycle`, `pack`, `sphere`,
-   `type`, `encounter`, `scenario`, `scenario_encounter`). Every other table (users, decks,
-   decklists, comments, votes, …) is created empty. It already reflects the current prod
-   schema, so **do not** re-run the `migrations/` scripts on top of it — they are baked in.
-   Register a fresh account once the app is up (the seeded `tester` login only exists in the
-   prod dump).
+1. **vendor/**: `$X composer install` (Composer 2.2 is in the image). On `master` use the rsync
+   path instead (see Development workflow).
+
+2. **DB**: two options.
+
+   **(a) Public bootstrap (no prod data / no PII):** `make fixtures` (bootstrap schema and card
+   data, Doctrine migrations, then test fixtures).
+
+   **(b) Full prod dump (maintainers with data access only).** `ringsdb_daily.sql` (~695 MB,
+   from 2026-06) predates the hand-written scripts that the PR deleted from `migrations/` (all
+   applied in prod), so replay them from `master`, then add the `user.dark_mode` column prod
+   gained without a script, then run the Doctrine migrations:
    ```bash
-   docker exec -i ringsdb-db-1 mysql -uroot -pringsdb symfony < ringsdb_bootstrap.sql
+   M="docker compose exec -T mysql mysql -uroot -ppasswd ringsdb"
+   $M < ringsdb_daily.sql
+   for f in card-printings/01_schema card-printings/02_migrate card-printings/03_user_art_preferences \
+            card-printings/04_cleanup custom-packs/01_schema custom-packs/02_published \
+            stats-precompute/01_stat_cards_cache; do
+     git show master:migrations/$f.sql | $M
+   done
+   $M -e "ALTER TABLE user ADD dark_mode TINYINT(1) NOT NULL DEFAULT '0'"
+   $X php app/console doctrine:migrations:migrate -n
+   $X php app/console doctrine:schema:validate
+   $X php app/console fos:user:create tester tester@localhost.invalid test1234
    ```
 
-   **(b) Full prod dump (maintainers with data access only).** Import the prod dump then
-   apply the migrations it predates:
-   ```bash
-   docker exec -i ringsdb-db-1 mysql -uroot -pringsdb symfony < ringsdb_daily.sql
-   docker exec -i ringsdb-db-1 mysql -uroot -pringsdb symfony < migrations/card-printings/01_schema.sql
-   docker exec -i ringsdb-db-1 mysql -uroot -pringsdb symfony < migrations/card-printings/02_migrate.sql
-   docker exec -i ringsdb-db-1 mysql -uroot -pringsdb symfony < migrations/card-printings/03_user_art_preferences.sql
-   ```
+3. **Card images** (~832 MB, needed for card/deck pages):
+   `rsync -az rings@ringsdb.com:/var/www/ringsdb/web/bundles/cards/ ../card_images/`
 
-2. **vendor/**: depends on the branch. `vendor/` is gitignored (untracked as of
-   `chore/untrack-vendor`); front controllers (`web/app.php`, `web/app_dev.php`,
-   `app/console`) load `vendor/autoload.php` directly, so no bootstrap-build step is needed.
+### Tests and checks
 
-   **`symfony-upgrade` branch (and anything based on it):** the lock was regenerated with
-   Composer 2 (Symfony 3.4, FOSUserBundle 2.1, Doctrine ORM 2.7, Twig 2.16; since PR #214). Install it cleanly with
-   Composer 2 inside the web image, as your uid, so versions and ownership match:
-   ```bash
-   curl -sL https://getcomposer.org/download/latest-2.2.x/composer.phar -o /tmp/composer.phar
-   docker run --rm -u $(id -u):$(id -g) -e HOME=/tmp -e COMPOSER_HOME=/tmp/c \
-     -v "$PWD":/app -v /tmp/composer.phar:/composer.phar:ro -w /app \
-     --entrypoint php $(docker inspect -f '{{.Config.Image}}' ringsdb-web-1) \
-     /composer.phar install --no-interaction --no-scripts
-   ```
-   `bin/` may be root-owned from an old install; `docker exec ringsdb-web-1 chown -R $(id -u) bin`
-   first if Composer can't write to it.
-
-   **`master` (pre-upgrade):** rsync from server; do NOT run `composer install` there (that
-   lock is Composer-1 era and Composer 2 resolves it to versions that break FOSUserBundle):
-   ```bash
-   rsync -az rings@ringsdb.com:/var/www/ringsdb/vendor/ vendor/
-   composer dump-autoload   # Composer 1
-   ```
-   Switching between the two branches means reinstalling `vendor/` each way.
-
-3. **Card images** (~832 MB, optional but needed for card/deck pages):
-   ```bash
-   chown -R $(id -u) web/bundles
-   rsync -az rings@ringsdb.com:/var/www/ringsdb/web/bundles/cards/ web/bundles/cards/
-   ```
+The Makefile targets use `exec -it`; without a terminal, run the same commands with `-T`.
+`make test-fixtures` rebuilds the test DB, then `bin/simple-phpunit`, `bin/phpstan` (after
+`cache:warmup --env=test`) and `lint:twig`. The snapshots assume a bare environment: run
+PHPUnit with **no card images** (`CARD_IMAGES_DIR=<empty dir> docker compose up -d symfony`,
+otherwise `imagesrc` is filled in) and **`game_name: ~`** in `parameters.yml` (it appears in
+page titles), then restore both.
 
 ### Key gotchas
 
-- **Apache uid**: `docker-compose.yml` passes `APACHE_RUN_USER: "#<uid>"` so Apache workers
-  run as your host uid. Repo files are mode 640 — if this is wrong you get misleading
-  "class not found / service not found" errors, not permission errors.
-- **Cache permissions**: after any `cache:clear` run inside the container (which runs as root),
-  fix ownership or login silently fails:
-  ```bash
-  docker exec ringsdb-web-1 chown -R 1433601250 app/cache app/logs
-  ```
 - **Login form**: the page has two forms — submit via Enter in the password field (the first
   submit button on the page belongs to the card-search form, not login).
-- **Local-only config files** (not committed): `parameters.yml`, `app/config/config_prod.yml`,
-  `app/config/config_dev.yml`. `config_dev.yml` / `parameters.yml` disable https-force
-  (`channel: http`) and enable live assets (`assetic.use_controller: true`), but
-  `config_prod.yml` sets `channel: https`, so `/login` on the prod front controller redirects
-  to `https://localhost` — log in via `app_local.php` instead.
-- **Console on PHP 7.4**: some `app/console` commands die in debug mode on a Doctrine ORM
-  "continue targeting switch" warning; add `--no-debug`.
+- **Old card codes in JSON**: quest log snapshots (and deck history) store card codes from
+  before the card-printings merge, e.g. `31031`, now a printing (`card_printing.image_code`)
+  of card `17143`. Look up codes with that fallback (`Decks::findCardByCode`).
 
 ## Development workflow
 
-- `master`: no Composer reinstalls. `symfony-upgrade`: `composer install` from the lock is
-  expected (see vendor/ note above).
+- `master` (pre-upgrade): `vendor/` is rsynced from the server, do NOT run `composer install`
+  there (its lock is Composer-1 era; Composer 2 resolves it to versions that break
+  FOSUserBundle): `rsync -az rings@ringsdb.com:/var/www/ringsdb/vendor/ vendor/` then
+  `composer dump-autoload` (Composer 1). `symfony-upgrade`: `composer install` from the lock.
+  Switching branches means reinstalling `vendor/`.
 - Validate migration SQL by parsing `ringsdb_daily.sql` with Python (the SQL dump is ~695 MB at
   repo root). Current card/set reference data lives in the committed `ringsdb_bootstrap.sql`
   (see first-time setup); the old `card-data.sql` / `packs-data.sql` / `scenario-data.sql`
