@@ -6,6 +6,9 @@ fi
 
 ln -sfn /var/card_images web/bundles/cards
 
+# web/js/extra.js and app.js (to run again after a change of one of their files)
+php app/console app:assets:js
+
 php app/console server:run 0.0.0.0
 
 # the server could not start (e.g. the kernel does not boot): keep the container up, so that

@@ -13,6 +13,10 @@ sh:
 sql:
 	docker compose exec -it mysql mysql -u root -ppasswd
 
+# web/js/extra.js and app.js (AppBundle\Asset\JavascriptBundles): after a change of one of their files
+assets:
+	docker compose exec -it -u www-data symfony php app/console app:assets:js
+
 fixtures:
 	docker compose exec -it -u www-data symfony php app/console doctrine:database:drop --force
 	docker compose exec -it -u www-data symfony php app/console doctrine:database:create

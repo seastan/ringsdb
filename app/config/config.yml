@@ -22,7 +22,9 @@ framework:
     #serializer:      { enable_annotations: true }
     templating:
         engines: ['twig']
-        #assets_version: 20150817
+    assets:
+        # ?v=<hash> on the JavaScript files (see JavascriptVersionStrategy)
+        version_strategy: AppBundle\Asset\JavascriptVersionStrategy
     default_locale:  "%locale%"
     trusted_hosts:   ~
     trusted_proxies: ~
@@ -55,7 +57,6 @@ assetic:
         cssrewrite: ~
         scssphp:
             formatter: 'Leafo\ScssPhp\Formatter\Compressed'
-        jsqueeze: ~
 
 # Doctrine Configuration
 doctrine:

@@ -1,9 +1,7 @@
 {% extends 'AppBundle::layout.html.twig' %}
 
 {% block javascripts %}
-    {% javascripts '@AppBundle/Resources/public/js/ui.collection.js' %}
-        <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+    <script src="{{ asset('bundles/app/js/ui.collection.js') }}"></script>
 
     {% if reloaduser %}
         <script type="text/javascript">

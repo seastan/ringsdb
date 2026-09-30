@@ -43,7 +43,6 @@
         "friendsofsymfony/jsrouting-bundle": "^1.5",
         "ezyang/htmlpurifier": "^4.6",
         "leafo/scssphp": "^0.2.0",
-        "patchwork/jsqueeze": "~1.0",
         "nelmio/api-doc-bundle": "^2.9",
         "erusev/parsedown": "^1.6",
         "symfony/twig-bundle": "^3.4",
@@ -67,6 +66,7 @@
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
             "php app/console cache:clear --no-warmup",
             "php app/console assets:install web --symlink --relative",
+            "php app/console app:assets:js",
             "php app/console assetic:dump"
         ],
         "post-install-cmd": [

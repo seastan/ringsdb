@@ -1,9 +1,7 @@
 {% extends 'AppBundle::layout.html.twig' %}
 
 {% block javascripts %}
-    {% javascripts '@AppBundle/Resources/public/js/ui.reviews.js' %}
-        <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+    <script src="{{ asset('bundles/app/js/ui.reviews.js') }}"></script>
 {% endblock %}
 
 {% block body %}

@@ -153,7 +153,7 @@ are deprecated. Done by hand (no Rector):
 | Package | Status | Replacement / action |
 |---|---|---|
 | `friendsofsymfony/user-bundle` 2.0 | to be replaced (decided) | Symfony Security, see "Removing FOSUserBundle" |
-| `symfony/assetic-bundle`, `leafo/scssphp`, `patchwork/jsqueeze` | dropped in Symfony 4 | see "Front-end assets" |
+| `symfony/assetic-bundle`, `leafo/scssphp` | abandoned, blocks Symfony 4 | JavaScript done, CSS left, see "Front-end assets"; `patchwork/jsqueeze` unused (to remove) |
 | `symfony/swiftmailer-bundle` | abandoned | Symfony Mailer (`\Swift_Message::newInstance()` in the comment notifications, FOSUser emails) |
 | `liuggio/excelbundle` (PHPExcel) | done | replaced by PhpSpreadsheet (admin Excel export / import) |
 | `sensio/framework-extra-bundle` | abandoned | native attributes (`#[Route]`, `#[IsGranted]`, `#[MapEntity]`) |
@@ -167,10 +167,26 @@ are deprecated. Done by hand (no Rector):
 
 ## Front-end assets
 
-Assetic (SCSS compiled by scssphp, JS minified by jsqueeze, `assetic:dump` in the Composer
-scripts, `assetic.use_controller` in the local config) was dropped in Symfony 4 and has no
-drop-in replacement: AssetMapper (with a Sass bundle) or Webpack Encore. Probably the largest
-item not covered by the tests (they check the visible text of the pages, not the assets).
+AsseticBundle is abandoned (its last version supports Symfony 2 and 3 only): it blocks Symfony 4.
+AssetMapper, the current replacement, needs Symfony 6.3; Webpack Encore needs Node. The assets are
+replaced in steps, without Node, by plain files; not covered by the tests (they check the visible
+text of the pages, not the assets): check the pages by hand (no 404, no JavaScript error).
+
+- Done, the JavaScript: `app:assets:js` (`BuildJavascriptsCommand`) concatenates the files loaded
+  by every page into `web/js/extra.js` (the libraries of `Resources/public/cdn/js/`) and
+  `web/js/app.js` (the application), in the order of `AppBundle\Asset\JavascriptBundles`, in
+  every environment, without minification (jsqueeze, abandoned, minified `app.js` in production;
+  gzip does most of it). It runs as a Composer script (so on each deployment) and in the dev
+  entrypoint; run it again after a change of one of these files. The script of each page
+  (`ui.*.js`) is a plain `<script src="{{ asset('bundles/app/js/...') }}">`. The inline script of
+  the layout stays between the two files: it creates the global `app` that the `app.*.js` files
+  extend. `AppBundle\Asset\JavascriptVersionStrategy` adds `?v=<hash of the content>` to the
+  URLs of the `.js` files (Assetic's cache busting did it), and leaves the other assets alone.
+- Left, the CSS: the `{% stylesheets %}` block of the layout (SCSS compiled by scssphp 0.2,
+  `cssrewrite` for the `url(...)`) is still built by Assetic (`assetic:dump`, `use_controller` in
+  dev).
+- The libraries are old (jQuery 2, Bootstrap 3, Highcharts 4, moment 2.12...): upgrading them is
+  another step.
 
 ## Porting the test suite
 

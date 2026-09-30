@@ -2,9 +2,7 @@
 {% import "AppBundle::macros.html.twig" as macros %}
 
 {% block javascripts %}
-    {% javascripts '@AppBundle/Resources/public/js/ui.questlogview.js' %}
-        <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+    <script src="{{ asset('bundles/app/js/ui.questlogview.js') }}"></script>
 
     <script type="text/javascript">
         var Decks = {};

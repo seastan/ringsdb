@@ -42,11 +42,6 @@
         <link rel="stylesheet" href="{{ asset_url }}"/>
     {% endstylesheets %}
 
-    <!--[if lt IE 9]>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.js"></script>
-    <![endif]-->
-
     {% block stylesheets %}{% endblock %}
 
     {% if app.environment == 'prod' %}
@@ -164,21 +159,8 @@
     <script src="{{ asset('/bundles/fosjsrouting/js/router.js') }}"></script>
     <script src="{{ path('fos_js_routing_js', { "callback": "fos.Router.setData" }) }}"></script>
 
-    {% javascripts output="js/extra.js"
-        '@AppBundle/Resources/public/cdn/js/jquery.min.js'
-        '@AppBundle/Resources/public/cdn/js/jquery-ui.min.js'
-        '@AppBundle/Resources/public/cdn/js/underscore-min.js'
-        '@AppBundle/Resources/public/cdn/js/jquery.qtip.js'
-        '@AppBundle/Resources/public/cdn/js/typeahead.jquery.min.js'
-        '@AppBundle/Resources/public/cdn/js/marked.min.js'
-        '@AppBundle/Resources/public/cdn/js/jquery.textcomplete.min.js'
-        '@AppBundle/Resources/public/cdn/js/moment.min.js'
-        '@AppBundle/Resources/public/cdn/js/highcharts.js'
-        '@AppBundle/Resources/public/cdn/js/bootstrap.js'
-        '@AppBundle/Resources/public/cdn/js/bootstrap-markdown.min.js'
-        '@AppBundle/Resources/public/cdn/js/fdb-all.min.js' %}
-        <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+    {# built by app:assets:js (AppBundle\Asset\JavascriptBundles) #}
+    <script src="{{ asset('js/extra.js') }}"></script>
 
     {#<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>#}
     {#<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>#}
@@ -210,28 +192,8 @@
         });
     </script>
 
-    {% javascripts filter="?jsqueeze" output="js/app.js"
-        '@AppBundle/Resources/public/js/app.data.js'
-        '@AppBundle/Resources/public/js/app.format.js'
-        '@AppBundle/Resources/public/js/app.tip.js'
-        '@AppBundle/Resources/public/js/app.card_modal.js'
-        '@AppBundle/Resources/public/js/app.user.js'
-        '@AppBundle/Resources/public/js/app.binomial.js'
-        '@AppBundle/Resources/public/js/app.hypergeometric.js'
-        '@AppBundle/Resources/public/js/app.draw_simulator.js'
-        '@AppBundle/Resources/public/js/app.play_simulator.js'
-        '@AppBundle/Resources/public/js/app.textcomplete.js'
-        '@AppBundle/Resources/public/js/app.markdown.js'
-        '@AppBundle/Resources/public/js/app.smart_filter.js'
-        '@AppBundle/Resources/public/js/app.deck.js'
-        '@AppBundle/Resources/public/js/app.diff.js'
-        '@AppBundle/Resources/public/js/app.deck_history.js'
-        '@AppBundle/Resources/public/js/app.deck_charts.js'
-        '@AppBundle/Resources/public/js/app.deck_selection.js'
-        '@AppBundle/Resources/public/js/app.suggestions-mixed.js'
-        '@AppBundle/Resources/public/js/app.ui.js' %}
-        <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+    {# built by app:assets:js (AppBundle\Asset\JavascriptBundles) #}
+    <script src="{{ asset('js/app.js') }}"></script>
 
     {% block javascripts %}{% endblock %}
 </body>

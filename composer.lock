@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "25559520c08425baa3fceaf46936b150",
+    "content-hash": "993ce32b6ea568d614550feef7a454a3",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -2961,53 +2961,6 @@
                 "source": "https://github.com/paragonie/random_compat"
             },
             "time": "2022-02-16T17:07:03+00:00"
-        },
-        {
-            "name": "patchwork/jsqueeze",
-            "version": "v1.0.7",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/tchwork/jsqueeze.git",
-                "reference": "f90a933213534b93e4ff3c2c3026ff7458f7721b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/tchwork/jsqueeze/zipball/f90a933213534b93e4ff3c2c3026ff7458f7721b",
-                "reference": "f90a933213534b93e4ff3c2c3026ff7458f7721b",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.1.4"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "JSqueeze": "class/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "(Apache-2.0 or GPL-2.0)"
-            ],
-            "authors": [
-                {
-                    "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
-                }
-            ],
-            "description": "Efficient JavaScript minification in PHP",
-            "homepage": "https://github.com/tchwork/jsqueeze",
-            "keywords": [
-                "compression",
-                "javascript",
-                "minification"
-            ],
-            "support": {
-                "issues": "https://github.com/tchwork/jsqueeze/issues",
-                "source": "https://github.com/tchwork/jsqueeze/tree/v1.0.7"
-            },
-            "abandoned": true,
-            "time": "2015-03-25T10:11:08+00:00"
         },
         {
             "name": "phpoffice/phpspreadsheet",

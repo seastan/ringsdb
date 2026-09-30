@@ -2,9 +2,7 @@
 {% import "AppBundle::macros.html.twig" as macros %}
 
 {% block javascripts %}
-    {% javascripts '@AppBundle/Resources/public/js/ui.card.js' %}
-        <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+    <script src="{{ asset('bundles/app/js/ui.card.js') }}"></script>
 
     <script type="text/javascript">
         app.user.params.card_id = {{ cards ? cards[0].id : null }};
