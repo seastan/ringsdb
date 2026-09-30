@@ -2,6 +2,10 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Repository\UserRepository;
+use AppBundle\Repository\DecklistRepository;
+use AppBundle\Repository\DeckRepository;
+use AppBundle\Repository\CommentRepository;
 use AppBundle\Entity\User;
 use AppBundle\Entity\Decklist;
 use AppBundle\Entity\Deck;
@@ -10,6 +14,21 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 
 class UserAdminController extends AbstractController {
+	/**
+	 * @var CommentRepository
+	 */
+	private $commentRepository;
+
+	/**
+	 * @var UserRepository
+	 */
+	private $userRepository;
+
+	public function __construct(CommentRepository $commentRepository, UserRepository $userRepository) {
+		$this->commentRepository = $commentRepository;
+		$this->userRepository = $userRepository;
+	}
+
 	/**
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
@@ -23,14 +42,13 @@ class UserAdminController extends AbstractController {
 	 * @return \Symfony\Component\HttpFoundation\RedirectResponse
 	 */
 	public function processAction(Request $request) {
-		$em = $this->getDoctrine()->getManager();
 		$user = null;
 
 		if ($request->request->get('username')) {
-			$user = $em->getRepository(User::class)->findOneBy(['username' => $request->request->get('username')]);
+			$user = $this->userRepository->findOneBy(['username' => $request->request->get('username')]);
 		} else {
 			if ($request->request->get('id')) {
-				$user = $em->getRepository(User::class)->find($request->request->get('id'));
+				$user = $this->userRepository->find($request->request->get('id'));
 			}
 		}
 
@@ -48,9 +66,8 @@ class UserAdminController extends AbstractController {
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function showAction($user_id) {
-		$em = $this->getDoctrine()->getManager();
 		/* @var $user \AppBundle\Entity\User */
-		$user = $em->getRepository(User::class)->find($user_id);
+		$user = $this->userRepository->find($user_id);
 		if (!$user) {
 			throw $this->createNotFoundException("User not found");
 		}
@@ -68,7 +85,7 @@ class UserAdminController extends AbstractController {
 	public function toggleLockedAction($user_id) {
 		$em = $this->getDoctrine()->getManager();
 		/* @var $user \AppBundle\Entity\User */
-		$user = $em->getRepository(User::class)->find($user_id);
+		$user = $this->userRepository->find($user_id);
 		if (!$user) {
 			throw $this->createNotFoundException("User not found");
 		}
@@ -84,9 +101,8 @@ class UserAdminController extends AbstractController {
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function decklistsAction($user_id) {
-		$em = $this->getDoctrine()->getManager();
 		/* @var $user \AppBundle\Entity\User */
-		$user = $em->getRepository(User::class)->find($user_id);
+		$user = $this->userRepository->find($user_id);
 		if (!$user) {
 			throw $this->createNotFoundException("User not found");
 		}
@@ -101,18 +117,18 @@ class UserAdminController extends AbstractController {
 	 * @param mixed $decklist_id
 	 * @return \Symfony\Component\HttpFoundation\RedirectResponse
 	 */
-	public function deleteDecklistAction($decklist_id) {
+	public function deleteDecklistAction($decklist_id, DeckRepository $deckRepository, DecklistRepository $decklistRepository) {
 		$em = $this->getDoctrine()->getManager();
 
 		/* @var $decklist \AppBundle\Entity\Decklist */
-		$decklist = $em->getRepository(Decklist::class)->find($decklist_id);
+		$decklist = $decklistRepository->find($decklist_id);
 		if (!$decklist) {
 			throw $this->createNotFoundException("Decklist not found");
 		}
 
 		// first we remove the foreign keys in Decklist and Deck pointing to this decklist
 
-		$successors = $em->getRepository(Decklist::class)->findBy([
+		$successors = $decklistRepository->findBy([
 			'precedent' => $decklist
 		]);
 		foreach ($successors as $successor) {
@@ -120,7 +136,7 @@ class UserAdminController extends AbstractController {
 			$successor->setPrecedent(null);
 		}
 
-		$children = $em->getRepository(Deck::class)->findBy([
+		$children = $deckRepository->findBy([
 			'parent' => $decklist
 		]);
 		foreach ($children as $child) {
@@ -143,9 +159,8 @@ class UserAdminController extends AbstractController {
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function commentsAction($user_id) {
-		$em = $this->getDoctrine()->getManager();
 		/* @var $user \AppBundle\Entity\User */
-		$user = $em->getRepository(User::class)->find($user_id);
+		$user = $this->userRepository->find($user_id);
 		if (!$user) {
 			throw $this->createNotFoundException("User not found");
 		}
@@ -163,7 +178,7 @@ class UserAdminController extends AbstractController {
 	public function toggleHiddenCommentAction($comment_id) {
 		$em = $this->getDoctrine()->getManager();
 		/* @var $comment \AppBundle\Entity\Comment */
-		$comment = $em->getRepository(Comment::class)->find($comment_id);
+		$comment = $this->commentRepository->find($comment_id);
 		if (!$comment) {
 			throw $this->createNotFoundException("Comment not found");
 		}
@@ -181,7 +196,7 @@ class UserAdminController extends AbstractController {
 	public function deleteCommentAction($comment_id) {
 		$em = $this->getDoctrine()->getManager();
 		/* @var $comment \AppBundle\Entity\Comment */
-		$comment = $em->getRepository(Comment::class)->find($comment_id);
+		$comment = $this->commentRepository->find($comment_id);
 		if (!$comment) {
 			throw $this->createNotFoundException("Comment not found");
 		}

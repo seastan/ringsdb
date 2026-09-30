@@ -3,9 +3,12 @@
 
 namespace AppBundle\Services;
 
+use AppBundle\Repository\SphereRepository;
+use AppBundle\Repository\ReviewRepository;
+use AppBundle\Repository\CycleRepository;
+use AppBundle\Repository\CardRepository;
 use AppBundle\Entity\Sphere;
 use AppBundle\Entity\Review;
-use AppBundle\Entity\Cycle;
 use AppBundle\Entity\Card;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Component\Asset\Packages;
@@ -35,14 +38,38 @@ class CardsData {
 	 */
 	private $rootDir;
 
+    /**
+     * @var CardRepository
+     */
+    private $cardRepository;
+
+    /**
+     * @var CycleRepository
+     */
+    private $cycleRepository;
+
+    /**
+     * @var ReviewRepository
+     */
+    private $reviewRepository;
+
+    /**
+     * @var SphereRepository
+     */
+    private $sphereRepository;
+
 	/**
 	 * @param mixed $rootDir
 	 */
-	public function __construct(Registry $doctrine, UrlGeneratorInterface $router, Packages $assets_packages, $rootDir) {
+	public function __construct(Registry $doctrine, UrlGeneratorInterface $router, Packages $assets_packages, $rootDir, CardRepository $cardRepository, CycleRepository $cycleRepository, ReviewRepository $reviewRepository, SphereRepository $sphereRepository) {
 		$this->doctrine = $doctrine;
 		$this->router = $router;
 		$this->assets_packages = $assets_packages;
 		$this->rootDir = $rootDir;
+        $this->cardRepository = $cardRepository;
+        $this->cycleRepository = $cycleRepository;
+        $this->reviewRepository = $reviewRepository;
+        $this->sphereRepository = $sphereRepository;
 	}
 
 	/**
@@ -89,7 +116,7 @@ class CardsData {
 	 * @return list<array<string, mixed>>
 	 */
 	public function allSetsData() {
-		$list_cycles = $this->doctrine->getRepository(Cycle::class)->findBy([], ["position" => "ASC"]);
+		$list_cycles = $this->cycleRepository->findBy([], ["position" => "ASC"]);
 		$cycles = [];
 
 		foreach ($list_cycles as $cycle) {
@@ -139,7 +166,7 @@ class CardsData {
 	 * @return array<int, Sphere>
 	 */
 	public function getPrimarySpheres() {
-		$spheres = $this->doctrine->getRepository(Sphere::class)->findBy(["is_primary" => true], ["code" => "ASC"]);
+		$spheres = $this->sphereRepository->findBy(["is_primary" => true], ["code" => "ASC"]);
 
 		return $spheres;
 	}
@@ -155,7 +182,7 @@ class CardsData {
         /* @var \Doctrine\ORM\EntityManager $em */
         $em = $this->doctrine;
 
-        $qb = $em->getRepository(Card::class)->createQueryBuilder('c');
+        $qb = $this->cardRepository->createQueryBuilder('c');
         $qb->leftJoin('c.type', 't')->leftJoin('c.sphere', 's');
         $qb2 = null;
         $qb3 = null;
@@ -669,7 +696,7 @@ class CardsData {
 	 * @return array<int, Review>
 	 */
 	public function get_reviews($card) {
-		$reviews = $this->doctrine->getRepository(Review::class)->findBy(['card' => $card], ['nbVotes' => 'DESC', 'id' => 'ASC']);
+		$reviews = $this->reviewRepository->findBy(['card' => $card], ['nbVotes' => 'DESC', 'id' => 'ASC']);
 
 		$response = $reviews;
 

@@ -2,7 +2,9 @@
 
 namespace AppBundle\Services;
 
-use AppBundle\Entity\Decklist;
+use AppBundle\Repository\DecklistRepository;
+use AppBundle\Repository\DeckchangeRepository;
+use AppBundle\Repository\CardRepository;
 use AppBundle\Entity\Card;
 use AppBundle\Entity\Deck;
 use Doctrine\ORM\EntityManagerInterface;
@@ -34,11 +36,29 @@ class Decks {
      */
     private $logger;
 
-    public function __construct(EntityManagerInterface $doctrine, DeckValidationHelper $deck_validation_helper, Diff $diff, LoggerInterface $logger) {
+    /**
+     * @var CardRepository
+     */
+    private $cardRepository;
+
+    /**
+     * @var DeckchangeRepository
+     */
+    private $deckchangeRepository;
+
+    /**
+     * @var DecklistRepository
+     */
+    private $decklistRepository;
+
+    public function __construct(EntityManagerInterface $doctrine, DeckValidationHelper $deck_validation_helper, Diff $diff, LoggerInterface $logger, CardRepository $cardRepository, DeckchangeRepository $deckchangeRepository, DecklistRepository $decklistRepository) {
         $this->doctrine = $doctrine;
         $this->deck_validation_helper = $deck_validation_helper;
         $this->diff = $diff;
         $this->logger = $logger;
+        $this->cardRepository = $cardRepository;
+        $this->deckchangeRepository = $deckchangeRepository;
+        $this->decklistRepository = $decklistRepository;
     }
 
     /**
@@ -241,7 +261,7 @@ class Decks {
 
         if ($decklist_id) {
             /* @var $decklist \AppBundle\Entity\Decklist */
-            $decklist = $this->doctrine->getRepository(Decklist::class)->find($decklist_id);
+            $decklist = $this->decklistRepository->find($decklist_id);
             if ($decklist) {
                 $deck->setParent($decklist);
             }
@@ -526,7 +546,7 @@ class Decks {
      * @return array<int, Deckchange>
      */
     public function getUnsavedChanges($deck) {
-        return $this->doctrine->getRepository(Deckchange::class)->findBy([
+        return $this->deckchangeRepository->findBy([
             'deck' => $deck,
             'isSaved' => false
         ]);

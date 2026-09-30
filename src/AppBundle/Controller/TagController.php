@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Controller;
 
+use AppBundle\Repository\DeckRepository;
 use AppBundle\Services\Decks;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,8 +16,14 @@ class TagController extends AbstractController {
      */
     private $decks;
 
-    public function __construct(Decks $decks) {
+    /**
+     * @var DeckRepository
+     */
+    private $deckRepository;
+
+    public function __construct(Decks $decks, DeckRepository $deckRepository) {
         $this->decks = $decks;
+        $this->deckRepository = $deckRepository;
     }
 
     /**
@@ -33,7 +40,7 @@ class TagController extends AbstractController {
 
         foreach ($list_id as $id) {
             /* @var $deck Deck */
-            $deck = $em->getRepository(Deck::class)->find($id);
+            $deck = $this->deckRepository->find($id);
 
             if (!$deck) {
                 continue;
@@ -66,7 +73,7 @@ class TagController extends AbstractController {
 
         foreach ($list_id as $id) {
             /* @var $deck Deck */
-            $deck = $em->getRepository(Deck::class)->find($id);
+            $deck = $this->deckRepository->find($id);
 
             if (!$deck) {
                 continue;
@@ -98,7 +105,7 @@ class TagController extends AbstractController {
 
         foreach ($list_id as $id) {
             /* @var $deck Deck */
-            $deck = $em->getRepository(Deck::class)->find($id);
+            $deck = $this->deckRepository->find($id);
 
             if (!$deck) {
                 continue;

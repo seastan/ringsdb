@@ -2,7 +2,7 @@
 
 namespace AppBundle\Command;
 
-use AppBundle\Entity\Decklist;
+use AppBundle\Repository\DecklistRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -16,9 +16,15 @@ class FixThreatCommand extends Command {
      */
     private $em;
 
-    public function __construct(EntityManagerInterface $em) {
+    /**
+     * @var DecklistRepository
+     */
+    private $decklistRepository;
+
+    public function __construct(EntityManagerInterface $em, DecklistRepository $decklistRepository) {
         parent::__construct();
         $this->em = $em;
+        $this->decklistRepository = $decklistRepository;
     }
 
     /**
@@ -36,7 +42,7 @@ class FixThreatCommand extends Command {
         $count = 0;
 
         /* @var $decklists \AppBundle\Entity\Decklist[] */
-        $decklists = $em->getRepository(Decklist::class)->findAll();
+        $decklists = $this->decklistRepository->findAll();
         foreach ($decklists as $decklist) {
             /* @var $decklist \AppBundle\Entity\Decklist */
             $decklist->setStartingThreat($decklist->getSlots()->getStartingThreat());

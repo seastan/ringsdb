@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Repository\ScenarioRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -15,14 +16,22 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
  */
 class ScenarioController extends AbstractController {
     /**
+     * @var ScenarioRepository
+     */
+    private $scenarioRepository;
+
+    public function __construct(ScenarioRepository $scenarioRepository) {
+        $this->scenarioRepository = $scenarioRepository;
+    }
+
+    /**
      * Lists all Scenario entities.
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction() {
-        $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository(Scenario::class)->findAll();
+        $entities = $this->scenarioRepository->findAll();
 
         return $this->render('AppBundle:Scenario:index.html.twig', [
             'entities' => $entities,
@@ -115,9 +124,8 @@ class ScenarioController extends AbstractController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction($id) {
-        $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository(Scenario::class)->find($id);
+        $entity = $this->scenarioRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Scenario entity.');
@@ -138,9 +146,8 @@ class ScenarioController extends AbstractController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function editAction($id) {
-        $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository(Scenario::class)->find($id);
+        $entity = $this->scenarioRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Scenario entity.');
@@ -165,7 +172,7 @@ class ScenarioController extends AbstractController {
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository(Scenario::class)->find($id);
+        $entity = $this->scenarioRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Scenario entity.');
@@ -204,7 +211,7 @@ class ScenarioController extends AbstractController {
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository(Scenario::class)->find($id);
+            $entity = $this->scenarioRepository->find($id);
 
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Scenario entity.');

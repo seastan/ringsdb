@@ -2,8 +2,8 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\UserCustomPack;
-use AppBundle\Entity\Cycle;
+use AppBundle\Repository\UserCustomPackRepository;
+use AppBundle\Repository\CycleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,11 +16,11 @@ class CollectionController extends AbstractController {
      * @param bool $reloaduser
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function packsAction($reloaduser = false) {
+    public function packsAction($reloaduser = false, CycleRepository $cycleRepository, UserCustomPackRepository $userCustomPackRepository) {
         $categories = [];
         $categories[] = ["label" => "Core / Deluxe", "packs" => []];
         $repackaged = ["label" => "Repackaged", "packs" => []];
-        $list_cycles = $this->getDoctrine()->getRepository(Cycle::class)->findBy([], ["position" => "ASC"]);
+        $list_cycles = $cycleRepository->findBy([], ["position" => "ASC"]);
 
         // owned_packs is a per-pack COUNT map encoded as "id" / "id:count" tokens
         // (legacy "id-2"/"id-3" core copies each count as +1).
@@ -90,8 +90,7 @@ class CollectionController extends AbstractController {
             $categories[] = $repackaged;
         }
 
-        $customPacks = $this->getDoctrine()
-            ->getRepository(UserCustomPack::class)
+        $customPacks = $userCustomPackRepository
             ->findBy(['user' => $this->getUser()], ['createdAt' => 'ASC', 'id' => 'ASC']);
 
         return $this->render('AppBundle:Collection:packs.html.twig', [

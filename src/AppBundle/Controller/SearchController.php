@@ -2,10 +2,12 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\Type;
-use AppBundle\Entity\Sphere;
-use AppBundle\Entity\Pack;
-use AppBundle\Entity\Cycle;
+use AppBundle\Repository\TypeRepository;
+use AppBundle\Repository\SphereRepository;
+use AppBundle\Repository\PackRepository;
+use AppBundle\Repository\CycleRepository;
+use AppBundle\Repository\CardPrintingRepository;
+use AppBundle\Repository\CardRepository;
 use AppBundle\Entity\CardPrinting;
 use AppBundle\Entity\Card;
 use AppBundle\Services\CardsData;
@@ -34,11 +36,35 @@ class SearchController extends AbstractController {
      */
     private $publisherName;
 
-    public function __construct(CardsData $cardsData, int $cacheExpiration, ?string $gameName, ?string $publisherName) {
+    /**
+     * @var CardPrintingRepository
+     */
+    private $cardPrintingRepository;
+
+    /**
+     * @var CycleRepository
+     */
+    private $cycleRepository;
+
+    /**
+     * @var PackRepository
+     */
+    private $packRepository;
+
+    /**
+     * @var SphereRepository
+     */
+    private $sphereRepository;
+
+    public function __construct(CardsData $cardsData, int $cacheExpiration, ?string $gameName, ?string $publisherName, CardPrintingRepository $cardPrintingRepository, CycleRepository $cycleRepository, PackRepository $packRepository, SphereRepository $sphereRepository) {
         $this->cardsData = $cardsData;
         $this->cacheExpiration = $cacheExpiration;
         $this->gameName = $gameName;
         $this->publisherName = $publisherName;
+        $this->cardPrintingRepository = $cardPrintingRepository;
+        $this->cycleRepository = $cycleRepository;
+        $this->packRepository = $packRepository;
+        $this->sphereRepository = $sphereRepository;
     }
 
     /**
@@ -91,14 +117,14 @@ class SearchController extends AbstractController {
     /**
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function formAction() {
+    public function formAction(TypeRepository $typeRepository) {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
 
         $dbh = $this->getDoctrine()->getConnection();
 
-        $list_packs = $this->getDoctrine()->getRepository(Pack::class)->findBy([], ["dateRelease" => "ASC", "position" => "ASC"]);
+        $list_packs = $this->packRepository->findBy([], ["dateRelease" => "ASC", "position" => "ASC"]);
         $packs = [];
         foreach ($list_packs as $pack) {
             /* @var $pack \AppBundle\Entity\Pack */
@@ -108,7 +134,7 @@ class SearchController extends AbstractController {
             ];
         }
 
-        $list_cycles = $this->getDoctrine()->getRepository(Cycle::class)->findBy([], ["position" => "ASC"]);
+        $list_cycles = $this->cycleRepository->findBy([], ["position" => "ASC"]);
         $cycles = [];
         foreach ($list_cycles as $cycle) {
             /* @var $cycle \AppBundle\Entity\Cycle */
@@ -118,8 +144,8 @@ class SearchController extends AbstractController {
             ];
         }
 
-        $types = $this->getDoctrine()->getRepository(Type::class)->findBy([], ["name" => "ASC"]);
-        $spheres = $this->getDoctrine()->getRepository(Sphere::class)->findBy([], ["id" => "ASC"]);
+        $types = $typeRepository->findBy([], ["name" => "ASC"]);
+        $spheres = $this->sphereRepository->findBy([], ["id" => "ASC"]);
 
         $traits = $this->cardsData->getDistinctTraits();
         $traits = array_filter(array_keys($traits));
@@ -150,8 +176,8 @@ class SearchController extends AbstractController {
      * @param mixed $card_code
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function zoomAction($card_code, Request $request) {
-        $card = $this->getDoctrine()->getRepository(Card::class)->findOneBy(["code" => $card_code]);
+    public function zoomAction($card_code, Request $request, CardRepository $cardRepository) {
+        $card = $cardRepository->findOneBy(["code" => $card_code]);
         if (!$card) {
             throw $this->createNotFoundException('Sorry, this card is not in the database (yet?)');
         }
@@ -183,7 +209,7 @@ class SearchController extends AbstractController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function listAction($pack_code, $view, $sort, $page, Request $request) {
-        $pack = $this->getDoctrine()->getRepository(Pack::class)->findOneBy(['code' => $pack_code]);
+        $pack = $this->packRepository->findOneBy(['code' => $pack_code]);
 
         if (!$pack) {
             throw $this->createNotFoundException('This pack does not exist');
@@ -216,7 +242,7 @@ class SearchController extends AbstractController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function cycleAction($cycle_code, $view, $sort, $page, Request $request) {
-        $cycle = $this->getDoctrine()->getRepository(Cycle::class)->findOneBy(["code" => $cycle_code]);
+        $cycle = $this->cycleRepository->findOneBy(["code" => $cycle_code]);
 
         if (!$cycle) {
             throw $this->createNotFoundException('This cycle does not exist');
@@ -252,7 +278,7 @@ class SearchController extends AbstractController {
         $sort = $request->query->get('sort') ?: 'name';
 
         $operators = [":", "!", "<", ">"];
-        $spheres = $this->getDoctrine()->getRepository(Sphere::class)->findAll();
+        $spheres = $this->sphereRepository->findAll();
 
         $params = [];
 
@@ -386,7 +412,7 @@ class SearchController extends AbstractController {
             if ($pagetitle == '') {
                 if (count($conditions) == 1 && count($conditions[0]) == 3 && $conditions[0][1] == ":") {
                     if ($conditions[0][0] == "e") {
-                        $pack = $this->getDoctrine()->getRepository(Pack::class)->findOneBy(["code" => $conditions[0][2]]);
+                        $pack = $this->packRepository->findOneBy(["code" => $conditions[0][2]]);
 
                         if ($pack) {
                             $pagetitle = $pack->getName();
@@ -394,7 +420,7 @@ class SearchController extends AbstractController {
                     }
 
                     if ($conditions[0][0] == "c") {
-                        $cycle = $this->getDoctrine()->getRepository(Cycle::class)->findOneBy(["code" => $conditions[0][2]]);
+                        $cycle = $this->cycleRepository->findOneBy(["code" => $conditions[0][2]]);
 
                         if ($cycle) {
                             $pagetitle = $cycle->getName();
@@ -519,16 +545,16 @@ class SearchController extends AbstractController {
 
         $selectedPack = null;
         if ($selectedPackCode) {
-            $selectedPack = $em->getRepository(Pack::class)->findOneBy(['code' => $selectedPackCode]);
+            $selectedPack = $this->packRepository->findOneBy(['code' => $selectedPackCode]);
         }
 
         if ($selectedPack) {
             // Navigate within the selected printing's pack via CardPrinting positions.
-            $printing = $em->getRepository(CardPrinting::class)->findOneBy(['card' => $card, 'pack' => $selectedPack]);
+            $printing = $this->cardPrintingRepository->findOneBy(['card' => $card, 'pack' => $selectedPack]);
             if ($printing) {
                 $pos = $printing->getPosition();
-                $prevPrinting = $em->getRepository(CardPrinting::class)->findOneBy(['pack' => $selectedPack, 'position' => $pos - 1]);
-                $nextPrinting = $em->getRepository(CardPrinting::class)->findOneBy(['pack' => $selectedPack, 'position' => $pos + 1]);
+                $prevPrinting = $this->cardPrintingRepository->findOneBy(['pack' => $selectedPack, 'position' => $pos - 1]);
+                $nextPrinting = $this->cardPrintingRepository->findOneBy(['pack' => $selectedPack, 'position' => $pos + 1]);
                 $prev = $prevPrinting ? $prevPrinting->getCard() : null;
                 $next = $nextPrinting ? $nextPrinting->getCard() : null;
             } else {
@@ -540,8 +566,8 @@ class SearchController extends AbstractController {
             $selectedPack    = $primaryPrinting ? $primaryPrinting->getPack() : null;
             if ($primaryPrinting && $selectedPack) {
                 $pos  = $primaryPrinting->getPosition();
-                $prevP = $em->getRepository(CardPrinting::class)->findOneBy(['pack' => $selectedPack, 'position' => $pos - 1]);
-                $nextP = $em->getRepository(CardPrinting::class)->findOneBy(['pack' => $selectedPack, 'position' => $pos + 1]);
+                $prevP = $this->cardPrintingRepository->findOneBy(['pack' => $selectedPack, 'position' => $pos - 1]);
+                $nextP = $this->cardPrintingRepository->findOneBy(['pack' => $selectedPack, 'position' => $pos + 1]);
                 $prev  = $prevP ? $prevP->getCard() : null;
                 $next  = $nextP ? $nextP->getCard() : null;
             } else {

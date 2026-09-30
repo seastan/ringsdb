@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Repository\CycleRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -15,14 +16,22 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
  */
 class CycleController extends AbstractController {
     /**
+     * @var CycleRepository
+     */
+    private $cycleRepository;
+
+    public function __construct(CycleRepository $cycleRepository) {
+        $this->cycleRepository = $cycleRepository;
+    }
+
+    /**
      * Lists all Cycle entities.
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction() {
-        $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository(Cycle::class)->findAll();
+        $entities = $this->cycleRepository->findAll();
 
         return $this->render('AppBundle:Cycle:index.html.twig', [
             'entities' => $entities,
@@ -75,9 +84,8 @@ class CycleController extends AbstractController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction($id) {
-        $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository(Cycle::class)->find($id);
+        $entity = $this->cycleRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Cycle entity.');
@@ -98,9 +106,8 @@ class CycleController extends AbstractController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function editAction($id) {
-        $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository(Cycle::class)->find($id);
+        $entity = $this->cycleRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Cycle entity.');
@@ -125,7 +132,7 @@ class CycleController extends AbstractController {
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository(Cycle::class)->find($id);
+        $entity = $this->cycleRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Cycle entity.');
@@ -161,7 +168,7 @@ class CycleController extends AbstractController {
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository(Cycle::class)->find($id);
+            $entity = $this->cycleRepository->find($id);
 
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Cycle entity.');

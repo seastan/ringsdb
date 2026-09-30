@@ -1,25 +1,21 @@
 <?php
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\Scenario;
+use AppBundle\Repository\ScenarioRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 
 use AppBundle\Command\ScrapBeornScenarioDataCommand;
-use AppBundle\Entity\Card;
-use AppBundle\Entity\Cycle;
-use AppBundle\Entity\Pack;
 
 class CommandController extends AbstractController {
 	/**
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function formAction() {
-        $em = $this->getDoctrine()->getManager();
+	public function formAction(ScenarioRepository $scenarioRepository) {
 
-        $entities = $em->getRepository(Scenario::class)->findAll();
+        $entities = $scenarioRepository->findAll();
 
         return $this->render('AppBundle:Command:form.html.twig', [
             'entities' => $entities,

@@ -2,7 +2,7 @@
 
 namespace AppBundle\Command;
 
-use AppBundle\Entity\Card;
+use AppBundle\Repository\CardRepository;
 use Symfony\Component\Asset\Packages;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -29,12 +29,17 @@ class DownloadImagesCommand extends Command
      */
     private $rootDir;
 
-    public function __construct(EntityManagerInterface $em, Packages $packages, string $rootDir)
-    {
+    /**
+     * @var CardRepository
+     */
+    private $cardRepository;
+
+    public function __construct(EntityManagerInterface $em, Packages $packages, string $rootDir, CardRepository $cardRepository) {
         parent::__construct();
         $this->em = $em;
         $this->packages = $packages;
         $this->rootDir = $rootDir;
+        $this->cardRepository = $cardRepository;
     }
 
     /**
@@ -57,7 +62,7 @@ class DownloadImagesCommand extends Command
         $em = $this->em;
 
         /* @var $repo \AppBundle\Entity\ReviewRepository */
-        $repo = $em->getRepository(Card::class);
+        $repo = $this->cardRepository;
 
         $rootDir = $this->rootDir;
         $output->writeln($rootDir);

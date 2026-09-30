@@ -2,8 +2,10 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Repository\PackRepository;
+use AppBundle\Repository\CardPrintingRepository;
+use AppBundle\Repository\CardRepository;
 use AppBundle\Entity\Pack;
-use AppBundle\Entity\CardPrinting;
 use AppBundle\Services\Texts;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -17,11 +19,25 @@ use AppBundle\Entity\Card;
 
 class ExcelController extends AbstractController {
 	/**
+	 * @var CardRepository
+	 */
+	private $cardRepository;
+
+	/**
+	 * @var PackRepository
+	 */
+	private $packRepository;
+
+	public function __construct(CardRepository $cardRepository, PackRepository $packRepository) {
+		$this->cardRepository = $cardRepository;
+		$this->packRepository = $packRepository;
+	}
+
+	/**
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function downloadFormAction() {
-		$em = $this->getDoctrine()->getManager();
-		$packs = $em->getRepository(Pack::class)->findBy([], ['dateRelease' => 'ASC', 'name' => 'ASC']);
+		$packs = $this->packRepository->findBy([], ['dateRelease' => 'ASC', 'name' => 'ASC']);
 
 		return $this->render('AppBundle:Excel:download_form.html.twig', [
 			'packs' => $packs
@@ -31,21 +47,21 @@ class ExcelController extends AbstractController {
 	/**
 	 * @return \Symfony\Component\HttpFoundation\StreamedResponse
 	 */
-	public function downloadProcessAction(Request $request, Texts $texts) {
+	public function downloadProcessAction(Request $request, Texts $texts, CardPrintingRepository $cardPrintingRepository) {
 		$ignoredFields = ['id', 'dateCreation', 'dateUpdate'];
 
 		$em = $this->getDoctrine()->getManager();
 
 		$pack_id = $request->request->get('pack');
 		if ($pack_id == 0) {
-			$cards = $em->getRepository(Card::class)->findBy([], ['code' => 'ASC']);
+			$cards = $this->cardRepository->findBy([], ['code' => 'ASC']);
 			$pack_name = 'LotR LCG Cards';
 		} else {
-			$pack = $em->getRepository(Pack::class)->find($pack_id);
+			$pack = $this->packRepository->find($pack_id);
 			if (!$pack) {
 				throw $this->createNotFoundException('Pack not found.');
 			}
-			$printings = $em->getRepository(CardPrinting::class)->findBy(['pack' => $pack], ['position' => 'ASC']);
+			$printings = $cardPrintingRepository->findBy(['pack' => $pack], ['position' => 'ASC']);
 			$cards = array_values(array_unique(array_map(function($p) { return $p->getCard(); }, $printings), SORT_REGULAR));
 			$pack_name = $pack->getName();
 		}
@@ -186,7 +202,7 @@ class ExcelController extends AbstractController {
 
 		/* @var $em \Doctrine\ORM\EntityManager */
 		$em = $this->getDoctrine()->getManager();
-		$repo = $em->getRepository(Card::class);
+		$repo = $this->cardRepository;
 
 		$metaData = $em->getClassMetadata(Card::class);
 		$fieldNames = $metaData->getFieldNames();

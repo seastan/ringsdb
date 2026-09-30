@@ -2,7 +2,8 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\Card;
+use AppBundle\Repository\UserCustomPackRepository;
+use AppBundle\Repository\CardRepository;
 use AppBundle\Entity\UserCustomPack;
 use AppBundle\Entity\UserCustomPackCard;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,6 +14,20 @@ use Symfony\Component\HttpFoundation\Response;
 class CustomPackController extends AbstractController {
     use CurrentUserTrait;
 
+    /**
+     * @var CardRepository
+     */
+    private $cardRepository;
+
+    /**
+     * @var UserCustomPackRepository
+     */
+    private $userCustomPackRepository;
+
+    public function __construct(CardRepository $cardRepository, UserCustomPackRepository $userCustomPackRepository) {
+        $this->cardRepository = $cardRepository;
+        $this->userCustomPackRepository = $userCustomPackRepository;
+    }
 
     /**
      * @return \Symfony\Component\HttpFoundation\Response
@@ -175,8 +190,7 @@ class CustomPackController extends AbstractController {
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function publishedListAction() {
-        $packs = $this->getDoctrine()
-            ->getRepository(UserCustomPack::class)
+        $packs = $this->userCustomPackRepository
             ->findBy(['isPublished' => true], ['createdAt' => 'ASC', 'id' => 'ASC']);
 
         $result = [];
@@ -215,8 +229,7 @@ class CustomPackController extends AbstractController {
             return new JsonResponse(['error' => 'Not authenticated'], 401);
         }
 
-        $source = $this->getDoctrine()
-            ->getRepository(UserCustomPack::class)
+        $source = $this->userCustomPackRepository
             ->findOneBy(['id' => $id, 'isPublished' => true]);
 
         if (!$source) {
@@ -259,8 +272,7 @@ class CustomPackController extends AbstractController {
             return new JsonResponse([], 401);
         }
 
-        $packs = $this->getDoctrine()
-            ->getRepository(UserCustomPack::class)
+        $packs = $this->userCustomPackRepository
             ->findBy(['user' => $user], ['createdAt' => 'ASC', 'id' => 'ASC']);
 
         $result = [];
@@ -292,8 +304,7 @@ class CustomPackController extends AbstractController {
      * @return \AppBundle\Entity\UserCustomPack|null
      */
     private function loadOwnedPack($id) {
-        $pack = $this->getDoctrine()
-            ->getRepository(UserCustomPack::class)
+        $pack = $this->userCustomPackRepository
             ->find($id);
 
         if (!$pack || $pack->getUser()->getId() !== $this->currentUser()->getId()) {
@@ -309,7 +320,7 @@ class CustomPackController extends AbstractController {
      * @param array<int|string, mixed> $cardEntries
      */
     private function attachCards($em, UserCustomPack $pack, array $cardEntries) {
-        $cardRepo = $this->getDoctrine()->getRepository(Card::class);
+        $cardRepo = $this->cardRepository;
         $seen = [];
         foreach ($cardEntries as $entry) {
             $code = isset($entry['card_code']) ? (string) preg_replace('/[^0-9]/', '', $entry['card_code']) : '';

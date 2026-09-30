@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Repository\UserRepository;
 use AppBundle\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -9,8 +10,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use AppBundle\Entity\Review;
-use AppBundle\Entity\Reviewcomment;
 
 class PatronCommand extends Command {
     use StringInputTrait;
@@ -20,9 +19,15 @@ class PatronCommand extends Command {
      */
     private $em;
 
-    public function __construct(EntityManagerInterface $em) {
+    /**
+     * @var UserRepository
+     */
+    private $userRepository;
+
+    public function __construct(EntityManagerInterface $em, UserRepository $userRepository) {
         parent::__construct();
         $this->em = $em;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -49,7 +54,7 @@ class PatronCommand extends Command {
         $donation = (int) $input->getArgument('donation');
 
         $em = $this->em;
-        $repo = $em->getRepository(User::class);
+        $repo = $this->userRepository;
         $user = $repo->findOneBy(['email' => $email]);
 
         if (!$user) {

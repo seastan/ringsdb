@@ -2,7 +2,7 @@
 
 namespace AppBundle\Command;
 
-use AppBundle\Entity\Scenario;
+use AppBundle\Repository\ScenarioRepository;
 use AppBundle\Services\Texts;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -22,10 +22,16 @@ class FixCanonicalNamesCommand extends Command {
      */
     private $texts;
 
-    public function __construct(EntityManagerInterface $em, Texts $texts) {
+    /**
+     * @var ScenarioRepository
+     */
+    private $scenarioRepository;
+
+    public function __construct(EntityManagerInterface $em, Texts $texts, ScenarioRepository $scenarioRepository) {
         parent::__construct();
         $this->em = $em;
         $this->texts = $texts;
+        $this->scenarioRepository = $scenarioRepository;
     }
 
     /**
@@ -42,7 +48,7 @@ class FixCanonicalNamesCommand extends Command {
         $texts = $this->texts;
         $count = 0;
 
-        $scenarios = $em->getRepository(Scenario::class)->findAll();
+        $scenarios = $this->scenarioRepository->findAll();
         foreach ($scenarios as $scenario) {
             $nameCanonical = $texts->slugify($scenario->getName());
 

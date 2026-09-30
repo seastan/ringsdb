@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Repository\CardRepository;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,8 +21,14 @@ class CardController extends AbstractController {
      */
     private $rootDir;
 
-    public function __construct(string $rootDir) {
+    /**
+     * @var CardRepository
+     */
+    private $cardRepository;
+
+    public function __construct(string $rootDir, CardRepository $cardRepository) {
         $this->rootDir = $rootDir;
+        $this->cardRepository = $cardRepository;
     }
 
     /**
@@ -30,9 +37,8 @@ class CardController extends AbstractController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction() {
-        $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository(Card::class)->findAll();
+        $entities = $this->cardRepository->findAll();
 
         return $this->render('AppBundle:Card:index.html.twig', [
             'entities' => $entities,
@@ -85,9 +91,8 @@ class CardController extends AbstractController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction($id) {
-        $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository(Card::class)->find($id);
+        $entity = $this->cardRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Card entity.');
@@ -108,9 +113,8 @@ class CardController extends AbstractController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function editAction($id) {
-        $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository(Card::class)->find($id);
+        $entity = $this->cardRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Card entity.');
@@ -137,7 +141,7 @@ class CardController extends AbstractController {
     public function updateAction(Request $request, $id, Packages $packages) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository(Card::class)->find($id);
+        $entity = $this->cardRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Card entity.');
@@ -184,7 +188,7 @@ class CardController extends AbstractController {
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository(Card::class)->find($id);
+            $entity = $this->cardRepository->find($id);
 
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Card entity.');
@@ -209,7 +213,7 @@ class CardController extends AbstractController {
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository(Card::class)->find($id);
+            $entity = $this->cardRepository->find($id);
 
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Card entity.');

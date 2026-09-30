@@ -2,10 +2,12 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Repository\TypeRepository;
+use AppBundle\Repository\SphereRepository;
+use AppBundle\Repository\PackRepository;
+use AppBundle\Repository\CardPrintingRepository;
 use AppBundle\Entity\Type;
 use AppBundle\Entity\Sphere;
-use AppBundle\Entity\Pack;
-use AppBundle\Entity\CardPrinting;
 use Symfony\Component\Asset\Packages;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -36,11 +38,35 @@ class ScrapBeornCardDataCommand extends Command {
      */
     private $rootDir;
 
-    public function __construct(EntityManagerInterface $em, Packages $packages, string $rootDir) {
+    /**
+     * @var CardPrintingRepository
+     */
+    private $cardPrintingRepository;
+
+    /**
+     * @var PackRepository
+     */
+    private $packRepository;
+
+    /**
+     * @var SphereRepository
+     */
+    private $sphereRepository;
+
+    /**
+     * @var TypeRepository
+     */
+    private $typeRepository;
+
+    public function __construct(EntityManagerInterface $em, Packages $packages, string $rootDir, CardPrintingRepository $cardPrintingRepository, PackRepository $packRepository, SphereRepository $sphereRepository, TypeRepository $typeRepository) {
         parent::__construct();
         $this->em = $em;
         $this->packages = $packages;
         $this->rootDir = $rootDir;
+        $this->cardPrintingRepository = $cardPrintingRepository;
+        $this->packRepository = $packRepository;
+        $this->sphereRepository = $sphereRepository;
+        $this->typeRepository = $typeRepository;
     }
 
 
@@ -95,8 +121,8 @@ class ScrapBeornCardDataCommand extends Command {
         $assets_helper = $this->packages;
         $rootDir = $this->rootDir;
 
-        $allSpheres = $em->getRepository(Sphere::class)->findAll();
-        $allTypes = $em->getRepository(Type::class)->findAll();
+        $allSpheres = $this->sphereRepository->findAll();
+        $allTypes = $this->typeRepository->findAll();
 
         $setname = self::stringArgument($input, 'beornset');
         $skip = (int) $input->getOption('skip');
@@ -169,7 +195,7 @@ class ScrapBeornCardDataCommand extends Command {
         }
 
         foreach ($sets as $set) {
-            $pack = $em->getRepository(Pack::class)->findOneBy(['name' => $set]);
+            $pack = $this->packRepository->findOneBy(['name' => $set]);
 
             if (!$pack) {
                 $output->writeln("<error>Cannot find pack [" . $set . "]</error>");
@@ -309,7 +335,7 @@ class ScrapBeornCardDataCommand extends Command {
                 //$octgn = substr($cardCrawler->filter('img[title^="OCTGN"]')->attr('title'), -36);
 
 		// Get matching RingsDB card
-                $bcPrinting = $em->getRepository(CardPrinting::class)->createQueryBuilder('cp')
+                $bcPrinting = $this->cardPrintingRepository->createQueryBuilder('cp')
                     ->join('cp.card', 'c')->where('c.name = :n')->andWhere('cp.pack = :p')
                     ->setParameter('n', $name)->setParameter('p', $pack)->setMaxResults(1)->getQuery()->getOneOrNullResult();
                 $card = $bcPrinting ? $bcPrinting->getCard() : null;

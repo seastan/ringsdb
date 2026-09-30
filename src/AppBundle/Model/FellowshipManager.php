@@ -2,6 +2,7 @@
 
 namespace AppBundle\Model;
 
+use AppBundle\Repository\CardRepository;
 use AppBundle\Entity\Card;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,10 +56,16 @@ class FellowshipManager {
 	 */
 	private $router;
 
-	public function __construct(EntityManagerInterface $doctrine, RequestStack $request_stack, UrlGeneratorInterface $router) {
+    /**
+     * @var CardRepository
+     */
+    private $cardRepository;
+
+	public function __construct(EntityManagerInterface $doctrine, RequestStack $request_stack, UrlGeneratorInterface $router, CardRepository $cardRepository) {
 		$this->doctrine = $doctrine;
 		$this->request_stack = $request_stack;
 		$this->router = $router;
+        $this->cardRepository = $cardRepository;
 	}
 
 	/**
@@ -305,7 +312,7 @@ class FellowshipManager {
             if (!empty($cards_code)) {
                 foreach ($cards_code as $i => $card_code) {
                     /* @var $card \AppBundle\Entity\Card */
-                    $card = $this->doctrine->getRepository(Card::class)->findOneBy(['code' => $card_code]);
+                    $card = $this->cardRepository->findOneBy(['code' => $card_code]);
                     if (!$card) {
                         continue;
                     }

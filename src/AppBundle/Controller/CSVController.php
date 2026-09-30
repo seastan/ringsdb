@@ -1,6 +1,10 @@
 <?php
 namespace AppBundle\Controller;
 
+use AppBundle\Repository\PackRepository;
+use AppBundle\Repository\CycleRepository;
+use AppBundle\Repository\CardPrintingRepository;
+use AppBundle\Repository\CardRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -8,7 +12,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 use AppBundle\Entity\Card;
 use AppBundle\Entity\CardPrinting;
-use AppBundle\Entity\Cycle;
 use AppBundle\Entity\Pack;
 
 class CSVController extends AbstractController {
@@ -22,7 +25,7 @@ class CSVController extends AbstractController {
 	/**
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function uploadProcessAction(Request $request) {
+	public function uploadProcessAction(Request $request, CardRepository $cardRepository, CardPrintingRepository $cardPrintingRepository, CycleRepository $cycleRepository, PackRepository $packRepository) {
 		$inputCode = $request->request->get('code');
 		$inputOldCode = $request->request->get('old_code');
 		$inputName = $request->request->get('name');
@@ -52,12 +55,12 @@ class CSVController extends AbstractController {
 		}
 
 		$em = $this->getDoctrine()->getManager();
-		$packRepo = $em->getRepository(Pack::class);
+		$packRepo = $packRepository;
 		$pack = $packRepo->findOneBy(['code' => $inputCode]);
 		$oldPack = $packRepo->findOneBy(['code' => $inputOldCode]);
 
 		if (!$pack && !$oldPack) {
-			$cycleRepo = $em->getRepository(Cycle::class);
+			$cycleRepo = $cycleRepository;
 			// 'ALeP' cycle code doesn't exist; fall back to the most recent cycle.
 			$cycle = $cycleRepo->findOneBy(['code' => 'ALeP'])
 				?? $cycleRepo->findOneBy([], ['id' => 'DESC']);
@@ -116,7 +119,7 @@ class CSVController extends AbstractController {
 			}
 		}
 
-		$printingRepo = $em->getRepository(CardPrinting::class);
+		$printingRepo = $cardPrintingRepository;
 		$cardMeta = $em->getClassMetadata(Card::class);
 		$cardFieldNames = $cardMeta->getFieldNames();
 		$cardAssocMappings = $cardMeta->getAssociationMappings();
@@ -161,7 +164,7 @@ class CSVController extends AbstractController {
 				}
 
 				if (!$cardEntity) {
-					$cardRepo = $em->getRepository(Card::class);
+					$cardRepo = $cardRepository;
 					$cardEntity = $cardRepo->findOneBy(['code' => $card['code']]);
 				}
 

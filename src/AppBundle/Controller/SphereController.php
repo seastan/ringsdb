@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Repository\SphereRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -16,14 +17,22 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 class SphereController extends AbstractController {
 
     /**
+     * @var SphereRepository
+     */
+    private $sphereRepository;
+
+    public function __construct(SphereRepository $sphereRepository) {
+        $this->sphereRepository = $sphereRepository;
+    }
+
+    /**
      * Lists all Sphere entities.
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction() {
-        $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository(Sphere::class)->findAll();
+        $entities = $this->sphereRepository->findAll();
 
         return $this->render('AppBundle:Sphere:index.html.twig', array(
             'entities' => $entities,
@@ -92,9 +101,8 @@ class SphereController extends AbstractController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction($id) {
-        $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository(Sphere::class)->find($id);
+        $entity = $this->sphereRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Sphere entity.');
@@ -115,9 +123,8 @@ class SphereController extends AbstractController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function editAction($id) {
-        $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository(Sphere::class)->find($id);
+        $entity = $this->sphereRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Sphere entity.');
@@ -160,7 +167,7 @@ class SphereController extends AbstractController {
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository(Sphere::class)->find($id);
+        $entity = $this->sphereRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Sphere entity.');
@@ -195,7 +202,7 @@ class SphereController extends AbstractController {
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository(Sphere::class)->find($id);
+            $entity = $this->sphereRepository->find($id);
 
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Sphere entity.');

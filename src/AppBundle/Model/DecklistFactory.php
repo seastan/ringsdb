@@ -2,21 +2,15 @@
 
 namespace AppBundle\Model;
 
-use AppBundle\Entity\Sphere;
+use AppBundle\Repository\SphereRepository;
 use AppBundle\Entity\Decklist;
 use AppBundle\Entity\Deck;
-use Doctrine\ORM\EntityManagerInterface;
 use AppBundle\Helper\DeckValidationHelper;
 use AppBundle\Services\Texts;
 use AppBundle\Entity\Decklistslot;
 use AppBundle\Entity\Decklistsideslot;
 
 class DecklistFactory {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $doctrine;
-
     /**
      * @var DeckValidationHelper
      */
@@ -27,10 +21,15 @@ class DecklistFactory {
      */
     private $texts;
 
-    public function __construct(EntityManagerInterface $doctrine, DeckValidationHelper $deckValidationHelper, Texts $texts) {
-        $this->doctrine = $doctrine;
+    /**
+     * @var SphereRepository
+     */
+    private $sphereRepository;
+
+    public function __construct(DeckValidationHelper $deckValidationHelper, Texts $texts, SphereRepository $sphereRepository) {
         $this->deckValidationHelper = $deckValidationHelper;
         $this->texts = $texts;
+        $this->sphereRepository = $sphereRepository;
     }
 
     /**
@@ -68,7 +67,7 @@ class DecklistFactory {
 
         $countBySphere = $deck->getSlots()->getCountBySphere();
         $predominantSphere = array_keys($countBySphere, max($countBySphere))[0];
-        $predominantSphere = $this->doctrine->getRepository(Sphere::class)->findOneBy(["code" => $predominantSphere]);
+        $predominantSphere = $this->sphereRepository->findOneBy(["code" => $predominantSphere]);
 
         $heroes = $deck->getSlots()->getHeroDeck();
 

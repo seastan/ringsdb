@@ -2,9 +2,10 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Repository\UserRepository;
+use AppBundle\Repository\DecklistRepository;
+use AppBundle\Repository\DeckRepository;
 use AppBundle\Entity\User;
-use AppBundle\Entity\Decklist;
-use AppBundle\Entity\Deck;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -18,9 +19,27 @@ class RemoveUserCommand extends Command {
      */
     private $em;
 
-    public function __construct(EntityManagerInterface $em) {
+    /**
+     * @var DeckRepository
+     */
+    private $deckRepository;
+
+    /**
+     * @var DecklistRepository
+     */
+    private $decklistRepository;
+
+    /**
+     * @var UserRepository
+     */
+    private $userRepository;
+
+    public function __construct(EntityManagerInterface $em, DeckRepository $deckRepository, DecklistRepository $decklistRepository, UserRepository $userRepository) {
         parent::__construct();
         $this->em = $em;
+        $this->deckRepository = $deckRepository;
+        $this->decklistRepository = $decklistRepository;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -41,7 +60,7 @@ class RemoveUserCommand extends Command {
         $em = $this->em;
 
         $user_id = $input->getArgument('user_id');
-        $user = $em->getRepository(User::class)->find($user_id);
+        $user = $this->userRepository->find($user_id);
 
         if (!$user) {
             $output->writeln("User not found");
@@ -50,14 +69,14 @@ class RemoveUserCommand extends Command {
 
         $output->writeln("User " . $user->getUsername());
 
-        $decks = $em->getRepository(Deck::class)->findBy([
+        $decks = $this->deckRepository->findBy([
             'user' => $user
         ]);
 
         $output->writeln(count($decks) . " decks");
 
         foreach ($decks as $deck) {
-            $children = $em->getRepository(Decklist::class)->findBy([
+            $children = $this->decklistRepository->findBy([
                 'parent' => $deck
             ]);
 
@@ -70,21 +89,21 @@ class RemoveUserCommand extends Command {
 
         $output->writeln("Decks deleted");
 
-        $decklists = $em->getRepository(Decklist::class)->findBy([
+        $decklists = $this->decklistRepository->findBy([
             'user' => $user
         ]);
 
         $output->writeln(count($decklists) . " decklists");
 
         foreach ($decklists as $decklist) {
-            $successors = $em->getRepository(Decklist::class)->findBy([
+            $successors = $this->decklistRepository->findBy([
                 'precedent' => $decklist
             ]);
             foreach ($successors as $successor) {
                 $successor->setPrecedent(null);
             }
 
-            $children = $em->getRepository(Deck::class)->findBy([
+            $children = $this->deckRepository->findBy([
                 'parent' => $decklist
             ]);
             foreach ($children as $child) {

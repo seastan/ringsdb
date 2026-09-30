@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Repository\TypeRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -15,14 +16,22 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
  */
 class TypeController extends AbstractController {
     /**
+     * @var TypeRepository
+     */
+    private $typeRepository;
+
+    public function __construct(TypeRepository $typeRepository) {
+        $this->typeRepository = $typeRepository;
+    }
+
+    /**
      * Lists all Type entities.
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction() {
-        $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository(Type::class)->findAll();
+        $entities = $this->typeRepository->findAll();
 
         return $this->render('AppBundle:Type:index.html.twig', [
             'entities' => $entities,
@@ -91,9 +100,8 @@ class TypeController extends AbstractController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction($id) {
-        $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository(Type::class)->find($id);
+        $entity = $this->typeRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Type entity.');
@@ -114,9 +122,8 @@ class TypeController extends AbstractController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function editAction($id) {
-        $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository(Type::class)->find($id);
+        $entity = $this->typeRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Type entity.');
@@ -159,7 +166,7 @@ class TypeController extends AbstractController {
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository(Type::class)->find($id);
+        $entity = $this->typeRepository->find($id);
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Type entity.');
@@ -194,7 +201,7 @@ class TypeController extends AbstractController {
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository(Type::class)->find($id);
+            $entity = $this->typeRepository->find($id);
 
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Type entity.');

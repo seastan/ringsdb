@@ -2,8 +2,9 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Repository\DecklistRepository;
+use AppBundle\Repository\DeckRepository;
 use AppBundle\Entity\Decklist;
-use AppBundle\Entity\Deck;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,9 +18,21 @@ class DeleteDecklistCommand extends Command {
      */
     private $em;
 
-    public function __construct(EntityManagerInterface $em) {
+    /**
+     * @var DeckRepository
+     */
+    private $deckRepository;
+
+    /**
+     * @var DecklistRepository
+     */
+    private $decklistRepository;
+
+    public function __construct(EntityManagerInterface $em, DeckRepository $deckRepository, DecklistRepository $decklistRepository) {
         parent::__construct();
         $this->em = $em;
+        $this->deckRepository = $deckRepository;
+        $this->decklistRepository = $decklistRepository;
     }
 
     /**
@@ -40,13 +53,13 @@ class DeleteDecklistCommand extends Command {
         $em = $this->em;
         
         $decklist_id = $input->getArgument('decklist_id');
-        $decklist = $em->getRepository(Decklist::class)->find($decklist_id);
+        $decklist = $this->decklistRepository->find($decklist_id);
         if (!$decklist) {
             $output->writeln("Decklist not found");
             return 1;
         }
         
-        $successors = $em->getRepository(Decklist::class)->findBy(array(
+        $successors = $this->decklistRepository->findBy(array(
             'precedent' => $decklist
         ));
         
@@ -55,7 +68,7 @@ class DeleteDecklistCommand extends Command {
             $successor->setPrecedent(null);
         }
         
-        $children = $em->getRepository(Deck::class)->findBy(array(
+        $children = $this->deckRepository->findBy(array(
             'parent' => $decklist
         ));
 
