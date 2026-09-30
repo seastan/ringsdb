@@ -2,6 +2,7 @@
 
 namespace AppBundle\Services;
 
+use AppBundle\Entity\Card;
 use AppBundle\Entity\Deck;
 use Doctrine\ORM\EntityManagerInterface;
 use AppBundle\Entity\Deckslot;
@@ -256,9 +257,7 @@ class Decks {
         $spheres = [];
 
         foreach ($content['main'] as $card_code => $qty) {
-            $card = $this->doctrine->getRepository('AppBundle:Card')->findOneBy([
-                "code" => $card_code
-            ]);
+            $card = $this->findCardByCode((string) $card_code);
 
             if (!$card) {
                 continue;
@@ -297,9 +296,7 @@ class Decks {
         }
 
         foreach ($content['side'] as $card_code => $qty) {
-            $card = $this->doctrine->getRepository('AppBundle:Card')->findOneBy([
-                "code" => $card_code
-            ]);
+            $card = $this->findCardByCode((string) $card_code);
 
             if (!$card) {
                 continue;
@@ -376,6 +373,9 @@ class Decks {
         }
 
         foreach ($content['main'] as $card_code => $qty) {
+            if (!isset($cards[$card_code])) {
+                continue;
+            }
             $card = $cards[$card_code];
             $slot = new Deckslot();
             $slot->setQuantity($qty);
@@ -385,6 +385,9 @@ class Decks {
         }
 
         foreach ($content['side'] as $card_code => $qty) {
+            if (!isset($cards[$card_code])) {
+                continue;
+            }
             $card = $cards[$card_code];
             $slot = new Decksideslot();
             $slot->setQuantity($qty);
@@ -400,6 +403,22 @@ class Decks {
 
 
     /**
+     * The card with this code, or else the canonical card of the printing with this image code:
+     * deck contents stored as JSON (quest log snapshots...) still use the codes of the cards
+     * merged by the card-printings migration.
+     */
+    private function findCardByCode(string $code): ?Card {
+        $card = $this->doctrine->getRepository('AppBundle:Card')->findOneBy(['code' => $code]);
+        if ($card) {
+            return $card;
+        }
+
+        $printing = $this->doctrine->getRepository('AppBundle:CardPrinting')->findOneBy(['imageCode' => $code]);
+
+        return $printing ? $printing->getCard() : null;
+    }
+
+    /**
      * @param mixed $deck
      * @param mixed $content
      * @return void
@@ -412,9 +431,7 @@ class Decks {
         $latestPack = null;
 
         foreach ($content['main'] as $card_code => $qty) {
-            $card = $this->doctrine->getRepository('AppBundle:Card')->findOneBy([
-                "code" => $card_code
-            ]);
+            $card = $this->findCardByCode((string) $card_code);
 
             if (!$card) {
                 continue;
@@ -432,9 +449,7 @@ class Decks {
         }
 
         foreach ($content['side'] as $card_code => $qty) {
-            $card = $this->doctrine->getRepository('AppBundle:Card')->findOneBy([
-                "code" => $card_code
-            ]);
+            $card = $this->findCardByCode((string) $card_code);
 
             if (!$card) {
                 continue;
@@ -462,6 +477,9 @@ class Decks {
         }
 
         foreach ($content['main'] as $card_code => $qty) {
+            if (!isset($cards[$card_code])) {
+                continue;
+            }
             $card = $cards[$card_code];
             $slot = new Deckslot();
             $slot->setQuantity($qty);
@@ -471,6 +489,9 @@ class Decks {
         }
 
         foreach ($content['side'] as $card_code => $qty) {
+            if (!isset($cards[$card_code])) {
+                continue;
+            }
             $card = $cards[$card_code];
             $slot = new Decksideslot();
             $slot->setQuantity($qty);

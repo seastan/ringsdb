@@ -253,6 +253,26 @@ class QuestlogWorkflowTest extends WebTestCase {
     }
 
     /**
+     * Snapshots stored before the card-printings migration can use the code of a merged card:
+     * 31031 is now a printing of card 17143 (Magic Ring). The lists build the snapshots.
+     */
+    public function testSnapshotWithTheCodeOfAMergedCard(): void {
+        $client = static::createClient();
+        $content = (string) $this->db($client)->fetchColumn('SELECT content FROM questlog_deck WHERE id = 1');
+        try {
+            $data = json_decode($content, true);
+            $data['main']['31031'] = 1;
+            $data['side']['99999'] = 1;
+            $this->db($client)->update('questlog_deck', ['content' => json_encode($data)], ['id' => 1]);
+
+            $client->request('GET', '/questlogs/recent');
+            $this->assertSame(200, $client->getResponse()->getStatusCode());
+        } finally {
+            $this->db($client)->update('questlog_deck', ['content' => $content], ['id' => 1]);
+        }
+    }
+
+    /**
      * The quest log keeps the cards that were posted, not the deck's current cards.
      */
     public function testLoggedContentIsKept(): void {
