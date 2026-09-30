@@ -3,8 +3,6 @@ parameters:
     paths:
         - src
     ignoreErrors:
-        # legacy code: the Doctrine collections have no generic types; to revisit after the migration
-        - identifier: missingType.generics
         # phpstan-doctrine: columns nullable in the database but typed non-null in the entities
         # (docblocks); making them nullable spreads to every caller of their getters. To fix with
         # the typed properties, see MIGRATION.md

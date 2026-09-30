@@ -470,7 +470,7 @@ class Questlog {
     /**
      * Get decks
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\QuestlogDeck>
      */
     public function getDecks() {
         return $this->decks;
@@ -502,7 +502,7 @@ class Questlog {
     /**
      * Get comments
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\QuestlogComment>
      */
     public function getComments() {
         return $this->comments;
@@ -578,7 +578,7 @@ class Questlog {
     /**
      * Get favorites
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     public function getFavorites() {
         return $this->favorites;
@@ -610,7 +610,7 @@ class Questlog {
     /**
      * Get votes
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     public function getVotes() {
         return $this->votes;

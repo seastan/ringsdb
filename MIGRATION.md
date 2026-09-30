@@ -85,7 +85,7 @@ Each removal reduces what has to be ported.
   migration".
 - **Time in tests** (`ClockInterface`): see "Tests and time".
 - **Static analysis** (`make phpstan`, level 8 of phpstan 2.2, see "Static analysis"): level 9,
-  the nullable columns typed non-null, the generic types; the analysis of the tests
+  the nullable columns typed non-null; the analysis of the tests
   (`phpstan-phpunit`, with PHPUnit 9).
 
 # Migration plan
@@ -223,15 +223,26 @@ Found by `phpstan-doctrine` and fixed:
 Left for later: the 49 columns nullable in the database but typed non-null in the entities
 (`doctrine.columnType`, ignored: making them nullable spreads to every caller of their getters; to
 fix with the typed properties); level 9 (1136 errors with phpstan 1.4, all about `mixed`: request
-parameters, query results, the `mixed` parameters of the level 6 docblocks) and the generic types
-of the other classes (`missingType.generics` is ignored; the collections of the entities are
-typed). Both are cheaper on the rewritten code.
+parameters, query results, the `mixed` parameters of the level 6 docblocks), cheaper on the
+rewritten code.
 
 The value types of the arrays are checked (`missingType.iterableValue`, 51 docblocks of `src/`):
 precise shapes where the structure is small and stable (the import parsers, the page links of
 the managers, the deck contents), `array<string, mixed>` for the large ones (the card infos, the
 SQL rows). Found on the way: the archive import tested a `content` its parsers always return (one
 deck per file, even empty: unchanged).
+
+The generic types are checked too (`missingType.generics`): the collections of the entities
+(`Collection<int, Deckslot>`...) and their getters, the paginators of the managers
+(`Paginator<Decklist>`), the forms (`AbstractType<Card>`, `FormInterface<Sphere>`), and
+`SlotCollectionInterface<T of SlotInterface>` (the slots of a deck, of a decklist...; the code
+that accepts any of them uses `SlotCollectionInterface<covariant SlotInterface>`). Once the
+elements were typed, phpstan found defensive code that could never run, removed: null checks on
+the sphere / type of a card, the author of a comment, the deck of a fellowship (all `NOT NULL`),
+the items of a paginator; `$cycle->getPacks()[0]` replaced by `first()` (seven places). And the
+guards of `SlotCollectionDecorator` against slots without a card (commit `4a245da8`, for the
+quest log snapshots): a slot cannot have no card (`setCard()` takes a `Card`), the actual crash
+was in `Decks::setSlots()`, fixed (see "Quest logs").
 
 ## Environment
 
@@ -694,6 +705,10 @@ directly.
 - Checking "public" sets `is_public` and `date_publish` (on every save of a public quest log).
 - Refused: no deck (`422`), a deck without content ("Cannot save a questlog with an empty
   deck", `200`), unknown scenario (`404`).
+- Fixed: the quest log lists rebuild the decks from the logged content
+  (`QuestLogController::setSnapshot()`, `Decks::setSlots()`): a card of the content missing from
+  the database (e.g. not imported yet) made the page fail (undefined offset, then a `TypeError`
+  on `setCard(null)`). It is now skipped (`testUnknownCardOfTheLoggedContentIsSkipped`).
 - A quest log with votes, favorites or comments keeps its decks and visibility (the "public"
   checkbox is disabled); the other fields can still change. It cannot be deleted.
 - Another user's deck requires them to share their decks and is cloned; a decklist needs no

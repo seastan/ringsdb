@@ -205,7 +205,7 @@ class CardPrintingController extends AbstractController {
 
     /**
      * @param mixed $id
-     * @return \Symfony\Component\Form\FormInterface
+     * @return \Symfony\Component\Form\FormInterface<mixed>
      */
     private function createDeleteForm($id) {
         return $this->createFormBuilder(['id' => $id])

@@ -58,7 +58,7 @@ class TypeController extends AbstractController {
      *
      * @param Type $entity The entity
      *
-     * @return \Symfony\Component\Form\FormInterface The form
+     * @return \Symfony\Component\Form\FormInterface<Type> The form
      */
     private function createCreateForm(Type $entity) {
         $form = $this->createForm(TypeType::class, $entity, [
@@ -137,7 +137,7 @@ class TypeController extends AbstractController {
      *
      * @param Type $entity The entity
      *
-     * @return \Symfony\Component\Form\FormInterface The form
+     * @return \Symfony\Component\Form\FormInterface<Type> The form
      */
     private function createEditForm(Type $entity) {
         $form = $this->createForm(TypeType::class, $entity, [
@@ -212,7 +212,7 @@ class TypeController extends AbstractController {
      *
      * @param mixed $id The entity id
      *
-     * @return \Symfony\Component\Form\FormInterface The form
+     * @return \Symfony\Component\Form\FormInterface<mixed> The form
      */
     private function createDeleteForm($id) {
         return $this->createFormBuilder()

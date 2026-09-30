@@ -138,7 +138,8 @@ class DecklistManager {
 	}
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @param \Doctrine\ORM\Query<mixed, \AppBundle\Entity\Decklist> $query
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Decklist>
      */
     private function getPaginator(Query $query) {
         $paginator = new Paginator($query, $fetchJoinCollection = false);
@@ -148,7 +149,7 @@ class DecklistManager {
     }
 
     /**
-     * @return \Doctrine\Common\Collections\ArrayCollection
+     * @return \Doctrine\Common\Collections\ArrayCollection<int, \AppBundle\Entity\Decklist>
      */
     public function getEmptyList() {
         $this->maxcount = 0;
@@ -157,7 +158,7 @@ class DecklistManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Decklist>
      */
     public function findDecklistsByPopularity() {
         $qb = $this->getQueryBuilder();
@@ -171,7 +172,7 @@ class DecklistManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Decklist>
      */
     public function findDecklistsByAge() {
         $qb = $this->getQueryBuilder();
@@ -185,7 +186,7 @@ class DecklistManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Decklist>
      */
     public function findDecklistsByRecentDiscussion() {
         $qb = $this->getQueryBuilder();
@@ -199,7 +200,7 @@ class DecklistManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Decklist>
      */
     public function findDecklistsByFavorite(User $user) {
         $qb = $this->getQueryBuilder();
@@ -216,7 +217,7 @@ class DecklistManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Decklist>
      */
     public function findDecklistsByAuthor(User $user) {
         $qb = $this->getQueryBuilder();
@@ -232,7 +233,7 @@ class DecklistManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Decklist>
      */
     public function findDecklistsInHallOfFame() {
         $qb = $this->getQueryBuilder();
@@ -247,7 +248,7 @@ class DecklistManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Decklist>
      */
     public function findDecklistsInHotTopic() {
         $qb = $this->getQueryBuilder();
@@ -263,7 +264,7 @@ class DecklistManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Decklist>
      */
     public function findDecklistsWithComplexSearch() {
         $request = $this->currentRequest();

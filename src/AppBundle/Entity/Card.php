@@ -126,7 +126,7 @@ class Card {
     /**
      * Get printings
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\CardPrinting>
      */
     public function getPrintings() {
         return $this->printings;
@@ -610,7 +610,7 @@ class Card {
     /**
      * Get reviews
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Review>
      */
     public function getReviews() {
         return $this->reviews;

@@ -288,6 +288,25 @@ class QuestlogWorkflowTest extends WebTestCase {
         $this->assertSame('Untitled Questlog', $this->fetchQuestlog($client, $id)['name']);
     }
 
+    /**
+     * The lists of quest logs rebuild their decks from the logged content (setSnapshot): a card of
+     * the content missing from the database (e.g. a card not imported yet) is skipped, instead of
+     * failing the page.
+     */
+    public function testUnknownCardOfTheLoggedContentIsSkipped(): void {
+        $client = $this->createAuthenticatedClient();
+        list(, $form) = $this->newForm($client);
+        $form['quest'] = '1';
+        $played = json_encode(['main' => ['01001' => 1, '99999' => 2], 'side' => ['99998' => 1]]);
+        self::selectDecks($form, [1 => [1, false, $played]]);
+        $client->submit($form);
+        $id = $this->questlogIdFromRedirect($client);
+
+        $client->request('GET', '/myquestlogs');
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+    }
+
     public function testInvalidValuesAreReplacedByDefaults(): void {
         $client = $this->createAuthenticatedClient();
         list(, $form) = $this->newForm($client);

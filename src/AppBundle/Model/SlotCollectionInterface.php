@@ -4,12 +4,16 @@ namespace AppBundle\Model;
 
 /**
  * Interface for a collection of SlotInterface
+ *
+ * @template T of SlotInterface
+ * @extends \IteratorAggregate<int, T>
+ * @extends \ArrayAccess<int, T>
  */
 interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \ArrayAccess {
     /**
      * Add a slot
      *
-     * @param SlotInterface $element
+     * @param T $element
      * @return bool
      */
     public function add($element);
@@ -17,7 +21,7 @@ interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \Array
     /**
      * Remove a slot
      *
-     * @param SlotInterface $element
+     * @param T $element
      * @return bool
      */
     public function removeElement($element);
@@ -25,7 +29,7 @@ interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \Array
     /**
      * Get the underlying collection of slots
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, T>
      */
     public function getSlots();
 
@@ -46,7 +50,7 @@ interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \Array
     /**
      * Get all slots sorted by type code
      *
-     * @return array<string, list<SlotInterface>>
+     * @return array<string, list<T>>
      */
     public function getSlotsByType();
 
@@ -68,14 +72,14 @@ interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \Array
     /**
      * Get the hero deck
      *
-     * @return \AppBundle\Model\SlotCollectionInterface
+     * @return \AppBundle\Model\SlotCollectionInterface<T>
      */
     public function getHeroDeck();
 
     /**
      * Get the draw deck
      *
-     * @return \AppBundle\Model\SlotCollectionInterface
+     * @return \AppBundle\Model\SlotCollectionInterface<T>
      */
     public function getDrawDeck();
 

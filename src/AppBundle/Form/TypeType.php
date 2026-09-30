@@ -6,9 +6,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<\AppBundle\Entity\Type>
+ */
 class TypeType extends AbstractType {
     /**
-     * @param FormBuilderInterface $builder
+     * @param FormBuilderInterface<\AppBundle\Entity\Type|null> $builder
      * @param array<string, mixed> $options
      * @return void
      */

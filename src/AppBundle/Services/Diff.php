@@ -27,14 +27,14 @@ class Diff {
      * Computes the diff between a list of SlotCollectionInterface
      * Mutates its arguments by removing the intersection from them
      *
-     * @param SlotCollectionInterface[] $list_slots
-     * @return SlotCollectionInterface $intersection
+     * @param array<int, SlotCollectionInterface<covariant \AppBundle\Model\SlotInterface>> $list_slots
+     * @return SlotCollectionInterface<Deckslot> $intersection
      */
     public function getSlotsDiff($list_slots) {
         // list of all the codes found in every slots
         $cardCodes = [];
 
-        /* @var $slots SlotCollectionInterface */
+        /* @var $slots SlotCollectionInterface<covariant \AppBundle\Model\SlotInterface> */
         foreach ($list_slots as $slots) {
             /* @var $slot SlotInterface */
             foreach ($slots as $slot) {
@@ -82,6 +82,11 @@ class Diff {
             // we need to find the minimum quantity among all SlotCollections
             $minimum = (count($quantities) > 0) ? min($quantities) : 0;
 
+            // found in every slots (the occurrence count above)
+            if ($card === null) {
+                continue;
+            }
+
             // we create a slot for this
             $slot = new Deckslot();
             $slot->setCard($card);
@@ -93,7 +98,9 @@ class Diff {
             // then we remove that many cards from every SlotCollection
             foreach ($indexes as $j => $index) {
                 $slot = $list_slots[$j][$index];
-                $slot->setQuantity($slot->getQuantity() - $minimum);
+                if ($slot !== null) {
+                    $slot->setQuantity($slot->getQuantity() - $minimum);
+                }
             }
         }
 

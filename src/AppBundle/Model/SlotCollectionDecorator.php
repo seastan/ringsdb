@@ -6,13 +6,19 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Decorator for a collection of SlotInterface
+ *
+ * @template T of SlotInterface
+ * @implements SlotCollectionInterface<T>
  */
 class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterface {
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection<int, T>
      */
     protected $slots;
 
+    /**
+     * @param \Doctrine\Common\Collections\Collection<int, T> $slots
+     */
     public function __construct(\Doctrine\Common\Collections\Collection $slots) {
         $this->slots = $slots;
     }
@@ -65,7 +71,6 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
         $packs = [];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if (!$card) continue;
             $pack = $card->getPack();
             if (!$pack) continue;
 
@@ -101,7 +106,6 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
         $slotsByType = ['hero' => [], 'ally' => [], 'attachment' => [], 'event' => [], 'player-side-quest' => [], 'player-objective' => [], 'contract' => [], 'treasure' => []];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if (!$card || !$card->getType()) continue;
             if (array_key_exists($card->getType()->getCode(), $slotsByType)) {
                 $slotsByType[$card->getType()->getCode()][] = $slot;
             }
@@ -114,7 +118,6 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
         $countByType = ['hero' => 0, 'ally' => 0, 'attachment' => 0, 'event' => 0, 'player-side-quest' => 0, 'player-objective' => 0, 'contract' => 0, 'treasure' => 0];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if (!$card || !$card->getType()) continue;
             if (array_key_exists($card->getType()->getCode(), $countByType)) {
                 $countByType[$card->getType()->getCode()] += $slot->getQuantity();
             }
@@ -127,7 +130,6 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
         $countBySphere = ['spirit' => 0, 'tactics' => 0, 'leadership' => 0, 'lore' => 0];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if (!$card || !$card->getSphere()) continue;
             if (array_key_exists($card->getSphere()->getCode(), $countBySphere)) {
                 $countBySphere[$card->getSphere()->getCode()] += $slot->getQuantity();
             }
@@ -140,7 +142,7 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
         $heroDeck = [];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if ($card && $card->getType() && $card->getType()->getCode() === 'hero') {
+            if ($card->getType()->getCode() === 'hero') {
                 $heroDeck[] = $slot;
             }
         }
@@ -152,7 +154,7 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
         $drawDeck = [];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if ($card && $card->getType() && in_array($card->getType()->getCode(), ['ally', 'attachment', 'event', 'player-side-quest', 'player-objective', 'contract', 'treasure'])) {
+            if (in_array($card->getType()->getCode(), ['ally', 'attachment', 'event', 'player-side-quest', 'player-objective', 'contract', 'treasure'])) {
                 $drawDeck[] = $slot;
             }
         }
@@ -207,7 +209,6 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
         $copiesAndDeckLimit = [];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if (!$card || !$card->getType()) continue;
             $cardName = $card->getName();
 
             if ($card->getType()->getCode() === 'hero') {

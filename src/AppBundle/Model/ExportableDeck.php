@@ -47,12 +47,12 @@ abstract class ExportableDeck {
     abstract public function getLastPack();
 
     /**
-     * @return \AppBundle\Model\SlotCollectionInterface
+     * @return \AppBundle\Model\SlotCollectionInterface<covariant \AppBundle\Model\SlotInterface>
      */
     abstract public function getSlots();
 
     /**
-     * @return \AppBundle\Model\SlotCollectionInterface
+     * @return \AppBundle\Model\SlotCollectionInterface<covariant \AppBundle\Model\SlotInterface>
      */
     abstract public function getSideslots();
 

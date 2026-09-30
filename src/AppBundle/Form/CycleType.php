@@ -7,6 +7,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
+/**
+ * @extends AbstractType<\AppBundle\Entity\Cycle>
+ */
 class CycleType extends AbstractType {
     /**
      * @return void

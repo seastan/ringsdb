@@ -435,7 +435,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Get slots
      *
-     * @return \AppBundle\Model\SlotCollectionInterface
+     * @return \AppBundle\Model\SlotCollectionInterface<Deckslot>
      */
     public function getSlots() {
         return new \AppBundle\Model\SlotCollectionDecorator($this->slots);
@@ -467,7 +467,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Get sideslots
      *
-     * @return \AppBundle\Model\SlotCollectionInterface
+     * @return \AppBundle\Model\SlotCollectionInterface<Decksideslot>
      */
     public function getSideslots() {
         return new \AppBundle\Model\SlotCollectionDecorator($this->sideslots);
@@ -499,7 +499,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Get children
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Decklist>
      */
     public function getChildren() {
         return $this->children;
@@ -531,7 +531,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Get changes
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Deckchange>
      */
     public function getChanges() {
         return $this->changes;
@@ -685,7 +685,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Get fellowships
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\FellowshipDeck>
      */
     public function getFellowships() {
         return $this->fellowships;
@@ -694,7 +694,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Get allFellowships
      *
-     * @return array<int, FellowshipDeck>
+     * @return array<int, FellowshipDeck|FellowshipDecklist>
      */
     public function getAllFellowships() {
         $childrenFellowships = $this->getFellowships()->toArray();
@@ -737,7 +737,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Get questlogs
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\QuestlogDeck>
      */
     public function getQuestlogs() {
         return $this->questlogs;

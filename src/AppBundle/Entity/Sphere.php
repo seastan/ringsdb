@@ -158,7 +158,7 @@ class Sphere {
     /**
      * Get cards
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Card>
      */
     public function getCards() {
         return $this->cards;

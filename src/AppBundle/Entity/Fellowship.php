@@ -367,7 +367,7 @@ class Fellowship {
     /**
      * Get decks
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\FellowshipDeck>
      */
     public function getDecks() {
         return $this->decks;
@@ -399,7 +399,7 @@ class Fellowship {
     /**
      * Get decklists
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\FellowshipDecklist>
      */
     public function getDecklists() {
         return $this->decklists;
@@ -431,7 +431,7 @@ class Fellowship {
     /**
      * Get comments
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\FellowshipComment>
      */
     public function getComments() {
         return $this->comments;
@@ -485,7 +485,7 @@ class Fellowship {
     /**
      * Get favorites
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     public function getFavorites() {
         return $this->favorites;
@@ -517,7 +517,7 @@ class Fellowship {
     /**
      * Get votes
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     public function getVotes() {
         return $this->votes;

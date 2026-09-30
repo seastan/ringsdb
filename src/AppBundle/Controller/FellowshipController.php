@@ -479,6 +479,7 @@ class FellowshipController extends AbstractController {
             return $this->redirect($this->generateUrl('fellowship_view', [ 'fellowship_id' => $fellowship->getId() ]));
         }
 
+        /** @var array<string, mixed> $data */
         $data = [
             'pagetitle' => "Publish Fellowship",
             'deck1' => null,
@@ -770,11 +771,11 @@ class FellowshipController extends AbstractController {
         foreach ($list_cycles as $cycle) {
             /* @var $cycle \AppBundle\Entity\Cycle */
             $size = count($cycle->getPacks());
-            if ($cycle->getPosition() == 0 || $size == 0) {
+            $first_pack = $cycle->getPacks()->first();
+            if ($cycle->getPosition() == 0 || $first_pack === false) {
                 continue;
             }
 
-            $first_pack = $cycle->getPacks()[0];
             if ($size === 1 && $first_pack->getName() == $cycle->getName()) {
                 $checked = count($packs) ? in_array($first_pack->getId(), $packs) : true;
                 if ($checked) {
@@ -874,11 +875,11 @@ class FellowshipController extends AbstractController {
         foreach ($list_cycles as $cycle) {
             /* @var $cycle \AppBundle\Entity\Cycle */
             $size = count($cycle->getPacks());
-            if ($cycle->getPosition() == 0 || $size == 0) {
+            $first_pack = $cycle->getPacks()->first();
+            if ($cycle->getPosition() == 0 || $first_pack === false) {
                 continue;
             }
 
-            $first_pack = $cycle->getPacks()[0];
             if ($size === 1 && $first_pack->getName() == $cycle->getName()) {
                 $checked = count($packs) ? in_array($first_pack->getId(), $packs) : true;
 
@@ -1008,9 +1009,6 @@ class FellowshipController extends AbstractController {
 
             foreach ($decks as $deck) {
                 /* @var $deck \AppBundle\Entity\Deck */
-                if (!$deck) {
-                    continue;
-                }
 
                 if ($octgn) {
                     $extension = 'o8d';
@@ -1160,7 +1158,7 @@ class FellowshipController extends AbstractController {
             foreach ($fellowship->getComments() as $comment) {
                 /* @var $comment \AppBundle\Entity\FellowshipComment */
                 $commenter = $comment->getUser();
-                if ($commenter && $commenter->getIsNotifCommenter()) {
+                if ($commenter->getIsNotifCommenter()) {
                     if (!isset($spool[$commenter->getEmail()])) {
                         $spool[$commenter->getEmail()] = 'AppBundle:Emails:newfellowshipcomment_commenter.html.twig';
                     }

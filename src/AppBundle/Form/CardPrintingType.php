@@ -9,6 +9,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
+/**
+ * @extends AbstractType<\AppBundle\Entity\CardPrinting>
+ */
 class CardPrintingType extends AbstractType {
     /**
      * @return void

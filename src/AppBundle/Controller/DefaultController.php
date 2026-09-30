@@ -212,24 +212,20 @@ class DefaultController extends AbstractController {
         for ($i = 0; $i < min($num_comments,count($decklists_recent_discussion)); $i++) {
             $decklist = $decklists_recent_discussion[$i];
             $comment = [];
-            if ($decklist) {
-                $lastcomment = $decklist->getComments()->last();
-                if ($lastcomment) {
-                    if ($lastcomment->getIsHidden()) {
-                        continue;
-                    }
-                    $comment['type'] = 'decklist';
-                    $comment['decklist'] = $decklist;
-                    $comment['user'] = $lastcomment->getUser();
-                    $comment['dateCreation'] = $lastcomment->getDateCreation();
-                    $comment['text'] = $lastcomment->getText();
-                } else {
+            $lastcomment = $decklist->getComments()->last();
+            if ($lastcomment) {
+                if ($lastcomment->getIsHidden()) {
                     continue;
                 }
+                $comment['type'] = 'decklist';
+                $comment['decklist'] = $decklist;
+                $comment['user'] = $lastcomment->getUser();
+                $comment['dateCreation'] = $lastcomment->getDateCreation();
+                $comment['text'] = $lastcomment->getText();
+            } else {
+                continue;
             }
-            if ($comment) {
-                $all_comments[] = $comment;
-            }
+            $all_comments[] = $comment;
         }
         // Recent fellowship comments
         $fellowship_manager->setLimit($num_comments);
@@ -238,21 +234,17 @@ class DefaultController extends AbstractController {
         for ($i = 0; $i < min($num_comments,count($fellowships_recent_discussion)); $i++) {
             $fellowship = $fellowships_recent_discussion[$i];
             $comment = [];
-            if ($fellowship) {
-                $lastcomment = $fellowship->getComments()->last();
-                if ($lastcomment) {
-                    $comment['type'] = 'fellowship';
-                    $comment['fellowship'] = $fellowship;
-                    $comment['user'] = $lastcomment->getUser();
-                    $comment['dateCreation'] = $lastcomment->getDateCreation();
-                    $comment['text'] = $lastcomment->getText();
-                } else {
-                    continue;
-                }
+            $lastcomment = $fellowship->getComments()->last();
+            if ($lastcomment) {
+                $comment['type'] = 'fellowship';
+                $comment['fellowship'] = $fellowship;
+                $comment['user'] = $lastcomment->getUser();
+                $comment['dateCreation'] = $lastcomment->getDateCreation();
+                $comment['text'] = $lastcomment->getText();
+            } else {
+                continue;
             }
-            if ($comment) {
-                $all_comments[] = $comment;
-            }
+            $all_comments[] = $comment;
         }
         // Get recent card reviews
         $dql = "SELECT DISTINCT r FROM AppBundle:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC, r.id DESC";

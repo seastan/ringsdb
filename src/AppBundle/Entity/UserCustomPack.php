@@ -125,7 +125,7 @@ class UserCustomPack {
     public function setUpdatedAt($updatedAt) { $this->updatedAt = $updatedAt; return $this; }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\UserCustomPackCard>
      */
     public function getCards() { return $this->cards; }
 

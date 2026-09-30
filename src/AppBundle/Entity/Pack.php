@@ -273,7 +273,7 @@ class Pack {
     /**
      * Get printings
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\CardPrinting>
      */
     public function getPrintings() {
         return $this->printings;

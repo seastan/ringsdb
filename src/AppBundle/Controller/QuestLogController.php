@@ -766,11 +766,11 @@ class QuestLogController extends AbstractController {
         foreach ($list_cycles as $cycle) {
             /* @var $cycle \AppBundle\Entity\Cycle */
             $size = count($cycle->getPacks());
-            if ($cycle->getPosition() == 0 || $size == 0) {
+            $first_pack = $cycle->getPacks()->first();
+            if ($cycle->getPosition() == 0 || $first_pack === false) {
                 continue;
             }
 
-            $first_pack = $cycle->getPacks()[0];
             if ($size === 1 && $first_pack->getName() == $cycle->getName()) {
                 $checked = count($packs) ? in_array($first_pack->getId(), $packs) : true;
                 if ($checked) {
@@ -869,11 +869,11 @@ class QuestLogController extends AbstractController {
         foreach ($list_cycles as $cycle) {
             /* @var $cycle \AppBundle\Entity\Cycle */
             $size = count($cycle->getPacks());
-            if ($cycle->getPosition() == 0 || $size == 0) {
+            $first_pack = $cycle->getPacks()->first();
+            if ($cycle->getPosition() == 0 || $first_pack === false) {
                 continue;
             }
 
-            $first_pack = $cycle->getPacks()[0];
             if ($size === 1 && $first_pack->getName() == $cycle->getName()) {
                 $checked = count($packs) ? in_array($first_pack->getId(), $packs) : true;
 
@@ -1194,7 +1194,7 @@ class QuestLogController extends AbstractController {
             foreach ($questlog->getComments() as $comment) {
                 /* @var $comment \AppBundle\Entity\QuestlogComment */
                 $commenter = $comment->getUser();
-                if ($commenter && $commenter->getIsNotifCommenter()) {
+                if ($commenter->getIsNotifCommenter()) {
                     if (!isset($spool[$commenter->getEmail()])) {
                         $spool[$commenter->getEmail()] = 'AppBundle:Emails:newquestlogcomment_commenter.html.twig';
                     }

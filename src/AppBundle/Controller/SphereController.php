@@ -59,7 +59,7 @@ class SphereController extends AbstractController {
      *
      * @param Sphere $entity The entity
      *
-     * @return \Symfony\Component\Form\FormInterface The form
+     * @return \Symfony\Component\Form\FormInterface<Sphere> The form
      */
     private function createCreateForm(Sphere $entity) {
         $form = $this->createForm(SphereType::class, $entity, array(
@@ -138,7 +138,7 @@ class SphereController extends AbstractController {
     *
     * @param Sphere $entity The entity
     *
-    * @return \Symfony\Component\Form\FormInterface The form
+    * @return \Symfony\Component\Form\FormInterface<Sphere> The form
     */
     private function createEditForm(Sphere $entity) {
         $form = $this->createForm(SphereType::class, $entity, array(
@@ -213,7 +213,7 @@ class SphereController extends AbstractController {
      *
      * @param mixed $id The entity id
      *
-     * @return \Symfony\Component\Form\FormInterface The form
+     * @return \Symfony\Component\Form\FormInterface<mixed> The form
      */
     private function createDeleteForm($id) {
         return $this->createFormBuilder()

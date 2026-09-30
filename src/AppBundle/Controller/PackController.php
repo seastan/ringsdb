@@ -179,7 +179,7 @@ class PackController extends AbstractController {
      *
      * @param mixed $id The entity id
      *
-     * @return \Symfony\Component\Form\FormInterface The form
+     * @return \Symfony\Component\Form\FormInterface<mixed> The form
      */
     private function createDeleteForm($id) {
         return $this->createFormBuilder(array('id' => $id))

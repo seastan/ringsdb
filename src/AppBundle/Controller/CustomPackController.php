@@ -189,8 +189,8 @@ class CustomPackController extends AbstractController {
                 $cards[] = [
                     'card_code' => $card->getCode(),
                     'card_name' => $card->getName(),
-                    'sphere_code' => $sphere ? $sphere->getCode() : 'neutral',
-                    'type_name' => $type ? $type->getName() : null,
+                    'sphere_code' => $sphere->getCode(),
+                    'type_name' => $type->getName(),
                     'quantity' => $entry->getQuantity(),
                 ];
             }
@@ -271,7 +271,7 @@ class CustomPackController extends AbstractController {
                 $cards[] = [
                     'card_code' => $card->getCode(),
                     'card_name' => $card->getName(),
-                    'type_code' => $card->getType() ? $card->getType()->getCode() : null,
+                    'type_code' => $card->getType()->getCode(),
                     'quantity' => $entry->getQuantity(),
                 ];
             }

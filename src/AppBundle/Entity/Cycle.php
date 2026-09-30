@@ -236,7 +236,7 @@ class Cycle {
     /**
      * Get packs
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Pack>
      */
     public function getPacks() {
         return $this->packs;

@@ -125,7 +125,8 @@ class QuestLogManager {
      * creates the paginator around the query
      *
      * @param Query $query
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @param \Doctrine\ORM\Query<mixed, \AppBundle\Entity\Questlog> $query
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Questlog>
      */
     private function getPaginator(Query $query) {
         $paginator = new Paginator($query, $fetchJoinCollection = false);
@@ -135,7 +136,7 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\Common\Collections\ArrayCollection
+     * @return \Doctrine\Common\Collections\ArrayCollection<int, \AppBundle\Entity\Questlog>
      */
     public function getEmptyList() {
         $this->maxcount = 0;
@@ -144,7 +145,7 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Questlog>
      */
     public function findQuestLogsByPopularity() {
         $qb = $this->getQueryBuilder();
@@ -158,7 +159,7 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Questlog>
      */
     public function findQuestLogsByAge() {
         $qb = $this->getQueryBuilder();
@@ -172,7 +173,7 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Questlog>
      */
     public function findQuestLogsByFavorite(User $user) {
         $qb = $this->getQueryBuilder();
@@ -189,7 +190,7 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Questlog>
      */
     public function findQuestLogsByAuthor(User $user) {
         $qb = $this->getQueryBuilder();
@@ -205,7 +206,7 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Questlog>
      */
     public function findQuestLogsInHallOfFame() {
         $qb = $this->getQueryBuilder();
@@ -220,7 +221,7 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Questlog>
      */
     public function findQuestLogsInHotTopic() {
         $qb = $this->getQueryBuilder();
@@ -236,7 +237,7 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Questlog>
      */
     public function findQuestLogsWithComplexSearch() {
         $request = $this->currentRequest();

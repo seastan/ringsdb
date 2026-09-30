@@ -7,9 +7,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
+/**
+ * @extends AbstractType<\AppBundle\Entity\Scenario>
+ */
 class ScenarioType extends AbstractType {
     /**
-     * @param FormBuilderInterface $builder
+     * @param FormBuilderInterface<\AppBundle\Entity\Scenario|null> $builder
      * @param array<string, mixed> $options
      * @return void
      */

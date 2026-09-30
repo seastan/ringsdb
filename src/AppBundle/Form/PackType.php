@@ -8,6 +8,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
+/**
+ * @extends AbstractType<\AppBundle\Entity\Pack>
+ */
 class PackType extends AbstractType {
     /**
      * @return void

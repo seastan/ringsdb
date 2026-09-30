@@ -179,7 +179,7 @@ class CycleController extends AbstractController {
      *
      * @param mixed $id The entity id
      *
-     * @return \Symfony\Component\Form\FormInterface The form
+     * @return \Symfony\Component\Form\FormInterface<mixed> The form
      */
     private function createDeleteForm($id) {
         return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();

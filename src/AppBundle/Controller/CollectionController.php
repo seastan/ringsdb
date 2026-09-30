@@ -56,12 +56,12 @@ class CollectionController extends AbstractController {
 
         foreach ($list_cycles as $cycle) {
             $size = count($cycle->getPacks());
+            $first_pack = $cycle->getPacks()->first();
 
-            if ($cycle->getPosition() == 0 || $size == 0) {
+            if ($cycle->getPosition() == 0 || $first_pack === false) {
                 continue;
             }
 
-            $first_pack = $cycle->getPacks()[0];
             if ($size === 1 && $first_pack->getName() == $cycle->getName()) {
                 if ($first_pack->getIsRepackaged()) {
                     $repackaged["packs"][] = $entryOf($first_pack);

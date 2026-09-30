@@ -416,7 +416,7 @@ class User extends BaseUser {
     /**
      * Get decks
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Deck>
      */
     public function getDecks() {
         return $this->decks;
@@ -448,7 +448,7 @@ class User extends BaseUser {
     /**
      * Get decklists
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Decklist>
      */
     public function getDecklists() {
         return $this->decklists;
@@ -480,7 +480,7 @@ class User extends BaseUser {
     /**
      * Get comments
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Comment>
      */
     public function getComments() {
         return $this->comments;
@@ -512,7 +512,7 @@ class User extends BaseUser {
     /**
      * Get reviews
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Review>
      */
     public function getReviews() {
         return $this->reviews;
@@ -546,7 +546,7 @@ class User extends BaseUser {
     /**
      * Get favorites
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Decklist>
      */
     public function getFavorites() {
         return $this->favorites;
@@ -580,7 +580,7 @@ class User extends BaseUser {
     /**
      * Get votes
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Decklist>
      */
     public function getVotes() {
         return $this->votes;
@@ -612,7 +612,7 @@ class User extends BaseUser {
     /**
      * Get reviewvotes
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Review>
      */
     public function getReviewvotes() {
         return $this->reviewvotes;
@@ -653,7 +653,7 @@ class User extends BaseUser {
     /**
      * Get following
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     public function getFollowing() {
         return $this->following;
@@ -685,7 +685,7 @@ class User extends BaseUser {
     /**
      * Get followers
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     public function getFollowers() {
         return $this->followers;
@@ -775,7 +775,7 @@ class User extends BaseUser {
     /**
      * Get fellowships
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Fellowship>
      */
     public function getFellowships() {
         return $this->fellowships;
@@ -836,7 +836,7 @@ class User extends BaseUser {
     /**
      * Get fellowshipComments
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\FellowshipComment>
      */
     public function getFellowshipComments() {
         return $this->fellowship_comments;
@@ -868,7 +868,7 @@ class User extends BaseUser {
     /**
      * Get fellowshipFavorites
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Fellowship>
      */
     public function getFellowshipFavorites() {
         return $this->fellowship_favorites;
@@ -900,7 +900,7 @@ class User extends BaseUser {
     /**
      * Get fellowshipVotes
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Fellowship>
      */
     public function getFellowshipVotes() {
         return $this->fellowship_votes;
@@ -941,7 +941,7 @@ class User extends BaseUser {
     /**
      * Get questlogs
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Questlog>
      */
     public function getQuestlogs() {
         return $this->questlogs;
@@ -973,7 +973,7 @@ class User extends BaseUser {
     /**
      * Get questlogComments
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\QuestlogComment>
      */
     public function getQuestlogComments() {
         return $this->questlog_comments;
@@ -1014,7 +1014,7 @@ class User extends BaseUser {
     /**
      * Get questlogFavorites
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Questlog>
      */
     public function getQuestlogFavorites() {
         return $this->questlog_favorites;
@@ -1046,7 +1046,7 @@ class User extends BaseUser {
     /**
      * Get questlogVotes
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Questlog>
      */
     public function getQuestlogVotes() {
         return $this->questlog_votes;

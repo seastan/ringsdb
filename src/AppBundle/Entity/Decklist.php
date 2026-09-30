@@ -429,7 +429,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get slots
      *
-     * @return \AppBundle\Model\SlotCollectionInterface
+     * @return \AppBundle\Model\SlotCollectionInterface<Decklistslot>
      */
     public function getSlots() {
         return new \AppBundle\Model\SlotCollectionDecorator($this->slots);
@@ -461,7 +461,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get slots
      *
-     * @return \AppBundle\Model\SlotCollectionInterface
+     * @return \AppBundle\Model\SlotCollectionInterface<Decklistsideslot>
      */
     public function getSideslots() {
         return new \AppBundle\Model\SlotCollectionDecorator($this->sideslots);
@@ -493,7 +493,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get comments
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Comment>
      */
     public function getComments() {
         return $this->comments;
@@ -525,7 +525,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get successors
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Decklist>
      */
     public function getSuccessors() {
         return $this->successors;
@@ -557,7 +557,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get children
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Deck>
      */
     public function getChildren() {
         return $this->children;
@@ -677,7 +677,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get favorites
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     public function getFavorites() {
         return $this->favorites;
@@ -709,7 +709,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get votes
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     public function getVotes() {
         return $this->votes;
@@ -770,7 +770,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get spheres
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Sphere>
      */
     public function getSpheres() {
         return $this->spheres;
@@ -834,7 +834,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get fellowships
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\FellowshipDecklist>
      */
     public function getFellowships() {
         return $this->fellowships;
@@ -910,7 +910,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get questlogs
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\QuestlogDeck>
      */
     public function getQuestlogs() {
         return $this->questlogs;

@@ -125,7 +125,8 @@ class FellowshipManager {
      * creates the paginator around the query
      *
      * @param Query $query
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @param \Doctrine\ORM\Query<mixed, \AppBundle\Entity\Fellowship> $query
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Fellowship>
      */
     private function getPaginator(Query $query) {
         $paginator = new Paginator($query, $fetchJoinCollection = false);
@@ -135,7 +136,7 @@ class FellowshipManager {
     }
 
     /**
-     * @return \Doctrine\Common\Collections\ArrayCollection
+     * @return \Doctrine\Common\Collections\ArrayCollection<int, \AppBundle\Entity\Fellowship>
      */
     public function getEmptyList() {
         $this->maxcount = 0;
@@ -144,7 +145,7 @@ class FellowshipManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Fellowship>
      */
     public function findFellowshipsByPopularity() {
         $qb = $this->getQueryBuilder();
@@ -158,7 +159,7 @@ class FellowshipManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Fellowship>
      */
     public function findFellowshipsByAge() {
         $qb = $this->getQueryBuilder();
@@ -172,7 +173,7 @@ class FellowshipManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Fellowship>
      */
     public function findFellowshipsByRecentDiscussion() {
         $qb = $this->getQueryBuilder();
@@ -187,7 +188,7 @@ class FellowshipManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Fellowship>
      */
     public function findFellowshipsByFavorite(User $user) {
         $qb = $this->getQueryBuilder();
@@ -204,7 +205,7 @@ class FellowshipManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Fellowship>
      */
     public function findFellowshipsByAuthor(User $user) {
         $qb = $this->getQueryBuilder();
@@ -220,7 +221,7 @@ class FellowshipManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Fellowship>
      */
     public function findFellowshipsInHallOfFame() {
         $qb = $this->getQueryBuilder();
@@ -235,7 +236,7 @@ class FellowshipManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Fellowship>
      */
     public function findFellowshipsInHotTopic() {
         $qb = $this->getQueryBuilder();
@@ -251,7 +252,7 @@ class FellowshipManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\AppBundle\Entity\Fellowship>
      */
     public function findFellowshipsWithComplexSearch() {
         $request = $this->currentRequest();

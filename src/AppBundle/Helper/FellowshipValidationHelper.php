@@ -21,7 +21,7 @@ class FellowshipValidationHelper {
             $deck = $fellowship_deck->getDeck();
 
             foreach ($deck->getSlots()->getHeroDeck() as &$hero) {
-                /* @var $hero \AppBundle\Model\SlotCollectionInterface */
+                /* @var $hero \AppBundle\Model\SlotCollectionInterface<covariant \AppBundle\Model\SlotInterface> */
                 if (isset($heroes[$hero->getCard()->getName()])) {
                     return 'hero_conflicts';
                 }
@@ -37,7 +37,7 @@ class FellowshipValidationHelper {
             $deck = $fellowship_decklist->getDecklist();
 
             foreach ($deck->getSlots()->getHeroDeck() as &$hero) {
-                /* @var $hero \AppBundle\Model\SlotCollectionInterface */
+                /* @var $hero \AppBundle\Model\SlotCollectionInterface<covariant \AppBundle\Model\SlotInterface> */
                 if (isset($heroes[$hero->getCard()->getName()])) {
                     return 'hero_conflicts';
                 }

@@ -386,11 +386,11 @@ class SocialController extends AbstractController {
         foreach ($list_cycles as $cycle) {
             /* @var $cycle \AppBundle\Entity\Cycle */
             $size = count($cycle->getPacks());
-            if ($cycle->getPosition() == 0 || $size == 0) {
+            $first_pack = $cycle->getPacks()->first();
+            if ($cycle->getPosition() == 0 || $first_pack === false) {
                 continue;
             }
 
-            $first_pack = $cycle->getPacks()[0];
             if ($size === 1 && $first_pack->getName() == $cycle->getName()) {
                 $checked = count($packs) ? in_array($first_pack->getId(), $packs) : true;
                 if ($checked) {
@@ -724,7 +724,7 @@ class SocialController extends AbstractController {
             foreach ($decklist->getComments() as $comment) {
                 /* @var $comment Comment */
                 $commenter = $comment->getUser();
-                if ($commenter && $commenter->getIsNotifCommenter()) {
+                if ($commenter->getIsNotifCommenter()) {
                     if (!isset($spool[$commenter->getEmail()])) {
                         $spool[$commenter->getEmail()] = 'AppBundle:Emails:newcomment_commenter.html.twig';
                     }
@@ -955,11 +955,11 @@ class SocialController extends AbstractController {
         foreach ($list_cycles as $cycle) {
             /* @var $cycle \AppBundle\Entity\Cycle */
             $size = count($cycle->getPacks());
-            if ($cycle->getPosition() == 0 || $size == 0) {
+            $first_pack = $cycle->getPacks()->first();
+            if ($cycle->getPosition() == 0 || $first_pack === false) {
                 continue;
             }
 
-            $first_pack = $cycle->getPacks()[0];
             if ($size === 1 && $first_pack->getName() == $cycle->getName()) {
                 $checked = count($packs) ? in_array($first_pack->getId(), $packs) : true;
 

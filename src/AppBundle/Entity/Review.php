@@ -226,7 +226,7 @@ class Review {
     /**
      * Get comments
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Reviewcomment>
      */
     public function getComments() {
         return $this->comments;
@@ -302,7 +302,7 @@ class Review {
     /**
      * Get votes
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\User>
      */
     public function getVotes() {
         return $this->votes;

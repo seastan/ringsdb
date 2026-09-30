@@ -514,9 +514,6 @@ class CardsData {
 		$cardinfo['packs'] = [];
 		foreach ($card->getPrintings() as $printing) {
 			$pack = $printing->getPack();
-			if (!$pack) {
-				continue;
-			}
 
 			$prImageUrl = $this->assets_packages->getUrl('bundles/cards/' . $printing->getImageCode() . '.png');
 			$prImagePath = $this->rootDir . '/../web' . preg_replace('/\?.*/', '', $prImageUrl);
@@ -538,7 +535,7 @@ class CardsData {
 			if ($a['date_release'] === null && $b['date_release'] === null) return 0;
 			if ($a['date_release'] === null) return 1;
 			if ($b['date_release'] === null) return -1;
-			return strcmp($a['date_release'], $b['date_release']);
+			return strcmp((string) $a['date_release'], (string) $b['date_release']);
 		});
 
 		if ($api) {

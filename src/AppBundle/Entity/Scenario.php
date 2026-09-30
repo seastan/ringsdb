@@ -240,7 +240,7 @@ class Scenario implements \JsonSerializable {
     /**
      * Get encounters
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Encounter>
      */
     public function getEncounters() {
         return $this->encounters;
@@ -1138,7 +1138,7 @@ class Scenario implements \JsonSerializable {
     /**
      * Get questlogs
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Questlog>
      */
     public function getQuestlogs() {
         return $this->questlogs;

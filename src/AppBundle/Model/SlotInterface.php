@@ -19,4 +19,12 @@ interface SlotInterface {
      * @return integer
      */
     public function getQuantity();
+
+    /**
+     * Set quantity
+     *
+     * @param integer $quantity
+     * @return self
+     */
+    public function setQuantity($quantity);
 }
