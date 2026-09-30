@@ -1,5 +1,6 @@
 AppBundle\Entity\Questlog:
     type: entity
+    repositoryClass: AppBundle\Repository\QuestlogRepository
     table: questlog
     manyToOne:
         user:

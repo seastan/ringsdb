@@ -1,5 +1,6 @@
 AppBundle\Entity\Encounter:
     type: entity
+    repositoryClass: AppBundle\Repository\EncounterRepository
     table: encounter
     cache:
         usage: NONSTRICT_READ_WRITE

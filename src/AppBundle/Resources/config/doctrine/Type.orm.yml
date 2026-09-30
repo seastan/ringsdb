@@ -1,5 +1,6 @@
 AppBundle\Entity\Type:
     type: entity
+    repositoryClass: AppBundle\Repository\TypeRepository
     table: type
     cache:
         usage: NONSTRICT_READ_WRITE

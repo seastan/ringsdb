@@ -1,5 +1,6 @@
 AppBundle\Entity\Sphere:
     type: entity
+    repositoryClass: AppBundle\Repository\SphereRepository
     table: sphere
     cache:
         usage: NONSTRICT_READ_WRITE

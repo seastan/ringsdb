@@ -1,5 +1,6 @@
 AppBundle\Entity\Pack:
     type: entity
+    repositoryClass: AppBundle\Repository\PackRepository
     table: pack
     cache:
         usage: NONSTRICT_READ_WRITE

@@ -1,5 +1,6 @@
 AppBundle\Entity\UserCustomPack:
     type: entity
+    repositoryClass: AppBundle\Repository\UserCustomPackRepository
     table: user_custom_pack
     manyToOne:
         user:

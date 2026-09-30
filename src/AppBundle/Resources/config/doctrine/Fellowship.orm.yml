@@ -1,5 +1,6 @@
 AppBundle\Entity\Fellowship:
     type: entity
+    repositoryClass: AppBundle\Repository\FellowshipRepository
     table: fellowship
     manyToOne:
         user:

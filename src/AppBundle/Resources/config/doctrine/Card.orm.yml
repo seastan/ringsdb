@@ -1,5 +1,6 @@
 AppBundle\Entity\Card:
     type: entity
+    repositoryClass: AppBundle\Repository\CardRepository
     table: card
     cache:
         usage: NONSTRICT_READ_WRITE

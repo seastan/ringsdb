@@ -1,5 +1,6 @@
 AppBundle\Entity\Cycle:
     type: entity
+    repositoryClass: AppBundle\Repository\CycleRepository
     table: cycle
     cache:
         usage: NONSTRICT_READ_WRITE

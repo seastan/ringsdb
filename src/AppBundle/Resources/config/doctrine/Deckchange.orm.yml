@@ -1,5 +1,6 @@
 AppBundle\Entity\Deckchange:
     type: entity
+    repositoryClass: AppBundle\Repository\DeckchangeRepository
     table: deckchange
     manyToOne:
         deck:

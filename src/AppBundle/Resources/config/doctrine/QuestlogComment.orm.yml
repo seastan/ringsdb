@@ -1,5 +1,6 @@
 AppBundle\Entity\QuestlogComment:
     type: entity
+    repositoryClass: AppBundle\Repository\QuestlogCommentRepository
     table: questlog_comment
     manyToOne:
         user:

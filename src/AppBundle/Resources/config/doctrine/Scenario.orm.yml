@@ -1,5 +1,6 @@
 AppBundle\Entity\Scenario:
     type: entity
+    repositoryClass: AppBundle\Repository\ScenarioRepository
     table: scenario
     cache:
         usage: NONSTRICT_READ_WRITE

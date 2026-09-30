@@ -1,5 +1,6 @@
 AppBundle\Entity\Deck:
     type: entity
+    repositoryClass: AppBundle\Repository\DeckRepository
     table: deck
     manyToOne:
         user:
