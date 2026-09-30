@@ -5,19 +5,19 @@ parameters:
     # phpstan/phpstan-symfony: the service types, read from the container dumped in debug mode
     # (make phpstan warms up the test cache first)
     symfony:
-        containerXmlPath: var/cache/test/appTestDebugProjectContainer.xml
-        consoleApplicationLoader: src/AppBundle/PHPStan/console-application.php
+        containerXmlPath: var/cache/test/srcTestDebugProjectContainer.xml
+        consoleApplicationLoader: src/PHPStan/console-application.php
     # phpstan/phpstan-doctrine: the entity metadata (YAML mappings), for the repositories, the
     # fields and the DQL
     doctrine:
-        objectManagerLoader: src/AppBundle/PHPStan/object-manager.php
+        objectManagerLoader: src/PHPStan/object-manager.php
 
 services:
     -
-        class: AppBundle\PHPStan\DoctrineRegistryReturnTypeExtension
+        class: App\PHPStan\DoctrineRegistryReturnTypeExtension
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension
     -
-        class: AppBundle\PHPStan\ControllerGetUserReturnTypeExtension
+        class: App\PHPStan\ControllerGetUserReturnTypeExtension
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension

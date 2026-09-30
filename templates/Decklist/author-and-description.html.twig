@@ -1,0 +1,17 @@
+{% import 'macros.html.twig' as macros %}
+
+<h3 class="username">
+    <span class="fa fa-user"></span>
+    {{ macros.username(decklist.user) }}
+</h3>
+{% if decklist.successors|length %}
+    {% for successor in decklist.successors %}
+        {% if decklist.user==successor.user %}
+            <div>
+                <span class="fa fa-forward"></span> <i>{{ decklist.user.username }} has a newer deck inspired by this one: <a class="decklist-name" href="{{ path('decklist_detail', { 'decklist_id': successor.id, 'decklist_name': successor.nameCanonical|e('url') }) }}">{{ successor.name }}</i></a>
+            </div>
+            <br>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+<div id="deck-description">{{ decklist.descriptionHtml|raw }}</div>

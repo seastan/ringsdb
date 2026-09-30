@@ -9,11 +9,12 @@
          verbose="true">
     <testsuites>
         <testsuite name="default">
-            <directory suffix="Test.php">tests/AppBundle</directory>
+            <directory suffix="Test.php">tests</directory>
         </testsuite>
     </testsuites>
     <php>
-        <env name="KERNEL_CLASS" value="AppKernel"/>
+        <env name="APP_ENV" value="test" force="true"/>
+        <env name="KERNEL_CLASS" value="App\Kernel"/>
         <env name="SYMFONY_PHPUNIT_VERSION" value="6.5"/>
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
     </php>
@@ -26,8 +27,8 @@
         <whitelist addUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">src</directory>
             <exclude>
-                <directory>src/AppBundle/DataFixtures</directory>
-                <directory>src/AppBundle/PHPStan</directory>
+                <directory>src/DataFixtures</directory>
+                <directory>src/PHPStan</directory>
             </exclude>
         </whitelist>
     </filter>

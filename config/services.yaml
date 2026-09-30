@@ -1,0 +1,61 @@
+parameters:
+    locale: en
+    # required channel of the login and registration pages (security.yaml): https in production
+    # (services_prod.yaml)
+    channel: http
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+        bind:
+            # the document root (web/ before the Symfony 4 layout)
+            $publicDir: '%kernel.project_dir%/public'
+            $cacheDir: '%kernel.cache_dir%'
+            $cacheExpiration: '%env(int:CACHE_EXPIRATION)%'
+            $gameName: '%env(GAME_NAME)%'
+            $publisherName: '%env(PUBLISHER_NAME)%'
+
+    # every class of the application is a service, identified by its class name
+    App\:
+        resource: '../src/*'
+        exclude: '../src/{Kernel.php,DataFixtures,DependencyInjection,DQL,Entity,PHPStan,Resources,Migrations,Tests,Model/ExportableDeck.php,Model/SlotCollectionDecorator.php,Model/SlotCollectionInterface.php,Model/SlotInterface.php,Command/StringInputTrait.php,Controller/CurrentUserTrait.php}'
+
+    # controllers are fetched from the container by the controller resolver, and can receive
+    # services as action arguments
+    App\Controller\:
+        resource: '../src/Controller'
+        exclude: '../src/Controller/CurrentUserTrait.php'
+        public: true
+        tags: ['controller.service_arguments']
+
+    App\Listener\CoreExceptionListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onCoreException, priority: 1000 }
+
+    App\Services\Texts:
+        arguments: ['%kernel.cache_dir%/htmlpurifier']
+
+    App\Model\DecklistManager:
+        shared: false
+
+    App\Model\FellowshipManager:
+        shared: false
+
+    App\Model\QuestLogManager:
+        shared: false
+
+    # FOSUserBundle 2 declares no autowiring alias for its mailer
+    FOS\UserBundle\Mailer\MailerInterface: '@fos_user.mailer'
+
+    fos_user.doctrine_registry:
+        alias: doctrine
+
+    # the historical ids, still fetched with get() by the fixtures and the tests
+    decks: { alias: App\Services\Decks, public: true }
+    texts: { alias: App\Services\Texts, public: true }
+    app.card_stats: { alias: App\Stats\CardStatsCalculator, public: true }
+    decklist_factory: { alias: App\Model\DecklistFactory, public: true }
+    fellowship_manager: { alias: App\Model\FellowshipManager, public: true }
+    questlog_manager: { alias: App\Model\QuestLogManager, public: true }

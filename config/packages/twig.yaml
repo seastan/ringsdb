@@ -1,0 +1,11 @@
+# Twig Configuration
+twig:
+    debug:            "%kernel.debug%"
+    strict_variables: "%kernel.debug%"
+    globals:
+        cards_data:             '@App\Services\CardsData'
+        deck_validation_helper: '@App\Helper\DeckValidationHelper'
+        dragncards_room:        '%env(DRAGNCARDS_ROOM)%'
+        noindex:                '%env(bool:NOINDEX)%'
+    form_themes:
+        - 'bootstrap_3_layout.html.twig'

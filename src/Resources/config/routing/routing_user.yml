@@ -1,0 +1,106 @@
+remind_email:
+    path: /remind/{username}
+    defaults:
+        _controller: App\Controller\UserController::remindAction
+
+user_profile_public:
+    path: /profile/{user_id}/{user_name}/{page}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\UserController::publicProfileAction
+        page: 1
+    requirements:
+        user_id: \d+
+
+user_profile_edit:
+    path: /profile_edit
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\UserController::editProfileAction
+
+user_profile_save:
+    path: /profile_save
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\UserController::saveProfileAction
+
+decklist_favorite:
+    path: /favorite
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\SocialController::favoriteAction
+
+decklist_like:
+    path: /like
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\SocialController::voteAction
+
+decklist_comment:
+    path: /comment
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\SocialController::commentAction
+
+decklist_comment_hide:
+    path: /hidecomment/{comment_id}/{hidden}
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\SocialController::hidecommentAction
+
+fellowship_favorite:
+    path: /fellowship_favorite
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\FellowshipController::favoriteAction
+
+fellowship_like:
+    path: /fellowship_like
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\FellowshipController::voteAction
+
+fellowship_comment:
+    path: /fellowship_comment
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\FellowshipController::commentAction
+
+fellowship_comment_hide:
+    path: /fellowship_hidecomment/{comment_id}/{hidden}
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\FellowshipController::hidecommentAction
+
+questlog_favorite:
+    path: /questlog_favorite
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\QuestLogController::favoriteAction
+
+questlog_like:
+    path: /questlog_like
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\QuestLogController::voteAction
+
+questlog_comment:
+    path: /questlog_comment
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\QuestLogController::commentAction
+
+questlog_comment_hide:
+    path: /questlog_hidecomment/{comment_id}/{hidden}
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\QuestLogController::hidecommentAction
+
+card_reviews_list_byauthor:
+    path: /reviews/{user_id}/{page}
+    defaults:
+        _controller: App\Controller\ReviewController::byauthorAction
+        page: 1
+    requirements:
+        page: \d+
+        user_id: \d+

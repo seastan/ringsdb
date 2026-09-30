@@ -7,4 +7,5 @@ if (function_exists('xdebug_set_filter')) {
     xdebug_set_filter(XDEBUG_FILTER_CODE_COVERAGE, XDEBUG_PATH_WHITELIST, [__DIR__ . '/src/']);
 }
 
-require __DIR__ . '/vendor/autoload.php';
+// the .env files (APP_ENV=test comes from phpunit.xml)
+require __DIR__ . '/config/bootstrap.php';

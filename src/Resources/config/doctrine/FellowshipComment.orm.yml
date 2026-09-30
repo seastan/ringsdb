@@ -1,0 +1,38 @@
+App\Entity\FellowshipComment:
+    type: entity
+    repositoryClass: App\Repository\FellowshipCommentRepository
+    table: fellowshipcomment
+    manyToOne:
+        user:
+            targetEntity: User
+            inversedBy: fellowship_comments
+            joinColumn:
+                name: user_id
+                referencedColumnName: id
+                nullable: false
+        fellowship:
+            targetEntity: Fellowship
+            inversedBy: comments
+            joinColumn:
+                name: fellowship_id
+                referencedColumnName: id
+                nullable: false
+    fields:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+        text:
+            type: text
+        dateCreation:
+            type: datetime
+            nullable: false
+            column: date_creation
+            gedmo:
+                timestampable:
+                    on: create
+        isHidden:
+            type: boolean
+            column: is_hidden
+

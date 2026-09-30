@@ -1,0 +1,23 @@
+framework:
+    #esi:       ~
+    translator: { fallbacks: ["en"] }
+    secret:     '%env(SECRET)%'
+    router:
+        strict_requirements: ~
+    form:            ~
+    csrf_protection: ~
+    validation:      { enable_annotations: true }
+    #serializer:      { enable_annotations: true }
+    templating:
+        engines: ['twig']
+    assets:
+        # ?v=<hash> on the JavaScript and CSS files (see ContentHashVersionStrategy)
+        version_strategy: App\Asset\ContentHashVersionStrategy
+    default_locale:  "%locale%"
+    trusted_hosts:   ~
+    session:
+        # handler_id set to null will use default session handler from php.ini
+        handler_id:      ~
+        cookie_lifetime: 604800
+    fragments:            ~
+    http_method_override: true

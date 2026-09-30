@@ -5,16 +5,12 @@
     "type": "project",
     "autoload": {
         "psr-4": {
-            "AppBundle\\": "src/AppBundle"
-        },
-        "classmap": [
-            "app/AppKernel.php",
-            "app/AppCache.php"
-        ]
+            "App\\": "src/"
+        }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "App\\Tests\\": "tests/"
         },
         "files": [
             "vendor/symfony/symfony/src/Symfony/Component/VarDumper/Resources/functions/dump.php"
@@ -39,7 +35,6 @@
         "friendsofsymfony/jsrouting-bundle": "^2.2",
         "friendsofsymfony/user-bundle": "^2.1.0",
         "gedmo/doctrine-extensions": "^2.4",
-        "incenteev/composer-parameter-handler": "~2.0",
         "nelmio/api-doc-bundle": "^2.9",
         "ocramius/proxy-manager": "~2.2.0",
         "phpoffice/phpspreadsheet": "^1.30.7",
@@ -61,10 +56,10 @@
     },
     "scripts": {
         "symfony-scripts": [
-            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
-            "php app/console cache:clear --no-warmup",
-            "php app/console assets:install web --symlink --relative",
-            "php app/console app:assets"
+            "php bin/console cache:clear --no-warmup",
+            "php bin/console assets:install public --symlink --relative",
+            "ln -sfn ../../src/Resources/public public/bundles/app",
+            "php bin/console app:assets"
         ],
         "post-install-cmd": [
             "@symfony-scripts"
@@ -80,17 +75,6 @@
         "sort-packages": true,
         "allow-plugins": {
             "phpstan/extension-installer": true
-        }
-    },
-    "extra": {
-        "symfony-app-dir": "app",
-        "symfony-bin-dir": "bin",
-        "symfony-var-dir": "var",
-        "symfony-web-dir": "web",
-        "symfony-tests-dir": "tests",
-        "symfony-assets-install": "relative",
-        "incenteev-parameters": {
-            "file": "app/config/parameters.yml"
         }
     }
 }

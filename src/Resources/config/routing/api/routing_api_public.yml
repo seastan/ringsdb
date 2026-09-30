@@ -1,0 +1,88 @@
+api_public_custom_packs_published:
+    path: /custom-packs/published
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\CustomPackController::publishedListAction
+    options:
+        expose: true
+
+api_packs:
+    path: /packs/
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\ApiController::listPacksAction
+
+api_card:
+    path: /card/{card_code}.{_format}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\ApiController::getCardAction
+        _format: json
+    requirements:
+        _format: json
+
+api_cards:
+    path: /cards/
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\ApiController::listCardsAction
+
+
+api_cards_search:
+    path: /cards/search/{q}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\ApiController::searchCardsAction
+
+api_cards_pack:
+    path: /cards/{pack_code}.{_format}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\ApiController::listCardsByPackAction
+        _format: json
+    requirements:
+        _format: json|xml|xlsx|xls
+
+api_decklist:
+    path: /decklist/{decklist_id}.{_format}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\ApiController::getDecklistAction
+        _format: json
+    requirements:
+        _format: json
+        decklist_id: \d+
+
+api_decklists_by_date:
+    path: /decklists/by_date/{date}.{_format}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\ApiController::listDecklistsByDateAction
+        _format: json
+    requirements:
+        _format: json
+        date: \d\d\d\d-\d\d-\d\d
+
+api_decklists_by_card:
+    path: /decklists/top_by_card/{card_code}.{_format}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\ApiController::listTopDecklistsByCardAction
+        _format: json
+    requirements:
+        _format: json
+
+user_info:
+    path: /user/info
+    defaults:
+        _controller: App\Controller\UserController::infoAction
+
+api_scenario:
+    path: /scenario/{scenario_id}.{_format}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\ApiController::getScenarioAction
+        _format: json
+    requirements:
+        _format: json
+        scenario_id: \d+

@@ -22,24 +22,41 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 ROOT="$(pwd)"
-CONSOLE="php app/console"
+CONSOLE="php bin/console"
 
-# read by app/console, including in the Composer scripts (the dev bundles are
-# not installed)
-export SYMFONY_ENV=prod
+# read by config/bootstrap.php, including in the Composer scripts (the dev
+# bundles are not installed); a real environment variable wins over the .env
+# files
+export APP_ENV=prod
 
 echo "==> Redeploying $ROOT"
 
 # --- 0. Checks, before any change ---------------------------------------------
 # The card images.
-# assets:install (a Composer script) deletes every directory of web/bundles/
-# that is not a bundle's: a real web/bundles/cards directory would be lost. A
+# assets:install (a Composer script) deletes every directory of public/bundles/
+# that is not a bundle's: a real public/bundles/cards directory would be lost. A
 # symlink is only unlinked, its target is kept.
+if [ -d public/bundles/cards ] && [ ! -L public/bundles/cards ]; then
+    echo "!! public/bundles/cards is a directory: the deploy would delete it." >&2
+    echo "   Move it out of the checkout first, then set CARD_IMAGES_DIR, e.g.:" >&2
+    echo "     mv public/bundles/cards /var/www/card-images" >&2
+    echo "     export CARD_IMAGES_DIR=/var/www/card-images" >&2
+    exit 1
+fi
+# web/ was the document root before the Symfony 4 layout (public/ now).
 if [ -d web/bundles/cards ] && [ ! -L web/bundles/cards ]; then
-    echo "!! web/bundles/cards is a directory: the deploy would delete it." >&2
+    echo "!! web/bundles/cards is a directory (the former document root)." >&2
     echo "   Move it out of the checkout first, then set CARD_IMAGES_DIR, e.g.:" >&2
     echo "     mv web/bundles/cards /var/www/card-images" >&2
     echo "     export CARD_IMAGES_DIR=/var/www/card-images" >&2
+    exit 1
+fi
+
+# The configuration: the values of this server for the environment variables of
+# .env (committed defaults), in .env.local (formerly app/config/parameters.yml).
+if [ ! -f .env.local ] && [ ! -f .env.prod.local ]; then
+    echo "!! No .env.local: create it with the values of this server (the variables" >&2
+    echo "   of .env, APP_ENV=prod included; formerly app/config/parameters.yml)." >&2
     exit 1
 fi
 if [ -z "${CARD_IMAGES_DIR:-}" ] || [ ! -d "$CARD_IMAGES_DIR" ]; then
@@ -103,7 +120,7 @@ fi
 rm -rf "$PLATFORM_DIR"
 
 # --- 1. Maintenance mode -----------------------------------------------------
-# web/app.php answers 503 with web/maintenance.html while the flag exists, so
+# public/index.php answers 503 with public/maintenance.html while the flag exists, so
 # nothing writes to the database or the cache during the update.
 MAINTENANCE_FLAG="$ROOT/maintenance.flag"
 SNAPSHOT=""
@@ -122,7 +139,8 @@ if [ "${MAINTENANCE:-1}" != "0" ]; then
 fi
 
 # --- 2. Snapshot the database -------------------------------------------------
-# The connection comes from app/config/parameters.yml; the password goes
+# The connection comes from the DATABASE_* variables (.env, .env.local,
+# loaded by config/bootstrap.php); the password goes
 # through a defaults file, not the command line.
 SNAPSHOT_DIR="${SNAPSHOT_DIR:-$HOME/db-snapshots}"
 # the snapshots hold the users' data (emails, password hashes): owner only
@@ -130,15 +148,14 @@ mkdir -p "$SNAPSHOT_DIR"
 chmod 700 "$SNAPSHOT_DIR"
 
 db_parameter() {
-    php -r 'require "vendor/autoload.php";
-        $p = Symfony\Component\Yaml\Yaml::parse(file_get_contents("app/config/parameters.yml"))["parameters"];
-        echo $p[$argv[1]] ?? "";' "$1"
+    php -r 'require "config/bootstrap.php";
+        echo $_SERVER[$argv[1]] ?? "";' "$1"
 }
-DB_HOST="$(db_parameter database_host)"
-DB_PORT="$(db_parameter database_port)"
-DB_NAME="$(db_parameter database_name)"
-DB_USER="$(db_parameter database_user)"
-DB_PASSWORD="$(db_parameter database_password)"
+DB_HOST="$(db_parameter DATABASE_HOST)"
+DB_PORT="$(db_parameter DATABASE_PORT)"
+DB_NAME="$(db_parameter DATABASE_NAME)"
+DB_USER="$(db_parameter DATABASE_USER)"
+DB_PASSWORD="$(db_parameter DATABASE_PASSWORD)"
 
 SNAPSHOT="$SNAPSHOT_DIR/${DB_NAME}_$(date +%Y%m%d-%H%M%S).sql.gz"
 echo "==> Snapshotting $DB_NAME to $SNAPSHOT..."
@@ -167,8 +184,7 @@ else
 fi
 
 # --- 4. Install the dependencies ----------------------------------------------
-# The Composer scripts then build parameters.yml, clear the cache, install and
-# dump the assets.
+# The Composer scripts then clear the cache, install and build the assets.
 # The prod kernel uses its cached container without checking whether it is up
 # to date: remove it, or the cache:clear of the Composer scripts would boot the
 # container of the previous code. Renamed first: the move is instant, even if
@@ -186,7 +202,7 @@ rm -rf var/cache/prod.old.*
 composer install --no-dev --optimize-autoloader --no-interaction
 
 echo "==> Linking the card images ($CARD_IMAGES_DIR)..."
-ln -sfn "$CARD_IMAGES_DIR" web/bundles/cards
+ln -sfn "$CARD_IMAGES_DIR" public/bundles/cards
 
 # --- 5. Apply the database migrations -----------------------------------------
 echo "==> Applying the migrations (snapshot: $SNAPSHOT)..."
@@ -200,8 +216,8 @@ $CONSOLE doctrine:migrations:migrate --no-interaction --allow-no-migration
 # Use setfacl, NOT chown — chown would strip the ACLs the web server needs.
 echo "==> Refreshing cache/log ACLs (best-effort)..."
 if command -v setfacl >/dev/null 2>&1; then
-    setfacl -R  -m u:rings:rwX -m u:www-data:rwX var/cache var/logs 2>/dev/null || true
-    setfacl -dR -m u:rings:rwX -m u:www-data:rwX var/cache var/logs 2>/dev/null || true
+    setfacl -R  -m u:rings:rwX -m u:www-data:rwX var/cache var/log 2>/dev/null || true
+    setfacl -dR -m u:rings:rwX -m u:www-data:rwX var/cache var/log 2>/dev/null || true
 fi
 
 # --- 7. Leave maintenance mode ------------------------------------------------

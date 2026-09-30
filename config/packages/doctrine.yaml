@@ -1,0 +1,34 @@
+# Doctrine Configuration
+doctrine:
+    dbal:
+        driver:         pdo_mysql
+        server_version: 5.6
+        # the connection of each environment: .env (.env.test for the tests)
+        host:           '%env(DATABASE_HOST)%'
+        port:           '%env(int:DATABASE_PORT)%'
+        dbname:         '%env(DATABASE_NAME)%'
+        user:           '%env(DATABASE_USER)%'
+        password:       '%env(DATABASE_PASSWORD)%'
+        charset:        UTF8
+        schema_filter: '~^(?!stat_cards_cache$)~'
+
+    orm:
+        auto_generate_proxy_classes: "%kernel.debug%"
+        naming_strategy:             doctrine.orm.naming_strategy.underscore_number_aware
+        auto_mapping:                true
+        mappings:
+            # the entities of the application (no longer a bundle): YAML mappings, one file per
+            # entity (Card.orm.yml for App\Entity\Card)
+            App:
+                is_bundle: false
+                type:      yml
+                dir:       '%kernel.project_dir%/src/Resources/config/doctrine'
+                prefix:    'App\Entity'
+                # the 'App:Card' aliases of the DQL and the forms, until they are replaced with the
+                # class names (aliases are removed in ORM 3)
+                alias:     App
+        dql:
+            string_functions:
+                replace: App\DQL\ReplaceFunction
+            numeric_functions:
+                power: App\DQL\PowerFunction

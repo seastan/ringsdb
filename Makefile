@@ -14,27 +14,27 @@ sql:
 	docker compose exec -it mysql mysql -u root -ppasswd
 
 assets:
-	docker compose exec -it -u www-data symfony php app/console app:assets
+	docker compose exec -it -u www-data symfony php bin/console app:assets
 
 fixtures:
-	docker compose exec -it -u www-data symfony php app/console doctrine:database:drop --force
-	docker compose exec -it -u www-data symfony php app/console doctrine:database:create
+	docker compose exec -it -u www-data symfony php bin/console doctrine:database:drop --force
+	docker compose exec -it -u www-data symfony php bin/console doctrine:database:create
 	docker compose exec -T mysql mysql -u symfony -ppasswd ringsdb < ringsdb_bootstrap.sql
 	docker compose exec -T mysql mysql -u symfony -ppasswd ringsdb < ringsdb_reset_auto_increment.sql
 	# stored function used by the card statistics; created as root (binary logging requires SUPER)
 	docker compose exec -T mysql mysql -u root -ppasswd ringsdb < function-source-code.sql
-	docker compose exec -it -u www-data symfony php app/console doctrine:migrations:migrate -n
-	docker compose exec -it -u www-data symfony php app/console doctrine:fixtures:load --append
+	docker compose exec -it -u www-data symfony php bin/console doctrine:migrations:migrate -n
+	docker compose exec -it -u www-data symfony php bin/console doctrine:fixtures:load --append
 
 test-fixtures:
-	docker compose exec -it -u www-data symfony php app/console doctrine:database:drop --env=test --force
-	docker compose exec -it -u www-data symfony php app/console doctrine:database:create --env=test
+	docker compose exec -it -u www-data symfony php bin/console doctrine:database:drop --env=test --force
+	docker compose exec -it -u www-data symfony php bin/console doctrine:database:create --env=test
 	docker compose exec -T mysql_test mysql -u symfony -ppasswd ringsdb_test < ringsdb_bootstrap.sql
 	docker compose exec -T mysql_test mysql -u symfony -ppasswd ringsdb_test < ringsdb_reset_auto_increment.sql
 	# stored function used by the card statistics; created as root (binary logging requires SUPER)
 	docker compose exec -T mysql_test mysql -u root -ppasswd ringsdb_test < function-source-code.sql
-	docker compose exec -it -u www-data symfony php app/console doctrine:migrations:migrate -n --env=test
-	docker compose exec -it -u www-data symfony php app/console doctrine:fixtures:load --append --env=test
+	docker compose exec -it -u www-data symfony php bin/console doctrine:migrations:migrate -n --env=test
+	docker compose exec -it -u www-data symfony php bin/console doctrine:fixtures:load --append --env=test
 
 phpunit: test-fixtures
 	docker compose exec -it -u www-data symfony php vendor/bin/simple-phpunit
@@ -46,11 +46,11 @@ coverage: test-fixtures
 
 # cache:warmup: the service types are read from the dumped container (see phpstan.neon)
 phpstan:
-	docker compose exec -it -u www-data symfony php app/console cache:warmup --env=test
+	docker compose exec -it -u www-data symfony php bin/console cache:warmup --env=test
 	docker compose exec -it -u www-data symfony php vendor/bin/phpstan --memory-limit=-1
 
 deprecations:
 	docker compose exec -it -u www-data -e SYMFONY_DEPRECATIONS_HELPER=verbose=max[total]=999999 symfony php vendor/bin/simple-phpunit
 
 lint-twig:
-	docker compose exec -it -u www-data symfony php app/console lint:twig src/AppBundle/Resources/views app/Resources
+	docker compose exec -it -u www-data symfony php bin/console lint:twig templates

@@ -1,0 +1,14 @@
+# these routes are available to anybody
+app_api_public:
+    resource: "api/routing_api_public.yml"
+    prefix: /public
+
+# these routes are available to logged users
+app_api_private:
+    resource: "api/routing_api_private.yml"
+    prefix: /private
+
+api_intro:
+    path: /
+    defaults:
+        _controller: App\Controller\DefaultController::apiIntroAction

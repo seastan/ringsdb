@@ -1,0 +1,52 @@
+<?php
+
+namespace App\DataFixtures\ORM;
+
+use App\Entity\Comment;
+use App\Entity\Decklist;
+use App\Entity\User;
+use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Doctrine\Common\Persistence\ObjectManager;
+use App\DataFixtures\ORM\LoadDecklistData;
+use App\DataFixtures\ORM\LoadUserData;
+
+class LoadCommentData extends AbstractFixture implements DependentFixtureInterface
+{
+
+    /**
+     * @return array<int, class-string>
+     */
+    public function getDependencies()
+    {
+        return [
+            LoadUserData::class,
+            LoadDecklistData::class
+        ];
+    }
+
+    /**
+     * @return void
+     */
+    public function load(ObjectManager $manager)
+    {
+        /** @var User $user */
+        $user = $this->getReference('test-user');
+        /** @var Decklist $decklist */
+        $decklist = $this->getReference('test-decklist-1');
+
+        $comment = new Comment();
+        $comment->setText('Comment test');
+        $comment->setDateCreation(new \DateTime('2015-08-16'));
+        $comment->setUser($user);
+        $comment->setDecklist($decklist);
+        $comment->setIsHidden(false);
+
+        $decklist->setDateUpdate(new \DateTime('2015-08-16'));
+        $decklist->setDateLastComment(new \DateTime('2015-08-16'));
+        $decklist->setNbcomments(1);
+
+        $manager->persist($comment);
+        $manager->flush();
+    }
+}

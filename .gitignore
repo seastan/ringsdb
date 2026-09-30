@@ -1,22 +1,18 @@
-/app/bootstrap.php.cache
 /var/
-/app/config/parameters.yml
-/app/phpunit.xml
-/bin/
 /composer.phar
 /vendor/
-/web/bundles/
+/public/bundles/
 tags
-/web/js/
-/web/css/
+/public/js/
+/public/css/
 /.externalToolBuilders/
 /.settings/
 /.buildpath
 /.project
 /.tags_swap
 /.idea/
-/web/suggestions.json
-/src/AppBundle/Resources/public/js/fos_js_routes.js
+/public/suggestions.json
+/src/Resources/public/js/fos_js_routes.js
 user-data.sql
 beorn.json
 .DS_Store
@@ -26,8 +22,10 @@ ringsdb_daily.sql
 __pycache__/
 
 # Local front controller
-/web/app_local.php
+/public/app_local.php
 
 # deploy.sh: maintenance mode flag, backup of vendor/
 /maintenance.flag
 /vendor.bak/
+/.env.local
+/.env.*.local
