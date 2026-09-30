@@ -2,109 +2,64 @@
 
 namespace AppBundle\Services;
 
-use Doctrine\ORM\EntityManagerInterface;
 use AppBundle\Model\SlotCollectionInterface;
 use AppBundle\Model\SlotInterface;
-use AppBundle\Model\SlotCollectionDecorator;
-use AppBundle\Entity\Deckslot;
-use Doctrine\Common\Collections\ArrayCollection;
+use AppBundle\Entity\Card;
 
 /**
+ * Differences between decks.
  *
  * @author AWOPM
  */
 class Diff {
     /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
-    public function __construct(EntityManagerInterface $doctrine) {
-        $this->em = $doctrine;
-    }
-
-    /**
-     * Computes the diff between a list of SlotCollectionInterface
-     * Mutates its arguments by removing the intersection from them
+     * Compares slot collections (the same part of several decks): the cards they have in common,
+     * with the smallest of their quantities, then what is left in each collection. The slots are
+     * not changed. The cards come in the order of their slots, the common ones in the order of the
+     * first collection.
      *
-     * @param array<int, SlotCollectionInterface<covariant \AppBundle\Model\SlotInterface>> $list_slots
-     * @return SlotCollectionInterface<Deckslot> $intersection
+     * @param array<int, SlotCollectionInterface<covariant SlotInterface>> $collections
+     * @return array{common: list<array{card: Card, quantity: int}>, differences: list<list<array{card: Card, quantity: int}>>}
      */
-    public function getSlotsDiff($list_slots) {
-        // list of all the codes found in every slots
-        $cardCodes = [];
-
-        /* @var $slots SlotCollectionInterface<covariant \AppBundle\Model\SlotInterface> */
-        foreach ($list_slots as $slots) {
-            /* @var $slot SlotInterface */
+    public function compareSlots(array $collections): array {
+        // for each collection, card code => quantity
+        $quantities = [];
+        $cards = [];
+        foreach ($collections as $slots) {
+            $collection = [];
             foreach ($slots as $slot) {
-                // since we're going to mutate the slots, we detach them first
-                $this->em->detach($slot);
-
-                $cardCodes[] = $slot->getCard()->getCode();
+                $card = $slot->getCard();
+                $cards[$card->getCode()] = $card;
+                $collection[$card->getCode()] = ($collection[$card->getCode()] ?? 0) + $slot->getQuantity();
             }
+            $quantities[] = $collection;
         }
 
-        // then we count each code occurence
-        $cardCodeCounts = array_count_values($cardCodes);
-
-        // list of the slots common to every slots, after removing them from every slots
-        $intersection = new ArrayCollection();
-
-        foreach ($cardCodeCounts as $cardCode => $occurences) {
-            // if this card cannot be found in every slots, move on
-            if ($occurences < count($list_slots)) {
-                continue;
+        $common = [];
+        foreach ($quantities[0] ?? [] as $code => $minimum) {
+            foreach ($quantities as $collection) {
+                $minimum = min($minimum, $collection[$code] ?? 0);
             }
-
-            // we'll get the card later
-            $card = null;
-
-            // this is the list of where we can find that code in each flatList
-            $indexes = [];
-
-            // this is the list of the quantities we found in each flatList
-            $quantities = [];
-
-            // searching all slots for that code
-            foreach ($list_slots as $j => $slots) {
-                // searching the slots
-                foreach ($slots as $k => $slot) {
-                    if ($slot->getCard()->getCode() == $cardCode) {
-                        $card = $slot->getCard();
-                        $indexes[$j] = $k;
-                        $quantities[$j] = $slot->getQuantity();
-                        break;
-                    }
-                }
-            }
-
-            // we need to find the minimum quantity among all SlotCollections
-            $minimum = (count($quantities) > 0) ? min($quantities) : 0;
-
-            // found in every slots (the occurrence count above)
-            if ($card === null) {
-                continue;
-            }
-
-            // we create a slot for this
-            $slot = new Deckslot();
-            $slot->setCard($card);
-            $slot->setQuantity($minimum);
-
-            // we add this slot to the list of common slots
-            $intersection->add($slot);
-
-            // then we remove that many cards from every SlotCollection
-            foreach ($indexes as $j => $index) {
-                $slot = $list_slots[$j][$index];
-                if ($slot !== null) {
-                    $slot->setQuantity($slot->getQuantity() - $minimum);
+            if ($minimum > 0) {
+                $common[] = ['card' => $cards[$code], 'quantity' => $minimum];
+                foreach (array_keys($quantities) as $i) {
+                    $quantities[$i][$code] -= $minimum;
                 }
             }
         }
 
-        return new SlotCollectionDecorator($intersection);
+        $differences = [];
+        foreach ($quantities as $collection) {
+            $left = [];
+            foreach ($collection as $code => $quantity) {
+                if ($quantity > 0) {
+                    $left[] = ['card' => $cards[$code], 'quantity' => $quantity];
+                }
+            }
+            $differences[] = $left;
+        }
+
+        return ['common' => $common, 'differences' => $differences];
     }
 
     /**

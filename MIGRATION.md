@@ -544,8 +544,11 @@ field). Everything the tests create is deleted in `tearDown()`.
 - Another user's deck cannot be edited, saved, or published (`403`).
 - Deck comparison (`/deck/compare/{deck1}/{deck2}`, `DeckCompareTest`): cards in common with
   the minimum quantity, then what is left in each deck, for heroes, draw deck and sideboard;
-  the decks are not modified (the slots are detached before `Diff::getSlotsDiff()` changes them);
-  another user's decks require them to share their decks.
+  the decks are not modified; another user's decks require them to share their decks.
+  Rewritten: `Diff::getSlotsDiff()` subtracted the common cards from the slots themselves (the
+  page then read the decks for what was left), so it detached them first (`EntityManager::detach()`,
+  removed in ORM 3). `Diff::compareSlots()` changes nothing: it returns the common cards and what
+  is left in each deck, as `{card, quantity}` arrays that the template shows.
 - `GET /deck/copy/{decklist_id}` copies a decklist into a new deck (version 0.1) whose parent is
   the decklist; publishing that deck creates a decklist whose predecessor is the original one
   ("Derived from" / "Inspiration for").

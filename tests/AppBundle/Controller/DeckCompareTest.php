@@ -8,7 +8,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 /**
  * Deck comparison (/deck/compare/{deck1}/{deck2}, "Compare two decks" on the My Decks page),
- * built with Diff::getSlotsDiff().
+ * built with Diff::compareSlots() (which changes nothing, checked by the tests).
  *
  * The fixture decks share no card, so the test inserts two decks of "test" with cards in common:
  *
