@@ -29,11 +29,11 @@ class User extends BaseUser {
      */
     private $reputation;
     /**
-     * @var string
+     * @var string|null
      */
     private $resume;
     /**
-     * @var string
+     * @var string|null
      */
     private $color;
     /**
@@ -173,7 +173,7 @@ class User extends BaseUser {
     /**
      * Set resume
      *
-     * @param string $resume
+     * @param string|null $resume
      *
      * @return User
      */
@@ -186,7 +186,7 @@ class User extends BaseUser {
     /**
      * Get resume
      *
-     * @return string
+     * @return string|null
      */
     public function getResume() {
         return $this->resume;
@@ -195,7 +195,7 @@ class User extends BaseUser {
     /**
      * Set color
      *
-     * @param string $color
+     * @param string|null $color
      *
      * @return User
      */
@@ -208,7 +208,7 @@ class User extends BaseUser {
     /**
      * Get color
      *
-     * @return string
+     * @return string|null
      */
     public function getColor() {
         return $this->color;
@@ -691,14 +691,14 @@ class User extends BaseUser {
         return $this->followers;
     }
     /**
-     * @var string
+     * @var string|null
      */
     private $ownedPacks;
 
     /**
      * Set ownedPacks
      *
-     * @param string $ownedPacks
+     * @param string|null $ownedPacks
      *
      * @return User
      */
@@ -711,7 +711,7 @@ class User extends BaseUser {
     /**
      * Get ownedPacks
      *
-     * @return string
+     * @return string|null
      */
     public function getOwnedPacks() {
         return $this->ownedPacks;

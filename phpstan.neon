@@ -6,7 +6,7 @@ parameters:
         # phpstan-doctrine: columns nullable in the database but typed non-null in the entities
         # (docblocks), fixed for the reference data (Card, CardPrinting, Pack, Sphere); left for
         # the user content. See MIGRATION.md
-        - identifier: doctrine.columnType
+#        - identifier: doctrine.columnType
     # phpstan/phpstan-symfony: the service types, read from the container dumped in debug mode
     # (make phpstan warms up the test cache first)
     symfony:

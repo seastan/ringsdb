@@ -231,8 +231,10 @@ missing for some printings (70, 74), and the overrides (`traits` ... `quest`) ar
 of them (nullable by design, "empty = the value of the card"); its properties became nullable.
 And for `Pack.dateRelease` (no `NULL` in the reference data, but `NULL` means an unreleased pack:
 kept nullable); `Sphere.octgnid` (`NULL` for the 7 spheres, used by nothing) was dropped
-(migration `Version20260930102154`). Left: the user
-content (descriptions, `dateLastComment`, `datePublish`, `Questlog.score`, `User.resume`...),
+(migration `Version20260930102154`). `User.resume`, `color` and `ownedPacks` stay nullable, their
+properties too: `NULL` for the accounts that never saved their profile or collection, read like
+`''` everywhere. Left: the user content (descriptions, `dateLastComment`, `datePublish`,
+`Questlog.score`...),
 whose production data is not in the bootstrap: count its `NULL` values in production before
 choosing between `NOT NULL` and nullable properties. Left for later: level 9 (1136 errors with phpstan 1.4, all about `mixed`: request
 parameters, query results, the `mixed` parameters of the level 6 docblocks), cheaper on the
