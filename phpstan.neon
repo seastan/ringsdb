@@ -4,8 +4,8 @@ parameters:
         - src
     ignoreErrors:
         # phpstan-doctrine: columns nullable in the database but typed non-null in the entities
-        # (docblocks); making them nullable spreads to every caller of their getters. To fix with
-        # the typed properties, see MIGRATION.md
+        # (docblocks), fixed for Card only; making them nullable spreads to every caller of their
+        # getters. See MIGRATION.md
         - identifier: doctrine.columnType
     # phpstan/phpstan-symfony: the service types, read from the container dumped in debug mode
     # (make phpstan warms up the test cache first)

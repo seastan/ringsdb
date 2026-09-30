@@ -20,15 +20,15 @@ class Card {
      */
     private $name;
     /**
-     * @var string
+     * @var string|null
      */
     private $traits;
     /**
-     * @var string
+     * @var string|null
      */
     private $text;
     /**
-     * @var string
+     * @var string|null
      */
     private $flavor;
     /**
@@ -36,37 +36,37 @@ class Card {
      */
     private $isUnique;
     /**
-     * @var integer
+     * @var string|null
      */
     private $cost;
     /**
-     * @var integer
+     * @var int|null
      */
     private $threat;
     /**
-     * @var integer
+     * @var int|null
      */
     private $willpower;
     /**
-     * @var integer
+     * @var int|null
      */
     private $attack;
     /**
-     * @var integer
+     * @var int|null
      */
     private $defense;
     /**
-     * @var integer
+     * @var int|null
      */
     private $health;
     /**
-     * @var integer
+     * @var int|null
      */
     private $victory;
     /**
      * @var integer
      */
-    private $deckLimit;
+    private $deckLimit = 3;
     /**
      * @var \DateTime
      */
@@ -255,7 +255,7 @@ class Card {
     /**
      * Set traits
      *
-     * @param string $traits
+     * @param string|null $traits
      *
      * @return Card
      */
@@ -268,7 +268,7 @@ class Card {
     /**
      * Get traits
      *
-     * @return string
+     * @return string|null
      */
     public function getTraits() {
         return $this->traits;
@@ -277,7 +277,7 @@ class Card {
     /**
      * Set text
      *
-     * @param string $text
+     * @param string|null $text
      *
      * @return Card
      */
@@ -290,7 +290,7 @@ class Card {
     /**
      * Get text
      *
-     * @return string
+     * @return string|null
      */
     public function getText() {
         return $this->text;
@@ -299,7 +299,7 @@ class Card {
     /**
      * Set flavor
      *
-     * @param string $flavor
+     * @param string|null $flavor
      *
      * @return Card
      */
@@ -312,7 +312,7 @@ class Card {
     /**
      * Get flavor
      *
-     * @return string
+     * @return string|null
      */
     public function getFlavor() {
         return $this->flavor;
@@ -343,7 +343,7 @@ class Card {
     /**
      * Set cost
      *
-     * @param integer $cost
+     * @param string|null $cost
      *
      * @return Card
      */
@@ -356,7 +356,7 @@ class Card {
     /**
      * Get cost
      *
-     * @return integer
+     * @return string|null
      */
     public function getCost() {
         return $this->cost;
@@ -365,7 +365,7 @@ class Card {
     /**
      * Set threat
      *
-     * @param integer $threat
+     * @param int|null $threat
      *
      * @return Card
      */
@@ -378,7 +378,7 @@ class Card {
     /**
      * Get threat
      *
-     * @return integer
+     * @return int|null
      */
     public function getThreat() {
         return $this->threat;
@@ -387,7 +387,7 @@ class Card {
     /**
      * Set willpower
      *
-     * @param integer $willpower
+     * @param int|null $willpower
      *
      * @return Card
      */
@@ -400,7 +400,7 @@ class Card {
     /**
      * Get willpower
      *
-     * @return integer
+     * @return int|null
      */
     public function getWillpower() {
         return $this->willpower;
@@ -409,7 +409,7 @@ class Card {
     /**
      * Set attack
      *
-     * @param integer $attack
+     * @param int|null $attack
      *
      * @return Card
      */
@@ -422,7 +422,7 @@ class Card {
     /**
      * Get attack
      *
-     * @return integer
+     * @return int|null
      */
     public function getAttack() {
         return $this->attack;
@@ -431,7 +431,7 @@ class Card {
     /**
      * Set defense
      *
-     * @param integer $defense
+     * @param int|null $defense
      *
      * @return Card
      */
@@ -444,7 +444,7 @@ class Card {
     /**
      * Get defense
      *
-     * @return integer
+     * @return int|null
      */
     public function getDefense() {
         return $this->defense;
@@ -453,7 +453,7 @@ class Card {
     /**
      * Set health
      *
-     * @param integer $health
+     * @param int|null $health
      *
      * @return Card
      */
@@ -466,7 +466,7 @@ class Card {
     /**
      * Get health
      *
-     * @return integer
+     * @return int|null
      */
     public function getHealth() {
         return $this->health;
@@ -475,7 +475,7 @@ class Card {
     /**
      * Set victory
      *
-     * @param integer $victory
+     * @param int|null $victory
      *
      * @return Card
      */
@@ -488,7 +488,7 @@ class Card {
     /**
      * Get victory
      *
-     * @return integer
+     * @return int|null
      */
     public function getVictory() {
         return $this->victory;
@@ -505,12 +505,13 @@ class Card {
     /**
      * Set deckLimit
      *
-     * @param integer $deckLimit
+     * @param integer|null $deckLimit null (an empty field of the admin form or of a CSV import) for
+     *                              the default, 3
      *
      * @return Card
      */
     public function setDeckLimit($deckLimit) {
-        $this->deckLimit = $deckLimit;
+        $this->deckLimit = $deckLimit ?? 3;
 
         return $this;
     }
@@ -669,14 +670,14 @@ class Card {
     }
 
     /**
-     * @var integer
+     * @var int|null
      */
     private $quest;
 
     /**
      * Set quest
      *
-     * @param integer $quest
+     * @param int|null $quest
      *
      * @return Card
      */
@@ -689,7 +690,7 @@ class Card {
     /**
      * Get quest
      *
-     * @return integer
+     * @return int|null
      */
     public function getQuest() {
         return $this->quest;

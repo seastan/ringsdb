@@ -220,9 +220,15 @@ Found by `phpstan-doctrine` and fixed:
   `FellowshipDecklist` (never called);
 - the dead `QuestLogManager::findQuestLogsByRecentDiscussion()` (see "Removed dead code").
 
-Left for later: the 49 columns nullable in the database but typed non-null in the entities
-(`doctrine.columnType`, ignored: making them nullable spreads to every caller of their getters; to
-fix with the typed properties); level 9 (1136 errors with phpstan 1.4, all about `mixed`: request
+Columns nullable in the database but typed non-null in the entities (`doctrine.columnType`,
+still ignored): fixed for `Card`, where the reference data of production (the bootstrap) shows
+which columns hold `NULL`: `traits`, `text`, `flavor`, `cost` (a string: `X`...) and the stats
+are nullable (a hero has no cost, an ally no threat...), so the properties became nullable;
+`deck_limit` never is: `NOT NULL`, 3 by default (migration `Version20260930090741`;
+`setDeckLimit(null)`, from an empty field of the admin form or of a CSV import, stores 3). The
+other entities are left (`CardPrinting`: the overrides are nullable by design, "empty = the value
+of the card"; `Pack.dateRelease`: `NULL` means an unreleased pack; `Sphere.octgnid`: never set;
+the user content). Left for later: level 9 (1136 errors with phpstan 1.4, all about `mixed`: request
 parameters, query results, the `mixed` parameters of the level 6 docblocks), cheaper on the
 rewritten code.
 
@@ -319,6 +325,9 @@ was in `Decks::setSlots()`, fixed (see "Quest logs").
   - `Version20260929215538`: makes the foreign keys of the 32 required associations `NOT NULL`
     (see "Static analysis"). It fails if one of them contains `NULL`: run the query of its
     docblock on production first (every count must be 0, or `NULL` for an empty table).
+  - `Version20260930090741`: makes `card.deck_limit` `NOT NULL`, 3 by default (see "Static
+    analysis"). No card of the reference data has a `NULL` deck limit; the query of its docblock
+    checks it on production.
   - `stat_cards_cache` has no entity (filled by SQL, see "Card statistics"): the
     `schema_filter` of the DBAL connection hides it from Doctrine, which would drop it
     otherwise. Any other table without an entity must be added to that filter.

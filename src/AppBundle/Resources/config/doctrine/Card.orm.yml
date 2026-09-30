@@ -88,8 +88,10 @@ AppBundle\Entity\Card:
             nullable: true
         deckLimit:
             type: smallint
-            nullable: true
+            nullable: false
             column: deck_limit
+            options:
+                default: 3
         dateCreation:
             type: datetime
             nullable: false
