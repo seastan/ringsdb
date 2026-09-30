@@ -207,15 +207,15 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
      */
     private $dateUpdate;
     /**
-     * @var string
+     * @var string|null
      */
     private $descriptionMd;
     /**
-     * @var string
+     * @var string|null
      */
     private $problem;
     /**
-     * @var string
+     * @var string|null
      */
     private $tags;
     /**
@@ -346,7 +346,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Set descriptionMd
      *
-     * @param string $descriptionMd
+     * @param string|null $descriptionMd
      *
      * @return Deck
      */
@@ -359,7 +359,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Get descriptionMd
      *
-     * @return string
+     * @return string|null
      */
     public function getDescriptionMd() {
         return $this->descriptionMd;
@@ -368,7 +368,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Set problem
      *
-     * @param string $problem
+     * @param string|null $problem
      *
      * @return Deck
      */
@@ -381,7 +381,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Get problem
      *
-     * @return string
+     * @return string|null
      */
     public function getProblem() {
         return $this->problem;
@@ -390,7 +390,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Set tags
      *
-     * @param string $tags
+     * @param string|null $tags
      *
      * @return Deck
      */
@@ -403,7 +403,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Get tags
      *
-     * @return string
+     * @return string|null
      */
     public function getTags() {
         return $this->tags;

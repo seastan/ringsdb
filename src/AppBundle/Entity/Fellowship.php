@@ -19,11 +19,11 @@ class Fellowship {
      */
     private $nameCanonical;
     /**
-     * @var string
+     * @var string|null
      */
     private $descriptionMd;
     /**
-     * @var string
+     * @var string|null
      */
     private $descriptionHtml;
     /**
@@ -51,7 +51,7 @@ class Fellowship {
      */
     private $dateUpdate;
     /**
-    * @var \DateTime
+    * @var \DateTime|null
     */
     private $dateLastComment;
     /**
@@ -146,7 +146,7 @@ class Fellowship {
     /**
      * Set descriptionMd
      *
-     * @param string $descriptionMd
+     * @param string|null $descriptionMd
      *
      * @return Fellowship
      */
@@ -159,7 +159,7 @@ class Fellowship {
     /**
      * Get descriptionMd
      *
-     * @return string
+     * @return string|null
      */
     public function getDescriptionMd() {
         return $this->descriptionMd;
@@ -168,7 +168,7 @@ class Fellowship {
     /**
      * Set descriptionHtml
      *
-     * @param string $descriptionHtml
+     * @param string|null $descriptionHtml
      *
      * @return Fellowship
      */
@@ -181,7 +181,7 @@ class Fellowship {
     /**
      * Get descriptionHtml
      *
-     * @return string
+     * @return string|null
      */
     public function getDescriptionHtml() {
         return $this->descriptionHtml;
@@ -322,7 +322,7 @@ class Fellowship {
     /**
      * Set dateLastComment
      *
-     * @param \DateTime $dateLastComment
+     * @param \DateTime|null $dateLastComment
      *
      * @return Fellowship
      */
@@ -335,7 +335,7 @@ class Fellowship {
     /**
      * Get dateLastComment
      *
-     * @return \DateTime
+     * @return \DateTime|null
      */
     public function getDateLastComment() {
         return $this->dateLastComment;
@@ -551,14 +551,14 @@ class Fellowship {
     }
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      */
     private $datePublish;
 
     /**
      * Set datePublish
      *
-     * @param \DateTime $datePublish
+     * @param \DateTime|null $datePublish
      *
      * @return Fellowship
      */
@@ -571,7 +571,7 @@ class Fellowship {
     /**
      * Get datePublish
      *
-     * @return \DateTime
+     * @return \DateTime|null
      */
     public function getDatePublish() {
         return $this->datePublish;

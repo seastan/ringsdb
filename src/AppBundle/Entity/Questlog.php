@@ -19,11 +19,11 @@ class Questlog {
      */
     private $nameCanonical;
     /**
-     * @var string
+     * @var string|null
      */
     private $descriptionMd;
     /**
-     * @var string
+     * @var string|null
      */
     private $descriptionHtml;
     /**
@@ -39,7 +39,7 @@ class Questlog {
      */
     private $success;
     /**
-     * @var integer
+     * @var integer|null
      */
     private $score;
     /**
@@ -161,7 +161,7 @@ class Questlog {
     /**
      * Set descriptionMd
      *
-     * @param string $descriptionMd
+     * @param string|null $descriptionMd
      *
      * @return Questlog
      */
@@ -174,7 +174,7 @@ class Questlog {
     /**
      * Get descriptionMd
      *
-     * @return string
+     * @return string|null
      */
     public function getDescriptionMd() {
         return $this->descriptionMd;
@@ -183,7 +183,7 @@ class Questlog {
     /**
      * Set descriptionHtml
      *
-     * @param string $descriptionHtml
+     * @param string|null $descriptionHtml
      *
      * @return Questlog
      */
@@ -196,7 +196,7 @@ class Questlog {
     /**
      * Get descriptionHtml
      *
-     * @return string
+     * @return string|null
      */
     public function getDescriptionHtml() {
         return $this->descriptionHtml;
@@ -271,7 +271,7 @@ class Questlog {
     /**
      * Set score
      *
-     * @param integer $score
+     * @param integer|null $score
      *
      * @return Questlog
      */
@@ -284,7 +284,7 @@ class Questlog {
     /**
      * Get score
      *
-     * @return integer
+     * @return integer|null
      */
     public function getScore() {
         return $this->score;
@@ -617,14 +617,14 @@ class Questlog {
     }
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      */
     private $datePublish;
 
     /**
      * Set datePublish
      *
-     * @param \DateTime $datePublish
+     * @param \DateTime|null $datePublish
      *
      * @return Questlog
      */
@@ -637,7 +637,7 @@ class Questlog {
     /**
      * Get datePublish
      *
-     * @return \DateTime
+     * @return \DateTime|null
      */
     public function getDatePublish() {
         return $this->datePublish;

@@ -220,23 +220,27 @@ Found by `phpstan-doctrine` and fixed:
   `FellowshipDecklist` (never called);
 - the dead `QuestLogManager::findQuestLogsByRecentDiscussion()` (see "Removed dead code").
 
-Columns nullable in the database but typed non-null in the entities (`doctrine.columnType`,
-still ignored): fixed for `Card`, where the reference data of production (the bootstrap) shows
-which columns hold `NULL`: `traits`, `text`, `flavor`, `cost` (a string: `X`...) and the stats
-are nullable (a hero has no cost, an ally no threat...), so the properties became nullable;
-`deck_limit` never is: `NOT NULL`, 3 by default (migration `Version20260930090741`;
-`setDeckLimit(null)`, from an empty field of the admin form or of a CSV import, stores 3). Same
-for `CardPrinting`, where no column can become `NOT NULL`: `illustrator` and `octgnid` are
-missing for some printings (70, 74), and the overrides (`traits` ... `quest`) are `NULL` for all
-of them (nullable by design, "empty = the value of the card"); its properties became nullable.
-And for `Pack.dateRelease` (no `NULL` in the reference data, but `NULL` means an unreleased pack:
-kept nullable); `Sphere.octgnid` (`NULL` for the 7 spheres, used by nothing) was dropped
-(migration `Version20260930102154`). `User.resume`, `color` and `ownedPacks` stay nullable, their
-properties too: `NULL` for the accounts that never saved their profile or collection, read like
-`''` everywhere. Left: the user content (descriptions, `dateLastComment`, `datePublish`,
-`Questlog.score`...),
-whose production data is not in the bootstrap: count its `NULL` values in production before
-choosing between `NOT NULL` and nullable properties. Left for later: level 9 (1136 errors with phpstan 1.4, all about `mixed`: request
+Columns nullable in the database but typed non-null in the entities (`doctrine.columnType`, no
+longer ignored: nothing is ignored in `phpstan.neon`). For the reference data, the bootstrap is the
+production data, so each column was checked: in `Card`, `traits`, `text`, `flavor`, `cost` (a
+string: `X`, `-`...) and the stats are nullable (a hero has no cost, an ally no threat...), so the
+properties became nullable; `deck_limit` never is: `NOT NULL`, 3 by default (migration
+`Version20260930090741`; `setDeckLimit(null)`, from an empty field of the admin form or of a CSV
+import, stores 3). In `CardPrinting`, no column can become `NOT NULL`: `illustrator` and
+`octgnid` are missing for some printings (70, 74), and the overrides (`traits` ... `quest`) are
+`NULL` for all of them (nullable by design, "empty = the value of the card"). `Pack.dateRelease`
+has no `NULL` in the reference data, but `NULL` means an unreleased pack: kept nullable.
+`Sphere.octgnid` (`NULL` for the 7 spheres, used by nothing) was dropped (migration
+`Version20260930102154`). The user content, whose production data is unknown, keeps its nullable
+columns and got nullable properties: `User.resume`, `color`, `ownedPacks` (`NULL` for the
+accounts that never saved their profile or collection, read like `''` everywhere), the
+descriptions of decks, decklists, fellowships and quest logs, `dateLastComment`, `datePublish`,
+`Deck.tags` / `problem`, `Deckchange.version`, `Decklist.freezeComments`, `Questlog.score`,
+`QuestlogDeck.player`. The callers needed two `(string)` casts, same behaviour in PHP 7.4: the
+traits of the heroes for Folco (`SlotCollectionDecorator`), the printings' octgnid in the CSV
+import.
+
+Left for later: level 9 (1136 errors with phpstan 1.4, all about `mixed`: request
 parameters, query results, the `mixed` parameters of the level 6 docblocks), cheaper on the
 rewritten code.
 

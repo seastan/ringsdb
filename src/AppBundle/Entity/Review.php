@@ -19,7 +19,7 @@ class Review {
      */
     private $dateUpdate;
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      */
     private $dateLastComment;
     /**
@@ -115,7 +115,7 @@ class Review {
     /**
      * Set dateLastComment
      *
-     * @param \DateTime $dateLastComment
+     * @param \DateTime|null $dateLastComment
      *
      * @return Review
      */
@@ -128,7 +128,7 @@ class Review {
     /**
      * Get dateLastComment
      *
-     * @return \DateTime
+     * @return \DateTime|null
      */
     public function getDateLastComment() {
         return $this->dateLastComment;

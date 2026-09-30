@@ -35,15 +35,15 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      */
     private $dateUpdate;
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      */
     private $dateLastComment;
     /**
-     * @var string
+     * @var string|null
      */
     private $descriptionMd;
     /**
-     * @var string
+     * @var string|null
      */
     private $descriptionHtml;
     /**
@@ -63,7 +63,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      */
     private $nbComments;
     /**
-     * @var bool
+     * @var bool|null
      */
     private $freezeComments;
     /**
@@ -230,7 +230,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
      /**
      * Set dateLastComment
      *
-     * @param \DateTime $dateLastComment
+     * @param \DateTime|null $dateLastComment
      *
      * @return Decklist
      */
@@ -243,7 +243,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get dateLastComment
      *
-     * @return \DateTime
+     * @return \DateTime|null
      */
     public function getDateLastComment() {
         return $this->dateLastComment;
@@ -252,7 +252,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Set descriptionMd
      *
-     * @param string $descriptionMd
+     * @param string|null $descriptionMd
      *
      * @return Decklist
      */
@@ -265,7 +265,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get descriptionMd
      *
-     * @return string
+     * @return string|null
      */
     public function getDescriptionMd() {
         return $this->descriptionMd;
@@ -274,7 +274,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Set descriptionHtml
      *
-     * @param string $descriptionHtml
+     * @param string|null $descriptionHtml
      *
      * @return Decklist
      */
@@ -287,7 +287,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get descriptionHtml
      *
-     * @return string
+     * @return string|null
      */
     public function getDescriptionHtml() {
         return $this->descriptionHtml;
@@ -384,7 +384,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Set freezeComments
      *
-     * @param bool $freezeComments
+     * @param bool|null $freezeComments
      *
      * @return Decklist
      */
@@ -397,7 +397,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get freezeComments
      *
-     * @return bool
+     * @return bool|null
      */
     public function getFreezeComments() {
         return $this->freezeComments;

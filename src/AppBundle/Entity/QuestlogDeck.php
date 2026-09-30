@@ -151,14 +151,14 @@ class QuestlogDeck {
     }
 
     /**
-     * @var string
+     * @var string|null
      */
     private $player;
 
     /**
      * Set player
      *
-     * @param string $player
+     * @param string|null $player
      *
      * @return QuestlogDeck
      */
@@ -171,7 +171,7 @@ class QuestlogDeck {
     /**
      * Get player
      *
-     * @return string
+     * @return string|null
      */
     public function getPlayer() {
         return $this->player;

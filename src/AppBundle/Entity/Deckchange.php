@@ -23,7 +23,7 @@ class Deckchange {
      */
     private $isSaved;
     /**
-     * @var string
+     * @var string|null
      */
     private $version;
     /**
@@ -131,7 +131,7 @@ class Deckchange {
     /**
      * Set version
      *
-     * @param string $version
+     * @param string|null $version
      *
      * @return Deckchange
      */
@@ -144,7 +144,7 @@ class Deckchange {
     /**
      * Get version
      *
-     * @return string
+     * @return string|null
      */
     public function getVersion() {
         return $this->version;
