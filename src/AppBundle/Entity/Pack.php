@@ -32,7 +32,7 @@ class Pack {
      */
     private $dateUpdate;
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      */
     private $dateRelease;
     /**
@@ -221,7 +221,7 @@ class Pack {
     /**
      * Set dateRelease
      *
-     * @param \DateTime $dateRelease
+     * @param \DateTime|null $dateRelease
      *
      * @return Pack
      */

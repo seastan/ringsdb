@@ -26,9 +26,6 @@ AppBundle\Entity\Sphere:
         is_primary:
             type: boolean
             nullable: false
-        octgnid:
-            type: string
-            nullable: true
     uniqueConstraints:
         sphere_code_idx:
             columns: [ code ]

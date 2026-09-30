@@ -19,8 +19,7 @@ class SphereType extends AbstractType {
       $builder
           ->add('code')
           ->add('name')
-          ->add('is_primary')
-          ->add('octgnid');
+          ->add('is_primary');
   }
 
     /**

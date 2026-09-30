@@ -27,7 +27,6 @@ Name
 Tactics
 isPrimary
 1
-Octgnid
 Back to the list
 Edit
 Delete

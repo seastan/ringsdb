@@ -22,7 +22,6 @@ Sphere edit
 Code
 Name
 Is primary
-Octgnid
 Update
 Edit
 Back to the list

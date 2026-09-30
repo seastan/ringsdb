@@ -229,8 +229,12 @@ are nullable (a hero has no cost, an ally no threat...), so the properties becam
 for `CardPrinting`, where no column can become `NOT NULL`: `illustrator` and `octgnid` are
 missing for some printings (70, 74), and the overrides (`traits` ... `quest`) are `NULL` for all
 of them (nullable by design, "empty = the value of the card"); its properties became nullable.
-The other entities are left (`Pack.dateRelease`: `NULL` means an unreleased pack;
-`Sphere.octgnid`: never set; the user content). Left for later: level 9 (1136 errors with phpstan 1.4, all about `mixed`: request
+And for `Pack.dateRelease` (no `NULL` in the reference data, but `NULL` means an unreleased pack:
+kept nullable); `Sphere.octgnid` (`NULL` for the 7 spheres, used by nothing) was dropped
+(migration `Version20260930102154`). Left: the user
+content (descriptions, `dateLastComment`, `datePublish`, `Questlog.score`, `User.resume`...),
+whose production data is not in the bootstrap: count its `NULL` values in production before
+choosing between `NOT NULL` and nullable properties. Left for later: level 9 (1136 errors with phpstan 1.4, all about `mixed`: request
 parameters, query results, the `mixed` parameters of the level 6 docblocks), cheaper on the
 rewritten code.
 
@@ -330,6 +334,7 @@ was in `Decks::setSlots()`, fixed (see "Quest logs").
   - `Version20260930090741`: makes `card.deck_limit` `NOT NULL`, 3 by default (see "Static
     analysis"). No card of the reference data has a `NULL` deck limit; the query of its docblock
     checks it on production.
+  - `Version20260930102154`: drops the unused `sphere.octgnid` (see "OCTGN features").
   - `stat_cards_cache` has no entity (filled by SQL, see "Card statistics"): the
     `schema_filter` of the DBAL connection hides it from Doctrine, which would drop it
     otherwise. Any other table without an entity must be added to that filter.
@@ -1071,10 +1076,11 @@ an earlier plan to drop them). The broken OCTGN commands were removed.
   version ("(MotK) Guthlaf" has the octgnid of Guthlaf). OCTGN cannot tell them apart: the import
   chooses the original card (the lowest id, as before the refactor), so a MotK hero exported to
   OCTGN comes back as the original hero. 74 printings have no octgnid.
-- Data: `CardPrinting.octgnid` and `Sphere.octgnid` (mappings, forms `CardPrintingType`,
-  `SphereType`, admin templates `Card/`, `CardPrinting/`, `Sphere/`), filled by the CSV import
-  (`CSVController`) and `BeornJSONtoRingsDBcsv.py`; returned by the public API for each card and
-  printing, and by the card statistics (with an OCTGN id `mapping` of the reprints).
+- Data: `CardPrinting.octgnid` (mapping, form `CardPrintingType`, admin templates `Card/`,
+  `CardPrinting/`), filled by the CSV import (`CSVController`) and `BeornJSONtoRingsDBcsv.py`;
+  returned by the public API for each card and printing, and by the card statistics (with an OCTGN
+  id `mapping` of the reprints). Removed: `Sphere.octgnid` (inherited from ThronesDB, never set,
+  used by nothing but its own admin form and pages; migration `Version20260930102154`).
 - The "about" page mentions OCTGN (`Default/about.html.twig`).
 - Removed: `UpdateOctgnCommand` (`app:octgn`), which still used a `Faction` entity (ThronesDB)
   and `Card::setOctgnid()`, so it could not run, and `ScrapOctgnCardDataCommand`

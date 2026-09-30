@@ -20,10 +20,6 @@ class Sphere {
      */
     private $is_primary;
     /**
-     * @var string
-     */
-    private $octgnid;
-    /**
      * @var \Doctrine\Common\Collections\Collection<int, \AppBundle\Entity\Card>
      */
     private $cards;
@@ -110,27 +106,7 @@ class Sphere {
         return $this->is_primary;
     }
 
-    /**
-     * Set octgnid
-     *
-     * @param string $octgnid
-     *
-     * @return Sphere
-     */
-    public function setOctgnid($octgnid) {
-        $this->octgnid = $octgnid;
 
-        return $this;
-    }
-
-    /**
-     * Get octgnid
-     *
-     * @return string
-     */
-    public function getOctgnid() {
-        return $this->octgnid;
-    }
 
     /**
      * Add card

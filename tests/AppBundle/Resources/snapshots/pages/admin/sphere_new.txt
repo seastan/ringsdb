@@ -22,7 +22,6 @@ Sphere creation
 Code
 Name
 Is primary
-Octgnid
 Create
 Back to the list
 About

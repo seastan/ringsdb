@@ -10,7 +10,6 @@
                 <th>Code</th>
                 <th>Name</th>
                 <th>IsPrimary</th>
-                <th>OctgnId</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -21,7 +20,6 @@
                 <td>{{ entity.code }}</td>
                 <td>{{ entity.name }}</td>
                 <td>{{ entity.isPrimary }}</td>
-                <td>{{ entity.octgnid }}</td>
                 <td>
                         <a href="{{ path('admin_sphere_show', { 'id': entity.id }) }}" class="btn btn-default btn-sm">show</a>
                         <a href="{{ path('admin_sphere_edit', { 'id': entity.id }) }}" class="btn btn-default btn-sm">edit</a>
