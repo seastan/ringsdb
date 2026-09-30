@@ -256,15 +256,21 @@ class AdminPagesTest extends WebTestCase {
     }
 
     /**
-     * BUG: blocking has no effect, FOSUserBundle 2's isAccountNonLocked() always returns true.
+     * A blocked user cannot log in: User::isAccountNonLocked() reads the "locked" column
+     * (FOSUserBundle 2's own version always returns true).
      */
-    public function testBlockedUserCanStillLogIn(): void {
+    public function testBlockedUserCannotLogIn(): void {
         $client = static::createClient();
         $this->db($client)->update('user', ['locked' => 1], ['username' => 'test']);
         try {
-            $client = $this->createAuthenticatedClient('test');
+            $crawler = $client->request('GET', '/login');
+            $client->submit($crawler->selectButton('_submit')->form(['_username' => 'test', '_password' => 'test']));
+            $this->assertTrue($client->getResponse()->isRedirect());
+            $this->assertSame('/login', parse_url((string) $client->getResponse()->headers->get('Location'), PHP_URL_PATH));
+
             $client->request('GET', '/decks');
-            $this->assertSame(200, $client->getResponse()->getStatusCode());
+            $this->assertSame(302, $client->getResponse()->getStatusCode());
+            $this->assertSame('/login', parse_url((string) $client->getResponse()->headers->get('Location'), PHP_URL_PATH));
         } finally {
             $this->db($client)->update('user', ['locked' => 0], ['username' => 'test']);
         }

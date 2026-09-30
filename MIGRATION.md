@@ -38,8 +38,9 @@ Each removal reduces what has to be ported.
 - **`/admin/stat_cards` and the `app:stats:precompute-cards` cron**: nothing in the repository
   consumes that JSON, probably an external report. Ask the maintainers / check the nginx logs
   (see "Card statistics").
-- **User blocking**: the "Block" button of the admin has had no effect since FOSUserBundle 2.
-  Reimplement it with a `UserChecker` or drop it, with the `locked` column (see "Admin area").
+- **User blocking**: FOSUserBundle 2 no longer enforces the `locked` column; `User` now
+  overrides `isAccountNonLocked()` (and the expiry checks) so the admin "Block" button works
+  again. Move this to a `UserChecker` when replacing FOSUser (see "Admin area").
 - **JSONP on the public API**: the callback is echoed unsanitised (XSS vector). Validate it or
   drop JSONP; dropping it changes the public API (see "Public API").
 - **Card scraping commands**: `app:beorn:html` (`ScrapBeornCardDataCommand`, scrapes the Hall of
@@ -784,9 +785,11 @@ hasErrata`. Pinned by `AdminCsvTest`:
 - Fixed: `/admin/user/show/{id}` and the "Block" button crashed, FOSUserBundle 2 having dropped
   the "locked" feature: `User` kept the `$locked` property (the prod database still has the
   column) without accessors. `isLocked()` / `setLocked()` were added.
-- BUG, not fixed: blocking a user has no effect, FOSUser 2's `isAccountNonLocked()` always
-  returns `true` (pinned by `testBlockedUserCanStillLogIn`). To reimplement with a `UserChecker`
-  when replacing FOSUser, or to drop.
+- Fixed: blocking a user had no effect, FOSUser 2's `isAccountNonLocked()` always returns
+  `true` (production's FOSUser dev-master still honoured it). `User` overrides
+  `isAccountNonLocked()`, `isAccountNonExpired()` and `isCredentialsNonExpired()` to read the
+  columns again (covered by `testBlockedUserCannotLogIn`). Move to a `UserChecker` when
+  replacing FOSUser.
 - The user's "Date of last update" changes at each login (`last_login`, then Gedmo
   timestampable); it is masked in the admin user page snapshot.
 - `StatController` concatenates the `month` query parameter into its SQL
