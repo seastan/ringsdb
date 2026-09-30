@@ -1105,11 +1105,11 @@ class User extends BaseUser {
      * These restore the 1.x behavior the Symfony UserChecker relies on.
      */
 
-    public function isAccountNonLocked() {
+    public function isAccountNonLocked(): bool {
         return !$this->locked;
     }
 
-    public function isAccountNonExpired() {
+    public function isAccountNonExpired(): bool {
         if (true === $this->expired) {
             return false;
         }
@@ -1121,7 +1121,7 @@ class User extends BaseUser {
         return true;
     }
 
-    public function isCredentialsNonExpired() {
+    public function isCredentialsNonExpired(): bool {
         if (true === $this->credentialsExpired) {
             return false;
         }
