@@ -55,7 +55,7 @@ class CardController extends AbstractController {
         $form = $this->createForm(CardType::class, $entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
             $em->flush();
@@ -152,7 +152,7 @@ class CardController extends AbstractController {
         $editForm = $this->createForm(CardType::class, $entity, ['method' => 'PUT']);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->persist($entity);
             $em->flush();
 
@@ -186,7 +186,7 @@ class CardController extends AbstractController {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $entity = $this->cardRepository->find($id);
 
@@ -211,7 +211,7 @@ class CardController extends AbstractController {
         $form = $this->createForceDeleteForm($id);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $entity = $this->cardRepository->find($id);
 

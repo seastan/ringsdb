@@ -111,7 +111,7 @@ class CardPrintingController extends AbstractController {
         $form       = $this->createForm(CardPrintingType::class, $entity, ['filter_pack' => $filterPack]);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($entity);
             $em->flush();
 
@@ -168,7 +168,7 @@ class CardPrintingController extends AbstractController {
         $editForm   = $this->createForm(CardPrintingType::class, $entity, ['filter_pack' => $filterPack, 'method' => 'PUT']);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->persist($entity);
             $em->flush();
 
@@ -192,7 +192,7 @@ class CardPrintingController extends AbstractController {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em     = $this->getDoctrine()->getManager();
             $entity = $this->cardPrintingRepository->find($id);
 

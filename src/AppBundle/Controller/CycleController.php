@@ -48,7 +48,7 @@ class CycleController extends AbstractController {
         $form = $this->createForm(CycleType::class, $entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
             $em->flush();
@@ -142,7 +142,7 @@ class CycleController extends AbstractController {
         $editForm = $this->createForm(CycleType::class, $entity, ['method' => 'PUT']);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em->persist($entity);
             $em->flush();
 
@@ -166,7 +166,7 @@ class CycleController extends AbstractController {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $entity = $this->cycleRepository->find($id);
 

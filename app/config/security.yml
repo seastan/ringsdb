@@ -30,6 +30,8 @@ security:
                 default_target_path: index
             logout:       true
             anonymous:    true
+            # the Symfony 4 behaviour: a session is closed when its user changes (password, disabled...)
+            logout_on_user_change: true
             remember_me:
                 secret:   "%secret%"
                 lifetime: 31536000 # 365 jours en secondes

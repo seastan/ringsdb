@@ -48,7 +48,7 @@ class ScenarioController extends AbstractController {
         $form = $this->createForm(ScenarioType::class, $entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
 #            $texts = $this->getContainer()->get('texts');
 #            $entity->setCanonicalName($texts->slugify($entity->getName()));
             # Set defaults
@@ -182,7 +182,7 @@ class ScenarioController extends AbstractController {
         $editForm = $this->createForm(ScenarioType::class, $entity, ['method' => 'PUT']);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
 #            $texts = $this->getContainer()->get('texts');
 #            $entity->setCanonicalName($texts->slugify($entity->getName()));
 
@@ -209,7 +209,7 @@ class ScenarioController extends AbstractController {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $entity = $this->scenarioRepository->find($id);
 
