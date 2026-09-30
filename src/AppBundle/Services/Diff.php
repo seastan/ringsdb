@@ -102,7 +102,7 @@ class Diff {
 
     /**
      * @param mixed $decks
-     * @return array
+     * @return array{array<int, array<int|string, int>>, array<int|string, int>}
      */
     public function diffContents($decks) {
 

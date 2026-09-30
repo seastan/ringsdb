@@ -183,7 +183,7 @@ class BuilderController extends AbstractController {
 
     /**
      * @param mixed $text
-     * @return array
+     * @return array{content: array{main: array<int|string, int>, side: array<int|string, int>}, description: string}
      */
     public function parseTextImport($text) {
         /* @var $em \Doctrine\ORM\EntityManager */
@@ -288,7 +288,7 @@ class BuilderController extends AbstractController {
 
     /**
      * @param mixed $octgn
-     * @return array
+     * @return array{content: array{main: array<int|string, int>, side: array<int|string, int>}, description: string}
      */
     public function parseOctgnImport($octgn) {
         /* @var $em \Doctrine\ORM\EntityManager */
@@ -883,12 +883,11 @@ class BuilderController extends AbstractController {
 
                 $deckname = pathinfo($name, PATHINFO_FILENAME);
 
-                if (isset($parse['content']) && $parse['content']) {
-                    /* @var $deck \AppBundle\Entity\Deck */
-                    $deck = new Deck();
-                    $em->persist($deck);
-                    $this->decks->saveDeck($this->getUser(), $deck, null, $deckname, '', '', $parse['content'], null);
-                }
+                // one deck per file, even without any card (an empty deck)
+                /* @var $deck \AppBundle\Entity\Deck */
+                $deck = new Deck();
+                $em->persist($deck);
+                $this->decks->saveDeck($this->getUser(), $deck, null, $deckname, '', '', $parse['content'], null);
             }
         }
         $zip->close();

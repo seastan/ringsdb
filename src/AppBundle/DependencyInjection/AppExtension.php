@@ -16,6 +16,7 @@ class AppExtension extends Extension {
     /**
      * {@inheritdoc}
      * @return void
+     * @param array<int, array<string, mixed>> $configs
      */
     public function load(array $configs, ContainerBuilder $container) {
         $configuration = new Configuration();

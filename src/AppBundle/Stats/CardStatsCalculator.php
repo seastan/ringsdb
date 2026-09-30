@@ -487,7 +487,7 @@ FROM (
 	}
 
 	/**
-	 * @return array
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function getPacks() {
 		$dbh = $this->conn;
@@ -501,7 +501,7 @@ ORDER BY date_release";
 	}
 
 	/**
-	 * @return array
+	 * @return array<string, array{string, string}>
 	 */
 	private function getPackRuless() {
 		$pack_rules = ['Core Set' => ['2000-01-01', '2011-07-21'],

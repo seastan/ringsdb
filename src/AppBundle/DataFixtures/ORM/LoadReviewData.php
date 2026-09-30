@@ -26,6 +26,9 @@ class LoadReviewData extends AbstractFixture implements ContainerAwareInterface,
         $this->container = $container;
     }
 
+    /**
+     * @return array<int, class-string>
+     */
     public function getDependencies()
     {
         return [

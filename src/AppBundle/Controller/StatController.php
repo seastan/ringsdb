@@ -398,7 +398,7 @@ ON c.cycle = u.cycle";
 	}
 
 	/**
-	 * @return array
+	 * @return array<int, array<string, mixed>>
 	 */
 	function getPacks() {
 		$dbh = $this->getDoctrine()->getConnection();
@@ -412,7 +412,7 @@ ORDER BY date_release";
 	}
 
 	/**
-	 * @return array
+	 * @return array<string, array{string, string}>
 	 */
 	function getPackRuless() {
 		$pack_rules = ['Core Set' => ['2000-01-01', '2011-07-21'],
@@ -430,7 +430,7 @@ ORDER BY date_release";
 	}
 
 	/**
-	 * @return array
+	 * @return array<int, array<string, mixed>>
 	 */
 	function getQuests() {
 		$dbh = $this->getDoctrine()->getConnection();

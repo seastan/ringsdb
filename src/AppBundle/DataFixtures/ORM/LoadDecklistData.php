@@ -25,6 +25,9 @@ class LoadDecklistData extends AbstractFixture implements ContainerAwareInterfac
         $this->container = $container;
     }
 
+    /**
+     * @return array<int, class-string>
+     */
     public function getDependencies()
     {
         return [

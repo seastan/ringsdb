@@ -2,22 +2,13 @@ parameters:
     level: 8
     paths:
         - src
-        - tests
     ignoreErrors:
-        # legacy code: arrays are untyped structures and Doctrine collections have no generic types;
-        # to revisit after the migration
-        - identifier: missingType.iterableValue
+        # legacy code: the Doctrine collections have no generic types; to revisit after the migration
         - identifier: missingType.generics
         # phpstan-doctrine: columns nullable in the database but typed non-null in the entities
         # (docblocks); making them nullable spreads to every caller of their getters. To fix with
         # the typed properties, see MIGRATION.md
         - identifier: doctrine.columnType
-    bootstrapFiles:
-        # PHPUnit is installed by simple-phpunit (SYMFONY_PHPUNIT_VERSION in phpunit.xml), outside
-        # Composer's autoloader: KernelTestCase / WebTestCase extend its TestCase
-        - vendor/bin/.phpunit/phpunit-6.5-0/vendor/autoload.php
-    stubFiles:
-        - src/AppBundle/PHPStan/stubs/Assert.stub
     # phpstan/phpstan-symfony: the service types, read from the container dumped in debug mode
     # (make phpstan warms up the test cache first)
     symfony:
@@ -35,40 +26,5 @@ services:
             - phpstan.broker.dynamicMethodReturnTypeExtension
     -
         class: AppBundle\PHPStan\ControllerGetUserReturnTypeExtension
-        tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
-    -
-        class: AppBundle\PHPStan\HeaderBagGetReturnTypeExtension
-        tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
-    -
-        class: AppBundle\PHPStan\PHPUnitAssertMethodTypeSpecifyingExtension
-        tags:
-            - phpstan.typeSpecifier.methodTypeSpecifyingExtension
-    -
-        class: AppBundle\PHPStan\PHPUnitAssertStaticMethodTypeSpecifyingExtension
-        tags:
-            - phpstan.typeSpecifier.staticMethodTypeSpecifyingExtension
-    # the tests only read the response, request and container of the client after a request
-    -
-        class: AppBundle\PHPStan\NonNullReturnTypeExtension
-        arguments: [Symfony\Component\BrowserKit\Client, [getResponse, getRequest, getInternalResponse, getInternalRequest, getCrawler]]
-        tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
-    -
-        class: AppBundle\PHPStan\NonNullReturnTypeExtension
-        arguments: [Symfony\Bundle\FrameworkBundle\Client, [getContainer, getKernel]]
-        tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
-    # the content of the responses (tested), false only for streamed responses
-    -
-        class: AppBundle\PHPStan\NonNullReturnTypeExtension
-        arguments: [Symfony\Component\HttpFoundation\Response, [getContent]]
-        tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
-    # the kernel is booted
-    -
-        class: AppBundle\PHPStan\NonNullReturnTypeExtension
-        arguments: [Symfony\Component\HttpKernel\KernelInterface, [getContainer]]
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension

@@ -4,7 +4,7 @@ namespace AppBundle\Entity;
 
 class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable {
     /**
-     * @return array
+     * @return list<array<string, mixed>>
      */
     public function getHistory() {
         $slots = $this->getSlots();
@@ -694,7 +694,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Get allFellowships
      *
-     * @return array
+     * @return array<int, FellowshipDeck>
      */
     public function getAllFellowships() {
         $childrenFellowships = $this->getFellowships()->toArray();
@@ -746,7 +746,7 @@ class Deck extends \AppBundle\Model\ExportableDeck implements \JsonSerializable 
     /**
      * Get allQuestlogs
      *
-     * @return array
+     * @return array<int, QuestlogDeck>
      */
     public function getAllQuestlogs() {
         $allQuestlogs = $this->getQuestlogs()->toArray();

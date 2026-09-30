@@ -10,7 +10,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 class EncounterType extends AbstractType {
     /**
      * @param FormBuilderInterface $builder
-     * @param array $options
+     * @param array<string, mixed> $options
      * @return void
      */
     public function buildForm(FormBuilderInterface $builder, array $options) {

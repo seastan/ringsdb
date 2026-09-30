@@ -60,7 +60,7 @@ class Decks {
     /**
      * @param mixed $user
      * @param mixed $limit
-     * @return array
+     * @return list<array<string, mixed>>
      */
     public function getDecksWithSlotsForUser($user, $limit = null) {
         // Step 1: get the right deck IDs with no collection join so LIMIT works correctly
@@ -523,7 +523,7 @@ class Decks {
 
     /**
      * @param mixed $deck
-     * @return array
+     * @return array<int, Deckchange>
      */
     public function getUnsavedChanges($deck) {
         return $this->doctrine->getRepository(Deckchange::class)->findBy([

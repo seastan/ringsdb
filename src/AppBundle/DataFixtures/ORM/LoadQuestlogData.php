@@ -14,6 +14,9 @@ use Doctrine\Common\Persistence\ObjectManager;
 class LoadQuestlogData extends AbstractFixture implements DependentFixtureInterface
 {
 
+    /**
+     * @return array<int, class-string>
+     */
     public function getDependencies()
     {
         return [

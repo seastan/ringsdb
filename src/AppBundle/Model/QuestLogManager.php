@@ -368,7 +368,7 @@ class QuestLogManager {
     }
 
     /**
-     * @return array
+     * @return list<array{numero: int, url: string, current: bool}>
      */
     public function getAllPages() {
         $request = $this->currentRequest();

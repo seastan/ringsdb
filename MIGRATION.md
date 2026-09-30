@@ -85,8 +85,8 @@ Each removal reduces what has to be ported.
   migration".
 - **Time in tests** (`ClockInterface`): see "Tests and time".
 - **Static analysis** (`make phpstan`, level 8 of phpstan 2.2, see "Static analysis"): level 9,
-  the nullable columns typed non-null, the value types of arrays, and `phpstan-phpunit` instead
-  of our PHPUnit extensions.
+  the nullable columns typed non-null, the generic types; the analysis of the tests
+  (`phpstan-phpunit`, with PHPUnit 9).
 
 # Migration plan
 
@@ -190,8 +190,8 @@ skeleton, it is ported first, then run against the new application.
 
 ## Static analysis
 
-`make phpstan` runs phpstan 2.2 at level 8 on `src/` and `tests/` (configuration in
-`phpstan.neon`), with the official extensions (loaded by `phpstan/extension-installer`):
+`make phpstan` runs phpstan 2.2 at level 8 on `src/` (configuration in `phpstan.neon`; the tests
+are no longer analysed), with the official extensions (loaded by `phpstan/extension-installer`):
 
 - `phpstan-symfony`: the service types, read from the container dumped in `var/cache/test`
   (hence the `cache:warmup` of `make phpstan`), and the console helpers
@@ -203,12 +203,14 @@ skeleton, it is ported first, then run against the new application.
   remain, still valid in ORM 2.7). phpstan's result cache does not know the mappings: after
   changing one, `vendor/bin/phpstan clear-result-cache`.
 
-`phpstan-phpunit` is not installed (its latest version needs phpstan 2.3 and conflicts with
-PHPUnit < 7): the tests run PHPUnit 6.5. Our own extensions remain in `src/AppBundle/PHPStan/`:
-the PHPUnit assertions narrowing types (until PHPUnit 9 and `phpstan-phpunit`), the Doctrine
-registry (`getManager()` / `getConnection()` return the ORM entity manager / the DBAL connection),
-the logged in user (`getUser()` is an `AppBundle\Entity\User`), the non-null response / request /
-container of the test client, `HeaderBag::get()`; and a stub for a wrong PHPUnit docblock.
+Our own extensions in `src/AppBundle/PHPStan/` are down to two: the Doctrine registry
+(`getManager()` / `getConnection()` return the ORM entity manager / the DBAL connection, which
+phpstan-doctrine does not say) and the logged in user (`getUser()` is an `AppBundle\Entity\User`).
+The ones that only served the analysis of the tests were removed with it: the PHPUnit assertions
+narrowing types, the non-null response / request / container of the test client,
+`HeaderBag::get()`, the PHPUnit stub and bootstrap file. `phpstan-phpunit` is not installed (its
+latest version needs phpstan 2.3 and conflicts with PHPUnit < 7): to consider with PHPUnit 9, if
+the tests are analysed again.
 
 Found by `phpstan-doctrine` and fixed:
 - the required associations were nullable: 32 mappings declared `nullable: false` on the
@@ -221,9 +223,15 @@ Found by `phpstan-doctrine` and fixed:
 Left for later: the 49 columns nullable in the database but typed non-null in the entities
 (`doctrine.columnType`, ignored: making them nullable spreads to every caller of their getters; to
 fix with the typed properties); level 9 (1136 errors with phpstan 1.4, all about `mixed`: request
-parameters, query results, the `mixed` parameters of the level 6 docblocks) and the value types of
-arrays (`missingType.iterableValue` and `missingType.generics` are ignored; the collections of the
-entities are now typed). Both are cheaper on the rewritten code.
+parameters, query results, the `mixed` parameters of the level 6 docblocks) and the generic types
+of the other classes (`missingType.generics` is ignored; the collections of the entities are
+typed). Both are cheaper on the rewritten code.
+
+The value types of the arrays are checked (`missingType.iterableValue`, 51 docblocks of `src/`):
+precise shapes where the structure is small and stable (the import parsers, the page links of
+the managers, the deck contents), `array<string, mixed>` for the large ones (the card infos, the
+SQL rows). Found on the way: the archive import tested a `content` its parsers always return (one
+deck per file, even empty: unchanged).
 
 ## Environment
 

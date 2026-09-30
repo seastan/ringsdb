@@ -34,22 +34,20 @@ test-fixtures:
 	docker compose exec -it -u www-data symfony php app/console doctrine:fixtures:load --append --env=test
 
 phpunit: test-fixtures
-	docker compose exec -it -u www-data symfony php bin/simple-phpunit
+	docker compose exec -it -u www-data symfony php vendor/bin/simple-phpunit
 
 # Code coverage report in var/cache/coverage/index.html (uses Xdebug)
 coverage: test-fixtures
-	docker compose exec -it -u www-data symfony php bin/simple-phpunit --coverage-html var/cache/coverage --coverage-text=php://stdout --colors=never
+	docker compose exec -it -u www-data symfony php vendor/bin/simple-phpunit --coverage-html var/cache/coverage --coverage-text=php://stdout --colors=never
 	@echo "Code coverage report: \033[36mfile://${PWD}/var/cache/coverage/index.html\033[0m"
 
-# simple-phpunit install: PHPUnit is needed to analyse the tests; cache:warmup: the service
-# types are read from the dumped container (see phpstan.neon)
+# cache:warmup: the service types are read from the dumped container (see phpstan.neon)
 phpstan:
-	docker compose exec -it -u www-data symfony php bin/simple-phpunit install
 	docker compose exec -it -u www-data symfony php app/console cache:warmup --env=test
-	docker compose exec -it -u www-data symfony php bin/phpstan --memory-limit=-1
+	docker compose exec -it -u www-data symfony php vendor/bin/phpstan --memory-limit=-1
 
 deprecations:
-	docker compose exec -it -u www-data -e SYMFONY_DEPRECATIONS_HELPER=verbose=max[total]=999999 symfony php bin/simple-phpunit
+	docker compose exec -it -u www-data -e SYMFONY_DEPRECATIONS_HELPER=verbose=max[total]=999999 symfony php vendor/bin/simple-phpunit
 
 lint-twig:
 	docker compose exec -it -u www-data symfony php app/console lint:twig src/AppBundle/Resources/views app/Resources

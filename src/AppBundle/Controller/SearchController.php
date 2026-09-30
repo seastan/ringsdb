@@ -418,7 +418,7 @@ class SearchController extends AbstractController {
                 $card = $rows[$rowindex];
                 /* @var $pack \AppBundle\Entity\Pack */
                 $pack = $card->getPack();
-                /** @var array $cardinfo */
+                /** @var array<string, mixed> $cardinfo */
                 $cardinfo = $this->cardsData->getCardInfo($card, false);
 
                 if (empty($availability[$pack->getCode()])) {

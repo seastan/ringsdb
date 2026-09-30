@@ -41,8 +41,8 @@ class DefaultController extends AbstractController {
     /**
      * Newest first
      *
-     * @param array $a
-     * @param array $b
+     * @param array<string, mixed> $a
+     * @param array<string, mixed> $b
      * @return int
      */
     function orderNew($a, $b) {

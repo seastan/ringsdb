@@ -86,7 +86,7 @@ class CardsData {
 	}
 
 	/**
-	 * @return array
+	 * @return list<array<string, mixed>>
 	 */
 	public function allSetsData() {
 		$list_cycles = $this->doctrine->getRepository(Cycle::class)->findBy([], ["position" => "ASC"]);
@@ -136,7 +136,7 @@ class CardsData {
 	}
 
 	/**
-	 * @return array
+	 * @return array<int, Sphere>
 	 */
 	public function getPrimarySpheres() {
 		$spheres = $this->doctrine->getRepository(Sphere::class)->findBy(["is_primary" => true], ["code" => "ASC"]);
@@ -148,7 +148,7 @@ class CardsData {
      * @param mixed $conditions
      * @param mixed $sortorder
      * @param bool $forceempty
-     * @return array
+     * @return array<int, Card>
      */
     public function get_search_rows($conditions, $sortorder, $forceempty = false) {
         $i = 0;
@@ -453,7 +453,7 @@ class CardsData {
 	 *
 	 * @param \AppBundle\Entity\Card $card
 	 * @param bool $api
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function getCardInfo($card, $api = false) {
 		$cardinfo = [];
@@ -557,7 +557,7 @@ class CardsData {
 
 	/**
 	 * @param mixed $query
-	 * @return array
+	 * @return list<array<int, string>>
 	 */
 	public function syntax($query) {
 		// renvoie une liste de conditions (array)
@@ -669,7 +669,7 @@ class CardsData {
 
 	/**
 	 * @param mixed $card
-	 * @return array
+	 * @return array<int, Review>
 	 */
 	public function get_reviews($card) {
 		$reviews = $this->doctrine->getRepository(Review::class)->findBy(['card' => $card], ['nbVotes' => 'DESC', 'id' => 'ASC']);

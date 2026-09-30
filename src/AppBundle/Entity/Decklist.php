@@ -843,7 +843,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get allFellowships
      *
-     * @return array
+     * @return array<int, FellowshipDecklist>
      */
     public function getAllFellowships() {
         $allFellowships = $this->getFellowships()->toArray();
@@ -919,7 +919,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     /**
      * Get allQuestlogs
      *
-     * @return array
+     * @return array<int, QuestlogDeck>
      */
     public function getAllQuestlogs() {
         $theseLogs = $this->getQuestlogs()->toArray();
@@ -932,7 +932,7 @@ class Decklist extends \AppBundle\Model\ExportableDeck implements \JsonSerializa
     }
 
     /**
-     * @return array
+     * @return array{main: array<int|string, int>, side: array<int|string, int>}
      */
     public function getContent()
     {

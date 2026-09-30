@@ -49,7 +49,7 @@ class SuggestionsCommand extends Command {
 
     /**
      * @param mixed $arr
-     * @return array
+     * @return list<array{int, int}>
      */
     private function getAllPairs($arr) {
         $pairs = [];
@@ -68,7 +68,7 @@ class SuggestionsCommand extends Command {
      * are seen together in a deck
      * also returns an array of card codes
      * x and y are private indexes, not card.id
-     * @return array
+     * @return array{index: array<int, string>, matrix: array<int, array<int, float|int>>}
      */
     private function getSuggestions() {
         $matrix = [];

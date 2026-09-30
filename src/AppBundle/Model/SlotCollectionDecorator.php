@@ -201,7 +201,7 @@ class SlotCollectionDecorator implements \AppBundle\Model\SlotCollectionInterfac
     }
 
     /**
-     * @return array
+     * @return array<string, array{copies: int, deck_limit: int}>
      */
     public function getCopiesAndDeckLimit() {
         $copiesAndDeckLimit = [];

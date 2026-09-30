@@ -13,6 +13,9 @@ use Doctrine\Common\Persistence\ObjectManager;
 class LoadFellowshipData extends AbstractFixture implements DependentFixtureInterface
 {
 
+    /**
+     * @return array<int, class-string>
+     */
     public function getDependencies()
     {
         return [

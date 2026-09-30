@@ -8,7 +8,7 @@ class DeckValidationHelper {
 
     /**
      * @param mixed $deck
-     * @return array
+     * @return list<\AppBundle\Entity\Card>
      */
     public function getInvalidCards($deck) {
         $invalidCards = [];

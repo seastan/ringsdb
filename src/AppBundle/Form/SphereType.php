@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class SphereType extends AbstractType {
     /**
      * @param FormBuilderInterface $builder
-     * @param array $options
+   * @param array<string, mixed> $options
    * @return void
    */
   public function buildForm(FormBuilderInterface $builder, array $options) {

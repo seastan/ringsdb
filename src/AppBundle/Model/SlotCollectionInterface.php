@@ -46,14 +46,14 @@ interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \Array
     /**
      * Get all slots sorted by type code
      *
-     * @return array
+     * @return array<string, list<SlotInterface>>
      */
     public function getSlotsByType();
 
     /**
      * Get all slot counts sorted by type code
      *
-     * @return array
+     * @return array<string, int>
      */
     public function getCountByType();
 
@@ -82,7 +82,7 @@ interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \Array
     /**
      * Get the content as an array card_code => qty
      *
-     * @return array
+     * @return array<int|string, int>
      */
     public function getContent();
 

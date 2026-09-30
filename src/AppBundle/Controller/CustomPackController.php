@@ -306,6 +306,7 @@ class CustomPackController extends AbstractController {
     /**
      * @param mixed $em
      * @return void
+     * @param array<int|string, mixed> $cardEntries
      */
     private function attachCards($em, UserCustomPack $pack, array $cardEntries) {
         $cardRepo = $this->getDoctrine()->getRepository(Card::class);
