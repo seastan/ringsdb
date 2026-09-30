@@ -39,8 +39,7 @@ Each removal reduces what has to be ported.
 - **User blocking**: FOSUserBundle 2 no longer enforces the `locked` column; `User` now
   overrides `isAccountNonLocked()` (and the expiry checks) so the admin "Block" button works
   again. Move this to a `UserChecker` when replacing FOSUser (see "Admin area").
-- **JSONP on the public API**: the callback is echoed unsanitised (XSS vector). Validate it or
-  drop JSONP; dropping it changes the public API (see "Public API").
+- Done: **JSONP on the public API**, the callback is validated (see "Public API").
 - **Card scraping commands**: `app:beorn:html` (`ScrapBeornCardDataCommand`, scrapes the Hall of
   Beorn HTML pages, still full of debug output), `app:beorn:json` and `app:download-images`
   (`app:cgdb:cards` was removed). The CSV import
@@ -474,6 +473,11 @@ The OAuth2 API (`/api/oauth2`) has been removed: see "OAuth2 server (removed)" b
   for xls/xlsx). `/card/{code}.xml` is a `404` (route requirement).
 - Fixed: `/cards/search/{q}` ignored the `jsonp` parameter (the action tested `isset($jsonp)` but
   never read it from the request). It now supports JSONP like the other endpoints.
+- Fixed: the JSONP callback was echoed as is into the `application/javascript` response (XSS).
+  `ApiController::setJsonContent()` validates it with `JsonResponse::setCallback()` (a JavaScript
+  identifier, dots and brackets allowed, no reserved word): an invalid one is a `400`, an empty
+  one is ignored (plain JSON). The script is now `/**/callback(json);` (the comment prefix
+  protects against content sniffing); the `Content-Type` stays `application/javascript`.
 - `/cards/` `Last-Modified` is the most recent `dateUpdate` of the cards **and** of their
   printings.
 - `/custom-packs/published` and `/user/info` are not in `ApiController`: they return a
@@ -483,8 +487,6 @@ The OAuth2 API (`/api/oauth2`) has been removed: see "OAuth2 server (removed)" b
 
 ### To look at during the migration
 
-- JSONP: the callback name is echoed unsanitised into an `application/javascript` response
-  (XSS vector). Consider validating it (`^[\w.]+$`) or dropping JSONP in favour of CORS.
 - `listDecklistsByDateAction` builds its DQL by string concatenation (`LIKE '$date%'`); it is
   only safe because of the route requirement `\d\d\d\d-\d\d-\d\d`. Use a parameter.
 - `/custom-packs/published` is tested with a single published pack (`LoadCustomPackData`).

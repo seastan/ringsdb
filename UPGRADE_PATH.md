@@ -77,7 +77,7 @@ symfony/framework-bundle:
 
 1. Removals (OCTGN, twig/extensions, the scrapers, /api/doc depending on the decision).
 2. Symfony 3.4 + ORM 2.6/2.7 + local PHP 7.4 (aligned with prod), then deploy.
-3. PhpSpreadsheet, Assetic replaced, the bundle upgrades from point 4, Composer 2 and phpstan 2.
+3. PhpSpreadsheet, Assetic replaced, the bundle upgrades from point 4, Composer 2 and phpstan 2.
 4. Symfony 4.4, then deploy.
 5. Symfony 5.4 + ORM 2.13+ + FOSUser replaced, then deploy.
 6. PHPUnit 9, then PHP 8.2 or 8.3, then deploy.

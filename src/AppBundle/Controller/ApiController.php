@@ -14,6 +14,8 @@ use AppBundle\Entity\Card;
 use AppBundle\Entity\Scenario;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Collections\Criteria;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -115,13 +117,7 @@ class ApiController extends AbstractController {
         }
 
         $content = json_encode($packs);
-        if (isset($jsonp)) {
-            $content = "$jsonp($content)";
-            $response->headers->set('Content-Type', 'application/javascript');
-        } else {
-            $response->headers->set('Content-Type', 'application/json');
-        }
-        $response->setContent($content);
+        $this->setJsonContent($response, (string) $content, $jsonp);
 
         return $response;
     }
@@ -185,13 +181,7 @@ class ApiController extends AbstractController {
         $card = $this->cardsData->getCardInfo($card, true);
 
         $content = json_encode($card);
-        if (isset($jsonp)) {
-            $content = "$jsonp($content)";
-            $response->headers->set('Content-Type', 'application/javascript');
-        } else {
-            $response->headers->set('Content-Type', 'application/json');
-        }
-        $response->setContent($content);
+        $this->setJsonContent($response, (string) $content, $jsonp);
 
         return $response;
     }
@@ -263,13 +253,7 @@ class ApiController extends AbstractController {
         }
 
         $content = json_encode($cards);
-        if (isset($jsonp)) {
-            $content = "$jsonp($content)";
-            $response->headers->set('Content-Type', 'application/javascript');
-        } else {
-            $response->headers->set('Content-Type', 'application/json');
-        }
-        $response->setContent($content);
+        $this->setJsonContent($response, (string) $content, $jsonp);
 
         return $response;
     }
@@ -351,13 +335,7 @@ class ApiController extends AbstractController {
         }
 
         $content = json_encode($cards);
-        if (isset($jsonp)) {
-            $content = "$jsonp($content)";
-            $response->headers->set('Content-Type', 'application/javascript');
-        } else {
-            $response->headers->set('Content-Type', 'application/json');
-        }
-        $response->setContent($content);
+        $this->setJsonContent($response, (string) $content, $jsonp);
 
         return $response;
     }
@@ -422,14 +400,7 @@ class ApiController extends AbstractController {
 
         $content = json_encode($decklist);
 
-        if (isset($jsonp)) {
-            $content = "$jsonp($content)";
-            $response->headers->set('Content-Type', 'application/javascript');
-        } else {
-            $response->headers->set('Content-Type', 'application/json');
-        }
-
-        $response->setContent($content);
+        $this->setJsonContent($response, (string) $content, $jsonp);
 
         return $response;
     }
@@ -512,14 +483,7 @@ class ApiController extends AbstractController {
 
         $content = json_encode($decklists);
 
-        if (isset($jsonp)) {
-            $content = "$jsonp($content)";
-            $response->headers->set('Content-Type', 'application/javascript');
-        } else {
-            $response->headers->set('Content-Type', 'application/json');
-        }
-
-        $response->setContent($content);
+        $this->setJsonContent($response, (string) $content, $jsonp);
 
         return $response;
     }
@@ -626,14 +590,7 @@ class ApiController extends AbstractController {
 
         $content = json_encode($decklists);
 
-        if (isset($jsonp)) {
-            $content = "$jsonp($content)";
-            $response->headers->set('Content-Type', 'application/javascript');
-        } else {
-            $response->headers->set('Content-Type', 'application/json');
-        }
-
-        $response->setContent($content);
+        $this->setJsonContent($response, (string) $content, $jsonp);
 
         return $response;
     }
@@ -693,13 +650,7 @@ class ApiController extends AbstractController {
         }
 
         $content = json_encode($scenario);
-        if (isset($jsonp)) {
-            $content = "$jsonp($content)";
-            $response->headers->set('Content-Type', 'application/javascript');
-        } else {
-            $response->headers->set('Content-Type', 'application/json');
-        }
-        $response->setContent($content);
+        $this->setJsonContent($response, (string) $content, $jsonp);
 
         return $response;
     }
@@ -741,14 +692,35 @@ class ApiController extends AbstractController {
         }
 
         $content = json_encode($cards);
-        if (isset($jsonp)) {
-            $content = "$jsonp($content)";
-            $response->headers->set('Content-Type', 'application/javascript');
-        } else {
-            $response->headers->set('Content-Type', 'application/json');
-        }
-        $response->setContent($content);
+        $this->setJsonContent($response, (string) $content, $jsonp);
 
         return $response;
+    }
+
+    /**
+     * The JSON content of an API response, wrapped in the JSONP callback when one is given. The
+     * callback is validated by JsonResponse::setCallback() (a JavaScript identifier, with dots and
+     * brackets, no reserved word) and the script prefixed with a comment, against content sniffing.
+     * An empty callback is ignored.
+     *
+     * @param string|null $callback
+     */
+    private function setJsonContent(Response $response, string $json, $callback): void {
+        if ($callback === null || $callback === '') {
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent($json);
+
+            return;
+        }
+
+        $jsonp = new JsonResponse();
+        $jsonp->setJson($json);
+        try {
+            $jsonp->setCallback($callback);
+        } catch (\InvalidArgumentException $e) {
+            throw new BadRequestHttpException('Invalid JSONP callback.');
+        }
+        $response->headers->set('Content-Type', 'application/javascript');
+        $response->setContent((string) $jsonp->getContent());
     }
 }

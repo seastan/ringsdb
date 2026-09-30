@@ -111,9 +111,57 @@ class ApiControllerTest extends WebTestCase {
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('application/javascript', $response->headers->get('Content-Type'));
-        $this->assertRegExp('/^myCallback\((.*)\)$/s', $response->getContent());
-        $json = preg_replace('/^myCallback\((.*)\)$/s', '$1', $response->getContent());
+        // the comment prefix protects against content sniffing (JsonResponse::setCallback())
+        $this->assertRegExp('/^\/\*\*\/myCallback\((.*)\);$/s', $response->getContent());
+        $json = preg_replace('/^\/\*\*\/myCallback\((.*)\);$/s', '$1', $response->getContent());
         $this->assertMatchesJsonSnapshot($snapshot, $json);
+    }
+
+    /**
+     * Fixed: the callback was echoed as is into the script (XSS). It must be a JavaScript
+     * identifier, dots and brackets allowed, not a reserved word; otherwise 400.
+     *
+     * @dataProvider invalidJsonpProvider
+     */
+    public function testInvalidJsonpCallbackIsRefused(string $callback): void {
+        $client = static::createClient();
+        $response = $this->get($client, '/api/public/card/01001?jsonp=' . urlencode($callback));
+
+        $this->assertSame(400, $response->getStatusCode());
+        // not a script: the callback is not echoed as code
+        $this->assertNotSame('application/javascript', $response->headers->get('Content-Type'));
+        $this->assertNotContains('/**/', (string) $response->getContent());
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public function invalidJsonpProvider() {
+        return [
+            'script injection' => ['alert(document.cookie)//'],
+            'markup' => ['<script>alert(1)</script>'],
+            'reserved word' => ['function'],
+        ];
+    }
+
+    public function testJsonpCallbackWithDots(): void {
+        $client = static::createClient();
+        $response = $this->get($client, '/api/public/card/01001?jsonp=jQuery123.cb_4');
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringStartsWith('/**/jQuery123.cb_4(', (string) $response->getContent());
+    }
+
+    /**
+     * An empty callback is ignored: plain JSON.
+     */
+    public function testEmptyJsonpCallbackIsIgnored(): void {
+        $client = static::createClient();
+        $response = $this->get($client, '/api/public/card/01001?jsonp=');
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
+        $this->assertStringStartsWith('{', (string) $response->getContent());
     }
 
     /**
