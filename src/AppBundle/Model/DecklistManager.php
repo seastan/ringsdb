@@ -380,13 +380,15 @@ class DecklistManager {
                 // ever exclude decks that are unbuildable under ANY collection. Skipping it in that
                 // case avoids the full O(decklists x slots) scan that saturated php-fpm when crawlers
                 // submit every pack checkbox (the giant ?packs[]=... URLs).
-                // Only valid at the maximum core count (3, the search form's cap): with fewer cores
-                // the Core Set multiplier below still excludes decks, so the full check must run.
+                // This holds for any core count: with every pack selected, the repackaged products
+                // also supply the Core Set cards, so numcores changes nothing (on the 2026-06 prod
+                // data the same 2 decklists are excluded at 1, 2 and 3 cores). Running the full check
+                // for numcores < 3 would cost ~10x for no difference in results.
                 // Accepted deviation: in this all-packs case, the few decks that use more copies of a
                 // card than exist in total (unbuildable with any collection anyway) are no longer
                 // filtered out — this keeps the short-circuit table-free with no per-request scan.
                 $skipBuildable = false;
-                if (!empty($packs) && !$useCustomPacks && $cores >= 3) {
+                if (!empty($packs) && !$useCustomPacks) {
                     $packsWithCards = array_map('intval', $this->doctrine->getConnection()
                         ->executeQuery('SELECT DISTINCT pack_id FROM card_printing')
                         ->fetchAll(\PDO::FETCH_COLUMN));
