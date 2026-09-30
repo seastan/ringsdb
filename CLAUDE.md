@@ -37,7 +37,7 @@ Run the console as the container user: `X="docker compose exec -T -u www-data sy
 
 2. **DB**: two options.
 
-   **(a) Public bootstrap (no prod data / no PII):** `make fixtures` (bootstrap schema and card
+   **(a) Public bootstrap (no prod data / no PII):** `make fixtures` (**drops the dev DB**; bootstrap schema and card
    data, Doctrine migrations, then test fixtures).
 
    **(b) Full prod dump (maintainers with data access only).** `ringsdb_daily.sql` (~695 MB,
