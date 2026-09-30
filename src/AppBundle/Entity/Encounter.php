@@ -37,7 +37,7 @@ class Encounter implements \JsonSerializable {
      */
     private $dateUpdate;
     /**
-     * @var \AppBundle\Entity\Pack
+     * @var \AppBundle\Entity\Pack|null
      */
     private $pack;
     /**
@@ -163,7 +163,7 @@ class Encounter implements \JsonSerializable {
     /**
      * Get pack
      *
-     * @return \AppBundle\Entity\Pack
+     * @return \AppBundle\Entity\Pack|null
      */
     public function getPack() {
         return $this->pack;

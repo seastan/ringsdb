@@ -1,20 +1,39 @@
 <?php
 namespace AppBundle\Controller;
 
+use AppBundle\Services\Texts;
 use DateTime;
 use AppBundle\Entity\Card;
 use AppBundle\Entity\Review;
 use AppBundle\Entity\Reviewcomment;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class ReviewController extends Controller {
+class ReviewController extends AbstractController {
 
+    /**
+     * @var Texts
+     */
+    private $texts;
+
+    /**
+     * @var int
+     */
+    private $cacheExpiration;
+
+    public function __construct(Texts $texts, int $cacheExpiration) {
+        $this->texts = $texts;
+        $this->cacheExpiration = $cacheExpiration;
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function postAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -49,9 +68,9 @@ class ReviewController extends Controller {
 
         $review_raw = trim($request->get('review'));
 
-        $review_raw = preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $review_raw);
+        $review_raw = (string) preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $review_raw);
 
-        $review_html = $this->get('texts')->markdown($review_raw);
+        $review_html = $this->texts->markdown($review_raw);
         if (!$review_html) {
             throw new \Exception("Your review is empty.");
         }
@@ -72,6 +91,9 @@ class ReviewController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function editAction(Request $request) {
 
         /* @var $em \Doctrine\ORM\EntityManager */
@@ -98,9 +120,9 @@ class ReviewController extends Controller {
 
         $review_raw = trim($request->get('review'));
 
-        $review_raw = preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $review_raw);
+        $review_raw = (string) preg_replace('%(?<!\()\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?)(?:[^\s]*)?%iu', '[$1]($0)', $review_raw);
 
-        $review_html = $this->get('texts')->markdown($review_raw);
+        $review_html = $this->texts->markdown($review_raw);
         if (!$review_html) {
             return new Response('Your review is empty.');
         }
@@ -115,6 +137,9 @@ class ReviewController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function likeAction(Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -163,6 +188,10 @@ class ReviewController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function removeAction($id, Request $request) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -191,10 +220,14 @@ class ReviewController extends Controller {
         ]);
     }
 
+    /**
+     * @param int $page
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function listAction($page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         $limit = 5;
         if ($page < 1) {
@@ -257,10 +290,15 @@ class ReviewController extends Controller {
         ], $response);
     }
 
+    /**
+     * @param mixed $user_id
+     * @param int $page
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function byauthorAction($user_id, $page = 1, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         $limit = 5;
         if ($page < 1) {
@@ -272,6 +310,9 @@ class ReviewController extends Controller {
         $em = $this->getDoctrine()->getManager();
 
         $user = $em->getRepository('AppBundle:User')->find($user_id);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found.');
+        }
 
         $pagetitle = "Card Reviews by " . $user->getUsername();
 
@@ -328,6 +369,9 @@ class ReviewController extends Controller {
         ], $response);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function commentAction(Request $request) {
 
         /* @var $em \Doctrine\ORM\EntityManager */

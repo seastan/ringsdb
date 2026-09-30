@@ -2,16 +2,22 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 
-class UserAdminController extends Controller {
+class UserAdminController extends AbstractController {
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function findAction() {
 		return $this->render('AppBundle:Admin:find_user.html.twig', [
 			'pagetitle' => "Admin"
 		]);
 	}
 
+	/**
+	 * @return \Symfony\Component\HttpFoundation\RedirectResponse
+	 */
 	public function processAction(Request $request) {
 		$em = $this->getDoctrine()->getManager();
 		$user = null;
@@ -33,6 +39,10 @@ class UserAdminController extends Controller {
 		return $this->redirect($this->generateUrl('admin_show_user', ['user_id' => $user->getId()]));
 	}
 
+	/**
+	 * @param mixed $user_id
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function showAction($user_id) {
 		$em = $this->getDoctrine()->getManager();
 		/* @var $user \AppBundle\Entity\User */
@@ -47,6 +57,10 @@ class UserAdminController extends Controller {
 		]);
 	}
 
+	/**
+	 * @param mixed $user_id
+	 * @return \Symfony\Component\HttpFoundation\RedirectResponse
+	 */
 	public function toggleLockedAction($user_id) {
 		$em = $this->getDoctrine()->getManager();
 		/* @var $user \AppBundle\Entity\User */
@@ -61,6 +75,10 @@ class UserAdminController extends Controller {
 		return $this->redirect($this->generateUrl('admin_show_user', ['user_id' => $user->getId()]));
 	}
 
+	/**
+	 * @param mixed $user_id
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function decklistsAction($user_id) {
 		$em = $this->getDoctrine()->getManager();
 		/* @var $user \AppBundle\Entity\User */
@@ -75,6 +93,10 @@ class UserAdminController extends Controller {
 		]);
 	}
 
+	/**
+	 * @param mixed $decklist_id
+	 * @return \Symfony\Component\HttpFoundation\RedirectResponse
+	 */
 	public function deleteDecklistAction($decklist_id) {
 		$em = $this->getDoctrine()->getManager();
 
@@ -112,6 +134,10 @@ class UserAdminController extends Controller {
 		return $this->redirect($this->generateUrl('admin_user_decklists_show', ['user_id' => $decklist->getUser()->getId()]));
 	}
 
+	/**
+	 * @param mixed $user_id
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function commentsAction($user_id) {
 		$em = $this->getDoctrine()->getManager();
 		/* @var $user \AppBundle\Entity\User */
@@ -126,6 +152,10 @@ class UserAdminController extends Controller {
 		]);
 	}
 
+	/**
+	 * @param mixed $comment_id
+	 * @return \Symfony\Component\HttpFoundation\RedirectResponse
+	 */
 	public function toggleHiddenCommentAction($comment_id) {
 		$em = $this->getDoctrine()->getManager();
 		/* @var $comment \AppBundle\Entity\Comment */
@@ -140,6 +170,10 @@ class UserAdminController extends Controller {
 		return $this->redirect($this->generateUrl('admin_user_comments_show', ['user_id' => $comment->getUser()->getId()]));
 	}
 
+	/**
+	 * @param mixed $comment_id
+	 * @return \Symfony\Component\HttpFoundation\RedirectResponse
+	 */
 	public function deleteCommentAction($comment_id) {
 		$em = $this->getDoctrine()->getManager();
 		/* @var $comment \AppBundle\Entity\Comment */

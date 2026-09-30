@@ -2,14 +2,33 @@
 
 namespace AppBundle\Command;
 
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-class SuggestionsCommand extends ContainerAwareCommand {
+class SuggestionsCommand extends Command {
+    /**
+     * @var Connection
+     */
+    private $connection;
+
+    /**
+     * @var string
+     */
+    private $rootDir;
+
+    public function __construct(Connection $connection, string $rootDir) {
+        parent::__construct();
+        $this->connection = $connection;
+        $this->rootDir = $rootDir;
+    }
+
+    /**
+     * @return void
+     */
     protected function configure() {
         $this
             ->setName('app:suggestions')
@@ -18,14 +37,20 @@ class SuggestionsCommand extends ContainerAwareCommand {
 
     protected function execute(InputInterface $input, OutputInterface $output) {
         ini_set('memory_limit', '512M');
-        $webdir = $this->getContainer()->get('kernel')->getRootDir() . "/../web";
+        $webdir = $this->rootDir . "/../web";
 
         $suggestions = $this->getSuggestions();
         file_put_contents($webdir . "/suggestions.json", json_encode($suggestions));
 
         $output->writeln('done');
+
+        return 0;
     }
 
+    /**
+     * @param mixed $arr
+     * @return array
+     */
     private function getAllPairs($arr) {
         $pairs = [];
         for ($i = 0; $i < count($arr); $i++) {
@@ -43,11 +68,12 @@ class SuggestionsCommand extends ContainerAwareCommand {
      * are seen together in a deck
      * also returns an array of card codes
      * x and y are private indexes, not card.id
+     * @return array
      */
     private function getSuggestions() {
         $matrix = [];
 
-        $dbh = $this->getContainer()->get('doctrine')->getConnection();
+        $dbh = $this->connection;
 
         $cardsByIndex = $dbh->executeQuery("SELECT
 				c.id,
@@ -74,7 +100,7 @@ class SuggestionsCommand extends ContainerAwareCommand {
         }
 
         foreach ($cardsByIndex as $index => $card) {
-            $matrix[$index] = $index ? array_fill(0, $index, 0) : [];
+            $matrix[$index] = $index ? (array_fill(0, $index, 0) ?: []) : [];
         }
 
         $decks = $dbh->executeQuery("SELECT d.id FROM deck d ORDER BY d.id")->fetchAll();

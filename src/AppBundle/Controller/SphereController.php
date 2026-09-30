@@ -3,20 +3,22 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use AppBundle\Entity\Sphere;
 use AppBundle\Form\SphereType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 /**
  * Sphere controller.
  *
  */
-class SphereController extends Controller {
+class SphereController extends AbstractController {
 
     /**
      * Lists all Sphere entities.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction() {
         $em = $this->getDoctrine()->getManager();
@@ -31,6 +33,7 @@ class SphereController extends Controller {
     /**
      * Creates a new Sphere entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function createAction(Request $request) {
         $entity = new Sphere();
@@ -56,10 +59,10 @@ class SphereController extends Controller {
      *
      * @param Sphere $entity The entity
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createCreateForm(Sphere $entity) {
-        $form = $this->createForm(new SphereType(), $entity, array(
+        $form = $this->createForm(SphereType::class, $entity, array(
             'action' => $this->generateUrl('admin_sphere_create'),
             'method' => 'POST',
         ));
@@ -70,6 +73,7 @@ class SphereController extends Controller {
     /**
      * Displays a form to create a new Sphere entity.
      *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function newAction() {
         $entity = new Sphere();
@@ -84,6 +88,8 @@ class SphereController extends Controller {
     /**
      * Finds and displays a Sphere entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -105,6 +111,8 @@ class SphereController extends Controller {
     /**
      * Displays a form to edit an existing Sphere entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function editAction($id) {
         $em = $this->getDoctrine()->getManager();
@@ -130,15 +138,15 @@ class SphereController extends Controller {
     *
     * @param Sphere $entity The entity
     *
-    * @return \Symfony\Component\Form\Form The form
+    * @return \Symfony\Component\Form\FormInterface The form
     */
     private function createEditForm(Sphere $entity) {
-        $form = $this->createForm(new SphereType(), $entity, array(
+        $form = $this->createForm(SphereType::class, $entity, array(
             'action' => $this->generateUrl('admin_sphere_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));
 
-        $form->add('submit', 'submit', array('label' => 'Update'));
+        $form->add('submit', SubmitType::class, array('label' => 'Update'));
 
         return $form;
     }
@@ -146,6 +154,8 @@ class SphereController extends Controller {
     /**
      * Edits an existing Sphere entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function updateAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
@@ -176,6 +186,8 @@ class SphereController extends Controller {
     /**
      * Deletes a Sphere entity.
      *
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, $id) {
         $form = $this->createDeleteForm($id);
@@ -201,7 +213,7 @@ class SphereController extends Controller {
      *
      * @param mixed $id The entity id
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface The form
      */
     private function createDeleteForm($id) {
         return $this->createFormBuilder()

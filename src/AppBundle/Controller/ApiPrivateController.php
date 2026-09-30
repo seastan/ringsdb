@@ -2,11 +2,16 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
-class ApiPrivateController extends Controller {
+class ApiPrivateController extends AbstractController {
+    use CurrentUserTrait;
+
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function listDecksAction(Request $request) {
 		$response = new Response();
 
@@ -49,6 +54,10 @@ class ApiPrivateController extends Controller {
 		return $response;
 	}
 
+	/**
+	 * @param mixed $username
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function listUserDecksAction($username, Request $request) {
 		$response = new Response();
 
@@ -70,7 +79,7 @@ class ApiPrivateController extends Controller {
             return $response;
         }
 
-        $show_private_decks = /*$user->getIsShareDecks() ||*/ $user->getId() == $this->getUser()->getId();
+        $show_private_decks = /*$user->getIsShareDecks() ||*/ $user->getId() == $this->currentUser()->getId();
 
         /* @var $decklists \AppBundle\Entity\Decklist[] */
         $decklists = $em->getRepository('AppBundle:Decklist')->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
@@ -112,6 +121,10 @@ class ApiPrivateController extends Controller {
 
 	/*
 	 * Get the description of one Deck of the authenticated user
+	 */
+	/**
+	 * @param mixed $id
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function loadDeckAction($id, Request $request) {
 		$response = new Response();

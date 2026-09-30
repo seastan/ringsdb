@@ -113,7 +113,7 @@ class FellowshipComment {
      *
      * @return FellowshipComment
      */
-    public function setUser(\AppBundle\Entity\User $user = null) {
+    public function setUser(\AppBundle\Entity\User $user) {
         $this->user = $user;
 
         return $this;
@@ -135,7 +135,7 @@ class FellowshipComment {
      *
      * @return FellowshipComment
      */
-    public function setFellowship(\AppBundle\Entity\Fellowship $fellowship = null) {
+    public function setFellowship(\AppBundle\Entity\Fellowship $fellowship) {
         $this->fellowship = $fellowship;
 
         return $this;

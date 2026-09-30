@@ -1,59 +1,51 @@
 services:
-    # core exception listener
-    core_exception_listener:
-        class: AppBundle\Listener\CoreExceptionListener
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+        bind:
+            $rootDir: '%kernel.root_dir%'
+            $cacheDir: '%kernel.cache_dir%'
+            $cacheExpiration: '%cache_expiration%'
+            $gameName: '%game_name%'
+            $publisherName: '%publisher_name%'
+
+    # every class of the bundle is a service, identified by its class name
+    AppBundle\:
+        resource: '../../*'
+        exclude: '../../{AppBundle.php,DataFixtures,DependencyInjection,DQL,Entity,PHPStan,Resources,Tests,Model/ExportableDeck.php,Model/SlotCollectionDecorator.php,Model/SlotCollectionInterface.php,Model/SlotInterface.php,Command/StringInputTrait.php,Controller/CurrentUserTrait.php}'
+
+    # controllers are fetched from the container by the controller resolver, and can receive
+    # services as action arguments
+    AppBundle\Controller\:
+        resource: '../../Controller'
+        exclude: '../../Controller/CurrentUserTrait.php'
+        public: true
+        tags: ['controller.service_arguments']
+
+    AppBundle\Listener\CoreExceptionListener:
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onCoreException, priority: 1000 }
 
-    app.twig_extension:
-        class: AppBundle\Helper\TwigExtension
-        public: false
-        tags:
-            - { name: twig.extension }
+    AppBundle\Services\Texts:
+        arguments: ['%kernel.cache_dir%/htmlpurifier']
 
-    decks:
-        class: AppBundle\Services\Decks
-        arguments: ["@doctrine.orm.entity_manager", "@deck_validation_helper", "@diff", "@logger"]
-
-    texts:
-        class: AppBundle\Services\Texts
-        arguments: ["%kernel.cache_dir%/htmlpurifier"]
-
-    diff:
-        class: AppBundle\Services\Diff
-        arguments: ["@doctrine.orm.entity_manager"]
-
-    cards_data:
-        class: AppBundle\Services\CardsData
-        arguments: ["@doctrine", "@request_stack", "@router", "@templating.helper.assets", "%kernel.root_dir%"]
-
-    app.card_stats:
-        class: AppBundle\Stats\CardStatsCalculator
-        arguments: ["@doctrine"]
-
-    decklist_manager:
-        class: AppBundle\Model\DecklistManager
+    AppBundle\Model\DecklistManager:
         shared: false
-        arguments: ["@doctrine.orm.entity_manager", "@request_stack", "@router", "@logger"]
 
-    decklist_factory:
-        class: AppBundle\Model\DecklistFactory
-        arguments: ["@doctrine.orm.entity_manager", "@deck_validation_helper", "@texts"]
-
-    deck_validation_helper:
-        class: AppBundle\Helper\DeckValidationHelper
-        arguments: []
-
-    fellowship_validation_helper:
-        class: AppBundle\Helper\FellowshipValidationHelper
-        arguments: []
-
-    fellowship_manager:
-        class: AppBundle\Model\FellowshipManager
+    AppBundle\Model\FellowshipManager:
         shared: false
-        arguments: ["@doctrine.orm.entity_manager", "@request_stack", "@router", "@logger"]
 
-    questlog_manager:
-        class: AppBundle\Model\QuestLogManager
+    AppBundle\Model\QuestLogManager:
         shared: false
-        arguments: ["@doctrine.orm.entity_manager", "@request_stack", "@router", "@logger"]
+
+    # FOSUserBundle 2 declares no autowiring alias for its mailer
+    FOS\UserBundle\Mailer\MailerInterface: '@fos_user.mailer'
+
+    # the historical ids, still fetched with get() by the fixtures and the tests
+    decks: { alias: AppBundle\Services\Decks, public: true }
+    texts: { alias: AppBundle\Services\Texts, public: true }
+    app.card_stats: { alias: AppBundle\Stats\CardStatsCalculator, public: true }
+    decklist_factory: { alias: AppBundle\Model\DecklistFactory, public: true }
+    fellowship_manager: { alias: AppBundle\Model\FellowshipManager, public: true }
+    questlog_manager: { alias: AppBundle\Model\QuestLogManager, public: true }

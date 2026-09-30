@@ -31,7 +31,7 @@ class QuestLogManagerTest extends KernelTestCase {
     /** @var array */
     private $fixtureUsers;
 
-    protected function setUp() {
+    protected function setUp(): void {
         static::bootKernel();
         $this->connection = static::$kernel->getContainer()->get('doctrine')->getConnection();
         foreach (['questlog', 'questlog_comment', 'deck'] as $table) {
@@ -54,7 +54,7 @@ class QuestLogManagerTest extends KernelTestCase {
             'date_creation' => date('Y-m-d H:i:s'), 'is_hidden' => 0]);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $max = $this->maxIds;
         foreach ([
             "DELETE FROM questlog_comment WHERE id > {$max['questlog_comment']}",
@@ -74,6 +74,11 @@ class QuestLogManagerTest extends KernelTestCase {
 
     /* ------------------------------------------------------------ helpers */
 
+    /**
+     * @param mixed $name
+     * @param mixed $userId
+     * @return int
+     */
     private function insertQuestlog($name, $userId, array $deckIds, array $values) {
         $this->connection->insert('questlog', $values + [
             'user_id' => $userId, 'scenario_id' => 1, 'name' => $name, 'name_canonical' => strtolower(str_replace(' ', '-', $name)),
@@ -92,9 +97,11 @@ class QuestLogManagerTest extends KernelTestCase {
 
     /**
      * A copy of fixture deck 2 with the given cards ([card id => quantity]).
+     * @return int
      */
     private function insertDeck(array $slots) {
         $row = $this->connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
+        $this->assertNotFalse($row);
         unset($row['id']);
         $this->connection->insert('deck', ['name' => 'PHPUnit Deck'] + $row);
         $id = (int) $this->connection->lastInsertId();
@@ -107,6 +114,7 @@ class QuestLogManagerTest extends KernelTestCase {
 
     /**
      * @return QuestLogManager
+     * @param mixed $username
      */
     private function manager(array $query = [], $username = null) {
         $container = static::$kernel->getContainer();
@@ -119,12 +127,20 @@ class QuestLogManagerTest extends KernelTestCase {
         return $manager;
     }
 
+    /**
+     * @param mixed $username
+     * @return \AppBundle\Entity\User
+     */
     private function user($username) {
-        return static::$kernel->getContainer()->get('doctrine')->getRepository('AppBundle:User')->findOneBy(['username' => $username]);
+        $user = static::$kernel->getContainer()->get('doctrine')->getRepository('AppBundle:User')->findOneBy(['username' => $username]);
+        $this->assertNotNull($user);
+
+        return $user;
     }
 
     /**
      * @return string[] the names (Q1...Q5) of the quest logs found, in order
+     * @param mixed $paginator
      */
     private function names($paginator) {
         $names = array_flip($this->ids);
@@ -138,7 +154,7 @@ class QuestLogManagerTest extends KernelTestCase {
 
     /* -------------------------------------------------------------- lists */
 
-    public function testLists() {
+    public function testLists(): void {
         $this->assertSame(['Q2', 'Q3', 'Q5', 'Q1'], $this->names($this->manager()->findQuestLogsByPopularity()));
         $this->assertSame(['Q3', 'Q2', 'Q5', 'Q1'], $this->names($this->manager()->findQuestLogsByAge()));
         $this->assertSame(['Q2'], $this->names($this->manager()->findQuestLogsByFavorite($this->user('admin'))));
@@ -155,13 +171,13 @@ class QuestLogManagerTest extends KernelTestCase {
      * Dead code: Questlog has no dateLastComment field (quest logs only count their comments), and
      * nothing calls this method.
      */
-    public function testFindByRecentDiscussionIsBroken() {
+    public function testFindByRecentDiscussionIsBroken(): void {
         $this->expectException(\Doctrine\ORM\Query\QueryException::class);
         $this->expectExceptionMessage('has no field or association named dateLastComment');
         $this->manager()->findQuestLogsByRecentDiscussion();
     }
 
-    public function testPagination() {
+    public function testPagination(): void {
         $manager = $this->manager();
         $manager->setLimit(2);
         $manager->setPage(2);
@@ -172,7 +188,7 @@ class QuestLogManagerTest extends KernelTestCase {
         $this->assertSame(2, $manager->getNumberOfPages());
     }
 
-    public function testEmptyList() {
+    public function testEmptyList(): void {
         $manager = $this->manager();
         $this->assertCount(0, $manager->getEmptyList());
         $this->assertSame(0, $manager->getMaxCount());
@@ -182,11 +198,15 @@ class QuestLogManagerTest extends KernelTestCase {
 
     /**
      * @dataProvider searchProvider
+     * @param mixed $username
      */
-    public function testComplexSearch(array $query, array $expected, $username = null) {
+    public function testComplexSearch(array $query, array $expected, $username = null): void {
         $this->assertSame($expected, $this->names($this->manager($query, $username)->findQuestLogsWithComplexSearch()));
     }
 
+    /**
+     * @return array
+     */
     public function searchProvider() {
         return [
             'no criteria' => [[], ['Q2', 'Q3', 'Q5', 'Q1']],
@@ -210,7 +230,7 @@ class QuestLogManagerTest extends KernelTestCase {
         ];
     }
 
-    public function testSortByReputation() {
+    public function testSortByReputation(): void {
         $this->connection->update('user', ['reputation' => 10], ['username' => 'admin']);
 
         $this->assertSame(['Q3', 'Q5', 'Q2', 'Q1'], $this->names($this->manager(['sort' => 'reputation'])->findQuestLogsWithComplexSearch()));

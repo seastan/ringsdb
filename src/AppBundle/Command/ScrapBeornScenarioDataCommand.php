@@ -2,8 +2,9 @@
 
 namespace AppBundle\Command;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Command\Command;
 use AppBundle\Entity\Card;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -11,8 +12,21 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\VarDumper\VarDumper;
 
-class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
+class ScrapBeornScenarioDataCommand extends Command {
 
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    public function __construct(EntityManagerInterface $em) {
+        parent::__construct();
+        $this->em = $em;
+    }
+
+    /**
+     * @return void
+     */
     protected function configure() {
         $this->setName('app:beorn:scenario')
             ->setDescription('Download scenario statistics data from Hall of Beorn')
@@ -42,13 +56,22 @@ class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
         $customjson = $input->getOption('customjson');
 
         /* @var $em \Doctrine\ORM\EntityManager */
-        $em = $this->getContainer()->get('doctrine')->getManager();
+        $em = $this->em;
 
         $this->command($em, $name, $skip, $customjson);
         $output->writeln("Done.");
+
+        return 0;
     }
 
-	function command($em, $name, $skip, $customjson) {
+	/**
+	 * @param mixed $em
+	 * @param mixed $name
+	 * @param mixed $skip
+	 * @param mixed $customjson
+	 * @return string
+	 */
+	public static function command($em, $name, $skip, $customjson) {
 		$res = '';
 		$name = $name ?: null;
 		$skip = $skip ?: 0;
@@ -69,8 +92,7 @@ class ScrapBeornScenarioDataCommand extends ContainerAwareCommand {
 				continue;
 			}
 
-			$beornscenario = str_replace('ALeP - ', '', $scenario->getName());
-			$beornscenario = str_replace([' ', 'ú', 'î', 'û', ','], ['-', '%C3%BA', '%C3%AE', '%C3%BB', ''], $beornscenario);
+			$beornscenario = strtr($scenario->getName(), ['ALeP - ' => '', ' ' => '-', 'ú' => '%C3%BA', 'î' => '%C3%AE', 'û' => '%C3%BB', ',' => '']);
 			$output_line = $beornscenario;
 			VarDumper::dump($output_line);
 			$res .= $output_line . "\n<br>";

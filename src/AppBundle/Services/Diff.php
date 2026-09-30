@@ -2,7 +2,7 @@
 
 namespace AppBundle\Services;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use AppBundle\Model\SlotCollectionInterface;
 use AppBundle\Model\SlotInterface;
 use AppBundle\Model\SlotCollectionDecorator;
@@ -12,10 +12,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  *
  * @author AWOPM
- * @property $em EntityManager
  */
 class Diff {
-    public function __construct(EntityManager $doctrine) {
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    public function __construct(EntityManagerInterface $doctrine) {
         $this->em = $doctrine;
     }
 
@@ -96,6 +100,10 @@ class Diff {
         return new SlotCollectionDecorator($intersection);
     }
 
+    /**
+     * @param mixed $decks
+     * @return array
+     */
     public function diffContents($decks) {
 
         // n flat lists of the cards of each decklist

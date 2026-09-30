@@ -1,0 +1,13 @@
+<?php
+
+namespace PHPUnit\Framework;
+
+abstract class Assert
+{
+    /**
+     * @param mixed $condition
+     * @param string $message
+     * @return void
+     */
+    public static function assertNotFalse($condition, $message = '') {}
+}

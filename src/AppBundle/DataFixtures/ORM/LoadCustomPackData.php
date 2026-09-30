@@ -2,6 +2,7 @@
 
 namespace AppBundle\DataFixtures\ORM;
 
+use AppBundle\Entity\Card;
 use AppBundle\Entity\User;
 use AppBundle\Entity\UserCustomPack;
 use AppBundle\Entity\UserCustomPackCard;
@@ -18,6 +19,9 @@ class LoadCustomPackData extends AbstractFixture implements DependentFixtureInte
         ];
     }
 
+    /**
+     * @return void
+     */
     public function load(ObjectManager $manager)
     {
         /** @var User $user */
@@ -36,7 +40,11 @@ class LoadCustomPackData extends AbstractFixture implements DependentFixtureInte
         foreach (['01001' => 1, '01016' => 3] as $code => $quantity) {
             $entry = new UserCustomPackCard();
             $entry->setCustomPack($pack);
-            $entry->setCard($cardRepo->findOneBy(['code' => $code]));
+            $card = $cardRepo->findOneBy(['code' => $code]);
+            if (!$card instanceof Card) {
+                throw new \LogicException("Card $code is missing.");
+            }
+            $entry->setCard($card);
             $entry->setQuantity($quantity);
             $pack->addCard($entry);
         }

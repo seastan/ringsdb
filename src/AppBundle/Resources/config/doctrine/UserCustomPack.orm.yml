@@ -7,7 +7,8 @@ AppBundle\Entity\UserCustomPack:
             joinColumn:
                 name: user_id
                 referencedColumnName: id
-            nullable: false
+                nullable: false
+                onDelete: CASCADE
     oneToMany:
         cards:
             targetEntity: UserCustomPackCard
@@ -51,3 +52,6 @@ AppBundle\Entity\UserCustomPack:
     uniqueConstraints:
         ucp_code_idx:
             columns: [ code ]
+    indexes:
+        ucp_user_idx:
+            columns: [ user_id ]

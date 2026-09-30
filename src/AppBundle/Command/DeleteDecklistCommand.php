@@ -2,14 +2,27 @@
 
 namespace AppBundle\Command;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-class DeleteDecklistCommand extends ContainerAwareCommand {
+class DeleteDecklistCommand extends Command {
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    public function __construct(EntityManagerInterface $em) {
+        parent::__construct();
+        $this->em = $em;
+    }
+
+    /**
+     * @return void
+     */
     protected function configure() {
         $this
             ->setName('app:decklist:delete')
@@ -22,10 +35,14 @@ class DeleteDecklistCommand extends ContainerAwareCommand {
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
-        $em = $this->getContainer()->get('doctrine')->getManager();
+        $em = $this->em;
         
         $decklist_id = $input->getArgument('decklist_id');
         $decklist = $em->getRepository('AppBundle:Decklist')->find($decklist_id);
+        if (!$decklist) {
+            $output->writeln("Decklist not found");
+            return 1;
+        }
         
         $successors = $em->getRepository('AppBundle:Decklist')->findBy(array(
             'precedent' => $decklist
@@ -50,5 +67,7 @@ class DeleteDecklistCommand extends ContainerAwareCommand {
         $em->flush();
         
         $output->writeln("Decklist deleted");
+
+        return 0;
     }
 }

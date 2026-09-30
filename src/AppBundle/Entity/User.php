@@ -9,6 +9,9 @@ use FOS\UserBundle\Model\User as BaseUser;
  * User
  */
 class User extends BaseUser {
+    /**
+     * @return float
+     */
     public function getMaxNbDecks() {
         return 5 * (100 + floor($this->reputation / 10));
     }
@@ -404,6 +407,7 @@ class User extends BaseUser {
      * Remove deck
      *
      * @param \AppBundle\Entity\Deck $deck
+     * @return void
      */
     public function removeDeck(\AppBundle\Entity\Deck $deck) {
         $this->decks->removeElement($deck);
@@ -435,6 +439,7 @@ class User extends BaseUser {
      * Remove decklist
      *
      * @param \AppBundle\Entity\Decklist $decklist
+     * @return void
      */
     public function removeDecklist(\AppBundle\Entity\Decklist $decklist) {
         $this->decklists->removeElement($decklist);
@@ -466,6 +471,7 @@ class User extends BaseUser {
      * Remove comment
      *
      * @param \AppBundle\Entity\Comment $comment
+     * @return void
      */
     public function removeComment(\AppBundle\Entity\Comment $comment) {
         $this->comments->removeElement($comment);
@@ -497,6 +503,7 @@ class User extends BaseUser {
      * Remove review
      *
      * @param \AppBundle\Entity\Review $review
+     * @return void
      */
     public function removeReview(\AppBundle\Entity\Review $review) {
         $this->reviews->removeElement($review);
@@ -529,6 +536,7 @@ class User extends BaseUser {
      * Remove favorite
      *
      * @param \AppBundle\Entity\Decklist $favorite
+     * @return void
      */
     public function removeFavorite(\AppBundle\Entity\Decklist $favorite) {
         $favorite->removeFavorite($this);
@@ -562,6 +570,7 @@ class User extends BaseUser {
      * Remove vote
      *
      * @param \AppBundle\Entity\Decklist $vote
+     * @return void
      */
     public function removeVote(\AppBundle\Entity\Decklist $vote) {
         $vote->removeVote($this);
@@ -594,6 +603,7 @@ class User extends BaseUser {
      * Remove reviewvote
      *
      * @param \AppBundle\Entity\Review $reviewvote
+     * @return void
      */
     public function removeReviewvote(\AppBundle\Entity\Review $reviewvote) {
         $this->reviewvotes->removeElement($reviewvote);
@@ -634,6 +644,7 @@ class User extends BaseUser {
      * Remove following
      *
      * @param \AppBundle\Entity\User $following
+     * @return void
      */
     public function removeFollowing(\AppBundle\Entity\User $following) {
         $this->following->removeElement($following);
@@ -665,6 +676,7 @@ class User extends BaseUser {
      * Remove follower
      *
      * @param \AppBundle\Entity\User $follower
+     * @return void
      */
     public function removeFollower(\AppBundle\Entity\User $follower) {
         $this->followers->removeElement($follower);
@@ -706,14 +718,14 @@ class User extends BaseUser {
     }
 
     /**
-     * @var string
+     * @var string|null
      */
     private $artPreferences;
 
     /**
      * Set artPreferences (JSON map of card code => preferred pack code)
      *
-     * @param string $artPreferences
+     * @param string|null $artPreferences
      *
      * @return User
      */
@@ -726,7 +738,7 @@ class User extends BaseUser {
     /**
      * Get artPreferences
      *
-     * @return string
+     * @return string|null
      */
     public function getArtPreferences() {
         return $this->artPreferences;
@@ -754,6 +766,7 @@ class User extends BaseUser {
      * Remove fellowship
      *
      * @param \AppBundle\Entity\Fellowship $fellowship
+     * @return void
      */
     public function removeFellowship(\AppBundle\Entity\Fellowship $fellowship) {
         $this->fellowships->removeElement($fellowship);
@@ -768,6 +781,9 @@ class User extends BaseUser {
         return $this->fellowships;
     }
 
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection<int, mixed>
+     */
     public function getPublicFellowships() {
         $publicFellowships = [];
 
@@ -811,6 +827,7 @@ class User extends BaseUser {
      * Remove fellowshipComment
      *
      * @param \AppBundle\Entity\FellowshipComment $fellowshipComment
+     * @return void
      */
     public function removeFellowshipComment(\AppBundle\Entity\FellowshipComment $fellowshipComment) {
         $this->fellowship_comments->removeElement($fellowshipComment);
@@ -842,6 +859,7 @@ class User extends BaseUser {
      * Remove fellowshipFavorite
      *
      * @param \AppBundle\Entity\Fellowship $fellowshipFavorite
+     * @return void
      */
     public function removeFellowshipFavorite(\AppBundle\Entity\Fellowship $fellowshipFavorite) {
         $this->fellowship_favorites->removeElement($fellowshipFavorite);
@@ -873,6 +891,7 @@ class User extends BaseUser {
      * Remove fellowshipVote
      *
      * @param \AppBundle\Entity\Fellowship $fellowshipVote
+     * @return void
      */
     public function removeFellowshipVote(\AppBundle\Entity\Fellowship $fellowshipVote) {
         $this->fellowship_votes->removeElement($fellowshipVote);
@@ -913,6 +932,7 @@ class User extends BaseUser {
      * Remove questlog
      *
      * @param \AppBundle\Entity\Questlog $questlog
+     * @return void
      */
     public function removeQuestlog(\AppBundle\Entity\Questlog $questlog) {
         $this->questlogs->removeElement($questlog);
@@ -944,6 +964,7 @@ class User extends BaseUser {
      * Remove questlogComment
      *
      * @param \AppBundle\Entity\QuestlogComment $questlogComment
+     * @return void
      */
     public function removeQuestlogComment(\AppBundle\Entity\QuestlogComment $questlogComment) {
         $this->questlog_comments->removeElement($questlogComment);
@@ -984,6 +1005,7 @@ class User extends BaseUser {
      * Remove questlogFavorite
      *
      * @param \AppBundle\Entity\Questlog $questlogFavorite
+     * @return void
      */
     public function removeQuestlogFavorite(\AppBundle\Entity\Questlog $questlogFavorite) {
         $this->questlog_favorites->removeElement($questlogFavorite);
@@ -1015,6 +1037,7 @@ class User extends BaseUser {
      * Remove questlogVote
      *
      * @param \AppBundle\Entity\Questlog $questlogVote
+     * @return void
      */
     public function removeQuestlogVote(\AppBundle\Entity\Questlog $questlogVote) {
         $this->questlog_votes->removeElement($questlogVote);

@@ -2,12 +2,18 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CollectionController extends Controller {
+class CollectionController extends AbstractController {
+    use CurrentUserTrait;
 
+
+    /**
+     * @param bool $reloaduser
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function packsAction($reloaduser = false) {
         $categories = [];
         $categories[] = ["label" => "Core / Deluxe", "packs" => []];
@@ -16,7 +22,7 @@ class CollectionController extends Controller {
 
         // owned_packs is a per-pack COUNT map encoded as "id" / "id:count" tokens
         // (legacy "id-2"/"id-3" core copies each count as +1).
-        $owned_packs = $this->getUser()->getOwnedPacks();
+        $owned_packs = $this->currentUser()->getOwnedPacks();
         $hasCollection = !empty($owned_packs);
         $countById = [];
         if ($hasCollection) {
@@ -94,6 +100,9 @@ class CollectionController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function savePacksAction(Request $request) {
         $selectedPacks = $request->get('selected-packs');
 
@@ -104,7 +113,7 @@ class CollectionController extends Controller {
 
         $em = $this->getDoctrine()->getManager();
 
-        $user = $this->getUser();
+        $user = $this->currentUser();
         $user->setOwnedPacks($selectedPacks);
         $em->persist($user);
         $em->flush();
@@ -118,6 +127,7 @@ class CollectionController extends Controller {
     /**
      * Save the user's preferred art (printing) for a card.
      * POST card_code + pack_code; pack_code empty/"default" clears the preference.
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function saveArtPreferenceAction(Request $request) {
         $user = $this->getUser();
@@ -125,8 +135,8 @@ class CollectionController extends Controller {
             return new Response(json_encode(['success' => false, 'error' => 'not logged in']), 403, ['Content-Type' => 'application/json']);
         }
 
-        $cardCode = preg_replace('/[^0-9]/', '', $request->get('card_code'));
-        $packCode = preg_replace('/[^A-Za-z0-9_-]/', '', $request->get('pack_code'));
+        $cardCode = (string) preg_replace('/[^0-9]/', '', $request->get('card_code'));
+        $packCode = (string) preg_replace('/[^A-Za-z0-9_-]/', '', $request->get('pack_code'));
         if (!$cardCode) {
             return new Response(json_encode(['success' => false, 'error' => 'missing card_code']), 400, ['Content-Type' => 'application/json']);
         }
@@ -142,7 +152,7 @@ class CollectionController extends Controller {
         }
 
         $em = $this->getDoctrine()->getManager();
-        $user->setArtPreferences(empty($prefs) ? null : json_encode($prefs));
+        $user->setArtPreferences(empty($prefs) ? null : (string) json_encode($prefs));
         $em->persist($user);
         $em->flush();
 

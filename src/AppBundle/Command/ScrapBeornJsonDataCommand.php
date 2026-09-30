@@ -2,8 +2,10 @@
 
 namespace AppBundle\Command;
 
+use Symfony\Component\Asset\Packages;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Command\Command;
 use AppBundle\Entity\Card;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,8 +14,33 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\VarDumper\VarDumper;
 
-class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
+class ScrapBeornJsonDataCommand extends Command {
 
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    /**
+     * @var Packages
+     */
+    private $packages;
+
+    /**
+     * @var string
+     */
+    private $rootDir;
+
+    public function __construct(EntityManagerInterface $em, Packages $packages, string $rootDir) {
+        parent::__construct();
+        $this->em = $em;
+        $this->packages = $packages;
+        $this->rootDir = $rootDir;
+    }
+
+    /**
+     * @return void
+     */
     protected function configure() {
         $this->setName('app:beorn:json')
              ->setDescription('Download new card data from Hall of Beorn JSON Export')
@@ -45,17 +72,17 @@ class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
 
     protected function execute(InputInterface $input, OutputInterface $output) {
 
-        $em = $this->getContainer()->get('doctrine')->getManager();
+        $em = $this->em;
 
         $questionHelper = $this->getHelper('question');
 
-        $assets_helper = $this->getContainer()->get('templating.helper.assets');
-        $rootDir = $this->getContainer()->get('kernel')->getRootDir();
+        $assets_helper = $this->packages;
+        $rootDir = $this->rootDir;
 
         $allSpheres = $em->getRepository('AppBundle:Sphere')->findAll();
         $allTypes = $em->getRepository('AppBundle:Type')->findAll();
 
-        $skip = $input->getOption('skip') ?: 0;
+        $skip = (int) $input->getOption('skip');
         $forceData = $input->getOption('force-data');
         $forceImage = $input->getOption('force-image');
         $showTexts = $input->getOption('show-texts');
@@ -68,7 +95,7 @@ class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
             $json = file_get_contents("http://hallofbeorn.com/Export/Cards");
             file_put_contents('beorn.json', $json);
         }
-        $beorn = json_decode($json);
+        $beorn = json_decode((string) $json);
 
         $i = 0;
         foreach ($beorn as $data) {
@@ -163,5 +190,7 @@ class ScrapBeornJsonDataCommand extends ContainerAwareCommand {
 
         $em->flush();
         $output->writeln("Done.");
+
+        return 0;
     }
 }

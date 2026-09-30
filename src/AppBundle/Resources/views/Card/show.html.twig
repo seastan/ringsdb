@@ -50,9 +50,8 @@
         <a href="{{ path('admin_card_edit', { 'id': entity.id }) }}" class="btn btn-default">
             Edit
         </a>
-        <form action="{{ path('admin_card_delete', { 'id': entity.id }) }}" method="post" style="display:inline-block">
-            <input type="hidden" name="_method" value="DELETE" />
+        {{ form_start(delete_form, {'action': path('admin_card_delete', { 'id': entity.id }), 'attr': {'style': 'display:inline-block'}}) }}
             {{ form_widget(delete_form) }}
             <button type="submit" class="btn btn-danger">Delete</button>
-        </form>
+        {{ form_end(delete_form) }}
 {% endblock %}

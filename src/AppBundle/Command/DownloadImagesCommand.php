@@ -2,16 +2,43 @@
 
 namespace AppBundle\Command;
 
+use Symfony\Component\Asset\Packages;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-class DownloadImagesCommand extends ContainerAwareCommand
+class DownloadImagesCommand extends Command
 {
 
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    /**
+     * @var Packages
+     */
+    private $packages;
+
+    /**
+     * @var string
+     */
+    private $rootDir;
+
+    public function __construct(EntityManagerInterface $em, Packages $packages, string $rootDir)
+    {
+        parent::__construct();
+        $this->em = $em;
+        $this->packages = $packages;
+        $this->rootDir = $rootDir;
+    }
+
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this
@@ -23,15 +50,15 @@ class DownloadImagesCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
 
-        $assets_helper = $this->getContainer()->get('templating.helper.assets');
+        $assets_helper = $this->packages;
 
         /* @var $em \Doctrine\ORM\EntityManager */
-        $em = $this->getContainer()->get('doctrine')->getManager();
+        $em = $this->em;
 
         /* @var $repo \AppBundle\Entity\ReviewRepository */
         $repo = $em->getRepository('AppBundle:Card');
 
-        $rootDir = $this->getContainer()->get('kernel')->getRootDir();
+        $rootDir = $this->rootDir;
         $output->writeln($rootDir);
 
         $cards = $repo->findBy([], ['code' => 'ASC']);
@@ -62,5 +89,6 @@ class DownloadImagesCommand extends ContainerAwareCommand
 
         }
 
+        return 0;
     }
 }

@@ -19,10 +19,10 @@
     </form>
 </div>
 
-<form action="{{ path('admin_card_printing_create') }}{% if filter_pack %}?filter_pack={{ filter_pack }}{% endif %}" method="post" {{ form_enctype(form) }}>
+{{ form_start(form, {'action': path('admin_card_printing_create') ~ (filter_pack ? '?filter_pack=' ~ filter_pack : '')}) }}
     {{ form_widget(form) }}
     <button type="submit" class="btn btn-success">Create</button>
-</form>
+{{ form_end(form) }}
 
 <a href="{{ path('admin_card_printing') }}" class="btn btn-default" style="margin-top:0.5em">Back to the list</a>
 {% endblock %}

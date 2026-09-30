@@ -31,15 +31,15 @@ class SuggestionsCommandTest extends KernelTestCase {
     /** @var int */
     private $maxDeckId;
 
-    protected function setUp() {
+    protected function setUp(): void {
         static::bootKernel();
         $this->connection = static::$kernel->getContainer()->get('doctrine')->getConnection();
         $this->maxDeckId = (int) $this->connection->fetchColumn('SELECT MAX(id) FROM deck');
         $this->file = static::$kernel->getRootDir() . '/../web/suggestions.json';
-        $this->backup = file_exists($this->file) ? file_get_contents($this->file) : null;
+        $this->backup = file_exists($this->file) ? (string) file_get_contents($this->file) : null;
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         if ($this->backup === null) {
             @unlink($this->file);
         } else {
@@ -63,11 +63,12 @@ class SuggestionsCommandTest extends KernelTestCase {
         $this->assertSame("done\n", $tester->getDisplay());
         $this->assertFileExists($this->file);
 
-        return json_decode(file_get_contents($this->file), true);
+        return json_decode((string) file_get_contents($this->file), true);
     }
 
-    private function insertDeck(array $cardIds) {
+    private function insertDeck(array $cardIds): void {
         $row = $this->connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
+        $this->assertNotFalse($row);
         unset($row['id']);
         $this->connection->insert('deck', ['name' => 'PHPUnit Suggestions'] + $row);
         $id = (int) $this->connection->lastInsertId();
@@ -78,6 +79,9 @@ class SuggestionsCommandTest extends KernelTestCase {
 
     /**
      * The value of the matrix for two card codes.
+     * @param mixed $code1
+     * @param mixed $code2
+     * @return mixed
      */
     private static function value(array $suggestions, $code1, $code2) {
         $i = array_search($code1, $suggestions['index'], true);
@@ -89,7 +93,7 @@ class SuggestionsCommandTest extends KernelTestCase {
 
     /* -------------------------------------------------------------- tests */
 
-    public function testSuggestionsOfTheFixtureDecks() {
+    public function testSuggestionsOfTheFixtureDecks(): void {
         $suggestions = $this->runCommand();
 
         // the cards of the 4 fixture decks, by card id
@@ -113,7 +117,7 @@ class SuggestionsCommandTest extends KernelTestCase {
         $this->assertSame($pairs, $total);
     }
 
-    public function testCardsUsedTogether() {
+    public function testCardsUsedTogether(): void {
         // Aragorn and Gimli, in two more decks
         $this->insertDeck([self::ARAGORN, self::GIMLI]);
         $this->insertDeck([self::ARAGORN, self::GIMLI]);
@@ -129,7 +133,7 @@ class SuggestionsCommandTest extends KernelTestCase {
      * The count is divided by the number of decks of the rarer card, when it is used in 100 decks
      * or more: 100 decks with Aragorn and Gimli, 50 of them with Guard of the Citadel too.
      */
-    public function testWeightingByTheNumberOfDecks() {
+    public function testWeightingByTheNumberOfDecks(): void {
         for ($i = 0; $i < 150; $i++) {
             $this->insertDeck($i < 50 ? [self::ARAGORN, self::GIMLI, 13] : [self::ARAGORN, self::GIMLI]);
         }

@@ -38,13 +38,12 @@ twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
     globals:
-        cards_data:             "@cards_data"
-        deck_validation_helper: "@deck_validation_helper"
+        cards_data:             '@AppBundle\Services\CardsData'
+        deck_validation_helper: '@AppBundle\Helper\DeckValidationHelper'
         dragncards_room:        "%dragncards_room%"
         noindex:                "%noindex%"
     form_themes:
         - 'bootstrap_3_layout.html.twig'
-        - 'AppBundle::form_widgets.html.twig'
 
 # Assetic Configuration
 assetic:
@@ -69,6 +68,7 @@ doctrine:
         user:           "%database_user%"
         password:       "%database_password%"
         charset:        UTF8
+        schema_filter: '~^(?!stat_cards_cache$)~'
 
     orm:
         auto_generate_proxy_classes: "%kernel.debug%"
@@ -108,18 +108,6 @@ fos_js_routing:
 # NelmioApiDocBundle Configuration
 nelmio_api_doc: ~
 
-# FOSOAuthServerBundle Configuration
-fos_oauth_server:
-    db_driver:           orm       # Driver availables: orm, mongodb, or propel
-    client_class:        AppBundle\Entity\Client
-    access_token_class:  AppBundle\Entity\AccessToken
-    refresh_token_class: AppBundle\Entity\RefreshToken
-    auth_code_class:     AppBundle\Entity\AuthCode
-    service:
-        user_provider:   fos_user.user_manager
-
 services:
     fos_user.doctrine_registry:
         alias: doctrine
-
-gregwar_captcha: ~

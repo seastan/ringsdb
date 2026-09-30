@@ -3,7 +3,7 @@ namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 
 use AppBundle\Entity\Card;
@@ -11,17 +11,23 @@ use AppBundle\Entity\CardPrinting;
 use AppBundle\Entity\Cycle;
 use AppBundle\Entity\Pack;
 
-class CSVController extends Controller {
+class CSVController extends AbstractController {
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function uploadFormAction() {
 		return $this->render('AppBundle:CSV:upload_form.html.twig');
 	}
 
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function uploadProcessAction(Request $request) {
 		$inputCode = $request->request->get('code');
 		$inputOldCode = $request->request->get('old_code');
 		$inputName = $request->request->get('name');
 		$inputFileName = $request->files->get('upfile')->getPathname();
-		$content = str_replace("\xEF\xBB\xBF", '', trim(file_get_contents($inputFileName)));
+		$content = str_replace("\xEF\xBB\xBF", '', trim((string) file_get_contents($inputFileName)));
 		$content = str_replace("\r", "\n", str_replace("\n", '<br/>', str_replace("\r\n", "\r", $content)));
 		$content_array = explode("\n", $content);
 
@@ -38,7 +44,7 @@ class CSVController extends Controller {
 			$row = str_getcsv($row);
 
 			for ($i = 0; $i < count($row); $i++) {
-				$card[$columns[$i]] = str_replace('<br/>', "\n", $row[$i]);
+				$card[$columns[$i]] = (string) str_replace('<br/>', "\n", (string) $row[$i]);
 			}
 
 			$newIds[$card['octgnid']] = 1;
@@ -65,12 +71,12 @@ class CSVController extends Controller {
 			$pack->setName($inputName);
 			$pack->setPosition(1);
 			$pack->setSize(1);
-			$pack->setDateRelease(date_create('2030-02-01'));
+			$pack->setDateRelease(new \DateTime('2030-02-01'));
 			$pack->setCycle($cycle);
 			$em->persist($pack);
 			$em->flush();
 		}
-		elseif (!$pack && $oldPack) {
+		elseif (!$pack) {
 			$pack = $oldPack;
 			$pack->setCode($inputCode);
 			$em->persist($pack);
@@ -196,11 +202,13 @@ class CSVController extends Controller {
 					// Association field on Card (type, sphere).
 					$associationMapping = $cardAssocMappings[$colName];
 					$associationRepository = $em->getRepository($associationMapping['targetEntity']);
+					/** @var \AppBundle\Entity\Type|\AppBundle\Entity\Sphere|null $associationEntity */
 					$associationEntity = $associationRepository->findOneBy(['name' => $value]);
 
 					if (!$associationEntity) {
 						if (($colName == 'type') && ($value == 'Other')) { // legacy code
 							$value = 'Contract';
+							/** @var \AppBundle\Entity\Type|null $associationEntity */
 							$associationEntity = $associationRepository->findOneBy(['name' => $value]);
 							if (!$associationEntity) {
 								throw new \Exception("cannot find entity [$colName] of name [$value]");
@@ -218,7 +226,7 @@ class CSVController extends Controller {
 				}
 				elseif (in_array($colName, $cardFieldNames)) {
 					// Scalar field on Card.
-					$type = $cardMeta->getTypeOfField($colName);
+					$type = $cardMeta->getTypeOfField((string) $colName);
 
 					if ($type === 'boolean') {
 						$value = (boolean)$value;
@@ -240,7 +248,7 @@ class CSVController extends Controller {
 				}
 				elseif (in_array($colName, $printingFieldNames)) {
 					// Scalar field on CardPrinting (quantity, illustrator, imageCode, …).
-					$type = $printingMeta->getTypeOfField($colName);
+					$type = $printingMeta->getTypeOfField((string) $colName);
 
 					if ($type === 'boolean') {
 						$value = (boolean)$value;

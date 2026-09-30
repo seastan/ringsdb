@@ -2,9 +2,10 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Services\CardsData;
 use AppBundle\Entity\Card;
 use AppBundle\Entity\Scenario;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Collections\Criteria;
@@ -12,7 +13,22 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ApiController extends Controller {
+class ApiController extends AbstractController {
+    /**
+     * @var CardsData
+     */
+    private $cardsData;
+
+    /**
+     * @var int
+     */
+    private $cacheExpiration;
+
+    public function __construct(CardsData $cardsData, int $cacheExpiration) {
+        $this->cardsData = $cardsData;
+        $this->cacheExpiration = $cacheExpiration;
+    }
+
     /**
      * Get the description of all the packs as an array of JSON objects.
      *
@@ -30,7 +46,7 @@ class ApiController extends Controller {
     public function listPacksAction(Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $request->query->get('jsonp');
@@ -64,11 +80,11 @@ class ApiController extends Controller {
                 "name" => $pack->getName(),
                 "code" => $pack->getCode(),
                 "position" => $pack->getPosition(),
-                "cycle_position" => $pack->getCycle() ? $pack->getCycle()->getPosition() : 0,
+                "cycle_position" => $pack->getCycle()->getPosition(),
                 "available" => $pack->getDateRelease() ? $pack->getDateRelease()->format('Y-m-d') : '',
                 "known" => intval($real),
                 "total" => $max,
-                "url" => $this->get('router')->generate('cards_list', ['pack_code' => $pack->getCode()], UrlGeneratorInterface::ABSOLUTE_URL),
+                "url" => $this->generateUrl('cards_list', ['pack_code' => $pack->getCode()], UrlGeneratorInterface::ABSOLUTE_URL),
                 "id" => $pack->getId()
             ];
         }
@@ -111,11 +127,12 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $card_code
      */
     public function getCardAction($card_code, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $request->query->get('jsonp');
@@ -131,10 +148,7 @@ class ApiController extends Controller {
         }
 
         // check the last-modified-since header
-        $lastModified = null;
-        if (!$lastModified || $lastModified < $card->getDateUpdate()) {
-            $lastModified = $card->getDateUpdate();
-        }
+        $lastModified = $card->getDateUpdate();
 
         $response->setLastModified($lastModified);
         if ($response->isNotModified($request)) {
@@ -143,7 +157,7 @@ class ApiController extends Controller {
 
         // build the response
         /* @var $card \AppBundle\Entity\Card */
-        $card = $this->get('cards_data')->getCardInfo($card, true, "en");
+        $card = $this->cardsData->getCardInfo($card, true);
 
         $content = json_encode($card);
         if (isset($jsonp)) {
@@ -174,7 +188,7 @@ class ApiController extends Controller {
     public function listCardsAction(Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $request->query->get('jsonp');
@@ -220,7 +234,7 @@ class ApiController extends Controller {
         $cards = [];
         /* @var $card \AppBundle\Entity\Card */
         foreach ($list_cards as $card) {
-            $cards[] = $this->get('cards_data')->getCardInfo($card, true, "en");
+            $cards[] = $this->cardsData->getCardInfo($card, true);
         }
 
         $content = json_encode($cards);
@@ -261,11 +275,12 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $pack_code
      */
     public function listCardsByPackAction($pack_code, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $request->query->get('jsonp');
@@ -286,15 +301,15 @@ class ApiController extends Controller {
             throw $this->createNotFoundException('Pack not found');
         }
 
-        $conditions = $this->get('cards_data')->syntax("e:$pack_code");
-        $this->get('cards_data')->validateConditions($conditions);
-        $query = $this->get('cards_data')->buildQueryFromConditions($conditions);
+        $conditions = $this->cardsData->syntax("e:$pack_code");
+        $this->cardsData->validateConditions($conditions);
+        $query = $this->cardsData->buildQueryFromConditions($conditions);
 
         $cards = [];
         $last_modified = null;
 
         /* @var $rows \AppBundle\Entity\Card[] */
-        if ($query && $rows = $this->get('cards_data')->get_search_rows($conditions, "set")) {
+        if ($query && $rows = $this->cardsData->get_search_rows($conditions, "set")) {
             for ($rowindex = 0; $rowindex < count($rows); $rowindex++) {
                 if (empty($last_modified) || $last_modified < $rows[$rowindex]->getDateUpdate()) {
                     $last_modified = $rows[$rowindex]->getDateUpdate();
@@ -305,7 +320,7 @@ class ApiController extends Controller {
                 return $response;
             }
             for ($rowindex = 0; $rowindex < count($rows); $rowindex++) {
-                $card = $this->get('cards_data')->getCardInfo($rows[$rowindex], true, "en");
+                $card = $this->cardsData->getCardInfo($rows[$rowindex], true);
                 $cards[] = $card;
             }
         }
@@ -349,11 +364,12 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $decklist_id
      */
     public function getDecklistAction($decklist_id, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $request->query->get('jsonp');
@@ -420,11 +436,12 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $date
      */
     public function listDecklistsByDateAction($date, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $request->query->get('jsonp');
@@ -445,7 +462,7 @@ class ApiController extends Controller {
         $cardRepo = $em->getRepository('AppBundle:Card');
         $userRepo = $em->getRepository('AppBundle:User');
 
-        $decklists = json_decode(json_encode($decklists), true);
+        $decklists = json_decode((string) json_encode($decklists), true);
         foreach ($decklists as &$decklist) {
             $decklist['heroes_details'] = [];
             $username = '';
@@ -457,6 +474,9 @@ class ApiController extends Controller {
             $codes = array_keys($decklist['heroes']);
             foreach ($codes as $code) {
                 $card = $cardRepo->findOneBy(['code' => $code]);
+                if (!$card) {
+                    continue;
+                }
                 $decklist['heroes_details'][] = [
                     'name' => $card->getName(),
                     'sphere' => $card->getSphere()->getName(),
@@ -505,11 +525,12 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $card_code
      */
     public function listTopDecklistsByCardAction($card_code, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $request->query->get('jsonp');
@@ -618,11 +639,12 @@ class ApiController extends Controller {
      * )
      * @param Request $request
      * @return Response
+     * @param mixed $scenario_id
      */
     public function getScenarioAction($scenario_id, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $request->query->get('jsonp');
@@ -638,10 +660,7 @@ class ApiController extends Controller {
         }
 
         // check the last-modified-since header
-        $lastModified = null;
-        if (!$lastModified || $lastModified < $scenario->getDateUpdate()) {
-            $lastModified = $scenario->getDateUpdate();
-        }
+        $lastModified = $scenario->getDateUpdate();
 
         $response->setLastModified($lastModified);
         if ($response->isNotModified($request)) {
@@ -660,21 +679,27 @@ class ApiController extends Controller {
         return $response;
     }
 
+    /**
+     * @param mixed $q
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function searchCardsAction($q, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        static $availability = [];
+        $jsonp = $request->query->get('jsonp');
 
         $cards = [];
 
-        $conditions = $this->get('cards_data')->syntax(urldecode($q));
-        $conditions = $this->get('cards_data')->validateConditions($conditions);
+        $conditions = $this->cardsData->syntax(urldecode($q));
+        $conditions = $this->cardsData->validateConditions($conditions);
 
-        $query = $this->get('cards_data')->buildQueryFromConditions($conditions);
-        if ($query && $rows = $this->get('cards_data')->get_search_rows($conditions, "set")) {
+        $last_modified = null;
+
+        $query = $this->cardsData->buildQueryFromConditions($conditions);
+        if ($query && $rows = $this->cardsData->get_search_rows($conditions, "set")) {
             for ($rowindex = 0; $rowindex < count($rows); $rowindex++) {
                 if (empty($last_modified) || $last_modified < $rows[$rowindex]->getDateUpdate()) {
                     $last_modified = $rows[$rowindex]->getDateUpdate();
@@ -685,7 +710,7 @@ class ApiController extends Controller {
                 return $response;
             }
             for ($rowindex = 0; $rowindex < count($rows); $rowindex++) {
-                $card = $this->get('cards_data')->getCardInfo($rows[$rowindex], true, "en");
+                $card = $this->cardsData->getCardInfo($rows[$rowindex], true);
                 $cards[] = $card;
             }
         }

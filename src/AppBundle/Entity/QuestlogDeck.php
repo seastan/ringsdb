@@ -23,11 +23,11 @@ class QuestlogDeck {
      */
     private $questlog;
     /**
-     * @var \AppBundle\Entity\Deck
+     * @var \AppBundle\Entity\Deck|null
      */
     private $deck;
     /**
-     * @var \AppBundle\Entity\Decklist
+     * @var \AppBundle\Entity\Decklist|null
      */
     private $decklist;
 
@@ -91,7 +91,7 @@ class QuestlogDeck {
      *
      * @return QuestlogDeck
      */
-    public function setQuestlog(\AppBundle\Entity\Questlog $questlog = null) {
+    public function setQuestlog(\AppBundle\Entity\Questlog $questlog) {
         $this->questlog = $questlog;
 
         return $this;
@@ -122,7 +122,7 @@ class QuestlogDeck {
     /**
      * Get deck
      *
-     * @return \AppBundle\Entity\Deck
+     * @return \AppBundle\Entity\Deck|null
      */
     public function getDeck() {
         return $this->deck;
@@ -144,7 +144,7 @@ class QuestlogDeck {
     /**
      * Get decklist
      *
-     * @return \AppBundle\Entity\Decklist
+     * @return \AppBundle\Entity\Decklist|null
      */
     public function getDecklist() {
         return $this->decklist;

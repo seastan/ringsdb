@@ -4,13 +4,18 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\UserCustomPack;
 use AppBundle\Entity\UserCustomPackCard;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CustomPackController extends Controller {
+class CustomPackController extends AbstractController {
+    use CurrentUserTrait;
 
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function newFormAction() {
         return $this->render('AppBundle:Collection:custom_pack_form.html.twig', [
             'pagetitle' => 'Create Custom Pack',
@@ -19,6 +24,9 @@ class CustomPackController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function saveAction(Request $request) {
         $user = $this->getUser();
         $em = $this->getDoctrine()->getManager();
@@ -53,6 +61,10 @@ class CustomPackController extends Controller {
         return $this->redirectToRoute('collection_packs');
     }
 
+    /**
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function editFormAction($id) {
         $pack = $this->loadOwnedPack($id);
         if (!$pack) {
@@ -66,6 +78,10 @@ class CustomPackController extends Controller {
         ]);
     }
 
+    /**
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function updateAction(Request $request, $id) {
         $pack = $this->loadOwnedPack($id);
         if (!$pack) {
@@ -98,6 +114,10 @@ class CustomPackController extends Controller {
         return $this->redirectToRoute('collection_packs');
     }
 
+    /**
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function deleteAction(Request $request, $id) {
         $pack = $this->loadOwnedPack($id);
         if (!$pack) {
@@ -112,6 +132,10 @@ class CustomPackController extends Controller {
         return $this->redirectToRoute('collection_packs');
     }
 
+    /**
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function toggleAction(Request $request, $id) {
         $pack = $this->loadOwnedPack($id);
         if (!$pack) {
@@ -127,6 +151,10 @@ class CustomPackController extends Controller {
         return $this->redirectToRoute('collection_packs');
     }
 
+    /**
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function publishAction(Request $request, $id) {
         $pack = $this->loadOwnedPack($id);
         if (!$pack) {
@@ -142,6 +170,9 @@ class CustomPackController extends Controller {
         return $this->redirectToRoute('collection_packs');
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function publishedListAction() {
         $packs = $this->getDoctrine()
             ->getRepository('AppBundle:UserCustomPack')
@@ -173,6 +204,10 @@ class CustomPackController extends Controller {
         return new JsonResponse($result);
     }
 
+    /**
+     * @param mixed $id
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function copyAction(Request $request, $id) {
         $user = $this->getUser();
         if (!$user) {
@@ -214,6 +249,9 @@ class CustomPackController extends Controller {
         return new JsonResponse(['success' => true, 'name' => $copy->getName()]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function apiListAction() {
         $user = $this->getUser();
         if (!$user) {
@@ -248,23 +286,31 @@ class CustomPackController extends Controller {
         return new JsonResponse($result);
     }
 
+    /**
+     * @param mixed $id
+     * @return \AppBundle\Entity\UserCustomPack|null
+     */
     private function loadOwnedPack($id) {
         $pack = $this->getDoctrine()
             ->getRepository('AppBundle:UserCustomPack')
             ->find($id);
 
-        if (!$pack || $pack->getUser()->getId() !== $this->getUser()->getId()) {
+        if (!$pack || $pack->getUser()->getId() !== $this->currentUser()->getId()) {
             return null;
         }
 
         return $pack;
     }
 
+    /**
+     * @param mixed $em
+     * @return void
+     */
     private function attachCards($em, UserCustomPack $pack, array $cardEntries) {
         $cardRepo = $this->getDoctrine()->getRepository('AppBundle:Card');
         $seen = [];
         foreach ($cardEntries as $entry) {
-            $code = isset($entry['card_code']) ? preg_replace('/[^0-9]/', '', $entry['card_code']) : '';
+            $code = isset($entry['card_code']) ? (string) preg_replace('/[^0-9]/', '', $entry['card_code']) : '';
             $qty = isset($entry['quantity']) ? (int)$entry['quantity'] : 1;
             if ($code === '' || $qty < 1 || $qty > 9 || isset($seen[$code])) {
                 continue;

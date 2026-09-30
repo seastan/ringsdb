@@ -18,6 +18,9 @@ use Symfony\Component\DomCrawler\Form;
  * fixture decks: everything is restored in tearDown().
  */
 class FellowshipWorkflowTest extends WebTestCase {
+    use \AppBundle\Tests\LocationTrait;
+    use \AppBundle\Tests\FormFieldTrait;
+
     /** @var int[] max ids before the test, by table */
     private $maxIds = [];
     /** @var array */
@@ -25,7 +28,7 @@ class FellowshipWorkflowTest extends WebTestCase {
     /** @var array */
     private $fixtureFellowship;
 
-    protected function setUp() {
+    protected function setUp(): void {
         $connection = $this->db(static::createClient());
         foreach (['fellowship', 'fellowship_deck', 'fellowship_decklist', 'decklist', 'deck'] as $table) {
             $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
@@ -34,6 +37,10 @@ class FellowshipWorkflowTest extends WebTestCase {
         $this->fixtureFellowship = $this->fellowshipOneState($connection);
     }
 
+    /**
+     * @param mixed $connection
+     * @return array<int, mixed>
+     */
     private function fellowshipOneState($connection) {
         return [
             $connection->fetchAssoc('SELECT name, is_public, nb_decks, nb_votes, nb_favorites, nb_comments FROM fellowship WHERE id = 1'),
@@ -42,7 +49,7 @@ class FellowshipWorkflowTest extends WebTestCase {
         ];
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $connection = $this->db(static::createClient());
         $max = $this->maxIds;
         foreach ([
@@ -82,10 +89,17 @@ class FellowshipWorkflowTest extends WebTestCase {
 
     /* ------------------------------------------------------------ helpers */
 
+    /**
+     * @return \Doctrine\DBAL\Connection
+     */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
     }
 
+    /**
+     * @param string $username
+     * @return \Symfony\Bundle\FrameworkBundle\Client
+     */
     private function createAuthenticatedClient($username = 'test') {
         $client = static::createClient();
         $crawler = $client->request('GET', '/login');
@@ -98,13 +112,17 @@ class FellowshipWorkflowTest extends WebTestCase {
     /**
      * Fills the deck picker's hidden fields: [slot => [id, is_decklist]].
      */
-    private static function selectDecks(Form $form, array $decks) {
+    private static function selectDecks(Form $form, array $decks): void {
         for ($i = 1; $i <= 4; $i++) {
             $form["deck{$i}_id"] = isset($decks[$i]) ? $decks[$i][0] : '';
             $form["deck{$i}_is_decklist"] = isset($decks[$i]) ? ($decks[$i][1] ? 'true' : 'false') : '';
         }
     }
 
+    /**
+     * @param mixed $id
+     * @return mixed
+     */
     private function fetchFellowship(Client $client, $id) {
         return $this->db($client)->fetchAssoc(
             'SELECT f.name, f.name_canonical, f.description_md, f.description_html, f.is_public, f.nb_decks, u.username, f.date_publish IS NOT NULL AS published
@@ -115,6 +133,7 @@ class FellowshipWorkflowTest extends WebTestCase {
 
     /**
      * @return array [deck number => 'deck:<id>' | 'decklist:<id>']
+     * @param mixed $id
      */
     private function fetchFellowshipDecks(Client $client, $id) {
         $decks = [];
@@ -131,6 +150,9 @@ class FellowshipWorkflowTest extends WebTestCase {
 
     /**
      * Creates a fellowship through the form, returns its id.
+     * @param mixed $name
+     * @param string $description
+     * @return int
      */
     private function createFellowship(Client $client, $name, array $decks, $description = '') {
         $crawler = $client->request('GET', '/fellowship/new/0/0/0/0');
@@ -142,14 +164,14 @@ class FellowshipWorkflowTest extends WebTestCase {
         $client->submit($form);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('#^/fellowship/view/\d+$#', $client->getResponse()->headers->get('Location'));
+        $this->assertRegExp('#^/fellowship/view/\d+$#', self::location($client->getResponse()));
 
-        return (int) substr($client->getResponse()->headers->get('Location'), strlen('/fellowship/view/'));
+        return (int) substr(self::location($client->getResponse()), strlen('/fellowship/view/'));
     }
 
     /* -------------------------------------------------------------- tests */
 
-    public function testCreateEditPublishFellowship() {
+    public function testCreateEditPublishFellowship(): void {
         $client = $this->createAuthenticatedClient();
 
         // 1. create with decks 1 and 2
@@ -174,9 +196,9 @@ class FellowshipWorkflowTest extends WebTestCase {
         $crawler = $client->request('GET', "/fellowship/edit/$id");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $form = $crawler->filter('form[action="/fellowship/save"]')->form();
-        $this->assertSame((string) $id, $form['fellowship_id']->getValue());
-        $this->assertSame('PHPUnit Fellowship', $form['name']->getValue());
-        $this->assertSame('Two *decks*', $form['descriptionMd']->getValue());
+        $this->assertSame((string) $id, self::field($form, 'fellowship_id')->getValue());
+        $this->assertSame('PHPUnit Fellowship', self::field($form, 'name')->getValue());
+        $this->assertSame('Two *decks*', self::field($form, 'descriptionMd')->getValue());
         $form['name'] = 'PHPUnit Fellowship Edited';
         self::selectDecks($form, [1 => [1, false], 3 => [3, true]]);
         $client->submit($form);
@@ -192,8 +214,10 @@ class FellowshipWorkflowTest extends WebTestCase {
         $crawler = $client->request('GET', "/fellowship/publish/$id");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $form = $crawler->filter('form[action="/fellowship/publish"]')->form();
-        $this->assertSame('1', $form['deck_selection_1']->getValue());
-        $this->assertSame(['0', '1'], $form['deck_selection_1']->availableOptionValues());
+        $this->assertSame('1', self::field($form, 'deck_selection_1')->getValue());
+        /** @var \Symfony\Component\DomCrawler\Field\ChoiceFormField $selection */
+        $selection = $form['deck_selection_1'];
+        $this->assertSame(['0', '1'], $selection->availableOptionValues());
         $form['deck_selection_1'] = '0';
         $form['name'] = 'PHPUnit Published Fellowship';
         $form['descriptionMd'] = 'Published';
@@ -214,6 +238,7 @@ class FellowshipWorkflowTest extends WebTestCase {
 
         // deck 1 was published as a new decklist, the fellowship now only references decklists
         $newDecklist = $this->db($client)->fetchAssoc('SELECT id, name, version FROM decklist WHERE id > ? AND parent_deck_id = 1', [$this->maxIds['decklist']]);
+        $this->assertNotFalse($newDecklist);
         $this->assertSame(['Dwarf Lore/Leadership/Tactics', '2.0'], [$newDecklist['name'], $newDecklist['version']]);
         $this->assertSame([1 => 'decklist:' . $newDecklist['id'], 2 => 'decklist:3'], $this->fetchFellowshipDecks($client, $id));
 
@@ -238,7 +263,7 @@ class FellowshipWorkflowTest extends WebTestCase {
         $this->assertContains('PHPUnit Renamed', $crawler->filter('h1')->text());
     }
 
-    public function testPublishKeepsTheMatchingDecklistsByDefault() {
+    public function testPublishKeepsTheMatchingDecklistsByDefault(): void {
         $client = $this->createAuthenticatedClient();
         $id = $this->createFellowship($client, 'PHPUnit Matching', [1 => [1, false], 2 => [2, false]]);
 
@@ -254,7 +279,7 @@ class FellowshipWorkflowTest extends WebTestCase {
      * BUG: "Save and Publish" (auto_publish) never publishes: saveAction tests
      * empty($fellowship->getDecks()), and a Doctrine collection is never empty().
      */
-    public function testSaveAndPublishDoesNotPublish() {
+    public function testSaveAndPublishDoesNotPublish(): void {
         $client = $this->createAuthenticatedClient();
         $crawler = $client->request('GET', '/fellowship/new/0/0/0/0');
         $form = $crawler->filter('form[action="/fellowship/save"]')->form();
@@ -264,12 +289,12 @@ class FellowshipWorkflowTest extends WebTestCase {
         $client->request('POST', '/fellowship/save', $form->getValues() + ['auto_publish' => '1']);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
-        $id = (int) substr($client->getResponse()->headers->get('Location'), strlen('/fellowship/view/'));
+        $id = (int) substr(self::location($client->getResponse()), strlen('/fellowship/view/'));
         $fellowship = $this->fetchFellowship($client, $id);
         $this->assertSame(['0', '0'], [$fellowship['is_public'], $fellowship['published']]);
     }
 
-    public function testHeroConflictsPreventPublishing() {
+    public function testHeroConflictsPreventPublishing(): void {
         $client = $this->createAuthenticatedClient();
         // Gimli, Dáin Ironfoot and Bifur in both decks
         $id = $this->createFellowship($client, 'PHPUnit Conflict', [1 => [1, false], 2 => [1, true]]);
@@ -284,7 +309,7 @@ class FellowshipWorkflowTest extends WebTestCase {
         $this->assertSame('0', $this->fetchFellowship($client, $id)['is_public']);
     }
 
-    public function testEmptyFellowshipIsRefused() {
+    public function testEmptyFellowshipIsRefused(): void {
         $client = $this->createAuthenticatedClient();
         $crawler = $client->request('GET', '/fellowship/new/0/0/0/0');
         $form = $crawler->filter('form[action="/fellowship/save"]')->form();
@@ -296,7 +321,7 @@ class FellowshipWorkflowTest extends WebTestCase {
         $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM fellowship WHERE id > ?', [$this->maxIds['fellowship']]));
     }
 
-    public function testNewFellowshipFormIsPrefilledWithTheGivenDecks() {
+    public function testNewFellowshipFormIsPrefilledWithTheGivenDecks(): void {
         $client = $this->createAuthenticatedClient();
         $crawler = $client->request('GET', '/fellowship/new/1/2/0/0');
 
@@ -308,7 +333,7 @@ class FellowshipWorkflowTest extends WebTestCase {
 
     /* ---------------------------------------------------- other users' decks */
 
-    public function testUsingAnotherUsersDeckRequiresSharing() {
+    public function testUsingAnotherUsersDeckRequiresSharing(): void {
         $client = $this->createAuthenticatedClient('admin');
         $crawler = $client->request('GET', '/fellowship/new/0/0/0/0');
         $form = $crawler->filter('form[action="/fellowship/save"]')->form();
@@ -324,15 +349,16 @@ class FellowshipWorkflowTest extends WebTestCase {
         $this->db($client)->update('user', ['is_share_decks' => 1], ['username' => 'test']);
         $client->submit($form);
         $this->assertSame(302, $client->getResponse()->getStatusCode());
-        $id = (int) substr($client->getResponse()->headers->get('Location'), strlen('/fellowship/view/'));
+        $id = (int) substr(self::location($client->getResponse()), strlen('/fellowship/view/'));
         $decks = $this->fetchFellowshipDecks($client, $id);
         $cloneId = (int) substr($decks[1], strlen('deck:'));
         $this->assertGreaterThan($this->maxIds['deck'], $cloneId);
         $clone = $this->db($client)->fetchAssoc('SELECT d.name, u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$cloneId]);
+        $this->assertNotFalse($clone);
         $this->assertSame(['Dwarf Lore/Leadership/Tactics', 'admin'], [$clone['name'], $clone['username']]);
     }
 
-    public function testCannotChangeAnotherUsersFellowship() {
+    public function testCannotChangeAnotherUsersFellowship(): void {
         $client = $this->createAuthenticatedClient('admin');
 
         $client->request('GET', '/fellowship/edit/1');
@@ -355,7 +381,7 @@ class FellowshipWorkflowTest extends WebTestCase {
 
     /* ------------------------------------------------------------- delete */
 
-    public function testDeleteFellowship() {
+    public function testDeleteFellowship(): void {
         $client = $this->createAuthenticatedClient();
         $id = $this->createFellowship($client, 'PHPUnit Delete', [1 => [1, false]]);
 
@@ -369,7 +395,7 @@ class FellowshipWorkflowTest extends WebTestCase {
         $this->assertSame('1', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deck WHERE id = 1'));
     }
 
-    public function testFellowshipWithSocialActivityCannotBeDeleted() {
+    public function testFellowshipWithSocialActivityCannotBeDeleted(): void {
         $client = $this->createAuthenticatedClient();
         $this->db($client)->update('fellowship', ['nb_votes' => 1], ['id' => 1]);
 
@@ -381,7 +407,7 @@ class FellowshipWorkflowTest extends WebTestCase {
         $this->assertSame('Heirs to Numeror Cycle', $this->fetchFellowship($client, 1)['name']);
     }
 
-    public function testDeleteList() {
+    public function testDeleteList(): void {
         $client = $this->createAuthenticatedClient();
         $id1 = $this->createFellowship($client, 'PHPUnit Delete 1', [1 => [1, false]]);
         $id2 = $this->createFellowship($client, 'PHPUnit Delete 2', [1 => [2, false]]);
@@ -393,5 +419,18 @@ class FellowshipWorkflowTest extends WebTestCase {
         $this->assertSame('/myfellowships', $client->getResponse()->headers->get('Location'));
         $this->assertFalse($this->fetchFellowship($client, $id1));
         $this->assertSame('PHPUnit Delete 2', $this->fetchFellowship($client, $id2)['name']);
+    }
+
+    /**
+     * Fixed: commenting on or voting for an unknown fellowship crashed (500): 400.
+     */
+    public function testCommentAndVoteOnAnUnknownFellowship(): void {
+        $client = $this->createAuthenticatedClient();
+
+        $client->request('POST', '/user/fellowship_comment', ['id' => 999, 'comment' => 'Hello']);
+        $this->assertSame(400, $client->getResponse()->getStatusCode());
+
+        $client->request('POST', '/user/fellowship_like', ['id' => 999]);
+        $this->assertSame(400, $client->getResponse()->getStatusCode());
     }
 }

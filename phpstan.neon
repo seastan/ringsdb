@@ -1,0 +1,88 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    ignoreErrors:
+        # legacy code: arrays are untyped structures and Doctrine collections have no generic types;
+        # to revisit after the migration
+        - identifier: missingType.iterableValue
+        - identifier: missingType.generics
+    bootstrapFiles:
+        # PHPUnit is installed by simple-phpunit (SYMFONY_PHPUNIT_VERSION in phpunit.xml), outside
+        # Composer's autoloader: KernelTestCase / WebTestCase extend its TestCase
+        - vendor/bin/.phpunit/phpunit-6.5-0/vendor/autoload.php
+    stubFiles:
+        - src/AppBundle/PHPStan/stubs/Assert.stub
+        - src/AppBundle/PHPStan/stubs/Connection.stub
+        - src/AppBundle/PHPStan/stubs/EntityRepository.stub
+
+services:
+    -
+        class: AppBundle\PHPStan\DoctrineRegistryReturnTypeExtension
+        arguments: [Doctrine\Persistence\ManagerRegistry]
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: AppBundle\PHPStan\DoctrineRegistryReturnTypeExtension
+        arguments: [Doctrine\ORM\EntityManager]
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        # the fixtures get the entity manager as an ObjectManager
+        class: AppBundle\PHPStan\DoctrineRegistryReturnTypeExtension
+        arguments: [Doctrine\Persistence\ObjectManager]
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: AppBundle\PHPStan\SymfonyContainerReturnTypeExtension
+        arguments: [Symfony\Component\DependencyInjection\ContainerInterface, %currentWorkingDirectory%/app/cache/test/appTestDebugProjectContainer.xml]
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: AppBundle\PHPStan\SymfonyContainerReturnTypeExtension
+        arguments: [Symfony\Bundle\FrameworkBundle\Controller\AbstractController, %currentWorkingDirectory%/app/cache/test/appTestDebugProjectContainer.xml]
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: AppBundle\PHPStan\ControllerGetUserReturnTypeExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: AppBundle\PHPStan\HeaderBagGetReturnTypeExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: AppBundle\PHPStan\PHPUnitAssertMethodTypeSpecifyingExtension
+        tags:
+            - phpstan.typeSpecifier.methodTypeSpecifyingExtension
+    -
+        class: AppBundle\PHPStan\PHPUnitAssertStaticMethodTypeSpecifyingExtension
+        tags:
+            - phpstan.typeSpecifier.staticMethodTypeSpecifyingExtension
+    -
+        class: AppBundle\PHPStan\DoctrineIdentifierReadWriteExtension
+        tags:
+            - phpstan.properties.readWriteExtension
+    # the tests only read the response, request and container of the client after a request
+    -
+        class: AppBundle\PHPStan\NonNullReturnTypeExtension
+        arguments: [Symfony\Component\BrowserKit\Client, [getResponse, getRequest, getInternalResponse, getInternalRequest, getCrawler]]
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: AppBundle\PHPStan\NonNullReturnTypeExtension
+        arguments: [Symfony\Bundle\FrameworkBundle\Client, [getContainer, getKernel]]
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    # the content of the responses (tested), false only for streamed responses
+    -
+        class: AppBundle\PHPStan\NonNullReturnTypeExtension
+        arguments: [Symfony\Component\HttpFoundation\Response, [getContent]]
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    # the kernel is booted
+    -
+        class: AppBundle\PHPStan\NonNullReturnTypeExtension
+        arguments: [Symfony\Component\HttpKernel\KernelInterface, [getContainer]]
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension

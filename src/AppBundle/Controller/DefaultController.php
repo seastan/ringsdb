@@ -2,7 +2,8 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use AppBundle\Services\CardsData;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Model\DecklistManager;
 use AppBundle\Model\FellowshipManager;
@@ -13,19 +14,50 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 
 
-class DefaultController extends Controller {
-    function orderNew($a, $b) {
-        return ($a['dateCreation'] < $b['dateCreation']);
+class DefaultController extends AbstractController {
+    /**
+     * @var int
+     */
+    private $cacheExpiration;
+
+    /**
+     * @var string|null
+     */
+    private $gameName;
+
+    /**
+     * @var string|null
+     */
+    private $publisherName;
+
+    public function __construct(int $cacheExpiration, ?string $gameName, ?string $publisherName) {
+        $this->cacheExpiration = $cacheExpiration;
+        $this->gameName = $gameName;
+        $this->publisherName = $publisherName;
     }
 
-    public function indexAction() {
+    /**
+     * Newest first
+     *
+     * @param array $a
+     * @param array $b
+     * @return int
+     */
+    function orderNew($a, $b) {
+        return $b['dateCreation'] <=> $a['dateCreation'];
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function indexAction(DecklistManager $decklistManager, FellowshipManager $fellowshipManager) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         // Managers
-        $decklist_manager = $this->get('decklist_manager');
-        $fellowship_manager = $this->get('fellowship_manager');
+        $decklist_manager = $decklistManager;
+        $fellowship_manager = $fellowshipManager;
         $em = $this->getDoctrine()->getManager();
         
         $typeNames = [];
@@ -193,7 +225,9 @@ class DefaultController extends Controller {
                     continue;
                 }
             }
-            $all_comments[] = $comment;
+            if ($comment) {
+                $all_comments[] = $comment;
+            }
         }
         // Recent fellowship comments
         $fellowship_manager->setLimit($num_comments);
@@ -214,7 +248,9 @@ class DefaultController extends Controller {
                     continue;
                 }
             }
-            $all_comments[] = $comment;
+            if ($comment) {
+                $all_comments[] = $comment;
+            }
         }
         // Get recent card reviews
         $dql = "SELECT DISTINCT r FROM AppBundle:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC, r.id DESC";
@@ -231,7 +267,9 @@ class DefaultController extends Controller {
                 $comment['dateCreation'] = $review->getDateCreation();
                 $comment['text'] = $review->getTextHtml();
             }
-            $all_comments[] = $comment;
+            if ($comment) {
+                $all_comments[] = $comment;
+            }
         }
         // Recent review comments
         $em = $this->getDoctrine()->getManager();
@@ -254,7 +292,9 @@ class DefaultController extends Controller {
                     continue;
                 }
             }
-            $all_comments[] = $comment;
+            if ($comment) {
+                $all_comments[] = $comment;
+            }
         }
 
         // Sort all comments by date
@@ -267,9 +307,9 @@ class DefaultController extends Controller {
             $comment = $all_comments[$i];
             $text = $comment['text'];
             if (strlen($text) > 300) {
-                $text = preg_replace('/\s+?(\S+)?$/', '', substr($text . ' ', 0, 301));
+                $text = (string) preg_replace('/\s+?(\S+)?$/', '', substr($text . ' ', 0, 301));
                 if (strrpos($text, '<') > strrpos($text, '>')) $text = substr($text . ' ', 0, strrpos($text, '<')); 
-                $text = preg_replace('/\s+?(\S+)?$/', '', $text);
+                $text = (string) preg_replace('/\s+?(\S+)?$/', '', $text);
                 $text = $text . '...';
                 // Fix unclosed html tags
                 libxml_use_internal_errors(true);
@@ -278,17 +318,19 @@ class DefaultController extends Controller {
                 // Strip wrapping <html> and <body> tags
                 $mock = new \DOMDocument;
                 $body = $dom->getElementsByTagName('body')->item(0);
-                foreach ($body->childNodes as $child) {
-                    $mock->appendChild($mock->importNode($child, true));
+                if ($body) {
+                    foreach ($body->childNodes as $child) {
+                        $mock->appendChild($mock->importNode($child, true));
+                    }
                 }
-                $text = trim($mock->saveHTML());
+                $text = trim((string) $mock->saveHTML());
                 $text = preg_replace('/\n$/','',$text);
             }
             $all_comments[$i]['text'] = $text;
         }
 
-        $game_name = $this->container->getParameter('game_name');
-        $publisher_name = $this->container->getParameter('publisher_name');
+        $game_name = $this->gameName;
+        $publisher_name = $this->publisherName;
         
         return $this->render('AppBundle:Default:index.html.twig', [
             'pagetitle' =>  "$game_name Deckbuilder",
@@ -302,42 +344,51 @@ class DefaultController extends Controller {
         ], $response);
     }
 
-    function rulesAction() {
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    function rulesAction(CardsData $cardsData) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         $render = $this->renderView('AppBundle:Default:rules.html.twig', [
             "pagetitle" => "Rules",
             "pagedescription" => "Refer to the official rules of the game."
         ]);
 
-        $page = $this->get('cards_data')->replaceSymbols($render);
+        $page = $cardsData->replaceSymbols($render);
         $response->setContent($page);
 
         return $response;
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     function aboutAction() {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         return $this->render('AppBundle:Default:about.html.twig', [
             "pagetitle" => "About",
-            "game_name" => $this->container->getParameter('game_name'),
+            "game_name" => $this->gameName,
         ], $response);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     function apiIntroAction() {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         return $this->render('AppBundle:Default:apiIntro.html.twig', [
             "pagetitle" => "API",
-            "game_name" => $this->container->getParameter('game_name'),
-            "publisher_name" => $this->container->getParameter('publisher_name'),
+            "game_name" => $this->gameName,
+            "publisher_name" => $this->publisherName,
         ], $response);
     }
 }

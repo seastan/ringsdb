@@ -4,24 +4,27 @@ namespace AppBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 class EncounterType extends AbstractType {
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
+     * @return void
      */
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder
             ->add('code')
             ->add('name')
-            ->add('pack', 'entity', array('class' => 'AppBundle:Pack', 'property' => 'name'));
+            ->add('pack', EntityType::class, array('class' => 'AppBundle:Pack', 'choice_label' => 'name'));
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
+     * @return void
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver) {
+    public function configureOptions(OptionsResolver $resolver) {
         $resolver->setDefaults([
             'data_class' => 'AppBundle\Entity\Encounter'
         ]);
@@ -30,7 +33,7 @@ class EncounterType extends AbstractType {
     /**
      * @return string
      */
-    public function getName() {
+    public function getBlockPrefix() {
         return 'appbundle_encounter';
     }
 }

@@ -1,11 +1,14 @@
 # Migration Symfony 2.8 → 7.4 / PHP 8.5
 
-Migration notes. Starting point: Symfony 2.8.52, FOSUserBundle 2.0.2, PHP 7.1.33.
+Migration notes. Starting point: Symfony 2.8.52, FOSUserBundle 2.0.2, PHP 7.1.33. Current state:
+Symfony 3.4.49, FOSUserBundle 2.1.2, PHP 7.4.33, the same PHP version as production (see
+"Progress").
 
 The functional tests (`make phpunit`) are the safety net: they must stay green at every step.
 
 - **Roadmap**: what is left to do before the migration, by priority.
-- **Migration plan**: what the migration itself involves (dependencies, assets, tests, environment).
+- **Migration plan**: what the migration itself involves (steps done, dependencies, assets, tests,
+  environment).
 - **Reference**: the behaviour pinned by the tests, area by area, with the bugs and quirks found.
   The roadmap links to it by section name.
 
@@ -15,18 +18,10 @@ The functional tests (`make phpunit`) are the safety net: they must stay green a
 
 Each removal reduces what has to be ported.
 
-- **OAuth2 server**: check first that nothing calls it (nginx logs for `/api/oauth2/` and
-  `/oauth/v2/`: `deck/load` works without a token). Inventory in "OAuth2 server".
-- **OCTGN features**: two decisions first (see "OCTGN features"): the `octgnid` of the public API,
-  and the `octgnid` / reprint `mapping` of the card statistics.
-- **GregwarCaptchaBundle**: registered in `AppKernel`, configured (`gregwar_captcha: ~` in
-  `config.yml`), required in `composer.json` (`gregwar/captcha-bundle` 2.0.7), but no form uses
-  the `captcha` type: added on 2020-09-14 (commit `a07a2fd4`, "added captcha and vendor
-  directory") and never wired. To remove: the bundle registration and the configuration now;
-  the `composer.json` / `composer.lock` entry with the next dependency update (the lock is
-  Composer 1 era, see "Environment").
-- **twig/extensions**: required in `composer.json` but none of its extensions is registered in the
-  configuration: probably unused (abandoned package). Same removal as the captcha bundle.
+- Done: the **OAuth2 server** and **GregwarCaptchaBundle** (see "OAuth2 server (removed)").
+- Done: the broken OCTGN commands (`app:octgn`, `app:cards:octgn`). The OCTGN imports and exports
+  are kept (see "OCTGN features").
+- Done: **twig/extensions** (abandoned, none of its extensions was registered).
 - **Dead code found by the tests, not removed yet**:
   - the `/deck/can_publish/{id}` route (`deck_publish`), pointing to the missing
     `SocialController::publishAction` (see "Website browsing");
@@ -42,21 +37,25 @@ Each removal reduces what has to be ported.
 
 - **`/admin/stat_cards` and the `app:stats:precompute-cards` cron**: nothing in the repository
   consumes that JSON, probably an external report. Ask the maintainers / check the nginx logs
-  (see "Card statistics"). Linked to the OCTGN decision above.
+  (see "Card statistics").
 - **User blocking**: the "Block" button of the admin has had no effect since FOSUserBundle 2.
   Reimplement it with a `UserChecker` or drop it, with the `locked` column (see "Admin area").
 - **JSONP on the public API**: the callback is echoed unsanitised (XSS vector). Validate it or
   drop JSONP; dropping it changes the public API (see "Public API").
-- **`/api/doc` (NelmioApiDocBundle 2.x)**: the public API documentation, generated from the
-  `@ApiDoc` annotations of `ApiController` (8) and `Oauth2Controller` (4). No page links to it and
-  no test covers it. Porting it means NelmioApiDocBundle 4+, which is a rewrite (OpenAPI
-  attributes). Keep, drop, or replace with a static page?
+- **Card scraping commands**: `app:beorn:html` (`ScrapBeornCardDataCommand`, scrapes the Hall of
+  Beorn HTML pages, still full of debug output), `app:beorn:json` and `app:download-images`
+  (`app:cgdb:cards` was removed). The CSV import
+  (`BeornJSONtoRingsDBcsv.py`, see "Admin area") seems to have replaced them; `app:beorn:scenario`
+  is still used by the admin scenario import. Keep only what the maintainers still run.
+- Decided: **`/api/doc` (NelmioApiDocBundle 2.x)** is kept. It is the public API documentation,
+  generated from the `@ApiDoc` annotations of `ApiController` (8), and linked from the API
+  introduction page (`/api/`, `Default/apiIntro.html.twig`). No test covers it. Porting it means
+  NelmioApiDocBundle 4+, which is a rewrite (OpenAPI attributes).
 
 ## 3. Fixes cheaper to make now, with the tests
 
 - **PHP 8 breakers**:
-  - `POST /deck/autosave` calls `count()` on a decoded object: always 1 in PHP 7.1, a `TypeError`
-    in PHP 8 (see "Deck workflow").
+  - Fixed: `POST /deck/autosave` called `count()` on a decoded object (see "Deck workflow").
   - The deck contents are decoded with `(array) json_decode(...)` (objects inside) in the builder
     and in quest logs; the rewrite must keep the `{}` vs `[]` distinction of the empty deck guard
     (see "Deck workflow", "Quest logs").
@@ -73,11 +72,9 @@ Each removal reduces what has to be ported.
 
 ## 4. Open test gaps
 
-- CSV import and scenario import: waiting for sample files (see "Admin area").
-- `app/Resources/FOSUserBundle/views/Registration/checkEmail.html.twig`: probably ignored by
-  FOSUserBundle 2.0 (not verified, see "Removing FOSUserBundle").
+- Scenario import: waiting for a sample file (see "Admin area").
 - The merging of reprints by `source_code()` in the card statistics (see "Card statistics").
-- `/api/doc`, if kept (see above).
+- `/api/doc` (see above).
 
 ## 5. Left for during or after the migration
 
@@ -88,34 +85,85 @@ Each removal reduces what has to be ported.
 - **Line endings of the text exports** (CRLF → LF) after the migration: see "After the
   migration".
 - **Time in tests** (`ClockInterface`): see "Tests and time".
+- **Static analysis** (`make phpstan`, level 8 of phpstan 2.2, see "Static analysis"): level 9,
+  the value types of arrays and collections, and the official extensions instead of ours.
 
 # Migration plan
 
-## Strategy (to decide)
+## Strategy
 
-Step through the LTS versions (3.4 → 4.4 → 5.4 → 6.4 → 7.4, fixing deprecations at each step) or
-start from a Symfony 7.4 skeleton and port the code into it. The choice decides when the test
-suite has to be ported (see "Porting the test suite"). Whatever the choice, FOSUserBundle and
-FOSOAuthServerBundle are removed (decided), preferably before the first step.
+Decided: step through the LTS versions (3.4 → 4.4 → 5.4 → 6.4 → 7.4), fixing the deprecations at
+each step, and deploy each step to production (the detailed plan is in `UPGRADE_PATH.md`). PHP
+is only upgraded where a step needs it, to limit the production upgrades: it stays 7.4 until
+Symfony 5.4. FOSUserBundle is replaced (decided) with the Symfony 5.4 step, before PHP 8.4.
+
+## Progress
+
+### Symfony 3.4 (with PHP 7.4)
+
+Symfony 3.4.49 (the 2.x directory structure is kept: `app/`, `web/`, `app/console`), Twig 2,
+FOSUserBundle 2.1, Doctrine ORM 2.7 / DBAL 2.13, DoctrineBundle 1.12,
+doctrine-migrations-bundle 2.2 (see "Environment"), PHP 7.4 (the local stack, aligned with
+production), phpstan 2.2, PhpSpreadsheet 1.30 instead of PHPExcel (see "Admin area"). The lock
+is now a Composer 2 lock. Symfony 3.0 was skipped: 3.0.9 calls Twig's `getExtension('core')`,
+which Twig 2 no longer has.
+
+Code changes: `form_start()` / `form_end()` instead of `form_enctype()` (admin CRUD, FOSUser
+templates), `assets.packages` instead of the removed `templating.helper.assets`,
+`WebServerBundle` for `server:run` (dev / test), the `_configurator` route removed. Behaviour
+changes pinned by the tests:
+
+- The session listener makes every response of a request that used the session
+  `max-age=0, must-revalidate, private`: the private API responses lose their
+  `private, must-revalidate` / `no-cache` headers (see "Private API"). `Last-Modified` and the
+  `304` answers are unchanged.
+- `hide_user_not_found` also hides the account status errors since 3.4, so the login page could
+  no longer show "Account is disabled." (and its confirmation email link). It is now `false`,
+  and an unknown username still reads "Invalid credentials." through the
+  `security.en.yml` translation (see "Removing FOSUserBundle").
+- The date fields of the admin pack form have hidden (`sr-only`) Year / Month / Day labels.
+
+The Composer scripts of `sensio/distribution-bundle` failed with Composer 2 (they pass a string
+to `Process`): they were replaced by the commands themselves (`symfony-scripts`: parameters,
+`cache:clear`, `assets:install`, `assetic:dump`), and the bundle was removed with its
+environment check files (`web/config.php`, `app/check.php`, `app/SymfonyRequirements.php`).
+
+### Services and dependency injection
+
+Needed before Symfony 4, where services are private and `Controller` / `ContainerAwareCommand`
+are deprecated. Done by hand (no Rector):
+
+- `services.yml` registers every class of the bundle as a service, identified by its class
+  name, with autowiring and autoconfiguration. The services receive interfaces
+  (`EntityManagerInterface`, `UrlGeneratorInterface`, `LoggerInterface`). The parameters are
+  bound by name in `_defaults` (`$rootDir`, `$cacheDir`, `$cacheExpiration`, `$gameName`,
+  `$publisherName`). The historical ids (`texts`, `decks`, `fellowship_manager`...) are only
+  kept as aliases for the fixtures and the tests.
+- The commands extend `Command` and receive their dependencies in their constructor.
+- The controllers extend `AbstractController`: the services used by several methods and the
+  parameters are injected in the constructor, the services used by one action are arguments of
+  that action (`controller.service_arguments`). Left: `$this->get('session')` (one of the
+  services `AbstractController` still provides, to replace with `$request->getSession()` before
+  Symfony 6) and `getDoctrine()` (deprecated in Symfony 5.4).
+- Left: the fixtures (`ContainerAwareInterface`, DoctrineFixturesBundle 2.x) and the tests
+  still fetch services from the container by id.
 
 ## Dependencies
 
 | Package | Status | Replacement / action |
 |---|---|---|
 | `friendsofsymfony/user-bundle` 2.0 | to be replaced (decided) | Symfony Security, see "Removing FOSUserBundle" |
-| `friendsofsymfony/oauth-server-bundle` | depends on FOSUser | remove, see "OAuth2 server" |
-| `gregwar/captcha-bundle` | unused | remove, see roadmap |
-| `twig/extensions` | abandoned, probably unused | remove, see roadmap |
 | `symfony/assetic-bundle`, `leafo/scssphp`, `patchwork/jsqueeze` | dropped in Symfony 4 | see "Front-end assets" |
 | `symfony/swiftmailer-bundle` | abandoned | Symfony Mailer (`\Swift_Message::newInstance()` in the comment notifications, FOSUser emails) |
-| `liuggio/excelbundle` (PHPExcel) | abandoned | PhpSpreadsheet (admin Excel export / import) |
+| `liuggio/excelbundle` (PHPExcel) | done | replaced by PhpSpreadsheet (admin Excel export / import) |
 | `sensio/framework-extra-bundle` | abandoned | native attributes (`#[Route]`, `#[IsGranted]`, `#[MapEntity]`) |
-| `sensio/distribution-bundle`, `sensio/generator-bundle`, `incenteev/composer-parameter-handler` | Symfony 2 tooling | Symfony Flex, `.env`, MakerBundle |
+| `sensio/generator-bundle`, `incenteev/composer-parameter-handler` | Symfony 2 tooling | Symfony Flex, `.env`, MakerBundle (`sensio/distribution-bundle` removed, see "Progress") |
 | `nelmio/api-doc-bundle` 2.x | major rewrite in 4.x | see roadmap ("`/api/doc`") |
 | `friendsofsymfony/jsrouting-bundle` 1.x | maintained (3.x) | upgrade; `routes_to_expose: ['.*']` exposes every route, admin included: restrict it |
 | `gedmo/doctrine-extensions` 2.x | maintained (3.x) | upgrade; the timestampable listener is declared by hand (`doctrine_extensions.yml`), or use `stof/doctrine-extensions-bundle` |
 | `doctrine/orm` 2.x, `doctrine/dbal` 2.x | | ORM 3 / DBAL 4; the custom DQL functions `replace` and `power` (see "Card search") |
 | `ezyang/htmlpurifier`, `erusev/parsedown` | maintained | upgrade |
+| `phpstan/phpstan` 2.2 (dev) | maintained | add `phpstan-symfony`, `phpstan-doctrine` and `phpstan-phpunit` (see "Static analysis") |
 
 ## Front-end assets
 
@@ -130,22 +178,110 @@ Most tests go through HTTP and compare snapshots, so they survive the migration.
 current stack:
 
 - the `KernelTestCase` tests (managers, commands, card statistics): service ids
-  (`static::$kernel->getContainer()->get('cards_data')`, `'doctrine'`), `getRootDir()`;
-- PHPUnit 6.5 APIs: `assertContains()` on strings, `assertRegExp()`, `setUp()` / `tearDown()`
-  without `: void`. On PHP 7.1, PHPUnit cannot go past 7.5;
+  (`static::$kernel->getContainer()->get('fellowship_manager')`, `'doctrine'`), public until
+  Symfony 4.1 brings `test.service_container`; `getRootDir()`;
+- PHPUnit 6.5 APIs: `assertContains()` on strings, `assertRegExp()`. PHP 7.4 allows up to
+  PHPUnit 9.6. The test methods, `setUp()` and `tearDown()` already declare `: void` (required from
+  PHPUnit 8);
 - the fixtures (`DoctrineFixturesBundle` 2.x) and the `make test-fixtures` loading.
 
 To plan with the strategy: with LTS steps, the suite is upgraded as PHP goes up; with a new
 skeleton, it is ported first, then run against the new application.
 
+## Static analysis
+
+`make phpstan` runs phpstan 2.2 at level 8 on `src/` (configuration in `phpstan.neon`). The
+official extensions could not be installed with Composer 1, so `src/AppBundle/PHPStan/` has
+small replacements, to drop for `phpstan-symfony`, `phpstan-doctrine` and `phpstan-phpunit` now
+that Composer 2 is used:
+
+- the service types, read from the container dumped in `app/cache/test` (hence the
+  `cache:warmup` of `make phpstan`); the Doctrine registry, entity managers and
+  `getRepository('AppBundle:Card')` (an `EntityRepository<Card>`, with a stub);
+- the PHPUnit assertions narrowing types, the non-null response / request / container of the test
+  client, `HeaderBag::get()`, the entities' `$id` written by Doctrine;
+- stubs and ignored errors for wrong vendor docblocks (DBAL, PHPUnit 6.5).
+
+Left for later: level 9 (1136 errors with phpstan 1.4, all about `mixed`: request parameters,
+query results, untyped collections, the `mixed` parameters of the level 6 docblocks) and the
+value types of arrays and collections (the `missingType.iterableValue` and
+`missingType.generics` errors are ignored). Both are cheaper on the rewritten code.
+
 ## Environment
 
-- **Production database**: the tests run on MySQL 8.4 with `ONLY_FULL_GROUP_BY` (several queries
-  had to be fixed for it, see "Card statistics", "Lists and search managers"). Check the version
-  and `sql_mode` of production, so that the tests run on the same settings.
-- **Composer**: the lock is Composer 1 era and `vendor/` is copied from the server (Composer 2
-  drifts Symfony 2.7 → 2.8 and breaks FOSUserBundle, see `CLAUDE.md`). The migration needs
-  Composer 2 and a clean `composer install`.
+- **Production database**: the tests run on MySQL 8.0, the version of production, with the
+  default `sql_mode`. Production runs without `ONLY_FULL_GROUP_BY` (checked on 2026-09-29:
+  `STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION`),
+  the other modes are the same. The tests stay stricter on purpose: a query accepted with
+  `ONLY_FULL_GROUP_BY` works the same without it, and the mode catches the ambiguous
+  `GROUP BY`s, which return an arbitrary row of the group in production (several queries were
+  fixed for it, see "Card statistics", "Lists and search managers").
+- **Composer**: since the Symfony 3.4 step, the lock is updated with Composer 2 and production
+  runs a normal `composer install` (decided on 2026-09-28), with `SYMFONY_ENV=prod` (read by
+  the `app/console` calls of the Composer scripts).
+- **Deployment**: `./deploy.sh`, run on the server from the checkout to update (it works on its
+  own directory, so the same script serves the production and test checkouts; the previous
+  script is kept as `deploy_old.sh`). Steps:
+  0. checks, before any change: the card images (see below); Composer (>= 2.2); fetches the
+     upstream branch, checks that it can be fast-forwarded without overwriting local changes
+     (`git read-tree -mun`, a dry run of the checkout), and checks the PHP version and
+     extensions its `composer.lock` requires (`composer check-platform-reqs --lock --no-dev`,
+     on a copy of its `composer.json` / `composer.lock`);
+  1. switches to maintenance mode: creates `maintenance.flag` at the root of the checkout, then
+     waits 10 seconds for the requests in progress. While the flag exists, `web/app.php` and
+     `web/app_dev.php` answer `503` with `web/maintenance.html` before loading anything, so
+     nothing writes to the database or the cache during the update;
+  2. snapshots the database (`mysqldump --single-transaction --no-tablespaces`, connection from
+     `parameters.yml`) to `$SNAPSHOT_DIR` (default `~/db-snapshots`, mode 700: the snapshots hold
+     the users' data). The snapshot has no stored function (created by root, the application user
+     cannot dump it): to restore, load it then `function-source-code.sql` as root;
+  3. fast-forwards the branch to the commit checked in step 0 (`git merge --ff-only`; with
+     `SKIP_PULL=1`, no fetch and the current commit is redeployed);
+  4. backs up `vendor/` to `vendor.bak/` (replacing the previous backup), removes the prod cache (renamed first) and runs `composer install --no-dev
+     --optimize-autoloader --no-interaction`, whose scripts clear the cache and build the assets.
+     The prod kernel uses its cached container without checking it: without the removal, the
+     `cache:clear` would boot the container of the previous code. Then links the card images;
+  5. applies the Doctrine migrations (`doctrine:migrations:migrate --allow-no-migration`);
+  6. refreshes the ACLs of `app/cache` and `app/logs` (`setfacl`, best-effort);
+  7. leaves maintenance mode.
+
+  If a step fails, the site stays in maintenance mode and the script prints how to roll back
+  (previous commit, `vendor.bak/`, the database snapshot); `rm maintenance.flag` once fixed.
+
+  **First deployment** (once per checkout): the checkout still has the previous `deploy.sh`,
+  which would clear the cache with the new code and the old `vendor/`. Pull first, and switch to
+  maintenance mode by hand at once (the pulled `web/app.php` honours the flag):
+  `git pull --ff-only && touch maintenance.flag && ./deploy.sh`. The script then finds the
+  checkout up to date and deploys the current commit. If one of its checks fails, the site stays
+  in maintenance mode: `git reset --hard ORIG_HEAD` and `rm maintenance.flag` to go back. `MAINTENANCE=0` keeps the site up (trivial redeploys).
+- **Card images** (about 832 MB, not in git): they live outside the checkout, in
+  `$CARD_IMAGES_DIR` (to set in the environment of the deploying user, e.g. in `~/.profile`; the
+  three checkouts can share it), served as `/bundles/cards/<code>.png` through the symlink
+  `web/bundles/cards`, that `deploy.sh` recreates. Since Symfony 3.4, `assets:install` (a
+  Composer script) deletes every directory of `web/bundles/` that is not a bundle's: a real
+  `web/bundles/cards` directory would be lost, a symlink is only unlinked (its target is kept).
+  `deploy.sh` refuses to run while `web/bundles/cards` is a directory. Once per server, before
+  the first deployment: `mv web/bundles/cards <dir>` and `export CARD_IMAGES_DIR=<dir>`. The web
+  server must follow symlinks (Apache in production: `FollowSymLinks` or
+  `SymLinksIfOwnerMatch`). Same trap locally: link `web/bundles/cards` to the images, never copy
+  them there.
+- **Schema changes**: from now on they go through `doctrine/doctrine-migrations-bundle` (2.2), in
+  `app/DoctrineMigrations/` (namespace `Application\Migrations`, table `migration_versions`).
+  `ringsdb_bootstrap.sql` stays the production schema before the first Doctrine migration, so
+  `make fixtures` / `make test-fixtures` run `doctrine:migrations:migrate` after loading it; in
+  production, `deploy.sh` runs it (see "Deployment"). The older hand-written scripts of `migrations/` are
+  already applied in production (and part of the bootstrap).
+  - `Version20260929134447`: aligns `user` with the FOSUserBundle 2 mappings (`username`,
+    `email` and their canonical versions shortened to 180 characters, nullable `salt`, unique
+    `confirmation_token`) and `user_custom_pack_card.quantity` (`TINYINT UNSIGNED` →
+    `SMALLINT UNSIGNED`: DBAL 2 maps `TINYINT` to a boolean). It fails if a value is longer
+    than 180 characters or if a confirmation token is duplicated (queries in its docblock):
+    checked on production on 2026-09-29, the values are under 50 characters and no confirmation
+    token is duplicated.
+  - `Version20260929135555`: drops the `oauth2_*` tables (see "OAuth2 server (removed)").
+  - `stat_cards_cache` has no entity (filled by SQL, see "Card statistics"): the
+    `schema_filter` of the DBAL connection hides it from Doctrine, which would drop it
+    otherwise. Any other table without an entity must be added to that filter.
 
 # Reference
 
@@ -218,12 +354,17 @@ In Symfony 7.4:
 
 ### Configuration issues found
 
+- `hide_user_not_found: false` (`security.yml`, since Symfony 3.4, see "Progress") keeps the
+  "Account is disabled." message; the translation of "Username could not be found." into
+  "Invalid credentials." (`app/Resources/translations/security.en.yml`) keeps unknown usernames
+  indistinguishable from wrong passwords. Both are to reproduce in the new login.
 - `config.yml` declares `fos_user.firewall_name: main`, but the firewall is named `default`.
   It works today (automatic login after confirmation is tested), but it should be fixed in the
   new configuration.
-- `app/Resources/FOSUserBundle/views/Registration/checkEmail.html.twig` uses the FOSUser 1.x
-  file name; FOSUser 2.0 looks for `check_email.html.twig`. This override is probably ignored
-  today (not verified).
+- Removed: the FOSUserBundle overrides named after FOSUser 1.x templates, which FOSUser 2 does not
+  load (it renders `check_email`, `change_password`...): `Registration/checkEmail.html.twig`,
+  `Resetting/checkEmail.html.twig`, `Resetting/passwordAlreadyRequested.html.twig` and
+  `ChangePassword/changePassword*.html.twig`. The pages already used FOSUser's templates.
 
 ## Public API (`/api/public/*`)
 
@@ -243,7 +384,7 @@ quest logs, in `app.deck.js` / `app.deck_selection.js`; `api_private_custom_pack
 `app.ui.js`). Covered by `src/AppBundle/Tests/Controller/ApiPrivateControllerTest.php` (see
 "Private API" below).
 
-The OAuth2 API (`/api/oauth2`) is to be removed before migrating: see "OAuth2 server" below.
+The OAuth2 API (`/api/oauth2`) has been removed: see "OAuth2 server (removed)" below.
 
 ### Current behaviour pinned by the tests (quirks to keep or fix on purpose)
 
@@ -251,7 +392,8 @@ The OAuth2 API (`/api/oauth2`) is to be removed before migrating: see "OAuth2 se
 - `/cards/{pack_code}.xml|xls|xlsx` returns `200` with the plain text body
   `<format> format not supported. Only json is supported.` (`text/xml` for xml, `text/html`
   for xls/xlsx). `/card/{code}.xml` is a `404` (route requirement).
-- `/cards/search/{q}` ignores the `jsonp` parameter.
+- Fixed: `/cards/search/{q}` ignored the `jsonp` parameter (the action tested `isset($jsonp)` but
+  never read it from the request). It now supports JSONP like the other endpoints.
 - `/cards/` `Last-Modified` is the most recent `dateUpdate` of the cards **and** of their
   printings.
 - `/custom-packs/published` and `/user/info` are not in `ApiController`: they return a
@@ -362,19 +504,19 @@ field). Everything the tests create is deleted in `tearDown()`.
     check: the deck is deleted and silently removed from its fellowship (cascade remove on
     `Deck.fellowships`, the fellowship keeps its `nb_decks`).
   - `POST /deck/autosave` stores the builder's diff as an unsaved `deckchange`, replaced by a
-    saved one on the next save. The diff is decoded as objects and tested with `count()`, which
-    is always 1 for an object in PHP 7.1 (an empty diff still creates an entry) and a `TypeError`
-    in PHP 8: to rewrite with `json_decode(..., true)`. A 2-part diff with its first two parts
-    empty reads undefined offsets 2 and 3 (`500` in debug mode).
+    saved one on the next save. Fixed: the diff was decoded as objects and tested with
+    `count()`, always 1 for an object (an empty diff still created an entry; a warning since
+    PHP 7.2, a `TypeError` in PHP 8), and a 2-part diff with empty parts read undefined offsets.
+    It is now decoded as arrays: an empty diff, in 4 or 2 parts, creates no entry.
   - Unknown deck, another user's deck, wrong diff: HTTP exceptions, `500` for AJAX requests
     (`CoreExceptionListener`).
   - `POST /deck/import/all` (zip archive, "uparchive"): one deck per file, named after the file
     (without folder nor extension); text files through the text import parser, `.o8d` through the
     OCTGN one; a file without any card gives an empty deck; a non-zip file or no file is a `422`.
-    BUG: the OCTGN parser (`BuilderController::parseOctgnImport`, also used by the single file
-    import of a `.o8d`, `/deck/fileimport`) still looks cards up by `Card.octgnid`, moved to
+    Fixed: the OCTGN parser (`BuilderController::parseOctgnImport`, also used by the single file
+    import of a `.o8d`, `/deck/fileimport`) looked cards up by `Card.octgnid`, moved to
     `CardPrinting` by the card printings refactor ("Unrecognized field: octgnid", `500`, nothing
-    imported).
+    imported). See "OCTGN features".
 - Decklist edit / save / delete (`/decklist/edit|save|delete/{id}`, `DecklistEditTest`): no
   `access_control` rule for `/decklist/`, the controllers check the user; anonymous users are
   redirected to the login page on edit / save but get a `403` on delete (different exception
@@ -457,6 +599,9 @@ fixture decks: the tests restore them in `tearDown()`.
   `empty($fellowship->getDecks())`, and a Doctrine collection object is never `empty()`.
 - No CSRF protection on `/fellowship/save`, `/fellowship/publish`, `/fellowship/delete`,
   `/fellowship/delete_list`.
+- Fixed (found by phpstan): commenting on or voting for an unknown fellowship
+  (`/user/fellowship_comment`, `/user/fellowship_like`) crashed on `null`; it now answers `400`,
+  like the decklists.
 - The fixture fellowship 1 is public but references decks (not decklists): a state the
   application itself does not produce. (It had no `date_publish` either, which Twig displayed as
   the current date: fixed in `LoadFellowshipData`.)
@@ -477,49 +622,31 @@ sent with AJAX after logging in, like the site's JavaScript does.
 - `/custom-packs`: the user's custom packs.
 - Errors (unknown user or deck, deck not shared) are `200` with
   `{"success": false, "error": ...}`.
-- With data: `Cache-Control: private, must-revalidate` + `Last-Modified`, and `304` on
-  `If-Modified-Since`; without data: `no-cache`, no `Last-Modified`.
+- With data: `Last-Modified`, and `304` on `If-Modified-Since`; without data, no
+  `Last-Modified`. `Cache-Control` is `max-age=0, must-revalidate, private` in both cases, set
+  by the session listener since Symfony 3.4 (it was `private, must-revalidate` with data,
+  `no-cache` without).
 - Anonymous: `403` `{"success": false, "message": "Access Denied."}` for AJAX requests (through
   `CoreExceptionListener`), redirect to the login page otherwise.
 
-## OAuth2 server (to be removed)
+## OAuth2 server (removed)
 
-`FOSOAuthServerBundle` makes RingsDB an OAuth2 server, so that third-party applications can act
-on behalf of a user through `/api/oauth2/*`. Inherited from ThronesDB. Plan: remove it before
-the migration (the bundle depends on FOSUserBundle and is not maintained for recent Symfony
-versions).
+`FOSOAuthServerBundle` made RingsDB an OAuth2 server, so that third-party applications could act
+on behalf of a user through `/api/oauth2/*` (inherited from ThronesDB). Token checking had been
+disabled (the `api_oauth2` firewall was commented out), and the API had 4 routes: the session
+user's decks, loading any shared deck (to anyone), and deck save / publish (both disabled).
+Nothing called it any more: it was removed, with `GregwarCaptchaBundle`, which no form used.
 
-What is there today:
+Removed: the bundles (`AppKernel`, `composer.json`, `config.yml`), the `oauth_token` /
+`oauth_authorize` firewalls and the `^/api/oauth2` access rule, the `/oauth/v2/*` and
+`/api/oauth2/*` routes, `Oauth2Controller`, `CreateClientCommand`, `SecurityController` and its
+template (the login form of the authorization endpoint), the templates overriding the bundle's,
+the entities `Client`, `AccessToken`, `RefreshToken`, `AuthCode` and their mappings, the OAuth2
+section of the API introduction page (`/api/`).
 
-- Config: `fos_oauth_server` in `config.yml` (entities `Client`, `AccessToken`, `RefreshToken`,
-  `AuthCode`, tables `oauth2_*`; user provider `fos_user.user_manager`), bundle registered in
-  `AppKernel`.
-- Token endpoints, still active: `/oauth/v2/token` (firewall `oauth_token`, `security: false`)
-  and `/oauth/v2/auth` (firewall `oauth_authorize`, with its own login form: routes
-  `oauth_server_auth_login` / `oauth_server_auth_login_check`, `SecurityController`). Tokens can
-  still be issued if clients are registered in `oauth2_client`.
-- Token checking is disabled: the `api_oauth2` firewall (`fos_oauth: true`) is commented out, so
-  `/api/oauth2/*` goes through the regular `default` firewall and `access_control` lets
-  anonymous users in. Tokens are ignored.
-- `Oauth2Controller`:
-  - `GET /api/oauth2/decks`: decks of the session user (empty without a session);
-  - `GET /api/oauth2/deck/load/{id}`: any deck whose owner shares their decks, to anyone
-    (owner check commented out), with `Access-Control-Allow-Origin: *`;
-  - `PUT /api/oauth2/deck/save/{id}`: the action is commented out (route to a missing method,
-    `500`);
-  - `PUT /api/oauth2/deck/publish/{id}`: always `403` "Publishing via API has been disabled.".
-
-Before removing it, check whether anything still calls it: `oauth2_client` /
-`oauth2_access_token` rows (`SELECT COUNT(*), FROM_UNIXTIME(MAX(expires_at)) FROM
-oauth2_access_token`) and, more reliably, the nginx logs for `/api/oauth2/` and `/oauth/v2/`
-(`deck/load` works without a token). If `deck/load` has to survive, move it to `/api/public`.
-
-To remove: the bundle (`AppKernel`, `composer.json`, `config.yml`), the `oauth_token` /
-`oauth_authorize` firewalls and the commented `api_oauth2` one, the `^/api/oauth2`
-access rule, the `/oauth/v2/*` and `/api/oauth2/*` routes (`routing.yml`, `routing_api.yml`,
-`routing_api_oauth2.yml`), `Oauth2Controller`, `SecurityController` and its template
-`AppBundle:Security:login.html.twig` (only used by the `oauth_server_auth_login*` routes), the 4
-entities and their mappings, and the `oauth2_*` tables.
+The `oauth2_*` tables are dropped by the Doctrine migration `Version20260929135555` (see
+"Environment"), run by `deploy.sh`; `ringsdb_bootstrap.sql` still contains them, as the
+production schema before the migrations.
 
 ## Quest logs
 
@@ -555,6 +682,11 @@ directly.
 - The deck contents are decoded with `(array) json_decode(...)` (objects inside), like the deck
   builder does: `{"main": {}}` passes the "empty deck" guard.
 - No CSRF protection on `/questlog/save`, `/questlog/delete`, `/questlog/delete_list`.
+- Fixed (found by phpstan): commenting on or voting for an unknown quest log
+  (`/user/questlog_comment`, `/user/questlog_like`) crashed on `null`; it now answers `400`.
+- Fixed: the quest log list of a decklist page (`Decklist::getAllQuestlogs()`) was meant to include
+  the quest logs of its parent deck, but they were assigned to a misspelled variable
+  (`$parentlogs`) and never listed (found by phpstan).
 
 ## Card reviews
 
@@ -600,29 +732,48 @@ printing lists (1300+ rows), JSON snapshots for the statistics (`?month=2015-08`
 `snapshots/api/admin/`).
 
 The Excel export / import is covered by `src/AppBundle/Tests/Controller/AdminExcelTest.php`, by
-round trip: download a pack (or all the cards), change the file with PHPExcel, upload it back
+round trip: download a pack (or all the cards), change the file with PhpSpreadsheet, upload it back
 (field and association changes, card creation only with `create`, unknown association).
 
 The write forms are covered by `src/AppBundle/Tests/Controller/AdminWriteTest.php`, on records
 created by the test only: the generated CRUD of the 8 reference entities (create → show,
 edit → edit, delete → list, through the real forms, CSRF tokens included), scenario encounters,
 card force delete, user search, comment hide/delete, decklist delete. Not covered yet: the card
-image upload (unused, see below), the scenario import command
-(`/admin/command/`, downloads from hallofbeorn.com unless a custom JSON is given) and the
-CSV import.
+image upload (unused, see below) and the scenario import command (`/admin/command/`, downloads
+from hallofbeorn.com unless a custom JSON is given).
 
-### Pending: import tests, waiting for sample files
+The Excel import is also tested with a download made in production
+(`src/AppBundle/Tests/Resources/fixtures/import/core-set.xlsx`), and the CSV import by
+`src/AppBundle/Tests/Controller/AdminCsvTest.php`, with the CSV of the ALeP pack "The Hobbit"
+(`fixtures/import/alep-the-hobbit.csv`, 21 cards, already in the database): upload of an
+unchanged pack, of a new pack, cards missing from the CSV, renaming with the old code, a CSV
+without cards. The samples are stored without line ending conversion (`.gitattributes`): the
+CSV import tells the rows (CRLF) from the line breaks of the texts (LF).
 
-To be written once representative files are available (to be stored under
-`src/AppBundle/Tests/Resources/fixtures/`):
+### CSV import (`POST /admin/csv/upload`, `CSVController`)
 
-- **CSV import** (`POST /admin/csv/upload`, `CSVController`): fields `code`, `old_code`, `name`
-  (the pack) and the file `upfile`. Header line + one card per line, in the format produced by
-  `BeornJSONtoRingsDBcsv.py` from a Hall of Beorn JSON export: `pack, type, sphere, position,
-  code, name, traits, text, flavor, isUnique, cost, threat, willpower, attack, defense, health,
-  victory, quest, quantity, deckLimit, illustrator, octgnid, hasErrata`. Creates or renames the
-  pack (new packs go to the `ALeP` cycle, or the last one), creates or updates cards and
-  printings. Needed: a real CSV for a new pack, and one updating an existing pack.
+Fields `code`, `old_code`, `name` (the pack) and the file `upfile`. Header line + one card per
+line, in the format produced by `BeornJSONtoRingsDBcsv.py` from a Hall of Beorn JSON export:
+`pack, type, sphere, position, code, name, traits, text, flavor, isUnique, cost, threat,
+willpower, attack, defense, health, victory, quest, quantity, deckLimit, illustrator, octgnid,
+hasErrata`. Pinned by `AdminCsvTest`:
+
+- The pack is found by code, then by old code (it is then renamed); otherwise it is created in
+  the `ALeP` cycle, or the last one as there is no such cycle, released on 2030-02-01.
+- The printings are found by `octgnid` in the pack; otherwise the card is found by code (a
+  reprint: new printing of the existing card) or created.
+- The cards of the pack missing from the CSV are not deleted: their name is prefixed with
+  "[deleted]" and their code gets a unique suffix.
+- BUG, not fixed: the card fields of the CSV (code, position, texts...) are written to the
+  canonical card, even when the printing is a reprint. Uploading "The Hobbit" again gives Beorn
+  (card 131005, from another pack) the code, position, text and flavor of its ALeP printing
+  (503991). The card-level fields should only be written when the card was created by the
+  import, or the printing is its first one.
+- Only the rows ending with CRLF are rows: a CSV saved with LF line endings is read as a single
+  row ("No cards found in the CSV file").
+
+### Pending: scenario import test, waiting for a sample file
+
 - **Scenario import** (`POST /admin/command/`, `command=scenario`,
   `ScrapBeornScenarioDataCommand`): downloads `http://hallofbeorn.com/LotR/ScenarioDetails/...`
   unless `customjson` is given. Needed: a saved Hall of Beorn scenario JSON, so the test never
@@ -652,7 +803,15 @@ To be written once representative files are available (to be stored under
   soon as the controller returns it, so the test client gets an empty body (the tests capture it
   with an output buffer). The export file names come from `slugify()`, which drops the spaces
   (`lotrlcgcards.xlsx`).
-- PHPExcel (`liuggio/ExcelBundle`) is abandoned: replace it with PhpSpreadsheet.
+- Done: PHPExcel (`liuggio/ExcelBundle`, abandoned) was replaced by PhpSpreadsheet. The files are
+  same columns and values; whole numbers are read back as ints (floats with PHPExcel).
+- Fixed: the "Delete" button of an admin pack page (`Pack/show.html.twig`) posted to
+  `admin_cycle_delete`; the delete forms share their CSRF token, so it deleted the cycle with the
+  same id as the pack (`testPackPageDeletesThePack`).
+- The generated CRUD controllers of card, cycle, card printing, pack, encounter and scenario used
+  the Symfony 2 `$form->bind($request)`, which ignores the request method. They now use
+  `handleRequest()`; their edit and delete forms declare the `PUT` / `DELETE` methods that the
+  templates send with the `_method` field (found by phpstan).
 - Moderation actions are GET routes that write: `/admin/user/toggle_locked/{id}`,
   `/admin/decklist/delete/{id}`, `/admin/comment/toggle_hidden/{id}`,
   `/admin/comment/delete/{id}`.
@@ -662,12 +821,12 @@ To be written once representative files are available (to be stored under
   of the admin card form (unmapped `file` field in `CardType`, file move in
   `CardController::updateAction`). It writes `web/bundles/app/images/cards/<code>.png`, but the
   site reads card images from `web/bundles/cards/<code>.png` (and `<image_code>.png` for
-  printings, `CardsData`): uploaded images are never displayed. It also keeps the `.png` name
+  printings, `CardsData`; a symlink to `$CARD_IMAGES_DIR`, see "Environment"): uploaded images
+  are never displayed. It also keeps the `.png` name
   whatever the actual format. Not tested.
 - The generated CRUD controllers use the Symfony 2 form API (`createForm(new XxxType())`,
-  `$form->bind($request)`, `'entity'` / `'checkbox'` type names, `getName()`), which is gone in
-  recent versions (`createForm(XxxType::class)`, `handleRequest()`, FQCN types,
-  `getBlockPrefix()`).
+  `'entity'` / `'checkbox'` type names, `getName()`), which is gone in recent versions
+  (`createForm(XxxType::class)`, FQCN types, `getBlockPrefix()`).
 - Deleting reference data still in use (e.g. a cycle with packs, a card in decks) fails on the
   foreign keys with a `500` instead of an error message. `Card` has a "force delete" that
   removes its slots, printings and reviews, with SQL built by concatenation (the id comes from
@@ -709,7 +868,8 @@ which have to be reimplemented when FOSUserBundle is removed.
   invalid."); password confirmation must match.
 - Password reset: an email with a `/resetting/reset/{token}` link; a second request is ignored
   while the first one is recent (`retry_ttl`); no hint when the user does not exist; the token
-  is single-use, an unknown or used token is a `404`; after the reset the user is logged in.
+  is single-use, an unknown or used token redirects to the login page (a `404` before
+  FOSUserBundle 2.1); after the reset the user is logged in.
 
 ### To look at during the migration
 
@@ -745,7 +905,8 @@ Covered by `src/AppBundle/Tests/Controller/CollectionTest.php`.
 Per-card monthly usage statistics: for each card, the number of decks using it and the average
 number of copies (capped at 3 per deck), in "full" decks (last pack released on or after
 2019-08-02) and "limited" decks (older), plus sideboards and totals. Precomputed by the
-`app:stats:precompute-cards` command (cron) into `stat_cards_cache`, served as JSON by
+`app:stats:precompute-cards` command (cron) into `stat_cards_cache` (a table without an entity,
+excluded from the Doctrine schema by `schema_filter`), served as JSON by
 `/admin/stat_cards` (admin only). Nothing in the repository consumes that JSON: probably an
 external report made by an admin, to be confirmed (nginx logs, maintainers) before deciding
 whether to keep it.
@@ -759,7 +920,7 @@ heroes counted as the card they copy and implying the contract 22134, sideboards
 - Fixed: the step 1 query did `GROUP BY c.code` while selecting non-aggregated columns
   (`cprim.octgnid`, from a derived table), rejected by MySQL 8's default `ONLY_FULL_GROUP_BY`.
   The selected columns were added to the `GROUP BY` (same result, one primary printing per
-  card); production presumably runs without `ONLY_FULL_GROUP_BY`.
+  card); production runs without `ONLY_FULL_GROUP_BY` (see "Environment").
 - It relies on the `source_code()` MySQL stored function (`function-source-code.sql`), which
   `ringsdb_bootstrap.sql` does not contain: `make fixtures` / `make test-fixtures` now load it,
   as root (with binary logging, creating a function requires SUPER).
@@ -800,8 +961,8 @@ name, number of decks, cards, packs, custom packs, number of Core Sets, sort ord
   ignored for anonymous users).
 - The "number of Core Sets" filters (fellowships only) are only applied with a card or pack
   filter; without a value they filter nothing.
-- The `$ignoreEmptyDescriptions` parameter of the `ByAge` / `ByRecentDiscussion` methods is
-  ignored.
+- Removed: the `$ignoreEmptyDescriptions` parameter of the `ByAge` / `ByRecentDiscussion` methods,
+  which was ignored (found by phpstan).
 
 ### To look at during the migration
 
@@ -826,40 +987,45 @@ name, number of decks, cards, packs, custom packs, number of Core Sets, sort ord
   `/api/public/user/info`). Without an amount (or with 0) it shows the total. The amount is not
   checked (a negative one is subtracted); an unknown user is reported but exits with code 0.
 
-## OCTGN features (to be removed)
+- Card scraping commands (`app:beorn:html`, `app:beorn:json`, `app:download-images`): candidates
+  for removal, see the roadmap. Removed: `app:cgdb:cards` (`ScrapCardDataCommand`, scraped
+  cardgamedb.com), which used the console `DialogHelper` removed in Symfony 3.0.
+- `app:remove-user` and `app:decklist:delete` now exit with code 1 when the user or decklist is
+  not found (the latter crashed).
 
-Plan: drop every OCTGN feature (OCTGN is a desktop client for the game) before the migration, so
-they do not have to be ported. Do not fix the OCTGN bugs found by the tests, remove the features
-instead.
+## OCTGN features
 
-What there is today:
+OCTGN is a desktop client for the game. Its deck files (`.o8d`, XML listing the cards by their
+OCTGN id) can be exported and imported: these features are kept (decided on 2026-09-28, after
+an earlier plan to drop them). The broken OCTGN commands were removed.
 
-- Exports as `.o8d` (template `Export/octgn.xml.twig`): routes `deck_export_octgn`,
-  `deck_export_octgn_list`, `decklist_export_octgn`, `fellowship_export_octgn`,
-  `questlog_export_octgn`, with their buttons in the toolbars (`Builder/`, `Decklist/`,
-  `Fellowship/`, `Quest/`, `QuestLog/toolbar.html.twig`), the My Decks page
-  (`Builder/decks.html.twig`, `no-decks.html.twig`) and the scripts `ui.decklist.js`,
-  `ui.decks.js`, `ui.fellowshipview.js`, `ui.questlogview.js`.
+- Exports as `.o8d` (template `Export/octgn.xml.twig`, the `octgnid` of each card's primary
+  printing): routes `deck_export_octgn`, `deck_export_octgn_list`, `decklist_export_octgn`,
+  `fellowship_export_octgn`, `questlog_export_octgn`, with their buttons in the toolbars
+  (`Builder/`, `Decklist/`, `Fellowship/`, `Quest/`, `QuestLog/toolbar.html.twig`), the My Decks
+  page (`Builder/decks.html.twig`, `no-decks.html.twig`) and the scripts `ui.decklist.js`,
+  `ui.decks.js`, `ui.fellowshipview.js`, `ui.questlogview.js`. Covered by the download snapshots
+  (`WebsiteBrowsingTest`).
 - Imports of `.o8d`: `BuilderController::parseOctgnImport()`, used by the single file import
   (`/deck/fileimport`, `Modale/file.html.twig`) and the archive import (`/deck/import/all`).
-  BUG, not to be fixed: the parser looks cards up by `Card.octgnid`, moved to `CardPrinting` by
-  the card printings refactor, so both imports fail on a `.o8d` (pinned by
-  `DeckManagementTest::testImportAnArchiveWithAnOctgnFile`).
+  Fixed: the parser looked the cards up by `Card.octgnid`, moved to `CardPrinting` by the card
+  printings refactor, so both imports failed on a `.o8d`. The cards are now found by the octgnid
+  of any of their printings (quantities of several printings of a card add up). Covered by an
+  export → import round trip of the fixture decks (`DeckWorkflowTest`,
+  `testOctgnExportCanBeImportedBack`) and by `DeckManagementTest::testImportAnArchiveWithAnOctgnFile`.
+- The octgnid is not unique: 100 of them are shared by a hero and its Messenger of the King
+  version ("(MotK) Guthlaf" has the octgnid of Guthlaf). OCTGN cannot tell them apart: the import
+  chooses the original card (the lowest id, as before the refactor), so a MotK hero exported to
+  OCTGN comes back as the original hero. 74 printings have no octgnid.
 - Data: `CardPrinting.octgnid` and `Sphere.octgnid` (mappings, forms `CardPrintingType`,
   `SphereType`, admin templates `Card/`, `CardPrinting/`, `Sphere/`), filled by the CSV import
-  (`CSVController`) and `BeornJSONtoRingsDBcsv.py`.
-- Commands: `UpdateOctgnCommand`, `ScrapOctgnCardDataCommand`, and the OCTGN parts of
-  `ScrapBeornCardDataCommand`.
+  (`CSVController`) and `BeornJSONtoRingsDBcsv.py`; returned by the public API for each card and
+  printing, and by the card statistics (with an OCTGN id `mapping` of the reprints).
 - The "about" page mentions OCTGN (`Default/about.html.twig`).
-
-Decisions needed before removing:
-
-- The public API returns `octgnid` for each card and each printing (`CardsData`, served by
-  `/api/public/card(s)`): removing it changes the public API (its snapshots) for its external
-  consumers.
-- The card statistics (`CardStatsCalculator`, `StatController`) return the cards' `octgnid`
-  and an OCTGN id `mapping` of the reprints, probably used by the external report that consumes
-  them (see "Card statistics").
+- Removed: `UpdateOctgnCommand` (`app:octgn`), which still used a `Faction` entity (ThronesDB)
+  and `Card::setOctgnid()`, so it could not run, and `ScrapOctgnCardDataCommand`
+  (`app:cards:octgn`). The OCTGN parts of `ScrapBeornCardDataCommand` remain (see the roadmap,
+  card scraping commands).
 
 ## Card search
 
@@ -890,6 +1056,11 @@ removed before the migration so that it does not have to be ported:
   user and of the whole site. Their routes were reused for the user admin panel on 2016-04-01
   (commit `497ccf27`); the admin pages `/admin/user/comments/{user_id}`
   (`UserAdminController::commentsAction`) replace them.
+- The FOSUserBundle group templates (`app/Resources/FOSUserBundle/views/Group/`): the groups are
+  not used.
+- `app:twig` (`TwigCacheCommand`): called `Twig_Environment::getCacheFilename()`, removed in
+  Twig 2, so it crashed (found by phpstan).
+- `Decklist::$is_simple_export` and its accessors: never used.
 - `AppBundle\DQL\BinaryFunction` and the `BINARY(c.name) LIKE '%SOG%'` condition of the acronym
   search (`CardsData`, name search): a case-sensitive search of the acronym in the name, which
   matches no RingsDB card (no card name has 2 capitals in a row). The initials condition

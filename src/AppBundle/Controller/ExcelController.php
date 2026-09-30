@@ -2,13 +2,21 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Services\Texts;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\Card;
 
-class ExcelController extends Controller {
+class ExcelController extends AbstractController {
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function downloadFormAction() {
 		$em = $this->getDoctrine()->getManager();
 		$packs = $em->getRepository('AppBundle:Pack')->findBy([], ['dateRelease' => 'ASC', 'name' => 'ASC']);
@@ -18,7 +26,10 @@ class ExcelController extends Controller {
 		]);
 	}
 
-	public function downloadProcessAction(Request $request) {
+	/**
+	 * @return \Symfony\Component\HttpFoundation\StreamedResponse
+	 */
+	public function downloadProcessAction(Request $request, Texts $texts) {
 		$ignoredFields = ['id', 'dateCreation', 'dateUpdate'];
 
 		$em = $this->getDoctrine()->getManager();
@@ -29,6 +40,9 @@ class ExcelController extends Controller {
 			$pack_name = 'LotR LCG Cards';
 		} else {
 			$pack = $em->getRepository('AppBundle:Pack')->find($pack_id);
+			if (!$pack) {
+				throw $this->createNotFoundException('Pack not found.');
+			}
 			$printings = $em->getRepository('AppBundle:CardPrinting')->findBy(['pack' => $pack], ['position' => 'ASC']);
 			$cards = array_values(array_unique(array_map(function($p) { return $p->getCard(); }, $printings), SORT_REGULAR));
 			$pack_name = $pack->getName();
@@ -38,6 +52,7 @@ class ExcelController extends Controller {
 
 		$associationMappings = $em->getClassMetadata('AppBundle:Card')->getAssociationMappings();
 
+		$lastModified = null;
 		/* @var $card \AppBundle\Entity\Card */
 		foreach ($cards as $card) {
 			if (empty($lastModified) || $lastModified < $card->getDateUpdate()) {
@@ -45,15 +60,16 @@ class ExcelController extends Controller {
 			}
 		}
 
-		$phpExcelObject = $this->get('phpexcel')->createPHPExcelObject();
-		$phpExcelObject->getProperties()->setCreator("Sydtrack")->setLastModifiedBy($lastModified->format('Y-m-d'))->setTitle($pack_name);
-		$phpActiveSheet = $phpExcelObject->setActiveSheetIndex(0);
+		$spreadsheet = new Spreadsheet();
+		$spreadsheet->getProperties()->setCreator("Sydtrack")->setLastModifiedBy($lastModified ? $lastModified->format('Y-m-d') : '')->setTitle($pack_name);
+		$phpActiveSheet = $spreadsheet->setActiveSheetIndex(0);
 		$phpActiveSheet->setTitle(mb_substr($pack_name, 0, 31));
 
-		$col_index = 0;
+		// PhpSpreadsheet columns start at 1
+		$col_index = 1;
 		foreach ($associationMappings as $fieldName => $associationMapping) {
 			if ($associationMapping['isOwningSide']) {
-				$phpCell = $phpActiveSheet->getCellByColumnAndRow($col_index++, 1);
+				$phpCell = $phpActiveSheet->getCell([$col_index++, 1]);
 				$phpCell->setValue($fieldName);
 			}
 		}
@@ -61,18 +77,18 @@ class ExcelController extends Controller {
 			if (in_array($fieldName, $ignoredFields)) {
 				continue;
 			}
-			$phpCell = $phpActiveSheet->getCellByColumnAndRow($col_index++, 1);
+			$phpCell = $phpActiveSheet->getCell([$col_index++, 1]);
 			$phpCell->setValue($fieldName);
 		}
 
 		foreach ($cards as $row_index => $card) {
-			$col_index = 0;
+			$col_index = 1;
 			foreach ($associationMappings as $fieldName => $associationMapping) {
 				if ($associationMapping['isOwningSide']) {
 					$getter = str_replace(' ', '', ucwords(str_replace('_', ' ', "get_$fieldName")));
 					$value = $card->$getter() ? $card->$getter()->getName() : '';
 
-					$phpCell = $phpActiveSheet->getCellByColumnAndRow($col_index++, $row_index + 2);
+					$phpCell = $phpActiveSheet->getCell([$col_index++, $row_index + 2]);
 					$phpCell->setValue($value);
 				}
 			}
@@ -88,9 +104,9 @@ class ExcelController extends Controller {
 				}
 				$type = $em->getClassMetadata('AppBundle:Card')->getTypeOfField($fieldName);
 
-				$phpCell = $phpActiveSheet->getCellByColumnAndRow($col_index++, $row_index + 2);
+				$phpCell = $phpActiveSheet->getCell([$col_index++, $row_index + 2]);
 				if ($fieldName == 'code') {
-					$phpCell->setValueExplicit($value, 's');
+					$phpCell->setValueExplicit($value, DataType::TYPE_STRING);
 				} else {
 					if ($type == 'boolean') {
 						$phpCell->setValue($value ? "1" : "");
@@ -101,28 +117,35 @@ class ExcelController extends Controller {
 			}
 		}
 
-		$writer = $this->get('phpexcel')->createWriter($phpExcelObject, 'Excel2007');
-		$response = $this->get('phpexcel')->createStreamedResponse($writer);
+		$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+		$response = new StreamedResponse(function () use ($writer) {
+			$writer->save('php://output');
+		});
 		$response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
-		$response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->get('texts')->slugify($pack_name) . '.xlsx'));
+		$response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $texts->slugify($pack_name) . '.xlsx'));
 		$response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
 		return $response;
 	}
 
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function uploadFormAction() {
 		return $this->render('AppBundle:Excel:upload_form.html.twig');
 	}
 
+	/**
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
 	public function uploadProcessAction(Request $request) {
 		/* @var $uploadedFile \Symfony\Component\HttpFoundation\File\UploadedFile */
 		$uploadedFile = $request->files->get('upfile');
 		$inputFileName = $uploadedFile->getPathname();
-		$inputFileType = \PHPExcel_IOFactory::identify($inputFileName);
-		$objReader = \PHPExcel_IOFactory::createReader($inputFileType);
+		$objReader = IOFactory::createReaderForFile($inputFileName);
 		$objReader->setReadDataOnly(true);
-		$objPHPExcel = $objReader->load($inputFileName);
-		$objWorksheet = $objPHPExcel->getActiveSheet();
+		$spreadsheet = $objReader->load($inputFileName);
+		$objWorksheet = $spreadsheet->getActiveSheet();
 
 		$enableCardCreation = $request->request->has('create');
 
@@ -137,7 +160,8 @@ class ExcelController extends Controller {
 				$firstRow = false;
 
 				// analysis of first row
-				foreach ($row->getCellIterator() as $cell) {
+				$cellIterator = $row->getCellIterator();
+				foreach ($cellIterator as $cell) {
 					$colNames[$cell->getColumn()] = $cell->getValue();
 				}
 				continue;
@@ -192,6 +216,7 @@ class ExcelController extends Controller {
 					$associationMapping = $associationMappings[$colName];
 
 					$associationRepository = $em->getRepository($associationMapping['targetEntity']);
+					/** @var \AppBundle\Entity\Type|\AppBundle\Entity\Sphere|null $associationEntity */
 					$associationEntity = $associationRepository->findOneBy(['name' => $value]);
 					if (!$associationEntity) {
 						throw new \Exception("cannot find entity [$colName] of name [$value]");
@@ -204,7 +229,7 @@ class ExcelController extends Controller {
 					}
 				} else {
 					if (in_array($colName, $fieldNames)) {
-						$type = $metaData->getTypeOfField($colName);
+						$type = $metaData->getTypeOfField((string) $colName);
 						if ($type === 'boolean') {
 							$value = (boolean)$value;
 						}

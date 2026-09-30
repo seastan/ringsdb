@@ -20,7 +20,7 @@ class CollectionTest extends WebTestCase {
     /** @var int[] */
     private $maxIds = [];
 
-    protected function setUp() {
+    protected function setUp(): void {
         $connection = $this->db(static::createClient());
         $this->fixtureUsers = $connection->fetchAll('SELECT id, owned_packs, art_preferences FROM user ORDER BY id');
         $this->fixturePack = [
@@ -32,7 +32,7 @@ class CollectionTest extends WebTestCase {
         }
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $connection = $this->db(static::createClient());
         $connection->exec("DELETE FROM user_custom_pack_card WHERE custom_pack_id > {$this->maxIds['user_custom_pack']} OR id > {$this->maxIds['user_custom_pack_card']}");
         $connection->exec("DELETE FROM user_custom_pack WHERE id > {$this->maxIds['user_custom_pack']}");
@@ -54,10 +54,17 @@ class CollectionTest extends WebTestCase {
 
     /* ------------------------------------------------------------ helpers */
 
+    /**
+     * @return \Doctrine\DBAL\Connection
+     */
     private function db(Client $client) {
         return $client->getContainer()->get('doctrine')->getConnection();
     }
 
+    /**
+     * @param string $username
+     * @return \Symfony\Bundle\FrameworkBundle\Client
+     */
     private function createAuthenticatedClient($username = 'test') {
         $client = static::createClient();
         $crawler = $client->request('GET', '/login');
@@ -67,12 +74,20 @@ class CollectionTest extends WebTestCase {
         return $client;
     }
 
+    /**
+     * @param mixed $packId
+     * @return array<int|string, int>
+     */
     private function packCards(Client $client, $packId) {
         $rows = $this->db($client)->fetchAll('SELECT c.code, e.quantity FROM user_custom_pack_card e JOIN card c ON c.id = e.card_id WHERE e.custom_pack_id = ? ORDER BY e.id', [$packId]);
 
         return array_map('intval', array_column($rows, 'quantity', 'code'));
     }
 
+    /**
+     * @param mixed $id
+     * @return mixed
+     */
     private function fetchPack(Client $client, $id) {
         return $this->db($client)->fetchAssoc('SELECT p.name, p.code, p.is_enabled, p.is_published, u.username FROM user_custom_pack p JOIN user u ON u.id = p.user_id WHERE p.id = ?', [$id]);
     }
@@ -80,6 +95,9 @@ class CollectionTest extends WebTestCase {
     /**
      * Submits the custom pack form; the page's JavaScript serializes the card list into the
      * hidden "cards_json" field.
+     * @param mixed $pageUri
+     * @param mixed $name
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     private function submitPackForm(Client $client, $pageUri, $name, array $cards) {
         $crawler = $client->request('GET', $pageUri);
@@ -92,7 +110,7 @@ class CollectionTest extends WebTestCase {
 
     /* -------------------------------------------------------- owned packs */
 
-    public function testSaveOwnedPacks() {
+    public function testSaveOwnedPacks(): void {
         $client = $this->createAuthenticatedClient();
         $crawler = $client->request('GET', '/collection/packs');
         $form = $crawler->filter('form[action="/collection/packs/save"]')->form(['selected-packs' => '1:2,2,3']);
@@ -107,7 +125,7 @@ class CollectionTest extends WebTestCase {
         $this->assertSame('1:2,2,3', json_decode($client->getResponse()->getContent(), true)['owned_packs']);
     }
 
-    public function testInvalidPackSelectionIsRefused() {
+    public function testInvalidPackSelectionIsRefused(): void {
         $client = $this->createAuthenticatedClient();
         $client->request('POST', '/collection/packs/save', ['selected-packs' => '1,2; DROP TABLE user']);
 
@@ -118,7 +136,7 @@ class CollectionTest extends WebTestCase {
 
     /* ---------------------------------------------------- art preferences */
 
-    public function testArtPreferences() {
+    public function testArtPreferences(): void {
         $client = $this->createAuthenticatedClient();
         $save = function ($cardCode, $packCode) use ($client) {
             $client->request('POST', '/collection/art/save', ['card_code' => $cardCode, 'pack_code' => $packCode], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
@@ -135,7 +153,7 @@ class CollectionTest extends WebTestCase {
         $this->assertNull($save('01002', ''));
     }
 
-    public function testArtPreferenceWithoutCard() {
+    public function testArtPreferenceWithoutCard(): void {
         $client = $this->createAuthenticatedClient();
         $client->request('POST', '/collection/art/save', ['pack_code' => 'RevCore']);
 
@@ -145,7 +163,7 @@ class CollectionTest extends WebTestCase {
 
     /* ------------------------------------------------------- custom packs */
 
-    public function testCreateEditAndDeleteACustomPack() {
+    public function testCreateEditAndDeleteACustomPack(): void {
         $client = $this->createAuthenticatedClient();
 
         // 1. create: invalid entries are skipped (unknown card, duplicate, quantity out of 1..9)
@@ -194,7 +212,7 @@ class CollectionTest extends WebTestCase {
         $this->assertSame([], $this->packCards($client, $id));
     }
 
-    public function testCustomPackNameIsRequired() {
+    public function testCustomPackNameIsRequired(): void {
         $client = $this->createAuthenticatedClient();
 
         $response = $this->submitPackForm($client, '/collection/custom-pack/new', '  ', [['card_code' => '01001', 'quantity' => 1]]);
@@ -210,8 +228,10 @@ class CollectionTest extends WebTestCase {
 
     /**
      * @dataProvider foreignPackRouteProvider
+     * @param mixed $method
+     * @param mixed $uri
      */
-    public function testCannotChangeAnotherUsersPack($method, $uri) {
+    public function testCannotChangeAnotherUsersPack($method, $uri): void {
         $client = $this->createAuthenticatedClient('admin');
         $client->request($method, $uri, ['name' => 'Hacked', 'cards_json' => '[]']);
 
@@ -220,6 +240,9 @@ class CollectionTest extends WebTestCase {
         $this->assertSame(['01001' => 1, '01016' => 3], $this->packCards($client, 1));
     }
 
+    /**
+     * @return array
+     */
     public function foreignPackRouteProvider() {
         return [
             'edit form' => ['GET', '/collection/custom-pack/1/edit'],
@@ -230,7 +253,7 @@ class CollectionTest extends WebTestCase {
         ];
     }
 
-    public function testCopyAPublishedPack() {
+    public function testCopyAPublishedPack(): void {
         $client = $this->createAuthenticatedClient('admin');
         $client->request('POST', '/collection/custom-pack/1/copy', [], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
@@ -243,7 +266,7 @@ class CollectionTest extends WebTestCase {
         $this->assertSame(['01001' => 1, '01016' => 3], $this->packCards($client, $id));
     }
 
-    public function testCopyAnUnpublishedPack() {
+    public function testCopyAnUnpublishedPack(): void {
         $client = $this->createAuthenticatedClient('admin');
         $this->db($client)->update('user_custom_pack', ['is_published' => 0], ['id' => 1]);
         $client->request('POST', '/collection/custom-pack/1/copy');
@@ -255,8 +278,9 @@ class CollectionTest extends WebTestCase {
 
     /**
      * @dataProvider anonymousRouteProvider
+     * @param mixed $uri
      */
-    public function testAnonymousIsRedirectedToLogin($uri) {
+    public function testAnonymousIsRedirectedToLogin($uri): void {
         $client = static::createClient();
         $client->request('POST', $uri, ['selected-packs' => '1', 'card_code' => '01001', 'name' => 'Anonymous']);
 
@@ -264,6 +288,9 @@ class CollectionTest extends WebTestCase {
         $this->assertSame('http://localhost/login', $client->getResponse()->headers->get('Location'));
     }
 
+    /**
+     * @return array
+     */
     public function anonymousRouteProvider() {
         return [
             'owned packs' => ['/collection/packs/save'],

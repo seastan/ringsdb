@@ -1,15 +1,30 @@
 <?php
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use AppBundle\Services\Decks;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\Deck;
 use Symfony\Component\HttpFoundation\Response;
 
-class TagController extends Controller {
+class TagController extends AbstractController {
+    use CurrentUserTrait;
+
+    /**
+     * @var Decks
+     */
+    private $decks;
+
+    public function __construct(Decks $decks) {
+        $this->decks = $decks;
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function addAction(Request $request) {
         $list_id = $request->get('ids');
-        $list_tag = $this->get('decks')->normalizeTags((array) $request->get('tags'));
+        $list_tag = $this->decks->normalizeTags((array) $request->get('tags'));
 
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -24,11 +39,11 @@ class TagController extends Controller {
                 continue;
             }
 
-            if ($this->getUser()->getId() != $deck->getUser()->getId()) {
+            if ($this->currentUser()->getId() != $deck->getUser()->getId()) {
                 continue;
             }
 
-            $tags = $this->get('decks')->normalizeTags(array_merge($this->get('decks')->normalizeTags($deck->getTags()), $list_tag));
+            $tags = $this->decks->normalizeTags(array_merge($this->decks->normalizeTags($deck->getTags()), $list_tag));
             $response['tags'][$deck->getId()] = $tags;
             $deck->setTags(implode(' ', $tags));
         }
@@ -37,9 +52,12 @@ class TagController extends Controller {
         return new Response(json_encode($response));
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function removeAction(Request $request) {
         $list_id = $request->get('ids');
-        $list_tag = $this->get('decks')->normalizeTags((array) $request->get('tags'));
+        $list_tag = $this->decks->normalizeTags((array) $request->get('tags'));
 
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -54,11 +72,11 @@ class TagController extends Controller {
                 continue;
             }
 
-            if ($this->getUser()->getId() != $deck->getUser()->getId()) {
+            if ($this->currentUser()->getId() != $deck->getUser()->getId()) {
                 continue;
             }
 
-            $tags = array_values(array_diff($this->get('decks')->normalizeTags($deck->getTags()), $list_tag));
+            $tags = array_values(array_diff($this->decks->normalizeTags($deck->getTags()), $list_tag));
             $response['tags'][$deck->getId()] = $tags;
             $deck->setTags(implode(' ', $tags));
         }
@@ -67,6 +85,9 @@ class TagController extends Controller {
         return new Response(json_encode($response));
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function clearAction(Request $request) {
         $list_id = $request->get('ids');
 
@@ -83,7 +104,7 @@ class TagController extends Controller {
                 continue;
             }
 
-            if ($this->getUser()->getId() != $deck->getUser()->getId()) {
+            if ($this->currentUser()->getId() != $deck->getUser()->getId()) {
                 continue;
             }
 

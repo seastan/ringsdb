@@ -2,10 +2,10 @@
 
 namespace AppBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\Router;
-use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use AppBundle\Entity\User;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -19,43 +19,106 @@ use Doctrine\Common\Collections\ArrayCollection;
  *
  */
 class DecklistManager {
+	/**
+	 * @var \AppBundle\Entity\Sphere|null
+	 */
 	protected $predominantSphere;
+	/**
+	 * @var int
+	 */
 	protected $page = 1;
+	/**
+	 * @var int
+	 */
 	protected $start = 0;
+	/**
+	 * @var int
+	 */
 	protected $limit = 30;
+	/**
+	 * @var int
+	 */
 	protected $maxcount = 0;
+	/**
+	 * @var \AppBundle\Entity\User|null
+	 */
 	protected $user = null;
 
-	public function __construct(EntityManager $doctrine, RequestStack $request_stack, Router $router, LoggerInterface $logger) {
+	/**
+	 * @var EntityManagerInterface
+	 */
+	private $doctrine;
+
+	/**
+	 * @var RequestStack
+	 */
+	private $request_stack;
+
+	/**
+	 * @var UrlGeneratorInterface
+	 */
+	private $router;
+
+	public function __construct(EntityManagerInterface $doctrine, RequestStack $request_stack, UrlGeneratorInterface $router) {
 		$this->doctrine = $doctrine;
 		$this->request_stack = $request_stack;
 		$this->router = $router;
-		$this->logger = $logger;
 	}
 
+	/**
+	 * The current request: the searches and the pagination read its parameters.
+	 */
+	private function currentRequest(): Request {
+		$request = $this->request_stack->getCurrentRequest();
+		if ($request === null) {
+			throw new \LogicException('No current request.');
+		}
+
+		return $request;
+	}
+
+	/**
+	 * @param mixed $user
+	 * @return void
+	 */
 	public function setUser($user) {
 		$this->user = $user;
 	}
 
+	/**
+	 * @return void
+	 */
 	public function setPredominantSphere(Sphere $predominantSphere = null) {
 		$this->predominantSphere = $predominantSphere;
 	}
 
+	/**
+	 * @param mixed $limit
+	 * @return void
+	 */
 	public function setLimit($limit) {
 		$this->limit = $limit;
 	}
 
+	/**
+	 * @param mixed $page
+	 * @return void
+	 */
 	public function setPage($page) {
 		$this->page = max($page, 1);
 		$this->start = ($this->page - 1) * $this->limit;
 	}
 
+	/**
+	 * @return int
+	 */
 	public function getMaxCount() {
 		return $this->maxcount;
 	}
 
 	/**
 	 * creates the basic query builder and initializes it
+	 * @return \Doctrine\ORM\QueryBuilder
 	 */
 	private function getQueryBuilder() {
 		$qb = $this->doctrine->createQueryBuilder();
@@ -73,6 +136,9 @@ class DecklistManager {
 		return $qb;
 	}
 
+    /**
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
     private function getPaginator(Query $query) {
         $paginator = new Paginator($query, $fetchJoinCollection = false);
         $this->maxcount = $paginator->count();
@@ -80,12 +146,18 @@ class DecklistManager {
         return $paginator;
     }
 
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
     public function getEmptyList() {
         $this->maxcount = 0;
 
         return new ArrayCollection([]);
     }
 
+    /**
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
     public function findDecklistsByPopularity() {
         $qb = $this->getQueryBuilder();
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
@@ -97,6 +169,9 @@ class DecklistManager {
         return $this->getPaginator($qb->getQuery());
     }
 
+    /**
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
     public function findDecklistsByAge() {
         $qb = $this->getQueryBuilder();
 
@@ -108,6 +183,9 @@ class DecklistManager {
         return $this->getPaginator($qb->getQuery());
     }
 
+    /**
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
     public function findDecklistsByRecentDiscussion() {
         $qb = $this->getQueryBuilder();
 
@@ -119,6 +197,9 @@ class DecklistManager {
         return $this->getPaginator($qb->getQuery());
     }
 
+    /**
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
     public function findDecklistsByFavorite(User $user) {
         $qb = $this->getQueryBuilder();
 
@@ -133,6 +214,9 @@ class DecklistManager {
         return $this->getPaginator($qb->getQuery());
     }
 
+    /**
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
     public function findDecklistsByAuthor(User $user) {
         $qb = $this->getQueryBuilder();
 
@@ -146,6 +230,9 @@ class DecklistManager {
         return $this->getPaginator($qb->getQuery());
     }
 
+    /**
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
     public function findDecklistsInHallOfFame() {
         $qb = $this->getQueryBuilder();
 
@@ -158,6 +245,9 @@ class DecklistManager {
         return $this->getPaginator($qb->getQuery());
     }
 
+    /**
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
     public function findDecklistsInHotTopic() {
         $qb = $this->getQueryBuilder();
 
@@ -171,8 +261,11 @@ class DecklistManager {
         return $this->getPaginator($qb->getQuery());
     }
 
+    /**
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
     public function findDecklistsWithComplexSearch() {
-        $request = $this->request_stack->getCurrentRequest();
+        $request = $this->currentRequest();
 
         $cards_code = $request->query->get('cards');
         if (!is_array($cards_code)) {
@@ -314,6 +407,7 @@ class DecklistManager {
                     //
                     // Custom-only: same nested NOT EXISTS but with official_copies = 0, expressed
                     //   as ucpc.quantity >= s.quantity (left-side arithmetic becomes s.quantity - ucpc.quantity <= 0).
+                    $officialSubquery = '';
                     if (!empty($packs)) {
                         $officialSubquery =
                             '(SELECT COALESCE(SUM(CASE WHEN cp.pack = 1 THEN cp.quantity * :numcores ELSE cp.quantity END), 0) ' .
@@ -422,12 +516,18 @@ class DecklistManager {
         return $this->getPaginator($qb->getQuery());
     }
 
+    /**
+     * @return int
+     */
     public function getNumberOfPages() {
         return intval(ceil($this->maxcount / $this->limit));
     }
 
+    /**
+     * @return array
+     */
     public function getAllPages() {
-        $request = $this->request_stack->getCurrentRequest();
+        $request = $this->currentRequest();
         $route = $request->get('_route');
         $route_params = $request->get('_route_params');
         $query = $request->query->all();
@@ -447,6 +547,9 @@ class DecklistManager {
         return $pages;
     }
 
+    /**
+     * @return array<int, mixed>
+     */
     public function getClosePages() {
         $allPages = $this->getAllPages();
         $numero_courant = $this->page - 1;
@@ -460,12 +563,15 @@ class DecklistManager {
         return $pages;
     }
 
+    /**
+     * @return string|null
+     */
     public function getPreviousUrl() {
         if ($this->page === 1) {
             return null;
         }
 
-        $request = $this->request_stack->getCurrentRequest();
+        $request = $this->currentRequest();
         $route = $request->get('_route');
         $route_params = $request->get('_route_params');
 
@@ -478,12 +584,15 @@ class DecklistManager {
         return $this->router->generate($route, $params);
     }
 
+    /**
+     * @return string|null
+     */
     public function getNextUrl() {
         if ($this->page === $this->getNumberOfPages()) {
             return null;
         }
 
-        $request = $this->request_stack->getCurrentRequest();
+        $request = $this->currentRequest();
         $route = $request->get('_route');
         $route_params = $request->get('_route_params');
 

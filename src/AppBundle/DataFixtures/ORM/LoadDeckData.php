@@ -13,8 +13,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LoadDeckData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
+    /**
+     * @var \Symfony\Component\DependencyInjection\ContainerInterface|null
+     */
     private $container;
 
+    /**
+     * @return void
+     */
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
@@ -27,8 +33,14 @@ class LoadDeckData extends AbstractFixture implements ContainerAwareInterface, D
         ];
     }
 
+    /**
+     * @return void
+     */
     public function load(ObjectManager $manager)
     {
+        if ($this->container === null) {
+            throw new \LogicException('The container is not set.');
+        }
         /** @var Decks $deckService */
         $deckService = $this->container->get('decks');
 

@@ -7,6 +7,29 @@ namespace AppBundle\Model;
  */
 interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \ArrayAccess {
     /**
+     * Add a slot
+     *
+     * @param SlotInterface $element
+     * @return bool
+     */
+    public function add($element);
+
+    /**
+     * Remove a slot
+     *
+     * @param SlotInterface $element
+     * @return bool
+     */
+    public function removeElement($element);
+
+    /**
+     * Get the underlying collection of slots
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getSlots();
+
+    /**
      * Get quantity of cards
      *
      * @return integer
@@ -14,9 +37,9 @@ interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \Array
     public function countCards();
 
     /**
-     * Get included packs
+     * Get included packs, by release date: ['pack' => Pack, 'nb' => number of copies of the pack needed]
      *
-     * @return \AppBundle\Entity\Pack[]
+     * @return array<int, array<string, mixed>>
      */
     public function getIncludedPacks();
 
@@ -37,7 +60,7 @@ interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \Array
     /**
      * Get all slot counts sorted by sphere code
      *
-     * @return array
+     * @return non-empty-array<string, int>
      */
     public function getCountBySphere();
 

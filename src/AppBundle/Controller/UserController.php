@@ -2,20 +2,39 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use FOS\UserBundle\Model\UserManagerInterface;
+use FOS\UserBundle\Mailer\MailerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class UserController extends Controller {
+class UserController extends AbstractController {
+    use CurrentUserTrait;
+
+    /**
+     * @var int
+     */
+    private $cacheExpiration;
+
+    public function __construct(int $cacheExpiration) {
+        $this->cacheExpiration = $cacheExpiration;
+    }
+
     /*
 	 * displays details about a user and the list of decklists he published
 	 */
+    /**
+     * @param mixed $user_id
+     * @param mixed $user_name
+     * @param mixed $page
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function publicProfileAction($user_id, $user_name, $page, Request $request) {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge($this->container->getParameter('cache_expiration'));
+        $response->setMaxAge($this->cacheExpiration);
 
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -31,6 +50,9 @@ class UserController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function editProfileAction() {
         $user = $this->getUser();
 
@@ -42,13 +64,16 @@ class UserController extends Controller {
         ]);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function saveProfileAction(Request $request) {
         /* @var $user \AppBundle\Entity\User */
-        $user = $this->getUser();
+        $user = $this->currentUser();
 
         $em = $this->getDoctrine()->getManager();
 
-        $username = filter_var($request->get('username'), FILTER_SANITIZE_STRING);
+        $username = (string) filter_var($request->get('username'), FILTER_SANITIZE_STRING);
         if ($username !== $user->getUsername()) {
             $user_existing = $em->getRepository('AppBundle:User')->findOneBy(['username' => $username]);
 
@@ -61,13 +86,13 @@ class UserController extends Controller {
             $user->setUsername($username);
         }
 
-        $email = filter_var($request->get('email'), FILTER_SANITIZE_STRING);
+        $email = (string) filter_var($request->get('email'), FILTER_SANITIZE_STRING);
         if ($email !== $user->getEmail()) {
             $user->setEmail($email);
         }
 
-        $resume = filter_var($request->get('resume'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
-        $sphere_code = filter_var($request->get('user_sphere_code'), FILTER_SANITIZE_STRING);
+        $resume = (string) filter_var($request->get('resume'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+        $sphere_code = (string) filter_var($request->get('user_sphere_code'), FILTER_SANITIZE_STRING);
         $notifAuthor = $request->get('notif_author') ? true : false;
         $notifCommenter = $request->get('notif_commenter') ? true : false;
         $notifMention = $request->get('notif_mention') ? true : false;
@@ -96,6 +121,9 @@ class UserController extends Controller {
         return $response;
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function infoAction(Request $request) {
         $jsonp = $request->query->get('jsonp');
 
@@ -106,12 +134,11 @@ class UserController extends Controller {
 
         $content = null;
 
-        $securityContext = $this->container->get('security.context');
-        if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            $user = $this->getUser();
+        if ($this->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            $user = $this->currentUser();
             $user_id = $user->getId();
 
-            $public_profile_url = $this->get('router')->generate('user_profile_public', [
+            $public_profile_url = $this->generateUrl('user_profile_public', [
                 'user_id' => $user_id,
                 'user_name' => urlencode($user->getUsername())
             ]);
@@ -257,8 +284,13 @@ class UserController extends Controller {
         return $response;
     }
 
-    public function remindAction($username) {
-        $user = $this->get('fos_user.user_manager')->findUserByUsername($username);
+    /**
+     * @param mixed $username
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function remindAction($username, MailerInterface $userMailer, UserManagerInterface $userManager) {
+        /** @var \AppBundle\Entity\User|null $user */
+        $user = $userManager->findUserByUsername($username);
         if (!$user) {
             throw new NotFoundHttpException("Cannot find user from username [$username]");
         }
@@ -266,11 +298,11 @@ class UserController extends Controller {
             return $this->render('AppBundle:User:remind-no-token.html.twig');
         }
 
-        $this->get('fos_user.mailer')->sendConfirmationEmailMessage($user);
+        $userMailer->sendConfirmationEmailMessage($user);
 
         $this->get('session')->set('fos_user_send_confirmation_email/email', $user->getEmail());
 
-        $url = $this->get('router')->generate('fos_user_registration_check_email');
+        $url = $this->generateUrl('fos_user_registration_check_email');
 
         return $this->redirect($url);
     }

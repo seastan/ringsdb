@@ -3,11 +3,11 @@
 {% block content -%}
 <h1>Sphere creation</h1>
 
-    <form action="{{ path('admin_sphere_create') }}" method="post" {{ form_enctype(form) }}>
+    {{ form_start(form, {'action': path('admin_sphere_create')}) }}
         {{ form_widget(form) }}
         <button type="submit" class="btn btn-success">Create</button>
         <a href="{{ path('admin_sphere') }}" class="btn btn-default">
          	Back to the list
      	</a>
-    </form>
+    {{ form_end(form) }}
 {% endblock %}
