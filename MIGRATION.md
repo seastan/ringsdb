@@ -153,12 +153,12 @@ are deprecated. Done by hand (no Rector):
 |---|---|---|
 | `friendsofsymfony/user-bundle` 2.0 | to be replaced (decided) | Symfony Security, see "Removing FOSUserBundle" |
 | `symfony/assetic-bundle`, `leafo/scssphp`, `patchwork/jsqueeze` | abandoned, blocked Symfony 4 | done: replaced by `app:assets` and `scssphp/scssphp`, see "Front-end assets" (packages to remove) |
-| `symfony/swiftmailer-bundle` | abandoned | Symfony Mailer (`\Swift_Message::newInstance()` in the comment notifications, FOSUser emails) |
+| `symfony/swiftmailer-bundle` 3.3 (SwiftMailer 6) | abandoned | Symfony Mailer (`new \Swift_Message()` in the comment notifications, FOSUser emails) |
 | `liuggio/excelbundle` (PHPExcel) | done | replaced by PhpSpreadsheet (admin Excel export / import) |
 | `sensio/framework-extra-bundle` | abandoned | native attributes (`#[Route]`, `#[IsGranted]`, `#[MapEntity]`) |
-| `sensio/generator-bundle`, `incenteev/composer-parameter-handler` | Symfony 2 tooling | Symfony Flex, `.env`, MakerBundle (`sensio/distribution-bundle` removed, see "Progress") |
-| `nelmio/api-doc-bundle` 2.x | major rewrite in 4.x | see roadmap ("`/api/doc`") |
-| `friendsofsymfony/jsrouting-bundle` 1.x | maintained (3.x) | upgrade; `routes_to_expose: ['.*']` exposes every route, admin included: restrict it |
+| `incenteev/composer-parameter-handler` | Symfony 2 tooling | Symfony Flex, `.env` (`sensio/distribution-bundle` and `sensio/generator-bundle` removed; MakerBundle if code generation is needed) |
+| `nelmio/api-doc-bundle` 2.13 | 2.x supports Symfony 4, not 5; major rewrite in 4.x | see roadmap ("`/api/doc`"); its commands (`api:doc:dump`, unused) are auto-registered, so they are gone in Symfony 4.0 |
+| `friendsofsymfony/jsrouting-bundle` 2.8 | maintained (3.x) | kept to the end; `routes_to_expose: ['.*']` exposes every route, admin included: restrict it |
 | `gedmo/doctrine-extensions` 2.x | maintained (3.x) | upgrade; the timestampable listener is declared by hand (`doctrine_extensions.yml`), or use `stof/doctrine-extensions-bundle` |
 | `doctrine/orm` 2.x, `doctrine/dbal` 2.x | | ORM 3 / DBAL 4; the custom DQL functions `replace` and `power` (see "Card search") |
 | `ezyang/htmlpurifier`, `erusev/parsedown` | maintained | upgrade |
@@ -648,8 +648,9 @@ dates in `tearDown()` (the API's `Last-Modified` depends on them).
   status instead of `getStatusCode()`: every HTTP exception (400, 403, 404...) becomes a `500`
   (with the right JSON message). Affects all AJAX calls, e.g. the comment form.
 - No CSRF protection on `/user/comment` and `/user/hidecomment`.
-- Emails are sent synchronously during the request, with `\Swift_Message::newInstance()`
-  (SwiftMailer, replaced by Symfony Mailer in recent Symfony versions).
+- Emails are sent synchronously during the request, with `new \Swift_Message()` (SwiftMailer 6;
+  `Swift_Message::newInstance()` was removed in SwiftMailer 6; SwiftMailer is replaced by Symfony
+  Mailer in recent Symfony versions).
 
 ## Fellowships
 
