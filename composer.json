@@ -57,7 +57,6 @@
         "phpstan/phpstan": "^2.2",
         "phpstan/phpstan-doctrine": "^2.0",
         "phpstan/phpstan-symfony": "^2.0",
-        "sensio/generator-bundle": "~3.0",
         "symfony/phpunit-bridge": "4.4"
     },
     "scripts": {
