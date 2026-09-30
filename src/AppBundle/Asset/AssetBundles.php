@@ -3,12 +3,15 @@
 namespace AppBundle\Asset;
 
 /**
- * The JavaScript files loaded by every page (layout.html.twig), concatenated by app:assets:js into
- * web/js/: the libraries, then the application. Paths relative to Resources/public; the order
- * matters (jQuery before its plugins, app.data.js before the modules using it).
+ * The files loaded by every page (layout.html.twig), built by app:assets into web/: paths relative
+ * to Resources/public, in order.
  */
-class JavascriptBundles {
-    const BUNDLES = [
+class AssetBundles {
+    /**
+     * Concatenated: the libraries, then the application (jQuery before its plugins, app.data.js
+     * before the modules using it).
+     */
+    const JAVASCRIPTS = [
         'js/extra.js' => [
             'cdn/js/jquery.min.js',
             'cdn/js/jquery-ui.min.js',
@@ -43,6 +46,22 @@ class JavascriptBundles {
             'js/app.deck_selection.js',
             'js/app.suggestions-mixed.js',
             'js/app.ui.js',
+        ],
+    ];
+
+    /**
+     * Concatenated, the .scss compiled: the libraries, Bootstrap, then the styles of the site (the
+     * dark theme last, it overrides them).
+     */
+    const STYLESHEETS = [
+        'css/app.css' => [
+            'cdn/css/font-awesome.min.css',
+            'cdn/css/jquery.qtip.css',
+            'cdn/css/bootstrap-markdown.min.css',
+            'css/bootstrap.css',
+            'css/style.scss',
+            'css/icons.scss',
+            'css/dark.scss',
         ],
     ];
 }

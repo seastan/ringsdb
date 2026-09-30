@@ -23,8 +23,8 @@ framework:
     templating:
         engines: ['twig']
     assets:
-        # ?v=<hash> on the JavaScript files (see JavascriptVersionStrategy)
-        version_strategy: AppBundle\Asset\JavascriptVersionStrategy
+        # ?v=<hash> on the JavaScript and CSS files (see ContentHashVersionStrategy)
+        version_strategy: AppBundle\Asset\ContentHashVersionStrategy
     default_locale:  "%locale%"
     trusted_hosts:   ~
     trusted_proxies: ~
@@ -46,17 +46,6 @@ twig:
         noindex:                "%noindex%"
     form_themes:
         - 'bootstrap_3_layout.html.twig'
-
-# Assetic Configuration
-assetic:
-    debug:          "%kernel.debug%"
-    use_controller: false
-    bundles:        [ AppBundle ]
-    #java: /usr/bin/java
-    filters:
-        cssrewrite: ~
-        scssphp:
-            formatter: 'Leafo\ScssPhp\Formatter\Compressed'
 
 # Doctrine Configuration
 doctrine:

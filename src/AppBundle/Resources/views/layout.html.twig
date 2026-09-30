@@ -31,16 +31,8 @@
     {#<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.10.0/css/bootstrap-markdown.min.css">#}
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Amiri:400,400italic,700,700italic|Julius+Sans+One|Open+Sans:400,400italic,700,700italic|Open+Sans+Condensed:300">
 
-    {% stylesheets filter="cssrewrite,scssphp" output="css/app.css"
-        'bundles/app/cdn/css/font-awesome.min.css'
-        'bundles/app/cdn/css/jquery.qtip.css'
-        'bundles/app/cdn/css/bootstrap-markdown.min.css'
-        'bundles/app/css/bootstrap.css'
-        'bundles/app/css/style.scss'
-        'bundles/app/css/icons.scss'
-        'bundles/app/css/dark.scss' %}
-        <link rel="stylesheet" href="{{ asset_url }}"/>
-    {% endstylesheets %}
+    {# built by app:assets (AppBundle\Asset\AssetBundles) #}
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}"/>
 
     {% block stylesheets %}{% endblock %}
 
@@ -159,7 +151,7 @@
     <script src="{{ asset('/bundles/fosjsrouting/js/router.js') }}"></script>
     <script src="{{ path('fos_js_routing_js', { "callback": "fos.Router.setData" }) }}"></script>
 
-    {# built by app:assets:js (AppBundle\Asset\JavascriptBundles) #}
+    {# built by app:assets (AppBundle\Asset\AssetBundles) #}
     <script src="{{ asset('js/extra.js') }}"></script>
 
     {#<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>#}
@@ -192,7 +184,7 @@
         });
     </script>
 
-    {# built by app:assets:js (AppBundle\Asset\JavascriptBundles) #}
+    {# built by app:assets (AppBundle\Asset\AssetBundles) #}
     <script src="{{ asset('js/app.js') }}"></script>
 
     {% block javascripts %}{% endblock %}

@@ -13,10 +13,6 @@ imports:
 #        result_cache_driver: apc
 #        query_cache_driver: apc
 
-assetic:
-    workers:
-        cache_busting: ~
-
 monolog:
     handlers:
         main:
