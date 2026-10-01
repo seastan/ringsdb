@@ -64,7 +64,6 @@
         "symfony/security-bundle": "*",
         "symfony/serializer": "*",
         "symfony/swiftmailer-bundle": "^3.1",
-        "symfony/templating": "*",
         "symfony/translation": "*",
         "symfony/twig-bridge": "*",
         "symfony/twig-bundle": "*",

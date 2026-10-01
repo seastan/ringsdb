@@ -184,7 +184,7 @@ class SecurityControllerTest extends WebTestCase {
 
         // 5. the token cannot be reused
         $client->request('GET', '/register/confirm/' . $token);
-        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertRedirectsTo($client, '#/login$#');
 
         // 6. after logout, the new credentials work
         $client->request('GET', '/logout');
