@@ -34,6 +34,7 @@
         "friendsofsymfony/jsrouting-bundle": "^2.2",
         "friendsofsymfony/user-bundle": "^3.0.0",
         "gedmo/doctrine-extensions": "^3.0.0",
+        "nelmio/api-doc-bundle": "^4.38",
         "ocramius/proxy-manager": "~2.2.0",
         "phpoffice/phpspreadsheet": "^1.30.7",
         "scssphp/scssphp": "^1.13",
@@ -112,7 +113,7 @@
     },
     "extra": {
         "symfony": {
-            "require": "4.4.*"
+            "require": "5.4.*"
         }
     }
 }

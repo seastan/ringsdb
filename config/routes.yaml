@@ -5,6 +5,157 @@
 #    path: /
 #    defaults: { _controller: 'App\Controller\DefaultController::index' }
 
-app:
-    resource: "../../src/Resources/config/routing.yml"
-    prefix:   /
+app_admin:
+    resource: "routes/routing_admin.yml"
+    prefix: /admin
+
+app_api:
+    resource: "routes/routing_api.yml"
+    prefix: /api
+
+app_cards:
+    resource: "routes/routing_cards.yml"
+
+app_deck:
+    resource: "routes/routing_deck.yml"
+    prefix: /deck
+
+app_decklist:
+    resource: "routes/routing_decklist.yml"
+    prefix: /decklist
+
+app_fellowship:
+    resource: "routes/routing_fellowship.yml"
+    prefix: /fellowship
+
+app_questlog:
+    resource: "routes/routing_questlog.yml"
+    prefix: /questlog
+
+app_review:
+    resource: "routes/routing_review.yml"
+    prefix: /review
+
+app_tag:
+    resource: "routes/routing_tag.yml"
+    prefix: /tag
+
+app_user:
+    resource: "routes/routing_user.yml"
+    prefix: /user
+
+app_collection:
+    resource: "routes/routing_collection.yml"
+    prefix: /collection
+
+index:
+    path: /
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\DefaultController::indexAction
+
+patrons:
+    path: /patrons
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\SocialController::patronsAction
+
+about:
+    path: /about
+    defaults:
+        _controller: App\Controller\DefaultController::aboutAction
+
+decklist_byauthor:
+    path: /d/{username}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\SocialController::byauthorAction
+
+fellowship_byauthor:
+    path: /f/{username}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\FellowshipController::byauthorAction
+
+questlogs_byauthor:
+    path: /q/{username}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\QuestLogController::byauthorAction
+
+decks_list:
+    path: /decks
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\BuilderController::listAction
+
+myfellowships_list:
+    path: /myfellowships
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\FellowshipController::mylistAction
+
+myquestlogs_list:
+    path: /myquestlogs/{scenario_name_canonical}/{quest_mode}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\QuestLogController::mylistAction
+        scenario_name_canonical: null
+        quest_mode: normal
+
+questlogs_searchform:
+    path: /questlogs/search
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\QuestLogController::searchAction
+
+questlogs_list:
+    path: /questlogs/{type}/{page}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\QuestLogController::listAction
+        type: popular
+        page: 1
+    requirements:
+        page: \d+
+
+decklists_searchform:
+    path: /decklists/search
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\SocialController::searchAction
+
+decklists_list:
+    path: /decklists/{type}/{page}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\SocialController::listAction
+        type: popular
+        page: 1
+    requirements:
+        page: \d+
+
+fellowships_searchform:
+    path: /fellowships/search
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\FellowshipController::searchAction
+
+fellowships_list:
+    path: /fellowships/{type}/{page}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\FellowshipController::listAction
+        type: popular
+        page: 1
+    requirements:
+        page: \d+
+
+card_reviews_list:
+    path: /reviews/{page}
+    defaults:
+        _controller: App\Controller\ReviewController::listAction
+        page: 1
+    requirements:
+        page: \d+
+

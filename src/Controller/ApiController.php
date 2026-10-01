@@ -59,7 +59,7 @@ class ApiController extends AbstractController {
     /**
      * Get the description of all the packs as an array of JSON objects.
      *
-     * @ApiDoc(
+     * ApiDoc(
      *  section="Pack",
      *  resource=true,
      *  description="All the Packs",
@@ -125,7 +125,7 @@ class ApiController extends AbstractController {
     /**
      * Get the description of a card as a JSON object.
      *
-     * @ApiDoc(
+     * ApiDoc(
      *  section="Card",
      *  resource=true,
      *  description="One Card",
@@ -189,7 +189,7 @@ class ApiController extends AbstractController {
     /**
      * Get the description of all the cards as an array of JSON objects.
      *
-     * @ApiDoc(
+     * ApiDoc(
      *  section="Card",
      *  resource=true,
      *  description="All the Cards. Each card keeps pack_code/pack_name (its primary printing) plus a packs[] array listing every pack it appears in (pack_code, pack_name, position, quantity, image_code, illustrator, octgnid, imagesrc).",
@@ -261,7 +261,7 @@ class ApiController extends AbstractController {
     /**
      * Get the description of all the card from a pack, as an array of JSON objects.
      *
-     * @ApiDoc(
+     * ApiDoc(
      *  section="Card",
      *  resource=true,
      *  description="All the Cards from One Pack",
@@ -343,7 +343,7 @@ class ApiController extends AbstractController {
     /**
      * Get the description of a decklist as a JSON object.
      *
-     * @ApiDoc(
+     * ApiDoc(
      *  section="Decklist",
      *  resource=true,
      *  description="One Decklist",
@@ -408,7 +408,7 @@ class ApiController extends AbstractController {
     /**
      * Get the description of all the decklists published at a given date, as an array of JSON objects.
      *
-     * @ApiDoc(
+     * ApiDoc(
      *  section="Decklist",
      *  resource=true,
      *  description="All the Decklists from One Day",
@@ -491,7 +491,7 @@ class ApiController extends AbstractController {
     /**
      * Get the top 10 decklists published containing given card, as an array of JSON objects.
      *
-     * @ApiDoc(
+     * ApiDoc(
      *  section="Decklist",
      *  resource=true,
      *  description="Top 10 Decklists containing a specific card",
@@ -598,7 +598,7 @@ class ApiController extends AbstractController {
     /**
      * Get the description of a scenario as a JSON object.
      *
-     * @ApiDoc(
+     * ApiDoc(
      *  section="Scenario",
      *  resource=true,
      *  description="One Scenario",
