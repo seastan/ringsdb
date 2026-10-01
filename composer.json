@@ -83,8 +83,7 @@
         "symfony/phpunit-bridge": "4.4",
         "symfony/process": "*",
         "symfony/stopwatch": "*",
-        "symfony/web-profiler-bundle": "*",
-        "symfony/web-server-bundle": "*"
+        "symfony/web-profiler-bundle": "*"
     },
     "scripts": {
         "auto-scripts": {
