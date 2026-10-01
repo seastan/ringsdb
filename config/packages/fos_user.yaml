@@ -8,3 +8,5 @@ fos_user:
     registration:
         confirmation:
             enabled: true
+    service:
+        mailer: fos_user.mailer.twig_swift

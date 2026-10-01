@@ -46,9 +46,6 @@ services:
     App\Model\QuestLogManager:
         shared: false
 
-    # FOSUserBundle 2 declares no autowiring alias for its mailer
-    FOS\UserBundle\Mailer\MailerInterface: '@fos_user.mailer'
-
     fos_user.doctrine_registry:
         alias: doctrine
 
