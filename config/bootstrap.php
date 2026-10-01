@@ -13,7 +13,7 @@ use Symfony\Component\Dotenv\Dotenv;
 require dirname(__DIR__).'/vendor/autoload.php';
 
 $projectDir = dirname(__DIR__);
-$dotenv = new Dotenv();
+$dotenv = new Dotenv(false);
 
 if (is_file("$projectDir/.env")) {
     $dotenv->load("$projectDir/.env");

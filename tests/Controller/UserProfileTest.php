@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\DomCrawler\Form;
+use Symfony\Component\Mime\Address;
 
 /**
  * Profile forms:
@@ -299,10 +300,10 @@ class UserProfileTest extends WebTestCase {
         $this->assertSame('/resetting/check-email?username=test', $client->getResponse()->headers->get('Location'));
         $messages = $this->sentMessages($client);
         $this->assertCount(1, $messages);
-        $this->assertSame(['test@example.com'], array_keys($messages[0]->getTo()));
+        $this->assertEquals('test@example.com', $messages[0]->getTo()[0]->getAddress());
         $token = $this->fetchUser($client)['confirmation_token'];
         $this->assertNotEmpty($token);
-        $this->assertContains("/resetting/reset/$token", $messages[0]->getBody());
+        $this->assertContains("/resetting/reset/$token", str_replace("=\r\n", '', $messages[0]->getBody()->toString()));
 
         // 2. a second request is ignored while the first one is recent (no second email)
         $client->enableProfiler();

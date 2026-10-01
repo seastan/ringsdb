@@ -6,6 +6,7 @@ use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Mime\Address;
 
 /**
  * Registration / login / logout workflow (FOSUserBundle + security firewall "default").
@@ -146,7 +147,7 @@ class SecurityControllerTest extends WebTestCase {
         $messages = $this->sentMessages($client);
         $this->assertCount(1, $messages);
         $message = $messages[0];
-        $this->assertEquals([$email => null], $message->getTo());
+        $this->assertEquals($email, $message->getTo()[0]->getAddress());
 
         // 2. user is created, disabled, with a confirmation token
         $user = $this->findUser($client, $username);
@@ -156,7 +157,7 @@ class SecurityControllerTest extends WebTestCase {
         $this->assertNotEmpty($user->getConfirmationToken());
         $this->assertNotEquals('secret123', $user->getPassword(), 'Password must be encoded');
         $token = $user->getConfirmationToken();
-        $this->assertContains('/register/confirm/' . $token, $message->getBody());
+        $this->assertContains('/register/confirm/' . $token, str_replace("=\r\n", '', $message->getBody()->toString()));
 
         $client->followRedirect();
         $this->assertEquals(200, $client->getResponse()->getStatusCode());

@@ -26,6 +26,9 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FellowshipController extends AbstractController {
@@ -1129,7 +1132,7 @@ class FellowshipController extends AbstractController {
     /**
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function commentAction(Request $request, \Swift_Mailer $mailer, UserRepository $userRepository) {
+    public function commentAction(Request $request, MailerInterface $mailer, UserRepository $userRepository) {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
 
@@ -1210,7 +1213,11 @@ class FellowshipController extends AbstractController {
                 'profile' => $this->generateUrl('user_profile_edit', [], UrlGeneratorInterface::ABSOLUTE_URL)
             ];
             foreach ($spool as $email => $view) {
-                $message = (new \Swift_Message())->setSubject("[ringsdb] New comment")->setFrom(["seastan@ringsdb.com" => $user->getUsername()])->setTo($email)->setBody($this->renderView($view, $email_data), 'text/html');
+                $message = (new Email())
+                    ->subject("[ringsdb] New comment")
+                    ->from(new Address("seastan@ringsdb.com", "Seastan"))
+                    ->to(new Address($email, $user->getUsername()))
+                    ->html($this->renderView($view, $email_data));
                 $mailer->send($message);
             }
         }

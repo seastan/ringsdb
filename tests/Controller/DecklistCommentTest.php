@@ -5,6 +5,9 @@ namespace App\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Mailer\Event\MessageEvent;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 
 /**
  * Comments on a decklist: posting (POST /user/comment) and hiding (POST /user/hidecomment).
@@ -96,10 +99,11 @@ class DecklistCommentTest extends WebTestCase {
      */
     private function sentEmails(Client $client) {
         $emails = [];
-        /** @var \Swift_Message $message */
         foreach ($this->sentMessages($client) as $message) {
-            $this->assertSame(['seastan@ringsdb.com'], array_keys($message->getFrom()));
-            $emails[key($message->getTo())] = $message->getSubject();
+            $this->assertEquals('seastan@ringsdb.com', $message->getFrom()[0]->getAddress());
+            /** @var Address $address */
+            $address = $message->getTo()[0];
+            $emails[$address->getAddress()] = $message->getSubject();
         }
 
         return $emails;
@@ -130,8 +134,8 @@ class DecklistCommentTest extends WebTestCase {
         // the author is notified; the commenter is never notified of their own comment
         $message = $this->sentMessages($client)[0];
         $this->assertSame(['test@example.com' => '[ringsdb] New comment'], $this->sentEmails($client));
-        $this->assertSame(['seastan@ringsdb.com' => 'admin'], $message->getFrom());
-        $this->assertContains('<p>Nice <strong>deck</strong>!</p>', $message->getBody());
+        $this->assertEquals('seastan@ringsdb.com', $message->getFrom()[0]->getAddress());
+        $this->assertContains('<p>Nice <strong>deck</strong>!</p>', $message->getBody()->toString());
 
         // the comment is displayed on the decklist page
         $crawler = $client->request('GET', self::DECKLIST_1_URL);

@@ -9,4 +9,4 @@ fos_user:
         confirmation:
             enabled: true
     service:
-        mailer: fos_user.mailer.twig_swift
+        mailer: fos_user.mailer.twig_symfony

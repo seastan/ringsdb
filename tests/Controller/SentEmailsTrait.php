@@ -3,7 +3,10 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
-use Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector;
+use Symfony\Component\Mailer\DataCollector\MessageDataCollector;
+use Symfony\Component\Mailer\Event\MessageEvent;
+use Symfony\Component\Mailer\Event\MessageEvents;
+use Symfony\Component\Mime\Email;
 
 /**
  * The emails sent during the last request, from the profiler (call $client->enableProfiler()
@@ -11,14 +14,22 @@ use Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector;
  */
 trait SentEmailsTrait {
     /**
-     * @return \Swift_Message[]
+     * @return MessageEvents
      */
-    private function sentMessages(Client $client) {
+    private function sentMessageEvents(Client $client) {
         $profile = $client->getProfile();
         self::assertNotFalse($profile, 'the profiler is not enabled');
         /** @var MessageDataCollector $collector */
-        $collector = $profile->getCollector('swiftmailer');
+        $collector = $profile->getCollector('mailer');
 
-        return $collector->getMessages();
+        return $collector->getEvents();
+    }
+
+    /**
+     * @param Client $client
+     * @return Email[]
+     */
+    private function sentMessages(Client $client): array {
+        return $this->sentMessageEvents($client)->getMessages();
     }
 }
