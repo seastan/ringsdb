@@ -22,8 +22,6 @@ phpstan/phpstan:
 
 phpoffice/phpspreadsheet:
 - 1.30.7 requires php: >=7.4.0 <8.5.0
-- 1.19.0 requires php: ^7.2 || ^8.0
-- 1.12.0 requires php: ^7.1
 
 composer/composer:
 - 2.10.3 requires php: ^7.2.5 || ^8.0
@@ -32,9 +30,6 @@ doctrine/doctrine-migrations-bundle:
 - 2.2.3 requires php: ^7.1|^8.0 and symfony/framework-bundle: ~3.4|~4.0|~5.0
 
 friendsofsymfony/user-bundle:
-- 2.1.2 requires php: ^5.5.9 || ^7.0 and symfony/security-bundle: ^2.7 || ^3.0
-- 2.2.0 requires symfony/security-bundle: ^4.4
-- 3.0.0 requires symfony/security-bundle: ^4.4 || ^5.0
 - 3.1.0 requires symfony/security-bundle: ^4.4 || ^5.0 || ^6.0
 - 4.0.0 requires symfony/security-bundle: ^6.4 || ^7.0
 
