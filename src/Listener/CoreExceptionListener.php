@@ -10,7 +10,7 @@ class CoreExceptionListener {
      * @return void
      */
     public function onCoreException(\Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent $event) {
-        $exception = $event->getException();
+        $exception = $event->getThrowable();
         $request = $event->getRequest();
         if (!$request->isXmlHttpRequest()) {
             return;

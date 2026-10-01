@@ -129,7 +129,8 @@ class UserController extends AbstractController {
         // Persist the preference in a long-lived cookie so the theme can be applied
         // immediately (without a flash of the wrong theme) on this device, even though
         // pages are publicly cached and the canonical preference lives in the database.
-        $response->headers->setCookie(new Cookie('dark_mode', $darkMode ? '1' : '0', strtotime('+1 year'), '/', null, false, false));
+        $cookie = Cookie::create('dark_mode', $darkMode ? '1' : '0', strtotime('+1 year'), '/', null, false, false);
+        $response->headers->setCookie($cookie);
 
         return $response;
     }
