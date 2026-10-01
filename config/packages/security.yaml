@@ -1,9 +1,5 @@
 security:
-    # Symfony 3.4 also hides the account status errors (disabled, locked...) behind "Bad
-    # credentials": show them as Symfony 2.8 did, the login page offers to resend the
-    # confirmation email of a disabled account. An unknown username still reads "Invalid
-    # credentials." (app/Resources/translations/security.en.yml).
-    hide_user_not_found: false
+    hide_user_not_found: true
 
     encoders:
         FOS\UserBundle\Model\UserInterface: sha512

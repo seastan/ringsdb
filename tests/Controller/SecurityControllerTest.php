@@ -167,7 +167,7 @@ class SecurityControllerTest extends WebTestCase {
         $this->login($client, $username, 'secret123');
         $this->assertRedirectsTo($client, '#/login$#');
         $crawler = $client->followRedirect();
-        $this->assertContains('Account is disabled', $crawler->filter('.alert-danger')->text());
+        $this->assertContains('Invalid credentials', $crawler->filter('.alert-danger')->text());
         $this->assertCount(1, $crawler->filter('a[href="/user/remind/' . $username . '"]'));
         $this->assertAnonymous($client);
 
