@@ -36,7 +36,7 @@
         "ocramius/proxy-manager": "~2.2.0",
         "phpoffice/phpspreadsheet": "^1.30.7",
         "scssphp/scssphp": "^1.13",
-        "sensio/framework-extra-bundle": "~3.0,>=3.0.2",
+        "sensio/framework-extra-bundle": "^5.0.0",
         "symfony/asset": "*",
         "symfony/cache": "*",
         "symfony/config": "*",
@@ -114,7 +114,7 @@
     },
     "extra": {
         "symfony": {
-            "require": "4.3.3"
+            "require": "3.4.*"
         }
     }
 }
