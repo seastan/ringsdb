@@ -1,17 +1,16 @@
 <?php
 
-namespace App\DataFixtures\ORM;
+namespace App\DataFixtures;
 
 use App\Entity\Comment;
 use App\Entity\Decklist;
 use App\Entity\User;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use App\DataFixtures\ORM\LoadDecklistData;
-use App\DataFixtures\ORM\LoadUserData;
 
-class LoadCommentData extends AbstractFixture implements DependentFixtureInterface
+class LoadCommentData extends Fixture implements DependentFixtureInterface
 {
 
     /**

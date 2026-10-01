@@ -1,18 +1,18 @@
 <?php
 
-namespace App\DataFixtures\ORM;
+namespace App\DataFixtures;
 
 use App\Entity\Card;
 use App\Entity\Review;
 use App\Entity\User;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use App\DataFixtures\ORM\LoadUserData;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class LoadReviewData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
+class LoadReviewData extends Fixture implements ContainerAwareInterface, DependentFixtureInterface
 {
     /**
      * @var \Symfony\Component\DependencyInjection\ContainerInterface|null

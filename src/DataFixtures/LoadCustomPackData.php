@@ -1,17 +1,17 @@
 <?php
 
-namespace App\DataFixtures\ORM;
+namespace App\DataFixtures;
 
 use App\Entity\Card;
 use App\Entity\User;
 use App\Entity\UserCustomPack;
 use App\Entity\UserCustomPackCard;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use App\DataFixtures\ORM\LoadUserData;
 
-class LoadCustomPackData extends AbstractFixture implements DependentFixtureInterface
+class LoadCustomPackData extends Fixture implements DependentFixtureInterface
 {
     /**
      * @return array<int, class-string>

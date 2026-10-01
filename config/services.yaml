@@ -20,7 +20,7 @@ services:
     # every class of the application is a service, identified by its class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{Kernel.php,DataFixtures,DependencyInjection,DQL,Entity,PHPStan,Resources,Migrations,Tests,Model/ExportableDeck.php,Model/SlotCollectionDecorator.php,Model/SlotCollectionInterface.php,Model/SlotInterface.php,Command/StringInputTrait.php,Controller/CurrentUserTrait.php}'
+        exclude: '../src/{Kernel.php,DependencyInjection,DQL,Entity,PHPStan,Resources,Migrations,Model/ExportableDeck.php,Model/SlotCollectionDecorator.php,Model/SlotCollectionInterface.php,Model/SlotInterface.php,Command/StringInputTrait.php,Controller/CurrentUserTrait.php}'
 
     # controllers are fetched from the container by the controller resolver, and can receive
     # services as action arguments

@@ -1,19 +1,18 @@
 <?php
 
-namespace App\DataFixtures\ORM;
+namespace App\DataFixtures;
 
-use App\Entity\Scenario;
 use App\Entity\Decklist;
 use App\Entity\Questlog;
 use App\Entity\QuestlogDeck;
+use App\Entity\Scenario;
 use App\Entity\User;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use App\DataFixtures\ORM\LoadDecklistData;
-use App\DataFixtures\ORM\LoadUserData;
 
-class LoadQuestlogData extends AbstractFixture implements DependentFixtureInterface
+class LoadQuestlogData extends Fixture implements DependentFixtureInterface
 {
 
     /**
