@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -13,6 +14,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * 01016); "admin" owns none. Everything is restored in tearDown().
  */
 class CollectionTest extends WebTestCase {
+
+    private KernelBrowser $client;
     /** @var array */
     private $fixtureUsers;
     /** @var array */
@@ -21,7 +24,8 @@ class CollectionTest extends WebTestCase {
     private $maxIds = [];
 
     protected function setUp(): void {
-        $connection = $this->db(static::createClient());
+        $this->client = static::createClient();
+        $connection = $this->db($this->client);
         $this->fixtureUsers = $connection->fetchAll('SELECT id, owned_packs, art_preferences FROM user ORDER BY id');
         $this->fixturePack = [
             $connection->fetchAssoc('SELECT * FROM user_custom_pack WHERE id = 1'),
@@ -33,7 +37,7 @@ class CollectionTest extends WebTestCase {
     }
 
     protected function tearDown(): void {
-        $connection = $this->db(static::createClient());
+        $connection = $this->db($this->client);
         $connection->exec("DELETE FROM user_custom_pack_card WHERE custom_pack_id > {$this->maxIds['user_custom_pack']} OR id > {$this->maxIds['user_custom_pack_card']}");
         $connection->exec("DELETE FROM user_custom_pack WHERE id > {$this->maxIds['user_custom_pack']}");
         list($pack, $cards) = $this->fixturePack;
@@ -66,7 +70,7 @@ class CollectionTest extends WebTestCase {
      * @return \Symfony\Bundle\FrameworkBundle\Client
      */
     private function createAuthenticatedClient($username = 'test') {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $username]));
         $this->assertTrue($client->getResponse()->isRedirect(), "Login as $username failed");
@@ -281,7 +285,7 @@ class CollectionTest extends WebTestCase {
      * @param mixed $uri
      */
     public function testAnonymousIsRedirectedToLogin($uri): void {
-        $client = static::createClient();
+        $client = $this->client;
         $client->request('POST', $uri, ['selected-packs' => '1', 'card_code' => '01001', 'name' => 'Anonymous']);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());

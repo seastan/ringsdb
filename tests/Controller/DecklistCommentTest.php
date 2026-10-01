@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -20,19 +21,22 @@ class DecklistCommentTest extends WebTestCase {
 
     const DECKLIST_1_URL = '/decklist/view/1/dwarfloreleadershiptactics-1.0';
 
+    private KernelBrowser $client;
+
     /** @var int */
     private $maxCommentId;
     /** @var array */
     private $decklists;
 
     protected function setUp(): void {
-        $connection = $this->db(static::createClient());
+        $this->client = static::createClient();
+        $connection = $this->db($this->client);
         $this->maxCommentId = (int) $connection->fetchColumn('SELECT MAX(id) FROM comment');
         $this->decklists = $connection->fetchAll('SELECT id, nb_comments, date_update, date_last_comment FROM decklist');
     }
 
     protected function tearDown(): void {
-        $connection = $this->db(static::createClient());
+        $connection = $this->db($this->client);
         $connection->executeUpdate('DELETE FROM comment WHERE id > ?', [$this->maxCommentId]);
         $connection->executeUpdate('UPDATE comment SET is_hidden = 0');
         foreach ($this->decklists as $decklist) {
@@ -55,7 +59,7 @@ class DecklistCommentTest extends WebTestCase {
      * @return \Symfony\Bundle\FrameworkBundle\Client
      */
     private function createAuthenticatedClient($username) {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $username]));
         $this->assertTrue($client->getResponse()->isRedirect(), "Login as $username failed");
@@ -224,7 +228,7 @@ class DecklistCommentTest extends WebTestCase {
     }
 
     public function testAnonymousCannotComment(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $client->request('POST', '/user/comment', ['id' => 1, 'comment' => 'Anonymous']);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());

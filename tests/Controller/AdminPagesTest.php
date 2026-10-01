@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -17,6 +18,13 @@ class AdminPagesTest extends WebTestCase {
     use PageSnapshotTrait;
     use JsonSnapshotTrait;
 
+    private KernelBrowser $client;
+
+    protected function setUp(): void
+    {
+        $this->client = static::createClient();
+    }
+
     /* ------------------------------------------------------------ helpers */
 
     /**
@@ -24,7 +32,7 @@ class AdminPagesTest extends WebTestCase {
      * @return \Symfony\Bundle\FrameworkBundle\Client
      */
     private function createAuthenticatedClient($username) {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $username]));
         $this->assertTrue($client->getResponse()->isRedirect(), "Login as $username failed");
@@ -77,7 +85,7 @@ class AdminPagesTest extends WebTestCase {
      * @param mixed $uri
      */
     public function testAnonymousIsRedirectedToLogin($uri): void {
-        $client = static::createClient();
+        $client = $this->client;
         $client->request('GET', $uri);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());

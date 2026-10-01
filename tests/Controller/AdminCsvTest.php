@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -19,6 +20,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class AdminCsvTest extends WebTestCase {
     use \App\Tests\TemporaryFileTrait;
 
+    private KernelBrowser $client;
+
     const SAMPLE = __DIR__ . '/../Resources/fixtures/import/alep-the-hobbit.csv';
 
     /** @var int[] */
@@ -29,7 +32,8 @@ class AdminCsvTest extends WebTestCase {
     private $files = [];
 
     protected function setUp(): void {
-        $connection = $this->db(static::createClient());
+        $this->client = static::createClient();
+        $connection = $this->db($this->client);
         foreach (['card', 'card_printing', 'pack'] as $table) {
             $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
         }
@@ -42,7 +46,7 @@ class AdminCsvTest extends WebTestCase {
     }
 
     protected function tearDown(): void {
-        $connection = $this->db(static::createClient());
+        $connection = $this->db($this->client);
         foreach (['card_printing', 'card', 'pack'] as $table) {
             $connection->exec("DELETE FROM $table WHERE id > {$this->maxIds[$table]}");
         }
@@ -67,7 +71,7 @@ class AdminCsvTest extends WebTestCase {
     }
 
     private function createAdminClient(): Client {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => 'admin', '_password' => 'admin']));
         $this->assertTrue($client->getResponse()->isRedirect(), 'Login as admin failed');

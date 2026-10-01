@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller;
 
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -13,12 +14,19 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 class CardSearchTest extends WebTestCase {
 
+    private KernelBrowser $client;
+
+    protected function setUp(): void
+    {
+        $this->client = static::createClient();
+    }
+
     /**
      * @return string[] the names of the cards found by the API
      * @param mixed $q
      */
     private function search($q) {
-        $client = static::createClient();
+        $client = $this->client;
         $client->request('GET', '/api/public/cards/search/' . rawurlencode($q));
         $this->assertSame(200, $client->getResponse()->getStatusCode(), "search $q");
 
@@ -60,7 +68,7 @@ class CardSearchTest extends WebTestCase {
     }
 
     public function testSiteSearch(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/find?q=LOS');
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());

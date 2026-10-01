@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -22,18 +23,21 @@ class AdminWriteTest extends WebTestCase {
     /** tables of the reference data, in an order that respects the foreign keys when deleting */
     const TABLES = ['card_printing', 'scenario_encounter', 'scenario', 'encounter', 'card', 'pack', 'cycle', 'type', 'sphere'];
 
+    private KernelBrowser $client;
+
     /** @var int[] */
     private $maxIds = [];
 
     protected function setUp(): void {
-        $connection = $this->db(static::createClient());
+        $this->client = static::createClient();
+        $connection = $this->db($this->client);
         foreach (array_merge(self::TABLES, ['comment', 'decklist', 'deck']) as $table) {
             $this->maxIds[$table] = $table === 'scenario_encounter' ? 0 : (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
         }
     }
 
     protected function tearDown(): void {
-        $connection = $this->db(static::createClient());
+        $connection = $this->db($this->client);
         $max = $this->maxIds;
         $connection->exec("DELETE FROM scenario_encounter WHERE scenario_id > {$max['scenario']} OR encounter_id > {$max['encounter']}");
         foreach (['decklist_spheres', 'decklistslot', 'decklistsideslot'] as $table) {
@@ -67,7 +71,7 @@ class AdminWriteTest extends WebTestCase {
      * @return \Symfony\Bundle\FrameworkBundle\Client
      */
     private function createAdminClient() {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => 'admin', '_password' => 'admin']));
         $this->assertTrue($client->getResponse()->isRedirect(), 'Login as admin failed');

@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Form;
 
@@ -20,13 +21,16 @@ class QuestlogWorkflowTest extends WebTestCase {
     use \App\Tests\LocationTrait;
     use \App\Tests\FormFieldTrait;
 
+    private KernelBrowser $client;
+
     /** @var int[] max ids before the test, by table */
     private $maxIds = [];
     /** @var array */
     private $fixtureQuestlog;
 
     protected function setUp(): void {
-        $connection = $this->db(static::createClient());
+        $this->client = static::createClient();
+        $connection = $this->db($this->client);
         foreach (['questlog', 'questlog_deck', 'deck'] as $table) {
             $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
         }
@@ -45,7 +49,7 @@ class QuestlogWorkflowTest extends WebTestCase {
     }
 
     protected function tearDown(): void {
-        $connection = $this->db(static::createClient());
+        $connection = $this->db($this->client);
         $max = $this->maxIds;
         foreach ([
             "DELETE FROM questlog_deck WHERE id > {$max['questlog_deck']} OR questlog_id > {$max['questlog']}",
@@ -83,7 +87,7 @@ class QuestlogWorkflowTest extends WebTestCase {
      * @return \Symfony\Bundle\FrameworkBundle\Client
      */
     private function createAuthenticatedClient($username = 'test') {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $username]));
         $this->assertTrue($client->getResponse()->isRedirect(), "Login as $username failed");

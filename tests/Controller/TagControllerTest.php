@@ -2,7 +2,9 @@
 
 namespace App\Tests\Controller;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -14,15 +16,19 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * 4 "tactics". Their tags and dates are restored in tearDown().
  */
 class TagControllerTest extends WebTestCase {
+    
+    private KernelBrowser $client;
+
     /** @var array */
     private $fixtureDecks;
 
     protected function setUp(): void {
-        $this->fixtureDecks = $this->db(static::createClient())->fetchAll('SELECT id, user_id, tags, date_update FROM deck ORDER BY id');
+        $this->client = static::createClient();
+        $this->fixtureDecks = $this->db($this->client)->fetchAll('SELECT id, user_id, tags, date_update FROM deck ORDER BY id');
     }
 
     protected function tearDown(): void {
-        $connection = $this->db(static::createClient());
+        $connection = $this->db($this->client);
         foreach ($this->fixtureDecks as $deck) {
             $connection->update('deck', $deck, ['id' => $deck['id']]);
         }
@@ -43,7 +49,7 @@ class TagControllerTest extends WebTestCase {
      * @return \Symfony\Bundle\FrameworkBundle\Client
      */
     private function createAuthenticatedClient($username = 'test') {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $username]));
         $this->assertTrue($client->getResponse()->isRedirect(), "Login as $username failed");
@@ -166,7 +172,7 @@ class TagControllerTest extends WebTestCase {
      * @param mixed $action
      */
     public function testAnonymousAjaxIsDenied($action): void {
-        $client = static::createClient();
+        $client = $this->client;
         $client->request('POST', "/tag/$action", ['ids' => ['1'], 'tags' => ['hacked']], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
         $this->assertSame(403, $client->getResponse()->getStatusCode());
@@ -179,7 +185,7 @@ class TagControllerTest extends WebTestCase {
      * @param mixed $action
      */
     public function testAnonymousIsRedirectedToLogin($action): void {
-        $client = static::createClient();
+        $client = $this->client;
         $client->request('POST', "/tag/$action", ['ids' => ['1'], 'tags' => ['hacked']]);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());

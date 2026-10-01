@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,7 +18,14 @@ use Symfony\Component\HttpFoundation\Response;
 class ApiControllerTest extends WebTestCase {
     use JsonSnapshotTrait;
 
+    private KernelBrowser $client;
+
     const CACHE_CONTROL = 'max-age=600, public';
+
+    protected function setUp(): void
+    {
+        $this->client = static::createClient();
+    }
 
     /* ------------------------------------------------------------ helpers */
 
@@ -76,7 +84,7 @@ class ApiControllerTest extends WebTestCase {
      * @param mixed $lastModified
      */
     public function testJsonEndpoint($snapshot, $uri, $lastModified): void {
-        $client = static::createClient();
+        $client = $this->client;
         $response = $this->get($client, $uri);
 
         $this->assertSame(200, $response->getStatusCode());
@@ -92,7 +100,7 @@ class ApiControllerTest extends WebTestCase {
     }
 
     public function testSearchLastModified(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $response = $this->get($client, '/api/public/cards/search/Aragorn');
 
         $this->assertApiHeaders($response, 'application/json', 'Fri, 09 Sep 2022 12:59:33 GMT');
@@ -106,7 +114,7 @@ class ApiControllerTest extends WebTestCase {
      * @param mixed $uri
      */
     public function testJsonp($snapshot, $uri): void {
-        $client = static::createClient();
+        $client = $this->client;
         $response = $this->get($client, $uri . '?jsonp=myCallback');
 
         $this->assertSame(200, $response->getStatusCode());
@@ -124,7 +132,7 @@ class ApiControllerTest extends WebTestCase {
      * @dataProvider invalidJsonpProvider
      */
     public function testInvalidJsonpCallbackIsRefused(string $callback): void {
-        $client = static::createClient();
+        $client = $this->client;
         $response = $this->get($client, '/api/public/card/01001?jsonp=' . urlencode($callback));
 
         $this->assertSame(400, $response->getStatusCode());
@@ -145,7 +153,7 @@ class ApiControllerTest extends WebTestCase {
     }
 
     public function testJsonpCallbackWithDots(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $response = $this->get($client, '/api/public/card/01001?jsonp=jQuery123.cb_4');
 
         $this->assertSame(200, $response->getStatusCode());
@@ -156,7 +164,7 @@ class ApiControllerTest extends WebTestCase {
      * An empty callback is ignored: plain JSON.
      */
     public function testEmptyJsonpCallbackIsIgnored(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $response = $this->get($client, '/api/public/card/01001?jsonp=');
 
         $this->assertSame(200, $response->getStatusCode());
@@ -188,7 +196,7 @@ class ApiControllerTest extends WebTestCase {
      * @param mixed $lastModified
      */
     public function testNotModifiedSince($uri, $lastModified): void {
-        $client = static::createClient();
+        $client = $this->client;
 
         $response = $this->get($client, $uri, ['HTTP_IF_MODIFIED_SINCE' => $lastModified]);
         $this->assertSame(304, $response->getStatusCode());
@@ -223,7 +231,7 @@ class ApiControllerTest extends WebTestCase {
      * @param mixed $expectedStatus
      */
     public function testErrors($uri, $expectedStatus): void {
-        $client = static::createClient();
+        $client = $this->client;
         $response = $this->get($client, $uri);
 
         $this->assertSame($expectedStatus, $response->getStatusCode());
@@ -250,7 +258,7 @@ class ApiControllerTest extends WebTestCase {
      * @param mixed $contentType
      */
     public function testUnsupportedFormatOnCardsByPack($format, $contentType): void {
-        $client = static::createClient();
+        $client = $this->client;
         $response = $this->get($client, '/api/public/cards/Core.' . $format);
 
         $this->assertSame(200, $response->getStatusCode());
@@ -270,7 +278,7 @@ class ApiControllerTest extends WebTestCase {
     }
 
     public function testPostIsNotAllowed(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $client->request('POST', '/api/public/card/01001');
 
         $this->assertSame(405, $client->getResponse()->getStatusCode());
@@ -279,7 +287,7 @@ class ApiControllerTest extends WebTestCase {
     /* ------------------------------------------ endpoints outside ApiController */
 
     public function testPublishedCustomPacks(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $response = $this->get($client, '/api/public/custom-packs/published');
 
         $this->assertSame(200, $response->getStatusCode());
@@ -288,7 +296,7 @@ class ApiControllerTest extends WebTestCase {
     }
 
     public function testUserInfoAnonymous(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $response = $this->get($client, '/api/private/user/info');
 
         $this->assertSame(302, $response->getStatusCode());
@@ -296,7 +304,7 @@ class ApiControllerTest extends WebTestCase {
     }
 
     public function testUserInfoAuthenticated(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => 'test', '_password' => 'test']));
         $this->assertTrue($client->getResponse()->isRedirect());

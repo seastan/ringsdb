@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\DomCrawler\Form;
@@ -19,15 +20,18 @@ class UserProfileTest extends WebTestCase {
     use SentEmailsTrait;
     use \App\Tests\FormFieldTrait;
 
+    private KernelBrowser $client;
+
     /** @var array */
     private $fixtureUsers;
 
     protected function setUp(): void {
-        $this->fixtureUsers = $this->db(static::createClient())->fetchAll('SELECT * FROM user ORDER BY id');
+        $this->client = static::createClient();
+        $this->fixtureUsers = $this->db($this->client)->fetchAll('SELECT * FROM user ORDER BY id');
     }
 
     protected function tearDown(): void {
-        $connection = $this->db(static::createClient());
+        $connection = $this->db($this->client);
         foreach ($this->fixtureUsers as $user) {
             $connection->update('user', $user, ['id' => $user['id']]);
         }
@@ -60,7 +64,7 @@ class UserProfileTest extends WebTestCase {
      * @return \Symfony\Bundle\FrameworkBundle\Client
      */
     private function createAuthenticatedClient($username = 'test') {
-        $client = static::createClient();
+        $client = $this->client;
         $this->assertTrue($this->login($client, $username, $username), "Login as $username failed");
 
         return $client;
@@ -164,8 +168,8 @@ class UserProfileTest extends WebTestCase {
 
         $user = $this->fetchUser($client);
         $this->assertSame(['phpunit_renamed', 'phpunit_renamed'], [$user['username'], $user['username_canonical']]);
-        $this->assertFalse($this->login(static::createClient(), 'test', 'test'));
-        $this->assertTrue($this->login(static::createClient(), 'phpunit_renamed', 'test'));
+        $this->assertFalse($this->login($this->client, 'test', 'test'));
+        $this->assertTrue($this->login($this->client, 'phpunit_renamed', 'test'));
     }
 
     public function testUsernameAlreadyTaken(): void {
@@ -276,14 +280,14 @@ class UserProfileTest extends WebTestCase {
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/profile/', $client->getResponse()->headers->get('Location'));
-        $this->assertFalse($this->login(static::createClient(), 'test', 'test'));
-        $this->assertTrue($this->login(static::createClient(), 'test', 'secret123'));
+        $this->assertFalse($this->login($this->client, 'test', 'test'));
+        $this->assertTrue($this->login($this->client, 'test', 'secret123'));
     }
 
     /* -------------------------------------------- FOSUser: reset password */
 
     public function testResetPassword(): void {
-        $client = static::createClient();
+        $client = $this->client;
 
         // 1. request: an email with a reset link is sent
         $crawler = $client->request('GET', '/resetting/request');
@@ -323,11 +327,11 @@ class UserProfileTest extends WebTestCase {
         $client->request('GET', "/resetting/reset/$token");
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/login', $client->getResponse()->headers->get('Location'));
-        $this->assertTrue($this->login(static::createClient(), 'test', 'secret123'));
+        $this->assertTrue($this->login($this->client, 'test', 'secret123'));
     }
 
     public function testResetPasswordOfUnknownUser(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $client->enableProfiler();
         $client->request('POST', '/resetting/send-email', ['username' => 'nobody']);
 
@@ -338,7 +342,7 @@ class UserProfileTest extends WebTestCase {
     }
 
     public function testUnknownResetToken(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $client->request('GET', '/resetting/reset/unknown-token');
 
         // redirect to the login page (a 404 before FOSUserBundle 2.1)

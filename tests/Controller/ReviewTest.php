@@ -4,6 +4,7 @@ namespace App\Tests\Controller;
 
 use App\Listener\CoreExceptionListener;
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,6 +23,8 @@ use Symfony\Component\HttpFoundation\Response;
 class ReviewTest extends WebTestCase {
     const CARD_URL = '/card/01001';
 
+    private KernelBrowser $client;
+
     /** @var int[] */
     private $maxIds = [];
     /** @var array */
@@ -30,7 +33,8 @@ class ReviewTest extends WebTestCase {
     private $fixtureUsers;
 
     protected function setUp(): void {
-        $connection = $this->db(static::createClient());
+        $this->client = static::createClient();
+        $connection = $this->db($this->client);
         foreach (['review', 'reviewcomment'] as $table) {
             $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
         }
@@ -41,7 +45,7 @@ class ReviewTest extends WebTestCase {
     }
 
     protected function tearDown(): void {
-        $connection = $this->db(static::createClient());
+        $connection = $this->db($this->client);
         $connection->exec("DELETE FROM reviewcomment WHERE id > {$this->maxIds['reviewcomment']}");
         $connection->exec("DELETE FROM reviewvote WHERE review_id > {$this->maxIds['review']} OR review_id = 1");
         $connection->exec("DELETE FROM review WHERE id > {$this->maxIds['review']}");
@@ -70,7 +74,7 @@ class ReviewTest extends WebTestCase {
      * @return \Symfony\Bundle\FrameworkBundle\Client
      */
     private function createAuthenticatedClient($username) {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $username]));
         $this->assertTrue($client->getResponse()->isRedirect(), "Login as $username failed");
@@ -190,7 +194,7 @@ class ReviewTest extends WebTestCase {
     }
 
     public function testAnonymousCannotWriteAReview(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $response = $this->ajax($client, '/review/post', ['card_id' => 2, 'review' => self::reviewText()]);
 
         $this->assertJsonAnswer($response, 403, ['success' => false, 'message' => 'You are not logged in.']);

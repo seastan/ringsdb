@@ -4,6 +4,7 @@ namespace App\Tests\Controller;
 
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -16,10 +17,17 @@ class SecurityControllerTest extends WebTestCase {
     use SentEmailsTrait;
     use \App\Tests\LocationTrait;
 
+    private KernelBrowser $client;
+
     const PREFIX = 'phpunit_';
 
+    protected function setUp(): void
+    {
+        $this->client = static::createClient();
+    }
+
     protected function tearDown(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $em = $client->getContainer()->get('doctrine')->getManager();
         $em->createQuery('DELETE FROM App\Entity\User u WHERE u.username LIKE :prefix')
             ->setParameter('prefix', self::PREFIX . '%')
@@ -114,7 +122,7 @@ class SecurityControllerTest extends WebTestCase {
     /* ------------------------------------------------------- registration */
 
     public function testRegistrationPageDisplaysForm(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/register/');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
@@ -129,7 +137,7 @@ class SecurityControllerTest extends WebTestCase {
     public function testFullRegistrationWorkflow(): void {
         $username = self::PREFIX . 'frodo';
         $email = 'phpunit_frodo@example.com';
-        $client = static::createClient();
+        $client = $this->client;
 
         // 1. submit the form: a confirmation email is sent, the user must check their inbox
         $this->submitRegistration($client, $username, $email, 'secret123', null, true);
@@ -195,7 +203,7 @@ class SecurityControllerTest extends WebTestCase {
      * @param mixed $expectedError
      */
     public function testRegistrationValidationErrors($username, $email, $password, $confirmation, $expectedError): void {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $this->submitRegistration($client, $username, $email, $password, $confirmation);
 
         // form is displayed again, with errors, and no user is created
@@ -221,7 +229,7 @@ class SecurityControllerTest extends WebTestCase {
     }
 
     public function testRegistrationRequiresCsrfToken(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $client->request('POST', '/register/', ['fos_user_registration_form' => [
             'email' => 'phpunit_csrf@example.com',
             'username' => self::PREFIX . 'csrf',
@@ -237,7 +245,7 @@ class SecurityControllerTest extends WebTestCase {
     /* -------------------------------------------------------------- login */
 
     public function testLoginPageDisplaysForm(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
@@ -249,7 +257,7 @@ class SecurityControllerTest extends WebTestCase {
     }
 
     public function testLoginWithUsername(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $this->login($client, 'test', 'test');
 
         $this->assertRedirectsTo($client, '#^http://localhost/$#');
@@ -257,7 +265,7 @@ class SecurityControllerTest extends WebTestCase {
     }
 
     public function testLoginWithEmail(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $this->login($client, 'test@example.com', 'test');
 
         $this->assertRedirectsTo($client, '#^http://localhost/$#');
@@ -265,7 +273,7 @@ class SecurityControllerTest extends WebTestCase {
     }
 
     public function testLoginRedirectsToOriginallyRequestedPage(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $client->request('GET', '/decks');
         $this->assertRedirectsTo($client, '#/login$#');
 
@@ -279,7 +287,7 @@ class SecurityControllerTest extends WebTestCase {
      * @param mixed $password
      */
     public function testLoginWithInvalidCredentials($username, $password): void {
-        $client = static::createClient();
+        $client = $this->client;
         $this->login($client, $username, $password);
 
         $this->assertRedirectsTo($client, '#/login$#');
@@ -300,7 +308,7 @@ class SecurityControllerTest extends WebTestCase {
     }
 
     public function testLoginRequiresCsrfToken(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $client->request('GET', '/login');
         $client->request('POST', '/login_check', ['_username' => 'test', '_password' => 'test', '_csrf_token' => 'invalid']);
 
@@ -311,7 +319,7 @@ class SecurityControllerTest extends WebTestCase {
     }
 
     public function testRememberMe(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $this->login($client, 'test', 'test', true);
         $this->assertTrue($client->getResponse()->isRedirect());
 
@@ -328,7 +336,7 @@ class SecurityControllerTest extends WebTestCase {
     /* ------------------------------------------------------------- logout */
 
     public function testLogout(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $this->login($client, 'test', 'test', true);
         $this->assertAuthenticatedAs($client, 'test');
 

@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -26,6 +27,8 @@ class DeckCompareTest extends WebTestCase {
     const ARAGORN = 1, GIMLI = 4, LEGOLAS = 5, GUARD_OF_THE_CITADEL = 13, VETERAN_AXEHAND = 28,
         GONDORIAN_SPEARMAN = 29, FEINT = 34, QUICK_STRIKE = 35;
 
+    private KernelBrowser $client;
+
     /** @var int */
     private $maxDeckId;
     /** @var int */
@@ -34,7 +37,8 @@ class DeckCompareTest extends WebTestCase {
     private $deckB;
 
     protected function setUp(): void {
-        $connection = $this->db(static::createClient());
+        $this->client = static::createClient();
+        $connection = $this->db($this->client);
         $this->maxDeckId = (int) $connection->fetchColumn('SELECT MAX(id) FROM deck');
         $this->deckA = $this->insertDeck('PHPUnit Deck A',
             [self::GIMLI => 1, self::LEGOLAS => 1, self::VETERAN_AXEHAND => 3, self::GONDORIAN_SPEARMAN => 2],
@@ -45,7 +49,7 @@ class DeckCompareTest extends WebTestCase {
     }
 
     protected function tearDown(): void {
-        $connection = $this->db(static::createClient());
+        $connection = $this->db($this->client);
         foreach (['deckslot', 'decksideslot'] as $table) {
             $connection->exec("DELETE FROM $table WHERE deck_id > {$this->maxDeckId}");
         }
@@ -68,7 +72,7 @@ class DeckCompareTest extends WebTestCase {
      * @return \Symfony\Bundle\FrameworkBundle\Client
      */
     private function createAuthenticatedClient($username = 'test') {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $username]));
         $this->assertTrue($client->getResponse()->isRedirect(), "Login as $username failed");
@@ -82,7 +86,7 @@ class DeckCompareTest extends WebTestCase {
      * @return int
      */
     private function insertDeck($name, array $main, array $side) {
-        $connection = $this->db(static::createClient());
+        $connection = $this->db($this->client);
         $row = $connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
         $this->assertNotFalse($row);
         unset($row['id']);

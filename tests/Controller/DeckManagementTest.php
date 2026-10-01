@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -19,6 +20,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class DeckManagementTest extends WebTestCase {
     use \App\Tests\TemporaryFileTrait;
 
+    private KernelBrowser $client;
+
     /** @var int[] */
     private $maxIds = [];
     /** @var array */
@@ -27,7 +30,8 @@ class DeckManagementTest extends WebTestCase {
     private $fixtureUsers;
 
     protected function setUp(): void {
-        $connection = $this->db(static::createClient());
+        $this->client = static::createClient();
+        $connection = $this->db($this->client);
         foreach (['deck', 'deckchange', 'fellowship', 'questlog'] as $table) {
             $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
         }
@@ -36,7 +40,7 @@ class DeckManagementTest extends WebTestCase {
     }
 
     protected function tearDown(): void {
-        $connection = $this->db(static::createClient());
+        $connection = $this->db($this->client);
         $max = $this->maxIds;
         foreach ($this->fixtureDecklists as $decklist) {
             $connection->update('decklist', $decklist, ['id' => $decklist['id']]);
@@ -73,7 +77,7 @@ class DeckManagementTest extends WebTestCase {
      * @return \Symfony\Bundle\FrameworkBundle\Client
      */
     private function createAuthenticatedClient($username = 'test') {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $username]));
         $this->assertTrue($client->getResponse()->isRedirect(), "Login as $username failed");
@@ -485,7 +489,7 @@ class DeckManagementTest extends WebTestCase {
      * @param mixed $uri
      */
     public function testAnonymousIsRedirectedToLogin($method, $uri): void {
-        $client = static::createClient();
+        $client = $this->client;
         $client->request($method, $uri, ['deck_id' => 1, 'ids' => '1', 'diff' => '[[],[],[],[]]']);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());

@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -16,6 +17,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class DecklistEditTest extends WebTestCase {
     use \App\Tests\FormFieldTrait;
 
+    private KernelBrowser $client;
+
     /** @var array */
     private $fixtureDecklists;
     /** @var array */
@@ -24,7 +27,8 @@ class DecklistEditTest extends WebTestCase {
     private $maxIds = [];
 
     protected function setUp(): void {
-        $connection = $this->db(static::createClient());
+        $this->client = static::createClient();
+        $connection = $this->db($this->client);
         $this->fixtureDecklists = $connection->fetchAll('SELECT id, name, name_canonical, description_md, description_html, precedent_decklist_id, date_update FROM decklist');
         $this->fixtureUsers = $connection->fetchAll('SELECT id, roles FROM user');
         foreach (['decklist', 'deck', 'fellowship'] as $table) {
@@ -33,7 +37,7 @@ class DecklistEditTest extends WebTestCase {
     }
 
     protected function tearDown(): void {
-        $connection = $this->db(static::createClient());
+        $connection = $this->db($this->client);
         $max = $this->maxIds;
         foreach ([
             "DELETE FROM fellowship_decklist WHERE fellowship_id > {$max['fellowship']}",
@@ -70,7 +74,7 @@ class DecklistEditTest extends WebTestCase {
      * @return \Symfony\Bundle\FrameworkBundle\Client
      */
     private function createAuthenticatedClient($username = 'test') {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $username]));
         $this->assertTrue($client->getResponse()->isRedirect(), "Login as $username failed");
@@ -228,7 +232,7 @@ class DecklistEditTest extends WebTestCase {
      * ROLE_SUPER_ADMIN can edit any decklist (not ROLE_ADMIN, see above).
      */
     public function testSuperAdminCanEdit(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $this->db($client)->update('user', ['roles' => serialize(['ROLE_SUPER_ADMIN'])], ['username' => 'admin']);
         $client = $this->createAuthenticatedClient('admin');
 
@@ -244,7 +248,7 @@ class DecklistEditTest extends WebTestCase {
      * @param mixed $uri
      */
     public function testAnonymousIsRedirectedToLogin($method, $uri): void {
-        $client = static::createClient();
+        $client = $this->client;
         $client->request($method, $uri, ['name' => 'Hacked']);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
@@ -293,7 +297,7 @@ class DecklistEditTest extends WebTestCase {
      * @param mixed $decklist
      */
     public function testRefusedDelete($username, $decklist): void {
-        $client = $username ? $this->createAuthenticatedClient($username) : static::createClient();
+        $client = $username ? $this->createAuthenticatedClient($username) : $this->client;
         $client->request('POST', "/decklist/delete/$decklist");
 
         $this->assertSame(403, $client->getResponse()->getStatusCode());

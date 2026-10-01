@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,8 +23,15 @@ class ApiPrivateControllerTest extends WebTestCase {
 
     const LAST_MODIFIED = 'Sun, 16 Aug 2015 00:00:00 GMT';
 
+    private KernelBrowser $client;
+
+    protected function setUp(): void
+    {
+        $this->client = static::createClient();
+    }
+
     protected function tearDown(): void {
-        static::createClient()->getContainer()->get('doctrine')->getConnection()
+        $this->client->getContainer()->get('doctrine')->getConnection()
             ->update('user', ['is_share_decks' => 0], ['username' => 'test']);
         parent::tearDown();
     }
@@ -35,7 +43,7 @@ class ApiPrivateControllerTest extends WebTestCase {
      * @return \Symfony\Bundle\FrameworkBundle\Client
      */
     private function createAuthenticatedClient($username) {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $username]));
         $this->assertTrue($client->getResponse()->isRedirect(), "Login as $username failed");
@@ -195,7 +203,7 @@ class ApiPrivateControllerTest extends WebTestCase {
      * @param mixed $uri
      */
     public function testAnonymousAjaxIsDenied($uri): void {
-        $client = static::createClient();
+        $client = $this->client;
         $response = $this->ajax($client, $uri);
 
         $this->assertSame(403, $response->getStatusCode());
@@ -208,7 +216,7 @@ class ApiPrivateControllerTest extends WebTestCase {
      * @param mixed $uri
      */
     public function testAnonymousIsRedirectedToLogin($uri): void {
-        $client = static::createClient();
+        $client = $this->client;
         $client->request('GET', $uri);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());

@@ -1,7 +1,6 @@
 Reference: https://tomasvotruba.com/blog/off-the-beaten-path-to-upgrade-symfony-28-to-72
 
 doctrine/doctrine-bundle:
-- 1.10.3 requires symfony/dependency-injection: ~2.7|~3.0|~4.0
 - 1.12.13 requires symfony/dependency-injection: ^3.4.30|^4.3.3
 - 2.0.0 requires symfony/dependency-injection: ^4.3.3|^5.0
 - 2.4.0 requires symfony/dependency-injection: ^4.3.3|^5.0|^6.0
@@ -30,11 +29,9 @@ composer/composer:
 - 2.10.3 requires php: ^7.2.5 || ^8.0
 
 doctrine/doctrine-migrations-bundle:
-- 1.3.2 requires php: >=5.4.0 and symfony/framework-bundle: ~2.7|~3.3|~4.0
 - 2.2.3 requires php: ^7.1|^8.0 and symfony/framework-bundle: ~3.4|~4.0|~5.0
 
 friendsofsymfony/user-bundle:
-- 2.0.2 requires php: ^5.5.9 || ^7.0 and symfony/security-bundle: ^2.7 || ^3.0
 - 2.1.2 requires php: ^5.5.9 || ^7.0 and symfony/security-bundle: ^2.7 || ^3.0
 - 2.2.0 requires symfony/security-bundle: ^4.4
 - 3.0.0 requires symfony/security-bundle: ^4.4 || ^5.0

@@ -5,6 +5,7 @@ namespace App\Tests\Controller;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -22,6 +23,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class AdminExcelTest extends WebTestCase {
     use \App\Tests\TemporaryFileTrait;
 
+    private KernelBrowser $client;
+
     const HEADER = ['type', 'sphere', 'position', 'code', 'name', 'traits', 'text', 'flavor', 'isUnique', 'cost', 'threat',
         'willpower', 'attack', 'defense', 'health', 'victory', 'quest', 'deckLimit', 'hasErrata'];
 
@@ -33,13 +36,14 @@ class AdminExcelTest extends WebTestCase {
     private $files = [];
 
     protected function setUp(): void {
-        $connection = $this->db(static::createClient());
+        $this->client = static::createClient();
+        $connection = $this->db($this->client);
         $this->maxCardId = (int) $connection->fetchColumn('SELECT MAX(id) FROM card');
         $this->coreCards = $connection->fetchAll('SELECT c.* FROM card c JOIN card_printing cp ON cp.card_id = c.id WHERE cp.pack_id = 1');
     }
 
     protected function tearDown(): void {
-        $connection = $this->db(static::createClient());
+        $connection = $this->db($this->client);
         $connection->exec("DELETE FROM card WHERE id > {$this->maxCardId}");
         foreach ($this->coreCards as $card) {
             $connection->update('card', $card, ['id' => $card['id']]);
@@ -63,7 +67,7 @@ class AdminExcelTest extends WebTestCase {
      * @return \Symfony\Bundle\FrameworkBundle\Client
      */
     private function createAdminClient() {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => 'admin', '_password' => 'admin']));
         $this->assertTrue($client->getResponse()->isRedirect(), 'Login as admin failed');

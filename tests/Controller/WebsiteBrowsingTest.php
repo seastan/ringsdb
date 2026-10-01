@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -18,13 +19,20 @@ class WebsiteBrowsingTest extends WebTestCase {
     use PageSnapshotTrait;
     use \App\Tests\TemporaryFileTrait;
 
+    private KernelBrowser $client;
+
+    protected function setUp(): void
+    {
+        $this->client = static::createClient();
+    }
+
     /* ------------------------------------------------------------ helpers */
 
     /**
      * @return \Symfony\Bundle\FrameworkBundle\Client
      */
     private function createAuthenticatedClient() {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => 'test', '_password' => 'test']));
         $this->assertTrue($client->getResponse()->isRedirect(), 'Login failed');
@@ -97,7 +105,7 @@ class WebsiteBrowsingTest extends WebTestCase {
      * @param mixed $title
      */
     public function testPublicPageAsAnonymous($uri, $snapshot, $title): void {
-        $this->assertPage(static::createClient(), $uri, 'anonymous/' . $snapshot, $title);
+        $this->assertPage($this->client, $uri, 'anonymous/' . $snapshot, $title);
     }
 
     /**
@@ -197,7 +205,7 @@ class WebsiteBrowsingTest extends WebTestCase {
      * @param mixed $expected
      */
     public function testAnonymousAccessIsDenied($uri, $status, $expected): void {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', $uri);
         $response = $client->getResponse();
 
@@ -210,7 +218,7 @@ class WebsiteBrowsingTest extends WebTestCase {
     }
 
     public function testAnonymousSeesNoDecklistOfHisOwn(): void {
-        $client = static::createClient();
+        $client = $this->client;
         $this->assertPage($client, '/decklists/mine', 'anonymous/decklists_mine', 'My Decklists · RingsDB');
     }
 
@@ -236,7 +244,7 @@ class WebsiteBrowsingTest extends WebTestCase {
      * @param mixed $location
      */
     public function testRedirect($uri, $location): void {
-        $client = static::createClient();
+        $client = $this->client;
         $client->request('GET', $uri);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
@@ -263,7 +271,7 @@ class WebsiteBrowsingTest extends WebTestCase {
      * @param mixed $title
      */
     public function testNotFound($uri, $title): void {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', $uri);
 
         $this->assertSame(404, $client->getResponse()->getStatusCode());
@@ -294,7 +302,7 @@ class WebsiteBrowsingTest extends WebTestCase {
      * @param mixed $authenticated
      */
     public function testDownload($uri, $snapshot, $contentType, $disposition, $authenticated): void {
-        $client = $authenticated ? $this->createAuthenticatedClient() : static::createClient();
+        $client = $authenticated ? $this->createAuthenticatedClient() : $this->client;
         $client->request('GET', $uri);
         $response = $client->getResponse();
 

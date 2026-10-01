@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -14,19 +15,22 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * Counters, dates and reputations are restored in tearDown().
  */
 class DecklistSocialTest extends WebTestCase {
+
+    private KernelBrowser $client;
     /** @var array */
     private $fixtureDecklists;
     /** @var array */
     private $fixtureUsers;
 
     protected function setUp(): void {
-        $connection = $this->db(static::createClient());
+        $this->client = static::createClient();
+        $connection = $this->db($this->client);
         $this->fixtureDecklists = $connection->fetchAll('SELECT id, nb_votes, nb_favorites, date_update FROM decklist');
         $this->fixtureUsers = $connection->fetchAll('SELECT id, reputation FROM user');
     }
 
     protected function tearDown(): void {
-        $connection = $this->db(static::createClient());
+        $connection = $this->db($this->client);
         $connection->exec('DELETE FROM favorite');
         $connection->exec('DELETE FROM vote');
         foreach ($this->fixtureDecklists as $decklist) {
@@ -52,7 +56,7 @@ class DecklistSocialTest extends WebTestCase {
      * @return \Symfony\Bundle\FrameworkBundle\Client
      */
     private function createAuthenticatedClient($username) {
-        $client = static::createClient();
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $username]));
         $this->assertTrue($client->getResponse()->isRedirect(), "Login as $username failed");
@@ -170,7 +174,7 @@ class DecklistSocialTest extends WebTestCase {
      * @param mixed $action
      */
     public function testAnonymousAjaxIsDenied($action): void {
-        $client = static::createClient();
+        $client = $this->client;
         $response = $this->post($client, $action, 2);
 
         $this->assertSame(403, $response->getStatusCode());
