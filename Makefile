@@ -42,6 +42,9 @@ test-fixtures:
 phpunit: test-fixtures
 	docker compose exec -it -u www-data symfony php vendor/bin/simple-phpunit
 
+phpunit-update-snapshots: test-fixtures
+	docker compose exec -it -u www-data -e UPDATE_SNAPSHOTS=1 symfony php vendor/bin/simple-phpunit
+
 # Code coverage report in var/cache/coverage/index.html (uses Xdebug)
 coverage: test-fixtures
 	docker compose exec -it -u www-data symfony php vendor/bin/simple-phpunit --coverage-html var/cache/coverage --coverage-text=php://stdout --colors=never

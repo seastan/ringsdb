@@ -84,9 +84,6 @@
             "ref": "5e490cc197fb6bb1ae22e5abbc531ddc633b6767"
         }
     },
-    "sensio/framework-extra-bundle": {
-        "version": "v3.0.29"
-    },
     "symfony/console": {
         "version": "3.4",
         "recipe": {
@@ -235,6 +232,19 @@
             "config/packages/twig.yaml",
             "config/routes/dev/twig.yaml",
             "templates/base.html.twig"
+        ]
+    },
+    "symfony/validator": {
+        "version": "4.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "4.3",
+            "ref": "3eb8df139ec05414489d55b97603c5f6ca0c44cb"
+        },
+        "files": [
+            "config/packages/test/validator.yaml",
+            "config/packages/validator.yaml"
         ]
     },
     "symfony/web-profiler-bundle": {

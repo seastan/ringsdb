@@ -105,7 +105,7 @@ class SecurityControllerTest extends WebTestCase {
         $client->request('GET', '/decks');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
-        $client->request('GET', '/api/public/user/info');
+        $client->request('GET', '/api/private/user/info');
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertInternalType('array', $data);
         $this->assertEquals($username, $data['name']);
@@ -246,14 +246,6 @@ class SecurityControllerTest extends WebTestCase {
         foreach (['_username', '_password', '_remember_me', '_csrf_token'] as $field) {
             $this->assertCount(1, $form->filter('input[name="' . $field . '"]'), "Missing field $field");
         }
-    }
-
-    public function testProtectedPageRedirectsAnonymousToLogin(): void {
-        $client = static::createClient();
-        $this->assertAnonymous($client);
-
-        $client->request('GET', '/api/public/user/info');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
 
     public function testLoginWithUsername(): void {

@@ -289,11 +289,10 @@ class ApiControllerTest extends WebTestCase {
 
     public function testUserInfoAnonymous(): void {
         $client = static::createClient();
-        $response = $this->get($client, '/api/public/user/info');
+        $response = $this->get($client, '/api/private/user/info');
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('application/json', $response->headers->get('Content-Type'));
-        $this->assertSame('null', $response->getContent());
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame('http://localhost/login', $client->getResponse()->headers->get('Location'));
     }
 
     public function testUserInfoAuthenticated(): void {
@@ -302,12 +301,12 @@ class ApiControllerTest extends WebTestCase {
         $client->submit($crawler->selectButton('_submit')->form(['_username' => 'test', '_password' => 'test']));
         $this->assertTrue($client->getResponse()->isRedirect());
 
-        $response = $this->get($client, '/api/public/user/info');
+        $response = $this->get($client, '/api/private/user/info');
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
         $this->assertMatchesJsonSnapshot('user_info_test', $response->getContent());
 
-        $response = $this->get($client, '/api/public/user/info?decklist_id=1');
+        $response = $this->get($client, '/api/private/user/info?decklist_id=1');
         $this->assertMatchesJsonSnapshot('user_info_test_decklist_1', $response->getContent());
     }
 }

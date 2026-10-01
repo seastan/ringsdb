@@ -142,7 +142,7 @@ class UserProfileTest extends WebTestCase {
 
         $crawler = $client->followRedirect();
         $this->assertContains('Successfully saved your profile.', $crawler->filter('body')->text());
-        $client->request('GET', '/api/public/user/info');
+        $client->request('GET', '/api/private/user/info');
         $info = json_decode($client->getResponse()->getContent(), true);
         $this->assertSame(['lore', true], [$info['sphere'], $info['dark_mode']]);
 

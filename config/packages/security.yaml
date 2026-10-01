@@ -21,6 +21,11 @@ security:
             pattern:    ^/(_(profiler|wdt|error)|css|images|js)/
             security: false
 
+        public_api:
+            pattern: ^/api/public
+            stateless: true
+            anonymous:    true
+
         default:
             pattern:    ^/
             form_login:
@@ -37,7 +42,7 @@ security:
                 lifetime: 31536000 # 365 jours en secondes
                 path:     /
                 domain:   ~ # Prend la valeur par défaut du domaine courant depuis $_SERVER
-            
+
     access_control:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: "%channel%" }
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: "%channel%" }

@@ -121,7 +121,7 @@ class CollectionTest extends WebTestCase {
         $this->assertContains('Collection saved.', $crawler->filter('body')->text());
         $this->assertSame('1:2,2,3', $this->db($client)->fetchColumn('SELECT owned_packs FROM user WHERE id = 1'));
 
-        $client->request('GET', '/api/public/user/info');
+        $client->request('GET', '/api/private/user/info');
         $this->assertSame('1:2,2,3', json_decode($client->getResponse()->getContent(), true)['owned_packs']);
     }
 

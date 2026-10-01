@@ -146,7 +146,6 @@ class UserController extends AbstractController {
         $card_id = $request->query->get('card_id');
 
         $content = null;
-
         if ($this->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $user = $this->currentUser();
             $user_id = $user->getId();

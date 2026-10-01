@@ -25,3 +25,8 @@ api_private_load_deck:
         _controller: App\Controller\ApiPrivateController::loadDeckAction
     requirements:
         id: \d+
+
+api_private_user_info:
+    path: /user/info
+    defaults:
+        _controller: App\Controller\UserController::infoAction

@@ -278,10 +278,10 @@ class WebsiteBrowsingTest extends WebTestCase {
      */
     public function downloadProvider() {
         return [
-            'decklist as text' => ['/decklist/export/text/1', 'decklist_1.txt', 'text/plain; charset=UTF-8', 'attachment; filename="dwarfloreleadershiptactics-1.0.txt"', false],
-            'decklist as OCTGN' => ['/decklist/export/octgn/1', 'decklist_1.o8d', 'application/octgn', 'attachment; filename="dwarfloreleadershiptactics-1.0.o8d"', false],
-            'deck as text' => ['/deck/export/text/1', 'deck_1.txt', 'text/plain; charset=UTF-8', 'attachment; filename="dwarfloreleadershiptactics.txt"', true],
-            'deck as OCTGN' => ['/deck/export/octgn/1', 'deck_1.o8d', 'application/octgn', 'attachment; filename="dwarfloreleadershiptactics.o8d"', true],
+            'decklist as text' => ['/decklist/export/text/1', 'decklist_1.txt', 'text/plain; charset=UTF-8', 'attachment; filename=dwarfloreleadershiptactics-1.0.txt', false],
+            'decklist as OCTGN' => ['/decklist/export/octgn/1', 'decklist_1.o8d', 'application/octgn', 'attachment; filename=dwarfloreleadershiptactics-1.0.o8d', false],
+            'deck as text' => ['/deck/export/text/1', 'deck_1.txt', 'text/plain; charset=UTF-8', 'attachment; filename=dwarfloreleadershiptactics.txt', true],
+            'deck as OCTGN' => ['/deck/export/octgn/1', 'deck_1.o8d', 'application/octgn', 'attachment; filename=dwarfloreleadershiptactics.o8d', true],
         ];
     }
 

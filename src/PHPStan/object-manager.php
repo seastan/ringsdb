@@ -9,8 +9,5 @@ require __DIR__.'/../../config/bootstrap.php';
 $kernel = new App\Kernel('test', true);
 $kernel->boot();
 $container = $kernel->getContainer();
-if ($container === null) {
-    throw new \LogicException('The kernel has no container.');
-}
 
 return $container->get('doctrine')->getManager();

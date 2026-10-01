@@ -141,7 +141,7 @@ class AdminExcelTest extends WebTestCase {
         $file = $this->download($client, 1);
 
         $this->assertSame('text/vnd.ms-excel; charset=utf-8', $client->getResponse()->headers->get('Content-Type'));
-        $this->assertSame('attachment; filename="coreset.xlsx"', $client->getResponse()->headers->get('Content-Disposition'));
+        $this->assertSame('attachment; filename=coreset.xlsx', $client->getResponse()->headers->get('Content-Disposition'));
         $rows = self::rows($file);
         // the associations (by name) then the fields of Card, except id and dates; one row per card
         $this->assertSame(self::HEADER, $rows[0]);
@@ -158,7 +158,7 @@ class AdminExcelTest extends WebTestCase {
         $client = $this->createAdminClient();
         $file = $this->download($client, 0);
 
-        $this->assertSame('attachment; filename="lotrlcgcards.xlsx"', $client->getResponse()->headers->get('Content-Disposition'));
+        $this->assertSame('attachment; filename=lotrlcgcards.xlsx', $client->getResponse()->headers->get('Content-Disposition'));
         $this->assertCount(1 + (int) $this->db($client)->fetchColumn('SELECT COUNT(*) FROM card'), self::rows($file));
     }
 
