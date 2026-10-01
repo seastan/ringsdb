@@ -68,7 +68,7 @@ class DeckValidationHelper {
             return 'invalid_for_tournament_play';
         }
 
-        foreach($deck->getSlots()->getCopiesAndDeckLimit() as $cardName => $value) {
+        foreach($deck->getSlots()->getCopiesAndDeckLimit() as $value) {
             if ($value['copies'] > $value['deck_limit']) {
                 return 'too_many_copies';
             }

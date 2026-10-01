@@ -217,7 +217,7 @@ class SlotCollectionDecorator implements \App\Model\SlotCollectionInterface {
                 $cardName = $cardName . 'Hero';
             }
 
-            if (!key_exists($cardName, $copiesAndDeckLimit)) {
+            if (!array_key_exists($cardName, $copiesAndDeckLimit)) {
                 $copiesAndDeckLimit[$cardName] = [
                     'copies' => $slot->getQuantity(),
                     'deck_limit' => $card->getDeckLimit(),

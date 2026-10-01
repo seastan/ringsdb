@@ -19,7 +19,7 @@ trait PageSnapshotTrait {
      * @return string
      */
     private static function pageText(Crawler $crawler) {
-        $crawler->filter('script, style, noscript')->each(function (Crawler $node) {
+        $crawler->filter('script, style, noscript')->each(function (Crawler $node): void {
             $domNode = $node->getNode(0);
             if ($domNode !== null && $domNode->parentNode !== null) {
                 $domNode->parentNode->removeChild($domNode);

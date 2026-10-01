@@ -218,7 +218,7 @@ class CSVController extends AbstractController {
 				$getter = str_replace(' ', '', ucwords(str_replace('_', ' ', "get_$colName")));
 				$setter = str_replace(' ', '', ucwords(str_replace('_', ' ', "set_$colName")));
 
-				if (key_exists($colName, $cardAssocMappings)) {
+				if (array_key_exists($colName, $cardAssocMappings)) {
 					// Association field on Card (type, sphere).
 					$associationMapping = $cardAssocMappings[$colName];
 					/** @var class-string<\App\Entity\Type|\App\Entity\Sphere> $targetEntity */

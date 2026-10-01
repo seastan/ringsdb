@@ -136,7 +136,7 @@ class ExcelController extends AbstractController {
 		}
 
 		$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-		$response = new StreamedResponse(function () use ($writer) {
+		$response = new StreamedResponse(function () use ($writer): void {
 			$writer->save('php://output');
 		});
 		$response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
@@ -230,7 +230,7 @@ class ExcelController extends AbstractController {
 				$getter = str_replace(' ', '', ucwords(str_replace('_', ' ', "get_$colName")));
 				$setter = str_replace(' ', '', ucwords(str_replace('_', ' ', "set_$colName")));
 
-				if (key_exists($colName, $associationMappings)) {
+				if (array_key_exists($colName, $associationMappings)) {
 					$associationMapping = $associationMappings[$colName];
 
 					/** @var class-string<\App\Entity\Type|\App\Entity\Sphere> $targetEntity */
@@ -267,7 +267,7 @@ class ExcelController extends AbstractController {
 				$em->persist($entity);
 				$counter++;
 
-				echo join("", $output);
+				echo implode("", $output);
 			}
 		}
 

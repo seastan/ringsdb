@@ -374,13 +374,13 @@ class ScrapBeornCardDataCommand extends Command {
                         }
                     }
     		$output->writeln("19");
-    
+
                     if (!$objType) {
                         $output->writeln("<error>Cannot find type [$type] for this card</error>");
                         die();
                     }
     		$output->writeln("20");
-    
+
                     $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', '\'', '\''], $text);
                     $text = (string) preg_replace('/<a title="Search:.*?>(.*?)<\/a>/', '\\1', $text);
                     $text = (string) preg_replace('/<a title="Keyword:.*?>(.*?)<\/a>/', '\\1', $text);
@@ -394,35 +394,35 @@ class ScrapBeornCardDataCommand extends Command {
                     $text = (string) preg_replace("/\n+/", "\n", $text);
                     $text = trim($text);
     		$output->writeln("21");
-    
+
                     if ($text && $showTexts) {
                         $output->writeln("Card text:");
                         VarDumper::dump($text);
                     }
     		$output->writeln("22");
-    
+
                     $flavor = str_replace(['<br />', '<br>'], ["\n", "\n"], $flavor);
                     $flavor = (string) preg_replace('/([a-z])–/s', '\\1-', $flavor);
                     $flavor = (string) preg_replace('/–(.*)$/s', '<cite>\\1</cite>', $flavor);
                     $flavor = (string) preg_replace("/ +/", " ", $flavor);
                     $flavor = (string) preg_replace("/\n+/", "\n", $flavor);
     		$output->writeln("23");
-    
-    
+
+
                     if ($flavor && $showTexts) {
                         $output->writeln("Card flavor:");
                         VarDumper::dump($flavor);
                     }
     		$output->writeln("24");
-    
+
                     $question = new ConfirmationQuestion("Shall I import this card?");
                     if (!$questionHelper->ask($input, $output, $question)) {
                         continue;
                     }
     		$output->writeln("25");
-    
+
     		$output->writeln("26");
-    
+
                     $card->setPosition($position);
                     if ($pack->getCycle()->getIsSaga()) {
                         $card->setCode(sprintf("%02d%d%03d", $pack->getCycle()->getPosition(), $pack->getPosition(), $position));
@@ -430,25 +430,25 @@ class ScrapBeornCardDataCommand extends Command {
                         $card->setCode(sprintf("%02d%03d", $pack->getCycle()->getPosition(), $position));
                     }
     		$output->writeln("27");
-    
-    
+
+
                     $card->setType($objType);
                     $card->setSphere($objSphere);
                     $card->setPack($pack);
-    
+
                     $card->setName($name);
                     $card->setTraits($traits);
                     $card->setText($text);
                     $card->setFlavor($flavor);
                     $card->setIsUnique($isUnique);
     		$output->writeln("28");
-    
+
                     if ($type === 'Hero') {
                         $cost = null;
                     } else {
                         $threat = null;
                     }
-    
+
     		$output->writeln("29");
                     $card->setCost($cost !== '' ? $cost : null);
                     $card->setThreat($threat !== '' ? $threat : null);
@@ -458,11 +458,11 @@ class ScrapBeornCardDataCommand extends Command {
                     $card->setHealth($health !== '' ? $health : null);
                     $card->setVictory($victory);
                     $card->setQuest($quest !== '' ? $quest : null);
-    
+
                     $card->setQuantity($quantity);
                     $card->setDeckLimit($limit);
                     $card->setHasErrata(false);
-    
+
                     //$card->setIllustrator(trim($data['illustrator']));
     
 		} // end of force-data
