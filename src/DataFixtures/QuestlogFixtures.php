@@ -10,9 +10,9 @@ use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 
-class LoadQuestlogData extends Fixture implements DependentFixtureInterface
+class QuestlogFixtures extends Fixture implements DependentFixtureInterface
 {
 
     /**
@@ -21,8 +21,8 @@ class LoadQuestlogData extends Fixture implements DependentFixtureInterface
     public function getDependencies()
     {
         return [
-            LoadUserData::class,
-            LoadDecklistData::class
+            UserFixtures::class,
+            DecklistFixtures::class
         ];
     }
 

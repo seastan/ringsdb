@@ -17,8 +17,8 @@ class CardStatsCalculator {
 	/** @var Connection */
 	private $conn;
 
-	public function __construct(Registry $doctrine) {
-		$this->conn = $doctrine->getConnection();
+	public function __construct(Connection $conn) {
+		$this->conn = $conn;
 	}
 
 	/**

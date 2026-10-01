@@ -8,11 +8,11 @@ use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class LoadReviewData extends Fixture implements ContainerAwareInterface, DependentFixtureInterface
+class ReviewFixtures extends Fixture implements ContainerAwareInterface, DependentFixtureInterface
 {
     /**
      * @var \Symfony\Component\DependencyInjection\ContainerInterface|null
@@ -33,7 +33,7 @@ class LoadReviewData extends Fixture implements ContainerAwareInterface, Depende
     public function getDependencies()
     {
         return [
-            LoadUserData::class,
+            UserFixtures::class,
         ];
     }
 

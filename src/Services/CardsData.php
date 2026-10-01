@@ -11,6 +11,7 @@ use App\Entity\Sphere;
 use App\Entity\Review;
 use App\Entity\Card;
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -19,9 +20,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class CardsData {
 	/**
-	 * @var Registry
+	 * @var EntityManagerInterface
 	 */
-	private $doctrine;
+	private $em;
 
 	/**
 	 * @var UrlGeneratorInterface
@@ -61,8 +62,8 @@ class CardsData {
 	/**
 	 * @param mixed $publicDir
 	 */
-	public function __construct(Registry $doctrine, UrlGeneratorInterface $router, Packages $assets_packages, $publicDir, CardRepository $cardRepository, CycleRepository $cycleRepository, ReviewRepository $reviewRepository, SphereRepository $sphereRepository) {
-		$this->doctrine = $doctrine;
+	public function __construct(EntityManagerInterface $em, UrlGeneratorInterface $router, Packages $assets_packages, $publicDir, CardRepository $cardRepository, CycleRepository $cycleRepository, ReviewRepository $reviewRepository, SphereRepository $sphereRepository) {
+		$this->em = $em;
 		$this->router = $router;
 		$this->assets_packages = $assets_packages;
 		$this->publicDir = $publicDir;
@@ -179,8 +180,6 @@ class CardsData {
      */
     public function get_search_rows($conditions, $sortorder, $forceempty = false) {
         $i = 0;
-        /* @var \Doctrine\ORM\EntityManager $em */
-        $em = $this->doctrine;
 
         $qb = $this->cardRepository->createQueryBuilder('c');
         $qb->leftJoin('c.type', 't')->leftJoin('c.sphere', 's');
@@ -485,7 +484,7 @@ class CardsData {
 	public function getCardInfo($card, $api = false) {
 		$cardinfo = [];
 
-		$metadata = $this->doctrine->getManager()->getClassMetadata(Card::class);
+		$metadata = $this->em->getClassMetadata(Card::class);
 		$fieldNames = $metadata->getFieldNames();
 		$associationMappings = $metadata->getAssociationMappings();
 
@@ -707,11 +706,7 @@ class CardsData {
 	 * @return array<string, int>
 	 */
 	public function getDistinctTraits() {
-		/**
-		 * @var \Doctrine\ORM\EntityManager $em
-		 */
-		$em = $this->doctrine->getManager();
-		$qb = $em->createQueryBuilder();
+		$qb = $this->em->createQueryBuilder();
 		$qb->from('App:Card', 'c');
 		$qb->select('c.traits');
 		$qb->distinct();

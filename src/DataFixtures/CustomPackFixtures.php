@@ -9,9 +9,9 @@ use App\Entity\UserCustomPackCard;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 
-class LoadCustomPackData extends Fixture implements DependentFixtureInterface
+class CustomPackFixtures extends Fixture implements DependentFixtureInterface
 {
     /**
      * @return array<int, class-string>
@@ -19,7 +19,7 @@ class LoadCustomPackData extends Fixture implements DependentFixtureInterface
     public function getDependencies()
     {
         return [
-            LoadUserData::class,
+            UserFixtures::class,
         ];
     }
 
