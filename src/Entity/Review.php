@@ -3,11 +3,12 @@
 namespace App\Entity;
 
 /**
- * Review
+ * Review.
  */
-class Review {
+class Review
+{
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
@@ -31,280 +32,294 @@ class Review {
      */
     private $textHtml;
     /**
-     * @var integer
+     * @var int
      */
     private $nbVotes;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Reviewcomment>
+     * @var \Doctrine\Common\Collections\Collection<int, Reviewcomment>
      */
     private $comments;
     /**
-     * @var \App\Entity\Card
+     * @var Card
      */
     private $card;
     /**
-     * @var \App\Entity\User
+     * @var User
      */
     private $user;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @var \Doctrine\Common\Collections\Collection<int, User>
      */
     private $votes;
 
     /**
-     * Constructor
+     * Constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->comments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->votes = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
      *
      * @return Review
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation)
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
+     * Get dateCreation.
      *
      * @return \DateTime
      */
-    public function getDateCreation() {
+    public function getDateCreation()
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
+     * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
      *
      * @return Review
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate($dateUpdate)
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
+     * Get dateUpdate.
      *
      * @return \DateTime
      */
-    public function getDateUpdate() {
+    public function getDateUpdate()
+    {
         return $this->dateUpdate;
     }
 
     /**
-     * Set dateLastComment
+     * Set dateLastComment.
      *
      * @param \DateTime|null $dateLastComment
      *
      * @return Review
      */
-    public function setDateLastComment($dateLastComment) {
+    public function setDateLastComment($dateLastComment)
+    {
         $this->dateLastComment = $dateLastComment;
 
         return $this;
     }
 
     /**
-     * Get dateLastComment
+     * Get dateLastComment.
      *
      * @return \DateTime|null
      */
-    public function getDateLastComment() {
+    public function getDateLastComment()
+    {
         return $this->dateLastComment;
     }
 
     /**
-     * Set textMd
+     * Set textMd.
      *
      * @param string $textMd
      *
      * @return Review
      */
-    public function setTextMd($textMd) {
+    public function setTextMd($textMd)
+    {
         $this->textMd = $textMd;
 
         return $this;
     }
 
     /**
-     * Get textMd
+     * Get textMd.
      *
      * @return string
      */
-    public function getTextMd() {
+    public function getTextMd()
+    {
         return $this->textMd;
     }
 
     /**
-     * Set textHtml
+     * Set textHtml.
      *
      * @param string $textHtml
      *
      * @return Review
      */
-    public function setTextHtml($textHtml) {
+    public function setTextHtml($textHtml)
+    {
         $this->textHtml = $textHtml;
 
         return $this;
     }
 
     /**
-     * Get textHtml
+     * Get textHtml.
      *
      * @return string
      */
-    public function getTextHtml() {
+    public function getTextHtml()
+    {
         return $this->textHtml;
     }
 
     /**
-     * Set nbVotes
+     * Set nbVotes.
      *
-     * @param integer $nbVotes
+     * @param int $nbVotes
      *
      * @return Review
      */
-    public function setNbVotes($nbVotes) {
+    public function setNbVotes($nbVotes)
+    {
         $this->nbVotes = $nbVotes;
 
         return $this;
     }
 
     /**
-     * Get nbVotes
+     * Get nbVotes.
      *
-     * @return integer
+     * @return int
      */
-    public function getNbVotes() {
+    public function getNbVotes()
+    {
         return $this->nbVotes;
     }
 
     /**
-     * Add comment
-     *
-     * @param \App\Entity\Reviewcomment $comment
+     * Add comment.
      *
      * @return Review
      */
-    public function addComment(\App\Entity\Reviewcomment $comment) {
+    public function addComment(Reviewcomment $comment)
+    {
         $this->comments[] = $comment;
 
         return $this;
     }
 
     /**
-     * Remove comment
+     * Remove comment.
      *
-     * @param \App\Entity\Reviewcomment $comment
      * @return void
      */
-    public function removeComment(\App\Entity\Reviewcomment $comment) {
+    public function removeComment(Reviewcomment $comment)
+    {
         $this->comments->removeElement($comment);
     }
 
     /**
-     * Get comments
+     * Get comments.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Reviewcomment>
+     * @return \Doctrine\Common\Collections\Collection<int, Reviewcomment>
      */
-    public function getComments() {
+    public function getComments()
+    {
         return $this->comments;
     }
 
     /**
-     * Set card
-     *
-     * @param \App\Entity\Card $card
+     * Set card.
      *
      * @return Review
      */
-    public function setCard(\App\Entity\Card $card) {
+    public function setCard(Card $card)
+    {
         $this->card = $card;
 
         return $this;
     }
 
     /**
-     * Get card
+     * Get card.
      *
-     * @return \App\Entity\Card
+     * @return Card
      */
-    public function getCard() {
+    public function getCard()
+    {
         return $this->card;
     }
 
     /**
-     * Set user
-     *
-     * @param \App\Entity\User $user
+     * Set user.
      *
      * @return Review
      */
-    public function setUser(\App\Entity\User $user) {
+    public function setUser(User $user)
+    {
         $this->user = $user;
 
         return $this;
     }
 
     /**
-     * Get user
+     * Get user.
      *
-     * @return \App\Entity\User
+     * @return User
      */
-    public function getUser() {
+    public function getUser()
+    {
         return $this->user;
     }
 
     /**
-     * Add vote
-     *
-     * @param \App\Entity\User $vote
+     * Add vote.
      *
      * @return Review
      */
-    public function addVote(\App\Entity\User $vote) {
+    public function addVote(User $vote)
+    {
         $this->votes[] = $vote;
 
         return $this;
     }
 
     /**
-     * Remove vote
+     * Remove vote.
      *
-     * @param \App\Entity\User $vote
      * @return void
      */
-    public function removeVote(\App\Entity\User $vote) {
+    public function removeVote(User $vote)
+    {
         $this->votes->removeElement($vote);
     }
 
     /**
-     * Get votes
+     * Get votes.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @return \Doctrine\Common\Collections\Collection<int, User>
      */
-    public function getVotes() {
+    public function getVotes()
+    {
         return $this->votes;
     }
 }

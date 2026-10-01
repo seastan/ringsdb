@@ -2,23 +2,21 @@
 
 namespace App\Command;
 
-use App\Repository\TypeRepository;
-use App\Repository\SphereRepository;
-use App\Repository\PackRepository;
 use App\Repository\CardPrintingRepository;
-use Symfony\Component\Asset\Packages;
+use App\Repository\PackRepository;
+use App\Repository\SphereRepository;
+use App\Repository\TypeRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\VarDumper\VarDumper;
 
-class ScrapBeornJsonDataCommand extends Command {
-
+class ScrapBeornJsonDataCommand extends Command
+{
     /**
      * @var EntityManagerInterface
      */
@@ -54,7 +52,8 @@ class ScrapBeornJsonDataCommand extends Command {
      */
     private $typeRepository;
 
-    public function __construct(EntityManagerInterface $em, Packages $packages, string $publicDir, CardPrintingRepository $cardPrintingRepository, PackRepository $packRepository, SphereRepository $sphereRepository, TypeRepository $typeRepository) {
+    public function __construct(EntityManagerInterface $em, Packages $packages, string $publicDir, CardPrintingRepository $cardPrintingRepository, PackRepository $packRepository, SphereRepository $sphereRepository, TypeRepository $typeRepository)
+    {
         parent::__construct();
         $this->em = $em;
         $this->packages = $packages;
@@ -68,7 +67,8 @@ class ScrapBeornJsonDataCommand extends Command {
     /**
      * @return void
      */
-    protected function configure() {
+    protected function configure()
+    {
         $this->setName('app:beorn:json')
              ->setDescription('Download new card data from Hall of Beorn JSON Export')
              ->addOption(
@@ -97,8 +97,8 @@ class ScrapBeornJsonDataCommand extends Command {
              );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
-
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $em = $this->em;
 
         $questionHelper = $this->getHelper('question');
@@ -115,11 +115,11 @@ class ScrapBeornJsonDataCommand extends Command {
         $showTexts = $input->getOption('show-texts');
 
         if (file_exists('beorn.json')) {
-            VarDumper::dump("Loading Local Beorn JSON");
+            VarDumper::dump('Loading Local Beorn JSON');
             $json = file_get_contents('beorn.json');
         } else {
-            VarDumper::dump("Loading Remote Beorn JSON");
-            $json = file_get_contents("http://hallofbeorn.com/Export/Cards");
+            VarDumper::dump('Loading Remote Beorn JSON');
+            $json = file_get_contents('http://hallofbeorn.com/Export/Cards');
             file_put_contents('beorn.json', $json);
         }
         $beorn = json_decode((string) $json);
@@ -130,7 +130,7 @@ class ScrapBeornJsonDataCommand extends Command {
                 continue;
             }
 
-            VarDumper::dump($data->Title . " $i");
+            VarDumper::dump($data->Title." $i");
 
             $cardset = $data->CardSet;
             $cardset = str_replace('The Hobbit: ', '', $cardset);
@@ -139,7 +139,7 @@ class ScrapBeornJsonDataCommand extends Command {
             $pack = $this->packRepository->findOneBy(['name' => $cardset]);
 
             if (!$pack) {
-                VarDumper::dump('Could not find pack ' . $data->CardSet);
+                VarDumper::dump('Could not find pack '.$data->CardSet);
                 continue;
             }
 
@@ -150,65 +150,65 @@ class ScrapBeornJsonDataCommand extends Command {
             $card = $bjPrinting ? $bjPrinting->getCard() : null;
 
             if (!$card) {
-                if ($data->CardType == 'Hero' || $data->CardType == 'Ally' || $data->CardType == 'Attachment' || $data->CardType == 'Event') {
-                    VarDumper::dump('Could not find card ' . $data->Title);
-                    $question = new ConfirmationQuestion("Continue?");
+                if ('Hero' == $data->CardType || 'Ally' == $data->CardType || 'Attachment' == $data->CardType || 'Event' == $data->CardType) {
+                    VarDumper::dump('Could not find card '.$data->Title);
+                    $question = new ConfirmationQuestion('Continue?');
                     $questionHelper->ask($input, $output, $question);
                 }
                 continue;
             }
 
             if ($card->getHasErrata() != $data->HasErrata) {
-                VarDumper::dump('Errata Mismatch ' . $data->Title);
+                VarDumper::dump('Errata Mismatch '.$data->Title);
                 VarDumper::dump($card->getHasErrata());
                 VarDumper::dump($data->HasErrata);
 
-                $question = new ConfirmationQuestion("Continue?");
+                $question = new ConfirmationQuestion('Continue?');
                 $questionHelper->ask($input, $output, $question);
             }
 
             if (property_exists($data->Front->Stats, 'ThreatCost') && $card->getThreat() != $data->Front->Stats->ThreatCost) {
-                VarDumper::dump('Threat Mismatch ' . $data->Title);
+                VarDumper::dump('Threat Mismatch '.$data->Title);
                 VarDumper::dump($card->getThreat());
                 VarDumper::dump($data->Front->Stats->ThreatCost);
 
-                $question = new ConfirmationQuestion("Continue?");
+                $question = new ConfirmationQuestion('Continue?');
                 $questionHelper->ask($input, $output, $question);
             }
 
             if (property_exists($data->Front->Stats, 'Willpower') && $card->getWillpower() != $data->Front->Stats->Willpower) {
-                VarDumper::dump('Willpower Mismatch ' . $data->Title);
+                VarDumper::dump('Willpower Mismatch '.$data->Title);
                 VarDumper::dump($card->getWillpower());
                 VarDumper::dump($data->Front->Stats->Willpower);
 
-                $question = new ConfirmationQuestion("Continue?");
+                $question = new ConfirmationQuestion('Continue?');
                 $questionHelper->ask($input, $output, $question);
             }
 
             if (property_exists($data->Front->Stats, 'Attack') && $card->getAttack() != $data->Front->Stats->Attack) {
-                VarDumper::dump('Attack Mismatch ' . $data->Title);
+                VarDumper::dump('Attack Mismatch '.$data->Title);
                 VarDumper::dump($card->getAttack());
                 VarDumper::dump($data->Front->Stats->Attack);
 
-                $question = new ConfirmationQuestion("Continue?");
+                $question = new ConfirmationQuestion('Continue?');
                 $questionHelper->ask($input, $output, $question);
             }
 
             if (property_exists($data->Front->Stats, 'Defense') && $card->getDefense() != $data->Front->Stats->Defense) {
-                VarDumper::dump('Defense Mismatch ' . $data->Title);
+                VarDumper::dump('Defense Mismatch '.$data->Title);
                 VarDumper::dump($card->getDefense());
                 VarDumper::dump($data->Front->Stats->Defense);
 
-                $question = new ConfirmationQuestion("Continue?");
+                $question = new ConfirmationQuestion('Continue?');
                 $questionHelper->ask($input, $output, $question);
             }
 
             if (property_exists($data->Front->Stats, 'HitPoints') && $card->getHealth() != $data->Front->Stats->HitPoints) {
-                VarDumper::dump('HitPoints Mismatch ' . $data->Title);
+                VarDumper::dump('HitPoints Mismatch '.$data->Title);
                 VarDumper::dump($card->getHealth());
                 VarDumper::dump($data->Front->Stats->HitPoints);
 
-                $question = new ConfirmationQuestion("Continue?");
+                $question = new ConfirmationQuestion('Continue?');
                 $questionHelper->ask($input, $output, $question);
             }
 
@@ -216,7 +216,7 @@ class ScrapBeornJsonDataCommand extends Command {
         }
 
         $em->flush();
-        $output->writeln("Done.");
+        $output->writeln('Done.');
 
         return 0;
     }

@@ -3,96 +3,100 @@
 namespace App\Entity;
 
 /**
- * FellowshipDecklist
+ * FellowshipDecklist.
  */
-class FellowshipDecklist {
+class FellowshipDecklist
+{
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
-     * @var integer
+     * @var int
      */
     private $deckNumber;
     /**
-     * @var \App\Entity\Fellowship
+     * @var Fellowship
      */
     private $fellowship;
     /**
-     * @var \App\Entity\Decklist
+     * @var Decklist
      */
     private $decklist;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set deckNumber
+     * Set deckNumber.
      *
-     * @param integer $deckNumber
+     * @param int $deckNumber
      *
      * @return FellowshipDecklist
      */
-    public function setDeckNumber($deckNumber) {
+    public function setDeckNumber($deckNumber)
+    {
         $this->deckNumber = $deckNumber;
 
         return $this;
     }
 
     /**
-     * Get deckNumber
+     * Get deckNumber.
      *
-     * @return integer
+     * @return int
      */
-    public function getDeckNumber() {
+    public function getDeckNumber()
+    {
         return $this->deckNumber;
     }
 
     /**
-     * Set fellowship
-     *
-     * @param \App\Entity\Fellowship $fellowship
+     * Set fellowship.
      *
      * @return FellowshipDecklist
      */
-    public function setFellowship(\App\Entity\Fellowship $fellowship) {
+    public function setFellowship(Fellowship $fellowship)
+    {
         $this->fellowship = $fellowship;
 
         return $this;
     }
 
     /**
-     * Get fellowship
+     * Get fellowship.
      *
-     * @return \App\Entity\Fellowship
+     * @return Fellowship
      */
-    public function getFellowship() {
+    public function getFellowship()
+    {
         return $this->fellowship;
     }
 
     /**
-     * Get decklist
+     * Get decklist.
      *
-     * @return \App\Entity\Decklist
+     * @return Decklist
      */
-    public function getDecklist() {
+    public function getDecklist()
+    {
         return $this->decklist;
     }
 
     /**
-     * Set decklist
-     *
-     * @param \App\Entity\Decklist $decklist
+     * Set decklist.
      *
      * @return FellowshipDecklist
      */
-    public function setDecklist(\App\Entity\Decklist $decklist) {
+    public function setDecklist(Decklist $decklist)
+    {
         $this->decklist = $decklist;
 
         return $this;

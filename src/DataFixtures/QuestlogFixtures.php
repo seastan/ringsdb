@@ -8,13 +8,11 @@ use App\Entity\QuestlogDeck;
 use App\Entity\Scenario;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
 class QuestlogFixtures extends Fixture implements DependentFixtureInterface
 {
-
     /**
      * @return array<int, class-string>
      */
@@ -22,7 +20,7 @@ class QuestlogFixtures extends Fixture implements DependentFixtureInterface
     {
         return [
             UserFixtures::class,
-            DecklistFixtures::class
+            DecklistFixtures::class,
         ];
     }
 
@@ -49,10 +47,10 @@ class QuestlogFixtures extends Fixture implements DependentFixtureInterface
         }
 
         $questlog->setUser($user);
-        $questlog->setName("Untitled Questlog");
-        $questlog->setNameCanonical("untitled-questlog");
-        $questlog->setDescriptionMd("Hello world");
-        $questlog->setDescriptionHtml("Hello world");
+        $questlog->setName('Untitled Questlog');
+        $questlog->setNameCanonical('untitled-questlog');
+        $questlog->setDescriptionMd('Hello world');
+        $questlog->setDescriptionHtml('Hello world');
         $questlog->setScenario($scenario);
         $questlog->setDatePlayed(new \DateTime('2015-08-16'));
         $questlog->setQuestMode('normal');
@@ -61,9 +59,9 @@ class QuestlogFixtures extends Fixture implements DependentFixtureInterface
         $questlog->setDateCreation(new \DateTime('2015-08-16'));
         $questlog->setDateUpdate(new \DateTime('2015-08-16'));
 
-        for($i=1; $i<5; $i++){
+        for ($i = 1; $i < 5; ++$i) {
             /** @var Decklist $decklist */
-            $decklist = $this->getReference('test-decklist-' . $i);
+            $decklist = $this->getReference('test-decklist-'.$i);
 
             $questlog_decklist = new QuestlogDeck();
             $questlog_decklist->setDecklist($decklist);
@@ -71,7 +69,7 @@ class QuestlogFixtures extends Fixture implements DependentFixtureInterface
             $questlog_decklist->setContent((string) json_encode($decklist->getContent()));
             $questlog_decklist->setDeckNumber($i);
             $questlog_decklist->setQuestlog($questlog);
-            $questlog_decklist->setPlayer('Player ' . $i);
+            $questlog_decklist->setPlayer('Player '.$i);
 
             $questlog->addDeck($questlog_decklist);
         }

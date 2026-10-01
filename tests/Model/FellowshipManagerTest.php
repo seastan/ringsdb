@@ -22,7 +22,8 @@ use Symfony\Component\HttpFoundation\Request;
  * Popularity is (1 + votes) / (1 + days since publication²): the order of these items does not
  * change over time.
  */
-class FellowshipManagerTest extends KernelTestCase {
+class FellowshipManagerTest extends KernelTestCase
+{
     /** @var Connection */
     private $connection;
     /** @var int[] */
@@ -32,7 +33,8 @@ class FellowshipManagerTest extends KernelTestCase {
     /** @var array */
     private $fixtureUsers;
 
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         static::bootKernel();
         $this->connection = static::$kernel->getContainer()->get('doctrine')->getConnection();
         foreach (['fellowship', 'fellowshipcomment', 'decklist'] as $table) {
@@ -55,7 +57,8 @@ class FellowshipManagerTest extends KernelTestCase {
             'date_creation' => date('Y-m-d H:i:s'), 'is_hidden' => 0]);
     }
 
-    protected function tearDown(): void {
+    protected function tearDown(): void
+    {
         $max = $this->maxIds;
         foreach ([
             "DELETE FROM fellowshipcomment WHERE id > {$max['fellowshipcomment']}",
@@ -76,11 +79,10 @@ class FellowshipManagerTest extends KernelTestCase {
     /* ------------------------------------------------------------ helpers */
 
     /**
-     * @param mixed $name
-     * @param mixed $userId
      * @return int
      */
-    private function insertFellowship($name, $userId, array $decklistIds, array $values) {
+    private function insertFellowship($name, $userId, array $decklistIds, array $values)
+    {
         $this->connection->insert('fellowship', $values + [
             'user_id' => $userId, 'name' => $name, 'name_canonical' => strtolower(str_replace(' ', '-', $name)),
             'is_public' => 1, 'nb_decks' => count($decklistIds), 'nb_votes' => 0, 'nb_favorites' => 0, 'nb_comments' => 0,
@@ -96,9 +98,11 @@ class FellowshipManagerTest extends KernelTestCase {
 
     /**
      * A copy of fixture decklist 2 with the given cards ([card id => quantity]).
+     *
      * @return int
      */
-    private function insertDecklist(array $slots) {
+    private function insertDecklist(array $slots)
+    {
         $row = $this->connection->fetchAssoc('SELECT * FROM decklist WHERE id = 2');
         $this->assertNotFalse($row);
         unset($row['id']);
@@ -113,9 +117,9 @@ class FellowshipManagerTest extends KernelTestCase {
 
     /**
      * @return FellowshipManager
-     * @param mixed $username
      */
-    private function manager(array $query = [], $username = null) {
+    private function manager(array $query = [], $username = null)
+    {
         $container = static::$kernel->getContainer();
         $container->get('request_stack')->push(Request::create('/fellowships/find', 'GET', $query));
         $manager = $container->get('fellowship_manager');
@@ -127,10 +131,10 @@ class FellowshipManagerTest extends KernelTestCase {
     }
 
     /**
-     * @param mixed $username
-     * @return \App\Entity\User
+     * @return User
      */
-    private function user($username) {
+    private function user($username)
+    {
         $user = static::$kernel->getContainer()->get('doctrine')->getRepository(User::class)->findOneBy(['username' => $username]);
         $this->assertNotNull($user);
 
@@ -139,9 +143,9 @@ class FellowshipManagerTest extends KernelTestCase {
 
     /**
      * @return string[] the names (F1...F5) of the fellowships found, in order
-     * @param mixed $paginator
      */
-    private function names($paginator) {
+    private function names($paginator)
+    {
         $names = array_flip($this->ids);
         $result = [];
         foreach ($paginator as $fellowship) {
@@ -153,7 +157,8 @@ class FellowshipManagerTest extends KernelTestCase {
 
     /* -------------------------------------------------------------- lists */
 
-    public function testLists(): void {
+    public function testLists(): void
+    {
         $this->assertSame(['F2', 'F3', 'F5', 'F1'], $this->names($this->manager()->findFellowshipsByPopularity()));
         $this->assertSame(['F3', 'F2', 'F5', 'F1'], $this->names($this->manager()->findFellowshipsByAge()));
         $this->assertSame(['F3', 'F2'], $this->names($this->manager()->findFellowshipsByRecentDiscussion()));
@@ -167,7 +172,8 @@ class FellowshipManagerTest extends KernelTestCase {
         $this->assertSame(['F3', 'F2', 'F5', 'F1'], $this->names($this->manager()->findFellowshipsInHotTopic()));
     }
 
-    public function testPagination(): void {
+    public function testPagination(): void
+    {
         $manager = $this->manager();
         $manager->setLimit(2);
         $manager->setPage(2);
@@ -178,7 +184,8 @@ class FellowshipManagerTest extends KernelTestCase {
         $this->assertSame(2, $manager->getNumberOfPages());
     }
 
-    public function testEmptyList(): void {
+    public function testEmptyList(): void
+    {
         $manager = $this->manager();
         $this->assertCount(0, $manager->getEmptyList());
         $this->assertSame(0, $manager->getMaxCount());
@@ -188,16 +195,17 @@ class FellowshipManagerTest extends KernelTestCase {
 
     /**
      * @dataProvider searchProvider
-     * @param mixed $username
      */
-    public function testComplexSearch(array $query, array $expected, $username = null): void {
+    public function testComplexSearch(array $query, array $expected, $username = null): void
+    {
         $this->assertSame($expected, $this->names($this->manager($query, $username)->findFellowshipsWithComplexSearch()));
     }
 
     /**
      * @return array
      */
-    public function searchProvider() {
+    public function searchProvider()
+    {
         return [
             'no criteria' => [[], ['F2', 'F3', 'F5', 'F1']],
             'author' => [['author' => 'admin'], ['F3']],
@@ -223,7 +231,8 @@ class FellowshipManagerTest extends KernelTestCase {
         ];
     }
 
-    public function testSortByReputation(): void {
+    public function testSortByReputation(): void
+    {
         $this->connection->update('user', ['reputation' => 10], ['username' => 'admin']);
 
         $this->assertSame(['F3', 'F5', 'F2', 'F1'], $this->names($this->manager(['sort' => 'reputation'])->findFellowshipsWithComplexSearch()));

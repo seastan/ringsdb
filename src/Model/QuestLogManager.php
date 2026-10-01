@@ -2,140 +2,147 @@
 
 namespace App\Model;
 
+use App\Entity\User;
 use App\Repository\CardRepository;
-use App\Entity\Card;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use App\Entity\User;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * The job of this class is to find and return questlogs
- * @author seastan
- * @property integer $maxcount Number of found rows for last request
+ * The job of this class is to find and return questlogs.
  *
+ * @author seastan
+ *
+ * @property int $maxcount Number of found rows for last request
  */
-class QuestLogManager {
-	/**
-	 * @var int
-	 */
-	protected $page = 1;
-	/**
-	 * @var int
-	 */
-	protected $start = 0;
-	/**
-	 * @var int
-	 */
-	protected $limit = 30;
-	/**
-	 * @var int
-	 */
-	protected $maxcount = 0;
-	/**
-	 * @var \App\Entity\User|null
-	 */
-	protected $user = null;
+class QuestLogManager
+{
+    /**
+     * @var int
+     */
+    protected $page = 1;
+    /**
+     * @var int
+     */
+    protected $start = 0;
+    /**
+     * @var int
+     */
+    protected $limit = 30;
+    /**
+     * @var int
+     */
+    protected $maxcount = 0;
+    /**
+     * @var User|null
+     */
+    protected $user;
 
-	/**
-	 * @var EntityManagerInterface
-	 */
-	private $doctrine;
+    /**
+     * @var EntityManagerInterface
+     */
+    private $doctrine;
 
-	/**
-	 * @var RequestStack
-	 */
-	private $request_stack;
+    /**
+     * @var RequestStack
+     */
+    private $request_stack;
 
-	/**
-	 * @var UrlGeneratorInterface
-	 */
-	private $router;
+    /**
+     * @var UrlGeneratorInterface
+     */
+    private $router;
 
     /**
      * @var CardRepository
      */
     private $cardRepository;
 
-	public function __construct(EntityManagerInterface $doctrine, RequestStack $request_stack, UrlGeneratorInterface $router, CardRepository $cardRepository) {
-		$this->doctrine = $doctrine;
-		$this->request_stack = $request_stack;
-		$this->router = $router;
+    public function __construct(EntityManagerInterface $doctrine, RequestStack $request_stack, UrlGeneratorInterface $router, CardRepository $cardRepository)
+    {
+        $this->doctrine = $doctrine;
+        $this->request_stack = $request_stack;
+        $this->router = $router;
         $this->cardRepository = $cardRepository;
-	}
-
-	/**
-	 * The current request: the searches and the pagination read its parameters.
-	 */
-	private function currentRequest(): Request {
-		$request = $this->request_stack->getCurrentRequest();
-		if ($request === null) {
-			throw new \LogicException('No current request.');
-		}
-
-		return $request;
-	}
-
-	/**
-	 * @param mixed $user
-	 * @return void
-	 */
-	public function setUser($user) {
-		$this->user = $user;
-	}
-
-	/**
-	 * @param mixed $limit
-	 * @return void
-	 */
-	public function setLimit($limit) {
-		$this->limit = $limit;
-	}
-
-	/**
-	 * @param mixed $page
-	 * @return void
-	 */
-	public function setPage($page) {
-		$this->page = max($page, 1);
-		$this->start = ($this->page - 1) * $this->limit;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getMaxCount() {
-		return $this->maxcount;
-	}
-
-	/**
-	 * creates the basic query builder and initializes it
-	 * @return \Doctrine\ORM\QueryBuilder
-	 */
-	private function getQueryBuilder() {
-		$qb = $this->doctrine->createQueryBuilder();
-		$qb->select('d');
-		$qb->from('App:Questlog', 'd');
-        $qb->andWhere('d.isPublic = 1');
-        $qb->setFirstResult($this->start);
-		$qb->setMaxResults($this->limit);
-		$qb->distinct();
-
-		return $qb;
-	}
+    }
 
     /**
-     * creates the paginator around the query
-     *
-     * @param Query $query
-     * @param \Doctrine\ORM\Query<mixed, \App\Entity\Questlog> $query
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Questlog>
+     * The current request: the searches and the pagination read its parameters.
      */
-    private function getPaginator(Query $query) {
+    private function currentRequest(): Request
+    {
+        $request = $this->request_stack->getCurrentRequest();
+        if (null === $request) {
+            throw new \LogicException('No current request.');
+        }
+
+        return $request;
+    }
+
+    /**
+     * @return void
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * @return void
+     */
+    public function setLimit($limit)
+    {
+        $this->limit = $limit;
+    }
+
+    /**
+     * @return void
+     */
+    public function setPage($page)
+    {
+        $this->page = max($page, 1);
+        $this->start = ($this->page - 1) * $this->limit;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxCount()
+    {
+        return $this->maxcount;
+    }
+
+    /**
+     * creates the basic query builder and initializes it.
+     *
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    private function getQueryBuilder()
+    {
+        $qb = $this->doctrine->createQueryBuilder();
+        $qb->select('d');
+        $qb->from('App:Questlog', 'd');
+        $qb->andWhere('d.isPublic = 1');
+        $qb->setFirstResult($this->start);
+        $qb->setMaxResults($this->limit);
+        $qb->distinct();
+
+        return $qb;
+    }
+
+    /**
+     * creates the paginator around the query.
+     *
+     * @param Query<mixed, \App\Entity\Questlog> $query
+     *
+     * @return Paginator<\App\Entity\Questlog>
+     */
+    private function getPaginator(Query $query)
+    {
         $paginator = new Paginator($query, $fetchJoinCollection = false);
         $this->maxcount = $paginator->count();
 
@@ -143,18 +150,20 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\Common\Collections\ArrayCollection<int, \App\Entity\Questlog>
+     * @return ArrayCollection<int, \App\Entity\Questlog>
      */
-    public function getEmptyList() {
+    public function getEmptyList()
+    {
         $this->maxcount = 0;
 
         return new ArrayCollection([]);
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Questlog>
+     * @return Paginator<\App\Entity\Questlog>
      */
-    public function findQuestLogsByPopularity() {
+    public function findQuestLogsByPopularity()
+    {
         $qb = $this->getQueryBuilder();
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.datePublish), 2)) AS HIDDEN popularity');
         $qb->orderBy('popularity', 'DESC');
@@ -166,9 +175,10 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Questlog>
+     * @return Paginator<\App\Entity\Questlog>
      */
-    public function findQuestLogsByAge() {
+    public function findQuestLogsByAge()
+    {
         $qb = $this->getQueryBuilder();
 
         $qb->orderBy('d.datePublish', 'DESC');
@@ -180,9 +190,10 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Questlog>
+     * @return Paginator<\App\Entity\Questlog>
      */
-    public function findQuestLogsByFavorite(User $user) {
+    public function findQuestLogsByFavorite(User $user)
+    {
         $qb = $this->getQueryBuilder();
 
         $qb->leftJoin('d.favorites', 'u');
@@ -197,9 +208,10 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Questlog>
+     * @return Paginator<\App\Entity\Questlog>
      */
-    public function findQuestLogsByAuthor(User $user) {
+    public function findQuestLogsByAuthor(User $user)
+    {
         $qb = $this->getQueryBuilder();
 
         $qb->andWhere('d.user = :user');
@@ -213,9 +225,10 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Questlog>
+     * @return Paginator<\App\Entity\Questlog>
      */
-    public function findQuestLogsInHallOfFame() {
+    public function findQuestLogsInHallOfFame()
+    {
         $qb = $this->getQueryBuilder();
 
         $qb->andWhere('d.nbVotes > 10');
@@ -228,9 +241,10 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Questlog>
+     * @return Paginator<\App\Entity\Questlog>
      */
-    public function findQuestLogsInHotTopic() {
+    public function findQuestLogsInHotTopic()
+    {
         $qb = $this->getQueryBuilder();
 
         $qb->addSelect('(SELECT count(c) FROM App:QuestlogComment c WHERE c.questlog=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
@@ -244,9 +258,10 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Questlog>
+     * @return Paginator<\App\Entity\Questlog>
      */
-    public function findQuestLogsWithComplexSearch() {
+    public function findQuestLogsWithComplexSearch()
+    {
         $request = $this->currentRequest();
 
         $cards_code = $request->query->get('cards');
@@ -289,8 +304,8 @@ class QuestLogManager {
         $useCustomPacks = !empty($customPackCodes) && $this->user;
 
         if (!empty($cards_code) || !empty($packs) || $useCustomPacks) {
-            $qb->innerJoin('d.decks', "l");
-            $qb->innerJoin('l.deck', "ld");
+            $qb->innerJoin('d.decks', 'l');
+            $qb->innerJoin('l.deck', 'ld');
 
             if (!empty($cards_code)) {
                 foreach ($cards_code as $i => $card_code) {
@@ -304,30 +319,30 @@ class QuestLogManager {
                     $qb->andWhere("s$i.card = :card$i");
                     $qb->setParameter("card$i", $card);
 
-                    //$packs[] = $card->getPack()->getId();
+                    // $packs[] = $card->getPack()->getId();
                 }
             }
             if (!empty($packs) || $useCustomPacks) {
                 $sub = $this->doctrine->createQueryBuilder();
-                $sub->select("c");
-                $sub->from("App:Card", "c");
+                $sub->select('c');
+                $sub->from('App:Card', 'c');
                 $sub->innerJoin('App:Deckslot', 's', 'WITH', 's.card = c');
                 $sub->where('s.deck = ld');
 
                 if (!empty($packs)) {
-                    $sub->andWhere("NOT EXISTS (SELECT cpqlm.id FROM App:CardPrinting cpqlm WHERE cpqlm.card = c AND cpqlm.pack IN (:qlm_packs))");
+                    $sub->andWhere('NOT EXISTS (SELECT cpqlm.id FROM App:CardPrinting cpqlm WHERE cpqlm.card = c AND cpqlm.pack IN (:qlm_packs))');
                     $qb->setParameter('qlm_packs', $packs);
                 }
 
                 if ($useCustomPacks) {
                     $sub->andWhere(
-                        "NOT EXISTS (" .
-                            "SELECT ucpcqlm.id FROM App:UserCustomPackCard ucpcqlm " .
-                            "JOIN ucpcqlm.customPack ucpqlm " .
-                            "WHERE ucpcqlm.card = c " .
-                            "AND ucpqlm.code IN (:qlm_custom_codes) " .
-                            "AND ucpqlm.user = :qlm_custom_user" .
-                        ")"
+                        'NOT EXISTS ('.
+                            'SELECT ucpcqlm.id FROM App:UserCustomPackCard ucpcqlm '.
+                            'JOIN ucpcqlm.customPack ucpqlm '.
+                            'WHERE ucpcqlm.card = c '.
+                            'AND ucpqlm.code IN (:qlm_custom_codes) '.
+                            'AND ucpqlm.user = :qlm_custom_user'.
+                        ')'
                     );
                     $qb->setParameter('qlm_custom_codes', $customPackCodes);
                     $qb->setParameter('qlm_custom_user', $this->user);
@@ -371,14 +386,16 @@ class QuestLogManager {
     /**
      * @return int
      */
-    public function getNumberOfPages() {
+    public function getNumberOfPages()
+    {
         return intval(ceil($this->maxcount / $this->limit));
     }
 
     /**
      * @return list<array{numero: int, url: string, current: bool}>
      */
-    public function getAllPages() {
+    public function getAllPages()
+    {
         $request = $this->currentRequest();
         $route = $request->get('_route');
         $route_params = $request->get('_route_params');
@@ -388,11 +405,11 @@ class QuestLogManager {
 
         $number_of_pages = $this->getNumberOfPages();
         $pages = [];
-        for ($page = 1; $page <= $number_of_pages; $page++) {
+        for ($page = 1; $page <= $number_of_pages; ++$page) {
             $pages[] = [
-                "numero" => $page,
-                "url" => $this->router->generate($route, ["page" => $page] + $params),
-                "current" => $page == $this->page
+                'numero' => $page,
+                'url' => $this->router->generate($route, ['page' => $page] + $params),
+                'current' => $page == $this->page,
             ];
         }
 
@@ -402,12 +419,13 @@ class QuestLogManager {
     /**
      * @return array<int, mixed>
      */
-    public function getClosePages() {
+    public function getClosePages()
+    {
         $allPages = $this->getAllPages();
         $numero_courant = $this->page - 1;
         $pages = [];
         foreach ($allPages as $numero => $page) {
-            if ($numero === 0 || $numero === count($allPages) - 1 || abs($numero - $numero_courant) <= 2) {
+            if (0 === $numero || $numero === count($allPages) - 1 || abs($numero - $numero_courant) <= 2) {
                 $pages[] = $page;
             }
         }
@@ -418,8 +436,9 @@ class QuestLogManager {
     /**
      * @return string|null
      */
-    public function getPreviousUrl() {
-        if ($this->page === 1) {
+    public function getPreviousUrl()
+    {
+        if (1 === $this->page) {
             return null;
         }
 
@@ -439,7 +458,8 @@ class QuestLogManager {
     /**
      * @return string|null
      */
-    public function getNextUrl() {
+    public function getNextUrl()
+    {
         if ($this->page === $this->getNumberOfPages()) {
             return null;
         }

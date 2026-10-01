@@ -2,7 +2,8 @@
 
 namespace App\Services;
 
-class Texts {
+class Texts
+{
     /**
      * @var \HTMLPurifier
      */
@@ -16,7 +17,8 @@ class Texts {
     /**
      * @param string $cache_dir where HTMLPurifier caches its definitions
      */
-    public function __construct($cache_dir) {
+    public function __construct($cache_dir)
+    {
         // HTMLPurifier does not create its base cache directory, and warns if it is missing
         if (!is_dir($cache_dir)) {
             mkdir($cache_dir, 0775, true);
@@ -32,41 +34,42 @@ class Texts {
     }
 
     /**
-     * Returns the processed version of a markdown text
-     * @param mixed $string
+     * Returns the processed version of a markdown text.
+     *
      * @return string
      */
-    public function markdown($string) {
+    public function markdown($string)
+    {
         return $this->purify($this->img_responsive($this->transform($string)));
     }
 
     /**
-     * removes any dangerous code from a HTML string
+     * removes any dangerous code from a HTML string.
      *
-     * @param mixed $string
      * @return string
      */
-    public function purify($string) {
+    public function purify($string)
+    {
         return $this->purifier_service->purify($string);
     }
 
     /**
-     * turns a Markdown string into a HTML string
+     * turns a Markdown string into a HTML string.
      *
-     * @param mixed $string
      * @return string
      */
-    public function transform($string) {
+    public function transform($string)
+    {
         return $this->markdown_service->text($string);
     }
 
     /**
-     * adds class="img-responsive" to every <img> tag
+     * adds class="img-responsive" to every <img> tag.
      *
-     * @param mixed $string
      * @return string
      */
-    public function img_responsive($string) {
+    public function img_responsive($string)
+    {
         return preg_replace('/<img/', '<img class="img-responsive"', $string);
     }
 
@@ -74,13 +77,15 @@ class Texts {
      * Transforms the string into a valid filename, lower-case, no spaces, pure ASCII, etc.
      *
      * @param string $filename
+     *
      * @return string
      */
-    public function slugify($filename) {
+    public function slugify($filename)
+    {
         $filename = (string) preg_replace('[^\w\-]', '-', $filename);
         // //TRANSLIT is not supported by every iconv implementation (e.g. musl on Alpine)
         $ascii = @iconv('utf-8', 'us-ascii//TRANSLIT', $filename);
-        $filename = $ascii !== false ? $ascii : (string) preg_replace('/[^\x00-\x7F]/', '', $filename);
+        $filename = false !== $ascii ? $ascii : (string) preg_replace('/[^\x00-\x7F]/', '', $filename);
         $filename = (string) preg_replace('/[^\w\-]/', '', $filename);
         $filename = (string) preg_replace('/\-+/', '-', $filename);
         $filename = trim($filename, '-');

@@ -19,8 +19,10 @@ use Symfony\Component\Console\Tester\CommandTester;
  * The command always writes web/suggestions.json: the file is saved in setUp() and restored in
  * tearDown(). The decks inserted by the tests are deleted.
  */
-class SuggestionsCommandTest extends KernelTestCase {
-    const ARAGORN = 1, GIMLI = 4;
+class SuggestionsCommandTest extends KernelTestCase
+{
+    public const ARAGORN = 1;
+    public const GIMLI = 4;
 
     /** @var Connection */
     private $connection;
@@ -31,16 +33,18 @@ class SuggestionsCommandTest extends KernelTestCase {
     /** @var int */
     private $maxDeckId;
 
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         static::bootKernel();
         $this->connection = static::$kernel->getContainer()->get('doctrine')->getConnection();
         $this->maxDeckId = (int) $this->connection->fetchColumn('SELECT MAX(id) FROM deck');
-        $this->file = static::$kernel->getProjectDir() . '/public/suggestions.json';
+        $this->file = static::$kernel->getProjectDir().'/public/suggestions.json';
         $this->backup = file_exists($this->file) ? (string) file_get_contents($this->file) : null;
     }
 
-    protected function tearDown(): void {
-        if ($this->backup === null) {
+    protected function tearDown(): void
+    {
+        if (null === $this->backup) {
             @unlink($this->file);
         } else {
             file_put_contents($this->file, $this->backup);
@@ -55,7 +59,8 @@ class SuggestionsCommandTest extends KernelTestCase {
     /**
      * @return array the decoded suggestions.json
      */
-    private function runCommand() {
+    private function runCommand()
+    {
         $application = new Application(static::$kernel);
         $tester = new CommandTester($application->find('app:suggestions'));
 
@@ -66,7 +71,8 @@ class SuggestionsCommandTest extends KernelTestCase {
         return json_decode((string) file_get_contents($this->file), true);
     }
 
-    private function insertDeck(array $cardIds): void {
+    private function insertDeck(array $cardIds): void
+    {
         $row = $this->connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
         $this->assertNotFalse($row);
         unset($row['id']);
@@ -79,11 +85,9 @@ class SuggestionsCommandTest extends KernelTestCase {
 
     /**
      * The value of the matrix for two card codes.
-     * @param mixed $code1
-     * @param mixed $code2
-     * @return mixed
      */
-    private static function value(array $suggestions, $code1, $code2) {
+    private static function value(array $suggestions, $code1, $code2)
+    {
         $i = array_search($code1, $suggestions['index'], true);
         $j = array_search($code2, $suggestions['index'], true);
         list($i, $j) = [max($i, $j), min($i, $j)];
@@ -93,7 +97,8 @@ class SuggestionsCommandTest extends KernelTestCase {
 
     /* -------------------------------------------------------------- tests */
 
-    public function testSuggestionsOfTheFixtureDecks(): void {
+    public function testSuggestionsOfTheFixtureDecks(): void
+    {
         $suggestions = $this->runCommand();
 
         // the cards of the 4 fixture decks, by card id
@@ -117,7 +122,8 @@ class SuggestionsCommandTest extends KernelTestCase {
         $this->assertSame($pairs, $total);
     }
 
-    public function testCardsUsedTogether(): void {
+    public function testCardsUsedTogether(): void
+    {
         // Aragorn and Gimli, in two more decks
         $this->insertDeck([self::ARAGORN, self::GIMLI]);
         $this->insertDeck([self::ARAGORN, self::GIMLI]);
@@ -133,8 +139,9 @@ class SuggestionsCommandTest extends KernelTestCase {
      * The count is divided by the number of decks of the rarer card, when it is used in 100 decks
      * or more: 100 decks with Aragorn and Gimli, 50 of them with Guard of the Citadel too.
      */
-    public function testWeightingByTheNumberOfDecks(): void {
-        for ($i = 0; $i < 150; $i++) {
+    public function testWeightingByTheNumberOfDecks(): void
+    {
+        for ($i = 0; $i < 150; ++$i) {
             $this->insertDeck($i < 50 ? [self::ARAGORN, self::GIMLI, 13] : [self::ARAGORN, self::GIMLI]);
         }
 

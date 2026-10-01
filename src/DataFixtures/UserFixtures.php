@@ -4,7 +4,6 @@ namespace App\DataFixtures;
 
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -12,14 +11,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class UserFixtures extends Fixture implements ContainerAwareInterface
 {
     /**
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface|null
+     * @var ContainerInterface|null
      */
     private $container;
 
     /**
      * @return void
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(?ContainerInterface $container = null)
     {
         $this->container = $container;
     }
@@ -29,7 +28,7 @@ class UserFixtures extends Fixture implements ContainerAwareInterface
      */
     public function load(ObjectManager $manager)
     {
-        if ($this->container === null) {
+        if (null === $this->container) {
             throw new \LogicException('The container is not set.');
         }
         $userManager = $this->container->get('fos_user.user_manager');

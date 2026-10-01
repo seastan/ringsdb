@@ -3,11 +3,12 @@
 namespace App\Entity;
 
 /**
- * Deckchange
+ * Deckchange.
  */
-class Deckchange {
+class Deckchange
+{
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
@@ -19,7 +20,7 @@ class Deckchange {
      */
     private $variation;
     /**
-     * @var boolean
+     * @var bool
      */
     private $isSaved;
     /**
@@ -27,126 +28,135 @@ class Deckchange {
      */
     private $version;
     /**
-     * @var \App\Entity\Deck
+     * @var Deck
      */
     private $deck;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
      *
      * @return Deckchange
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation)
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
+     * Get dateCreation.
      *
      * @return \DateTime
      */
-    public function getDateCreation() {
+    public function getDateCreation()
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set variation
+     * Set variation.
      *
      * @param string $variation
      *
      * @return Deckchange
      */
-    public function setVariation($variation) {
+    public function setVariation($variation)
+    {
         $this->variation = $variation;
 
         return $this;
     }
 
     /**
-     * Get variation
+     * Get variation.
      *
      * @return string
      */
-    public function getVariation() {
+    public function getVariation()
+    {
         return $this->variation;
     }
 
     /**
-     * Set isSaved
+     * Set isSaved.
      *
-     * @param boolean $isSaved
+     * @param bool $isSaved
      *
      * @return Deckchange
      */
-    public function setIsSaved($isSaved) {
+    public function setIsSaved($isSaved)
+    {
         $this->isSaved = $isSaved;
 
         return $this;
     }
 
     /**
-     * Get isSaved
+     * Get isSaved.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsSaved() {
+    public function getIsSaved()
+    {
         return $this->isSaved;
     }
 
     /**
-     * Set deck
-     *
-     * @param \App\Entity\Deck $deck
+     * Set deck.
      *
      * @return Deckchange
      */
-    public function setDeck(\App\Entity\Deck $deck) {
+    public function setDeck(Deck $deck)
+    {
         $this->deck = $deck;
 
         return $this;
     }
 
     /**
-     * Get deck
+     * Get deck.
      *
-     * @return \App\Entity\Deck
+     * @return Deck
      */
-    public function getDeck() {
+    public function getDeck()
+    {
         return $this->deck;
     }
 
     /**
-     * Set version
+     * Set version.
      *
      * @param string|null $version
      *
      * @return Deckchange
      */
-    public function setVersion($version) {
+    public function setVersion($version)
+    {
         $this->version = $version;
 
         return $this;
     }
 
     /**
-     * Get version
+     * Get version.
      *
      * @return string|null
      */
-    public function getVersion() {
+    public function getVersion()
+    {
         return $this->version;
     }
 }

@@ -2,96 +2,100 @@
 
 namespace App\Entity;
 
-class Decklistslot implements \App\Model\SlotInterface {
+class Decklistslot implements \App\Model\SlotInterface
+{
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
-     * @var integer
+     * @var int
      */
     private $quantity;
     /**
-     * @var \App\Entity\Decklist
+     * @var Decklist
      */
     private $decklist;
     /**
-     * @var \App\Entity\Card
+     * @var Card
      */
     private $card;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set quantity
+     * Set quantity.
      *
-     * @param integer $quantity
+     * @param int $quantity
      *
      * @return Decklistslot
      */
-    public function setQuantity($quantity) {
+    public function setQuantity($quantity)
+    {
         $this->quantity = $quantity;
 
         return $this;
     }
 
     /**
-     * Get quantity
+     * Get quantity.
      *
-     * @return integer
+     * @return int
      */
-    public function getQuantity() {
+    public function getQuantity()
+    {
         return $this->quantity;
     }
 
     /**
-     * Set decklist
-     *
-     * @param \App\Entity\Decklist $decklist
+     * Set decklist.
      *
      * @return Decklistslot
      */
-    public function setDecklist(\App\Entity\Decklist $decklist) {
+    public function setDecklist(Decklist $decklist)
+    {
         $this->decklist = $decklist;
 
         return $this;
     }
 
     /**
-     * Get decklist
+     * Get decklist.
      *
-     * @return \App\Entity\Decklist
+     * @return Decklist
      */
-    public function getDecklist() {
+    public function getDecklist()
+    {
         return $this->decklist;
     }
 
     /**
-     * Set card
-     *
-     * @param \App\Entity\Card $card
+     * Set card.
      *
      * @return Decklistslot
      */
-    public function setCard(\App\Entity\Card $card) {
+    public function setCard(Card $card)
+    {
         $this->card = $card;
 
         return $this;
     }
 
     /**
-     * Get card
+     * Get card.
      *
-     * @return \App\Entity\Card
+     * @return Card
      */
-    public function getCard() {
+    public function getCard()
+    {
         return $this->card;
     }
 }

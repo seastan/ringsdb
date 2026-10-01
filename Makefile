@@ -65,4 +65,7 @@ clear-cache:
 	docker compose exec -it -u www-data symfony php bin/console cache:clear --env=test
 	docker compose exec -it -u www-data symfony php bin/console cache:clear --env=dev
 
-all: install lint-twig phpstan phpunit
+cs:
+	docker compose exec -it -u www-data symfony php vendor/bin/php-cs-fixer fix
+
+all: install lint-twig cs phpstan phpunit

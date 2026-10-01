@@ -3,16 +3,15 @@
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use App\Entity\UserCustomPackCard;
 
-class UserCustomPack {
-
+class UserCustomPack
+{
     /**
      * @var int
      */
     private $id;
     /**
-     * @var \App\Entity\User
+     * @var User
      */
     private $user;
     /**
@@ -40,11 +39,12 @@ class UserCustomPack {
      */
     private $updatedAt;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\UserCustomPackCard>
+     * @var \Doctrine\Common\Collections\Collection<int, UserCustomPackCard>
      */
     private $cards;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->cards = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
@@ -53,96 +53,162 @@ class UserCustomPack {
     /**
      * @return int
      */
-    public function getId() { return $this->id; }
+    public function getId()
+    {
+        return $this->id;
+    }
 
     /**
-     * @return \App\Entity\User
+     * @return User
      */
-    public function getUser() { return $this->user; }
+    public function getUser()
+    {
+        return $this->user;
+    }
+
     /**
-     * @param mixed $user
      * @return $this
      */
-    public function setUser($user) { $this->user = $user; return $this; }
+    public function setUser($user)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
 
     /**
      * @return string
      */
-    public function getName() { return $this->name; }
+    public function getName()
+    {
+        return $this->name;
+    }
+
     /**
-     * @param mixed $name
      * @return $this
      */
-    public function setName($name) { $this->name = $name; return $this; }
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
 
     /**
      * @return string
      */
-    public function getCode() { return $this->code; }
+    public function getCode()
+    {
+        return $this->code;
+    }
+
     /**
-     * @param mixed $code
      * @return $this
      */
-    public function setCode($code) { $this->code = $code; return $this; }
+    public function setCode($code)
+    {
+        $this->code = $code;
+
+        return $this;
+    }
 
     /**
      * @return bool
      */
-    public function getIsEnabled() { return $this->isEnabled; }
+    public function getIsEnabled()
+    {
+        return $this->isEnabled;
+    }
+
     /**
-     * @param mixed $isEnabled
      * @return $this
      */
-    public function setIsEnabled($isEnabled) { $this->isEnabled = (bool)$isEnabled; return $this; }
+    public function setIsEnabled($isEnabled)
+    {
+        $this->isEnabled = (bool) $isEnabled;
+
+        return $this;
+    }
 
     /**
      * @return bool
      */
-    public function getIsPublished() { return $this->isPublished; }
+    public function getIsPublished()
+    {
+        return $this->isPublished;
+    }
+
     /**
-     * @param mixed $isPublished
      * @return $this
      */
-    public function setIsPublished($isPublished) { $this->isPublished = (bool)$isPublished; return $this; }
+    public function setIsPublished($isPublished)
+    {
+        $this->isPublished = (bool) $isPublished;
+
+        return $this;
+    }
 
     /**
      * @return \DateTime
      */
-    public function getCreatedAt() { return $this->createdAt; }
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
     /**
-     * @param mixed $createdAt
      * @return $this
      */
-    public function setCreatedAt($createdAt) { $this->createdAt = $createdAt; return $this; }
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
 
     /**
      * @return \DateTime
      */
-    public function getUpdatedAt() { return $this->updatedAt; }
-    /**
-     * @param mixed $updatedAt
-     * @return $this
-     */
-    public function setUpdatedAt($updatedAt) { $this->updatedAt = $updatedAt; return $this; }
-
-    /**
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\UserCustomPackCard>
-     */
-    public function getCards() { return $this->cards; }
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
 
     /**
      * @return $this
      */
-    public function clearCards() {
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return \Doctrine\Common\Collections\Collection<int, UserCustomPackCard>
+     */
+    public function getCards()
+    {
+        return $this->cards;
+    }
+
+    /**
+     * @return $this
+     */
+    public function clearCards()
+    {
         $this->cards->clear();
+
         return $this;
     }
 
     /**
      * @return $this
      */
-    public function addCard(UserCustomPackCard $card) {
+    public function addCard(UserCustomPackCard $card)
+    {
         $this->cards->add($card);
+
         return $this;
     }
 }

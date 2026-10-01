@@ -2,9 +2,10 @@
 
 namespace App\Entity;
 
-class Type {
+class Type
+{
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
@@ -16,99 +17,105 @@ class Type {
      */
     private $name;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Card>
+     * @var \Doctrine\Common\Collections\Collection<int, Card>
      */
     private $cards;
 
     /**
-     * Constructor
+     * Constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->cards = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set code
+     * Set code.
      *
      * @param string $code
      *
      * @return Type
      */
-    public function setCode($code) {
+    public function setCode($code)
+    {
         $this->code = $code;
 
         return $this;
     }
 
     /**
-     * Get code
+     * Get code.
      *
      * @return string
      */
-    public function getCode() {
+    public function getCode()
+    {
         return $this->code;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return Type
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
     /**
-     * Add card
-     *
-     * @param \App\Entity\Card $card
+     * Add card.
      *
      * @return Type
      */
-    public function addCard(\App\Entity\Card $card) {
+    public function addCard(Card $card)
+    {
         $this->cards[] = $card;
 
         return $this;
     }
 
     /**
-     * Remove card
+     * Remove card.
      *
-     * @param \App\Entity\Card $card
      * @return void
      */
-    public function removeCard(\App\Entity\Card $card) {
+    public function removeCard(Card $card)
+    {
         $this->cards->removeElement($card);
     }
 
     /**
-     * Get cards
+     * Get cards.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Card>
+     * @return \Doctrine\Common\Collections\Collection<int, Card>
      */
-    public function getCards() {
+    public function getCards()
+    {
         return $this->cards;
     }
 }

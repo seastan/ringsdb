@@ -2,15 +2,16 @@
 
 namespace App\Model;
 
-use App\Repository\SphereRepository;
-use App\Entity\Decklist;
 use App\Entity\Deck;
-use App\Helper\DeckValidationHelper;
-use App\Services\Texts;
-use App\Entity\Decklistslot;
+use App\Entity\Decklist;
 use App\Entity\Decklistsideslot;
+use App\Entity\Decklistslot;
+use App\Helper\DeckValidationHelper;
+use App\Repository\SphereRepository;
+use App\Services\Texts;
 
-class DecklistFactory {
+class DecklistFactory
+{
     /**
      * @var DeckValidationHelper
      */
@@ -26,23 +27,23 @@ class DecklistFactory {
      */
     private $sphereRepository;
 
-    public function __construct(DeckValidationHelper $deckValidationHelper, Texts $texts, SphereRepository $sphereRepository) {
+    public function __construct(DeckValidationHelper $deckValidationHelper, Texts $texts, SphereRepository $sphereRepository)
+    {
         $this->deckValidationHelper = $deckValidationHelper;
         $this->texts = $texts;
         $this->sphereRepository = $sphereRepository;
     }
 
     /**
-     * @param mixed $name
-     * @param mixed $descriptionMd
-     * @return \App\Entity\Decklist
+     * @return Decklist
      */
-    public function createDecklistFromDeck(Deck $deck, $name = null, $descriptionMd = null) {
+    public function createDecklistFromDeck(Deck $deck, $name = null, $descriptionMd = null)
+    {
         /* @var $lastPack \App\Entity\Pack */
         $lastPack = $deck->getLastPack();
         $problem = $this->deckValidationHelper->findProblem($deck, true);
         if ($problem) {
-            throw new \Exception('This deck cannot be published  because it is invalid: "' . $this->deckValidationHelper->getProblemLabel($problem) . '".');
+            throw new \Exception('This deck cannot be published  because it is invalid: "'.$this->deckValidationHelper->getProblemLabel($problem).'".');
         }
 
         // all good for decklist publication
@@ -67,7 +68,7 @@ class DecklistFactory {
 
         $countBySphere = $deck->getSlots()->getCountBySphere();
         $predominantSphere = array_keys($countBySphere, max($countBySphere))[0];
-        $predominantSphere = $this->sphereRepository->findOneBy(["code" => $predominantSphere]);
+        $predominantSphere = $this->sphereRepository->findOneBy(['code' => $predominantSphere]);
 
         $heroes = $deck->getSlots()->getHeroDeck();
 
@@ -81,7 +82,7 @@ class DecklistFactory {
         $decklist = new Decklist();
         $decklist->setName($name);
         $decklist->setVersion($deck->getVersion());
-        $decklist->setNameCanonical($this->texts->slugify($name) . '-' . $decklist->getVersion());
+        $decklist->setNameCanonical($this->texts->slugify($name).'-'.$decklist->getVersion());
         $decklist->setDescriptionMd($descriptionMd);
         $decklist->setDescriptionHtml($description);
         $decklist->setDateCreation(new \DateTime());
@@ -118,7 +119,7 @@ class DecklistFactory {
 
         if (count($deck->getChildren())) {
             $decklist->setPrecedent($deck->getChildren()[0]);
-        } else if ($deck->getParent()) {
+        } elseif ($deck->getParent()) {
             $decklist->setPrecedent($deck->getParent());
         }
         $decklist->setParent($deck);

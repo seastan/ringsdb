@@ -6,7 +6,6 @@ use App\Entity\Card;
 use App\Entity\Review;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -15,14 +14,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ReviewFixtures extends Fixture implements ContainerAwareInterface, DependentFixtureInterface
 {
     /**
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface|null
+     * @var ContainerInterface|null
      */
     private $container;
 
     /**
      * @return void
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(?ContainerInterface $container = null)
     {
         $this->container = $container;
     }
@@ -45,7 +44,7 @@ class ReviewFixtures extends Fixture implements ContainerAwareInterface, Depende
         /** @var User $user */
         $user = $this->getReference('test-user');
         $card = $manager->getRepository(Card::class)->findOneBy(['code' => '01001']);
-        if (!$card instanceof Card || $this->container === null) {
+        if (!$card instanceof Card || null === $this->container) {
             throw new \LogicException('Card 01001 or the container is missing.');
         }
 

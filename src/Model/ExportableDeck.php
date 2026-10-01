@@ -5,7 +5,8 @@ namespace App\Model;
 /**
  * Base class of Deck and Decklist, which implement the getters used by the exports.
  */
-abstract class ExportableDeck {
+abstract class ExportableDeck
+{
     /**
      * @return int
      */
@@ -47,20 +48,22 @@ abstract class ExportableDeck {
     abstract public function getLastPack();
 
     /**
-     * @return \App\Model\SlotCollectionInterface<covariant \App\Model\SlotInterface>
+     * @return SlotCollectionInterface<covariant \App\Model\SlotInterface>
      */
     abstract public function getSlots();
 
     /**
-     * @return \App\Model\SlotCollectionInterface<covariant \App\Model\SlotInterface>
+     * @return SlotCollectionInterface<covariant \App\Model\SlotInterface>
      */
     abstract public function getSideslots();
 
     /**
      * @param bool $withUnsavedChanges
+     *
      * @return array<string, mixed>
      */
-    public function getArrayExport($withUnsavedChanges = false) {
+    public function getArrayExport($withUnsavedChanges = false)
+    {
         /* @var $this \App\Entity\Deck */
         $slots = $this->getSlots();
         $sideslots = $this->getSideslots();
@@ -80,9 +83,9 @@ abstract class ExportableDeck {
             'slots' => $slots->getContent(),
             'sideslots' => $sideslots->getContent(),
             'version' => $this->getVersion(),
-            'last_pack' => $last_pack
+            'last_pack' => $last_pack,
         ];
-        if (method_exists($this,'getFreezeComments')) {
+        if (method_exists($this, 'getFreezeComments')) {
             $array['freeze_comments'] = $this->getFreezeComments();
         }
 
@@ -92,7 +95,8 @@ abstract class ExportableDeck {
     /**
      * @return array<string, mixed>
      */
-    public function getTextExport() {
+    public function getTextExport()
+    {
         /* @var $this \App\Entity\Deck */
         $slots = $this->getSlots();
         $sideslots = $this->getSideslots();

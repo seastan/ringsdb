@@ -3,11 +3,12 @@
 namespace App\Entity;
 
 /**
- * Reviewcomment
+ * Reviewcomment.
  */
-class Reviewcomment {
+class Reviewcomment
+{
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
@@ -23,130 +24,137 @@ class Reviewcomment {
      */
     private $text;
     /**
-     * @var \App\Entity\User
+     * @var User
      */
     private $user;
     /**
-     * @var \App\Entity\Review
+     * @var Review
      */
     private $review;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
      *
      * @return Reviewcomment
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation)
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
+     * Get dateCreation.
      *
      * @return \DateTime
      */
-    public function getDateCreation() {
+    public function getDateCreation()
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
+     * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
      *
      * @return Reviewcomment
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate($dateUpdate)
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
+     * Get dateUpdate.
      *
      * @return \DateTime
      */
-    public function getDateUpdate() {
+    public function getDateUpdate()
+    {
         return $this->dateUpdate;
     }
 
     /**
-     * Set text
+     * Set text.
      *
      * @param string $text
      *
      * @return Reviewcomment
      */
-    public function setText($text) {
+    public function setText($text)
+    {
         $this->text = $text;
 
         return $this;
     }
 
     /**
-     * Get text
+     * Get text.
      *
      * @return string
      */
-    public function getText() {
+    public function getText()
+    {
         return $this->text;
     }
 
     /**
-     * Set user
-     *
-     * @param \App\Entity\User $user
+     * Set user.
      *
      * @return Reviewcomment
      */
-    public function setUser(\App\Entity\User $user) {
+    public function setUser(User $user)
+    {
         $this->user = $user;
 
         return $this;
     }
 
     /**
-     * Get user
+     * Get user.
      *
-     * @return \App\Entity\User
+     * @return User
      */
-    public function getUser() {
+    public function getUser()
+    {
         return $this->user;
     }
 
     /**
-     * Set review
-     *
-     * @param \App\Entity\Review $review
+     * Set review.
      *
      * @return Reviewcomment
      */
-    public function setReview(\App\Entity\Review $review) {
+    public function setReview(Review $review)
+    {
         $this->review = $review;
 
         return $this;
     }
 
     /**
-     * Get review
+     * Get review.
      *
-     * @return \App\Entity\Review
+     * @return Review
      */
-    public function getReview() {
+    public function getReview()
+    {
         return $this->review;
     }
 }

@@ -2,15 +2,17 @@
 
 namespace App\Helper;
 
-class DeckValidationHelper {
-    public function __construct() {
+class DeckValidationHelper
+{
+    public function __construct()
+    {
     }
 
     /**
-     * @param mixed $deck
      * @return list<\App\Entity\Card>
      */
-    public function getInvalidCards($deck) {
+    public function getInvalidCards($deck)
+    {
         $invalidCards = [];
 
         /*
@@ -25,20 +27,20 @@ class DeckValidationHelper {
     }
 
     /**
-     * @param mixed $deck
-     * @param mixed $card
      * @return bool
      */
-    public function canIncludeCard($deck, $card) {
+    public function canIncludeCard($deck, $card)
+    {
         return true;
     }
 
     /**
-     * @param mixed $deck
      * @param bool $casualPlay
+     *
      * @return string|null
      */
-    public function findProblem($deck, $casualPlay = false) {
+    public function findProblem($deck, $casualPlay = false)
+    {
         /* @var $deck \App\Entity\Deck */
         $heroDeck = $deck->getSlots()->getHeroDeck();
         $heroDeckSize = $heroDeck->countCards();
@@ -64,11 +66,11 @@ class DeckValidationHelper {
         $cardsCount = $deck->getSlots()->getDrawDeck()->countCards();
         if ($cardsCount < 30) {
             return 'too_few_cards';
-        } else if ($cardsCount < 50 && !$casualPlay) {
+        } elseif ($cardsCount < 50 && !$casualPlay) {
             return 'invalid_for_tournament_play';
         }
 
-        foreach($deck->getSlots()->getCopiesAndDeckLimit() as $value) {
+        foreach ($deck->getSlots()->getCopiesAndDeckLimit() as $value) {
             if ($value['copies'] > $value['deck_limit']) {
                 return 'too_many_copies';
             }
@@ -82,21 +84,21 @@ class DeckValidationHelper {
     }
 
     /**
-     * @param mixed $problem
      * @return string
      */
-    public function getProblemLabel($problem) {
+    public function getProblemLabel($problem)
+    {
         if (!$problem) {
             return '';
         }
         $labels = [
-            'too_many_heroes' => "Contains too many heroes",
-            'too_few_heroes' => "Contains too few heroes",
-            'too_few_cards' => "Contains too few cards",
-            'too_many_copies' => "Contains too many copies of a card (by title)",
-            'invalid_for_tournament_play' => "Invalid for tournament play for having less than 50 cards",
-            'duplicated_unique_heroes' => "More than one hero with the same unique name",
-            'invalid_cards' => "Contains forbidden cards"
+            'too_many_heroes' => 'Contains too many heroes',
+            'too_few_heroes' => 'Contains too few heroes',
+            'too_few_cards' => 'Contains too few cards',
+            'too_many_copies' => 'Contains too many copies of a card (by title)',
+            'invalid_for_tournament_play' => 'Invalid for tournament play for having less than 50 cards',
+            'duplicated_unique_heroes' => 'More than one hero with the same unique name',
+            'invalid_cards' => 'Contains forbidden cards',
         ];
 
         if (isset($labels[$problem])) {

@@ -2,13 +2,14 @@
 
 namespace App\Entity;
 
-class Card {
+class Card
+{
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
-     * @var integer
+     * @var int
      */
     private $position;
     /**
@@ -32,7 +33,7 @@ class Card {
      */
     private $flavor;
     /**
-     * @var boolean
+     * @var bool
      */
     private $isUnique;
     /**
@@ -64,7 +65,7 @@ class Card {
      */
     private $victory;
     /**
-     * @var integer
+     * @var int
      */
     private $deckLimit = 3;
     /**
@@ -76,69 +77,68 @@ class Card {
      */
     private $dateUpdate;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Review>
+     * @var \Doctrine\Common\Collections\Collection<int, Review>
      */
     private $reviews;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\CardPrinting>
+     * @var \Doctrine\Common\Collections\Collection<int, CardPrinting>
      */
     private $printings;
     /**
-     * @var \App\Entity\Type
+     * @var Type
      */
     private $type;
     /**
-     * @var \App\Entity\Sphere
+     * @var Sphere
      */
     private $sphere;
 
     /**
-     * Constructor
+     * Constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->reviews = new \Doctrine\Common\Collections\ArrayCollection();
         $this->printings = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
-     * Add printing
-     *
-     * @param \App\Entity\CardPrinting $printing
+     * Add printing.
      *
      * @return Card
      */
-    public function addPrinting(\App\Entity\CardPrinting $printing) {
+    public function addPrinting(CardPrinting $printing)
+    {
         $this->printings[] = $printing;
 
         return $this;
     }
 
     /**
-     * Remove printing
+     * Remove printing.
      *
-     * @param \App\Entity\CardPrinting $printing
      * @return void
      */
-    public function removePrinting(\App\Entity\CardPrinting $printing) {
+    public function removePrinting(CardPrinting $printing)
+    {
         $this->printings->removeElement($printing);
     }
 
     /**
-     * Get printings
+     * Get printings.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\CardPrinting>
+     * @return \Doctrine\Common\Collections\Collection<int, CardPrinting>
      */
-    public function getPrintings() {
+    public function getPrintings()
+    {
         return $this->printings;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getPrimaryPrinting() {
+    public function getPrimaryPrinting()
+    {
         $primary = null;
         foreach ($this->printings as $p) {
-            if ($primary === null) {
+            if (null === $primary) {
                 $primary = $p;
                 continue;
             }
@@ -151,13 +151,13 @@ class Card {
             // original one (e.g. Core Set over a later reprint or starter). A
             // null release date (unreleased/spoiled pack) sorts last; ties fall
             // back to the lower position.
-            if ($pDate === null && $primaryDate === null) {
+            if (null === $pDate && null === $primaryDate) {
                 $better = $p->getPosition() < $primary->getPosition();
-            } else if ($pDate === null) {
+            } elseif (null === $pDate) {
                 $better = false;
-            } else if ($primaryDate === null) {
+            } elseif (null === $primaryDate) {
                 $better = true;
-            } else if ($pDate == $primaryDate) {
+            } elseif ($pDate == $primaryDate) {
                 $better = $p->getPosition() < $primary->getPosition();
             } else {
                 $better = $pDate < $primaryDate;
@@ -167,505 +167,538 @@ class Card {
                 $primary = $p;
             }
         }
+
         return $primary;
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set position
+     * Set position.
      *
-     * @param integer $position
+     * @param int $position
      *
      * @return Card
      */
-    public function setPosition($position) {
+    public function setPosition($position)
+    {
         $this->position = $position;
 
         return $this;
     }
 
     /**
-     * Get position
+     * Get position.
      *
-     * @return integer
+     * @return int
      */
-    public function getPosition() {
+    public function getPosition()
+    {
         return $this->position;
     }
 
     /**
-     * Set code
+     * Set code.
      *
      * @param string $code
      *
      * @return Card
      */
-    public function setCode($code) {
+    public function setCode($code)
+    {
         $this->code = $code;
 
         return $this;
     }
 
     /**
-     * Get code
+     * Get code.
      *
      * @return string
      */
-    public function getCode() {
+    public function getCode()
+    {
         return $this->code;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return Card
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
     /**
      * @return string
      */
-    public function getAdminLabel() {
-        return $this->name . ' (' . $this->sphere->getName() . ', ' . $this->type->getName() . ')';
+    public function getAdminLabel()
+    {
+        return $this->name.' ('.$this->sphere->getName().', '.$this->type->getName().')';
     }
 
     /**
-     * Set traits
+     * Set traits.
      *
      * @param string|null $traits
      *
      * @return Card
      */
-    public function setTraits($traits) {
+    public function setTraits($traits)
+    {
         $this->traits = $traits;
 
         return $this;
     }
 
     /**
-     * Get traits
+     * Get traits.
      *
      * @return string|null
      */
-    public function getTraits() {
+    public function getTraits()
+    {
         return $this->traits;
     }
 
     /**
-     * Set text
+     * Set text.
      *
      * @param string|null $text
      *
      * @return Card
      */
-    public function setText($text) {
+    public function setText($text)
+    {
         $this->text = $text;
 
         return $this;
     }
 
     /**
-     * Get text
+     * Get text.
      *
      * @return string|null
      */
-    public function getText() {
+    public function getText()
+    {
         return $this->text;
     }
 
     /**
-     * Set flavor
+     * Set flavor.
      *
      * @param string|null $flavor
      *
      * @return Card
      */
-    public function setFlavor($flavor) {
+    public function setFlavor($flavor)
+    {
         $this->flavor = $flavor;
 
         return $this;
     }
 
     /**
-     * Get flavor
+     * Get flavor.
      *
      * @return string|null
      */
-    public function getFlavor() {
+    public function getFlavor()
+    {
         return $this->flavor;
     }
 
     /**
-     * Set isUnique
+     * Set isUnique.
      *
-     * @param boolean $isUnique
+     * @param bool $isUnique
      *
      * @return Card
      */
-    public function setIsUnique($isUnique) {
+    public function setIsUnique($isUnique)
+    {
         $this->isUnique = $isUnique;
 
         return $this;
     }
 
     /**
-     * Get isUnique
+     * Get isUnique.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsUnique() {
+    public function getIsUnique()
+    {
         return $this->isUnique;
     }
 
     /**
-     * Set cost
+     * Set cost.
      *
      * @param string|null $cost
      *
      * @return Card
      */
-    public function setCost($cost) {
+    public function setCost($cost)
+    {
         $this->cost = $cost;
 
         return $this;
     }
 
     /**
-     * Get cost
+     * Get cost.
      *
      * @return string|null
      */
-    public function getCost() {
+    public function getCost()
+    {
         return $this->cost;
     }
 
     /**
-     * Set threat
+     * Set threat.
      *
      * @param int|null $threat
      *
      * @return Card
      */
-    public function setThreat($threat) {
+    public function setThreat($threat)
+    {
         $this->threat = $threat;
 
         return $this;
     }
 
     /**
-     * Get threat
+     * Get threat.
      *
      * @return int|null
      */
-    public function getThreat() {
+    public function getThreat()
+    {
         return $this->threat;
     }
 
     /**
-     * Set willpower
+     * Set willpower.
      *
      * @param int|null $willpower
      *
      * @return Card
      */
-    public function setWillpower($willpower) {
+    public function setWillpower($willpower)
+    {
         $this->willpower = $willpower;
 
         return $this;
     }
 
     /**
-     * Get willpower
+     * Get willpower.
      *
      * @return int|null
      */
-    public function getWillpower() {
+    public function getWillpower()
+    {
         return $this->willpower;
     }
 
     /**
-     * Set attack
+     * Set attack.
      *
      * @param int|null $attack
      *
      * @return Card
      */
-    public function setAttack($attack) {
+    public function setAttack($attack)
+    {
         $this->attack = $attack;
 
         return $this;
     }
 
     /**
-     * Get attack
+     * Get attack.
      *
      * @return int|null
      */
-    public function getAttack() {
+    public function getAttack()
+    {
         return $this->attack;
     }
 
     /**
-     * Set defense
+     * Set defense.
      *
      * @param int|null $defense
      *
      * @return Card
      */
-    public function setDefense($defense) {
+    public function setDefense($defense)
+    {
         $this->defense = $defense;
 
         return $this;
     }
 
     /**
-     * Get defense
+     * Get defense.
      *
      * @return int|null
      */
-    public function getDefense() {
+    public function getDefense()
+    {
         return $this->defense;
     }
 
     /**
-     * Set health
+     * Set health.
      *
      * @param int|null $health
      *
      * @return Card
      */
-    public function setHealth($health) {
+    public function setHealth($health)
+    {
         $this->health = $health;
 
         return $this;
     }
 
     /**
-     * Get health
+     * Get health.
      *
      * @return int|null
      */
-    public function getHealth() {
+    public function getHealth()
+    {
         return $this->health;
     }
 
     /**
-     * Set victory
+     * Set victory.
      *
      * @param int|null $victory
      *
      * @return Card
      */
-    public function setVictory($victory) {
+    public function setVictory($victory)
+    {
         $this->victory = $victory;
 
         return $this;
     }
 
     /**
-     * Get victory
+     * Get victory.
      *
      * @return int|null
      */
-    public function getVictory() {
+    public function getVictory()
+    {
         return $this->victory;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getQuantity() {
+    public function getQuantity()
+    {
         $p = $this->getPrimaryPrinting();
+
         return $p ? $p->getQuantity() : null;
     }
 
     /**
-     * Set deckLimit
+     * Set deckLimit.
      *
-     * @param integer|null $deckLimit null (an empty field of the admin form or of a CSV import) for
-     *                              the default, 3
+     * @param int|null $deckLimit null (an empty field of the admin form or of a CSV import) for
+     *                            the default, 3
      *
      * @return Card
      */
-    public function setDeckLimit($deckLimit) {
+    public function setDeckLimit($deckLimit)
+    {
         $this->deckLimit = $deckLimit ?? 3;
 
         return $this;
     }
 
     /**
-     * Get deckLimit
+     * Get deckLimit.
      *
-     * @return integer
+     * @return int
      */
-    public function getDeckLimit() {
+    public function getDeckLimit()
+    {
         return $this->deckLimit;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getIllustrator() {
+    public function getIllustrator()
+    {
         $p = $this->getPrimaryPrinting();
+
         return $p ? $p->getIllustrator() : null;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getOctgnid() {
+    public function getOctgnid()
+    {
         $p = $this->getPrimaryPrinting();
+
         return $p ? $p->getOctgnid() : null;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
      *
      * @return Card
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation)
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
+     * Get dateCreation.
      *
      * @return \DateTime
      */
-    public function getDateCreation() {
+    public function getDateCreation()
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
+     * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
      *
      * @return Card
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate($dateUpdate)
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
+     * Get dateUpdate.
      *
      * @return \DateTime
      */
-    public function getDateUpdate() {
+    public function getDateUpdate()
+    {
         return $this->dateUpdate;
     }
 
     /**
-     * Add review
-     *
-     * @param \App\Entity\Review $review
+     * Add review.
      *
      * @return Card
      */
-    public function addReview(\App\Entity\Review $review) {
+    public function addReview(Review $review)
+    {
         $this->reviews[] = $review;
 
         return $this;
     }
 
     /**
-     * Remove review
+     * Remove review.
      *
-     * @param \App\Entity\Review $review
      * @return void
      */
-    public function removeReview(\App\Entity\Review $review) {
+    public function removeReview(Review $review)
+    {
         $this->reviews->removeElement($review);
     }
 
     /**
-     * Get reviews
+     * Get reviews.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Review>
+     * @return \Doctrine\Common\Collections\Collection<int, Review>
      */
-    public function getReviews() {
+    public function getReviews()
+    {
         return $this->reviews;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getPack() {
+    public function getPack()
+    {
         $p = $this->getPrimaryPrinting();
+
         return $p ? $p->getPack() : null;
     }
 
     /**
-     * Set type
-     *
-     * @param \App\Entity\Type $type
+     * Set type.
      *
      * @return Card
      */
-    public function setType(\App\Entity\Type $type) {
+    public function setType(Type $type)
+    {
         $this->type = $type;
 
         return $this;
     }
 
     /**
-     * Get type
+     * Get type.
      *
-     * @return \App\Entity\Type
+     * @return Type
      */
-    public function getType() {
+    public function getType()
+    {
         return $this->type;
     }
 
     /**
-     * Set sphere
-     *
-     * @param \App\Entity\Sphere $sphere
+     * Set sphere.
      *
      * @return Card
      */
-    public function setSphere(\App\Entity\Sphere $sphere) {
+    public function setSphere(Sphere $sphere)
+    {
         $this->sphere = $sphere;
 
         return $this;
     }
 
     /**
-     * Get sphere
+     * Get sphere.
      *
-     * @return \App\Entity\Sphere
+     * @return Sphere
      */
-    public function getSphere() {
+    public function getSphere()
+    {
         return $this->sphere;
     }
 
@@ -675,50 +708,54 @@ class Card {
     private $quest;
 
     /**
-     * Set quest
+     * Set quest.
      *
      * @param int|null $quest
      *
      * @return Card
      */
-    public function setQuest($quest) {
+    public function setQuest($quest)
+    {
         $this->quest = $quest;
 
         return $this;
     }
 
     /**
-     * Get quest
+     * Get quest.
      *
      * @return int|null
      */
-    public function getQuest() {
+    public function getQuest()
+    {
         return $this->quest;
     }
     /**
-     * @var boolean
+     * @var bool
      */
     private $hasErrata;
 
     /**
-     * Set hasErrata
+     * Set hasErrata.
      *
-     * @param boolean $hasErrata
+     * @param bool $hasErrata
      *
      * @return Card
      */
-    public function setHasErrata($hasErrata) {
+    public function setHasErrata($hasErrata)
+    {
         $this->hasErrata = $hasErrata;
 
         return $this;
     }
 
     /**
-     * Get hasErrata
+     * Get hasErrata.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getHasErrata() {
+    public function getHasErrata()
+    {
         return $this->hasErrata;
     }
 }

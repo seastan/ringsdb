@@ -3,11 +3,12 @@
 namespace App\Entity;
 
 /**
- * FellowshipComment
+ * FellowshipComment.
  */
-class FellowshipComment {
+class FellowshipComment
+{
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
@@ -23,157 +24,166 @@ class FellowshipComment {
      */
     private $text;
     /**
-     * @var \App\Entity\User
+     * @var User
      */
     private $user;
     /**
-     * @var \App\Entity\Fellowship
+     * @var Fellowship
      */
     private $fellowship;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
      *
      * @return FellowshipComment
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation)
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
+     * Get dateCreation.
      *
      * @return \DateTime
      */
-    public function getDateCreation() {
+    public function getDateCreation()
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
+     * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
      *
      * @return FellowshipComment
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate($dateUpdate)
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
+     * Get dateUpdate.
      *
      * @return \DateTime
      */
-    public function getDateUpdate() {
+    public function getDateUpdate()
+    {
         return $this->dateUpdate;
     }
 
     /**
-     * Set text
+     * Set text.
      *
      * @param string $text
      *
      * @return FellowshipComment
      */
-    public function setText($text) {
+    public function setText($text)
+    {
         $this->text = $text;
 
         return $this;
     }
 
     /**
-     * Get text
+     * Get text.
      *
      * @return string
      */
-    public function getText() {
+    public function getText()
+    {
         return $this->text;
     }
 
     /**
-     * Set user
-     *
-     * @param \App\Entity\User $user
+     * Set user.
      *
      * @return FellowshipComment
      */
-    public function setUser(\App\Entity\User $user) {
+    public function setUser(User $user)
+    {
         $this->user = $user;
 
         return $this;
     }
 
     /**
-     * Get user
+     * Get user.
      *
-     * @return \App\Entity\User
+     * @return User
      */
-    public function getUser() {
+    public function getUser()
+    {
         return $this->user;
     }
 
     /**
-     * Set fellowship
-     *
-     * @param \App\Entity\Fellowship $fellowship
+     * Set fellowship.
      *
      * @return FellowshipComment
      */
-    public function setFellowship(\App\Entity\Fellowship $fellowship) {
+    public function setFellowship(Fellowship $fellowship)
+    {
         $this->fellowship = $fellowship;
 
         return $this;
     }
 
     /**
-     * Get fellowship
+     * Get fellowship.
      *
-     * @return \App\Entity\Fellowship
+     * @return Fellowship
      */
-    public function getFellowship() {
+    public function getFellowship()
+    {
         return $this->fellowship;
     }
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $isHidden;
 
     /**
-     * Set isHidden
+     * Set isHidden.
      *
-     * @param boolean $isHidden
+     * @param bool $isHidden
      *
      * @return FellowshipComment
      */
-    public function setIsHidden($isHidden) {
+    public function setIsHidden($isHidden)
+    {
         $this->isHidden = $isHidden;
 
         return $this;
     }
 
     /**
-     * Get isHidden
+     * Get isHidden.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsHidden() {
+    public function getIsHidden()
+    {
         return $this->isHidden;
     }
 }

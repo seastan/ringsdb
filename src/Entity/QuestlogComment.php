@@ -3,11 +3,12 @@
 namespace App\Entity;
 
 /**
- * QuestlogComment
+ * QuestlogComment.
  */
-class QuestlogComment {
+class QuestlogComment
+{
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
@@ -19,135 +20,141 @@ class QuestlogComment {
      */
     private $dateCreation;
     /**
-     * @var boolean
+     * @var bool
      */
     private $isHidden;
     /**
-     * @var \App\Entity\User
+     * @var User
      */
     private $user;
     /**
-     * @var \App\Entity\Questlog
+     * @var Questlog
      */
     private $questlog;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set text
+     * Set text.
      *
      * @param string $text
      *
      * @return QuestlogComment
      */
-    public function setText($text) {
+    public function setText($text)
+    {
         $this->text = $text;
 
         return $this;
     }
 
     /**
-     * Get text
+     * Get text.
      *
      * @return string
      */
-    public function getText() {
+    public function getText()
+    {
         return $this->text;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
      *
      * @return QuestlogComment
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation)
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
+     * Get dateCreation.
      *
      * @return \DateTime
      */
-    public function getDateCreation() {
+    public function getDateCreation()
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set isHidden
+     * Set isHidden.
      *
-     * @param boolean $isHidden
+     * @param bool $isHidden
      *
      * @return QuestlogComment
      */
-    public function setIsHidden($isHidden) {
+    public function setIsHidden($isHidden)
+    {
         $this->isHidden = $isHidden;
 
         return $this;
     }
 
     /**
-     * Get isHidden
+     * Get isHidden.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsHidden() {
+    public function getIsHidden()
+    {
         return $this->isHidden;
     }
 
     /**
-     * Set user
-     *
-     * @param \App\Entity\User $user
+     * Set user.
      *
      * @return QuestlogComment
      */
-    public function setUser(\App\Entity\User $user) {
+    public function setUser(User $user)
+    {
         $this->user = $user;
 
         return $this;
     }
 
     /**
-     * Get user
+     * Get user.
      *
-     * @return \App\Entity\User
+     * @return User
      */
-    public function getUser() {
+    public function getUser()
+    {
         return $this->user;
     }
 
     /**
-     * Set questlog
-     *
-     * @param \App\Entity\Questlog $questlog
+     * Set questlog.
      *
      * @return QuestlogComment
      */
-    public function setQuestlog(\App\Entity\Questlog $questlog) {
+    public function setQuestlog(Questlog $questlog)
+    {
         $this->questlog = $questlog;
 
         return $this;
     }
 
     /**
-     * Get questlog
+     * Get questlog.
      *
-     * @return \App\Entity\Questlog
+     * @return Questlog
      */
-    public function getQuestlog() {
+    public function getQuestlog()
+    {
         return $this->questlog;
     }
 }
-

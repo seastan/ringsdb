@@ -3,11 +3,12 @@
 namespace App\Entity;
 
 /**
- * Comment
+ * Comment.
  */
-class Comment {
+class Comment
+{
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
@@ -19,134 +20,141 @@ class Comment {
      */
     private $dateCreation;
     /**
-     * @var boolean
+     * @var bool
      */
     private $isHidden;
     /**
-     * @var \App\Entity\User
+     * @var User
      */
     private $user;
     /**
-     * @var \App\Entity\Decklist
+     * @var Decklist
      */
     private $decklist;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set text
+     * Set text.
      *
      * @param string $text
      *
      * @return Comment
      */
-    public function setText($text) {
+    public function setText($text)
+    {
         $this->text = $text;
 
         return $this;
     }
 
     /**
-     * Get text
+     * Get text.
      *
      * @return string
      */
-    public function getText() {
+    public function getText()
+    {
         return $this->text;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
      *
      * @return Comment
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation)
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
+     * Get dateCreation.
      *
      * @return \DateTime
      */
-    public function getDateCreation() {
+    public function getDateCreation()
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set isHidden
+     * Set isHidden.
      *
-     * @param boolean $isHidden
+     * @param bool $isHidden
      *
      * @return Comment
      */
-    public function setIsHidden($isHidden) {
+    public function setIsHidden($isHidden)
+    {
         $this->isHidden = $isHidden;
 
         return $this;
     }
 
     /**
-     * Get isHidden
+     * Get isHidden.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsHidden() {
+    public function getIsHidden()
+    {
         return $this->isHidden;
     }
 
     /**
-     * Set user
-     *
-     * @param \App\Entity\User $user
+     * Set user.
      *
      * @return Comment
      */
-    public function setUser(\App\Entity\User $user) {
+    public function setUser(User $user)
+    {
         $this->user = $user;
 
         return $this;
     }
 
     /**
-     * Get user
+     * Get user.
      *
-     * @return \App\Entity\User
+     * @return User
      */
-    public function getUser() {
+    public function getUser()
+    {
         return $this->user;
     }
 
     /**
-     * Set decklist
-     *
-     * @param \App\Entity\Decklist $decklist
+     * Set decklist.
      *
      * @return Comment
      */
-    public function setDecklist(\App\Entity\Decklist $decklist) {
+    public function setDecklist(Decklist $decklist)
+    {
         $this->decklist = $decklist;
 
         return $this;
     }
 
     /**
-     * Get decklist
+     * Get decklist.
      *
-     * @return \App\Entity\Decklist
+     * @return Decklist
      */
-    public function getDecklist() {
+    public function getDecklist()
+    {
         return $this->decklist;
     }
 }

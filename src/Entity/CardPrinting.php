@@ -2,17 +2,18 @@
 
 namespace App\Entity;
 
-class CardPrinting {
+class CardPrinting
+{
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
-     * @var integer
+     * @var int
      */
     private $position;
     /**
-     * @var integer
+     * @var int
      */
     private $quantity;
     /**
@@ -76,438 +77,473 @@ class CardPrinting {
      */
     private $dateUpdate;
     /**
-     * @var \App\Entity\Card
+     * @var Card
      */
     private $card;
     /**
-     * @var \App\Entity\Pack
+     * @var Pack
      */
     private $pack;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set position
+     * Set position.
      *
-     * @param integer $position
+     * @param int $position
      *
      * @return CardPrinting
      */
-    public function setPosition($position) {
+    public function setPosition($position)
+    {
         $this->position = $position;
 
         return $this;
     }
 
     /**
-     * Get position
+     * Get position.
      *
-     * @return integer
+     * @return int
      */
-    public function getPosition() {
+    public function getPosition()
+    {
         return $this->position;
     }
 
     /**
-     * Set quantity
+     * Set quantity.
      *
-     * @param integer $quantity
+     * @param int $quantity
      *
      * @return CardPrinting
      */
-    public function setQuantity($quantity) {
+    public function setQuantity($quantity)
+    {
         $this->quantity = $quantity;
 
         return $this;
     }
 
     /**
-     * Get quantity
+     * Get quantity.
      *
-     * @return integer
+     * @return int
      */
-    public function getQuantity() {
+    public function getQuantity()
+    {
         return $this->quantity;
     }
 
     /**
-     * Set illustrator
+     * Set illustrator.
      *
      * @param string|null $illustrator
      *
      * @return CardPrinting
      */
-    public function setIllustrator($illustrator) {
+    public function setIllustrator($illustrator)
+    {
         $this->illustrator = $illustrator;
 
         return $this;
     }
 
     /**
-     * Get illustrator
+     * Get illustrator.
      *
      * @return string|null
      */
-    public function getIllustrator() {
+    public function getIllustrator()
+    {
         return $this->illustrator;
     }
 
     /**
-     * Set octgnid
+     * Set octgnid.
      *
      * @param string|null $octgnid
      *
      * @return CardPrinting
      */
-    public function setOctgnid($octgnid) {
+    public function setOctgnid($octgnid)
+    {
         $this->octgnid = $octgnid;
 
         return $this;
     }
 
     /**
-     * Get octgnid
+     * Get octgnid.
      *
      * @return string|null
      */
-    public function getOctgnid() {
+    public function getOctgnid()
+    {
         return $this->octgnid;
     }
 
     /**
-     * Set imageCode
+     * Set imageCode.
      *
      * @param string $imageCode
      *
      * @return CardPrinting
      */
-    public function setImageCode($imageCode) {
+    public function setImageCode($imageCode)
+    {
         $this->imageCode = $imageCode;
 
         return $this;
     }
 
     /**
-     * Get imageCode
+     * Get imageCode.
      *
      * @return string
      */
-    public function getImageCode() {
+    public function getImageCode()
+    {
         return $this->imageCode;
     }
 
     /**
-     * Set traits
+     * Set traits.
      *
      * @param string|null $traits
      *
      * @return CardPrinting
      */
-    public function setTraits($traits) {
+    public function setTraits($traits)
+    {
         $this->traits = $traits;
 
         return $this;
     }
 
     /**
-     * Get traits
+     * Get traits.
      *
      * @return string|null
      */
-    public function getTraits() {
+    public function getTraits()
+    {
         return $this->traits;
     }
 
     /**
-     * Set text
+     * Set text.
      *
      * @param string|null $text
      *
      * @return CardPrinting
      */
-    public function setText($text) {
+    public function setText($text)
+    {
         $this->text = $text;
 
         return $this;
     }
 
     /**
-     * Get text
+     * Get text.
      *
      * @return string|null
      */
-    public function getText() {
+    public function getText()
+    {
         return $this->text;
     }
 
     /**
-     * Set cost
+     * Set cost.
      *
      * @param string|null $cost
      *
      * @return CardPrinting
      */
-    public function setCost($cost) {
+    public function setCost($cost)
+    {
         $this->cost = $cost;
 
         return $this;
     }
 
     /**
-     * Get cost
+     * Get cost.
      *
      * @return string|null
      */
-    public function getCost() {
+    public function getCost()
+    {
         return $this->cost;
     }
 
     /**
-     * Set threat
+     * Set threat.
      *
      * @param int|null $threat
      *
      * @return CardPrinting
      */
-    public function setThreat($threat) {
+    public function setThreat($threat)
+    {
         $this->threat = $threat;
 
         return $this;
     }
 
     /**
-     * Get threat
+     * Get threat.
      *
      * @return int|null
      */
-    public function getThreat() {
+    public function getThreat()
+    {
         return $this->threat;
     }
 
     /**
-     * Set willpower
+     * Set willpower.
      *
      * @param int|null $willpower
      *
      * @return CardPrinting
      */
-    public function setWillpower($willpower) {
+    public function setWillpower($willpower)
+    {
         $this->willpower = $willpower;
 
         return $this;
     }
 
     /**
-     * Get willpower
+     * Get willpower.
      *
      * @return int|null
      */
-    public function getWillpower() {
+    public function getWillpower()
+    {
         return $this->willpower;
     }
 
     /**
-     * Set attack
+     * Set attack.
      *
      * @param int|null $attack
      *
      * @return CardPrinting
      */
-    public function setAttack($attack) {
+    public function setAttack($attack)
+    {
         $this->attack = $attack;
 
         return $this;
     }
 
     /**
-     * Get attack
+     * Get attack.
      *
      * @return int|null
      */
-    public function getAttack() {
+    public function getAttack()
+    {
         return $this->attack;
     }
 
     /**
-     * Set defense
+     * Set defense.
      *
      * @param int|null $defense
      *
      * @return CardPrinting
      */
-    public function setDefense($defense) {
+    public function setDefense($defense)
+    {
         $this->defense = $defense;
 
         return $this;
     }
 
     /**
-     * Get defense
+     * Get defense.
      *
      * @return int|null
      */
-    public function getDefense() {
+    public function getDefense()
+    {
         return $this->defense;
     }
 
     /**
-     * Set health
+     * Set health.
      *
      * @param int|null $health
      *
      * @return CardPrinting
      */
-    public function setHealth($health) {
+    public function setHealth($health)
+    {
         $this->health = $health;
 
         return $this;
     }
 
     /**
-     * Get health
+     * Get health.
      *
      * @return int|null
      */
-    public function getHealth() {
+    public function getHealth()
+    {
         return $this->health;
     }
 
     /**
-     * Set victory
+     * Set victory.
      *
      * @param int|null $victory
      *
      * @return CardPrinting
      */
-    public function setVictory($victory) {
+    public function setVictory($victory)
+    {
         $this->victory = $victory;
 
         return $this;
     }
 
     /**
-     * Get victory
+     * Get victory.
      *
      * @return int|null
      */
-    public function getVictory() {
+    public function getVictory()
+    {
         return $this->victory;
     }
 
     /**
-     * Set quest
+     * Set quest.
      *
      * @param int|null $quest
      *
      * @return CardPrinting
      */
-    public function setQuest($quest) {
+    public function setQuest($quest)
+    {
         $this->quest = $quest;
 
         return $this;
     }
 
     /**
-     * Get quest
+     * Get quest.
      *
      * @return int|null
      */
-    public function getQuest() {
+    public function getQuest()
+    {
         return $this->quest;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
      *
      * @return CardPrinting
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation)
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
+     * Get dateCreation.
      *
      * @return \DateTime
      */
-    public function getDateCreation() {
+    public function getDateCreation()
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
+     * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
      *
      * @return CardPrinting
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate($dateUpdate)
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
+     * Get dateUpdate.
      *
      * @return \DateTime
      */
-    public function getDateUpdate() {
+    public function getDateUpdate()
+    {
         return $this->dateUpdate;
     }
 
     /**
-     * Set card
-     *
-     * @param \App\Entity\Card $card
+     * Set card.
      *
      * @return CardPrinting
      */
-    public function setCard(\App\Entity\Card $card) {
+    public function setCard(Card $card)
+    {
         $this->card = $card;
 
         return $this;
     }
 
     /**
-     * Get card
+     * Get card.
      *
-     * @return \App\Entity\Card
+     * @return Card
      */
-    public function getCard() {
+    public function getCard()
+    {
         return $this->card;
     }
 
     /**
-     * Set pack
-     *
-     * @param \App\Entity\Pack $pack
+     * Set pack.
      *
      * @return CardPrinting
      */
-    public function setPack(\App\Entity\Pack $pack) {
+    public function setPack(Pack $pack)
+    {
         $this->pack = $pack;
 
         return $this;
     }
 
     /**
-     * Get pack
+     * Get pack.
      *
-     * @return \App\Entity\Pack
+     * @return Pack
      */
-    public function getPack() {
+    public function getPack()
+    {
         return $this->pack;
     }
 }

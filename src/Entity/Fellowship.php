@@ -3,11 +3,12 @@
 namespace App\Entity;
 
 /**
- * Fellowship
+ * Fellowship.
  */
-class Fellowship {
+class Fellowship
+{
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
@@ -27,19 +28,19 @@ class Fellowship {
      */
     private $descriptionHtml;
     /**
-     * @var boolean
+     * @var bool
      */
     private $isPublic;
     /**
-     * @var integer
+     * @var int
      */
     private $nbVotes;
     /**
-     * @var integer
+     * @var int
      */
     private $nbFavorites;
     /**
-     * @var integer
+     * @var int
      */
     private $nbComments;
     /**
@@ -51,38 +52,39 @@ class Fellowship {
      */
     private $dateUpdate;
     /**
-    * @var \DateTime|null
-    */
+     * @var \DateTime|null
+     */
     private $dateLastComment;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\FellowshipDeck>
+     * @var \Doctrine\Common\Collections\Collection<int, FellowshipDeck>
      */
     private $decks;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\FellowshipDecklist>
+     * @var \Doctrine\Common\Collections\Collection<int, FellowshipDecklist>
      */
     private $decklists;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\FellowshipComment>
+     * @var \Doctrine\Common\Collections\Collection<int, FellowshipComment>
      */
     private $comments;
     /**
-     * @var \App\Entity\User
+     * @var User
      */
     private $user;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @var \Doctrine\Common\Collections\Collection<int, User>
      */
     private $favorites;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @var \Doctrine\Common\Collections\Collection<int, User>
      */
     private $votes;
 
     /**
-     * Constructor
+     * Constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->decks = new \Doctrine\Common\Collections\ArrayCollection();
         $this->decklists = new \Doctrine\Common\Collections\ArrayCollection();
         $this->comments = new \Doctrine\Common\Collections\ArrayCollection();
@@ -91,462 +93,487 @@ class Fellowship {
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return Fellowship
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
     /**
-     * Set nameCanonical
+     * Set nameCanonical.
      *
      * @param string $nameCanonical
      *
      * @return Fellowship
      */
-    public function setNameCanonical($nameCanonical) {
+    public function setNameCanonical($nameCanonical)
+    {
         $this->nameCanonical = $nameCanonical;
 
         return $this;
     }
 
     /**
-     * Get nameCanonical
+     * Get nameCanonical.
      *
      * @return string
      */
-    public function getNameCanonical() {
+    public function getNameCanonical()
+    {
         return $this->nameCanonical;
     }
 
     /**
-     * Set descriptionMd
+     * Set descriptionMd.
      *
      * @param string|null $descriptionMd
      *
      * @return Fellowship
      */
-    public function setDescriptionMd($descriptionMd) {
+    public function setDescriptionMd($descriptionMd)
+    {
         $this->descriptionMd = $descriptionMd;
 
         return $this;
     }
 
     /**
-     * Get descriptionMd
+     * Get descriptionMd.
      *
      * @return string|null
      */
-    public function getDescriptionMd() {
+    public function getDescriptionMd()
+    {
         return $this->descriptionMd;
     }
 
     /**
-     * Set descriptionHtml
+     * Set descriptionHtml.
      *
      * @param string|null $descriptionHtml
      *
      * @return Fellowship
      */
-    public function setDescriptionHtml($descriptionHtml) {
+    public function setDescriptionHtml($descriptionHtml)
+    {
         $this->descriptionHtml = $descriptionHtml;
 
         return $this;
     }
 
     /**
-     * Get descriptionHtml
+     * Get descriptionHtml.
      *
      * @return string|null
      */
-    public function getDescriptionHtml() {
+    public function getDescriptionHtml()
+    {
         return $this->descriptionHtml;
     }
 
     /**
-     * Set isPublic
+     * Set isPublic.
      *
-     * @param boolean $isPublic
+     * @param bool $isPublic
      *
      * @return Fellowship
      */
-    public function setIsPublic($isPublic) {
+    public function setIsPublic($isPublic)
+    {
         $this->isPublic = $isPublic;
 
         return $this;
     }
 
     /**
-     * Get isPublic
+     * Get isPublic.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsPublic() {
+    public function getIsPublic()
+    {
         return $this->isPublic;
     }
 
     /**
-     * Set nbVotes
+     * Set nbVotes.
      *
-     * @param integer $nbVotes
+     * @param int $nbVotes
      *
      * @return Fellowship
      */
-    public function setNbVotes($nbVotes) {
+    public function setNbVotes($nbVotes)
+    {
         $this->nbVotes = $nbVotes;
 
         return $this;
     }
 
     /**
-     * Get nbVotes
+     * Get nbVotes.
      *
-     * @return integer
+     * @return int
      */
-    public function getNbVotes() {
+    public function getNbVotes()
+    {
         return $this->nbVotes;
     }
 
     /**
-     * Set nbFavorites
+     * Set nbFavorites.
      *
-     * @param integer $nbFavorites
+     * @param int $nbFavorites
      *
      * @return Fellowship
      */
-    public function setNbFavorites($nbFavorites) {
+    public function setNbFavorites($nbFavorites)
+    {
         $this->nbFavorites = $nbFavorites;
 
         return $this;
     }
 
     /**
-     * Get nbFavorites
+     * Get nbFavorites.
      *
-     * @return integer
+     * @return int
      */
-    public function getNbFavorites() {
+    public function getNbFavorites()
+    {
         return $this->nbFavorites;
     }
 
     /**
-     * Set nbComments
+     * Set nbComments.
      *
-     * @param integer $nbComments
+     * @param int $nbComments
      *
      * @return Fellowship
      */
-    public function setNbComments($nbComments) {
+    public function setNbComments($nbComments)
+    {
         $this->nbComments = $nbComments;
 
         return $this;
     }
 
     /**
-     * Get nbComments
+     * Get nbComments.
      *
-     * @return integer
+     * @return int
      */
-    public function getNbComments() {
+    public function getNbComments()
+    {
         return $this->nbComments;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
      *
      * @return Fellowship
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation)
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
+     * Get dateCreation.
      *
      * @return \DateTime
      */
-    public function getDateCreation() {
+    public function getDateCreation()
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
+     * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
      *
      * @return Fellowship
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate($dateUpdate)
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
+     * Get dateUpdate.
      *
      * @return \DateTime
      */
-    public function getDateUpdate() {
+    public function getDateUpdate()
+    {
         return $this->dateUpdate;
     }
 
     /**
-     * Set dateLastComment
+     * Set dateLastComment.
      *
      * @param \DateTime|null $dateLastComment
      *
      * @return Fellowship
      */
-    public function setDateLastComment($dateLastComment) {
+    public function setDateLastComment($dateLastComment)
+    {
         $this->dateLastComment = $dateLastComment;
 
         return $this;
     }
 
     /**
-     * Get dateLastComment
+     * Get dateLastComment.
      *
      * @return \DateTime|null
      */
-    public function getDateLastComment() {
+    public function getDateLastComment()
+    {
         return $this->dateLastComment;
     }
 
     /**
-     * Add deck
-     *
-     * @param \App\Entity\FellowshipDeck $deck
+     * Add deck.
      *
      * @return Fellowship
      */
-    public function addDeck(\App\Entity\FellowshipDeck $deck) {
+    public function addDeck(FellowshipDeck $deck)
+    {
         $this->decks[] = $deck;
 
         return $this;
     }
 
     /**
-     * Remove deck
+     * Remove deck.
      *
-     * @param \App\Entity\FellowshipDeck $deck
      * @return void
      */
-    public function removeDeck(\App\Entity\FellowshipDeck $deck) {
+    public function removeDeck(FellowshipDeck $deck)
+    {
         $this->decks->removeElement($deck);
     }
 
     /**
-     * Get decks
+     * Get decks.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\FellowshipDeck>
+     * @return \Doctrine\Common\Collections\Collection<int, FellowshipDeck>
      */
-    public function getDecks() {
+    public function getDecks()
+    {
         return $this->decks;
     }
 
     /**
-     * Add decklist
-     *
-     * @param \App\Entity\FellowshipDecklist $decklist
+     * Add decklist.
      *
      * @return Fellowship
      */
-    public function addDecklist(\App\Entity\FellowshipDecklist $decklist) {
+    public function addDecklist(FellowshipDecklist $decklist)
+    {
         $this->decklists[] = $decklist;
 
         return $this;
     }
 
     /**
-     * Remove decklist
+     * Remove decklist.
      *
-     * @param \App\Entity\FellowshipDecklist $decklist
      * @return void
      */
-    public function removeDecklist(\App\Entity\FellowshipDecklist $decklist) {
+    public function removeDecklist(FellowshipDecklist $decklist)
+    {
         $this->decklists->removeElement($decklist);
     }
 
     /**
-     * Get decklists
+     * Get decklists.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\FellowshipDecklist>
+     * @return \Doctrine\Common\Collections\Collection<int, FellowshipDecklist>
      */
-    public function getDecklists() {
+    public function getDecklists()
+    {
         return $this->decklists;
     }
 
     /**
-     * Add comment
-     *
-     * @param \App\Entity\FellowshipComment $comment
+     * Add comment.
      *
      * @return Fellowship
      */
-    public function addComment(\App\Entity\FellowshipComment $comment) {
+    public function addComment(FellowshipComment $comment)
+    {
         $this->comments[] = $comment;
 
         return $this;
     }
 
     /**
-     * Remove comment
+     * Remove comment.
      *
-     * @param \App\Entity\FellowshipComment $comment
      * @return void
      */
-    public function removeComment(\App\Entity\FellowshipComment $comment) {
+    public function removeComment(FellowshipComment $comment)
+    {
         $this->comments->removeElement($comment);
     }
 
     /**
-     * Get comments
+     * Get comments.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\FellowshipComment>
+     * @return \Doctrine\Common\Collections\Collection<int, FellowshipComment>
      */
-    public function getComments() {
+    public function getComments()
+    {
         return $this->comments;
     }
 
     /**
-     * Set user
-     *
-     * @param \App\Entity\User $user
+     * Set user.
      *
      * @return Fellowship
      */
-    public function setUser(\App\Entity\User $user) {
+    public function setUser(User $user)
+    {
         $this->user = $user;
 
         return $this;
     }
 
     /**
-     * Get user
+     * Get user.
      *
-     * @return \App\Entity\User
+     * @return User
      */
-    public function getUser() {
+    public function getUser()
+    {
         return $this->user;
     }
 
     /**
-     * Add favorite
-     *
-     * @param \App\Entity\User $favorite
+     * Add favorite.
      *
      * @return Fellowship
      */
-    public function addFavorite(\App\Entity\User $favorite) {
+    public function addFavorite(User $favorite)
+    {
         $this->favorites[] = $favorite;
 
         return $this;
     }
 
     /**
-     * Remove favorite
+     * Remove favorite.
      *
-     * @param \App\Entity\User $favorite
      * @return void
      */
-    public function removeFavorite(\App\Entity\User $favorite) {
+    public function removeFavorite(User $favorite)
+    {
         $this->favorites->removeElement($favorite);
     }
 
     /**
-     * Get favorites
+     * Get favorites.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @return \Doctrine\Common\Collections\Collection<int, User>
      */
-    public function getFavorites() {
+    public function getFavorites()
+    {
         return $this->favorites;
     }
 
     /**
-     * Add vote
-     *
-     * @param \App\Entity\User $vote
+     * Add vote.
      *
      * @return Fellowship
      */
-    public function addVote(\App\Entity\User $vote) {
+    public function addVote(User $vote)
+    {
         $this->votes[] = $vote;
 
         return $this;
     }
 
     /**
-     * Remove vote
+     * Remove vote.
      *
-     * @param \App\Entity\User $vote
      * @return void
      */
-    public function removeVote(\App\Entity\User $vote) {
+    public function removeVote(User $vote)
+    {
         $this->votes->removeElement($vote);
     }
 
     /**
-     * Get votes
+     * Get votes.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @return \Doctrine\Common\Collections\Collection<int, User>
      */
-    public function getVotes() {
+    public function getVotes()
+    {
         return $this->votes;
     }
 
     /**
-     * @var integer
+     * @var int
      */
     private $nbDecks;
 
     /**
-     * Set nbDecks
+     * Set nbDecks.
      *
-     * @param integer $nbDecks
+     * @param int $nbDecks
      *
      * @return Fellowship
      */
-    public function setNbDecks($nbDecks) {
+    public function setNbDecks($nbDecks)
+    {
         $this->nbDecks = $nbDecks;
 
         return $this;
     }
 
     /**
-     * Get nbDecks
+     * Get nbDecks.
      *
-     * @return integer
+     * @return int
      */
-    public function getNbDecks() {
+    public function getNbDecks()
+    {
         return $this->nbDecks;
     }
 
@@ -556,24 +583,26 @@ class Fellowship {
     private $datePublish;
 
     /**
-     * Set datePublish
+     * Set datePublish.
      *
      * @param \DateTime|null $datePublish
      *
      * @return Fellowship
      */
-    public function setDatePublish($datePublish) {
+    public function setDatePublish($datePublish)
+    {
         $this->datePublish = $datePublish;
 
         return $this;
     }
 
     /**
-     * Get datePublish
+     * Get datePublish.
      *
      * @return \DateTime|null
      */
-    public function getDatePublish() {
+    public function getDatePublish()
+    {
         return $this->datePublish;
     }
 }

@@ -15,23 +15,27 @@ use PHPStan\Type\Type;
  * declared by doctrine/persistence. phpstan-doctrine types the repositories (getRepository() with
  * a class name), not the registry.
  */
-class DoctrineRegistryReturnTypeExtension implements DynamicMethodReturnTypeExtension {
-    const RETURN_TYPES = [
+class DoctrineRegistryReturnTypeExtension implements DynamicMethodReturnTypeExtension
+{
+    public const RETURN_TYPES = [
         'getManager' => 'Doctrine\ORM\EntityManager',
         'getManagerForClass' => 'Doctrine\ORM\EntityManager',
         'resetManager' => 'Doctrine\ORM\EntityManager',
         'getConnection' => 'Doctrine\DBAL\Connection',
     ];
 
-    public function getClass(): string {
+    public function getClass(): string
+    {
         return 'Doctrine\Persistence\ManagerRegistry';
     }
 
-    public function isMethodSupported(MethodReflection $methodReflection): bool {
+    public function isMethodSupported(MethodReflection $methodReflection): bool
+    {
         return isset(self::RETURN_TYPES[$methodReflection->getName()]);
     }
 
-    public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): Type {
+    public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): Type
+    {
         return new ObjectType(self::RETURN_TYPES[$methodReflection->getName()]);
     }
 }

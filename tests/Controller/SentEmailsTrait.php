@@ -3,8 +3,8 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\Mailer\DataCollector\MessageDataCollector;
-use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Event\MessageEvents;
 use Symfony\Component\Mime\Email;
 
@@ -12,11 +12,13 @@ use Symfony\Component\Mime\Email;
  * The emails sent during the last request, from the profiler (call $client->enableProfiler()
  * before the request).
  */
-trait SentEmailsTrait {
+trait SentEmailsTrait
+{
     /**
      * @return MessageEvents
      */
-    private function sentMessageEvents(Client $client) {
+    private function sentMessageEvents(KernelBrowser $client)
+    {
         $profile = $client->getProfile();
         self::assertNotFalse($profile, 'the profiler is not enabled');
         /** @var MessageDataCollector $collector */
@@ -26,10 +28,10 @@ trait SentEmailsTrait {
     }
 
     /**
-     * @param Client $client
      * @return Email[]
      */
-    private function sentMessages(Client $client): array {
+    private function sentMessages(KernelBrowser $client): array
+    {
         return $this->sentMessageEvents($client)->getMessages();
     }
 }

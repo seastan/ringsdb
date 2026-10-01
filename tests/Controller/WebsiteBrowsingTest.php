@@ -15,7 +15,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * GET routes that write to the database (/deck/new, /deck/clone/{id}, /fellowship/publish/{id})
  * are deliberately left out.
  */
-class WebsiteBrowsingTest extends WebTestCase {
+class WebsiteBrowsingTest extends WebTestCase
+{
     use PageSnapshotTrait;
     use \App\Tests\TemporaryFileTrait;
 
@@ -29,9 +30,10 @@ class WebsiteBrowsingTest extends WebTestCase {
     /* ------------------------------------------------------------ helpers */
 
     /**
-     * @return \Symfony\Bundle\FrameworkBundle\Client
+     * @return KernelBrowser
      */
-    private function createAuthenticatedClient() {
+    private function createAuthenticatedClient()
+    {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => 'test', '_password' => 'test']));
@@ -40,12 +42,8 @@ class WebsiteBrowsingTest extends WebTestCase {
         return $client;
     }
 
-    /**
-     * @param mixed $uri
-     * @param mixed $snapshot
-     * @param mixed $title
-     */
-    private function assertPage(Client $client, $uri, $snapshot, $title): void {
+    private function assertPage(KernelBrowser $client, $uri, $snapshot, $title): void
+    {
         $crawler = $client->request('GET', $uri);
         $response = $client->getResponse();
 
@@ -54,16 +52,18 @@ class WebsiteBrowsingTest extends WebTestCase {
         $this->assertSame($title, trim($crawler->filter('title')->text()));
         // the home page's daily challenge is picked with srand(<day number>)
         $text = preg_replace('/^Daily Challenge: .*$/m', 'Daily Challenge: <masked, changes every day>', self::pageText($crawler));
-        $this->assertMatchesSnapshot($snapshot . '.txt', $text);
+        $this->assertMatchesSnapshot($snapshot.'.txt', $text);
     }
 
     /* ------------------------------------------------------ public pages */
 
     /**
-     * [uri, snapshot name, <title>]
+     * [uri, snapshot name, <title>].
+     *
      * @return array
      */
-    public function publicPageProvider() {
+    public function publicPageProvider()
+    {
         return [
             'home' => ['/', 'index', 'Deckbuilder · RingsDB'],
             'about' => ['/about', 'about', 'About · RingsDB'],
@@ -100,31 +100,29 @@ class WebsiteBrowsingTest extends WebTestCase {
 
     /**
      * @dataProvider publicPageProvider
-     * @param mixed $uri
-     * @param mixed $snapshot
-     * @param mixed $title
      */
-    public function testPublicPageAsAnonymous($uri, $snapshot, $title): void {
-        $this->assertPage($this->client, $uri, 'anonymous/' . $snapshot, $title);
+    public function testPublicPageAsAnonymous($uri, $snapshot, $title): void
+    {
+        $this->assertPage($this->client, $uri, 'anonymous/'.$snapshot, $title);
     }
 
     /**
      * @dataProvider publicPageProvider
-     * @param mixed $uri
-     * @param mixed $snapshot
-     * @param mixed $title
      */
-    public function testPublicPageAsUser($uri, $snapshot, $title): void {
-        $this->assertPage($this->createAuthenticatedClient(), $uri, 'user/' . $snapshot, $title);
+    public function testPublicPageAsUser($uri, $snapshot, $title): void
+    {
+        $this->assertPage($this->createAuthenticatedClient(), $uri, 'user/'.$snapshot, $title);
     }
 
     /* ---------------------------------------------------- members' pages */
 
     /**
-     * [uri, snapshot name, <title>]
+     * [uri, snapshot name, <title>].
+     *
      * @return array
      */
-    public function memberPageProvider() {
+    public function memberPageProvider()
+    {
         return [
             'my decks' => ['/decks', 'decks', 'My Decks · RingsDB'],
             'deck' => ['/deck/view/1', 'deck_view_1', 'Deckbuilder · RingsDB'],
@@ -155,21 +153,21 @@ class WebsiteBrowsingTest extends WebTestCase {
 
     /**
      * @dataProvider memberPageProvider
-     * @param mixed $uri
-     * @param mixed $snapshot
-     * @param mixed $title
      */
-    public function testMemberPage($uri, $snapshot, $title): void {
-        $this->assertPage($this->createAuthenticatedClient(), $uri, 'user/' . $snapshot, $title);
+    public function testMemberPage($uri, $snapshot, $title): void
+    {
+        $this->assertPage($this->createAuthenticatedClient(), $uri, 'user/'.$snapshot, $title);
     }
 
     /* ----------------------------------------------------- access control */
 
     /**
-     * Pages anonymous visitors cannot see: [uri, expected status, expected Location or error title]
+     * Pages anonymous visitors cannot see: [uri, expected status, expected Location or error title].
+     *
      * @return array
      */
-    public function anonymousAccessProvider() {
+    public function anonymousAccessProvider()
+    {
         $login = 'http://localhost/login';
 
         return [
@@ -200,11 +198,9 @@ class WebsiteBrowsingTest extends WebTestCase {
 
     /**
      * @dataProvider anonymousAccessProvider
-     * @param mixed $uri
-     * @param mixed $status
-     * @param mixed $expected
      */
-    public function testAnonymousAccessIsDenied($uri, $status, $expected): void {
+    public function testAnonymousAccessIsDenied($uri, $status, $expected): void
+    {
         $client = $this->client;
         $crawler = $client->request('GET', $uri);
         $response = $client->getResponse();
@@ -217,7 +213,8 @@ class WebsiteBrowsingTest extends WebTestCase {
         }
     }
 
-    public function testAnonymousSeesNoDecklistOfHisOwn(): void {
+    public function testAnonymousSeesNoDecklistOfHisOwn(): void
+    {
         $client = $this->client;
         $this->assertPage($client, '/decklists/mine', 'anonymous/decklists_mine', 'My Decklists · RingsDB');
     }
@@ -225,10 +222,12 @@ class WebsiteBrowsingTest extends WebTestCase {
     /* ---------------------------------------------------- redirects & 404 */
 
     /**
-     * [uri, expected Location]
+     * [uri, expected Location].
+     *
      * @return array
      */
-    public function redirectProvider() {
+    public function redirectProvider()
+    {
         return [
             'search matching a pack' => ['/find?q=e:Core', '/set/Core/list/name'],
             'search form processing' => ['/process?q=Aragorn', '/find?q=Aragorn'],
@@ -240,10 +239,9 @@ class WebsiteBrowsingTest extends WebTestCase {
 
     /**
      * @dataProvider redirectProvider
-     * @param mixed $uri
-     * @param mixed $location
      */
-    public function testRedirect($uri, $location): void {
+    public function testRedirect($uri, $location): void
+    {
         $client = $this->client;
         $client->request('GET', $uri);
 
@@ -252,10 +250,12 @@ class WebsiteBrowsingTest extends WebTestCase {
     }
 
     /**
-     * [uri, error title]
+     * [uri, error title].
+     *
      * @return array
      */
-    public function notFoundProvider() {
+    public function notFoundProvider()
+    {
         return [
             'unknown pack' => ['/set/nope', 'This pack does not exist (404 Not Found)'],
             'unknown cycle' => ['/cycle/nope', 'This cycle does not exist (404 Not Found)'],
@@ -267,10 +267,9 @@ class WebsiteBrowsingTest extends WebTestCase {
 
     /**
      * @dataProvider notFoundProvider
-     * @param mixed $uri
-     * @param mixed $title
      */
-    public function testNotFound($uri, $title): void {
+    public function testNotFound($uri, $title): void
+    {
         $client = $this->client;
         $crawler = $client->request('GET', $uri);
 
@@ -281,10 +280,12 @@ class WebsiteBrowsingTest extends WebTestCase {
     /* ---------------------------------------------------------- downloads */
 
     /**
-     * [uri, snapshot file, Content-Type, Content-Disposition, authenticated]
+     * [uri, snapshot file, Content-Type, Content-Disposition, authenticated].
+     *
      * @return array
      */
-    public function downloadProvider() {
+    public function downloadProvider()
+    {
         return [
             'decklist as text' => ['/decklist/export/text/1', 'decklist_1.txt', 'text/plain; charset=UTF-8', 'attachment; filename=dwarfloreleadershiptactics-1.0.txt', false],
             'decklist as OCTGN' => ['/decklist/export/octgn/1', 'decklist_1.o8d', 'application/octgn', 'attachment; filename=dwarfloreleadershiptactics-1.0.o8d', false],
@@ -295,13 +296,9 @@ class WebsiteBrowsingTest extends WebTestCase {
 
     /**
      * @dataProvider downloadProvider
-     * @param mixed $uri
-     * @param mixed $snapshot
-     * @param mixed $contentType
-     * @param mixed $disposition
-     * @param mixed $authenticated
      */
-    public function testDownload($uri, $snapshot, $contentType, $disposition, $authenticated): void {
+    public function testDownload($uri, $snapshot, $contentType, $disposition, $authenticated): void
+    {
         $client = $authenticated ? $this->createAuthenticatedClient() : $this->client;
         $client->request('GET', $uri);
         $response = $client->getResponse();
@@ -309,16 +306,18 @@ class WebsiteBrowsingTest extends WebTestCase {
         $this->assertSame(200, $response->getStatusCode(), "GET $uri");
         $this->assertSame($contentType, $response->headers->get('Content-Type'));
         $this->assertSame($disposition, $response->headers->get('Content-Disposition'));
-        $this->assertMatchesSnapshot('downloads/' . $snapshot, $response->getContent());
+        $this->assertMatchesSnapshot('downloads/'.$snapshot, $response->getContent());
     }
 
     /**
      * Zip archives: the content is checked entry by entry (zip metadata contains timestamps).
      *
      * [uri, expected entries => snapshot file]
+     *
      * @return array
      */
-    public function zipDownloadProvider() {
+    public function zipDownloadProvider()
+    {
         return [
             'decks as text' => ['/deck/export/text/list?ids[]=1&ids[]=2', [
                 'dwarfloreleadershiptactics 1.1.txt' => 'deck_list/dwarfloreleadershiptactics.txt',
@@ -353,9 +352,9 @@ class WebsiteBrowsingTest extends WebTestCase {
 
     /**
      * @dataProvider zipDownloadProvider
-     * @param mixed $uri
      */
-    public function testZipDownload($uri, array $entries): void {
+    public function testZipDownload($uri, array $entries): void
+    {
         $client = $this->createAuthenticatedClient();
         $client->request('GET', $uri);
         $response = $client->getResponse();
@@ -369,7 +368,7 @@ class WebsiteBrowsingTest extends WebTestCase {
         // true, or an error code
         $this->assertSame(true, $zip->open($file));
         $actual = [];
-        for ($i = 0; $i < $zip->numFiles; $i++) {
+        for ($i = 0; $i < $zip->numFiles; ++$i) {
             $actual[$zip->getNameIndex($i)] = $zip->getFromIndex($i);
         }
         $zip->close();
@@ -377,7 +376,7 @@ class WebsiteBrowsingTest extends WebTestCase {
 
         $this->assertSame(array_keys($entries), array_keys($actual));
         foreach ($entries as $name => $snapshot) {
-            $this->assertMatchesSnapshot('downloads/' . $snapshot, $actual[$name]);
+            $this->assertMatchesSnapshot('downloads/'.$snapshot, $actual[$name]);
         }
     }
 }

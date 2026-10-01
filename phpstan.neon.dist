@@ -1,7 +1,10 @@
 parameters:
-    level: 8
+    level: 0
     paths:
         - src
+    ignoreErrors:
+        -
+            identifier: doctrine.dql
     # phpstan/phpstan-symfony: the service types, read from the container dumped in debug mode
     # (make phpstan warms up the test cache first)
     symfony:

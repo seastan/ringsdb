@@ -14,14 +14,16 @@ use Symfony\Component\DomCrawler\Crawler;
  * To (re)generate the snapshots, run the tests with UPDATE_SNAPSHOTS=1, then review the diff:
  *   docker compose exec -e UPDATE_SNAPSHOTS=1 -u www-data symfony php bin/simple-phpunit
  */
-trait PageSnapshotTrait {
+trait PageSnapshotTrait
+{
     /**
      * @return string
      */
-    private static function pageText(Crawler $crawler) {
+    private static function pageText(Crawler $crawler)
+    {
         $crawler->filter('script, style, noscript')->each(function (Crawler $node): void {
             $domNode = $node->getNode(0);
-            if ($domNode !== null && $domNode->parentNode !== null) {
+            if (null !== $domNode && null !== $domNode->parentNode) {
                 $domNode->parentNode->removeChild($domNode);
             }
         });
@@ -30,20 +32,17 @@ trait PageSnapshotTrait {
         /** @var \DOMNode $textNode */
         foreach ($crawler->filterXPath('//body//text()') as $textNode) {
             $line = trim((string) preg_replace('/\s+/u', ' ', (string) $textNode->nodeValue));
-            if ($line !== '') {
+            if ('' !== $line) {
                 $lines[] = $line;
             }
         }
 
-        return implode("\n", $lines) . "\n";
+        return implode("\n", $lines)."\n";
     }
 
-    /**
-     * @param mixed $name
-     * @param mixed $actual
-     */
-    private function assertMatchesSnapshot($name, $actual): void {
-        $file = __DIR__ . '/../Resources/snapshots/pages/' . $name;
+    private function assertMatchesSnapshot($name, $actual): void
+    {
+        $file = __DIR__.'/../Resources/snapshots/pages/'.$name;
 
         if (getenv('UPDATE_SNAPSHOTS')) {
             if (!is_dir(dirname($file))) {

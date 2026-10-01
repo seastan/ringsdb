@@ -3,10 +3,12 @@
 namespace App\Entity;
 
 /**
- * Scenario
+ * Scenario.
  */
-class Scenario implements \JsonSerializable {
-    public function jsonSerialize() {
+class Scenario implements \JsonSerializable
+{
+    public function jsonSerialize()
+    {
         $encounters = $this->getEncounters()->toArray();
         $pack = $this->getPack();
 
@@ -58,9 +60,8 @@ class Scenario implements \JsonSerializable {
         return $array;
     }
 
-
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
@@ -80,1067 +81,1143 @@ class Scenario implements \JsonSerializable {
      */
     private $dateUpdate;
     /**
-     * @var \App\Entity\Pack|null
+     * @var Pack|null
      */
     private $pack;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Encounter>
+     * @var \Doctrine\Common\Collections\Collection<int, Encounter>
      */
     private $encounters;
 
     /**
-     * Constructor
+     * Constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->encounters = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set code
+     * Set code.
      *
      * @param string $code
      *
      * @return Scenario
      */
-    public function setCode($code) {
+    public function setCode($code)
+    {
         $this->code = $code;
 
         return $this;
     }
 
     /**
-     * Get code
+     * Get code.
      *
      * @return string
      */
-    public function getCode() {
+    public function getCode()
+    {
         return $this->code;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return Scenario
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
      *
      * @return Scenario
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation)
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
+     * Get dateCreation.
      *
      * @return \DateTime
      */
-    public function getDateCreation() {
+    public function getDateCreation()
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
+     * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
      *
      * @return Scenario
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate($dateUpdate)
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
+     * Get dateUpdate.
      *
      * @return \DateTime
      */
-    public function getDateUpdate() {
+    public function getDateUpdate()
+    {
         return $this->dateUpdate;
     }
 
     /**
-     * Set pack
-     *
-     * @param \App\Entity\Pack $pack
+     * Set pack.
      *
      * @return Scenario
      */
-    public function setPack(\App\Entity\Pack $pack = null) {
+    public function setPack(?Pack $pack = null)
+    {
         $this->pack = $pack;
 
         return $this;
     }
 
     /**
-     * Get pack
+     * Get pack.
      *
-     * @return \App\Entity\Pack|null
+     * @return Pack|null
      */
-    public function getPack() {
+    public function getPack()
+    {
         return $this->pack;
     }
 
     /**
-     * Add encounter
-     *
-     * @param \App\Entity\Encounter $encounter
+     * Add encounter.
      *
      * @return Scenario
      */
-    public function addEncounter(\App\Entity\Encounter $encounter) {
+    public function addEncounter(Encounter $encounter)
+    {
         $this->encounters[] = $encounter;
 
         return $this;
     }
 
     /**
-     * Remove encounter
+     * Remove encounter.
      *
-     * @param \App\Entity\Encounter $encounter
      * @return void
      */
-    public function removeEncounter(\App\Entity\Encounter $encounter) {
+    public function removeEncounter(Encounter $encounter)
+    {
         $this->encounters->removeElement($encounter);
     }
 
     /**
-     * Get encounters
+     * Get encounters.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Encounter>
+     * @return \Doctrine\Common\Collections\Collection<int, Encounter>
      */
-    public function getEncounters() {
+    public function getEncounters()
+    {
         return $this->encounters;
     }
 
     /**
-     * @var integer
+     * @var int
      */
     private $position;
 
     /**
-     * Set position
+     * Set position.
      *
-     * @param integer $position
+     * @param int $position
      *
      * @return Scenario
      */
-    public function setPosition($position) {
+    public function setPosition($position)
+    {
         $this->position = $position;
 
         return $this;
     }
 
     /**
-     * Get position
+     * Get position.
      *
-     * @return integer
+     * @return int
      */
-    public function getPosition() {
+    public function getPosition()
+    {
         return $this->position;
     }
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $hasEasy;
     /**
-     * @var boolean
+     * @var bool
      */
     private $hasNightmare;
     /**
-     * @var integer
+     * @var int
      */
     private $easyCards;
     /**
-     * @var integer
+     * @var int
      */
     private $easyEnemies;
     /**
-     * @var integer
+     * @var int
      */
     private $easyLocations;
     /**
-     * @var integer
+     * @var int
      */
     private $easyTreacheries;
     /**
-     * @var integer
+     * @var int
      */
     private $easyObjectiveAllies;
     /**
-     * @var integer
+     * @var int
      */
     private $easyObjectiveLocations;
     /**
-     * @var integer
+     * @var int
      */
     private $easySurges;
     /**
-     * @var integer
+     * @var int
      */
     private $easyShadows;
     /**
-     * @var integer
+     * @var int
      */
     private $easyEncounterSideQuests;
     /**
-     * @var integer
+     * @var int
      */
     private $normalCards;
     /**
-     * @var integer
+     * @var int
      */
     private $normalEnemies;
     /**
-     * @var integer
+     * @var int
      */
     private $normalLocations;
     /**
-     * @var integer
+     * @var int
      */
     private $normalTreacheries;
     /**
-     * @var integer
+     * @var int
      */
     private $normalObjectiveAllies;
     /**
-     * @var integer
+     * @var int
      */
     private $normalObjectiveLocations;
     /**
-     * @var integer
+     * @var int
      */
     private $normalSurges;
     /**
-     * @var integer
+     * @var int
      */
     private $normalShadows;
     /**
-     * @var integer
+     * @var int
      */
     private $normalEncounterSideQuests;
     /**
-     * @var integer
+     * @var int
      */
     private $nightmareCards;
     /**
-     * @var integer
+     * @var int
      */
     private $nightmareEnemies;
     /**
-     * @var integer
+     * @var int
      */
     private $nightmareLocations;
     /**
-     * @var integer
+     * @var int
      */
     private $nightmareTreacheries;
     /**
-     * @var integer
+     * @var int
      */
     private $nightmareObjectiveAllies;
     /**
-     * @var integer
+     * @var int
      */
     private $nightmareObjectiveLocations;
     /**
-     * @var integer
+     * @var int
      */
     private $nightmareSurges;
     /**
-     * @var integer
+     * @var int
      */
     private $nightmareShadows;
     /**
-     * @var integer
+     * @var int
      */
     private $nightmareEncounterSideQuests;
 
     /**
-     * Set hasEasy
+     * Set hasEasy.
      *
-     * @param boolean $hasEasy
+     * @param bool $hasEasy
      *
      * @return Scenario
      */
-    public function setHasEasy($hasEasy) {
+    public function setHasEasy($hasEasy)
+    {
         $this->hasEasy = $hasEasy;
 
         return $this;
     }
 
     /**
-     * Get hasEasy
+     * Get hasEasy.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getHasEasy() {
+    public function getHasEasy()
+    {
         return $this->hasEasy;
     }
 
     /**
-     * Set hasNightmare
+     * Set hasNightmare.
      *
-     * @param boolean $hasNightmare
+     * @param bool $hasNightmare
      *
      * @return Scenario
      */
-    public function setHasNightmare($hasNightmare) {
+    public function setHasNightmare($hasNightmare)
+    {
         $this->hasNightmare = $hasNightmare;
 
         return $this;
     }
 
     /**
-     * Get hasNightmare
+     * Get hasNightmare.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getHasNightmare() {
+    public function getHasNightmare()
+    {
         return $this->hasNightmare;
     }
 
     /**
-     * Set easyCards
+     * Set easyCards.
      *
-     * @param integer $easyCards
+     * @param int $easyCards
      *
      * @return Scenario
      */
-    public function setEasyCards($easyCards) {
+    public function setEasyCards($easyCards)
+    {
         $this->easyCards = $easyCards;
 
         return $this;
     }
 
     /**
-     * Get easyCards
+     * Get easyCards.
      *
-     * @return integer
+     * @return int
      */
-    public function getEasyCards() {
+    public function getEasyCards()
+    {
         return $this->easyCards;
     }
 
     /**
-     * Set easyEnemies
+     * Set easyEnemies.
      *
-     * @param integer $easyEnemies
+     * @param int $easyEnemies
      *
      * @return Scenario
      */
-    public function setEasyEnemies($easyEnemies) {
+    public function setEasyEnemies($easyEnemies)
+    {
         $this->easyEnemies = $easyEnemies;
 
         return $this;
     }
 
     /**
-     * Get easyEnemies
+     * Get easyEnemies.
      *
-     * @return integer
+     * @return int
      */
-    public function getEasyEnemies() {
+    public function getEasyEnemies()
+    {
         return $this->easyEnemies;
     }
 
     /**
-     * Set easyLocations
+     * Set easyLocations.
      *
-     * @param integer $easyLocations
+     * @param int $easyLocations
      *
      * @return Scenario
      */
-    public function setEasyLocations($easyLocations) {
+    public function setEasyLocations($easyLocations)
+    {
         $this->easyLocations = $easyLocations;
 
         return $this;
     }
 
     /**
-     * Get easyLocations
+     * Get easyLocations.
      *
-     * @return integer
+     * @return int
      */
-    public function getEasyLocations() {
+    public function getEasyLocations()
+    {
         return $this->easyLocations;
     }
 
     /**
-     * Set easyTreacheries
+     * Set easyTreacheries.
      *
-     * @param integer $easyTreacheries
+     * @param int $easyTreacheries
      *
      * @return Scenario
      */
-    public function setEasyTreacheries($easyTreacheries) {
+    public function setEasyTreacheries($easyTreacheries)
+    {
         $this->easyTreacheries = $easyTreacheries;
 
         return $this;
     }
 
     /**
-     * Get easyTreacheries
+     * Get easyTreacheries.
      *
-     * @return integer
+     * @return int
      */
-    public function getEasyTreacheries() {
+    public function getEasyTreacheries()
+    {
         return $this->easyTreacheries;
     }
 
     /**
-     * Set easyObjectiveAllies
+     * Set easyObjectiveAllies.
      *
-     * @param integer $easyObjectiveAllies
+     * @param int $easyObjectiveAllies
      *
      * @return Scenario
      */
-    public function setEasyObjectiveAllies($easyObjectiveAllies) {
+    public function setEasyObjectiveAllies($easyObjectiveAllies)
+    {
         $this->easyObjectiveAllies = $easyObjectiveAllies;
 
         return $this;
     }
 
     /**
-     * Get easyObjectiveAllies
+     * Get easyObjectiveAllies.
      *
-     * @return integer
+     * @return int
      */
-    public function getEasyObjectiveAllies() {
+    public function getEasyObjectiveAllies()
+    {
         return $this->easyObjectiveAllies;
     }
 
     /**
-     * Set easyObjectiveLocations
+     * Set easyObjectiveLocations.
      *
-     * @param integer $easyObjectiveLocations
+     * @param int $easyObjectiveLocations
      *
      * @return Scenario
      */
-    public function setEasyObjectiveLocations($easyObjectiveLocations) {
+    public function setEasyObjectiveLocations($easyObjectiveLocations)
+    {
         $this->easyObjectiveLocations = $easyObjectiveLocations;
 
         return $this;
     }
 
     /**
-     * Get easyObjectiveLocations
+     * Get easyObjectiveLocations.
      *
-     * @return integer
+     * @return int
      */
-    public function getEasyObjectiveLocations() {
+    public function getEasyObjectiveLocations()
+    {
         return $this->easyObjectiveLocations;
     }
 
     /**
-     * Set easySurges
+     * Set easySurges.
      *
-     * @param integer $easySurges
+     * @param int $easySurges
      *
      * @return Scenario
      */
-    public function setEasySurges($easySurges) {
+    public function setEasySurges($easySurges)
+    {
         $this->easySurges = $easySurges;
 
         return $this;
     }
 
     /**
-     * Get easySurges
+     * Get easySurges.
      *
-     * @return integer
+     * @return int
      */
-    public function getEasySurges() {
+    public function getEasySurges()
+    {
         return $this->easySurges;
     }
 
     /**
-     * Set easyShadows
+     * Set easyShadows.
      *
-     * @param integer $easyShadows
+     * @param int $easyShadows
      *
      * @return Scenario
      */
-    public function setEasyShadows($easyShadows) {
+    public function setEasyShadows($easyShadows)
+    {
         $this->easyShadows = $easyShadows;
 
         return $this;
     }
 
     /**
-     * Get easyShadows
+     * Get easyShadows.
      *
-     * @return integer
+     * @return int
      */
-    public function getEasyShadows() {
+    public function getEasyShadows()
+    {
         return $this->easyShadows;
     }
 
     /**
-     * Set easyEncounterSideQuests
+     * Set easyEncounterSideQuests.
      *
-     * @param integer $easyEncounterSideQuests
+     * @param int $easyEncounterSideQuests
      *
      * @return Scenario
      */
-    public function setEasyEncounterSideQuests($easyEncounterSideQuests) {
+    public function setEasyEncounterSideQuests($easyEncounterSideQuests)
+    {
         $this->easyEncounterSideQuests = $easyEncounterSideQuests;
 
         return $this;
     }
 
     /**
-     * Get easyEncounterSideQuests
+     * Get easyEncounterSideQuests.
      *
-     * @return integer
+     * @return int
      */
-    public function getEasyEncounterSideQuests() {
+    public function getEasyEncounterSideQuests()
+    {
         return $this->easyEncounterSideQuests;
     }
 
     /**
-     * Set normalCards
+     * Set normalCards.
      *
-     * @param integer $normalCards
+     * @param int $normalCards
      *
      * @return Scenario
      */
-    public function setNormalCards($normalCards) {
+    public function setNormalCards($normalCards)
+    {
         $this->normalCards = $normalCards;
 
         return $this;
     }
 
     /**
-     * Get normalCards
+     * Get normalCards.
      *
-     * @return integer
+     * @return int
      */
-    public function getNormalCards() {
+    public function getNormalCards()
+    {
         return $this->normalCards;
     }
 
     /**
-     * Set normalEnemies
+     * Set normalEnemies.
      *
-     * @param integer $normalEnemies
+     * @param int $normalEnemies
      *
      * @return Scenario
      */
-    public function setNormalEnemies($normalEnemies) {
+    public function setNormalEnemies($normalEnemies)
+    {
         $this->normalEnemies = $normalEnemies;
 
         return $this;
     }
 
     /**
-     * Get normalEnemies
+     * Get normalEnemies.
      *
-     * @return integer
+     * @return int
      */
-    public function getNormalEnemies() {
+    public function getNormalEnemies()
+    {
         return $this->normalEnemies;
     }
 
     /**
-     * Set normalLocations
+     * Set normalLocations.
      *
-     * @param integer $normalLocations
+     * @param int $normalLocations
      *
      * @return Scenario
      */
-    public function setNormalLocations($normalLocations) {
+    public function setNormalLocations($normalLocations)
+    {
         $this->normalLocations = $normalLocations;
 
         return $this;
     }
 
     /**
-     * Get normalLocations
+     * Get normalLocations.
      *
-     * @return integer
+     * @return int
      */
-    public function getNormalLocations() {
+    public function getNormalLocations()
+    {
         return $this->normalLocations;
     }
 
     /**
-     * Set normalTreacheries
+     * Set normalTreacheries.
      *
-     * @param integer $normalTreacheries
+     * @param int $normalTreacheries
      *
      * @return Scenario
      */
-    public function setNormalTreacheries($normalTreacheries) {
+    public function setNormalTreacheries($normalTreacheries)
+    {
         $this->normalTreacheries = $normalTreacheries;
 
         return $this;
     }
 
     /**
-     * Get normalTreacheries
+     * Get normalTreacheries.
      *
-     * @return integer
+     * @return int
      */
-    public function getNormalTreacheries() {
+    public function getNormalTreacheries()
+    {
         return $this->normalTreacheries;
     }
 
     /**
-     * Set normalObjectiveAllies
+     * Set normalObjectiveAllies.
      *
-     * @param integer $normalObjectiveAllies
+     * @param int $normalObjectiveAllies
      *
      * @return Scenario
      */
-    public function setNormalObjectiveAllies($normalObjectiveAllies) {
+    public function setNormalObjectiveAllies($normalObjectiveAllies)
+    {
         $this->normalObjectiveAllies = $normalObjectiveAllies;
 
         return $this;
     }
 
     /**
-     * Get normalObjectiveAllies
+     * Get normalObjectiveAllies.
      *
-     * @return integer
+     * @return int
      */
-    public function getNormalObjectiveAllies() {
+    public function getNormalObjectiveAllies()
+    {
         return $this->normalObjectiveAllies;
     }
 
     /**
-     * Set normalObjectiveLocations
+     * Set normalObjectiveLocations.
      *
-     * @param integer $normalObjectiveLocations
+     * @param int $normalObjectiveLocations
      *
      * @return Scenario
      */
-    public function setNormalObjectiveLocations($normalObjectiveLocations) {
+    public function setNormalObjectiveLocations($normalObjectiveLocations)
+    {
         $this->normalObjectiveLocations = $normalObjectiveLocations;
 
         return $this;
     }
 
     /**
-     * Get normalObjectiveLocations
+     * Get normalObjectiveLocations.
      *
-     * @return integer
+     * @return int
      */
-    public function getNormalObjectiveLocations() {
+    public function getNormalObjectiveLocations()
+    {
         return $this->normalObjectiveLocations;
     }
 
     /**
-     * Set normalSurges
+     * Set normalSurges.
      *
-     * @param integer $normalSurges
+     * @param int $normalSurges
      *
      * @return Scenario
      */
-    public function setNormalSurges($normalSurges) {
+    public function setNormalSurges($normalSurges)
+    {
         $this->normalSurges = $normalSurges;
 
         return $this;
     }
 
     /**
-     * Get normalSurges
+     * Get normalSurges.
      *
-     * @return integer
+     * @return int
      */
-    public function getNormalSurges() {
+    public function getNormalSurges()
+    {
         return $this->normalSurges;
     }
 
     /**
-     * Set normalShadows
+     * Set normalShadows.
      *
-     * @param integer $normalShadows
+     * @param int $normalShadows
      *
      * @return Scenario
      */
-    public function setNormalShadows($normalShadows) {
+    public function setNormalShadows($normalShadows)
+    {
         $this->normalShadows = $normalShadows;
 
         return $this;
     }
 
     /**
-     * Get normalShadows
+     * Get normalShadows.
      *
-     * @return integer
+     * @return int
      */
-    public function getNormalShadows() {
+    public function getNormalShadows()
+    {
         return $this->normalShadows;
     }
 
     /**
-     * Set normalEncounterSideQuests
+     * Set normalEncounterSideQuests.
      *
-     * @param integer $normalEncounterSideQuests
+     * @param int $normalEncounterSideQuests
      *
      * @return Scenario
      */
-    public function setNormalEncounterSideQuests($normalEncounterSideQuests) {
+    public function setNormalEncounterSideQuests($normalEncounterSideQuests)
+    {
         $this->normalEncounterSideQuests = $normalEncounterSideQuests;
 
         return $this;
     }
 
     /**
-     * Get normalEncounterSideQuests
+     * Get normalEncounterSideQuests.
      *
-     * @return integer
+     * @return int
      */
-    public function getNormalEncounterSideQuests() {
+    public function getNormalEncounterSideQuests()
+    {
         return $this->normalEncounterSideQuests;
     }
 
     /**
-     * Set nightmareCards
+     * Set nightmareCards.
      *
-     * @param integer $nightmareCards
+     * @param int $nightmareCards
      *
      * @return Scenario
      */
-    public function setNightmareCards($nightmareCards) {
+    public function setNightmareCards($nightmareCards)
+    {
         $this->nightmareCards = $nightmareCards;
 
         return $this;
     }
 
     /**
-     * Get nightmareCards
+     * Get nightmareCards.
      *
-     * @return integer
+     * @return int
      */
-    public function getNightmareCards() {
+    public function getNightmareCards()
+    {
         return $this->nightmareCards;
     }
 
     /**
-     * Set nightmareEnemies
+     * Set nightmareEnemies.
      *
-     * @param integer $nightmareEnemies
+     * @param int $nightmareEnemies
      *
      * @return Scenario
      */
-    public function setNightmareEnemies($nightmareEnemies) {
+    public function setNightmareEnemies($nightmareEnemies)
+    {
         $this->nightmareEnemies = $nightmareEnemies;
 
         return $this;
     }
 
     /**
-     * Get nightmareEnemies
+     * Get nightmareEnemies.
      *
-     * @return integer
+     * @return int
      */
-    public function getNightmareEnemies() {
+    public function getNightmareEnemies()
+    {
         return $this->nightmareEnemies;
     }
 
     /**
-     * Set nightmareLocations
+     * Set nightmareLocations.
      *
-     * @param integer $nightmareLocations
+     * @param int $nightmareLocations
      *
      * @return Scenario
      */
-    public function setNightmareLocations($nightmareLocations) {
+    public function setNightmareLocations($nightmareLocations)
+    {
         $this->nightmareLocations = $nightmareLocations;
 
         return $this;
     }
 
     /**
-     * Get nightmareLocations
+     * Get nightmareLocations.
      *
-     * @return integer
+     * @return int
      */
-    public function getNightmareLocations() {
+    public function getNightmareLocations()
+    {
         return $this->nightmareLocations;
     }
 
     /**
-     * Set nightmareTreacheries
+     * Set nightmareTreacheries.
      *
-     * @param integer $nightmareTreacheries
+     * @param int $nightmareTreacheries
      *
      * @return Scenario
      */
-    public function setNightmareTreacheries($nightmareTreacheries) {
+    public function setNightmareTreacheries($nightmareTreacheries)
+    {
         $this->nightmareTreacheries = $nightmareTreacheries;
 
         return $this;
     }
 
     /**
-     * Get nightmareTreacheries
+     * Get nightmareTreacheries.
      *
-     * @return integer
+     * @return int
      */
-    public function getNightmareTreacheries() {
+    public function getNightmareTreacheries()
+    {
         return $this->nightmareTreacheries;
     }
 
     /**
-     * Set nightmareObjectiveAllies
+     * Set nightmareObjectiveAllies.
      *
-     * @param integer $nightmareObjectiveAllies
+     * @param int $nightmareObjectiveAllies
      *
      * @return Scenario
      */
-    public function setNightmareObjectiveAllies($nightmareObjectiveAllies) {
+    public function setNightmareObjectiveAllies($nightmareObjectiveAllies)
+    {
         $this->nightmareObjectiveAllies = $nightmareObjectiveAllies;
 
         return $this;
     }
 
     /**
-     * Get nightmareObjectiveAllies
+     * Get nightmareObjectiveAllies.
      *
-     * @return integer
+     * @return int
      */
-    public function getNightmareObjectiveAllies() {
+    public function getNightmareObjectiveAllies()
+    {
         return $this->nightmareObjectiveAllies;
     }
 
     /**
-     * Set nightmareObjectiveLocations
+     * Set nightmareObjectiveLocations.
      *
-     * @param integer $nightmareObjectiveLocations
+     * @param int $nightmareObjectiveLocations
      *
      * @return Scenario
      */
-    public function setNightmareObjectiveLocations($nightmareObjectiveLocations) {
+    public function setNightmareObjectiveLocations($nightmareObjectiveLocations)
+    {
         $this->nightmareObjectiveLocations = $nightmareObjectiveLocations;
 
         return $this;
     }
 
     /**
-     * Get nightmareObjectiveLocations
+     * Get nightmareObjectiveLocations.
      *
-     * @return integer
+     * @return int
      */
-    public function getNightmareObjectiveLocations() {
+    public function getNightmareObjectiveLocations()
+    {
         return $this->nightmareObjectiveLocations;
     }
 
     /**
-     * Set nightmareSurges
+     * Set nightmareSurges.
      *
-     * @param integer $nightmareSurges
+     * @param int $nightmareSurges
      *
      * @return Scenario
      */
-    public function setNightmareSurges($nightmareSurges) {
+    public function setNightmareSurges($nightmareSurges)
+    {
         $this->nightmareSurges = $nightmareSurges;
 
         return $this;
     }
 
     /**
-     * Get nightmareSurges
+     * Get nightmareSurges.
      *
-     * @return integer
+     * @return int
      */
-    public function getNightmareSurges() {
+    public function getNightmareSurges()
+    {
         return $this->nightmareSurges;
     }
 
     /**
-     * Set nightmareShadows
+     * Set nightmareShadows.
      *
-     * @param integer $nightmareShadows
+     * @param int $nightmareShadows
      *
      * @return Scenario
      */
-    public function setNightmareShadows($nightmareShadows) {
+    public function setNightmareShadows($nightmareShadows)
+    {
         $this->nightmareShadows = $nightmareShadows;
 
         return $this;
     }
 
     /**
-     * Get nightmareShadows
+     * Get nightmareShadows.
      *
-     * @return integer
+     * @return int
      */
-    public function getNightmareShadows() {
+    public function getNightmareShadows()
+    {
         return $this->nightmareShadows;
     }
 
     /**
-     * Set nightmareEncounterSideQuests
+     * Set nightmareEncounterSideQuests.
      *
-     * @param integer $nightmareEncounterSideQuests
+     * @param int $nightmareEncounterSideQuests
      *
      * @return Scenario
      */
-    public function setNightmareEncounterSideQuests($nightmareEncounterSideQuests) {
+    public function setNightmareEncounterSideQuests($nightmareEncounterSideQuests)
+    {
         $this->nightmareEncounterSideQuests = $nightmareEncounterSideQuests;
 
         return $this;
     }
 
     /**
-     * Get nightmareEncounterSideQuests
+     * Get nightmareEncounterSideQuests.
      *
-     * @return integer
+     * @return int
      */
-    public function getNightmareEncounterSideQuests() {
+    public function getNightmareEncounterSideQuests()
+    {
         return $this->nightmareEncounterSideQuests;
     }
 
     /**
-     * @var integer
+     * @var int
      */
     private $easyObjectives;
     /**
-     * @var integer
+     * @var int
      */
     private $normalObjectives;
     /**
-     * @var integer
+     * @var int
      */
     private $nightmareObjectives;
 
     /**
-     * Set easyObjectives
+     * Set easyObjectives.
      *
-     * @param integer $easyObjectives
+     * @param int $easyObjectives
      *
      * @return Scenario
      */
-    public function setEasyObjectives($easyObjectives) {
+    public function setEasyObjectives($easyObjectives)
+    {
         $this->easyObjectives = $easyObjectives;
 
         return $this;
     }
 
     /**
-     * Get easyObjectives
+     * Get easyObjectives.
      *
-     * @return integer
+     * @return int
      */
-    public function getEasyObjectives() {
+    public function getEasyObjectives()
+    {
         return $this->easyObjectives;
     }
 
     /**
-     * Set normalObjectives
+     * Set normalObjectives.
      *
-     * @param integer $normalObjectives
+     * @param int $normalObjectives
      *
      * @return Scenario
      */
-    public function setNormalObjectives($normalObjectives) {
+    public function setNormalObjectives($normalObjectives)
+    {
         $this->normalObjectives = $normalObjectives;
 
         return $this;
     }
 
     /**
-     * Get normalObjectives
+     * Get normalObjectives.
      *
-     * @return integer
+     * @return int
      */
-    public function getNormalObjectives() {
+    public function getNormalObjectives()
+    {
         return $this->normalObjectives;
     }
 
     /**
-     * Set nightmareObjectives
+     * Set nightmareObjectives.
      *
-     * @param integer $nightmareObjectives
+     * @param int $nightmareObjectives
      *
      * @return Scenario
      */
-    public function setNightmareObjectives($nightmareObjectives) {
+    public function setNightmareObjectives($nightmareObjectives)
+    {
         $this->nightmareObjectives = $nightmareObjectives;
 
         return $this;
     }
 
     /**
-     * Get nightmareObjectives
+     * Get nightmareObjectives.
      *
-     * @return integer
+     * @return int
      */
-    public function getNightmareObjectives() {
+    public function getNightmareObjectives()
+    {
         return $this->nightmareObjectives;
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Questlog>
+     * @var \Doctrine\Common\Collections\Collection<int, Questlog>
      */
     private $questlogs;
 
     /**
-     * Add questlog
-     *
-     * @param \App\Entity\Questlog $questlog
+     * Add questlog.
      *
      * @return Scenario
      */
-    public function addQuestlog(\App\Entity\Questlog $questlog) {
+    public function addQuestlog(Questlog $questlog)
+    {
         $this->questlogs[] = $questlog;
 
         return $this;
     }
 
     /**
-     * Remove questlog
+     * Remove questlog.
      *
-     * @param \App\Entity\Questlog $questlog
      * @return void
      */
-    public function removeQuestlog(\App\Entity\Questlog $questlog) {
+    public function removeQuestlog(Questlog $questlog)
+    {
         $this->questlogs->removeElement($questlog);
     }
 
     /**
-     * Get questlogs
+     * Get questlogs.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Questlog>
+     * @return \Doctrine\Common\Collections\Collection<int, Questlog>
      */
-    public function getQuestlogs() {
+    public function getQuestlogs()
+    {
         return $this->questlogs;
     }
 
@@ -1150,24 +1227,26 @@ class Scenario implements \JsonSerializable {
     private $nameCanonical;
 
     /**
-     * Set nameCanonical
+     * Set nameCanonical.
      *
      * @param string $nameCanonical
      *
      * @return Scenario
      */
-    public function setNameCanonical($nameCanonical) {
+    public function setNameCanonical($nameCanonical)
+    {
         $this->nameCanonical = $nameCanonical;
 
         return $this;
     }
 
     /**
-     * Get nameCanonical
+     * Get nameCanonical.
      *
      * @return string
      */
-    public function getNameCanonical() {
+    public function getNameCanonical()
+    {
         return $this->nameCanonical;
     }
 }

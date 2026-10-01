@@ -6,13 +6,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Model\User as BaseUser;
 
 /**
- * User
+ * User.
  */
-class User extends BaseUser {
+class User extends BaseUser
+{
     /**
      * @return float
      */
-    public function getMaxNbDecks() {
+    public function getMaxNbDecks()
+    {
         return 5 * (100 + floor($this->reputation / 10));
     }
 
@@ -25,7 +27,7 @@ class User extends BaseUser {
      */
     private $dateUpdate;
     /**
-     * @var integer
+     * @var int
      */
     private $reputation;
     /**
@@ -37,67 +39,68 @@ class User extends BaseUser {
      */
     private $color;
     /**
-     * @var integer
+     * @var int
      */
     private $donation;
     /**
-     * @var boolean
+     * @var bool
      */
     private $isNotifAuthor = true;
     /**
-     * @var boolean
+     * @var bool
      */
     private $isNotifCommenter = true;
     /**
-     * @var boolean
+     * @var bool
      */
     private $isNotifMention = true;
     /**
-     * @var boolean
+     * @var bool
      */
     private $isNotifFollow = true;
     /**
-     * @var boolean
+     * @var bool
      */
     private $isNotifSuccessor = true;
     /**
-     * @var boolean
+     * @var bool
      */
     private $isShareDecks = false;
     /**
-     * @var boolean
+     * @var bool
      */
     private $darkMode = false;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Deck>
+     * @var \Doctrine\Common\Collections\Collection<int, Deck>
      */
     private $decks;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Decklist>
+     * @var \Doctrine\Common\Collections\Collection<int, Decklist>
      */
     private $decklists;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Comment>
+     * @var \Doctrine\Common\Collections\Collection<int, Comment>
      */
     private $comments;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Review>
+     * @var \Doctrine\Common\Collections\Collection<int, Review>
      */
     private $reviews;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Decklist>
+     * @var \Doctrine\Common\Collections\Collection<int, Decklist>
      */
     private $favorites;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Decklist>
+     * @var \Doctrine\Common\Collections\Collection<int, Decklist>
      */
     private $votes;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Review>
+     * @var \Doctrine\Common\Collections\Collection<int, Review>
      */
     private $reviewvotes;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         $this->reputation = 1;
@@ -105,427 +108,452 @@ class User extends BaseUser {
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
      *
      * @return User
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation)
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
+     * Get dateCreation.
      *
      * @return \DateTime
      */
-    public function getDateCreation() {
+    public function getDateCreation()
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
+     * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
      *
      * @return User
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate($dateUpdate)
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
+     * Get dateUpdate.
      *
      * @return \DateTime
      */
-    public function getDateUpdate() {
+    public function getDateUpdate()
+    {
         return $this->dateUpdate;
     }
 
     /**
-     * Set reputation
+     * Set reputation.
      *
-     * @param integer $reputation
+     * @param int $reputation
      *
      * @return User
      */
-    public function setReputation($reputation) {
+    public function setReputation($reputation)
+    {
         $this->reputation = $reputation;
 
         return $this;
     }
 
     /**
-     * Get reputation
+     * Get reputation.
      *
-     * @return integer
+     * @return int
      */
-    public function getReputation() {
+    public function getReputation()
+    {
         return $this->reputation;
     }
 
     /**
-     * Set resume
+     * Set resume.
      *
      * @param string|null $resume
      *
      * @return User
      */
-    public function setResume($resume) {
+    public function setResume($resume)
+    {
         $this->resume = $resume;
 
         return $this;
     }
 
     /**
-     * Get resume
+     * Get resume.
      *
      * @return string|null
      */
-    public function getResume() {
+    public function getResume()
+    {
         return $this->resume;
     }
 
     /**
-     * Set color
+     * Set color.
      *
      * @param string|null $color
      *
      * @return User
      */
-    public function setColor($color) {
+    public function setColor($color)
+    {
         $this->color = $color;
 
         return $this;
     }
 
     /**
-     * Get color
+     * Get color.
      *
      * @return string|null
      */
-    public function getColor() {
+    public function getColor()
+    {
         return $this->color;
     }
 
     /**
-     * Set donation
+     * Set donation.
      *
-     * @param integer $donation
+     * @param int $donation
      *
      * @return User
      */
-    public function setDonation($donation) {
+    public function setDonation($donation)
+    {
         $this->donation = $donation;
 
         return $this;
     }
 
     /**
-     * Get donation
+     * Get donation.
      *
-     * @return integer
+     * @return int
      */
-    public function getDonation() {
+    public function getDonation()
+    {
         return $this->donation;
     }
 
     /**
-     * Set isNotifAuthor
+     * Set isNotifAuthor.
      *
-     * @param boolean $isNotifAuthor
+     * @param bool $isNotifAuthor
      *
      * @return User
      */
-    public function setIsNotifAuthor($isNotifAuthor) {
+    public function setIsNotifAuthor($isNotifAuthor)
+    {
         $this->isNotifAuthor = $isNotifAuthor;
 
         return $this;
     }
 
     /**
-     * Get isNotifAuthor
+     * Get isNotifAuthor.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsNotifAuthor() {
+    public function getIsNotifAuthor()
+    {
         return $this->isNotifAuthor;
     }
 
     /**
-     * Set isNotifCommenter
+     * Set isNotifCommenter.
      *
-     * @param boolean $isNotifCommenter
+     * @param bool $isNotifCommenter
      *
      * @return User
      */
-    public function setIsNotifCommenter($isNotifCommenter) {
+    public function setIsNotifCommenter($isNotifCommenter)
+    {
         $this->isNotifCommenter = $isNotifCommenter;
 
         return $this;
     }
 
     /**
-     * Get isNotifCommenter
+     * Get isNotifCommenter.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsNotifCommenter() {
+    public function getIsNotifCommenter()
+    {
         return $this->isNotifCommenter;
     }
 
     /**
-     * Set isNotifMention
+     * Set isNotifMention.
      *
-     * @param boolean $isNotifMention
+     * @param bool $isNotifMention
      *
      * @return User
      */
-    public function setIsNotifMention($isNotifMention) {
+    public function setIsNotifMention($isNotifMention)
+    {
         $this->isNotifMention = $isNotifMention;
 
         return $this;
     }
 
     /**
-     * Get isNotifMention
+     * Get isNotifMention.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsNotifMention() {
+    public function getIsNotifMention()
+    {
         return $this->isNotifMention;
     }
 
     /**
-     * Set isNotifFollow
+     * Set isNotifFollow.
      *
-     * @param boolean $isNotifFollow
+     * @param bool $isNotifFollow
      *
      * @return User
      */
-    public function setIsNotifFollow($isNotifFollow) {
+    public function setIsNotifFollow($isNotifFollow)
+    {
         $this->isNotifFollow = $isNotifFollow;
 
         return $this;
     }
 
     /**
-     * Get isNotifFollow
+     * Get isNotifFollow.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsNotifFollow() {
+    public function getIsNotifFollow()
+    {
         return $this->isNotifFollow;
     }
 
     /**
-     * Set isNotifSuccessor
+     * Set isNotifSuccessor.
      *
-     * @param boolean $isNotifSuccessor
+     * @param bool $isNotifSuccessor
      *
      * @return User
      */
-    public function setIsNotifSuccessor($isNotifSuccessor) {
+    public function setIsNotifSuccessor($isNotifSuccessor)
+    {
         $this->isNotifSuccessor = $isNotifSuccessor;
 
         return $this;
     }
 
     /**
-     * Get isNotifSuccessor
+     * Get isNotifSuccessor.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsNotifSuccessor() {
+    public function getIsNotifSuccessor()
+    {
         return $this->isNotifSuccessor;
     }
 
     /**
-     * Set isShareDecks
+     * Set isShareDecks.
      *
-     * @param boolean $isShareDecks
+     * @param bool $isShareDecks
      *
      * @return User
      */
-    public function setIsShareDecks($isShareDecks) {
+    public function setIsShareDecks($isShareDecks)
+    {
         $this->isShareDecks = $isShareDecks;
 
         return $this;
     }
 
     /**
-     * Get isShareDecks
+     * Get isShareDecks.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsShareDecks() {
+    public function getIsShareDecks()
+    {
         return $this->isShareDecks;
     }
 
     /**
-     * Set darkMode
+     * Set darkMode.
      *
-     * @param boolean $darkMode
+     * @param bool $darkMode
      *
      * @return User
      */
-    public function setDarkMode($darkMode) {
+    public function setDarkMode($darkMode)
+    {
         $this->darkMode = $darkMode;
 
         return $this;
     }
 
     /**
-     * Get darkMode
+     * Get darkMode.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getDarkMode() {
+    public function getDarkMode()
+    {
         return $this->darkMode;
     }
 
     /**
-     * Add deck
-     *
-     * @param \App\Entity\Deck $deck
+     * Add deck.
      *
      * @return User
      */
-    public function addDeck(\App\Entity\Deck $deck) {
+    public function addDeck(Deck $deck)
+    {
         $this->decks[] = $deck;
 
         return $this;
     }
 
     /**
-     * Remove deck
+     * Remove deck.
      *
-     * @param \App\Entity\Deck $deck
      * @return void
      */
-    public function removeDeck(\App\Entity\Deck $deck) {
+    public function removeDeck(Deck $deck)
+    {
         $this->decks->removeElement($deck);
     }
 
     /**
-     * Get decks
+     * Get decks.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Deck>
+     * @return \Doctrine\Common\Collections\Collection<int, Deck>
      */
-    public function getDecks() {
+    public function getDecks()
+    {
         return $this->decks;
     }
 
     /**
-     * Add decklist
-     *
-     * @param \App\Entity\Decklist $decklist
+     * Add decklist.
      *
      * @return User
      */
-    public function addDecklist(\App\Entity\Decklist $decklist) {
+    public function addDecklist(Decklist $decklist)
+    {
         $this->decklists[] = $decklist;
 
         return $this;
     }
 
     /**
-     * Remove decklist
+     * Remove decklist.
      *
-     * @param \App\Entity\Decklist $decklist
      * @return void
      */
-    public function removeDecklist(\App\Entity\Decklist $decklist) {
+    public function removeDecklist(Decklist $decklist)
+    {
         $this->decklists->removeElement($decklist);
     }
 
     /**
-     * Get decklists
+     * Get decklists.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Decklist>
+     * @return \Doctrine\Common\Collections\Collection<int, Decklist>
      */
-    public function getDecklists() {
+    public function getDecklists()
+    {
         return $this->decklists;
     }
 
     /**
-     * Add comment
-     *
-     * @param \App\Entity\Comment $comment
+     * Add comment.
      *
      * @return User
      */
-    public function addComment(\App\Entity\Comment $comment) {
+    public function addComment(Comment $comment)
+    {
         $this->comments[] = $comment;
 
         return $this;
     }
 
     /**
-     * Remove comment
+     * Remove comment.
      *
-     * @param \App\Entity\Comment $comment
      * @return void
      */
-    public function removeComment(\App\Entity\Comment $comment) {
+    public function removeComment(Comment $comment)
+    {
         $this->comments->removeElement($comment);
     }
 
     /**
-     * Get comments
+     * Get comments.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Comment>
+     * @return \Doctrine\Common\Collections\Collection<int, Comment>
      */
-    public function getComments() {
+    public function getComments()
+    {
         return $this->comments;
     }
 
     /**
-     * Add review
-     *
-     * @param \App\Entity\Review $review
+     * Add review.
      *
      * @return User
      */
-    public function addReview(\App\Entity\Review $review) {
+    public function addReview(Review $review)
+    {
         $this->reviews[] = $review;
 
         return $this;
     }
 
     /**
-     * Remove review
+     * Remove review.
      *
-     * @param \App\Entity\Review $review
      * @return void
      */
-    public function removeReview(\App\Entity\Review $review) {
+    public function removeReview(Review $review)
+    {
         $this->reviews->removeElement($review);
     }
 
     /**
-     * Get reviews
+     * Get reviews.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Review>
+     * @return \Doctrine\Common\Collections\Collection<int, Review>
      */
-    public function getReviews() {
+    public function getReviews()
+    {
         return $this->reviews;
     }
 
     /**
-     * Add favorite
-     *
-     * @param \App\Entity\Decklist $favorite
+     * Add favorite.
      *
      * @return User
      */
-    public function addFavorite(\App\Entity\Decklist $favorite) {
+    public function addFavorite(Decklist $favorite)
+    {
         $favorite->addFavorite($this);
         $this->favorites[] = $favorite;
 
@@ -533,33 +561,33 @@ class User extends BaseUser {
     }
 
     /**
-     * Remove favorite
+     * Remove favorite.
      *
-     * @param \App\Entity\Decklist $favorite
      * @return void
      */
-    public function removeFavorite(\App\Entity\Decklist $favorite) {
+    public function removeFavorite(Decklist $favorite)
+    {
         $favorite->removeFavorite($this);
         $this->favorites->removeElement($favorite);
     }
 
     /**
-     * Get favorites
+     * Get favorites.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Decklist>
+     * @return \Doctrine\Common\Collections\Collection<int, Decklist>
      */
-    public function getFavorites() {
+    public function getFavorites()
+    {
         return $this->favorites;
     }
 
     /**
-     * Add vote
-     *
-     * @param \App\Entity\Decklist $vote
+     * Add vote.
      *
      * @return User
      */
-    public function addVote(\App\Entity\Decklist $vote) {
+    public function addVote(Decklist $vote)
+    {
         $vote->addVote($this);
         $this->votes[] = $vote;
 
@@ -567,127 +595,128 @@ class User extends BaseUser {
     }
 
     /**
-     * Remove vote
+     * Remove vote.
      *
-     * @param \App\Entity\Decklist $vote
      * @return void
      */
-    public function removeVote(\App\Entity\Decklist $vote) {
+    public function removeVote(Decklist $vote)
+    {
         $vote->removeVote($this);
         $this->votes->removeElement($vote);
     }
 
     /**
-     * Get votes
+     * Get votes.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Decklist>
+     * @return \Doctrine\Common\Collections\Collection<int, Decklist>
      */
-    public function getVotes() {
+    public function getVotes()
+    {
         return $this->votes;
     }
 
     /**
-     * Add reviewvote
-     *
-     * @param \App\Entity\Review $reviewvote
+     * Add reviewvote.
      *
      * @return User
      */
-    public function addReviewvote(\App\Entity\Review $reviewvote) {
+    public function addReviewvote(Review $reviewvote)
+    {
         $this->reviewvotes[] = $reviewvote;
 
         return $this;
     }
 
     /**
-     * Remove reviewvote
+     * Remove reviewvote.
      *
-     * @param \App\Entity\Review $reviewvote
      * @return void
      */
-    public function removeReviewvote(\App\Entity\Review $reviewvote) {
+    public function removeReviewvote(Review $reviewvote)
+    {
         $this->reviewvotes->removeElement($reviewvote);
     }
 
     /**
-     * Get reviewvotes
+     * Get reviewvotes.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Review>
+     * @return \Doctrine\Common\Collections\Collection<int, Review>
      */
-    public function getReviewvotes() {
+    public function getReviewvotes()
+    {
         return $this->reviewvotes;
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @var \Doctrine\Common\Collections\Collection<int, User>
      */
     private $following;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @var \Doctrine\Common\Collections\Collection<int, User>
      */
     private $followers;
 
     /**
-     * Add following
-     *
-     * @param \App\Entity\User $following
+     * Add following.
      *
      * @return User
      */
-    public function addFollowing(\App\Entity\User $following) {
+    public function addFollowing(User $following)
+    {
         $this->following[] = $following;
 
         return $this;
     }
 
     /**
-     * Remove following
+     * Remove following.
      *
-     * @param \App\Entity\User $following
      * @return void
      */
-    public function removeFollowing(\App\Entity\User $following) {
+    public function removeFollowing(User $following)
+    {
         $this->following->removeElement($following);
     }
 
     /**
-     * Get following
+     * Get following.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @return \Doctrine\Common\Collections\Collection<int, User>
      */
-    public function getFollowing() {
+    public function getFollowing()
+    {
         return $this->following;
     }
 
     /**
-     * Add follower
-     *
-     * @param \App\Entity\User $follower
+     * Add follower.
      *
      * @return User
      */
-    public function addFollower(\App\Entity\User $follower) {
+    public function addFollower(User $follower)
+    {
         $this->followers[] = $follower;
 
         return $this;
     }
 
     /**
-     * Remove follower
+     * Remove follower.
      *
-     * @param \App\Entity\User $follower
      * @return void
      */
-    public function removeFollower(\App\Entity\User $follower) {
+    public function removeFollower(User $follower)
+    {
         $this->followers->removeElement($follower);
     }
 
     /**
-     * Get followers
+     * Get followers.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @return \Doctrine\Common\Collections\Collection<int, User>
      */
-    public function getFollowers() {
+    public function getFollowers()
+    {
         return $this->followers;
     }
     /**
@@ -696,24 +725,26 @@ class User extends BaseUser {
     private $ownedPacks;
 
     /**
-     * Set ownedPacks
+     * Set ownedPacks.
      *
      * @param string|null $ownedPacks
      *
      * @return User
      */
-    public function setOwnedPacks($ownedPacks) {
+    public function setOwnedPacks($ownedPacks)
+    {
         $this->ownedPacks = $ownedPacks;
 
         return $this;
     }
 
     /**
-     * Get ownedPacks
+     * Get ownedPacks.
      *
      * @return string|null
      */
-    public function getOwnedPacks() {
+    public function getOwnedPacks()
+    {
         return $this->ownedPacks;
     }
 
@@ -723,68 +754,71 @@ class User extends BaseUser {
     private $artPreferences;
 
     /**
-     * Set artPreferences (JSON map of card code => preferred pack code)
+     * Set artPreferences (JSON map of card code => preferred pack code).
      *
      * @param string|null $artPreferences
      *
      * @return User
      */
-    public function setArtPreferences($artPreferences) {
+    public function setArtPreferences($artPreferences)
+    {
         $this->artPreferences = $artPreferences;
 
         return $this;
     }
 
     /**
-     * Get artPreferences
+     * Get artPreferences.
      *
      * @return string|null
      */
-    public function getArtPreferences() {
+    public function getArtPreferences()
+    {
         return $this->artPreferences;
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Fellowship>
+     * @var \Doctrine\Common\Collections\Collection<int, Fellowship>
      */
     private $fellowships;
 
     /**
-     * Add fellowship
-     *
-     * @param \App\Entity\Fellowship $fellowship
+     * Add fellowship.
      *
      * @return User
      */
-    public function addFellowship(\App\Entity\Fellowship $fellowship) {
+    public function addFellowship(Fellowship $fellowship)
+    {
         $this->fellowships[] = $fellowship;
 
         return $this;
     }
 
     /**
-     * Remove fellowship
+     * Remove fellowship.
      *
-     * @param \App\Entity\Fellowship $fellowship
      * @return void
      */
-    public function removeFellowship(\App\Entity\Fellowship $fellowship) {
+    public function removeFellowship(Fellowship $fellowship)
+    {
         $this->fellowships->removeElement($fellowship);
     }
 
     /**
-     * Get fellowships
+     * Get fellowships.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Fellowship>
+     * @return \Doctrine\Common\Collections\Collection<int, Fellowship>
      */
-    public function getFellowships() {
+    public function getFellowships()
+    {
         return $this->fellowships;
     }
 
     /**
-     * @return \Doctrine\Common\Collections\ArrayCollection<int, mixed>
+     * @return ArrayCollection<int, mixed>
      */
-    public function getPublicFellowships() {
+    public function getPublicFellowships()
+    {
         $publicFellowships = [];
 
         foreach ($this->fellowships as $fellowship) {
@@ -798,257 +832,257 @@ class User extends BaseUser {
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\FellowshipComment>
+     * @var \Doctrine\Common\Collections\Collection<int, FellowshipComment>
      */
     private $fellowship_comments;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Fellowship>
+     * @var \Doctrine\Common\Collections\Collection<int, Fellowship>
      */
     private $fellowship_favorites;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Fellowship>
+     * @var \Doctrine\Common\Collections\Collection<int, Fellowship>
      */
     private $fellowship_votes;
 
     /**
-     * Add fellowshipComment
-     *
-     * @param \App\Entity\FellowshipComment $fellowshipComment
+     * Add fellowshipComment.
      *
      * @return User
      */
-    public function addFellowshipComment(\App\Entity\FellowshipComment $fellowshipComment) {
+    public function addFellowshipComment(FellowshipComment $fellowshipComment)
+    {
         $this->fellowship_comments[] = $fellowshipComment;
 
         return $this;
     }
 
     /**
-     * Remove fellowshipComment
+     * Remove fellowshipComment.
      *
-     * @param \App\Entity\FellowshipComment $fellowshipComment
      * @return void
      */
-    public function removeFellowshipComment(\App\Entity\FellowshipComment $fellowshipComment) {
+    public function removeFellowshipComment(FellowshipComment $fellowshipComment)
+    {
         $this->fellowship_comments->removeElement($fellowshipComment);
     }
 
     /**
-     * Get fellowshipComments
+     * Get fellowshipComments.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\FellowshipComment>
+     * @return \Doctrine\Common\Collections\Collection<int, FellowshipComment>
      */
-    public function getFellowshipComments() {
+    public function getFellowshipComments()
+    {
         return $this->fellowship_comments;
     }
 
     /**
-     * Add fellowshipFavorite
-     *
-     * @param \App\Entity\Fellowship $fellowshipFavorite
+     * Add fellowshipFavorite.
      *
      * @return User
      */
-    public function addFellowshipFavorite(\App\Entity\Fellowship $fellowshipFavorite) {
+    public function addFellowshipFavorite(Fellowship $fellowshipFavorite)
+    {
         $this->fellowship_favorites[] = $fellowshipFavorite;
 
         return $this;
     }
 
     /**
-     * Remove fellowshipFavorite
+     * Remove fellowshipFavorite.
      *
-     * @param \App\Entity\Fellowship $fellowshipFavorite
      * @return void
      */
-    public function removeFellowshipFavorite(\App\Entity\Fellowship $fellowshipFavorite) {
+    public function removeFellowshipFavorite(Fellowship $fellowshipFavorite)
+    {
         $this->fellowship_favorites->removeElement($fellowshipFavorite);
     }
 
     /**
-     * Get fellowshipFavorites
+     * Get fellowshipFavorites.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Fellowship>
+     * @return \Doctrine\Common\Collections\Collection<int, Fellowship>
      */
-    public function getFellowshipFavorites() {
+    public function getFellowshipFavorites()
+    {
         return $this->fellowship_favorites;
     }
 
     /**
-     * Add fellowshipVote
-     *
-     * @param \App\Entity\Fellowship $fellowshipVote
+     * Add fellowshipVote.
      *
      * @return User
      */
-    public function addFellowshipVote(\App\Entity\Fellowship $fellowshipVote) {
+    public function addFellowshipVote(Fellowship $fellowshipVote)
+    {
         $this->fellowship_votes[] = $fellowshipVote;
 
         return $this;
     }
 
     /**
-     * Remove fellowshipVote
+     * Remove fellowshipVote.
      *
-     * @param \App\Entity\Fellowship $fellowshipVote
      * @return void
      */
-    public function removeFellowshipVote(\App\Entity\Fellowship $fellowshipVote) {
+    public function removeFellowshipVote(Fellowship $fellowshipVote)
+    {
         $this->fellowship_votes->removeElement($fellowshipVote);
     }
 
     /**
-     * Get fellowshipVotes
+     * Get fellowshipVotes.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Fellowship>
+     * @return \Doctrine\Common\Collections\Collection<int, Fellowship>
      */
-    public function getFellowshipVotes() {
+    public function getFellowshipVotes()
+    {
         return $this->fellowship_votes;
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Questlog>
+     * @var \Doctrine\Common\Collections\Collection<int, Questlog>
      */
     private $questlogs;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\QuestlogComment>
+     * @var \Doctrine\Common\Collections\Collection<int, QuestlogComment>
      */
     private $questlog_comments;
 
     /**
-     * Add questlog
-     *
-     * @param \App\Entity\Questlog $questlog
+     * Add questlog.
      *
      * @return User
      */
-    public function addQuestlog(\App\Entity\Questlog $questlog) {
+    public function addQuestlog(Questlog $questlog)
+    {
         $this->questlogs[] = $questlog;
 
         return $this;
     }
 
     /**
-     * Remove questlog
+     * Remove questlog.
      *
-     * @param \App\Entity\Questlog $questlog
      * @return void
      */
-    public function removeQuestlog(\App\Entity\Questlog $questlog) {
+    public function removeQuestlog(Questlog $questlog)
+    {
         $this->questlogs->removeElement($questlog);
     }
 
     /**
-     * Get questlogs
+     * Get questlogs.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Questlog>
+     * @return \Doctrine\Common\Collections\Collection<int, Questlog>
      */
-    public function getQuestlogs() {
+    public function getQuestlogs()
+    {
         return $this->questlogs;
     }
 
     /**
-     * Add questlogComment
-     *
-     * @param \App\Entity\QuestlogComment $questlogComment
+     * Add questlogComment.
      *
      * @return User
      */
-    public function addQuestlogComment(\App\Entity\QuestlogComment $questlogComment) {
+    public function addQuestlogComment(QuestlogComment $questlogComment)
+    {
         $this->questlog_comments[] = $questlogComment;
 
         return $this;
     }
 
     /**
-     * Remove questlogComment
+     * Remove questlogComment.
      *
-     * @param \App\Entity\QuestlogComment $questlogComment
      * @return void
      */
-    public function removeQuestlogComment(\App\Entity\QuestlogComment $questlogComment) {
+    public function removeQuestlogComment(QuestlogComment $questlogComment)
+    {
         $this->questlog_comments->removeElement($questlogComment);
     }
 
     /**
-     * Get questlogComments
+     * Get questlogComments.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\QuestlogComment>
+     * @return \Doctrine\Common\Collections\Collection<int, QuestlogComment>
      */
-    public function getQuestlogComments() {
+    public function getQuestlogComments()
+    {
         return $this->questlog_comments;
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Questlog>
+     * @var \Doctrine\Common\Collections\Collection<int, Questlog>
      */
     private $questlog_favorites;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Questlog>
+     * @var \Doctrine\Common\Collections\Collection<int, Questlog>
      */
     private $questlog_votes;
 
     /**
-     * Add questlogFavorite
-     *
-     * @param \App\Entity\Questlog $questlogFavorite
+     * Add questlogFavorite.
      *
      * @return User
      */
-    public function addQuestlogFavorite(\App\Entity\Questlog $questlogFavorite) {
+    public function addQuestlogFavorite(Questlog $questlogFavorite)
+    {
         $this->questlog_favorites[] = $questlogFavorite;
 
         return $this;
     }
 
     /**
-     * Remove questlogFavorite
+     * Remove questlogFavorite.
      *
-     * @param \App\Entity\Questlog $questlogFavorite
      * @return void
      */
-    public function removeQuestlogFavorite(\App\Entity\Questlog $questlogFavorite) {
+    public function removeQuestlogFavorite(Questlog $questlogFavorite)
+    {
         $this->questlog_favorites->removeElement($questlogFavorite);
     }
 
     /**
-     * Get questlogFavorites
+     * Get questlogFavorites.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Questlog>
+     * @return \Doctrine\Common\Collections\Collection<int, Questlog>
      */
-    public function getQuestlogFavorites() {
+    public function getQuestlogFavorites()
+    {
         return $this->questlog_favorites;
     }
 
     /**
-     * Add questlogVote
-     *
-     * @param \App\Entity\Questlog $questlogVote
+     * Add questlogVote.
      *
      * @return User
      */
-    public function addQuestlogVote(\App\Entity\Questlog $questlogVote) {
+    public function addQuestlogVote(Questlog $questlogVote)
+    {
         $this->questlog_votes[] = $questlogVote;
 
         return $this;
     }
 
     /**
-     * Remove questlogVote
+     * Remove questlogVote.
      *
-     * @param \App\Entity\Questlog $questlogVote
      * @return void
      */
-    public function removeQuestlogVote(\App\Entity\Questlog $questlogVote) {
+    public function removeQuestlogVote(Questlog $questlogVote)
+    {
         $this->questlog_votes->removeElement($questlogVote);
     }
 
     /**
-     * Get questlogVotes
+     * Get questlogVotes.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Questlog>
+     * @return \Doctrine\Common\Collections\Collection<int, Questlog>
      */
-    public function getQuestlogVotes() {
+    public function getQuestlogVotes()
+    {
         return $this->questlog_votes;
     }
 
@@ -1058,24 +1092,26 @@ class User extends BaseUser {
     protected $locked = false;
 
     /**
-     * Set locked
+     * Set locked.
      *
-     * @param boolean $locked
+     * @param bool $locked
      *
      * @return User
      */
-    public function setLocked($locked) {
+    public function setLocked($locked)
+    {
         $this->locked = (bool) $locked;
 
         return $this;
     }
 
     /**
-     * Get locked
+     * Get locked.
      *
-     * @return boolean
+     * @return bool
      */
-    public function isLocked() {
+    public function isLocked()
+    {
         return $this->locked;
     }
 

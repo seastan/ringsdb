@@ -21,7 +21,7 @@ if (is_file("$projectDir/.env")) {
 // APP_ENV decides which files come next: the real environment, else .env, else .env.local
 // (where a server sets APP_ENV=prod)
 $env = $_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? 'dev';
-if ($env !== 'test' && is_file("$projectDir/.env.local")) {
+if ('test' !== $env && is_file("$projectDir/.env.local")) {
     $dotenv->load("$projectDir/.env.local");
     $env = $_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? $env;
 }
@@ -32,7 +32,7 @@ foreach ([".env.$env", ".env.$env.local"] as $file) {
 }
 
 $_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = $env;
-$debug = $_SERVER['APP_DEBUG'] ?? $_ENV['APP_DEBUG'] ?? ($env !== 'prod');
+$debug = $_SERVER['APP_DEBUG'] ?? $_ENV['APP_DEBUG'] ?? ('prod' !== $env);
 $_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = (int) $debug || filter_var($debug, FILTER_VALIDATE_BOOLEAN) ? '1' : '0';
 putenv('APP_ENV='.$_SERVER['APP_ENV']);
 putenv('APP_DEBUG='.$_SERVER['APP_DEBUG']);

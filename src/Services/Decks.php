@@ -8,16 +8,19 @@ use App\Repository\DeckchangeRepository;
 use App\Repository\CardRepository;
 use App\Entity\Card;
 use App\Entity\Deck;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Deckslot;
-use App\Entity\Decksideslot;
-use Psr\Log\LoggerInterface;
 use App\Entity\Deckchange;
+use App\Entity\Decksideslot;
+use App\Entity\Deckslot;
 use App\Helper\DeckValidationHelper;
-use App\Services\Diff;
+use App\Repository\CardRepository;
+use App\Repository\DeckchangeRepository;
+use App\Repository\DecklistRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class Decks {
+class Decks
+{
     /**
      * @var EntityManagerInterface
      */
@@ -53,7 +56,8 @@ class Decks {
      */
     private $decklistRepository;
 
-    public function __construct(EntityManagerInterface $doctrine, DeckValidationHelper $deck_validation_helper, Diff $diff, LoggerInterface $logger, CardRepository $cardRepository, DeckchangeRepository $deckchangeRepository, DecklistRepository $decklistRepository) {
+    public function __construct(EntityManagerInterface $doctrine, DeckValidationHelper $deck_validation_helper, Diff $diff, LoggerInterface $logger, CardRepository $cardRepository, DeckchangeRepository $deckchangeRepository, DecklistRepository $decklistRepository)
+    {
         $this->doctrine = $doctrine;
         $this->deck_validation_helper = $deck_validation_helper;
         $this->diff = $diff;
@@ -64,10 +68,10 @@ class Decks {
     }
 
     /**
-     * @param mixed $user
      * @return array<int, mixed>
      */
-    public function getByUser($user) {
+    public function getByUser($user)
+    {
         /* @var $user \App\Entity\User */
         $decks = $user->getDecks();
         $list = [];
@@ -80,11 +84,10 @@ class Decks {
     }
 
     /**
-     * @param mixed $user
-     * @param mixed $limit
      * @return list<array<string, mixed>>
      */
-    public function getDecksWithSlotsForUser($user, $limit = null) {
+    public function getDecksWithSlotsForUser($user, $limit = null)
+    {
         // Step 1: get the right deck IDs with no collection join so LIMIT works correctly
         $idQuery = $this->doctrine->createQuery(
             'SELECT d.id FROM App\Entity\Deck d
@@ -92,7 +95,7 @@ class Decks {
              ORDER BY d.dateUpdate DESC, d.id ASC'
         )->setParameter('user', $user);
 
-        if ($limit !== null) {
+        if (null !== $limit) {
             $idQuery->setMaxResults($limit);
         }
 
@@ -131,19 +134,19 @@ class Decks {
                 $decks[$deckId] = [
                     'id' => (int) $deckId,
                     'name' => $row['name'],
-                    'version' => $row['major_version'] . '.' . $row['minor_version'],
+                    'version' => $row['major_version'].'.'.$row['minor_version'],
                     'problem' => $row['problem'],
                     'tags' => $row['tags'],
                     'date_creation' => $row['date_creation'] ? new \DateTime($row['date_creation']) : null,
-                    'last_pack' => $row['last_pack_name'] !== null ? ['name' => $row['last_pack_name']] : null,
+                    'last_pack' => null !== $row['last_pack_name'] ? ['name' => $row['last_pack_name']] : null,
                     'slots' => [],
                     'heroes' => [],
                 ];
             }
 
-            if ($row['card_code'] !== null) {
+            if (null !== $row['card_code']) {
                 $decks[$deckId]['slots'][$row['card_code']] = (int) $row['qty'];
-                if ($row['type_code'] === 'hero') {
+                if ('hero' === $row['type_code']) {
                     // remember hero codes; the Card entities are bulk-loaded below
                     $decks[$deckId]['heroes'][$row['card_code']] = true;
                     $heroCodes[$row['card_code']] = true;
@@ -184,21 +187,20 @@ class Decks {
     }
 
     /**
-     * @param mixed $user
      * @return int
      */
-    public function countDecksForUser($user) {
+    public function countDecksForUser($user)
+    {
         return (int) $this->doctrine->createQuery(
             'SELECT COUNT(d.id) FROM App\Entity\Deck d WHERE d.user = :user'
         )->setParameter('user', $user)->getSingleScalarResult();
     }
 
     /**
-     * @param mixed $deck
-     * @param mixed $user
-     * @return \App\Entity\Deck
+     * @return Deck
      */
-    public function cloneDeck($deck, $user) {
+    public function cloneDeck($deck, $user)
+    {
         /* @var $deck \App\Entity\Deck */
         if (!$deck) {
             throw new NotFoundHttpException("This deck doesn't exist.");
@@ -206,7 +208,7 @@ class Decks {
 
         $content = [
             'main' => [],
-            'side' => []
+            'side' => [],
         ];
 
         foreach ($deck->getSlots() as $slot) {
@@ -230,6 +232,7 @@ class Decks {
         $deck = new Deck();
         $this->saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, null);
         $this->doctrine->flush();
+
         return $deck;
     }
 
@@ -238,26 +241,18 @@ class Decks {
      * distinct, trimmed, non-empty tags.
      *
      * @param string|string[]|null $tags
+     *
      * @return string[]
      */
-    public function normalizeTags($tags) {
+    public function normalizeTags($tags)
+    {
         $tags = preg_split('/\s+/', trim(implode(' ', (array) $tags)), -1, PREG_SPLIT_NO_EMPTY) ?: [];
 
         return array_values(array_unique($tags));
     }
 
-    /**
-     * @param mixed $user
-     * @param mixed $deck
-     * @param mixed $decklist_id
-     * @param mixed $name
-     * @param mixed $description
-     * @param mixed $tags
-     * @param mixed $content
-     * @param mixed $source_deck
-     * @return mixed
-     */
-    public function saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, $source_deck) {
+    public function saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, $source_deck)
+    {
         /* @var $deck \App\Entity\Deck */
         /* @var $source_deck \App\Entity\Deck */
 
@@ -299,13 +294,13 @@ class Decks {
                             $latestPack = $pack;
                         }
                     }
-                } else if (!$pack->getDateRelease() || $latestPack->getDateRelease() < $pack->getDateRelease()) {
+                } elseif (!$pack->getDateRelease() || $latestPack->getDateRelease() < $pack->getDateRelease()) {
                     $latestPack = $pack;
                 }
             }
 
             $cards[$card_code] = $card;
-            if ($card->getType()->getCode() == 'hero') {
+            if ('hero' == $card->getType()->getCode()) {
                 $spheres[] = $card->getSphere()->getCode();
             }
 
@@ -349,14 +344,14 @@ class Decks {
         // on the deck content
         if ($source_deck) {
             // compute diff between current content and saved content
-            list ($listings) = $this->diff->diffContents([
+            list($listings) = $this->diff->diffContents([
                 $content['main'],
-                $source_deck->getSlots()->getContent()
+                $source_deck->getSlots()->getContent(),
             ]);
 
-            list ($sideListings) = $this->diff->diffContents([
+            list($sideListings) = $this->diff->diffContents([
                 $content['side'],
-                $source_deck->getSideslots()->getContent()
+                $source_deck->getSideslots()->getContent(),
             ]);
 
             $listings[2] = $sideListings[0];
@@ -442,11 +437,10 @@ class Decks {
     }
 
     /**
-     * @param mixed $deck
-     * @param mixed $content
      * @return void
      */
-    public function setSlots(&$deck, $content) {
+    public function setSlots(&$deck, $content)
+    {
         /* @var $deck \App\Entity\Deck */
         /* @var $latestPack \App\Entity\Pack */
 
@@ -525,10 +519,10 @@ class Decks {
     }
 
     /**
-     * @param mixed $deck
      * @return void
      */
-    public function revertDeck($deck) {
+    public function revertDeck($deck)
+    {
         /* @var $deck \App\Entity\Deck */
         $changes = $this->getUnsavedChanges($deck);
 
@@ -537,20 +531,20 @@ class Decks {
         }
 
         // if deck has only heroes, we delete it
-        if ($deck->getSlots()->getDrawDeck()->countCards() === 0) {
+        if (0 === $deck->getSlots()->getDrawDeck()->countCards()) {
             $this->doctrine->remove($deck);
         }
         $this->doctrine->flush();
     }
 
     /**
-     * @param mixed $deck
      * @return array<int, Deckchange>
      */
-    public function getUnsavedChanges($deck) {
+    public function getUnsavedChanges($deck)
+    {
         return $this->deckchangeRepository->findBy([
             'deck' => $deck,
-            'isSaved' => false
+            'isSaved' => false,
         ]);
     }
 }

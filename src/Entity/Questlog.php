@@ -3,11 +3,12 @@
 namespace App\Entity;
 
 /**
- * Questlog
+ * Questlog.
  */
-class Questlog {
+class Questlog
+{
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
@@ -35,31 +36,31 @@ class Questlog {
      */
     private $questMode;
     /**
-     * @var boolean
+     * @var bool
      */
     private $success;
     /**
-     * @var integer|null
+     * @var int|null
      */
     private $score;
     /**
-     * @var integer
+     * @var int
      */
     private $nbDecks;
     /**
-     * @var integer
+     * @var int
      */
     private $nbVotes;
     /**
-     * @var integer
+     * @var int
      */
     private $nbFavorites;
     /**
-     * @var integer
+     * @var int
      */
     private $nbComments;
     /**
-     * @var boolean
+     * @var bool
      */
     private $isPublic;
     /**
@@ -71,34 +72,35 @@ class Questlog {
      */
     private $dateUpdate;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\QuestlogDeck>
+     * @var \Doctrine\Common\Collections\Collection<int, QuestlogDeck>
      */
     private $decks;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\QuestlogComment>
+     * @var \Doctrine\Common\Collections\Collection<int, QuestlogComment>
      */
     private $comments;
     /**
-     * @var \App\Entity\User
+     * @var User
      */
     private $user;
     /**
-     * @var \App\Entity\Scenario
+     * @var Scenario
      */
     private $scenario;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @var \Doctrine\Common\Collections\Collection<int, User>
      */
     private $favorites;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @var \Doctrine\Common\Collections\Collection<int, User>
      */
     private $votes;
 
     /**
-     * Constructor
+     * Constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->decks = new \Doctrine\Common\Collections\ArrayCollection();
         $this->comments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->favorites = new \Doctrine\Common\Collections\ArrayCollection();
@@ -106,513 +108,544 @@ class Questlog {
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return Questlog
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
     /**
-     * Set nameCanonical
+     * Set nameCanonical.
      *
      * @param string $nameCanonical
      *
      * @return Questlog
      */
-    public function setNameCanonical($nameCanonical) {
+    public function setNameCanonical($nameCanonical)
+    {
         $this->nameCanonical = $nameCanonical;
 
         return $this;
     }
 
     /**
-     * Get nameCanonical
+     * Get nameCanonical.
      *
      * @return string
      */
-    public function getNameCanonical() {
+    public function getNameCanonical()
+    {
         return $this->nameCanonical;
     }
 
     /**
-     * Set descriptionMd
+     * Set descriptionMd.
      *
      * @param string|null $descriptionMd
      *
      * @return Questlog
      */
-    public function setDescriptionMd($descriptionMd) {
+    public function setDescriptionMd($descriptionMd)
+    {
         $this->descriptionMd = $descriptionMd;
 
         return $this;
     }
 
     /**
-     * Get descriptionMd
+     * Get descriptionMd.
      *
      * @return string|null
      */
-    public function getDescriptionMd() {
+    public function getDescriptionMd()
+    {
         return $this->descriptionMd;
     }
 
     /**
-     * Set descriptionHtml
+     * Set descriptionHtml.
      *
      * @param string|null $descriptionHtml
      *
      * @return Questlog
      */
-    public function setDescriptionHtml($descriptionHtml) {
+    public function setDescriptionHtml($descriptionHtml)
+    {
         $this->descriptionHtml = $descriptionHtml;
 
         return $this;
     }
 
     /**
-     * Get descriptionHtml
+     * Get descriptionHtml.
      *
      * @return string|null
      */
-    public function getDescriptionHtml() {
+    public function getDescriptionHtml()
+    {
         return $this->descriptionHtml;
     }
 
     /**
-     * Set datePlayed
+     * Set datePlayed.
      *
      * @param \DateTime $datePlayed
      *
      * @return Questlog
      */
-    public function setDatePlayed($datePlayed) {
+    public function setDatePlayed($datePlayed)
+    {
         $this->datePlayed = $datePlayed;
 
         return $this;
     }
 
     /**
-     * Get datePlayed
+     * Get datePlayed.
      *
      * @return \DateTime
      */
-    public function getDatePlayed() {
+    public function getDatePlayed()
+    {
         return $this->datePlayed;
     }
 
     /**
-     * Set questMode
+     * Set questMode.
      *
      * @param string $questMode
      *
      * @return Questlog
      */
-    public function setQuestMode($questMode) {
+    public function setQuestMode($questMode)
+    {
         $this->questMode = $questMode;
 
         return $this;
     }
 
     /**
-     * Get questMode
+     * Get questMode.
      *
      * @return string
      */
-    public function getQuestMode() {
+    public function getQuestMode()
+    {
         return $this->questMode;
     }
 
     /**
-     * Set success
+     * Set success.
      *
-     * @param boolean $success
+     * @param bool $success
      *
      * @return Questlog
      */
-    public function setSuccess($success) {
+    public function setSuccess($success)
+    {
         $this->success = $success;
 
         return $this;
     }
 
     /**
-     * Get success
+     * Get success.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getSuccess() {
+    public function getSuccess()
+    {
         return $this->success;
     }
 
     /**
-     * Set score
+     * Set score.
      *
-     * @param integer|null $score
+     * @param int|null $score
      *
      * @return Questlog
      */
-    public function setScore($score) {
+    public function setScore($score)
+    {
         $this->score = $score;
 
         return $this;
     }
 
     /**
-     * Get score
+     * Get score.
      *
-     * @return integer|null
+     * @return int|null
      */
-    public function getScore() {
+    public function getScore()
+    {
         return $this->score;
     }
 
     /**
-     * Set nbDecks
+     * Set nbDecks.
      *
-     * @param integer $nbDecks
+     * @param int $nbDecks
      *
      * @return Questlog
      */
-    public function setNbDecks($nbDecks) {
+    public function setNbDecks($nbDecks)
+    {
         $this->nbDecks = $nbDecks;
 
         return $this;
     }
 
     /**
-     * Get nbDecks
+     * Get nbDecks.
      *
-     * @return integer
+     * @return int
      */
-    public function getNbDecks() {
+    public function getNbDecks()
+    {
         return $this->nbDecks;
     }
 
     /**
-     * Set nbVotes
+     * Set nbVotes.
      *
-     * @param integer $nbVotes
+     * @param int $nbVotes
      *
      * @return Questlog
      */
-    public function setNbVotes($nbVotes) {
+    public function setNbVotes($nbVotes)
+    {
         $this->nbVotes = $nbVotes;
 
         return $this;
     }
 
     /**
-     * Get nbVotes
+     * Get nbVotes.
      *
-     * @return integer
+     * @return int
      */
-    public function getNbVotes() {
+    public function getNbVotes()
+    {
         return $this->nbVotes;
     }
 
     /**
-     * Set nbFavorites
+     * Set nbFavorites.
      *
-     * @param integer $nbFavorites
+     * @param int $nbFavorites
      *
      * @return Questlog
      */
-    public function setNbFavorites($nbFavorites) {
+    public function setNbFavorites($nbFavorites)
+    {
         $this->nbFavorites = $nbFavorites;
 
         return $this;
     }
 
     /**
-     * Get nbFavorites
+     * Get nbFavorites.
      *
-     * @return integer
+     * @return int
      */
-    public function getNbFavorites() {
+    public function getNbFavorites()
+    {
         return $this->nbFavorites;
     }
 
     /**
-     * Set nbComments
+     * Set nbComments.
      *
-     * @param integer $nbComments
+     * @param int $nbComments
      *
      * @return Questlog
      */
-    public function setNbComments($nbComments) {
+    public function setNbComments($nbComments)
+    {
         $this->nbComments = $nbComments;
 
         return $this;
     }
 
     /**
-     * Get nbComments
+     * Get nbComments.
      *
-     * @return integer
+     * @return int
      */
-    public function getNbComments() {
+    public function getNbComments()
+    {
         return $this->nbComments;
     }
 
     /**
-     * Set isPublic
+     * Set isPublic.
      *
-     * @param boolean $isPublic
+     * @param bool $isPublic
      *
      * @return Questlog
      */
-    public function setIsPublic($isPublic) {
+    public function setIsPublic($isPublic)
+    {
         $this->isPublic = $isPublic;
 
         return $this;
     }
 
     /**
-     * Get isPublic
+     * Get isPublic.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsPublic() {
+    public function getIsPublic()
+    {
         return $this->isPublic;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
      *
      * @return Questlog
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation)
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
+     * Get dateCreation.
      *
      * @return \DateTime
      */
-    public function getDateCreation() {
+    public function getDateCreation()
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
+     * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
      *
      * @return Questlog
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate($dateUpdate)
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
+     * Get dateUpdate.
      *
      * @return \DateTime
      */
-    public function getDateUpdate() {
+    public function getDateUpdate()
+    {
         return $this->dateUpdate;
     }
 
     /**
-     * Add deck
-     *
-     * @param \App\Entity\QuestlogDeck $deck
+     * Add deck.
      *
      * @return Questlog
      */
-    public function addDeck(\App\Entity\QuestlogDeck $deck) {
+    public function addDeck(QuestlogDeck $deck)
+    {
         $this->decks[] = $deck;
 
         return $this;
     }
 
     /**
-     * Remove deck
+     * Remove deck.
      *
-     * @param \App\Entity\QuestlogDeck $deck
      * @return void
      */
-    public function removeDeck(\App\Entity\QuestlogDeck $deck) {
+    public function removeDeck(QuestlogDeck $deck)
+    {
         $this->decks->removeElement($deck);
     }
 
     /**
-     * Get decks
+     * Get decks.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\QuestlogDeck>
+     * @return \Doctrine\Common\Collections\Collection<int, QuestlogDeck>
      */
-    public function getDecks() {
+    public function getDecks()
+    {
         return $this->decks;
     }
 
     /**
-     * Add comment
-     *
-     * @param \App\Entity\QuestlogComment $comment
+     * Add comment.
      *
      * @return Questlog
      */
-    public function addComment(\App\Entity\QuestlogComment $comment) {
+    public function addComment(QuestlogComment $comment)
+    {
         $this->comments[] = $comment;
 
         return $this;
     }
 
     /**
-     * Remove comment
+     * Remove comment.
      *
-     * @param \App\Entity\QuestlogComment $comment
      * @return void
      */
-    public function removeComment(\App\Entity\QuestlogComment $comment) {
+    public function removeComment(QuestlogComment $comment)
+    {
         $this->comments->removeElement($comment);
     }
 
     /**
-     * Get comments
+     * Get comments.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\QuestlogComment>
+     * @return \Doctrine\Common\Collections\Collection<int, QuestlogComment>
      */
-    public function getComments() {
+    public function getComments()
+    {
         return $this->comments;
     }
 
     /**
-     * Set user
-     *
-     * @param \App\Entity\User $user
+     * Set user.
      *
      * @return Questlog
      */
-    public function setUser(\App\Entity\User $user) {
+    public function setUser(User $user)
+    {
         $this->user = $user;
 
         return $this;
     }
 
     /**
-     * Get user
+     * Get user.
      *
-     * @return \App\Entity\User
+     * @return User
      */
-    public function getUser() {
+    public function getUser()
+    {
         return $this->user;
     }
 
     /**
-     * Set scenario
-     *
-     * @param \App\Entity\Scenario $scenario
+     * Set scenario.
      *
      * @return Questlog
      */
-    public function setScenario(\App\Entity\Scenario $scenario) {
+    public function setScenario(Scenario $scenario)
+    {
         $this->scenario = $scenario;
 
         return $this;
     }
 
     /**
-     * Get scenario
+     * Get scenario.
      *
-     * @return \App\Entity\Scenario
+     * @return Scenario
      */
-    public function getScenario() {
+    public function getScenario()
+    {
         return $this->scenario;
     }
 
     /**
-     * Add favorite
-     *
-     * @param \App\Entity\User $favorite
+     * Add favorite.
      *
      * @return Questlog
      */
-    public function addFavorite(\App\Entity\User $favorite) {
+    public function addFavorite(User $favorite)
+    {
         $this->favorites[] = $favorite;
 
         return $this;
     }
 
     /**
-     * Remove favorite
+     * Remove favorite.
      *
-     * @param \App\Entity\User $favorite
      * @return void
      */
-    public function removeFavorite(\App\Entity\User $favorite) {
+    public function removeFavorite(User $favorite)
+    {
         $this->favorites->removeElement($favorite);
     }
 
     /**
-     * Get favorites
+     * Get favorites.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @return \Doctrine\Common\Collections\Collection<int, User>
      */
-    public function getFavorites() {
+    public function getFavorites()
+    {
         return $this->favorites;
     }
 
     /**
-     * Add vote
-     *
-     * @param \App\Entity\User $vote
+     * Add vote.
      *
      * @return Questlog
      */
-    public function addVote(\App\Entity\User $vote) {
+    public function addVote(User $vote)
+    {
         $this->votes[] = $vote;
 
         return $this;
     }
 
     /**
-     * Remove vote
+     * Remove vote.
      *
-     * @param \App\Entity\User $vote
      * @return void
      */
-    public function removeVote(\App\Entity\User $vote) {
+    public function removeVote(User $vote)
+    {
         $this->votes->removeElement($vote);
     }
 
     /**
-     * Get votes
+     * Get votes.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @return \Doctrine\Common\Collections\Collection<int, User>
      */
-    public function getVotes() {
+    public function getVotes()
+    {
         return $this->votes;
     }
 
@@ -622,24 +655,26 @@ class Questlog {
     private $datePublish;
 
     /**
-     * Set datePublish
+     * Set datePublish.
      *
      * @param \DateTime|null $datePublish
      *
      * @return Questlog
      */
-    public function setDatePublish($datePublish) {
+    public function setDatePublish($datePublish)
+    {
         $this->datePublish = $datePublish;
 
         return $this;
     }
 
     /**
-     * Get datePublish
+     * Get datePublish.
      *
      * @return \DateTime|null
      */
-    public function getDatePublish() {
+    public function getDatePublish()
+    {
         return $this->datePublish;
     }
 }

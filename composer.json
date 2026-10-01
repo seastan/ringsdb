@@ -76,6 +76,8 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.4.5",
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "nikic/php-parser": "^4.19",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.2",
         "phpstan/phpstan-doctrine": "^2.0",

@@ -12,8 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * A term in capitals (2 letters or more) is also searched as an acronym: the initials of the words
  * of the name, dashes counting as spaces (REPLACE, App\DQL\ReplaceFunction).
  */
-class CardSearchTest extends WebTestCase {
-
+class CardSearchTest extends WebTestCase
+{
     private KernelBrowser $client;
 
     protected function setUp(): void
@@ -23,11 +23,11 @@ class CardSearchTest extends WebTestCase {
 
     /**
      * @return string[] the names of the cards found by the API
-     * @param mixed $q
      */
-    private function search($q) {
+    private function search($q)
+    {
         $client = $this->client;
-        $client->request('GET', '/api/public/cards/search/' . rawurlencode($q));
+        $client->request('GET', '/api/public/cards/search/'.rawurlencode($q));
         $this->assertSame(200, $client->getResponse()->getStatusCode(), "search $q");
 
         return array_column(json_decode($client->getResponse()->getContent(), true), 'name');
@@ -35,9 +35,9 @@ class CardSearchTest extends WebTestCase {
 
     /**
      * @dataProvider acronymProvider
-     * @param mixed $acronym
      */
-    public function testAcronym($acronym, array $expected): void {
+    public function testAcronym($acronym, array $expected): void
+    {
         $names = $this->search($acronym);
         sort($names);
 
@@ -47,7 +47,8 @@ class CardSearchTest extends WebTestCase {
     /**
      * @return array
      */
-    public function acronymProvider() {
+    public function acronymProvider()
+    {
         return [
             'initials' => ['LOS', ['Longbeard Orc Slayer']],
             // small words count: the initials are matched case-insensitively
@@ -58,7 +59,8 @@ class CardSearchTest extends WebTestCase {
         ];
     }
 
-    public function testAcronymsAreCaseSensitive(): void {
+    public function testAcronymsAreCaseSensitive(): void
+    {
         // in lower case, "los" is only searched in the names, case-insensitively
         $names = $this->search('los');
         $this->assertNotContains('Longbeard Orc Slayer', $names);
@@ -67,7 +69,8 @@ class CardSearchTest extends WebTestCase {
         }
     }
 
-    public function testSiteSearch(): void {
+    public function testSiteSearch(): void
+    {
         $client = $this->client;
         $crawler = $client->request('GET', '/find?q=LOS');
 

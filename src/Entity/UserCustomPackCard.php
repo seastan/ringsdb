@@ -2,21 +2,18 @@
 
 namespace App\Entity;
 
-use App\Entity\Card;
-use App\Entity\UserCustomPack;
-
-class UserCustomPackCard {
-
+class UserCustomPackCard
+{
     /**
      * @var int
      */
     private $id;
     /**
-     * @var \App\Entity\UserCustomPack
+     * @var UserCustomPack
      */
     private $customPack;
     /**
-     * @var \App\Entity\Card
+     * @var Card
      */
     private $card;
     /**
@@ -27,33 +24,62 @@ class UserCustomPackCard {
     /**
      * @return int
      */
-    public function getId() { return $this->id; }
+    public function getId()
+    {
+        return $this->id;
+    }
 
     /**
-     * @return \App\Entity\UserCustomPack
+     * @return UserCustomPack
      */
-    public function getCustomPack() { return $this->customPack; }
+    public function getCustomPack()
+    {
+        return $this->customPack;
+    }
+
     /**
      * @return $this
      */
-    public function setCustomPack(UserCustomPack $customPack) { $this->customPack = $customPack; return $this; }
+    public function setCustomPack(UserCustomPack $customPack)
+    {
+        $this->customPack = $customPack;
+
+        return $this;
+    }
 
     /**
-     * @return \App\Entity\Card
+     * @return Card
      */
-    public function getCard() { return $this->card; }
+    public function getCard()
+    {
+        return $this->card;
+    }
+
     /**
      * @return $this
      */
-    public function setCard(Card $card) { $this->card = $card; return $this; }
+    public function setCard(Card $card)
+    {
+        $this->card = $card;
+
+        return $this;
+    }
 
     /**
      * @return int
      */
-    public function getQuantity() { return $this->quantity; }
+    public function getQuantity()
+    {
+        return $this->quantity;
+    }
+
     /**
-     * @param mixed $quantity
      * @return $this
      */
-    public function setQuantity($quantity) { $this->quantity = max(1, (int)$quantity); return $this; }
+    public function setQuantity($quantity)
+    {
+        $this->quantity = max(1, (int) $quantity);
+
+        return $this;
+    }
 }

@@ -7,20 +7,18 @@ use App\Entity\Fellowship;
 use App\Entity\FellowshipDeck;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
 class FellowshipFixtures extends Fixture implements DependentFixtureInterface
 {
-
     /**
      * @return array<int, class-string>
      */
     public function getDependencies()
     {
         return [
-            DeckFixtures::class
+            DeckFixtures::class,
         ];
     }
 
@@ -39,16 +37,16 @@ class FellowshipFixtures extends Fixture implements DependentFixtureInterface
         $fellowship->setNbFavorites(0);
         $fellowship->setNbDecks(4);
         $fellowship->setUser($user);
-        $fellowship->setName("Heirs to Numeror Cycle");
-        $fellowship->setNameCanonical("heirs-to-numeror-cycle");
+        $fellowship->setName('Heirs to Numeror Cycle');
+        $fellowship->setNameCanonical('heirs-to-numeror-cycle');
         $fellowship->setDateCreation(new \DateTime('2015-08-16'));
         $fellowship->setDateUpdate(new \DateTime('2015-08-16'));
         $fellowship->setDateLastComment(new \DateTime('2015-08-16'));
         $fellowship->setDatePublish(new \DateTime('2015-08-16'));
 
-        for($i = 1; $i < 5; $i++) {
+        for ($i = 1; $i < 5; ++$i) {
             /** @var Deck $deck */
-            $deck = $this->getReference('test-deck-' . $i);
+            $deck = $this->getReference('test-deck-'.$i);
             $fellowship_deck = new FellowshipDeck();
             $fellowship_deck->setDeck($deck);
             $fellowship_deck->setDeckNumber($i);
@@ -59,5 +57,4 @@ class FellowshipFixtures extends Fixture implements DependentFixtureInterface
         $manager->persist($fellowship);
         $manager->flush();
     }
-
 }

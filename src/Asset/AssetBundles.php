@@ -6,12 +6,13 @@ namespace App\Asset;
  * The files loaded by every page (layout.html.twig), built by app:assets into web/: paths relative
  * to Resources/public, in order.
  */
-class AssetBundles {
+class AssetBundles
+{
     /**
      * Concatenated: the libraries, then the application (jQuery before its plugins, app.data.js
      * before the modules using it).
      */
-    const JAVASCRIPTS = [
+    public const JAVASCRIPTS = [
         'js/extra.js' => [
             'cdn/js/jquery.min.js',
             'cdn/js/jquery-ui.min.js',
@@ -53,7 +54,7 @@ class AssetBundles {
      * Concatenated, the .scss compiled: the libraries, Bootstrap, then the styles of the site (the
      * dark theme last, it overrides them).
      */
-    const STYLESHEETS = [
+    public const STYLESHEETS = [
         'css/app.css' => [
             'cdn/css/font-awesome.min.css',
             'cdn/css/jquery.qtip.css',

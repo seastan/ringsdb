@@ -6,13 +6,11 @@ use App\Entity\Comment;
 use App\Entity\Decklist;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
 class CommentFixtures extends Fixture implements DependentFixtureInterface
 {
-
     /**
      * @return array<int, class-string>
      */
@@ -20,7 +18,7 @@ class CommentFixtures extends Fixture implements DependentFixtureInterface
     {
         return [
             UserFixtures::class,
-            DecklistFixtures::class
+            DecklistFixtures::class,
         ];
     }
 

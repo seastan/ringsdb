@@ -3,27 +3,29 @@
 namespace App\Model;
 
 /**
- * Interface for an entity with a Card and a Quantity
+ * Interface for an entity with a Card and a Quantity.
  */
-interface SlotInterface {
+interface SlotInterface
+{
     /**
-     * Get card
+     * Get card.
      *
      * @return \App\Entity\Card
      */
     public function getCard();
 
     /**
-     * Get quantity
+     * Get quantity.
      *
-     * @return integer
+     * @return int
      */
     public function getQuantity();
 
     /**
-     * Set quantity
+     * Set quantity.
      *
-     * @param integer $quantity
+     * @param int $quantity
+     *
      * @return self
      */
     public function setQuantity($quantity);

@@ -3,16 +3,14 @@
 namespace App\Command;
 
 use App\Repository\UserRepository;
-use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Command\StringInputTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class PatronCommand extends Command {
+class PatronCommand extends Command
+{
     use StringInputTrait;
 
     /**
@@ -25,7 +23,8 @@ class PatronCommand extends Command {
      */
     private $userRepository;
 
-    public function __construct(EntityManagerInterface $em, UserRepository $userRepository) {
+    public function __construct(EntityManagerInterface $em, UserRepository $userRepository)
+    {
         parent::__construct();
         $this->em = $em;
         $this->userRepository = $userRepository;
@@ -34,7 +33,8 @@ class PatronCommand extends Command {
     /**
      * @return void
      */
-    protected function configure() {
+    protected function configure()
+    {
         $this
             ->setName('app:patron')
             ->setDescription('Add a donation to a user by email address or username')
@@ -50,7 +50,8 @@ class PatronCommand extends Command {
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $email = self::stringArgument($input, 'email');
         $donation = (int) $input->getArgument('donation');
 
@@ -66,12 +67,12 @@ class PatronCommand extends Command {
             if ($donation) {
                 $user->setDonation($donation + $user->getDonation());
                 $em->flush();
-                $output->writeln(date('c') . " " . "Success");
+                $output->writeln(date('c').' Success');
             } else {
-                $output->writeln(date('c') . " User " . $user->getUsername() . " donated " . $user->getDonation());
+                $output->writeln(date('c').' User '.$user->getUsername().' donated '.$user->getDonation());
             }
         } else {
-            $output->writeln(date('c') . " " . "Cannot find user [$email]");
+            $output->writeln(date('c').' '."Cannot find user [$email]");
         }
 
         return 0;

@@ -2,9 +2,10 @@
 
 namespace App\Entity;
 
-class Pack {
+class Pack
+{
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
@@ -16,11 +17,11 @@ class Pack {
      */
     private $name;
     /**
-     * @var integer
+     * @var int
      */
     private $position;
     /**
-     * @var integer
+     * @var int
      */
     private $size;
     /**
@@ -36,268 +37,287 @@ class Pack {
      */
     private $dateRelease;
     /**
-     * @var boolean
+     * @var bool
      */
     private $isRepackaged = false;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\CardPrinting>
+     * @var \Doctrine\Common\Collections\Collection<int, CardPrinting>
      */
     private $printings;
     /**
-     * @var \App\Entity\Cycle
+     * @var Cycle
      */
     private $cycle;
 
     /**
-     * Constructor
+     * Constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->printings = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
-     * Set isRepackaged
+     * Set isRepackaged.
      *
-     * @param boolean $isRepackaged
+     * @param bool $isRepackaged
      *
      * @return Pack
      */
-    public function setIsRepackaged($isRepackaged) {
+    public function setIsRepackaged($isRepackaged)
+    {
         $this->isRepackaged = $isRepackaged;
 
         return $this;
     }
 
     /**
-     * Get isRepackaged
+     * Get isRepackaged.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsRepackaged() {
+    public function getIsRepackaged()
+    {
         return $this->isRepackaged;
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set code
+     * Set code.
      *
      * @param string $code
      *
      * @return Pack
      */
-    public function setCode($code) {
+    public function setCode($code)
+    {
         $this->code = $code;
 
         return $this;
     }
 
     /**
-     * Get code
+     * Get code.
      *
      * @return string
      */
-    public function getCode() {
+    public function getCode()
+    {
         return $this->code;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return Pack
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
     /**
-     * Set position
+     * Set position.
      *
-     * @param integer $position
+     * @param int $position
      *
      * @return Pack
      */
-    public function setPosition($position) {
+    public function setPosition($position)
+    {
         $this->position = $position;
 
         return $this;
     }
 
     /**
-     * Get position
+     * Get position.
      *
-     * @return integer
+     * @return int
      */
-    public function getPosition() {
+    public function getPosition()
+    {
         return $this->position;
     }
 
     /**
-     * Set size
+     * Set size.
      *
-     * @param integer $size
+     * @param int $size
      *
      * @return Pack
      */
-    public function setSize($size) {
+    public function setSize($size)
+    {
         $this->size = $size;
 
         return $this;
     }
 
     /**
-     * Get size
+     * Get size.
      *
-     * @return integer
+     * @return int
      */
-    public function getSize() {
+    public function getSize()
+    {
         return $this->size;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
      *
      * @return Pack
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation)
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
+     * Get dateCreation.
      *
      * @return \DateTime
      */
-    public function getDateCreation() {
+    public function getDateCreation()
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
+     * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
      *
      * @return Pack
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate($dateUpdate)
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
+     * Get dateUpdate.
      *
      * @return \DateTime
      */
-    public function getDateUpdate() {
+    public function getDateUpdate()
+    {
         return $this->dateUpdate;
     }
 
     /**
-     * Set dateRelease
+     * Set dateRelease.
      *
      * @param \DateTime|null $dateRelease
      *
      * @return Pack
      */
-    public function setDateRelease($dateRelease) {
+    public function setDateRelease($dateRelease)
+    {
         $this->dateRelease = $dateRelease;
 
         return $this;
     }
 
     /**
-     * Get dateRelease
+     * Get dateRelease.
      *
      * @return \DateTime|null
      */
-    public function getDateRelease() {
+    public function getDateRelease()
+    {
         return $this->dateRelease;
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Card>
+     * @return \Doctrine\Common\Collections\Collection<int, Card>
      */
-    public function getCards() {
-        return $this->printings->map(function($p) { return $p->getCard(); });
+    public function getCards()
+    {
+        return $this->printings->map(function ($p) { return $p->getCard(); });
     }
 
     /**
-     * Add printing
-     *
-     * @param \App\Entity\CardPrinting $printing
+     * Add printing.
      *
      * @return Pack
      */
-    public function addPrinting(\App\Entity\CardPrinting $printing) {
+    public function addPrinting(CardPrinting $printing)
+    {
         $this->printings[] = $printing;
 
         return $this;
     }
 
     /**
-     * Remove printing
+     * Remove printing.
      *
-     * @param \App\Entity\CardPrinting $printing
      * @return void
      */
-    public function removePrinting(\App\Entity\CardPrinting $printing) {
+    public function removePrinting(CardPrinting $printing)
+    {
         $this->printings->removeElement($printing);
     }
 
     /**
-     * Get printings
+     * Get printings.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\CardPrinting>
+     * @return \Doctrine\Common\Collections\Collection<int, CardPrinting>
      */
-    public function getPrintings() {
+    public function getPrintings()
+    {
         return $this->printings;
     }
 
     /**
-     * Set cycle
-     *
-     * @param \App\Entity\Cycle $cycle
+     * Set cycle.
      *
      * @return Pack
      */
-    public function setCycle(\App\Entity\Cycle $cycle) {
+    public function setCycle(Cycle $cycle)
+    {
         $this->cycle = $cycle;
 
         return $this;
     }
 
     /**
-     * Get cycle
+     * Get cycle.
      *
-     * @return \App\Entity\Cycle
+     * @return Cycle
      */
-    public function getCycle() {
+    public function getCycle()
+    {
         return $this->cycle;
     }
 }

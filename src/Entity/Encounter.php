@@ -3,21 +3,23 @@
 namespace App\Entity;
 
 /**
- * Encounter
+ * Encounter.
  */
-class Encounter implements \JsonSerializable {
-    public function jsonSerialize() {
+class Encounter implements \JsonSerializable
+{
+    public function jsonSerialize()
+    {
         $array = [
             'id' => $this->getId(),
             'code' => $this->getCode(),
-            'name' => $this->getName()
+            'name' => $this->getName(),
         ];
 
         return $array;
     }
 
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
@@ -37,136 +39,147 @@ class Encounter implements \JsonSerializable {
      */
     private $dateUpdate;
     /**
-     * @var \App\Entity\Pack|null
+     * @var Pack|null
      */
     private $pack;
+
     /**
-     * Constructor
+     * Constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
     }
 
-    public function __toString() {
-        return (string)$this->getName();
+    public function __toString()
+    {
+        return (string) $this->getName();
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set code
+     * Set code.
      *
      * @param string $code
      *
      * @return Encounter
      */
-    public function setCode($code) {
+    public function setCode($code)
+    {
         $this->code = $code;
 
         return $this;
     }
 
     /**
-     * Get code
+     * Get code.
      *
      * @return string
      */
-    public function getCode() {
+    public function getCode()
+    {
         return $this->code;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return Encounter
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
      *
      * @return Encounter
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation)
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
+     * Get dateCreation.
      *
      * @return \DateTime
      */
-    public function getDateCreation() {
+    public function getDateCreation()
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
+     * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
      *
      * @return Encounter
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate($dateUpdate)
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
+     * Get dateUpdate.
      *
      * @return \DateTime
      */
-    public function getDateUpdate() {
+    public function getDateUpdate()
+    {
         return $this->dateUpdate;
     }
 
     /**
-     * Set pack
-     *
-     * @param \App\Entity\Pack $pack
+     * Set pack.
      *
      * @return Encounter
      */
-    public function setPack(\App\Entity\Pack $pack = null) {
+    public function setPack(?Pack $pack = null)
+    {
         $this->pack = $pack;
 
         return $this;
     }
 
     /**
-     * Get pack
+     * Get pack.
      *
-     * @return \App\Entity\Pack|null
+     * @return Pack|null
      */
-    public function getPack() {
+    public function getPack()
+    {
         return $this->pack;
     }
 }
-

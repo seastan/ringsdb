@@ -17,12 +17,13 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  * tests create is deleted, and the cards, printings and pack they change are restored, in
  * tearDown().
  */
-class AdminCsvTest extends WebTestCase {
+class AdminCsvTest extends WebTestCase
+{
     use \App\Tests\TemporaryFileTrait;
 
     private KernelBrowser $client;
 
-    const SAMPLE = __DIR__ . '/../Resources/fixtures/import/alep-the-hobbit.csv';
+    public const SAMPLE = __DIR__.'/../Resources/fixtures/import/alep-the-hobbit.csv';
 
     /** @var int[] */
     private $maxIds = [];
@@ -31,9 +32,10 @@ class AdminCsvTest extends WebTestCase {
     /** @var string[] */
     private $files = [];
 
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         $this->client = static::createClient();
-        $connection = $this->db($this->client);
+        $connection = $this->db();
         foreach (['card', 'card_printing', 'pack'] as $table) {
             $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
         }
@@ -45,7 +47,8 @@ class AdminCsvTest extends WebTestCase {
         ];
     }
 
-    protected function tearDown(): void {
+    protected function tearDown(): void
+    {
         $connection = $this->db($this->client);
         foreach (['card_printing', 'card', 'pack'] as $table) {
             $connection->exec("DELETE FROM $table WHERE id > {$this->maxIds[$table]}");
@@ -66,11 +69,13 @@ class AdminCsvTest extends WebTestCase {
     /**
      * @return \Doctrine\DBAL\Connection
      */
-    private function db(Client $client) {
-        return $client->getContainer()->get('doctrine')->getConnection();
+    private function db()
+    {
+        return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    private function createAdminClient(): Client {
+    private function createAdminClient(): KernelBrowser
+    {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => 'admin', '_password' => 'admin']));
@@ -82,13 +87,14 @@ class AdminCsvTest extends WebTestCase {
     /**
      * @return string the response
      */
-    private function upload(Client $client, string $file, string $code, string $name, string $oldCode = ''): string {
+    private function upload(KernelBrowser $client, string $file, string $code, string $name, string $oldCode = ''): string
+    {
         // the upload may be moved: send a copy
         $copy = self::temporaryFile('csv');
         $this->files[] = $copy;
         copy($file, $copy);
         $client->request('POST', '/admin/csv/upload', ['code' => $code, 'old_code' => $oldCode, 'name' => $name],
-            ['upfile' => new UploadedFile($copy, 'pack.csv', 'text/csv', (int) filesize($copy), null, true)]);
+            ['upfile' => new UploadedFile($copy, 'pack.csv', 'text/csv', null, true)]);
         $this->assertSame(200, $client->getResponse()->getStatusCode());
 
         return (string) $client->getResponse()->getContent();
@@ -98,7 +104,8 @@ class AdminCsvTest extends WebTestCase {
      * The rows of the sample (header first), changed by $change (row => row, or null to drop it),
      * written to a temporary file in the same format: lines ending with CRLF, LF in the texts.
      */
-    private function sampleVariant(callable $change): string {
+    private function sampleVariant(callable $change): string
+    {
         $in = fopen(self::SAMPLE, 'r');
         $this->assertNotFalse($in);
         fseek($in, 3); // UTF-8 BOM
@@ -106,31 +113,33 @@ class AdminCsvTest extends WebTestCase {
         $lines = [];
         while (is_array($row = fgetcsv($in))) {
             $row = $change(array_combine($header, $row));
-            if ($row !== null) {
+            if (null !== $row) {
                 $lines[] = self::csvLine(array_values($row));
             }
         }
         fclose($in);
         $file = self::temporaryFile('csv');
         $this->files[] = $file;
-        file_put_contents($file, "\xEF\xBB\xBF" . self::csvLine($header) . implode('', $lines));
+        file_put_contents($file, "\xEF\xBB\xBF".self::csvLine($header).implode('', $lines));
 
         return $file;
     }
 
-    private static function csvLine(array $values): string {
+    private static function csvLine(array $values): string
+    {
         $stream = fopen('php://memory', 'r+');
         self::assertNotFalse($stream);
         fputcsv($stream, $values);
         rewind($stream);
 
-        return rtrim((string) stream_get_contents($stream), "\n") . "\r\n";
+        return rtrim((string) stream_get_contents($stream), "\n")."\r\n";
     }
 
     /**
      * @return array the card and its printing in the pack, by the card name
      */
-    private function fetchPrinting(Client $client, string $packCode, string $name): array {
+    private function fetchPrinting(KernelBrowser $client, string $packCode, string $name): array
+    {
         $row = $this->db($client)->fetchAssoc('SELECT c.id, c.code, c.name, c.position, c.health, c.text, t.name AS type, s.name AS sphere,
                 cp.quantity, cp.illustrator, cp.octgnid
             FROM card_printing cp JOIN pack p ON p.id = cp.pack_id JOIN card c ON c.id = cp.card_id
@@ -141,12 +150,13 @@ class AdminCsvTest extends WebTestCase {
         return $row;
     }
 
-    private function printingPosition(Client $client, string $packCode, string $name): string {
+    private function printingPosition(KernelBrowser $client, string $packCode, string $name): string {
         return (string) $this->db($client)->fetchColumn('SELECT cp.position FROM card_printing cp JOIN pack p ON p.id = cp.pack_id
             JOIN card c ON c.id = cp.card_id WHERE p.code = ? AND c.name = ?', [$packCode, $name]);
     }
 
-    private function rowCount(Client $client, string $table): int {
+    private function rowCount(KernelBrowser $client, string $table): int
+    {
         return (int) $this->db($client)->fetchColumn("SELECT COUNT(*) FROM $table");
     }
 
@@ -159,7 +169,8 @@ class AdminCsvTest extends WebTestCase {
      * Beorn is a reprint in this pack (card 131005, from OHaUH), with the code of the ALeP printing
      * (503991) in the CSV: the canonical card is left unchanged, in both packs.
      */
-    public function testUploadAnUnchangedPack(): void {
+    public function testUploadAnUnchangedPack(): void
+    {
         $client = $this->createAdminClient();
         $counts = [$this->rowCount($client, 'card'), $this->rowCount($client, 'card_printing'), $this->rowCount($client, 'pack')];
         $bilbo = $this->fetchPrinting($client, 'THo', 'Bilbo Baggins');
@@ -208,13 +219,14 @@ class AdminCsvTest extends WebTestCase {
      * there is no such cycle, with a release date in 2030; the cards unknown by octgnid and by
      * code are created, with one printing each.
      */
-    public function testUploadANewPack(): void {
+    public function testUploadANewPack(): void
+    {
         $client = $this->createAdminClient();
         $counts = [$this->rowCount($client, 'card'), $this->rowCount($client, 'card_printing'), $this->rowCount($client, 'pack')];
         $file = $this->sampleVariant(function (array $row) {
             $row['pack'] = 'PHPUnit Pack';
-            $row['code'] = '99' . substr($row['code'], 2);
-            $row['octgnid'] = 'phpunit-' . $row['octgnid'];
+            $row['code'] = '99'.substr($row['code'], 2);
+            $row['octgnid'] = 'phpunit-'.$row['octgnid'];
 
             return $row;
         });
@@ -238,10 +250,11 @@ class AdminCsvTest extends WebTestCase {
      * The cards of the pack that are not in the CSV any more are not deleted: their name is
      * prefixed with "[deleted]" and their code gets a unique suffix.
      */
-    public function testCardsMissingFromTheCsvAreMarkedDeleted(): void {
+    public function testCardsMissingFromTheCsvAreMarkedDeleted(): void
+    {
         $client = $this->createAdminClient();
         $file = $this->sampleVariant(function (array $row) {
-            return $row['name'] === 'Bilbo Baggins' ? null : $row;
+            return 'Bilbo Baggins' === $row['name'] ? null : $row;
         });
 
         $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, $file, 'THo', 'ALeP - The Hobbit'));
@@ -255,7 +268,8 @@ class AdminCsvTest extends WebTestCase {
     /**
      * The old code finds the pack when the code is new: the pack is renamed, its cards are kept.
      */
-    public function testRenameAPackWithItsOldCode(): void {
+    public function testRenameAPackWithItsOldCode(): void
+    {
         $client = $this->createAdminClient();
         $packs = $this->rowCount($client, 'pack');
 
@@ -269,7 +283,8 @@ class AdminCsvTest extends WebTestCase {
     /**
      * Only the lines ending with CRLF are rows: with LF line endings, the whole file is one row.
      */
-    public function testCsvWithLfLineEndings(): void {
+    public function testCsvWithLfLineEndings(): void
+    {
         $client = $this->createAdminClient();
         $file = self::temporaryFile('csv');
         $this->files[] = $file;
@@ -278,7 +293,8 @@ class AdminCsvTest extends WebTestCase {
         $this->assertSame('No cards found in the CSV file', $this->upload($client, $file, 'THo', 'ALeP - The Hobbit'));
     }
 
-    public function testCsvWithoutCards(): void {
+    public function testCsvWithoutCards(): void
+    {
         $client = $this->createAdminClient();
         $file = $this->sampleVariant(function () {
             return null;

@@ -2,9 +2,10 @@
 
 namespace App\Entity;
 
-class Cycle {
+class Cycle
+{
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
@@ -16,15 +17,15 @@ class Cycle {
      */
     private $name;
     /**
-     * @var integer
+     * @var int
      */
     private $position;
     /**
-     * @var boolean
+     * @var bool
      */
     private $isBox;
     /**
-     * @var boolean
+     * @var bool
      */
     private $isSaga;
     /**
@@ -36,209 +37,225 @@ class Cycle {
      */
     private $dateUpdate;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Pack>
+     * @var \Doctrine\Common\Collections\Collection<int, Pack>
      */
     private $packs;
 
     /**
-     * Constructor
+     * Constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->packs = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set code
+     * Set code.
      *
      * @param string $code
      *
      * @return Cycle
      */
-    public function setCode($code) {
+    public function setCode($code)
+    {
         $this->code = $code;
 
         return $this;
     }
 
     /**
-     * Get code
+     * Get code.
      *
      * @return string
      */
-    public function getCode() {
+    public function getCode()
+    {
         return $this->code;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return Cycle
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
     /**
-     * Set position
+     * Set position.
      *
-     * @param integer $position
+     * @param int $position
      *
      * @return Cycle
      */
-    public function setPosition($position) {
+    public function setPosition($position)
+    {
         $this->position = $position;
 
         return $this;
     }
 
     /**
-     * Get position
+     * Get position.
      *
-     * @return integer
+     * @return int
      */
-    public function getPosition() {
+    public function getPosition()
+    {
         return $this->position;
     }
 
     /**
-     * Set isBox
+     * Set isBox.
      *
-     * @param boolean $isBox
+     * @param bool $isBox
      *
      * @return Cycle
      */
-    public function setIsBox($isBox) {
+    public function setIsBox($isBox)
+    {
         $this->isBox = $isBox;
 
         return $this;
     }
 
     /**
-     * Get isBox
+     * Get isBox.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsBox() {
+    public function getIsBox()
+    {
         return $this->isBox;
     }
 
     /**
-     * Set isSaga
+     * Set isSaga.
      *
-     * @param boolean $isSaga
+     * @param bool $isSaga
      *
      * @return Cycle
      */
-    public function setIsSaga($isSaga) {
+    public function setIsSaga($isSaga)
+    {
         $this->isSaga = $isSaga;
 
         return $this;
     }
 
     /**
-     * Get isSaga
+     * Get isSaga.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getIsSaga() {
+    public function getIsSaga()
+    {
         return $this->isSaga;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
      *
      * @return Cycle
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation)
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
+     * Get dateCreation.
      *
      * @return \DateTime
      */
-    public function getDateCreation() {
+    public function getDateCreation()
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
+     * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
      *
      * @return Cycle
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate($dateUpdate)
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
+     * Get dateUpdate.
      *
      * @return \DateTime
      */
-    public function getDateUpdate() {
+    public function getDateUpdate()
+    {
         return $this->dateUpdate;
     }
 
     /**
-     * Add pack
-     *
-     * @param \App\Entity\Pack $pack
+     * Add pack.
      *
      * @return Cycle
      */
-    public function addPack(\App\Entity\Pack $pack) {
+    public function addPack(Pack $pack)
+    {
         $this->packs[] = $pack;
 
         return $this;
     }
 
     /**
-     * Remove pack
+     * Remove pack.
      *
-     * @param \App\Entity\Pack $pack
      * @return void
      */
-    public function removePack(\App\Entity\Pack $pack) {
+    public function removePack(Pack $pack)
+    {
         $this->packs->removeElement($pack);
     }
 
     /**
-     * Get packs
+     * Get packs.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Pack>
+     * @return \Doctrine\Common\Collections\Collection<int, Pack>
      */
-    public function getPacks() {
+    public function getPacks()
+    {
         return $this->packs;
     }
 }

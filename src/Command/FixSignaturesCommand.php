@@ -5,12 +5,11 @@ namespace App\Command;
 use App\Repository\DecklistRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class FixSignaturesCommand extends Command {
+class FixSignaturesCommand extends Command
+{
     /**
      * @var EntityManagerInterface
      */
@@ -21,7 +20,8 @@ class FixSignaturesCommand extends Command {
      */
     private $decklistRepository;
 
-    public function __construct(EntityManagerInterface $em, DecklistRepository $decklistRepository) {
+    public function __construct(EntityManagerInterface $em, DecklistRepository $decklistRepository)
+    {
         parent::__construct();
         $this->em = $em;
         $this->decklistRepository = $decklistRepository;
@@ -30,12 +30,14 @@ class FixSignaturesCommand extends Command {
     /**
      * @return void
      */
-    protected function configure() {
+    protected function configure()
+    {
         $this->setName('app:fix-signatures')
              ->setDescription('Fix canonical names for decklists');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $em = $this->em;
 
         $count = 0;
@@ -54,12 +56,12 @@ class FixSignaturesCommand extends Command {
 
             if ($this_signature !== $decklist->getSignature()) {
                 $decklist->setSignature($this_signature);
-                $count++;
+                ++$count;
             }
         }
 
         $em->flush();
-        $output->writeln(date('c') . " Fixed $count decklist signatures.");
+        $output->writeln(date('c')." Fixed $count decklist signatures.");
 
         return 0;
     }

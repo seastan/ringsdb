@@ -7,7 +7,6 @@ use App\Entity\User;
 use App\Entity\UserCustomPack;
 use App\Entity\UserCustomPackCard;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 

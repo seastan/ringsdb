@@ -6,14 +6,15 @@ use Doctrine\ORM\Query\AST\Functions\FunctionNode;
 use Doctrine\ORM\Query\Lexer;
 
 /**
- * "REPLACE" "(" StringPrimary "," StringSecondary "," StringThird ")"
+ * "REPLACE" "(" StringPrimary "," StringSecondary "," StringThird ")".
  *
- *
- * @link    www.prohoney.com
+ * @see    www.prohoney.com
  * @since   2.0
+ *
  * @author  Igor Aleksejev
  */
-class ReplaceFunction extends FunctionNode {
+class ReplaceFunction extends FunctionNode
+{
     /**
      * @var \Doctrine\ORM\Query\AST\Node
      */
@@ -30,21 +31,23 @@ class ReplaceFunction extends FunctionNode {
     /**
      * @override
      */
-    public function getSql(\Doctrine\ORM\Query\SqlWalker $sqlWalker) {
-		return 'REPLACE(' .
-            $this->stringPrimary->dispatch($sqlWalker) . ', ' .
-            $this->stringSecondary->dispatch($sqlWalker) . ', ' .
-            $this->stringThird->dispatch($sqlWalker) .
+    public function getSql(\Doctrine\ORM\Query\SqlWalker $sqlWalker)
+    {
+        return 'REPLACE('.
+            $this->stringPrimary->dispatch($sqlWalker).', '.
+            $this->stringSecondary->dispatch($sqlWalker).', '.
+            $this->stringThird->dispatch($sqlWalker).
         ')';
-/*        return $sqlWalker->getConnection()->getDatabasePlatform()->getReplaceExpression(
-                        $this->stringPrimary, $this->stringSecondary, $this->stringThird
-        );*/
+        /*        return $sqlWalker->getConnection()->getDatabasePlatform()->getReplaceExpression(
+                                $this->stringPrimary, $this->stringSecondary, $this->stringThird
+                );*/
     }
 
     /**
      * @override
      */
-    public function parse(\Doctrine\ORM\Query\Parser $parser) {
+    public function parse(\Doctrine\ORM\Query\Parser $parser)
+    {
         $parser->match(Lexer::T_IDENTIFIER);
         $parser->match(Lexer::T_OPEN_PARENTHESIS);
         $this->stringPrimary = $parser->StringPrimary();

@@ -1,31 +1,36 @@
 <?php
+
 namespace App\Controller;
-
-use App\Repository\PackRepository;
-use App\Repository\CycleRepository;
-use App\Repository\CardPrintingRepository;
-use App\Repository\CardRepository;
-
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 
 use App\Entity\Card;
 use App\Entity\CardPrinting;
 use App\Entity\Pack;
+use App\Repository\CardPrintingRepository;
+use App\Repository\CardRepository;
+use App\Repository\CycleRepository;
+use App\Repository\PackRepository;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
-class CSVController extends AbstractController {
-	/**
-	 * @return \Symfony\Component\HttpFoundation\Response
-	 */
-	public function uploadFormAction() {
-		return $this->render('CSV/upload_form.html.twig');
-	}
+class CSVController extends AbstractController
+{
+    /**
+     * @return Response
+     *
+     * @Route("/admin/csv/upload", name="csv_upload_form", methods={"GET"})
+     */
+    public function uploadFormAction()
+    {
+        return $this->render('CSV/upload_form.html.twig');
+    }
 
-	/**
-	 * @return \Symfony\Component\HttpFoundation\Response
-	 */
+    /**
+     * @return Response
+     *
+     * @Route("/admin/csv/upload", name="csv_upload_process", methods={"POST"})
+     */
 	public function uploadProcessAction(Request $request, CardRepository $cardRepository, CardPrintingRepository $cardPrintingRepository, CycleRepository $cycleRepository, PackRepository $packRepository) {
 		$inputCode = $request->request->get('code');
 		$inputOldCode = $request->request->get('old_code');

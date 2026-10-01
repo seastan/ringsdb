@@ -14,22 +14,24 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * Fixture decklists 1-4 belong to "test" (reputation 1); "admin" (reputation 1) is the other user.
  * Counters, dates and reputations are restored in tearDown().
  */
-class DecklistSocialTest extends WebTestCase {
-
+class DecklistSocialTest extends WebTestCase
+{
     private KernelBrowser $client;
     /** @var array */
     private $fixtureDecklists;
     /** @var array */
     private $fixtureUsers;
 
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         $this->client = static::createClient();
         $connection = $this->db($this->client);
         $this->fixtureDecklists = $connection->fetchAll('SELECT id, nb_votes, nb_favorites, date_update FROM decklist');
         $this->fixtureUsers = $connection->fetchAll('SELECT id, reputation FROM user');
     }
 
-    protected function tearDown(): void {
+    protected function tearDown(): void
+    {
         $connection = $this->db($this->client);
         $connection->exec('DELETE FROM favorite');
         $connection->exec('DELETE FROM vote');
@@ -47,15 +49,16 @@ class DecklistSocialTest extends WebTestCase {
     /**
      * @return \Doctrine\DBAL\Connection
      */
-    private function db(Client $client) {
-        return $client->getContainer()->get('doctrine')->getConnection();
+    private function db()
+    {
+        return static::getContainer()->get('doctrine')->getConnection();
     }
 
     /**
-     * @param mixed $username
-     * @return \Symfony\Bundle\FrameworkBundle\Client
+     * @return KernelBrowser
      */
-    private function createAuthenticatedClient($username) {
+    private function createAuthenticatedClient($username)
+    {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $username]));
@@ -65,11 +68,10 @@ class DecklistSocialTest extends WebTestCase {
     }
 
     /**
-     * @param mixed $action
-     * @param mixed $decklistId
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    private function post(Client $client, $action, $decklistId) {
+    private function post(KernelBrowser $client, $action, $decklistId)
+    {
         $client->request('POST', "/user/$action", ['id' => $decklistId], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
         return $client->getResponse();
@@ -78,7 +80,8 @@ class DecklistSocialTest extends WebTestCase {
     /**
      * @return array<string, mixed>
      */
-    private function state(Client $client) {
+    private function state(KernelBrowser $client)
+    {
         $connection = $this->db($client);
 
         return [
@@ -95,7 +98,8 @@ class DecklistSocialTest extends WebTestCase {
     /**
      * Favorite is a toggle; the author gains (then loses) 5 reputation points.
      */
-    public function testFavoriteAndUnfavorite(): void {
+    public function testFavoriteAndUnfavorite(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
 
         $response = $this->post($client, 'favorite', 2);
@@ -113,14 +117,16 @@ class DecklistSocialTest extends WebTestCase {
         $this->assertSame(['nb_favorites' => '0', 'nb_votes' => '0', 'favorites' => '0', 'votes' => '0', 'author_reputation' => '1'], $this->state($client));
     }
 
-    public function testFavoriteOwnDecklistGivesNoReputation(): void {
+    public function testFavoriteOwnDecklistGivesNoReputation(): void
+    {
         $client = $this->createAuthenticatedClient('test');
 
         $this->assertSame('1', $this->post($client, 'favorite', 2)->getContent());
         $this->assertSame(['nb_favorites' => '1', 'nb_votes' => '0', 'favorites' => '1', 'votes' => '0', 'author_reputation' => '1'], $this->state($client));
     }
 
-    public function testFavoriteAnUnknownDecklist(): void {
+    public function testFavoriteAnUnknownDecklist(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
 
         $response = $this->post($client, 'favorite', 999);
@@ -135,7 +141,8 @@ class DecklistSocialTest extends WebTestCase {
     /**
      * A vote cannot be taken back; voting twice does nothing; the author gains 1 reputation point.
      */
-    public function testVote(): void {
+    public function testVote(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
 
         $response = $this->post($client, 'like', 2);
@@ -148,14 +155,16 @@ class DecklistSocialTest extends WebTestCase {
         $this->assertSame(['nb_favorites' => '0', 'nb_votes' => '1', 'favorites' => '0', 'votes' => '1', 'author_reputation' => '2'], $this->state($client));
     }
 
-    public function testCannotVoteForOwnDecklist(): void {
+    public function testCannotVoteForOwnDecklist(): void
+    {
         $client = $this->createAuthenticatedClient('test');
 
         $this->assertSame('0', $this->post($client, 'like', 2)->getContent());
         $this->assertSame(['nb_favorites' => '0', 'nb_votes' => '0', 'favorites' => '0', 'votes' => '0', 'author_reputation' => '1'], $this->state($client));
     }
 
-    public function testVoteForAnUnknownDecklist(): void {
+    public function testVoteForAnUnknownDecklist(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
 
         $client->request('POST', '/user/like', ['id' => 999]);
@@ -171,9 +180,9 @@ class DecklistSocialTest extends WebTestCase {
 
     /**
      * @dataProvider actionProvider
-     * @param mixed $action
      */
-    public function testAnonymousAjaxIsDenied($action): void {
+    public function testAnonymousAjaxIsDenied($action): void
+    {
         $client = $this->client;
         $response = $this->post($client, $action, 2);
 
@@ -185,15 +194,16 @@ class DecklistSocialTest extends WebTestCase {
     /**
      * @return array
      */
-    public function actionProvider() {
+    public function actionProvider()
+    {
         return ['favorite' => ['favorite'], 'vote' => ['like']];
     }
 
     /**
      * @dataProvider actionProvider
-     * @param mixed $action
      */
-    public function testGetIsNotAllowed($action): void {
+    public function testGetIsNotAllowed($action): void
+    {
         $client = $this->createAuthenticatedClient('admin');
         $client->request('GET', "/user/$action?id=2");
 

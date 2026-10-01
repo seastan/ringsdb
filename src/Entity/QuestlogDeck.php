@@ -3,15 +3,16 @@
 namespace App\Entity;
 
 /**
- * QuestlogDeck
+ * QuestlogDeck.
  */
-class QuestlogDeck {
+class QuestlogDeck
+{
     /**
-     * @var integer
+     * @var int
      */
     private $id;
     /**
-     * @var integer
+     * @var int
      */
     private $deckNumber;
     /**
@@ -19,134 +20,139 @@ class QuestlogDeck {
      */
     private $content;
     /**
-     * @var \App\Entity\Questlog
+     * @var Questlog
      */
     private $questlog;
     /**
-     * @var \App\Entity\Deck|null
+     * @var Deck|null
      */
     private $deck;
     /**
-     * @var \App\Entity\Decklist|null
+     * @var Decklist|null
      */
     private $decklist;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
-     * Set deckNumber
+     * Set deckNumber.
      *
-     * @param integer $deckNumber
+     * @param int $deckNumber
      *
      * @return QuestlogDeck
      */
-    public function setDeckNumber($deckNumber) {
+    public function setDeckNumber($deckNumber)
+    {
         $this->deckNumber = $deckNumber;
 
         return $this;
     }
 
     /**
-     * Get deckNumber
+     * Get deckNumber.
      *
-     * @return integer
+     * @return int
      */
-    public function getDeckNumber() {
+    public function getDeckNumber()
+    {
         return $this->deckNumber;
     }
 
     /**
-     * Set content
+     * Set content.
      *
      * @param string $content
      *
      * @return QuestlogDeck
      */
-    public function setContent($content) {
+    public function setContent($content)
+    {
         $this->content = $content;
 
         return $this;
     }
 
     /**
-     * Get content
+     * Get content.
      *
      * @return string
      */
-    public function getContent() {
+    public function getContent()
+    {
         return $this->content;
     }
 
     /**
-     * Set questlog
-     *
-     * @param \App\Entity\Questlog $questlog
+     * Set questlog.
      *
      * @return QuestlogDeck
      */
-    public function setQuestlog(\App\Entity\Questlog $questlog) {
+    public function setQuestlog(Questlog $questlog)
+    {
         $this->questlog = $questlog;
 
         return $this;
     }
 
     /**
-     * Get questlog
+     * Get questlog.
      *
-     * @return \App\Entity\Questlog
+     * @return Questlog
      */
-    public function getQuestlog() {
+    public function getQuestlog()
+    {
         return $this->questlog;
     }
 
     /**
-     * Set deck
-     *
-     * @param \App\Entity\Deck $deck
+     * Set deck.
      *
      * @return QuestlogDeck
      */
-    public function setDeck(\App\Entity\Deck $deck = null) {
+    public function setDeck(?Deck $deck = null)
+    {
         $this->deck = $deck;
 
         return $this;
     }
 
     /**
-     * Get deck
+     * Get deck.
      *
-     * @return \App\Entity\Deck|null
+     * @return Deck|null
      */
-    public function getDeck() {
+    public function getDeck()
+    {
         return $this->deck;
     }
 
     /**
-     * Set decklist
-     *
-     * @param \App\Entity\Decklist $decklist
+     * Set decklist.
      *
      * @return QuestlogDeck
      */
-    public function setDecklist(\App\Entity\Decklist $decklist = null) {
+    public function setDecklist(?Decklist $decklist = null)
+    {
         $this->decklist = $decklist;
 
         return $this;
     }
 
     /**
-     * Get decklist
+     * Get decklist.
      *
-     * @return \App\Entity\Decklist|null
+     * @return Decklist|null
      */
-    public function getDecklist() {
+    public function getDecklist()
+    {
         return $this->decklist;
     }
 
@@ -156,24 +162,26 @@ class QuestlogDeck {
     private $player;
 
     /**
-     * Set player
+     * Set player.
      *
      * @param string|null $player
      *
      * @return QuestlogDeck
      */
-    public function setPlayer($player) {
+    public function setPlayer($player)
+    {
         $this->player = $player;
 
         return $this;
     }
 
     /**
-     * Get player
+     * Get player.
      *
      * @return string|null
      */
-    public function getPlayer() {
+    public function getPlayer()
+    {
         return $this->player;
     }
 }

@@ -5,7 +5,6 @@ namespace App\DataFixtures;
 use App\Entity\Deck;
 use App\Model\DecklistFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -14,14 +13,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class DecklistFixtures extends Fixture implements ContainerAwareInterface, DependentFixtureInterface
 {
     /**
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface|null
+     * @var ContainerInterface|null
      */
     private $container;
 
     /**
      * @return void
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(?ContainerInterface $container = null)
     {
         $this->container = $container;
     }
@@ -32,7 +31,7 @@ class DecklistFixtures extends Fixture implements ContainerAwareInterface, Depen
     public function getDependencies()
     {
         return [
-            DeckFixtures::class
+            DeckFixtures::class,
         ];
     }
 
@@ -41,15 +40,15 @@ class DecklistFixtures extends Fixture implements ContainerAwareInterface, Depen
      */
     public function load(ObjectManager $manager)
     {
-        if ($this->container === null) {
+        if (null === $this->container) {
             throw new \LogicException('The container is not set.');
         }
         /** @var DecklistFactory $decklistFactory */
         $decklistFactory = $this->container->get('decklist_factory');
 
-        for($i = 1; $i < 5; $i++){
+        for ($i = 1; $i < 5; ++$i) {
             /** @var Deck $deck */
-            $deck = $this->getReference('test-deck-' . $i);
+            $deck = $this->getReference('test-deck-'.$i);
 
             $decklist = $decklistFactory->createDecklistFromDeck($deck, $deck->getName(), 'Hello World');
             $decklist->setDateCreation(new \DateTime('2015-08-16'));
@@ -59,7 +58,7 @@ class DecklistFixtures extends Fixture implements ContainerAwareInterface, Depen
             $deck->setDateUpdate(new \DateTime('2015-08-16'));
 
             $manager->persist($decklist);
-            $this->addReference('test-decklist-' . $i, $decklist);
+            $this->addReference('test-decklist-'.$i, $decklist);
         }
 
         $manager->flush();
