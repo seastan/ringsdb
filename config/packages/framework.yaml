@@ -1,6 +1,6 @@
 framework:
     #esi:       ~
-    secret:     '%env(SECRET)%'
+    secret:     '%env(APP_SECRET)%'
     router:
         strict_requirements: ~
     form:            ~

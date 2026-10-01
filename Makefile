@@ -47,7 +47,7 @@ coverage: test-fixtures
 	docker compose exec -it -u www-data symfony php vendor/bin/simple-phpunit --coverage-html var/cache/coverage --coverage-text=php://stdout --colors=never
 	@echo "Code coverage report: \033[36mfile://${PWD}/var/cache/coverage/index.html\033[0m"
 
-# cache:warmup: the service types are read from the dumped container (see phpstan.neon)
+# cache:warmup: the service types are read from the dumped container (see phpstan.neon.dist)
 phpstan:
 	docker compose exec -it -u www-data symfony php bin/console cache:warmup --env=test
 	docker compose exec -it -u www-data symfony php vendor/bin/phpstan --memory-limit=-1

@@ -148,7 +148,7 @@ the dependencies:
 
 Details:
 
-- **Environment variables** (`.env`): `DATABASE_*`, `MAILER_*`, `SECRET`,
+- **Environment variables** (`.env`): `DATABASE_*`, `MAILER_*`, `APP_SECRET`,
   `CACHE_EXPIRATION`, `EMAIL_SENDER_*`, `GAME_NAME`, `PUBLISHER_NAME`, `DRAGNCARDS_ROOM`,
   `NOINDEX`, `APP_ENV`. Each package config reads its own (`%env(MAILER_HOST)%` in
   `swiftmailer.yaml`...), not through parameters. The files follow the Symfony 4.2+ convention:
@@ -158,7 +158,7 @@ Details:
   machine), reads `APP_ENV` (so a server sets `APP_ENV=prod` in its `.env.local`), then loads
   `.env.<env>` and `.env.<env>.local`; each file wins over the previous ones, and a real
   environment variable wins over all of them (`deploy.sh` exports `APP_ENV=prod`,
-  `phpunit.xml` sets `APP_ENV=test`). As `.env.dev` is loaded after `.env.local`, a machine
+  `phpunit.xml.dist` sets `APP_ENV=test`). As `.env.dev` is loaded after `.env.local`, a machine
   changes a value of `.env.dev` in `.env.dev.local`. The Docker stack keeps its own default
   for `CARD_IMAGES_DIR` (`docker-compose.yaml`, which reads neither `.env.local` nor
   `.env.dev`). The unused `website_name` and `google_*` parameters were dropped.
@@ -181,8 +181,20 @@ Details:
   and by the Docker entrypoint. Moving these files to `public/` (and their URLs) is left for
   later.
 - **Composer**: the `AppKernel` classmap, the `incenteev/composer-parameter-handler` script and
-  the `extra` section are gone. The package itself is still required: to remove with
-  `composer remove incenteev/composer-parameter-handler`.
+  package are gone. `symfony/symfony` is replaced by the components the application uses,
+  each required explicitly in `^3.4` (the components it only gets through other packages too:
+  without `symfony/symfony`, their constraints let Composer install 4.x or 5.x versions, a
+  mix that the tests do not cover). Symfony Flex is installed, without applying its recipes to
+  the existing configuration (`symfony.lock` lists every package as configured, so they are not
+  applied again; a new package's recipe is still proposed). The Composer scripts are Flex
+  `auto-scripts`. Kept from the recipes: the commented-out configuration files (they show what
+  can be enabled), `bin/phpunit`, `DoctrineCacheBundle` (unused for now) and
+  `config/packages/prod/doctrine.yaml`, which enables the Doctrine metadata, query and result
+  caches in production and stops generating the proxies on the fly (`deploy.sh` warms the cache
+  up, which writes them).
+- **Configuration file names** (Flex convention): `phpunit.xml.dist`, `phpstan.neon.dist`,
+  `tests/bootstrap.php` (formerly `phpunit.xml`, `phpstan.neon`, `phpunit.bootstrap.php`); a
+  local `phpunit.xml` or `phpstan.neon` (ignored by git) overrides them.
 - **phpstan**: the container is now `var/cache/test/srcTestDebugProjectContainer.xml` (the name
   comes from the kernel's directory in 3.4, `App_KernelTestDebugContainer.xml` in 4.x).
 
@@ -215,7 +227,8 @@ are deprecated. Done by hand (no Rector):
 | `symfony/swiftmailer-bundle` 3.3 (SwiftMailer 6) | abandoned | Symfony Mailer (`new \Swift_Message()` in the comment notifications, FOSUser emails) |
 | `liuggio/excelbundle` (PHPExcel) | done | replaced by PhpSpreadsheet (admin Excel export / import) |
 | `sensio/framework-extra-bundle` | abandoned | native attributes (`#[Route]`, `#[IsGranted]`, `#[MapEntity]`) |
-| `incenteev/composer-parameter-handler` | Symfony 2 tooling | Symfony Flex, `.env` (`sensio/distribution-bundle` and `sensio/generator-bundle` removed; MakerBundle if code generation is needed) |
+| `symfony/symfony` | done | replaced by the components, required one by one in `^3.4` (see "Symfony 4 directory structure") |
+| `incenteev/composer-parameter-handler` | done | removed: `.env` files (see "Symfony 4 directory structure"); Symfony Flex installed without its recipes (`sensio/distribution-bundle` and `sensio/generator-bundle` removed; MakerBundle if code generation is needed) |
 | `nelmio/api-doc-bundle` 2.13 | 2.x supports Symfony 4, not 5; major rewrite in 4.x | see roadmap ("`/api/doc`"); its commands (`api:doc:dump`, unused) are auto-registered, so they are gone in Symfony 4.0 |
 | `friendsofsymfony/jsrouting-bundle` 2.8 | maintained (3.x) | kept to the end; `routes_to_expose: ['.*']` exposes every route, admin included: restrict it |
 | `gedmo/doctrine-extensions` 2.x | maintained (3.x) | upgrade; the timestampable listener is declared by hand (`doctrine_extensions.yml`), or use `stof/doctrine-extensions-bundle` |
@@ -266,7 +279,7 @@ skeleton, it is ported first, then run against the new application.
 
 ## Static analysis
 
-`make phpstan` runs phpstan 2.2 at level 8 on `src/` (configuration in `phpstan.neon`; the tests
+`make phpstan` runs phpstan 2.2 at level 8 on `src/` (configuration in `phpstan.neon.dist`; the tests
 are no longer analysed), with the official extensions (loaded by `phpstan/extension-installer`):
 
 - `phpstan-symfony`: the service types, read from the container dumped in `var/cache/test`
@@ -297,7 +310,7 @@ Found by `phpstan-doctrine` and fixed:
 - the dead `QuestLogManager::findQuestLogsByRecentDiscussion()` (see "Removed dead code").
 
 Columns nullable in the database but typed non-null in the entities (`doctrine.columnType`, no
-longer ignored: nothing is ignored in `phpstan.neon`). For the reference data, the bootstrap is the
+longer ignored: nothing is ignored in `phpstan.neon.dist`). For the reference data, the bootstrap is the
 production data, so each column was checked: in `Card`, `traits`, `text`, `flavor`, `cost` (a
 string: `X`, `-`...) and the stats are nullable (a hero has no cost, an ally no threat...), so the
 properties became nullable; `deck_limit` never is: `NOT NULL`, 3 by default (migration
@@ -371,7 +384,9 @@ was in `Decks::setSlots()`, fixed (see "Quest logs").
   4. backs up `vendor/` to `vendor.bak/` (replacing the previous backup), removes the prod cache (renamed first) and runs `composer install --no-dev
      --optimize-autoloader --no-interaction`, whose scripts clear the cache and build the assets.
      The prod kernel uses its cached container without checking it: without the removal, the
-     `cache:clear` would boot the container of the previous code. Then links the card images;
+     `cache:clear` would boot the container of the previous code. Then links the card images
+     and warms the cache up (`cache:warmup`: the scripts clear it with `--no-warmup`, and the
+     prod Doctrine proxies are only written by the warmup);
   5. applies the Doctrine migrations (`doctrine:migrations:migrate --allow-no-migration`);
   6. refreshes the ACLs of `var/cache` and `var/log` (`setfacl`, best-effort);
   7. leaves maintenance mode.
@@ -439,7 +454,7 @@ production. The site is down (maintenance page) during step 6 only, a few minute
    | — | `APP_ENV=prod` (**required**: Apache does not see the `APP_ENV` exported by `deploy.sh`; without it the site runs in `dev`, with the debug mode and the profiler) |
    | `database_host`, `database_port`, `database_name`, `database_user`, `database_password` | `DATABASE_HOST`, `DATABASE_PORT` (`3306` if `~`), `DATABASE_NAME`, `DATABASE_USER`, `DATABASE_PASSWORD` |
    | `mailer_transport`, `mailer_encryption`, `mailer_auth_mode`, `mailer_host`, `mailer_user`, `mailer_password` | `MAILER_TRANSPORT`, `MAILER_ENCRYPTION`, `MAILER_AUTH_MODE`, `MAILER_HOST`, `MAILER_USER`, `MAILER_PASSWORD` |
-   | `secret` | `SECRET` (**the same value**: it signs the remember-me cookies, a new one logs everybody out) |
+   | `secret` | `APP_SECRET` (**the same value**: it signs the remember-me cookies, a new one logs everybody out) |
    | `cache_expiration` | `CACHE_EXPIRATION` |
    | `email_sender_address`, `email_sender_name` | `EMAIL_SENDER_ADDRESS`, `EMAIL_SENDER_NAME` |
    | `game_name`, `publisher_name` | `GAME_NAME`, `PUBLISHER_NAME` |

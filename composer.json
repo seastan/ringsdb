@@ -92,7 +92,7 @@
         "auto-scripts": {
             "cache:clear --no-warmup": "symfony-cmd",
             "assets:install public --symlink --relative": "symfony-cmd",
-            "ln -sfn ../../src/Resources/public public/bundles/app":  "script",
+            "ln -sfn ../../src/Resources/public public/bundles/app": "script",
             "app:assets": "symfony-cmd"
         },
         "post-install-cmd": [
@@ -110,6 +110,11 @@
         "allow-plugins": {
             "phpstan/extension-installer": true,
             "symfony/flex": true
+        }
+    },
+    "extra": {
+        "symfony": {
+            "require": "3.4.*"
         }
     }
 }

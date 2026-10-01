@@ -4,3 +4,7 @@
 #index:
 #    path: /
 #    defaults: { _controller: 'App\Controller\DefaultController::index' }
+
+app:
+    resource: "../../src/Resources/config/routing.yml"
+    prefix:   /

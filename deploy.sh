@@ -9,7 +9,7 @@
 # version to deploy (before any change), switch to maintenance mode, snapshot
 # the database, fast-forward the branch, back up vendor/, install the
 # dependencies (the Composer scripts clear the cache and build the assets), link
-# the card images, apply the Doctrine migrations, refresh the cache/log ACLs,
+# the card images, warm up the cache, apply the Doctrine migrations, refresh the cache/log ACLs,
 # leave maintenance mode. If a step fails, the site stays in maintenance mode.
 #
 # Env:
@@ -203,6 +203,13 @@ composer install --no-dev --optimize-autoloader --no-interaction
 
 echo "==> Linking the card images ($CARD_IMAGES_DIR)..."
 ln -sfn "$CARD_IMAGES_DIR" public/bundles/cards
+
+# The Composer scripts clear the cache without warming it up (fast local
+# installs): build it now, before the site is back. In prod, Doctrine does not
+# generate its proxies on the fly (auto_generate_proxy_classes: false): the
+# warmup writes them, with the container, the router and the compiled templates.
+echo "==> Warming up the cache..."
+$CONSOLE cache:warmup
 
 # --- 5. Apply the database migrations -----------------------------------------
 echo "==> Applying the migrations (snapshot: $SNAPSHOT)..."

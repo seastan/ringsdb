@@ -33,7 +33,7 @@ security:
             # the Symfony 4 behaviour: a session is closed when its user changes (password, disabled...)
             logout_on_user_change: true
             remember_me:
-                secret:   '%env(SECRET)%'
+                secret:   '%env(APP_SECRET)%'
                 lifetime: 31536000 # 365 jours en secondes
                 path:     /
                 domain:   ~ # Prend la valeur par défaut du domaine courant depuis $_SERVER
