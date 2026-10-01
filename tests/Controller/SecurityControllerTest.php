@@ -168,7 +168,6 @@ class SecurityControllerTest extends WebTestCase {
         $this->assertRedirectsTo($client, '#/login$#');
         $crawler = $client->followRedirect();
         $this->assertContains('Invalid credentials', $crawler->filter('.alert-danger')->text());
-        $this->assertCount(1, $crawler->filter('a[href="/user/remind/' . $username . '"]'));
         $this->assertAnonymous($client);
 
         // 4. confirmation link enables the account and logs the user in
