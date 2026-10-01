@@ -59,3 +59,9 @@ services:
     decklist_factory: { alias: App\Model\DecklistFactory, public: true }
     fellowship_manager: { alias: App\Model\FellowshipManager, public: true }
     questlog_manager: { alias: App\Model\QuestLogManager, public: true }
+
+    Nelmio\ApiDocBundle\Command\SwaggerDumpCommand:
+        tags: ['console.command']
+
+    Nelmio\ApiDocBundle\Command\DumpCommand:
+        tags: ['console.command']

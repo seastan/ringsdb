@@ -4,8 +4,10 @@ namespace App\Helper;
 
 use App\Entity\Deck;
 use App\Entity\Decklist;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigTest;
 
-class TwigExtension extends \Twig_Extension {
+class TwigExtension extends AbstractExtension {
     /**
      * @return string
      */
@@ -15,10 +17,10 @@ class TwigExtension extends \Twig_Extension {
 
     public function getTests() {
         return [
-            new \Twig_SimpleTest('decklist', function($event) {
+            new TwigTest('decklist', function($event) {
                 return $event instanceof Decklist;
             }),
-            new \Twig_SimpleTest('deck', function($event) {
+            new TwigTest('deck', function($event) {
                 return $event instanceof Deck;
             })
         ];
