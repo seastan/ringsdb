@@ -54,3 +54,9 @@ deprecations:
 
 lint-twig:
 	docker compose exec -it -u www-data symfony php bin/console lint:twig templates
+
+clear-cache:
+	docker compose exec -it -u www-data symfony php bin/console cache:clear --env=test
+	docker compose exec -it -u www-data symfony php bin/console cache:clear --env=dev
+
+all: clear-cache lint-twig phpstan phpunit
