@@ -50,6 +50,7 @@
         "symfony/event-dispatcher": "^3.4",
         "symfony/filesystem": "^3.4",
         "symfony/finder": "^3.4",
+        "symfony/flex": "^1.22",
         "symfony/form": "^3.4",
         "symfony/framework-bundle": "^3.4",
         "symfony/http-foundation": "^3.4",
@@ -88,17 +89,17 @@
         "symfony/web-server-bundle": "^3.4"
     },
     "scripts": {
-        "symfony-scripts": [
-            "php bin/console cache:clear --no-warmup",
-            "php bin/console assets:install public --symlink --relative",
-            "ln -sfn ../../src/Resources/public public/bundles/app",
-            "php bin/console app:assets"
-        ],
+        "auto-scripts": {
+            "cache:clear --no-warmup": "symfony-cmd",
+            "assets:install public --symlink --relative": "symfony-cmd",
+            "ln -sfn ../../src/Resources/public public/bundles/app":  "script",
+            "app:assets": "symfony-cmd"
+        },
         "post-install-cmd": [
-            "@symfony-scripts"
+            "@auto-scripts"
         ],
         "post-update-cmd": [
-            "@symfony-scripts"
+            "@auto-scripts"
         ]
     },
     "config": {

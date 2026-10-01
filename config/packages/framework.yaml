@@ -1,6 +1,5 @@
 framework:
     #esi:       ~
-    translator: { fallbacks: ["en"] }
     secret:     '%env(SECRET)%'
     router:
         strict_requirements: ~
@@ -13,7 +12,6 @@ framework:
     assets:
         # ?v=<hash> on the JavaScript and CSS files (see ContentHashVersionStrategy)
         version_strategy: App\Asset\ContentHashVersionStrategy
-    default_locale:  "%locale%"
     trusted_hosts:   ~
     session:
         # handler_id set to null will use default session handler from php.ini

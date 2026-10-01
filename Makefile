@@ -16,6 +16,9 @@ sql:
 assets:
 	docker compose exec -it -u www-data symfony php bin/console app:assets
 
+install:
+	docker compose exec -it -u www-data symfony composer install
+
 fixtures:
 	docker compose exec -it -u www-data symfony php bin/console doctrine:database:drop --force
 	docker compose exec -it -u www-data symfony php bin/console doctrine:database:create
@@ -59,4 +62,4 @@ clear-cache:
 	docker compose exec -it -u www-data symfony php bin/console cache:clear --env=test
 	docker compose exec -it -u www-data symfony php bin/console cache:clear --env=dev
 
-all: clear-cache lint-twig phpstan phpunit
+all: install lint-twig phpstan phpunit

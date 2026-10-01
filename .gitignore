@@ -1,7 +1,4 @@
-/var/
 /composer.phar
-/vendor/
-/public/bundles/
 tags
 /public/js/
 /public/css/
@@ -21,11 +18,25 @@ beorn.json
 ringsdb_daily.sql
 __pycache__/
 
-# Local front controller
-/public/app_local.php
-
 # deploy.sh: maintenance mode flag, backup of vendor/
 /maintenance.flag
 /vendor.bak/
+
+###> symfony/framework-bundle ###
 /.env.local
+/.env.local.php
 /.env.*.local
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> symfony/phpunit-bridge ###
+.phpunit
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+
+###> symfony/web-server-bundle ###
+/.web-server-pid
+###< symfony/web-server-bundle ###
