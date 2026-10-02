@@ -1,0 +1,66 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controller\Questlog;
+
+use App\Entity\User;
+use App\Repository\QuestlogRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Routing\Annotation\Route;
+
+class DeleteListQuestlogController extends AbstractController
+{
+    private QuestlogRepository $questlogRepository;
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        QuestlogRepository $questlogRepository
+    ) {
+        $this->questlogRepository = $questlogRepository;
+        $this->entityManager = $entityManager;
+    }
+
+    /**
+     * @Route("/questlog/delete_list", name="questlog_delete_list", methods={"POST"})
+     */
+    public function __invoke(Request $request): RedirectResponse
+    {
+        /* @var $user User */
+        $user = $this->getUser();
+        if (!$user) {
+            throw new AccessDeniedHttpException('You must be logged in for this operation.');
+        }
+        $list_id = explode('-', $request->get('ids'));
+        $message = null;
+        foreach ($list_id as $id) {
+            /* @var $questlog \App\Entity\Questlog */
+            $questlog = $this->questlogRepository->find($id);
+            if (!$questlog) {
+                continue;
+            }
+            if ($user->getId() != $questlog->getUser()->getId()) {
+                continue;
+            }
+            if ($questlog->getNbVotes() || $questlog->getNbfavorites() || $questlog->getNbcomments()) {
+                $message = "You can't delete a published quest log. Unpublished selected quest logs were deleted.";
+            } else {
+                /* @var $decks \App\Entity\QuestlogDeck[] */
+                $decks = $questlog->getDecks();
+                foreach ($decks as $deck) {
+                    $this->entityManager->remove($deck);
+                }
+                $this->entityManager->remove($questlog);
+            }
+        }
+        $this->entityManager->flush();
+        $this->get('session')->getFlashBag()->set('notice', $message ?: 'Quest Logs deleted.');
+
+        return $this->redirect($this->generateUrl('myquestlogs_list'));
+    }
+}

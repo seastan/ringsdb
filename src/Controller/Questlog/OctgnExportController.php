@@ -30,7 +30,7 @@ class OctgnExportController extends AbstractController
      *     requirements={"questlog_id"="\d+"}
      * )
      */
-    public function octgnexportAction($questlog_id): Response
+    public function __invoke($questlog_id): Response
     {
         return $this->questlogArchiver->downloadFromSelection($this->currentUser(), $questlog_id, true);
     }
