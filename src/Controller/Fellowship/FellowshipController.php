@@ -15,7 +15,6 @@ use App\Entity\FellowshipDecklist;
 use App\Entity\User;
 use App\Helper\FellowshipValidationHelper;
 use App\Model\DecklistFactory;
-use App\Model\FellowshipManager;
 use App\Repository\CycleRepository;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
@@ -24,13 +23,11 @@ use App\Repository\FellowshipRepository;
 use App\Repository\UserRepository;
 use App\Services\Decks;
 use App\Services\Texts;
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -558,70 +555,8 @@ class FellowshipController extends AbstractController
         return $this->redirect($this->generateUrl('myfellowships_list'));
     }
 
-    private function searchForm(Request $request): string
-    {
-        $dbh = $this->getDoctrine()->getConnection();
-        $cards_code = $request->query->get('cards');
-        $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
-        $fellowship_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
-        $nb_decks = intval(filter_var($request->query->get('nb_decks'), FILTER_SANITIZE_NUMBER_INT));
-        $numcores = $request->query->get('numcores');
-        $numplaysets = $request->query->get('numplaysets');
-        $sort = $request->query->get('sort');
-        $packs = $request->query->get('packs');
-        if (!is_array($packs)) {
-            $packs = $dbh->executeQuery('SELECT id FROM pack')->fetchAll(\PDO::FETCH_COLUMN);
-        }
-        $categories = [];
-        $on = 0;
-        $off = 0;
-        $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
-        $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
-        foreach ($list_cycles as $cycle) {
-            /* @var $cycle Cycle */
-            $size = count($cycle->getPacks());
-            $first_pack = $cycle->getPacks()->first();
-            if (0 == $cycle->getPosition() || false === $first_pack) {
-                continue;
-            }
-            if (1 === $size && $first_pack->getName() == $cycle->getName()) {
-                $checked = count($packs) ? in_array($first_pack->getId(), $packs) : true;
-                if ($checked) {
-                    ++$on;
-                } else {
-                    ++$off;
-                }
-                $categories[0]['packs'][] = ['id' => $first_pack->getId(), 'label' => $first_pack->getName(), 'checked' => $checked, 'future' => null === $first_pack->getDateRelease()];
-            } else {
-                $category = ['label' => $cycle->getName(), 'packs' => []];
-                foreach ($cycle->getPacks() as $pack) {
-                    $checked = count($packs) ? in_array($pack->getId(), $packs) : true;
-                    if ($checked) {
-                        ++$on;
-                    } else {
-                        ++$off;
-                    }
-                    $category['packs'][] = ['id' => $pack->getId(), 'label' => $pack->getName(), 'checked' => $checked, 'future' => null === $pack->getDateRelease()];
-                }
-                $categories[] = $category;
-            }
-        }
-        $params = ['allowed' => $categories, 'on' => $on, 'off' => $off, 'author' => $author_name, 'name' => $fellowship_name, 'numcores' => $numcores, 'numplaysets' => $numplaysets];
-        $params['sort_'.$sort] = ' selected="selected"';
-        $params['nb_decks_selected'] = $nb_decks;
-        if (!empty($cards_code) && is_array($cards_code)) {
-            $cards = $dbh->executeQuery("SELECT\n    \t\t\t\tc.name,\n    \t\t\t\tc.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card c\n                    INNER JOIN sphere s ON s.id = c.sphere_id\n                    INNER JOIN type t ON t.id = c.type_id\n                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 WHERE cp2.card_id = c.id ORDER BY cp2.position ASC, cp2.id ASC LIMIT 1)\n                    INNER JOIN pack p ON p.id = cpr.pack_id\n                    WHERE c.code IN (?)\n    \t\t\t\tORDER BY c.code DESC", [$cards_code], [Connection::PARAM_INT_ARRAY])->fetchAll();
-            $params['cards'] = '';
-            foreach ($cards as $card) {
-                $params['cards'] .= $this->renderView('Search/card.html.twig', $card);
-            }
-        }
-
-        return $this->renderView('Fellowship/form.html.twig', $params);
-    }
-
     /**
-     * @Route("/fellowships/search", name="fellowships_searchform", methods={"GET"})
+     * @Route("/fellowships/search", name="fellowships_searchform", methods={"GET"}, priority="2")
      */
     public function searchAction(Request $request): Response
     {
@@ -685,94 +620,6 @@ class FellowshipController extends AbstractController
         $searchForm = $this->renderView('Fellowship/form.html.twig', ['spheres' => $spheres, 'allowed' => $categories, 'on' => $on, 'off' => $off, 'author' => '', 'name' => '', 'numcores' => '12', 'numplaysets' => '4']);
 
         return $this->render('Fellowship/public-fellowships.html.twig', ['pagetitle' => 'Fellowship Search', 'fellowships' => null, 'url' => $request->getRequestUri(), 'header' => $searchForm, 'type' => 'find', 'pages' => null, 'prevurl' => null, 'nexturl' => null], $response);
-    }
-
-    /**
-     * @Route(
-     *     "/fellowship/export/octgn/{fellowship_id}",
-     *     name="fellowship_export_octgn",
-     *     methods={"GET"},
-     *     requirements={"fellowship_id"="\d+"}
-     * )
-     */
-    public function octgnexportAction($fellowship_id): Response
-    {
-        return $this->downloadFromSelection($fellowship_id, true);
-    }
-
-    /**
-     * @Route(
-     *     "/fellowship/export/text/{fellowship_id}",
-     *     name="fellowship_export_text",
-     *     methods={"GET"},
-     *     requirements={"fellowship_id"="\d+"}
-     * )
-     */
-    public function textexportAction($fellowship_id): Response
-    {
-        return $this->downloadFromSelection($fellowship_id, false);
-    }
-
-    public function downloadFromSelection($fellowship_id, $octgn): Response
-    {
-        /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
-        /* @var $user User */
-        $user = $this->getUser();
-        if (!$user) {
-            throw new AccessDeniedHttpException('You must be logged in for this operation.');
-        }
-        /* @var $fellowship \App\Entity\Fellowship */
-        $fellowship = $this->fellowshipRepository->find($fellowship_id);
-        if (!$fellowship) {
-            throw new AccessDeniedHttpException("You don't have access to this fellowship.");
-        }
-        $fellowship_user = $fellowship->getUser();
-        $is_public = $fellowship->getIsPublic();
-        if ($fellowship_user->getId() != $user->getId() && !$fellowship_user->getIsShareDecks() && !$is_public) {
-            throw new AccessDeniedHttpException("You don't have access to this fellowship.");
-        }
-        $tmpDir = $this->cacheDir;
-        $file = tempnam($tmpDir, 'zip');
-        if (false === $file) {
-            throw new \RuntimeException("Cannot create a temporary file in {$tmpDir}");
-        }
-        $zip = new \ZipArchive();
-        $res = $zip->open($file, \ZipArchive::OVERWRITE);
-        if (true === $res) {
-            $decks = [];
-            /* @var $fellowship_decks \App\Entity\FellowshipDeck[] */
-            $fellowship_decks = $fellowship->getDecks();
-            foreach ($fellowship_decks as $fellowship_deck) {
-                $decks[] = $fellowship_deck->getDeck();
-            }
-            /* @var $fellowship_decks \App\Entity\FellowshipDecklist[] */
-            $fellowship_decklists = $fellowship->getDecklists();
-            foreach ($fellowship_decklists as $fellowship_decklist) {
-                $decks[] = $fellowship_decklist->getDecklist();
-            }
-            foreach ($decks as $deck) {
-                /* @var $deck Deck */
-                if ($octgn) {
-                    $extension = 'o8d';
-                    $content = $this->renderView('Export/octgn.xml.twig', ['deck' => $deck->getTextExport()]);
-                } else {
-                    $extension = 'txt';
-                    $content = $this->renderView('Export/plain.txt.twig', ['deck' => $deck->getTextExport()]);
-                }
-                $filename = $this->texts->slugify($deck->getName()).' '.$deck->getVersion().'.'.$extension;
-                $zip->addFromString($filename, $content);
-            }
-            $zip->close();
-        }
-        $response = new Response();
-        $response->headers->set('Content-Type', 'application/zip');
-        $response->headers->set('Content-Length', (string) filesize($file));
-        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->texts->slugify('RingsDB - Fellowship '.$fellowship_id).'.zip'));
-        $response->setContent(file_get_contents($file));
-        unlink($file);
-
-        return $response;
     }
 
     /**
@@ -967,77 +814,5 @@ class FellowshipController extends AbstractController
     public function byauthorAction($username): RedirectResponse
     {
         return $this->redirect($this->generateUrl('fellowships_list', ['type' => 'find', 'author' => $username]));
-    }
-
-    /**
-     * @param int $page
-     *
-     * @Route(
-     *     "/fellowships/{type}/{page}",
-     *     name="fellowships_list",
-     *     methods={"GET"},
-     *     requirements={"page"="\d+"},
-     *     defaults={"type"="popular", "page"=1}
-     * )
-     */
-    public function listAction($type, $page = 1, Request $request, FellowshipManager $fellowshipManager): Response
-    {
-        $response = new Response();
-        $response->setPublic();
-        $response->setMaxAge($this->cacheExpiration);
-        /**
-         * @var FellowshipManager $fellowship_manager
-         */
-        $fellowship_manager = $fellowshipManager;
-        $fellowship_manager->setLimit(30);
-        $fellowship_manager->setPage($page);
-        $header = '';
-        switch ($type) {
-            case 'find':
-                $pagetitle = 'Fellowship search results';
-                $header = $this->searchForm($request);
-                $fellowship_manager->setUser($this->getUser());
-                $paginator = $fellowship_manager->findFellowshipsWithComplexSearch();
-                break;
-            case 'favorites':
-                $response->setPrivate();
-                $user = $this->getUser();
-                if ($user) {
-                    $paginator = $fellowship_manager->findFellowshipsByFavorite($user);
-                } else {
-                    $paginator = $fellowship_manager->getEmptyList();
-                }
-                $pagetitle = 'Favorite Fellowships';
-                break;
-            case 'mine':
-                $response->setPrivate();
-                $user = $this->getUser();
-                if ($user) {
-                    $paginator = $fellowship_manager->findFellowshipsByAuthor($user);
-                } else {
-                    $paginator = $fellowship_manager->getEmptyList();
-                }
-                $pagetitle = 'My Public Fellowships';
-                break;
-            case 'recent':
-                $paginator = $fellowship_manager->findFellowshipsByAge();
-                $pagetitle = 'Recent Fellowships';
-                break;
-            case 'halloffame':
-                $paginator = $fellowship_manager->findFellowshipsInHallOfFame();
-                $pagetitle = 'Hall of Fame';
-                break;
-            case 'hottopics':
-                $paginator = $fellowship_manager->findFellowshipsInHotTopic();
-                $pagetitle = 'Hot Topics';
-                break;
-            case 'popular':
-            default:
-                $paginator = $fellowship_manager->findFellowshipsByPopularity();
-                $pagetitle = 'Popular Fellowships';
-                break;
-        }
-
-        return $this->render('Fellowship/public-fellowships.html.twig', ['pagetitle' => $pagetitle, 'pagedescription' => 'Browse the collection of thousands of premade decks.', 'fellowships' => $paginator, 'url' => $request->getRequestUri(), 'header' => $header, 'type' => $type, 'pages' => $fellowship_manager->getClosePages(), 'prevurl' => $fellowship_manager->getPreviousUrl(), 'nexturl' => $fellowship_manager->getNextUrl()], $response);
     }
 }

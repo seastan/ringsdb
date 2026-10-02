@@ -13,7 +13,6 @@ use App\Entity\QuestlogComment;
 use App\Entity\QuestlogDeck;
 use App\Entity\Scenario;
 use App\Entity\User;
-use App\Model\QuestLogManager;
 use App\Repository\CycleRepository;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
@@ -22,14 +21,13 @@ use App\Repository\QuestlogRepository;
 use App\Repository\ScenarioRepository;
 use App\Repository\UserRepository;
 use App\Services\Decks;
+use App\Services\SnapshotManager;
 use App\Services\Texts;
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -79,8 +77,9 @@ class QuestLogController extends AbstractController
      * @var ScenarioRepository
      */
     private $scenarioRepository;
+    private SnapshotManager $snapshotManager;
 
-    public function __construct(Decks $decks, Texts $texts, int $cacheExpiration, string $cacheDir, CycleRepository $cycleRepository, DeckRepository $deckRepository, DecklistRepository $decklistRepository, QuestlogRepository $questlogRepository, ScenarioRepository $scenarioRepository)
+    public function __construct(SnapshotManager $snapshotManager, Decks $decks, Texts $texts, int $cacheExpiration, string $cacheDir, CycleRepository $cycleRepository, DeckRepository $deckRepository, DecklistRepository $decklistRepository, QuestlogRepository $questlogRepository, ScenarioRepository $scenarioRepository)
     {
         $this->decks = $decks;
         $this->texts = $texts;
@@ -91,30 +90,7 @@ class QuestLogController extends AbstractController
         $this->decklistRepository = $decklistRepository;
         $this->questlogRepository = $questlogRepository;
         $this->scenarioRepository = $scenarioRepository;
-    }
-
-    // Set the deck content to the QuestlogDeck snapshot
-    public function setSnapshot($questlog): void
-    {
-        $questlog_decks = $questlog->getDecks();
-        $decks_service = $this->decks;
-        foreach ($questlog_decks as $questlog_deck) {
-            $deck = $questlog_deck->getDeck();
-            if (!$deck) {
-                $deck = new Deck();
-                $deck->setName('[deleted]');
-                $questlog_deck->setDeck($deck);
-            }
-            $questlogdeck_content = (array) json_decode($questlog_deck->getContent());
-            $decks_service->setSlots($deck, $questlogdeck_content);
-        }
-    }
-
-    public function setSnapshots($questlogs): void
-    {
-        foreach ($questlogs as $questlog) {
-            $this->setSnapshot($questlog);
-        }
+        $this->snapshotManager = $snapshotManager;
     }
 
     /**
@@ -175,7 +151,7 @@ class QuestLogController extends AbstractController
         } else {
             $questlogs = $this->questlogRepository->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => 'DESC', 'id' => 'DESC']);
         }
-        $this->setSnapshots($questlogs);
+        $this->snapshotManager->setSnapshots($questlogs);
         $victories = 0;
         $defeats = 0;
         $total = count($questlogs);
@@ -216,7 +192,7 @@ class QuestLogController extends AbstractController
         }
         /* @var $questlogs \App\Entity\Questlog[] */
         $questlogs = $this->questlogRepository->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
-        $this->setSnapshots($questlogs);
+        $this->snapshotManager->setSnapshots($questlogs);
 
         return $this->render('QuestLog/my-questlogs.html.twig', ['pagetitle' => 'My Quest Logs', 'pagedescription' => 'Log a new quest.', 'quests' => $quests, 'played_easy' => $playedEasy, 'played_normal' => $playedNormal, 'played_nightmare' => $playedNightmare, 'questlogs' => $questlogs, 'quest_mode' => 'normal', 'compact' => true]);
     }
@@ -317,7 +293,6 @@ class QuestLogController extends AbstractController
     {
         /* @var $questlog \App\Entity\Questlog */
         $questlog = $this->questlogRepository->find($questlog_id);
-        // $this->setSnapshot($questlog);
         if (!$questlog) {
             throw new NotFoundHttpException('This questlog does not exists.');
         }
@@ -537,69 +512,8 @@ class QuestLogController extends AbstractController
         return $this->redirect($this->generateUrl('myquestlogs_list'));
     }
 
-    private function searchForm(Request $request): string
-    {
-        $dbh = $this->getDoctrine()->getConnection();
-        $cards_code = $request->query->get('cards');
-        $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
-        $questlog_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
-        $scenario = filter_var($request->query->get('scenario'), FILTER_SANITIZE_STRING);
-        $nb_decks = intval(filter_var($request->query->get('nb_decks'), FILTER_SANITIZE_NUMBER_INT));
-        $sort = $request->query->get('sort');
-        $packs = $request->query->get('packs');
-        if (!is_array($packs)) {
-            $packs = $dbh->executeQuery('SELECT id FROM pack')->fetchAll(\PDO::FETCH_COLUMN);
-        }
-        $categories = [];
-        $on = 0;
-        $off = 0;
-        $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
-        $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
-        foreach ($list_cycles as $cycle) {
-            /* @var $cycle Cycle */
-            $size = count($cycle->getPacks());
-            $first_pack = $cycle->getPacks()->first();
-            if (0 == $cycle->getPosition() || false === $first_pack) {
-                continue;
-            }
-            if (1 === $size && $first_pack->getName() == $cycle->getName()) {
-                $checked = count($packs) ? in_array($first_pack->getId(), $packs) : true;
-                if ($checked) {
-                    ++$on;
-                } else {
-                    ++$off;
-                }
-                $categories[0]['packs'][] = ['id' => $first_pack->getId(), 'label' => $first_pack->getName(), 'checked' => $checked, 'future' => null === $first_pack->getDateRelease()];
-            } else {
-                $category = ['label' => $cycle->getName(), 'packs' => []];
-                foreach ($cycle->getPacks() as $pack) {
-                    $checked = count($packs) ? in_array($pack->getId(), $packs) : true;
-                    if ($checked) {
-                        ++$on;
-                    } else {
-                        ++$off;
-                    }
-                    $category['packs'][] = ['id' => $pack->getId(), 'label' => $pack->getName(), 'checked' => $checked, 'future' => null === $pack->getDateRelease()];
-                }
-                $categories[] = $category;
-            }
-        }
-        $params = ['name' => $questlog_name, 'allowed' => $categories, 'on' => $on, 'off' => $off, 'author' => $author_name, 'scenario' => $scenario];
-        $params['sort_'.$sort] = ' selected="selected"';
-        $params['nb_decks_selected'] = $nb_decks;
-        if (!empty($cards_code) && is_array($cards_code)) {
-            $cards = $dbh->executeQuery("SELECT\n    \t\t\t\tc.name,\n    \t\t\t\tc.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card c\n                    INNER JOIN sphere s ON s.id = c.sphere_id\n                    INNER JOIN type t ON t.id = c.type_id\n                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 WHERE cp2.card_id = c.id ORDER BY cp2.position ASC, cp2.id ASC LIMIT 1)\n                    INNER JOIN pack p ON p.id = cpr.pack_id\n                    WHERE c.code IN (?)\n    \t\t\t\tORDER BY c.code DESC", [$cards_code], [Connection::PARAM_INT_ARRAY])->fetchAll();
-            $params['cards'] = '';
-            foreach ($cards as $card) {
-                $params['cards'] .= $this->renderView('Search/card.html.twig', $card);
-            }
-        }
-
-        return $this->renderView('QuestLog/form.html.twig', $params);
-    }
-
     /**
-     * @Route("/questlogs/search", name="questlogs_searchform", methods={"GET"})
+     * @Route("/questlogs/search", name="questlogs_searchform", methods={"GET"}, priority="2")
      */
     public function searchAction(Request $request): Response
     {
@@ -703,94 +617,6 @@ class QuestLogController extends AbstractController
         $this->get('session')->getFlashBag()->set('notice', $message ?: 'Quest Logs deleted.');
 
         return $this->redirect($this->generateUrl('myquestlogs_list'));
-    }
-
-    /**
-     * @Route(
-     *     "/questlog/export/octgn/{questlog_id}",
-     *     name="questlog_export_octgn",
-     *     methods={"GET"},
-     *     requirements={"questlog_id"="\d+"}
-     * )
-     */
-    public function octgnexportAction($questlog_id): Response
-    {
-        return $this->downloadFromSelection($questlog_id, true);
-    }
-
-    /**
-     * @Route(
-     *     "/questlog/export/text/{questlog_id}",
-     *     name="questlog_export_text",
-     *     methods={"GET"},
-     *     requirements={"questlog_id"="\d+"}
-     * )
-     */
-    public function textexportAction($questlog_id): Response
-    {
-        return $this->downloadFromSelection($questlog_id, false);
-    }
-
-    public function downloadFromSelection($questlog_id, $octgn): Response
-    {
-        /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
-        /* @var $user User */
-        $user = $this->getUser();
-        if (!$user) {
-            throw new AccessDeniedHttpException('You must be logged in for this operation.');
-        }
-        /* @var $questlog \App\Entity\QuestLog */
-        $questlog = $this->questlogRepository->find($questlog_id);
-        if (!$questlog) {
-            throw new AccessDeniedHttpException("You don't have access to this questlog.");
-        }
-        $questlog_user = $questlog->getUser();
-        $is_public = $questlog->getIsPublic();
-        if ($questlog_user->getId() != $user->getId() && !$questlog_user->getIsShareDecks() && !$is_public) {
-            throw new AccessDeniedHttpException("You don't have access to this questlog.");
-        }
-        $tmpDir = $this->cacheDir;
-        $file = tempnam($tmpDir, 'zip');
-        if (false === $file) {
-            throw new \RuntimeException("Cannot create a temporary file in {$tmpDir}");
-        }
-        $zip = new \ZipArchive();
-        $res = $zip->open($file, \ZipArchive::OVERWRITE);
-        if (true === $res) {
-            $decks = [];
-            /* @var $questlog_decks \App\Entity\QuestlogDeck[] */
-            $questlog_decks = $questlog->getDecks();
-            foreach ($questlog_decks as $questlog_deck) {
-                $deck = $questlog_deck->getDeck();
-                $this->decks->setSlots($deck, json_decode($questlog_deck->getContent(), true));
-                $decks[] = $deck;
-            }
-            foreach ($decks as $deck) {
-                /* @var $deck \App\Entity\Deck */
-                if (!$deck) {
-                    continue;
-                }
-                if ($octgn) {
-                    $extension = 'o8d';
-                    $content = $this->renderView('Export/octgn.xml.twig', ['deck' => $deck->getTextExport()]);
-                } else {
-                    $extension = 'txt';
-                    $content = $this->renderView('Export/plain.txt.twig', ['deck' => $deck->getTextExport()]);
-                }
-                $filename = $this->texts->slugify($deck->getName()).' '.$deck->getVersion().'.'.$extension;
-                $zip->addFromString($filename, $content);
-            }
-            $zip->close();
-        }
-        $response = new Response();
-        $response->headers->set('Content-Type', 'application/zip');
-        $response->headers->set('Content-Length', (string) filesize($file));
-        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->texts->slugify('RingsDB - Quest Log '.$questlog_id).'.zip'));
-        $response->setContent(file_get_contents($file));
-        unlink($file);
-
-        return $response;
     }
 
     /**
@@ -981,78 +807,5 @@ class QuestLogController extends AbstractController
     public function byauthorAction($username): RedirectResponse
     {
         return $this->redirect($this->generateUrl('questlogs_list', ['type' => 'find', 'author' => $username]));
-    }
-
-    /**
-     * @param int $page
-     *
-     * @Route(
-     *     "/questlogs/{type}/{page}",
-     *     name="questlogs_list",
-     *     methods={"GET"},
-     *     requirements={"page"="\d+"},
-     *     defaults={"type"="popular", "page"=1}
-     * )
-     */
-    public function listAction($type, $page = 1, Request $request, QuestLogManager $questLogManager): Response
-    {
-        $response = new Response();
-        $response->setPublic();
-        $response->setMaxAge($this->cacheExpiration);
-        /**
-         * @var QuestLogManager $questlog_manager
-         */
-        $questlog_manager = $questLogManager;
-        $questlog_manager->setLimit(30);
-        $questlog_manager->setPage($page);
-        $header = '';
-        switch ($type) {
-            case 'find':
-                $pagetitle = 'Quest Log search results';
-                $header = $this->searchForm($request);
-                $questlog_manager->setUser($this->getUser());
-                $paginator = $questlog_manager->findQuestLogsWithComplexSearch();
-                break;
-            case 'favorites':
-                $response->setPrivate();
-                $user = $this->getUser();
-                if ($user) {
-                    $paginator = $questlog_manager->findQuestLogsByFavorite($user);
-                } else {
-                    $paginator = $questlog_manager->getEmptyList();
-                }
-                $pagetitle = 'Favorite Quest Logs';
-                break;
-            case 'mine':
-                $response->setPrivate();
-                $user = $this->getUser();
-                if ($user) {
-                    $paginator = $questlog_manager->findQuestLogsByAuthor($user);
-                } else {
-                    $paginator = $questlog_manager->getEmptyList();
-                }
-                $pagetitle = 'My Public Quest Logs';
-                break;
-            case 'recent':
-                $paginator = $questlog_manager->findQuestLogsByAge();
-                $pagetitle = 'Recent Quest Logs';
-                break;
-            case 'halloffame':
-                $paginator = $questlog_manager->findQuestLogsInHallOfFame();
-                $pagetitle = 'Hall of Fame';
-                break;
-            case 'hottopics':
-                $paginator = $questlog_manager->findQuestLogsInHotTopic();
-                $pagetitle = 'Hot Topics';
-                break;
-            case 'popular':
-            default:
-                $paginator = $questlog_manager->findQuestLogsByPopularity();
-                $pagetitle = 'Popular Quest Logs';
-                break;
-        }
-        $this->setSnapshots($paginator);
-
-        return $this->render('QuestLog/public-questlogs.html.twig', ['pagetitle' => $pagetitle, 'pagedescription' => 'Browse the collection of thousands of premade decks.', 'questlogs' => $paginator, 'url' => $request->getRequestUri(), 'header' => $header, 'type' => $type, 'pages' => $questlog_manager->getClosePages(), 'prevurl' => $questlog_manager->getPreviousUrl(), 'nexturl' => $questlog_manager->getNextUrl()], $response);
     }
 }

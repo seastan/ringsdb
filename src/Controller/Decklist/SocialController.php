@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Social;
+namespace App\Controller\Decklist;
 
 use App\Controller\CurrentUserTrait;
 use App\Entity\Comment;
@@ -13,14 +13,12 @@ use App\Entity\Pack;
 use App\Entity\User;
 use App\Helper\DeckValidationHelper;
 use App\Model\DecklistFactory;
-use App\Model\DecklistManager;
 use App\Repository\CommentRepository;
 use App\Repository\CycleRepository;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use App\Repository\UserRepository;
 use App\Services\Texts;
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -332,81 +330,6 @@ class SocialController extends AbstractController
         return $this->redirect($this->generateUrl('decklists_list', ['type' => 'mine']));
     }
 
-    private function searchForm(Request $request): string
-    {
-        $dbh = $this->getDoctrine()->getConnection();
-        $cards_code = $request->query->get('cards');
-        $cards_to_exclude = $request->query->get('cards_to_exclude');
-        $sphere_code = filter_var($request->query->get('sphere'), FILTER_SANITIZE_STRING);
-        $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
-        $decklist_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
-        $starting_threat = intval(filter_var($request->query->get('threat'), FILTER_SANITIZE_NUMBER_INT));
-        $starting_threat_o = $request->query->get('threato');
-        $author_reputation = intval(filter_var($request->query->get('reputation'), FILTER_SANITIZE_NUMBER_INT));
-        $author_reputation_o = $request->query->get('reputationo');
-        $numcores = $request->query->get('numcores');
-        $require_description = $request->query->get('require_description');
-        $sort = $request->query->get('sort');
-        $packs = $request->query->get('packs');
-        if (!is_array($packs)) {
-            $packs = $dbh->executeQuery('SELECT id FROM pack')->fetchAll(\PDO::FETCH_COLUMN);
-        }
-        $categories = [];
-        $on = 0;
-        $off = 0;
-        $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
-        $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
-        foreach ($list_cycles as $cycle) {
-            /* @var $cycle Cycle */
-            $size = count($cycle->getPacks());
-            $first_pack = $cycle->getPacks()->first();
-            if (0 == $cycle->getPosition() || false === $first_pack) {
-                continue;
-            }
-            if (1 === $size && $first_pack->getName() == $cycle->getName()) {
-                $checked = count($packs) ? in_array($first_pack->getId(), $packs) : true;
-                if ($checked) {
-                    ++$on;
-                } else {
-                    ++$off;
-                }
-                $categories[0]['packs'][] = ['id' => $first_pack->getId(), 'label' => $first_pack->getName(), 'checked' => $checked, 'future' => null === $first_pack->getDateRelease()];
-            } else {
-                $category = ['label' => $cycle->getName(), 'packs' => []];
-                foreach ($cycle->getPacks() as $pack) {
-                    $checked = count($packs) ? in_array($pack->getId(), $packs) : true;
-                    if ($checked) {
-                        ++$on;
-                    } else {
-                        ++$off;
-                    }
-                    $category['packs'][] = ['id' => $pack->getId(), 'label' => $pack->getName(), 'checked' => $checked, 'future' => null === $pack->getDateRelease()];
-                }
-                $categories[] = $category;
-            }
-        }
-        $params = ['allowed' => $categories, 'on' => $on, 'off' => $off, 'author' => $author_name, 'name' => $decklist_name, 'threat' => $starting_threat, 'threato' => $starting_threat_o, 'reputation' => $author_reputation, 'reputationo' => $author_reputation_o, 'numcores' => $numcores, 'require_description' => $require_description];
-        $params['sort_'.$sort] = ' selected="selected"';
-        $params['spheres'] = $dbh->executeQuery("SELECT\n                s.name,\n                s.code\n                FROM sphere s\n                ORDER BY s.name ASC")->fetchAll();
-        $params['sphere_selected'] = $sphere_code;
-        if (!empty($cards_code) && is_array($cards_code)) {
-            $cards = $dbh->executeQuery("SELECT\n    \t\t\t\tc.name,\n    \t\t\t\tc.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card c\n                    INNER JOIN sphere s ON s.id = c.sphere_id\n                    INNER JOIN type t ON t.id = c.type_id\n                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 JOIN pack pp ON pp.id = cp2.pack_id WHERE cp2.card_id = c.id ORDER BY (pp.date_release IS NULL), pp.date_release, cp2.position, cp2.id LIMIT 1)\n                    INNER JOIN pack p ON p.id = cpr.pack_id\n                    WHERE c.code IN (?)\n    \t\t\t\tORDER BY c.code DESC", [$cards_code], [Connection::PARAM_INT_ARRAY])->fetchAll();
-            $params['cards'] = '';
-            foreach ($cards as $card) {
-                $params['cards'] .= $this->renderView('Search/card.html.twig', $card);
-            }
-        }
-        if (!empty($cards_to_exclude) && is_array($cards_to_exclude)) {
-            $cards_to_exclude = $dbh->executeQuery("SELECT\n    \t\t\t\tk.name,\n    \t\t\t\tk.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card k\n                    INNER JOIN sphere s ON s.id = k.sphere_id\n                    INNER JOIN type t ON t.id = k.type_id\n                    INNER JOIN card_printing kpr ON kpr.id = (SELECT cp2.id FROM card_printing cp2 JOIN pack pp ON pp.id = cp2.pack_id WHERE cp2.card_id = k.id ORDER BY (pp.date_release IS NULL), pp.date_release, cp2.position, cp2.id LIMIT 1)\n                    INNER JOIN pack p ON p.id = kpr.pack_id\n                    WHERE k.code IN (?)\n    \t\t\t\tORDER BY k.code DESC", [$cards_to_exclude], [Connection::PARAM_INT_ARRAY])->fetchAll();
-            $params['cards_to_exclude'] = '';
-            foreach ($cards_to_exclude as $card_to_exclude) {
-                $params['cards_to_exclude'] .= $this->renderView('Search/card-to-exclude.html.twig', $card_to_exclude);
-            }
-        }
-
-        return $this->renderView('Search/form.html.twig', $params);
-    }
-
     /**
      * @Route("/d/{username}", name="decklist_byauthor", methods={"GET"})
      */
@@ -695,7 +618,7 @@ class SocialController extends AbstractController
     }
 
     /**
-     * @Route("/decklists/search", name="decklists_searchform", methods={"GET"})
+     * @Route("/decklists/search", name="decklists_searchform", methods={"GET"}, priority="2")
      */
     public function searchAction(Request $request): Response
     {
@@ -773,79 +696,5 @@ class SocialController extends AbstractController
         $users = $dbh->executeQuery('SELECT * FROM user WHERE donation > 0 ORDER BY donation DESC, username', [])->fetchAll(\PDO::FETCH_ASSOC);
 
         return $this->render('Default/patrons.html.twig', ['pagetitle' => 'The Gracious Patrons', 'patrons' => $users], $response);
-    }
-
-    /**
-     * displays the lists of decklists.
-     *
-     * @param int $page
-     *
-     * @Route(
-     *     "/decklists/{type}/{page}",
-     *     name="decklists_list",
-     *     methods={"GET"},
-     *     requirements={"page"="\d+"},
-     *     defaults={"type"="popular", "page"=1}
-     * )
-     */
-    public function listAction($type, $page = 1, Request $request, DecklistManager $decklistManager): Response
-    {
-        $response = new Response();
-        $response->setPublic();
-        $response->setMaxAge($this->cacheExpiration);
-        /**
-         * @var DecklistManager $decklist_manager
-         */
-        $decklist_manager = $decklistManager;
-        $decklist_manager->setLimit(30);
-        $decklist_manager->setPage($page);
-        $header = '';
-        switch ($type) {
-            case 'find':
-                $pagetitle = 'Decklist search results';
-                $header = $this->searchForm($request);
-                $decklist_manager->setUser($this->getUser());
-                $paginator = $decklist_manager->findDecklistsWithComplexSearch();
-                break;
-            case 'favorites':
-                $response->setPrivate();
-                $user = $this->getUser();
-                if ($user) {
-                    $paginator = $decklist_manager->findDecklistsByFavorite($user);
-                } else {
-                    $paginator = $decklist_manager->getEmptyList();
-                }
-                $pagetitle = 'Favorite Decklists';
-                break;
-            case 'mine':
-                $response->setPrivate();
-                $user = $this->getUser();
-                if ($user) {
-                    $paginator = $decklist_manager->findDecklistsByAuthor($user);
-                } else {
-                    $paginator = $decklist_manager->getEmptyList();
-                }
-                $pagetitle = 'My Decklists';
-                break;
-            case 'recent':
-                $paginator = $decklist_manager->findDecklistsByAge();
-                $pagetitle = 'Recent Decklists';
-                break;
-            case 'halloffame':
-                $paginator = $decklist_manager->findDecklistsInHallOfFame();
-                $pagetitle = 'Hall of Fame';
-                break;
-            case 'hottopics':
-                $paginator = $decklist_manager->findDecklistsInHotTopic();
-                $pagetitle = 'Hot Topics';
-                break;
-            case 'popular':
-            default:
-                $paginator = $decklist_manager->findDecklistsByPopularity();
-                $pagetitle = 'Popular Decklists';
-                break;
-        }
-
-        return $this->render('Decklist/decklists.html.twig', ['pagetitle' => $pagetitle, 'pagedescription' => 'Browse the collection of thousands of premade decks.', 'decklists' => $paginator, 'url' => $request->getRequestUri(), 'header' => $header, 'type' => $type, 'pages' => $decklist_manager->getClosePages(), 'prevurl' => $decklist_manager->getPreviousUrl(), 'nexturl' => $decklist_manager->getNextUrl()], $response);
     }
 }
