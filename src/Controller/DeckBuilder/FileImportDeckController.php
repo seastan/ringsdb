@@ -1,0 +1,54 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controller\DeckBuilder;
+
+use App\Services\DeckImporter;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Symfony\Component\Routing\Annotation\Route;
+
+class FileImportDeckController extends AbstractController
+{
+    private DeckImporter $deckImporter;
+
+    public function __construct(DeckImporter $deckImporter)
+    {
+        $this->deckImporter = $deckImporter;
+    }
+
+    /**
+     * @Route("/deck/fileimport", name="deck_fileimport", methods={"POST"})
+     */
+    public function fileimportAction(Request $request): Response
+    {
+        $filetype = filter_var($request->get('type'), FILTER_SANITIZE_STRING);
+        $uploadedFile = $request->files->get('upfile');
+        if (!isset($uploadedFile)) {
+            throw new UnprocessableEntityHttpException('No file uploaded');
+        }
+        $origname = $uploadedFile->getClientOriginalName();
+        $origext = $uploadedFile->getClientOriginalExtension();
+        $filename = $uploadedFile->getPathname();
+        if (function_exists('finfo_open')) {
+            // return mime type ala mimetype extension
+            $finfo = finfo_open(FILEINFO_MIME);
+            $mime = false !== $finfo ? (string) finfo_file($finfo, $filename) : '';
+            // check to see if the mime-type starts with 'text'
+            $is_text = 'text' == substr($mime, 0, 4) || 'application/xml' == substr($mime, 0, 15);
+            if (!$is_text) {
+                throw new UnprocessableEntityHttpException('Bad file');
+            }
+        }
+        if ('octgn' == $filetype || 'auto' == $filetype && 'o8d' == $origext) {
+            $parse = $this->deckImporter->parseOctgnImport(file_get_contents($filename));
+        } else {
+            $parse = $this->deckImporter->parseTextImport(file_get_contents($filename));
+        }
+
+        return $this->forward(SaveDeckController::class.'::saveAction', ['name' => str_replace(".{$origext}", '', $origname), 'content' => json_encode($parse['content']), 'description' => $parse['description']]);
+    }
+}
