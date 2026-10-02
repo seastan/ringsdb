@@ -10,6 +10,7 @@ use App\Repository\CardRepository;
 use App\Repository\UserCustomPackRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -43,7 +44,7 @@ class CustomPackController extends AbstractController
     /**
      * @Route("/collection/custom-pack/save", name="collection_custom_pack_save", methods={"POST"})
      */
-    public function saveAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function saveAction(Request $request): RedirectResponse
     {
         $user = $this->getUser();
         $em = $this->getDoctrine()->getManager();
@@ -99,7 +100,7 @@ class CustomPackController extends AbstractController
      *     requirements={"id"="\d+"}
      * )
      */
-    public function updateAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function updateAction(Request $request, $id): RedirectResponse
     {
         $pack = $this->loadOwnedPack($id);
         if (!$pack) {
@@ -138,7 +139,7 @@ class CustomPackController extends AbstractController
      *     requirements={"id"="\d+"}
      * )
      */
-    public function deleteAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function deleteAction(Request $request, $id): RedirectResponse
     {
         $pack = $this->loadOwnedPack($id);
         if (!$pack) {
@@ -160,7 +161,7 @@ class CustomPackController extends AbstractController
      *     requirements={"id"="\d+"}
      * )
      */
-    public function toggleAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function toggleAction(Request $request, $id): RedirectResponse
     {
         $pack = $this->loadOwnedPack($id);
         if (!$pack) {
@@ -183,7 +184,7 @@ class CustomPackController extends AbstractController
      *     requirements={"id"="\d+"}
      * )
      */
-    public function publishAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function publishAction(Request $request, $id): RedirectResponse
     {
         $pack = $this->loadOwnedPack($id);
         if (!$pack) {

@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace App\Form;
 
+use App\Entity\Encounter;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @extends AbstractType<\App\Entity\Encounter>
+ * @extends AbstractType<Encounter>
  */
 class EncounterType extends AbstractType
 {
     /**
-     * @param FormBuilderInterface<\App\Entity\Encounter|null> $builder
-     * @param array<string, mixed>                             $options
+     * @param FormBuilderInterface<Encounter|null> $builder
+     * @param array<string, mixed>                 $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

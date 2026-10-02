@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
+use App\Entity\Comment;
+use App\Entity\Deck;
+use App\Entity\Decklist;
+use App\Entity\User;
 use App\Repository\CommentRepository;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class UserAdminController extends AbstractController
@@ -32,7 +38,7 @@ class UserAdminController extends AbstractController
     /**
      * @Route("/admin/user/find", name="admin_find_user", methods={"GET"})
      */
-    public function findAction(): \Symfony\Component\HttpFoundation\Response
+    public function findAction(): Response
     {
         return $this->render('Admin/find_user.html.twig', ['pagetitle' => 'Admin']);
     }
@@ -40,7 +46,7 @@ class UserAdminController extends AbstractController
     /**
      * @Route("/admin/user/find_process", name="admin_find_user_process", methods={"POST"})
      */
-    public function processAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function processAction(Request $request): RedirectResponse
     {
         $user = null;
         if ($request->request->get('username')) {
@@ -62,9 +68,9 @@ class UserAdminController extends AbstractController
     /**
      * @Route("/admin/user/show/{user_id}", name="admin_show_user", methods={"GET"})
      */
-    public function showAction($user_id): \Symfony\Component\HttpFoundation\Response
+    public function showAction($user_id): Response
     {
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->userRepository->find($user_id);
         if (!$user) {
             throw $this->createNotFoundException('User not found');
@@ -76,10 +82,10 @@ class UserAdminController extends AbstractController
     /**
      * @Route("/admin/user/toggle_locked/{user_id}", name="admin_user_locked_toggle", methods={"GET"})
      */
-    public function toggleLockedAction($user_id): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function toggleLockedAction($user_id): RedirectResponse
     {
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->userRepository->find($user_id);
         if (!$user) {
             throw $this->createNotFoundException('User not found');
@@ -93,9 +99,9 @@ class UserAdminController extends AbstractController
     /**
      * @Route("/admin/user/decklists/{user_id}", name="admin_user_decklists_show", methods={"GET"})
      */
-    public function decklistsAction($user_id): \Symfony\Component\HttpFoundation\Response
+    public function decklistsAction($user_id): Response
     {
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->userRepository->find($user_id);
         if (!$user) {
             throw $this->createNotFoundException('User not found');
@@ -107,10 +113,10 @@ class UserAdminController extends AbstractController
     /**
      * @Route("/admin/decklist/delete/{decklist_id}", name="admin_decklist_delete", methods={"GET"})
      */
-    public function deleteDecklistAction($decklist_id, DeckRepository $deckRepository, DecklistRepository $decklistRepository): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function deleteDecklistAction($decklist_id, DeckRepository $deckRepository, DecklistRepository $decklistRepository): RedirectResponse
     {
         $em = $this->getDoctrine()->getManager();
-        /* @var $decklist \App\Entity\Decklist */
+        /* @var $decklist Decklist */
         $decklist = $decklistRepository->find($decklist_id);
         if (!$decklist) {
             throw $this->createNotFoundException('Decklist not found');
@@ -118,12 +124,12 @@ class UserAdminController extends AbstractController
         // first we remove the foreign keys in Decklist and Deck pointing to this decklist
         $successors = $decklistRepository->findBy(['precedent' => $decklist]);
         foreach ($successors as $successor) {
-            /* @var $successor \App\Entity\Decklist */
+            /* @var $successor Decklist */
             $successor->setPrecedent(null);
         }
         $children = $deckRepository->findBy(['parent' => $decklist]);
         foreach ($children as $child) {
-            /* @var $child \App\Entity\Deck */
+            /* @var $child Deck */
             $child->setParent(null);
         }
         $em->flush();
@@ -137,9 +143,9 @@ class UserAdminController extends AbstractController
     /**
      * @Route("/admin/user/comments/{user_id}", name="admin_user_comments_show", methods={"GET"})
      */
-    public function commentsAction($user_id): \Symfony\Component\HttpFoundation\Response
+    public function commentsAction($user_id): Response
     {
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->userRepository->find($user_id);
         if (!$user) {
             throw $this->createNotFoundException('User not found');
@@ -155,10 +161,10 @@ class UserAdminController extends AbstractController
      *     methods={"GET"}
      * )
      */
-    public function toggleHiddenCommentAction($comment_id): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function toggleHiddenCommentAction($comment_id): RedirectResponse
     {
         $em = $this->getDoctrine()->getManager();
-        /* @var $comment \App\Entity\Comment */
+        /* @var $comment Comment */
         $comment = $this->commentRepository->find($comment_id);
         if (!$comment) {
             throw $this->createNotFoundException('Comment not found');
@@ -172,10 +178,10 @@ class UserAdminController extends AbstractController
     /**
      * @Route("/admin/comment/delete/{comment_id}", name="admin_comment_delete", methods={"GET"})
      */
-    public function deleteCommentAction($comment_id): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function deleteCommentAction($comment_id): RedirectResponse
     {
         $em = $this->getDoctrine()->getManager();
-        /* @var $comment \App\Entity\Comment */
+        /* @var $comment Comment */
         $comment = $this->commentRepository->find($comment_id);
         if (!$comment) {
             throw $this->createNotFoundException('Comment not found');

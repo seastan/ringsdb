@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 /**
  * Fellowship.
  */
@@ -58,15 +61,15 @@ class Fellowship
      */
     private $dateLastComment;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, FellowshipDeck>
+     * @var Collection<int, FellowshipDeck>
      */
     private $decks;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, FellowshipDecklist>
+     * @var Collection<int, FellowshipDecklist>
      */
     private $decklists;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, FellowshipComment>
+     * @var Collection<int, FellowshipComment>
      */
     private $comments;
     /**
@@ -74,11 +77,11 @@ class Fellowship
      */
     private $user;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, User>
+     * @var Collection<int, User>
      */
     private $favorites;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, User>
+     * @var Collection<int, User>
      */
     private $votes;
 
@@ -87,11 +90,11 @@ class Fellowship
      */
     public function __construct()
     {
-        $this->decks = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->decklists = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->comments = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->favorites = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->votes = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->decks = new ArrayCollection();
+        $this->decklists = new ArrayCollection();
+        $this->comments = new ArrayCollection();
+        $this->favorites = new ArrayCollection();
+        $this->votes = new ArrayCollection();
     }
 
     /**
@@ -343,9 +346,9 @@ class Fellowship
     /**
      * Get decks.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, FellowshipDeck>
+     * @return Collection<int, FellowshipDeck>
      */
-    public function getDecks(): \Doctrine\Common\Collections\Collection
+    public function getDecks(): Collection
     {
         return $this->decks;
     }
@@ -371,9 +374,9 @@ class Fellowship
     /**
      * Get decklists.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, FellowshipDecklist>
+     * @return Collection<int, FellowshipDecklist>
      */
-    public function getDecklists(): \Doctrine\Common\Collections\Collection
+    public function getDecklists(): Collection
     {
         return $this->decklists;
     }
@@ -399,9 +402,9 @@ class Fellowship
     /**
      * Get comments.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, FellowshipComment>
+     * @return Collection<int, FellowshipComment>
      */
-    public function getComments(): \Doctrine\Common\Collections\Collection
+    public function getComments(): Collection
     {
         return $this->comments;
     }
@@ -445,9 +448,9 @@ class Fellowship
     /**
      * Get favorites.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, User>
+     * @return Collection<int, User>
      */
-    public function getFavorites(): \Doctrine\Common\Collections\Collection
+    public function getFavorites(): Collection
     {
         return $this->favorites;
     }
@@ -473,9 +476,9 @@ class Fellowship
     /**
      * Get votes.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, User>
+     * @return Collection<int, User>
      */
-    public function getVotes(): \Doctrine\Common\Collections\Collection
+    public function getVotes(): Collection
     {
         return $this->votes;
     }

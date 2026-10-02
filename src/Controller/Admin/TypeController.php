@@ -9,7 +9,10 @@ use App\Form\TypeType;
 use App\Repository\TypeRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -32,7 +35,7 @@ class TypeController extends AbstractController
      *
      * @Route("/admin/type/", name="admin_type")
      */
-    public function indexAction(): \Symfony\Component\HttpFoundation\Response
+    public function indexAction(): Response
     {
         $entities = $this->typeRepository->findAll();
 
@@ -44,7 +47,7 @@ class TypeController extends AbstractController
      *
      * @Route("/admin/type/create", name="admin_type_create", methods={"POST"})
      */
-    public function createAction(Request $request): \Symfony\Component\HttpFoundation\Response
+    public function createAction(Request $request): Response
     {
         $entity = new Type();
         $form = $this->createCreateForm($entity);
@@ -65,9 +68,9 @@ class TypeController extends AbstractController
      *
      * @param Type $entity The entity
      *
-     * @return \Symfony\Component\Form\FormInterface<Type> The form
+     * @return FormInterface<Type> The form
      */
-    private function createCreateForm(Type $entity): \Symfony\Component\Form\FormInterface
+    private function createCreateForm(Type $entity): FormInterface
     {
         $form = $this->createForm(TypeType::class, $entity, ['action' => $this->generateUrl('admin_type_create'), 'method' => 'POST']);
 
@@ -79,7 +82,7 @@ class TypeController extends AbstractController
      *
      * @Route("/admin/type/new", name="admin_type_new")
      */
-    public function newAction(): \Symfony\Component\HttpFoundation\Response
+    public function newAction(): Response
     {
         $entity = new Type();
         $form = $this->createCreateForm($entity);
@@ -92,7 +95,7 @@ class TypeController extends AbstractController
      *
      * @Route("/admin/type/{id}/show", name="admin_type_show")
      */
-    public function showAction($id): \Symfony\Component\HttpFoundation\Response
+    public function showAction($id): Response
     {
         $entity = $this->typeRepository->find($id);
         if (!$entity) {
@@ -108,7 +111,7 @@ class TypeController extends AbstractController
      *
      * @Route("/admin/type/{id}/edit", name="admin_type_edit")
      */
-    public function editAction($id): \Symfony\Component\HttpFoundation\Response
+    public function editAction($id): Response
     {
         $entity = $this->typeRepository->find($id);
         if (!$entity) {
@@ -125,9 +128,9 @@ class TypeController extends AbstractController
      *
      * @param Type $entity The entity
      *
-     * @return \Symfony\Component\Form\FormInterface<Type> The form
+     * @return FormInterface<Type> The form
      */
-    private function createEditForm(Type $entity): \Symfony\Component\Form\FormInterface
+    private function createEditForm(Type $entity): FormInterface
     {
         $form = $this->createForm(TypeType::class, $entity, ['action' => $this->generateUrl('admin_type_update', ['id' => $entity->getId()]), 'method' => 'PUT']);
         $form->add('submit', SubmitType::class, ['label' => 'Update']);
@@ -140,7 +143,7 @@ class TypeController extends AbstractController
      *
      * @Route("/admin/type/{id}/update", name="admin_type_update", methods={"POST", "PUT"})
      */
-    public function updateAction(Request $request, $id): \Symfony\Component\HttpFoundation\Response
+    public function updateAction(Request $request, $id): Response
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $this->typeRepository->find($id);
@@ -164,7 +167,7 @@ class TypeController extends AbstractController
      *
      * @Route("/admin/type/{id}/delete", name="admin_type_delete", methods={"POST", "DELETE"})
      */
-    public function deleteAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function deleteAction(Request $request, $id): RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
@@ -186,9 +189,9 @@ class TypeController extends AbstractController
      *
      * @param mixed $id The entity id
      *
-     * @return \Symfony\Component\Form\FormInterface<mixed> The form
+     * @return FormInterface<mixed> The form
      */
-    private function createDeleteForm($id): \Symfony\Component\Form\FormInterface
+    private function createDeleteForm($id): FormInterface
     {
         return $this->createFormBuilder()->setAction($this->generateUrl('admin_type_delete', ['id' => $id]))->setMethod('DELETE')->getForm();
     }

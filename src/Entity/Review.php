@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 /**
  * Review.
  */
@@ -38,7 +41,7 @@ class Review
      */
     private $nbVotes;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Reviewcomment>
+     * @var Collection<int, Reviewcomment>
      */
     private $comments;
     /**
@@ -50,7 +53,7 @@ class Review
      */
     private $user;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, User>
+     * @var Collection<int, User>
      */
     private $votes;
 
@@ -59,8 +62,8 @@ class Review
      */
     public function __construct()
     {
-        $this->comments = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->votes = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->comments = new ArrayCollection();
+        $this->votes = new ArrayCollection();
     }
 
     /**
@@ -212,9 +215,9 @@ class Review
     /**
      * Get comments.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Reviewcomment>
+     * @return Collection<int, Reviewcomment>
      */
-    public function getComments(): \Doctrine\Common\Collections\Collection
+    public function getComments(): Collection
     {
         return $this->comments;
     }
@@ -276,9 +279,9 @@ class Review
     /**
      * Get votes.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, User>
+     * @return Collection<int, User>
      */
-    public function getVotes(): \Doctrine\Common\Collections\Collection
+    public function getVotes(): Collection
     {
         return $this->votes;
     }

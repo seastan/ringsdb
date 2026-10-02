@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Entity\Decklist;
 use App\Repository\DecklistRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -37,15 +39,15 @@ class FixThreatCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->em;
 
         $count = 0;
 
-        /* @var $decklists \App\Entity\Decklist[] */
+        /* @var $decklists Decklist[] */
         $decklists = $this->decklistRepository->findAll();
         foreach ($decklists as $decklist) {
-            /* @var $decklist \App\Entity\Decklist */
+            /* @var $decklist Decklist */
             $decklist->setStartingThreat($decklist->getSlots()->getStartingThreat());
             ++$count;
         }

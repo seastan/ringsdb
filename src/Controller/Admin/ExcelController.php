@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Entity\Card;
+use App\Entity\Sphere;
+use App\Entity\Type;
 use App\Repository\CardPrintingRepository;
 use App\Repository\CardRepository;
 use App\Repository\PackRepository;
 use App\Services\Texts;
+use Doctrine\ORM\EntityManager;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -150,7 +154,7 @@ class ExcelController extends AbstractController
      */
     public function uploadProcessAction(Request $request): Response
     {
-        /* @var $uploadedFile \Symfony\Component\HttpFoundation\File\UploadedFile */
+        /* @var $uploadedFile UploadedFile */
         $uploadedFile = $request->files->get('upfile');
         $inputFileName = $uploadedFile->getPathname();
         $objReader = IOFactory::createReaderForFile($inputFileName);
@@ -185,7 +189,7 @@ class ExcelController extends AbstractController
                 $cards[] = $card;
             }
         }
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $repo = $this->cardRepository;
         $metaData = $em->getClassMetadata(Card::class);
@@ -212,10 +216,10 @@ class ExcelController extends AbstractController
                 $setter = str_replace(' ', '', ucwords(str_replace('_', ' ', "set_{$colName}")));
                 if (array_key_exists($colName, $associationMappings)) {
                     $associationMapping = $associationMappings[$colName];
-                    /** @var class-string<\App\Entity\Type|\App\Entity\Sphere> $targetEntity */
+                    /** @var class-string<Type|Sphere> $targetEntity */
                     $targetEntity = $associationMapping['targetEntity'];
                     $associationRepository = $em->getRepository($targetEntity);
-                    /** @var \App\Entity\Type|\App\Entity\Sphere|null $associationEntity */
+                    /** @var Type|Sphere|null $associationEntity */
                     $associationEntity = $associationRepository->findOneBy(['name' => $value]);
                     if (!$associationEntity) {
                         throw new \Exception("cannot find entity [{$colName}] of name [{$value}]");

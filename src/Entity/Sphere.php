@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 class Sphere
 {
     /**
@@ -23,7 +26,7 @@ class Sphere
      */
     private $is_primary;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Card>
+     * @var Collection<int, Card>
      */
     private $cards;
 
@@ -32,7 +35,7 @@ class Sphere
      */
     public function __construct()
     {
-        $this->cards = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->cards = new ArrayCollection();
     }
 
     /**
@@ -124,9 +127,9 @@ class Sphere
     /**
      * Get cards.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Card>
+     * @return Collection<int, Card>
      */
-    public function getCards(): \Doctrine\Common\Collections\Collection
+    public function getCards(): Collection
     {
         return $this->cards;
     }

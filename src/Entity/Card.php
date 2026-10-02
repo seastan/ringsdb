@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 class Card
 {
     /**
@@ -79,11 +82,11 @@ class Card
      */
     private $dateUpdate;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Review>
+     * @var Collection<int, Review>
      */
     private $reviews;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, CardPrinting>
+     * @var Collection<int, CardPrinting>
      */
     private $printings;
     /**
@@ -100,8 +103,8 @@ class Card
      */
     public function __construct()
     {
-        $this->reviews = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->printings = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->reviews = new ArrayCollection();
+        $this->printings = new ArrayCollection();
         $this->dateCreation = new \DateTime();
         $this->dateUpdate = new \DateTime();
     }
@@ -127,9 +130,9 @@ class Card
     /**
      * Get printings.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, CardPrinting>
+     * @return Collection<int, CardPrinting>
      */
-    public function getPrintings(): \Doctrine\Common\Collections\Collection
+    public function getPrintings(): Collection
     {
         return $this->printings;
     }
@@ -567,9 +570,9 @@ class Card
     /**
      * Get reviews.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Review>
+     * @return Collection<int, Review>
      */
-    public function getReviews(): \Doctrine\Common\Collections\Collection
+    public function getReviews(): Collection
     {
         return $this->reviews;
     }

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Comment;
+use App\Entity\Cycle;
 use App\Entity\Deck;
 use App\Entity\Decklist;
+use App\Entity\Pack;
 use App\Entity\User;
 use App\Helper\DeckValidationHelper;
 use App\Model\DecklistFactory;
@@ -17,7 +19,10 @@ use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use App\Repository\UserRepository;
 use App\Services\Texts;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -76,7 +81,7 @@ class SocialController extends AbstractController
      */
     public function publishFormAction($deck_id, DeckValidationHelper $deckValidationHelper): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         /* @var $user \App\Entity\User */
         $user = $this->getUser();
@@ -106,7 +111,7 @@ class SocialController extends AbstractController
             return $this->redirect($this->generateUrl('deck_view', ['deck_id' => $deck->getId()]));
         }
         */
-        /* @var $lastPack \App\Entity\Pack */
+        /* @var $lastPack Pack */
         /*
         $lastPack = $deck->getLastPack();
                 if (!$lastPack->getDateRelease() || $lastPack->getDateRelease() > new \DateTime()) {
@@ -146,7 +151,7 @@ class SocialController extends AbstractController
      */
     public function createAction(Request $request): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         /* @var $user \App\Entity\User */
         $user = $this->currentUser();
@@ -212,7 +217,7 @@ class SocialController extends AbstractController
      */
     public function editFormAction($decklist_id): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         /* @var $user \App\Entity\User */
         $user = $this->getUser();
@@ -241,9 +246,9 @@ class SocialController extends AbstractController
      *     requirements={"decklist_id"="\d+"}
      * )
      */
-    public function saveAction($decklist_id, Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function saveAction($decklist_id, Request $request): RedirectResponse
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $user = $this->getUser();
         if (!$user) {
@@ -294,9 +299,9 @@ class SocialController extends AbstractController
      *     requirements={"decklist_id"="\d+"}
      * )
      */
-    public function deleteAction($decklist_id): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function deleteAction($decklist_id): RedirectResponse
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $user = $this->getUser();
         if (!$user) {
@@ -351,7 +356,7 @@ class SocialController extends AbstractController
         $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
         $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
         foreach ($list_cycles as $cycle) {
-            /* @var $cycle \App\Entity\Cycle */
+            /* @var $cycle Cycle */
             $size = count($cycle->getPacks());
             $first_pack = $cycle->getPacks()->first();
             if (0 == $cycle->getPosition() || false === $first_pack) {
@@ -384,14 +389,14 @@ class SocialController extends AbstractController
         $params['spheres'] = $dbh->executeQuery("SELECT\n                s.name,\n                s.code\n                FROM sphere s\n                ORDER BY s.name ASC")->fetchAll();
         $params['sphere_selected'] = $sphere_code;
         if (!empty($cards_code) && is_array($cards_code)) {
-            $cards = $dbh->executeQuery("SELECT\n    \t\t\t\tc.name,\n    \t\t\t\tc.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card c\n                    INNER JOIN sphere s ON s.id = c.sphere_id\n                    INNER JOIN type t ON t.id = c.type_id\n                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 JOIN pack pp ON pp.id = cp2.pack_id WHERE cp2.card_id = c.id ORDER BY (pp.date_release IS NULL), pp.date_release, cp2.position, cp2.id LIMIT 1)\n                    INNER JOIN pack p ON p.id = cpr.pack_id\n                    WHERE c.code IN (?)\n    \t\t\t\tORDER BY c.code DESC", [$cards_code], [\Doctrine\DBAL\Connection::PARAM_INT_ARRAY])->fetchAll();
+            $cards = $dbh->executeQuery("SELECT\n    \t\t\t\tc.name,\n    \t\t\t\tc.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card c\n                    INNER JOIN sphere s ON s.id = c.sphere_id\n                    INNER JOIN type t ON t.id = c.type_id\n                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 JOIN pack pp ON pp.id = cp2.pack_id WHERE cp2.card_id = c.id ORDER BY (pp.date_release IS NULL), pp.date_release, cp2.position, cp2.id LIMIT 1)\n                    INNER JOIN pack p ON p.id = cpr.pack_id\n                    WHERE c.code IN (?)\n    \t\t\t\tORDER BY c.code DESC", [$cards_code], [Connection::PARAM_INT_ARRAY])->fetchAll();
             $params['cards'] = '';
             foreach ($cards as $card) {
                 $params['cards'] .= $this->renderView('Search/card.html.twig', $card);
             }
         }
         if (!empty($cards_to_exclude) && is_array($cards_to_exclude)) {
-            $cards_to_exclude = $dbh->executeQuery("SELECT\n    \t\t\t\tk.name,\n    \t\t\t\tk.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card k\n                    INNER JOIN sphere s ON s.id = k.sphere_id\n                    INNER JOIN type t ON t.id = k.type_id\n                    INNER JOIN card_printing kpr ON kpr.id = (SELECT cp2.id FROM card_printing cp2 JOIN pack pp ON pp.id = cp2.pack_id WHERE cp2.card_id = k.id ORDER BY (pp.date_release IS NULL), pp.date_release, cp2.position, cp2.id LIMIT 1)\n                    INNER JOIN pack p ON p.id = kpr.pack_id\n                    WHERE k.code IN (?)\n    \t\t\t\tORDER BY k.code DESC", [$cards_to_exclude], [\Doctrine\DBAL\Connection::PARAM_INT_ARRAY])->fetchAll();
+            $cards_to_exclude = $dbh->executeQuery("SELECT\n    \t\t\t\tk.name,\n    \t\t\t\tk.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card k\n                    INNER JOIN sphere s ON s.id = k.sphere_id\n                    INNER JOIN type t ON t.id = k.type_id\n                    INNER JOIN card_printing kpr ON kpr.id = (SELECT cp2.id FROM card_printing cp2 JOIN pack pp ON pp.id = cp2.pack_id WHERE cp2.card_id = k.id ORDER BY (pp.date_release IS NULL), pp.date_release, cp2.position, cp2.id LIMIT 1)\n                    INNER JOIN pack p ON p.id = kpr.pack_id\n                    WHERE k.code IN (?)\n    \t\t\t\tORDER BY k.code DESC", [$cards_to_exclude], [Connection::PARAM_INT_ARRAY])->fetchAll();
             $params['cards_to_exclude'] = '';
             foreach ($cards_to_exclude as $card_to_exclude) {
                 $params['cards_to_exclude'] .= $this->renderView('Search/card-to-exclude.html.twig', $card_to_exclude);
@@ -404,7 +409,7 @@ class SocialController extends AbstractController
     /**
      * @Route("/d/{username}", name="decklist_byauthor", methods={"GET"})
      */
-    public function byauthorAction($username): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function byauthorAction($username): RedirectResponse
     {
         return $this->redirect($this->generateUrl('decklists_list', ['type' => 'find', 'author' => $username]));
     }
@@ -452,7 +457,7 @@ class SocialController extends AbstractController
      */
     public function favoriteAction(Request $request): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $user = $this->getUser();
         if (!$user) {
@@ -492,7 +497,7 @@ class SocialController extends AbstractController
     /**
      * @Route("/user/comment", name="decklist_comment", methods={"POST"})
      */
-    public function commentAction(Request $request, MailerInterface $mailer, UserRepository $userRepository): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function commentAction(Request $request, MailerInterface $mailer, UserRepository $userRepository): RedirectResponse
     {
         /* @var $user User */
         $user = $this->getUser();
@@ -572,7 +577,7 @@ class SocialController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $comment = $commentRepository->find($comment_id);
         if (!$comment) {
@@ -595,7 +600,7 @@ class SocialController extends AbstractController
      */
     public function voteAction(Request $request): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $user = $this->getUser();
         if (!$user) {
@@ -639,7 +644,7 @@ class SocialController extends AbstractController
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         /* @var $decklist \App\Entity\Decklist */
         $decklist = $this->decklistRepository->find($decklist_id);
@@ -672,7 +677,7 @@ class SocialController extends AbstractController
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         /* @var $decklist \App\Entity\Decklist */
         $decklist = $this->decklistRepository->find($decklist_id);
@@ -722,7 +727,7 @@ class SocialController extends AbstractController
         $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
         $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
         foreach ($list_cycles as $cycle) {
-            /* @var $cycle \App\Entity\Cycle */
+            /* @var $cycle Cycle */
             $size = count($cycle->getPacks());
             $first_pack = $cycle->getPacks()->first();
             if (0 == $cycle->getPosition() || false === $first_pack) {

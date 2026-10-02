@@ -10,7 +10,10 @@ use App\Repository\CardPrintingRepository;
 use App\Repository\PackRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class CardPrintingController extends AbstractController
@@ -33,7 +36,7 @@ class CardPrintingController extends AbstractController
     /**
      * @Route("/admin/card-printing/", name="admin_card_printing")
      */
-    public function indexAction(Request $request): \Symfony\Component\HttpFoundation\Response
+    public function indexAction(Request $request): Response
     {
         $em = $this->getDoctrine()->getManager();
         $packId = $request->query->get('pack');
@@ -54,7 +57,7 @@ class CardPrintingController extends AbstractController
     /**
      * @Route("/admin/card-printing/{id}/show", name="admin_card_printing_show")
      */
-    public function showAction($id): \Symfony\Component\HttpFoundation\Response
+    public function showAction($id): Response
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $this->cardPrintingRepository->find($id);
@@ -69,7 +72,7 @@ class CardPrintingController extends AbstractController
     /**
      * @Route("/admin/card-printing/new", name="admin_card_printing_new")
      */
-    public function newAction(Request $request): \Symfony\Component\HttpFoundation\Response
+    public function newAction(Request $request): Response
     {
         $em = $this->getDoctrine()->getManager();
         $filterPack = $this->resolveFilterPack($request, $em);
@@ -82,7 +85,7 @@ class CardPrintingController extends AbstractController
     /**
      * @Route("/admin/card-printing/create", name="admin_card_printing_create", methods={"POST"})
      */
-    public function createAction(Request $request): \Symfony\Component\HttpFoundation\Response
+    public function createAction(Request $request): Response
     {
         $em = $this->getDoctrine()->getManager();
         $filterPack = $this->resolveFilterPack($request, $em);
@@ -102,7 +105,7 @@ class CardPrintingController extends AbstractController
     /**
      * @Route("/admin/card-printing/{id}/edit", name="admin_card_printing_edit")
      */
-    public function editAction(Request $request, $id): \Symfony\Component\HttpFoundation\Response
+    public function editAction(Request $request, $id): Response
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $this->cardPrintingRepository->find($id);
@@ -123,7 +126,7 @@ class CardPrintingController extends AbstractController
      *     methods={"POST", "PUT"}
      * )
      */
-    public function updateAction(Request $request, $id): \Symfony\Component\HttpFoundation\Response
+    public function updateAction(Request $request, $id): Response
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $this->cardPrintingRepository->find($id);
@@ -151,7 +154,7 @@ class CardPrintingController extends AbstractController
      *     methods={"POST", "DELETE"}
      * )
      */
-    public function deleteAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function deleteAction(Request $request, $id): RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
@@ -179,9 +182,9 @@ class CardPrintingController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\Form\FormInterface<mixed>
+     * @return FormInterface<mixed>
      */
-    private function createDeleteForm($id): \Symfony\Component\Form\FormInterface
+    private function createDeleteForm($id): FormInterface
     {
         return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }

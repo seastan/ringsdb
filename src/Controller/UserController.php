@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Card;
+use App\Entity\Decklist;
+use App\Entity\Fellowship;
+use App\Entity\Questlog;
+use App\Entity\Review;
 use App\Entity\User;
 use App\Repository\CardRepository;
 use App\Repository\DecklistRepository;
@@ -11,10 +16,12 @@ use App\Repository\FellowshipRepository;
 use App\Repository\QuestlogRepository;
 use App\Repository\SphereRepository;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManager;
 use FOS\UserBundle\Mailer\MailerInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -55,7 +62,7 @@ class UserController extends AbstractController
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         /* @var $user \App\Entity\User */
         $user = $this->userRepository->find($user_id);
@@ -80,7 +87,7 @@ class UserController extends AbstractController
     /**
      * @Route("/user/profile_save", name="user_profile_save", methods={"POST"})
      */
-    public function saveProfileAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function saveProfileAction(Request $request): RedirectResponse
     {
         /* @var $user \App\Entity\User */
         $user = $this->currentUser();
@@ -141,9 +148,9 @@ class UserController extends AbstractController
             $public_profile_url = $this->generateUrl('user_profile_public', ['user_id' => $user_id, 'user_name' => urlencode($user->getUsername())]);
             $content = ['public_profile_url' => $public_profile_url, 'id' => $user_id, 'name' => $user->getUsername(), 'sphere' => $user->getColor(), 'donation' => $user->getDonation(), 'owned_packs' => $user->getOwnedPacks(), 'dark_mode' => $user->getDarkMode(), 'art_preferences' => $user->getArtPreferences()];
             if (isset($decklist_id)) {
-                /* @var $em \Doctrine\ORM\EntityManager */
+                /* @var $em EntityManager */
                 $em = $this->getDoctrine()->getManager();
-                /* @var $decklist \App\Entity\Decklist */
+                /* @var $decklist Decklist */
                 $decklist = $decklistRepository->find($decklist_id);
                 if ($decklist) {
                     $decklist_id = $decklist->getId();
@@ -155,9 +162,9 @@ class UserController extends AbstractController
                 }
             }
             if (isset($fellowship_id)) {
-                /* @var $em \Doctrine\ORM\EntityManager */
+                /* @var $em EntityManager */
                 $em = $this->getDoctrine()->getManager();
-                /* @var $fellowship \App\Entity\Fellowship */
+                /* @var $fellowship Fellowship */
                 $fellowship = $fellowshipRepository->find($fellowship_id);
                 if ($fellowship) {
                     $fellowship_id = $fellowship->getId();
@@ -169,9 +176,9 @@ class UserController extends AbstractController
                 }
             }
             if (isset($questlog_id)) {
-                /* @var $em \Doctrine\ORM\EntityManager */
+                /* @var $em EntityManager */
                 $em = $this->getDoctrine()->getManager();
-                /* @var $questlog \App\Entity\Questlog */
+                /* @var $questlog Questlog */
                 $questlog = $questlogRepository->find($questlog_id);
                 if ($questlog) {
                     $questlog_id = $questlog->getId();
@@ -183,13 +190,13 @@ class UserController extends AbstractController
                 }
             }
             if (isset($card_id)) {
-                /* @var $em \Doctrine\ORM\EntityManager */
+                /* @var $em EntityManager */
                 $em = $this->getDoctrine()->getManager();
-                /* @var $card \App\Entity\Card */
+                /* @var $card Card */
                 $card = $cardRepository->find($card_id);
                 if ($card) {
                     $reviews = $card->getReviews();
-                    /* @var $review \App\Entity\Review */
+                    /* @var $review Review */
                     foreach ($reviews as $review) {
                         if ($review->getUser()->getId() === $user->getId()) {
                             $content['review_id'] = $review->getId();

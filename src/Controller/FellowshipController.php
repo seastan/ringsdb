@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Cycle;
+use App\Entity\Deck;
+use App\Entity\Decklist;
 use App\Entity\Fellowship;
 use App\Entity\FellowshipComment;
 use App\Entity\FellowshipDeck;
 use App\Entity\FellowshipDecklist;
+use App\Entity\User;
 use App\Helper\FellowshipValidationHelper;
 use App\Model\DecklistFactory;
 use App\Model\FellowshipManager;
@@ -19,7 +23,10 @@ use App\Repository\FellowshipRepository;
 use App\Repository\UserRepository;
 use App\Services\Decks;
 use App\Services\Texts;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -86,7 +93,7 @@ class FellowshipController extends AbstractController
      */
     public function mylistAction(): Response
     {
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->currentUser();
         /* @var $fellowships \App\Entity\Fellowship[] */
         $fellowships = $user->getFellowships();
@@ -114,10 +121,10 @@ class FellowshipController extends AbstractController
         for ($i = 0; $i < 4; ++$i) {
             $decks[$i] = null;
             if ($deck_ids[$i]) {
-                /* @var $decks \App\Entity\Deck[] */
+                /* @var $decks Deck[] */
                 $decks[$i] = $this->deckRepository->find($deck_ids[$i]);
                 if ($decks[$i]) {
-                    /* @var $user \App\Entity\User */
+                    /* @var $user User */
                     $user = $decks[$i]->getUser();
                     if (!$user->getIsShareDecks() && $user->getId() != $this->currentUser()->getId()) {
                         $decks[$i] = null;
@@ -140,7 +147,7 @@ class FellowshipController extends AbstractController
     public function editAction($fellowship_id): Response
     {
         $response = new Response();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->currentUser();
         /* @var $fellowship \App\Entity\Fellowship */
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
@@ -213,11 +220,11 @@ class FellowshipController extends AbstractController
     /**
      * @Route("/fellowship/save", name="fellowship_save", methods={"POST"})
      */
-    public function saveAction(Request $request, Decks $decks): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function saveAction(Request $request, Decks $decks): RedirectResponse
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->currentUser();
         $fellowship_id = intval(filter_var($request->request->get('fellowship_id'), FILTER_SANITIZE_NUMBER_INT));
         if ($fellowship_id) {
@@ -268,7 +275,7 @@ class FellowshipController extends AbstractController
                 $is_decklist = 'true' == filter_var($request->get('deck'.$i.'_is_decklist'), FILTER_SANITIZE_STRING);
                 if ($deck_id) {
                     if (!$is_decklist) {
-                        /* @var $deck \App\Entity\Deck */
+                        /* @var $deck Deck */
                         $deck = $this->deckRepository->find($deck_id);
                         if (!$deck) {
                             throw new NotFoundHttpException('One of the selected decks does not exists.');
@@ -287,7 +294,7 @@ class FellowshipController extends AbstractController
                         $fellowship_deck->setFellowship($fellowship);
                         $fellowship->addDeck($fellowship_deck);
                     } else {
-                        /* @var $decklist \App\Entity\Decklist */
+                        /* @var $decklist Decklist */
                         $decklist = $this->decklistRepository->find($deck_id);
                         if (!$decklist) {
                             throw new NotFoundHttpException('One of the selected decks does not exists.');
@@ -329,9 +336,9 @@ class FellowshipController extends AbstractController
      */
     public function publishFormAction($fellowship_id): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
@@ -360,7 +367,7 @@ class FellowshipController extends AbstractController
             $deck = $fellowship_deck->getDeck();
             if ($deck->getMajorVersion() > 0 && 1 == $deck->getMinorVersion()) {
                 // There may be a perfect copy published
-                /* @var $pub \App\Entity\Decklist */
+                /* @var $pub Decklist */
                 $pub = $deck->getChildren()->first();
                 if ($pub) {
                     $data['deck'.$fellowship_deck->getDeckNumber().'_match'] = $pub->getId();
@@ -372,7 +379,7 @@ class FellowshipController extends AbstractController
             $this_signature = md5((string) $this_content);
             $old_decklists = $this->decklistRepository->findBy(['signature' => $this_signature]);
             foreach ($old_decklists as $decklist) {
-                /* @var $decklist \App\Entity\Decklist */
+                /* @var $decklist Decklist */
                 if ($decklist->getParent() && $decklist->getParent()->getId() == $deck->getId()) {
                     continue;
                 }
@@ -396,11 +403,11 @@ class FellowshipController extends AbstractController
     /**
      * @Route("/fellowship/publish", name="fellowship_publish", methods={"POST"})
      */
-    public function publishAction(Request $request, DecklistFactory $decklistFactory): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function publishAction(Request $request, DecklistFactory $decklistFactory): RedirectResponse
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
@@ -467,11 +474,11 @@ class FellowshipController extends AbstractController
     /**
      * @Route("/fellowship/delete", name="fellowship_delete", methods={"POST"})
      */
-    public function deleteAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function deleteAction(Request $request): RedirectResponse
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
@@ -508,11 +515,11 @@ class FellowshipController extends AbstractController
     /**
      * @Route("/fellowship/delete_list", name="fellowship_delete_list", methods={"POST"})
      */
-    public function deleteListAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function deleteListAction(Request $request): RedirectResponse
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
@@ -570,7 +577,7 @@ class FellowshipController extends AbstractController
         $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
         $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
         foreach ($list_cycles as $cycle) {
-            /* @var $cycle \App\Entity\Cycle */
+            /* @var $cycle Cycle */
             $size = count($cycle->getPacks());
             $first_pack = $cycle->getPacks()->first();
             if (0 == $cycle->getPosition() || false === $first_pack) {
@@ -602,7 +609,7 @@ class FellowshipController extends AbstractController
         $params['sort_'.$sort] = ' selected="selected"';
         $params['nb_decks_selected'] = $nb_decks;
         if (!empty($cards_code) && is_array($cards_code)) {
-            $cards = $dbh->executeQuery("SELECT\n    \t\t\t\tc.name,\n    \t\t\t\tc.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card c\n                    INNER JOIN sphere s ON s.id = c.sphere_id\n                    INNER JOIN type t ON t.id = c.type_id\n                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 WHERE cp2.card_id = c.id ORDER BY cp2.position ASC, cp2.id ASC LIMIT 1)\n                    INNER JOIN pack p ON p.id = cpr.pack_id\n                    WHERE c.code IN (?)\n    \t\t\t\tORDER BY c.code DESC", [$cards_code], [\Doctrine\DBAL\Connection::PARAM_INT_ARRAY])->fetchAll();
+            $cards = $dbh->executeQuery("SELECT\n    \t\t\t\tc.name,\n    \t\t\t\tc.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card c\n                    INNER JOIN sphere s ON s.id = c.sphere_id\n                    INNER JOIN type t ON t.id = c.type_id\n                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 WHERE cp2.card_id = c.id ORDER BY cp2.position ASC, cp2.id ASC LIMIT 1)\n                    INNER JOIN pack p ON p.id = cpr.pack_id\n                    WHERE c.code IN (?)\n    \t\t\t\tORDER BY c.code DESC", [$cards_code], [Connection::PARAM_INT_ARRAY])->fetchAll();
             $params['cards'] = '';
             foreach ($cards as $card) {
                 $params['cards'] .= $this->renderView('Search/card.html.twig', $card);
@@ -646,7 +653,7 @@ class FellowshipController extends AbstractController
         $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
         $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
         foreach ($list_cycles as $cycle) {
-            /* @var $cycle \App\Entity\Cycle */
+            /* @var $cycle Cycle */
             $size = count($cycle->getPacks());
             $first_pack = $cycle->getPacks()->first();
             if (0 == $cycle->getPosition() || false === $first_pack) {
@@ -707,9 +714,9 @@ class FellowshipController extends AbstractController
 
     public function downloadFromSelection($fellowship_id, $octgn): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
@@ -744,7 +751,7 @@ class FellowshipController extends AbstractController
                 $decks[] = $fellowship_decklist->getDecklist();
             }
             foreach ($decks as $deck) {
-                /* @var $deck \App\Entity\Deck */
+                /* @var $deck Deck */
                 if ($octgn) {
                     $extension = 'o8d';
                     $content = $this->renderView('Export/octgn.xml.twig', ['deck' => $deck->getTextExport()]);
@@ -772,9 +779,9 @@ class FellowshipController extends AbstractController
      */
     public function favoriteAction(Request $request): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
@@ -785,7 +792,7 @@ class FellowshipController extends AbstractController
         if (!$fellowship) {
             throw new NotFoundHttpException('Wrong id');
         }
-        /* @var $author \App\Entity\User */
+        /* @var $author User */
         $author = $fellowship->getUser();
         $dbh = $this->getDoctrine()->getConnection();
         $is_favorite = $dbh->executeQuery("SELECT\n\t\t\t\tcount(*)\n\t\t\t\tFROM fellowship d\n\t\t\t\tJOIN fellowship_favorite f ON f.fellowship_id = d.id\n\t\t\t\tWHERE f.user_id = ?\n\t\t\t\tAND d.id = ?", [$user->getId(), $fellowship_id])->fetch(\PDO::FETCH_NUM)[0];
@@ -815,11 +822,11 @@ class FellowshipController extends AbstractController
     /**
      * @Route("/user/fellowship_comment", name="fellowship_comment", methods={"POST"})
      */
-    public function commentAction(Request $request, MailerInterface $mailer, UserRepository $userRepository): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function commentAction(Request $request, MailerInterface $mailer, UserRepository $userRepository): RedirectResponse
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
@@ -865,7 +872,7 @@ class FellowshipController extends AbstractController
                 }
             }
             foreach ($mentionned_usernames as $mentionned_username) {
-                /* @var $mentionned_user \App\Entity\User */
+                /* @var $mentionned_user User */
                 $mentionned_user = $userRepository->findOneBy(['username' => $mentionned_username]);
                 if ($mentionned_user && $mentionned_user->getIsNotifMention()) {
                     if (!isset($spool[$mentionned_user->getEmail()])) {
@@ -896,12 +903,12 @@ class FellowshipController extends AbstractController
      */
     public function hidecommentAction($comment_id, $hidden, FellowshipCommentRepository $fellowshipCommentRepository): Response
     {
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $comment = $fellowshipCommentRepository->find($comment_id);
         if (!$comment) {
@@ -924,7 +931,7 @@ class FellowshipController extends AbstractController
      */
     public function voteAction(Request $request): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $user = $this->getUser();
         if (!$user) {
@@ -940,7 +947,7 @@ class FellowshipController extends AbstractController
             $query = $this->fellowshipRepository->createQueryBuilder('d')->innerJoin('d.votes', 'u')->where('d.id = :fellowship_id')->andWhere('u.id = :user_id')->setParameter('fellowship_id', $fellowship_id)->setParameter('user_id', $user->getId())->getQuery();
             $result = $query->getResult();
             if (empty($result)) {
-                /* @var $author \App\Entity\User */
+                /* @var $author User */
                 $author = $fellowship->getUser();
                 $author->setReputation($author->getReputation() + 1);
                 $fellowship->addVote($user);
@@ -956,7 +963,7 @@ class FellowshipController extends AbstractController
     /**
      * @Route("/f/{username}", name="fellowship_byauthor", methods={"GET"})
      */
-    public function byauthorAction($username): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function byauthorAction($username): RedirectResponse
     {
         return $this->redirect($this->generateUrl('fellowships_list', ['type' => 'find', 'author' => $username]));
     }

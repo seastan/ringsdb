@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Entity\Card;
+use App\Entity\Questlog;
 use App\Entity\User;
 use App\Repository\CardRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -109,7 +112,7 @@ class QuestLogManager
     /**
      * creates the basic query builder and initializes it.
      */
-    private function getQueryBuilder(): \Doctrine\ORM\QueryBuilder
+    private function getQueryBuilder(): QueryBuilder
     {
         $qb = $this->doctrine->createQueryBuilder();
         $qb->select('d');
@@ -125,9 +128,9 @@ class QuestLogManager
     /**
      * creates the paginator around the query.
      *
-     * @param Query<mixed, \App\Entity\Questlog> $query
+     * @param Query<mixed, Questlog> $query
      *
-     * @return Paginator<\App\Entity\Questlog>
+     * @return Paginator<Questlog>
      */
     private function getPaginator(Query $query): Paginator
     {
@@ -138,7 +141,7 @@ class QuestLogManager
     }
 
     /**
-     * @return ArrayCollection<int, \App\Entity\Questlog>
+     * @return ArrayCollection<int, Questlog>
      */
     public function getEmptyList(): ArrayCollection
     {
@@ -148,7 +151,7 @@ class QuestLogManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Questlog>
+     * @return Paginator<Questlog>
      */
     public function findQuestLogsByPopularity(): Paginator
     {
@@ -163,7 +166,7 @@ class QuestLogManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Questlog>
+     * @return Paginator<Questlog>
      */
     public function findQuestLogsByAge(): Paginator
     {
@@ -178,7 +181,7 @@ class QuestLogManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Questlog>
+     * @return Paginator<Questlog>
      */
     public function findQuestLogsByFavorite(User $user): Paginator
     {
@@ -196,7 +199,7 @@ class QuestLogManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Questlog>
+     * @return Paginator<Questlog>
      */
     public function findQuestLogsByAuthor(User $user): Paginator
     {
@@ -213,7 +216,7 @@ class QuestLogManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Questlog>
+     * @return Paginator<Questlog>
      */
     public function findQuestLogsInHallOfFame(): Paginator
     {
@@ -229,7 +232,7 @@ class QuestLogManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Questlog>
+     * @return Paginator<Questlog>
      */
     public function findQuestLogsInHotTopic(): Paginator
     {
@@ -246,7 +249,7 @@ class QuestLogManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Questlog>
+     * @return Paginator<Questlog>
      */
     public function findQuestLogsWithComplexSearch(): Paginator
     {
@@ -297,7 +300,7 @@ class QuestLogManager
 
             if (!empty($cards_code)) {
                 foreach ($cards_code as $i => $card_code) {
-                    /* @var $card \App\Entity\Card */
+                    /* @var $card Card */
                     $card = $this->cardRepository->findOneBy(['code' => $card_code]);
                     if (!$card) {
                         continue;

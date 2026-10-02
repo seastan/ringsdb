@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Entity\Deck;
+use App\Entity\Pack;
+use App\Entity\User;
+
 /**
  * Base class of Deck and Decklist, which implement the getters used by the exports.
  */
@@ -19,11 +23,11 @@ abstract class ExportableDeck
 
     abstract public function getDescriptionMd(): ?string;
 
-    abstract public function getUser(): \App\Entity\User;
+    abstract public function getUser(): User;
 
     abstract public function getVersion(): string;
 
-    abstract public function getLastPack(): ?\App\Entity\Pack;
+    abstract public function getLastPack(): ?Pack;
 
     /**
      * @return SlotCollectionInterface<covariant \App\Model\SlotInterface>
@@ -42,7 +46,7 @@ abstract class ExportableDeck
      */
     public function getArrayExport($withUnsavedChanges = false): array
     {
-        /* @var $this \App\Entity\Deck */
+        /* @var $this Deck */
         $slots = $this->getSlots();
         $sideslots = $this->getSideslots();
         $last_pack = '';
@@ -75,7 +79,7 @@ abstract class ExportableDeck
      */
     public function getTextExport(): array
     {
-        /* @var $this \App\Entity\Deck */
+        /* @var $this Deck */
         $slots = $this->getSlots();
         $sideslots = $this->getSideslots();
 

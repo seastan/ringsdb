@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\Deck;
 use App\Repository\DeckRepository;
 use App\Services\Decks;
+use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,7 +38,7 @@ class TagController extends AbstractController
     {
         $list_id = $request->get('ids');
         $list_tag = $this->decks->normalizeTags((array) $request->get('tags'));
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $response = ['success' => true];
         foreach ($list_id as $id) {
@@ -65,7 +66,7 @@ class TagController extends AbstractController
     {
         $list_id = $request->get('ids');
         $list_tag = $this->decks->normalizeTags((array) $request->get('tags'));
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $response = ['success' => true];
         foreach ($list_id as $id) {
@@ -92,7 +93,7 @@ class TagController extends AbstractController
     public function clearAction(Request $request): Response
     {
         $list_id = $request->get('ids');
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $response = ['success' => true];
         foreach ($list_id as $id) {

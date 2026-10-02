@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 class Pack
 {
     /**
@@ -43,7 +46,7 @@ class Pack
      */
     private $isRepackaged = false;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, CardPrinting>
+     * @var Collection<int, CardPrinting>
      */
     private $printings;
     /**
@@ -56,7 +59,7 @@ class Pack
      */
     public function __construct()
     {
-        $this->printings = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->printings = new ArrayCollection();
     }
 
     /**
@@ -228,9 +231,9 @@ class Pack
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection<int, Card>
+     * @return Collection<int, Card>
      */
-    public function getCards(): \Doctrine\Common\Collections\Collection
+    public function getCards(): Collection
     {
         return $this->printings->map(fn ($p) => $p->getCard());
     }
@@ -256,9 +259,9 @@ class Pack
     /**
      * Get printings.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, CardPrinting>
+     * @return Collection<int, CardPrinting>
      */
-    public function getPrintings(): \Doctrine\Common\Collections\Collection
+    public function getPrintings(): Collection
     {
         return $this->printings;
     }

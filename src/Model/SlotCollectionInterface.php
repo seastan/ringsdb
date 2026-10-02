@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use ArrayAccess;
+use Doctrine\Common\Collections\Collection;
+use IteratorAggregate;
+
 /**
  * Interface for a collection of SlotInterface.
  *
@@ -12,7 +16,7 @@ namespace App\Model;
  * @extends \IteratorAggregate<int, T>
  * @extends \ArrayAccess<int, T>
  */
-interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \ArrayAccess
+interface SlotCollectionInterface extends \Countable, IteratorAggregate, ArrayAccess
 {
     /**
      * Add a slot.
@@ -31,9 +35,9 @@ interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \Array
     /**
      * Get the underlying collection of slots.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, T>
+     * @return Collection<int, T>
      */
-    public function getSlots(): \Doctrine\Common\Collections\Collection;
+    public function getSlots(): Collection;
 
     /**
      * Get quantity of cards.

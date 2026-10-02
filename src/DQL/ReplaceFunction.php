@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\DQL;
 
 use Doctrine\ORM\Query\AST\Functions\FunctionNode;
+use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\Lexer;
+use Doctrine\ORM\Query\Parser;
+use Doctrine\ORM\Query\SqlWalker;
 
 /**
  * "REPLACE" "(" StringPrimary "," StringSecondary "," StringThird ")".
@@ -18,22 +21,22 @@ use Doctrine\ORM\Query\Lexer;
 class ReplaceFunction extends FunctionNode
 {
     /**
-     * @var \Doctrine\ORM\Query\AST\Node
+     * @var Node
      */
     public $stringPrimary;
     /**
-     * @var \Doctrine\ORM\Query\AST\Node
+     * @var Node
      */
     public $stringSecondary;
     /**
-     * @var \Doctrine\ORM\Query\AST\Node
+     * @var Node
      */
     public $stringThird;
 
     /**
      * @override
      */
-    public function getSql(\Doctrine\ORM\Query\SqlWalker $sqlWalker)
+    public function getSql(SqlWalker $sqlWalker)
     {
         return 'REPLACE('.
             $this->stringPrimary->dispatch($sqlWalker).', '.
@@ -48,7 +51,7 @@ class ReplaceFunction extends FunctionNode
     /**
      * @override
      */
-    public function parse(\Doctrine\ORM\Query\Parser $parser): void
+    public function parse(Parser $parser): void
     {
         $parser->match(Lexer::T_IDENTIFIER);
         $parser->match(Lexer::T_OPEN_PARENTHESIS);

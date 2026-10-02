@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-class Decksideslot implements \App\Model\SlotInterface
+use App\Model\SlotInterface;
+
+class Decksideslot implements SlotInterface
 {
     /**
      * @var int|null

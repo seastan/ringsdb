@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 /**
  * Scenario.
  */
@@ -87,7 +90,7 @@ class Scenario implements \JsonSerializable
      */
     private $pack;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Encounter>
+     * @var Collection<int, Encounter>
      */
     private $encounters;
 
@@ -96,7 +99,7 @@ class Scenario implements \JsonSerializable
      */
     public function __construct()
     {
-        $this->encounters = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->encounters = new ArrayCollection();
     }
 
     /**
@@ -226,9 +229,9 @@ class Scenario implements \JsonSerializable
     /**
      * Get encounters.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Encounter>
+     * @return Collection<int, Encounter>
      */
-    public function getEncounters(): \Doctrine\Common\Collections\Collection
+    public function getEncounters(): Collection
     {
         return $this->encounters;
     }
@@ -1029,7 +1032,7 @@ class Scenario implements \JsonSerializable
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Questlog>
+     * @var Collection<int, Questlog>
      */
     private $questlogs;
 
@@ -1054,9 +1057,9 @@ class Scenario implements \JsonSerializable
     /**
      * Get questlogs.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Questlog>
+     * @return Collection<int, Questlog>
      */
-    public function getQuestlogs(): \Doctrine\Common\Collections\Collection
+    public function getQuestlogs(): Collection
     {
         return $this->questlogs;
     }

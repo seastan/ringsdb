@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Entity\Card;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * Decorator for a collection of SlotInterface.
@@ -16,14 +18,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 class SlotCollectionDecorator implements SlotCollectionInterface
 {
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, T>
+     * @var Collection<int, T>
      */
     protected $slots;
 
     /**
-     * @param \Doctrine\Common\Collections\Collection<int, T> $slots
+     * @param Collection<int, T> $slots
      */
-    public function __construct(\Doctrine\Common\Collections\Collection $slots)
+    public function __construct(Collection $slots)
     {
         $this->slots = $slots;
     }
@@ -189,7 +191,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         $folco = false;
 
         foreach ($heroDeck->getSlots() as $slot) {
-            /* @var $card \App\Entity\Card */
+            /* @var $card Card */
             $card = $slot->getCard();
             $threat += $card->getThreat();
 
@@ -251,7 +253,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         return $copiesAndDeckLimit;
     }
 
-    public function getSlots(): \Doctrine\Common\Collections\Collection
+    public function getSlots(): Collection
     {
         return $this->slots;
     }

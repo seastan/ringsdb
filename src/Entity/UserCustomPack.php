@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 class UserCustomPack
 {
@@ -41,7 +42,7 @@ class UserCustomPack
      */
     private $updatedAt;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, UserCustomPackCard>
+     * @var Collection<int, UserCustomPackCard>
      */
     private $cards;
 
@@ -163,9 +164,9 @@ class UserCustomPack
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection<int, UserCustomPackCard>
+     * @return Collection<int, UserCustomPackCard>
      */
-    public function getCards(): \Doctrine\Common\Collections\Collection
+    public function getCards(): Collection
     {
         return $this->cards;
     }

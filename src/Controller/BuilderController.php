@@ -7,6 +7,9 @@ namespace App\Controller;
 use App\Entity\Card;
 use App\Entity\Deck;
 use App\Entity\Deckchange;
+use App\Entity\Decklist;
+use App\Entity\Pack;
+use App\Entity\User;
 use App\Repository\CardRepository;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
@@ -19,6 +22,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -73,7 +77,7 @@ class BuilderController extends AbstractController
     /**
      * @Route("/deck/new", name="deck_buildform", methods={"GET"})
      */
-    public function newAction(): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function newAction(): RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -213,7 +217,7 @@ class BuilderController extends AbstractController
             $card = null;
             $pack = null;
             if ($pack_name) {
-                /* @var $pack \App\Entity\Pack */
+                /* @var $pack Pack */
                 $pack = $this->packRepository->findOneBy(['name' => $pack_name]);
                 if (!$pack) {
                     $pack = $this->packRepository->findOneBy(['code' => $pack_name]);
@@ -397,7 +401,7 @@ class BuilderController extends AbstractController
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->currentUser();
         if (count($user->getDecks()) > $user->getMaxNbDecks()) {
             throw new UnprocessableEntityHttpException('You have reached the maximum number of decks allowed. Delete some decks or increase your reputation.');
@@ -450,7 +454,7 @@ class BuilderController extends AbstractController
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->currentUser();
         if (count($user->getDecks()) > $user->getMaxNbDecks()) {
             return new JsonResponse(['success' => false, 'error' => 'You have reached the maximum number of decks allowed.'], 422);
@@ -488,7 +492,7 @@ class BuilderController extends AbstractController
     /**
      * @Route("/deck/delete", name="deck_delete", methods={"POST"})
      */
-    public function deleteAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function deleteAction(Request $request): RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -518,7 +522,7 @@ class BuilderController extends AbstractController
     /**
      * @Route("/deck/delete_list", name="deck_delete_list", methods={"POST"})
      */
-    public function deleteListAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function deleteListAction(Request $request): RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -577,7 +581,7 @@ class BuilderController extends AbstractController
      */
     public function listAction(Request $request): Response
     {
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->currentUser();
         $decksService = $this->decks;
         $showAll = (bool) $request->query->get('all', false);
@@ -605,7 +609,7 @@ class BuilderController extends AbstractController
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $decklist \App\Entity\Decklist */
+        /* @var $decklist Decklist */
         $decklist = $decklistRepository->find($decklist_id);
         if (!$decklist) {
             throw new NotFoundHttpException("This deck doesn't exist.");
@@ -687,7 +691,7 @@ class BuilderController extends AbstractController
     /**
      * @Route("/deck/import/all", name="decks_upload_all", methods={"POST"})
      */
-    public function uploadallAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function uploadallAction(Request $request): RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -739,7 +743,7 @@ class BuilderController extends AbstractController
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->currentUser();
         $deck_id = $request->get('deck_id');
         /* @var $deck \App\Entity\Deck */

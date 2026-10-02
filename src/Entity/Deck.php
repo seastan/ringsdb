@@ -4,7 +4,13 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
+use App\Model\ExportableDeck;
+use App\Model\SlotCollectionDecorator;
+use App\Model\SlotCollectionInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
+class Deck extends ExportableDeck implements \JsonSerializable
 {
     /**
      * @return list<array<string, mixed>>
@@ -230,19 +236,19 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      */
     private $minorVersion;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Deckslot>
+     * @var Collection<int, Deckslot>
      */
     private $slots;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Decksideslot>
+     * @var Collection<int, Decksideslot>
      */
     private $sideslots;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Decklist>
+     * @var Collection<int, Decklist>
      */
     private $children;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Deckchange>
+     * @var Collection<int, Deckchange>
      */
     private $changes;
     /**
@@ -263,11 +269,11 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      */
     public function __construct()
     {
-        $this->slots = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->sideslots = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->children = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->changes = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->fellowships = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->slots = new ArrayCollection();
+        $this->sideslots = new ArrayCollection();
+        $this->children = new ArrayCollection();
+        $this->changes = new ArrayCollection();
+        $this->fellowships = new ArrayCollection();
         $this->minorVersion = 0;
         $this->majorVersion = 0;
     }
@@ -421,11 +427,11 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * Get slots.
      *
-     * @return \App\Model\SlotCollectionInterface<Deckslot>
+     * @return SlotCollectionInterface<Deckslot>
      */
-    public function getSlots(): \App\Model\SlotCollectionInterface
+    public function getSlots(): SlotCollectionInterface
     {
-        return new \App\Model\SlotCollectionDecorator($this->slots);
+        return new SlotCollectionDecorator($this->slots);
     }
 
     /**
@@ -449,11 +455,11 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * Get sideslots.
      *
-     * @return \App\Model\SlotCollectionInterface<Decksideslot>
+     * @return SlotCollectionInterface<Decksideslot>
      */
-    public function getSideslots(): \App\Model\SlotCollectionInterface
+    public function getSideslots(): SlotCollectionInterface
     {
-        return new \App\Model\SlotCollectionDecorator($this->sideslots);
+        return new SlotCollectionDecorator($this->sideslots);
     }
 
     /**
@@ -477,9 +483,9 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * Get children.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Decklist>
+     * @return Collection<int, Decklist>
      */
-    public function getChildren(): \Doctrine\Common\Collections\Collection
+    public function getChildren(): Collection
     {
         return $this->children;
     }
@@ -505,9 +511,9 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * Get changes.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Deckchange>
+     * @return Collection<int, Deckchange>
      */
-    public function getChanges(): \Doctrine\Common\Collections\Collection
+    public function getChanges(): Collection
     {
         return $this->changes;
     }
@@ -612,7 +618,7 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, FellowshipDeck>
+     * @var Collection<int, FellowshipDeck>
      */
     private $fellowships;
 
@@ -637,9 +643,9 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * Get fellowships.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, FellowshipDeck>
+     * @return Collection<int, FellowshipDeck>
      */
-    public function getFellowships(): \Doctrine\Common\Collections\Collection
+    public function getFellowships(): Collection
     {
         return $this->fellowships;
     }
@@ -661,7 +667,7 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, QuestlogDeck>
+     * @var Collection<int, QuestlogDeck>
      */
     private $questlogs;
 
@@ -686,9 +692,9 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * Get questlogs.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, QuestlogDeck>
+     * @return Collection<int, QuestlogDeck>
      */
-    public function getQuestlogs(): \Doctrine\Common\Collections\Collection
+    public function getQuestlogs(): Collection
     {
         return $this->questlogs;
     }

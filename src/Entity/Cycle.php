@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 class Cycle
 {
     /**
@@ -39,7 +42,7 @@ class Cycle
      */
     private $dateUpdate;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Pack>
+     * @var Collection<int, Pack>
      */
     private $packs;
 
@@ -48,7 +51,7 @@ class Cycle
      */
     public function __construct()
     {
-        $this->packs = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->packs = new ArrayCollection();
     }
 
     /**
@@ -220,9 +223,9 @@ class Cycle
     /**
      * Get packs.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Pack>
+     * @return Collection<int, Pack>
      */
-    public function getPacks(): \Doctrine\Common\Collections\Collection
+    public function getPacks(): Collection
     {
         return $this->packs;
     }

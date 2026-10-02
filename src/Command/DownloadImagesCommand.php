@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Entity\ReviewRepository;
 use App\Repository\CardRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Console\Command\Command;
@@ -54,10 +56,10 @@ class DownloadImagesCommand extends Command
     {
         $assets_helper = $this->packages;
 
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->em;
 
-        /* @var $repo \App\Entity\ReviewRepository */
+        /* @var $repo ReviewRepository */
         $repo = $this->cardRepository;
 
         $publicDir = $this->publicDir;

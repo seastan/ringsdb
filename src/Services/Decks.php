@@ -11,8 +11,11 @@ use App\Repository\CardRepository;
 use App\Entity\Card;
 use App\Entity\Deck;
 use App\Entity\Deckchange;
+use App\Entity\Decklist;
 use App\Entity\Decksideslot;
 use App\Entity\Deckslot;
+use App\Entity\Pack;
+use App\Entity\User;
 use App\Helper\DeckValidationHelper;
 use App\Repository\CardRepository;
 use App\Repository\DeckchangeRepository;
@@ -74,7 +77,7 @@ class Decks
      */
     public function getByUser($user): array
     {
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $decks = $user->getDecks();
         $list = [];
 
@@ -253,7 +256,7 @@ class Decks
         /* @var $source_deck \App\Entity\Deck */
 
         if ($decklist_id) {
-            /* @var $decklist \App\Entity\Decklist */
+            /* @var $decklist Decklist */
             $decklist = $this->decklistRepository->find($decklist_id);
             if ($decklist) {
                 $deck->setParent($decklist);
@@ -266,7 +269,7 @@ class Decks
         $deck->setMinorVersion($deck->getMinorVersion() + 1);
 
         $cards = [];
-        /* @var $latestPack \App\Entity\Pack */
+        /* @var $latestPack Pack */
         $latestPack = null;
         $spheres = [];
 
@@ -277,7 +280,7 @@ class Decks
                 continue;
             }
 
-            /* @var $pack \App\Entity\Pack */
+            /* @var $pack Pack */
             $pack = $card->getPack();
             if (!$latestPack) {
                 $latestPack = $pack;
@@ -438,7 +441,7 @@ class Decks
     public function setSlots(&$deck, $content): void
     {
         /* @var $deck \App\Entity\Deck */
-        /* @var $latestPack \App\Entity\Pack */
+        /* @var $latestPack Pack */
 
         $cards = [];
         $latestPack = null;

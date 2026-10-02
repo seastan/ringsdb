@@ -6,6 +6,8 @@ namespace App\Controller;
 
 use App\Entity\Card;
 use App\Entity\CardPrinting;
+use App\Entity\Cycle;
+use App\Entity\Pack;
 use App\Repository\CardPrintingRepository;
 use App\Repository\CardRepository;
 use App\Repository\CycleRepository;
@@ -14,6 +16,7 @@ use App\Repository\SphereRepository;
 use App\Repository\TypeRepository;
 use App\Services\CardsData;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -85,13 +88,13 @@ class SearchController extends AbstractController
         $list_packs = $this->packRepository->findBy([], ['dateRelease' => 'ASC', 'position' => 'ASC']);
         $packs = [];
         foreach ($list_packs as $pack) {
-            /* @var $pack \App\Entity\Pack */
+            /* @var $pack Pack */
             $packs[] = ['name' => $pack->getName(), 'code' => $pack->getCode()];
         }
         $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
         $cycles = [];
         foreach ($list_cycles as $cycle) {
-            /* @var $cycle \App\Entity\Cycle */
+            /* @var $cycle Cycle */
             $cycles[] = ['name' => $cycle->getName(), 'code' => $cycle->getCode()];
         }
         $types = $typeRepository->findBy([], ['name' => 'ASC']);
@@ -169,7 +172,7 @@ class SearchController extends AbstractController
      *
      * @Route("/process", name="cards_processSearchForm")
      */
-    public function processAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function processAction(Request $request): RedirectResponse
     {
         $view = $request->query->get('view') ?: 'list';
         $sort = $request->query->get('sort') ?: 'name';
@@ -217,7 +220,7 @@ class SearchController extends AbstractController
     /**
      * Processes the action of the single card search input.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return RedirectResponse|Response
      *
      * @Route("/find", name="cards_find")
      */
@@ -303,7 +306,7 @@ class SearchController extends AbstractController
             for ($rowindex = $first; $rowindex < $last && $rowindex < count($rows); ++$rowindex) {
                 /* @var $card \App\Entity\Card */
                 $card = $rows[$rowindex];
-                /* @var $pack \App\Entity\Pack */
+                /* @var $pack Pack */
                 $pack = $card->getPack();
                 /** @var array<string, mixed> $cardinfo */
                 $cardinfo = $this->cardsData->getCardInfo($card, false);

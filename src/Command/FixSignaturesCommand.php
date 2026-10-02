@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Entity\Decklist;
 use App\Repository\DecklistRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -41,10 +42,10 @@ class FixSignaturesCommand extends Command
 
         $count = 0;
 
-        /* @var $decklists \App\Entity\Decklist[] */
+        /* @var $decklists Decklist[] */
         $decklists = $this->decklistRepository->findAll();
         foreach ($decklists as $decklist) {
-            /* @var $decklist \App\Entity\Decklist */
+            /* @var $decklist Decklist */
 
             $content = [
                 'main' => $decklist->getSlots()->getContent(),

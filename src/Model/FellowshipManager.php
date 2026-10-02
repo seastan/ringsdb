@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Entity\Card;
+use App\Entity\Fellowship;
 use App\Entity\User;
 use App\Repository\CardRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -110,7 +112,7 @@ class FellowshipManager
     /**
      * creates the basic query builder and initializes it.
      */
-    private function getQueryBuilder(): \Doctrine\ORM\QueryBuilder
+    private function getQueryBuilder(): QueryBuilder
     {
         $qb = $this->doctrine->createQueryBuilder();
         $qb->select('d');
@@ -126,9 +128,9 @@ class FellowshipManager
     /**
      * creates the paginator around the query.
      *
-     * @param Query<mixed, \App\Entity\Fellowship> $query
+     * @param Query<mixed, Fellowship> $query
      *
-     * @return Paginator<\App\Entity\Fellowship>
+     * @return Paginator<Fellowship>
      */
     private function getPaginator(Query $query): Paginator
     {
@@ -139,7 +141,7 @@ class FellowshipManager
     }
 
     /**
-     * @return ArrayCollection<int, \App\Entity\Fellowship>
+     * @return ArrayCollection<int, Fellowship>
      */
     public function getEmptyList(): ArrayCollection
     {
@@ -149,7 +151,7 @@ class FellowshipManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Fellowship>
+     * @return Paginator<Fellowship>
      */
     public function findFellowshipsByPopularity(): Paginator
     {
@@ -164,7 +166,7 @@ class FellowshipManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Fellowship>
+     * @return Paginator<Fellowship>
      */
     public function findFellowshipsByAge(): Paginator
     {
@@ -179,7 +181,7 @@ class FellowshipManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Fellowship>
+     * @return Paginator<Fellowship>
      */
     public function findFellowshipsByRecentDiscussion(): Paginator
     {
@@ -195,7 +197,7 @@ class FellowshipManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Fellowship>
+     * @return Paginator<Fellowship>
      */
     public function findFellowshipsByFavorite(User $user): Paginator
     {
@@ -213,7 +215,7 @@ class FellowshipManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Fellowship>
+     * @return Paginator<Fellowship>
      */
     public function findFellowshipsByAuthor(User $user): Paginator
     {
@@ -230,7 +232,7 @@ class FellowshipManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Fellowship>
+     * @return Paginator<Fellowship>
      */
     public function findFellowshipsInHallOfFame(): Paginator
     {
@@ -246,7 +248,7 @@ class FellowshipManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Fellowship>
+     * @return Paginator<Fellowship>
      */
     public function findFellowshipsInHotTopic(): Paginator
     {
@@ -263,7 +265,7 @@ class FellowshipManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Fellowship>
+     * @return Paginator<Fellowship>
      */
     public function findFellowshipsWithComplexSearch(): Paginator
     {

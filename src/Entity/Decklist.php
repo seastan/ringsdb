@@ -4,7 +4,13 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
+use App\Model\ExportableDeck;
+use App\Model\SlotCollectionDecorator;
+use App\Model\SlotCollectionInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
+class Decklist extends ExportableDeck implements \JsonSerializable
 {
     public function jsonSerialize()
     {
@@ -75,23 +81,23 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      */
     private $version;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Decklistslot>
+     * @var Collection<int, Decklistslot>
      */
     private $slots;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Decklistsideslot>
+     * @var Collection<int, Decklistsideslot>
      */
     private $sideslots;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Comment>
+     * @var Collection<int, Comment>
      */
     private $comments;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Decklist>
+     * @var Collection<int, Decklist>
      */
     private $successors;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Deck>
+     * @var Collection<int, Deck>
      */
     private $children;
     /**
@@ -111,11 +117,11 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      */
     private $precedent;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, User>
+     * @var Collection<int, User>
      */
     private $favorites;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, User>
+     * @var Collection<int, User>
      */
     private $votes;
 
@@ -124,15 +130,15 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      */
     public function __construct()
     {
-        $this->slots = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->sideslots = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->comments = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->successors = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->children = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->favorites = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->votes = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->spheres = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->fellowships = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->slots = new ArrayCollection();
+        $this->sideslots = new ArrayCollection();
+        $this->comments = new ArrayCollection();
+        $this->successors = new ArrayCollection();
+        $this->children = new ArrayCollection();
+        $this->favorites = new ArrayCollection();
+        $this->votes = new ArrayCollection();
+        $this->spheres = new ArrayCollection();
+        $this->fellowships = new ArrayCollection();
     }
 
     /**
@@ -404,11 +410,11 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * Get slots.
      *
-     * @return \App\Model\SlotCollectionInterface<Decklistslot>
+     * @return SlotCollectionInterface<Decklistslot>
      */
-    public function getSlots(): \App\Model\SlotCollectionInterface
+    public function getSlots(): SlotCollectionInterface
     {
-        return new \App\Model\SlotCollectionDecorator($this->slots);
+        return new SlotCollectionDecorator($this->slots);
     }
 
     /**
@@ -432,11 +438,11 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * Get slots.
      *
-     * @return \App\Model\SlotCollectionInterface<Decklistsideslot>
+     * @return SlotCollectionInterface<Decklistsideslot>
      */
-    public function getSideslots(): \App\Model\SlotCollectionInterface
+    public function getSideslots(): SlotCollectionInterface
     {
-        return new \App\Model\SlotCollectionDecorator($this->sideslots);
+        return new SlotCollectionDecorator($this->sideslots);
     }
 
     /**
@@ -460,9 +466,9 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * Get comments.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Comment>
+     * @return Collection<int, Comment>
      */
-    public function getComments(): \Doctrine\Common\Collections\Collection
+    public function getComments(): Collection
     {
         return $this->comments;
     }
@@ -488,9 +494,9 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * Get successors.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Decklist>
+     * @return Collection<int, Decklist>
      */
-    public function getSuccessors(): \Doctrine\Common\Collections\Collection
+    public function getSuccessors(): Collection
     {
         return $this->successors;
     }
@@ -516,9 +522,9 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * Get children.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Deck>
+     * @return Collection<int, Deck>
      */
-    public function getChildren(): \Doctrine\Common\Collections\Collection
+    public function getChildren(): Collection
     {
         return $this->children;
     }
@@ -616,9 +622,9 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * Get favorites.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, User>
+     * @return Collection<int, User>
      */
-    public function getFavorites(): \Doctrine\Common\Collections\Collection
+    public function getFavorites(): Collection
     {
         return $this->favorites;
     }
@@ -644,9 +650,9 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * Get votes.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, User>
+     * @return Collection<int, User>
      */
-    public function getVotes(): \Doctrine\Common\Collections\Collection
+    public function getVotes(): Collection
     {
         return $this->votes;
     }
@@ -672,7 +678,7 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Sphere>
+     * @var Collection<int, Sphere>
      */
     private $spheres;
 
@@ -699,9 +705,9 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * Get spheres.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Sphere>
+     * @return Collection<int, Sphere>
      */
-    public function getSpheres(): \Doctrine\Common\Collections\Collection
+    public function getSpheres(): Collection
     {
         return $this->spheres;
     }
@@ -730,7 +736,7 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, FellowshipDecklist>
+     * @var Collection<int, FellowshipDecklist>
      */
     private $fellowships;
 
@@ -755,9 +761,9 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * Get fellowships.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, FellowshipDecklist>
+     * @return Collection<int, FellowshipDecklist>
      */
-    public function getFellowships(): \Doctrine\Common\Collections\Collection
+    public function getFellowships(): Collection
     {
         return $this->fellowships;
     }
@@ -799,7 +805,7 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
         return $this->startingThreat;
     }
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, QuestlogDeck>
+     * @var Collection<int, QuestlogDeck>
      */
     private $questlogs;
 
@@ -824,9 +830,9 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * Get questlogs.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, QuestlogDeck>
+     * @return Collection<int, QuestlogDeck>
      */
-    public function getQuestlogs(): \Doctrine\Common\Collections\Collection
+    public function getQuestlogs(): Collection
     {
         return $this->questlogs;
     }

@@ -9,7 +9,10 @@ use App\Form\EncounterType;
 use App\Repository\EncounterRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -32,7 +35,7 @@ class EncounterController extends AbstractController
      *
      * @Route("/admin/encounter/", name="admin_encounter")
      */
-    public function indexAction(): \Symfony\Component\HttpFoundation\Response
+    public function indexAction(): Response
     {
         $entities = $this->encounterRepository->findAll();
 
@@ -44,7 +47,7 @@ class EncounterController extends AbstractController
      *
      * @Route("/admin/encounter/create", name="admin_encounter_create", methods={"POST"})
      */
-    public function createAction(Request $request): \Symfony\Component\HttpFoundation\Response
+    public function createAction(Request $request): Response
     {
         $entity = new Encounter();
         $form = $this->createForm(EncounterType::class, $entity);
@@ -65,7 +68,7 @@ class EncounterController extends AbstractController
      *
      * @Route("/admin/encounter/new", name="admin_encounter_new")
      */
-    public function newAction(): \Symfony\Component\HttpFoundation\Response
+    public function newAction(): Response
     {
         $entity = new Encounter();
         $form = $this->createForm(EncounterType::class, $entity);
@@ -78,7 +81,7 @@ class EncounterController extends AbstractController
      *
      * @Route("/admin/encounter/{id}/show", name="admin_encounter_show")
      */
-    public function showAction($id): \Symfony\Component\HttpFoundation\Response
+    public function showAction($id): Response
     {
         $entity = $this->encounterRepository->find($id);
         if (!$entity) {
@@ -94,7 +97,7 @@ class EncounterController extends AbstractController
      *
      * @Route("/admin/encounter/{id}/edit", name="admin_encounter_edit")
      */
-    public function editAction($id): \Symfony\Component\HttpFoundation\Response
+    public function editAction($id): Response
     {
         $entity = $this->encounterRepository->find($id);
         if (!$entity) {
@@ -111,7 +114,7 @@ class EncounterController extends AbstractController
      *
      * @Route("/admin/encounter/{id}/update", name="admin_encounter_update", methods={"POST", "PUT"})
      */
-    public function updateAction(Request $request, $id): \Symfony\Component\HttpFoundation\Response
+    public function updateAction(Request $request, $id): Response
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $this->encounterRepository->find($id);
@@ -136,7 +139,7 @@ class EncounterController extends AbstractController
      *
      * @Route("/admin/encounter/{id}/delete", name="admin_encounter_delete", methods={"POST", "DELETE"})
      */
-    public function deleteAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function deleteAction(Request $request, $id): RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
@@ -158,9 +161,9 @@ class EncounterController extends AbstractController
      *
      * @param mixed $id The entity id
      *
-     * @return \Symfony\Component\Form\FormInterface<mixed> The form
+     * @return FormInterface<mixed> The form
      */
-    private function createDeleteForm($id): \Symfony\Component\Form\FormInterface
+    private function createDeleteForm($id): FormInterface
     {
         return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }

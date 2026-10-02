@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Entity\Deck;
+use App\Entity\Decklist;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -66,7 +68,7 @@ class DeleteDecklistCommand extends Command
         ]);
 
         foreach ($successors as $successor) {
-            /* @var $successor \App\Entity\Decklist */
+            /* @var $successor Decklist */
             $successor->setPrecedent(null);
         }
 
@@ -75,7 +77,7 @@ class DeleteDecklistCommand extends Command
         ]);
 
         foreach ($children as $child) {
-            /* @var $child \App\Entity\Deck */
+            /* @var $child Deck */
             $child->setParent(null);
         }
 

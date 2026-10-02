@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Entity\Card;
+
 /**
  * Interface for an entity with a Card and a Quantity.
  */
@@ -12,7 +14,7 @@ interface SlotInterface
     /**
      * Get card.
      */
-    public function getCard(): \App\Entity\Card;
+    public function getCard(): Card;
 
     /**
      * Get quantity.

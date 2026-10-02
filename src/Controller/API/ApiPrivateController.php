@@ -2,12 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\API;
 
+use App\Controller\CurrentUserTrait;
 use App\Entity\Deck;
+use App\Entity\Decklist;
+use App\Entity\User;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,9 +41,9 @@ class ApiPrivateController extends AbstractController
     public function listDecksAction(Request $request): Response
     {
         $response = new Response();
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $decklists \App\Entity\Decklist[] */
+        /* @var $decklists Decklist[] */
         $decklists = $this->decklistRepository->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC', 'id' => 'DESC']);
         foreach ($decklists as &$decklist) {
             $decklist->setDescriptionMd('');
@@ -73,9 +77,9 @@ class ApiPrivateController extends AbstractController
     public function listUserDecksAction($username, Request $request, UserRepository $userRepository): Response
     {
         $response = new Response();
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $userRepository->findOneBy(['username' => $username]);
         if (!$user) {
             $content = json_encode(['success' => false, 'error' => 'This user does not exist.']);
@@ -85,7 +89,7 @@ class ApiPrivateController extends AbstractController
             return $response;
         }
         $show_private_decks = $user->getId() == $this->currentUser()->getId();
-        /* @var $decklists \App\Entity\Decklist[] */
+        /* @var $decklists Decklist[] */
         $decklists = $this->decklistRepository->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
         foreach ($decklists as &$decklist) {
             $decklist->setDescriptionMd('');
@@ -129,7 +133,7 @@ class ApiPrivateController extends AbstractController
     public function loadDeckAction($id, Request $request): Response
     {
         $response = new Response();
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         /* @var $deck \App\Entity\Deck */
         $deck = $this->deckRepository->find($id);
@@ -140,7 +144,7 @@ class ApiPrivateController extends AbstractController
 
             return $response;
         }
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $deck->getUser();
         if (!$user->getIsShareDecks() && $user != $this->getUser()) {
             $content = json_encode(['success' => false, 'error' => 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.']);

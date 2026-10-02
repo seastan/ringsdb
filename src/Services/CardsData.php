@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Controller\SearchController;
 use App\Entity\Card;
 use App\Entity\Review;
 use App\Entity\Sphere;
@@ -184,13 +185,13 @@ class CardsData
             $operator = array_shift($condition);
 
             $searchName = '';
-            if (isset(\App\Controller\SearchController::$searchKeys[$searchCode])) {
-                $searchName = \App\Controller\SearchController::$searchKeys[$searchCode];
+            if (isset(SearchController::$searchKeys[$searchCode])) {
+                $searchName = SearchController::$searchKeys[$searchCode];
             }
 
             $searchType = '';
-            if (isset(\App\Controller\SearchController::$searchTypes[$searchCode])) {
-                $searchType = \App\Controller\SearchController::$searchTypes[$searchCode];
+            if (isset(SearchController::$searchTypes[$searchCode])) {
+                $searchType = SearchController::$searchTypes[$searchCode];
             }
 
             switch ($searchType) {
@@ -663,7 +664,7 @@ class CardsData
             $searchCode = $l[0];
             $searchOp = $l[1];
 
-            if (in_array($searchOp, $numeric) && 'integer' !== \App\Controller\SearchController::$searchTypes[$searchCode] && 'date' !== \App\Controller\SearchController::$searchTypes[$searchCode]) {
+            if (in_array($searchOp, $numeric) && 'integer' !== SearchController::$searchTypes[$searchCode] && 'date' !== SearchController::$searchTypes[$searchCode]) {
                 // operator is numeric but searched property is not
                 unset($conditions[$i]);
             }

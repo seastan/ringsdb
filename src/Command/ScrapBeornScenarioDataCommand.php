@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Entity\Scenario;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -55,7 +56,7 @@ class ScrapBeornScenarioDataCommand extends Command
         $skip = $input->getOption('skip');
         $customjson = $input->getOption('customjson');
 
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->em;
 
         $this->command($em, $name, $skip, $customjson);

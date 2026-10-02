@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Helper;
 
+use App\Entity\Card;
+use App\Entity\Deck;
+
 class DeckValidationHelper
 {
     public function __construct()
@@ -11,7 +14,7 @@ class DeckValidationHelper
     }
 
     /**
-     * @return list<\App\Entity\Card>
+     * @return list<Card>
      */
     public function getInvalidCards($deck): array
     {
@@ -38,7 +41,7 @@ class DeckValidationHelper
      */
     public function findProblem($deck, $casualPlay = false): ?string
     {
-        /* @var $deck \App\Entity\Deck */
+        /* @var $deck Deck */
         $heroDeck = $deck->getSlots()->getHeroDeck();
         $heroDeckSize = $heroDeck->countCards();
 

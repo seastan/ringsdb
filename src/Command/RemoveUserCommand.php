@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Entity\Deck;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use App\Repository\UserRepository;
@@ -109,7 +110,7 @@ class RemoveUserCommand extends Command
                 'parent' => $decklist,
             ]);
             foreach ($children as $child) {
-                /* @var $child \App\Entity\Deck */
+                /* @var $child Deck */
                 $child->setParent(null);
             }
 

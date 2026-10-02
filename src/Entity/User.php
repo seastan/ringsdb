@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use FOS\UserBundle\Model\User as BaseUser;
 
 /**
@@ -70,31 +71,31 @@ class User extends BaseUser
      */
     private $darkMode = false;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Deck>
+     * @var Collection<int, Deck>
      */
     private $decks;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Decklist>
+     * @var Collection<int, Decklist>
      */
     private $decklists;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Comment>
+     * @var Collection<int, Comment>
      */
     private $comments;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Review>
+     * @var Collection<int, Review>
      */
     private $reviews;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Decklist>
+     * @var Collection<int, Decklist>
      */
     private $favorites;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Decklist>
+     * @var Collection<int, Decklist>
      */
     private $votes;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Review>
+     * @var Collection<int, Review>
      */
     private $reviewvotes;
 
@@ -387,9 +388,9 @@ class User extends BaseUser
     /**
      * Get decks.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Deck>
+     * @return Collection<int, Deck>
      */
-    public function getDecks(): \Doctrine\Common\Collections\Collection
+    public function getDecks(): Collection
     {
         return $this->decks;
     }
@@ -415,9 +416,9 @@ class User extends BaseUser
     /**
      * Get decklists.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Decklist>
+     * @return Collection<int, Decklist>
      */
-    public function getDecklists(): \Doctrine\Common\Collections\Collection
+    public function getDecklists(): Collection
     {
         return $this->decklists;
     }
@@ -443,9 +444,9 @@ class User extends BaseUser
     /**
      * Get comments.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Comment>
+     * @return Collection<int, Comment>
      */
-    public function getComments(): \Doctrine\Common\Collections\Collection
+    public function getComments(): Collection
     {
         return $this->comments;
     }
@@ -471,9 +472,9 @@ class User extends BaseUser
     /**
      * Get reviews.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Review>
+     * @return Collection<int, Review>
      */
-    public function getReviews(): \Doctrine\Common\Collections\Collection
+    public function getReviews(): Collection
     {
         return $this->reviews;
     }
@@ -501,9 +502,9 @@ class User extends BaseUser
     /**
      * Get favorites.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Decklist>
+     * @return Collection<int, Decklist>
      */
-    public function getFavorites(): \Doctrine\Common\Collections\Collection
+    public function getFavorites(): Collection
     {
         return $this->favorites;
     }
@@ -531,9 +532,9 @@ class User extends BaseUser
     /**
      * Get votes.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Decklist>
+     * @return Collection<int, Decklist>
      */
-    public function getVotes(): \Doctrine\Common\Collections\Collection
+    public function getVotes(): Collection
     {
         return $this->votes;
     }
@@ -559,19 +560,19 @@ class User extends BaseUser
     /**
      * Get reviewvotes.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Review>
+     * @return Collection<int, Review>
      */
-    public function getReviewvotes(): \Doctrine\Common\Collections\Collection
+    public function getReviewvotes(): Collection
     {
         return $this->reviewvotes;
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, User>
+     * @var Collection<int, User>
      */
     private $following;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, User>
+     * @var Collection<int, User>
      */
     private $followers;
 
@@ -596,9 +597,9 @@ class User extends BaseUser
     /**
      * Get following.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, User>
+     * @return Collection<int, User>
      */
-    public function getFollowing(): \Doctrine\Common\Collections\Collection
+    public function getFollowing(): Collection
     {
         return $this->following;
     }
@@ -624,9 +625,9 @@ class User extends BaseUser
     /**
      * Get followers.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, User>
+     * @return Collection<int, User>
      */
-    public function getFollowers(): \Doctrine\Common\Collections\Collection
+    public function getFollowers(): Collection
     {
         return $this->followers;
     }
@@ -681,7 +682,7 @@ class User extends BaseUser
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Fellowship>
+     * @var Collection<int, Fellowship>
      */
     private $fellowships;
 
@@ -706,9 +707,9 @@ class User extends BaseUser
     /**
      * Get fellowships.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Fellowship>
+     * @return Collection<int, Fellowship>
      */
-    public function getFellowships(): \Doctrine\Common\Collections\Collection
+    public function getFellowships(): Collection
     {
         return $this->fellowships;
     }
@@ -731,15 +732,15 @@ class User extends BaseUser
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, FellowshipComment>
+     * @var Collection<int, FellowshipComment>
      */
     private $fellowship_comments;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Fellowship>
+     * @var Collection<int, Fellowship>
      */
     private $fellowship_favorites;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Fellowship>
+     * @var Collection<int, Fellowship>
      */
     private $fellowship_votes;
 
@@ -764,9 +765,9 @@ class User extends BaseUser
     /**
      * Get fellowshipComments.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, FellowshipComment>
+     * @return Collection<int, FellowshipComment>
      */
-    public function getFellowshipComments(): \Doctrine\Common\Collections\Collection
+    public function getFellowshipComments(): Collection
     {
         return $this->fellowship_comments;
     }
@@ -792,9 +793,9 @@ class User extends BaseUser
     /**
      * Get fellowshipFavorites.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Fellowship>
+     * @return Collection<int, Fellowship>
      */
-    public function getFellowshipFavorites(): \Doctrine\Common\Collections\Collection
+    public function getFellowshipFavorites(): Collection
     {
         return $this->fellowship_favorites;
     }
@@ -820,19 +821,19 @@ class User extends BaseUser
     /**
      * Get fellowshipVotes.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Fellowship>
+     * @return Collection<int, Fellowship>
      */
-    public function getFellowshipVotes(): \Doctrine\Common\Collections\Collection
+    public function getFellowshipVotes(): Collection
     {
         return $this->fellowship_votes;
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Questlog>
+     * @var Collection<int, Questlog>
      */
     private $questlogs;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, QuestlogComment>
+     * @var Collection<int, QuestlogComment>
      */
     private $questlog_comments;
 
@@ -857,9 +858,9 @@ class User extends BaseUser
     /**
      * Get questlogs.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Questlog>
+     * @return Collection<int, Questlog>
      */
-    public function getQuestlogs(): \Doctrine\Common\Collections\Collection
+    public function getQuestlogs(): Collection
     {
         return $this->questlogs;
     }
@@ -885,19 +886,19 @@ class User extends BaseUser
     /**
      * Get questlogComments.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, QuestlogComment>
+     * @return Collection<int, QuestlogComment>
      */
-    public function getQuestlogComments(): \Doctrine\Common\Collections\Collection
+    public function getQuestlogComments(): Collection
     {
         return $this->questlog_comments;
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Questlog>
+     * @var Collection<int, Questlog>
      */
     private $questlog_favorites;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Questlog>
+     * @var Collection<int, Questlog>
      */
     private $questlog_votes;
 
@@ -922,9 +923,9 @@ class User extends BaseUser
     /**
      * Get questlogFavorites.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Questlog>
+     * @return Collection<int, Questlog>
      */
-    public function getQuestlogFavorites(): \Doctrine\Common\Collections\Collection
+    public function getQuestlogFavorites(): Collection
     {
         return $this->questlog_favorites;
     }
@@ -950,9 +951,9 @@ class User extends BaseUser
     /**
      * Get questlogVotes.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, Questlog>
+     * @return Collection<int, Questlog>
      */
-    public function getQuestlogVotes(): \Doctrine\Common\Collections\Collection
+    public function getQuestlogVotes(): Collection
     {
         return $this->questlog_votes;
     }

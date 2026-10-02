@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 /**
  * Questlog.
  */
@@ -74,11 +77,11 @@ class Questlog
      */
     private $dateUpdate;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, QuestlogDeck>
+     * @var Collection<int, QuestlogDeck>
      */
     private $decks;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, QuestlogComment>
+     * @var Collection<int, QuestlogComment>
      */
     private $comments;
     /**
@@ -90,11 +93,11 @@ class Questlog
      */
     private $scenario;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, User>
+     * @var Collection<int, User>
      */
     private $favorites;
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, User>
+     * @var Collection<int, User>
      */
     private $votes;
 
@@ -103,10 +106,10 @@ class Questlog
      */
     public function __construct()
     {
-        $this->decks = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->comments = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->favorites = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->votes = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->decks = new ArrayCollection();
+        $this->comments = new ArrayCollection();
+        $this->favorites = new ArrayCollection();
+        $this->votes = new ArrayCollection();
         $this->dateCreation = new \DateTime();
         $this->dateUpdate = new \DateTime();
     }
@@ -440,9 +443,9 @@ class Questlog
     /**
      * Get decks.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, QuestlogDeck>
+     * @return Collection<int, QuestlogDeck>
      */
-    public function getDecks(): \Doctrine\Common\Collections\Collection
+    public function getDecks(): Collection
     {
         return $this->decks;
     }
@@ -468,9 +471,9 @@ class Questlog
     /**
      * Get comments.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, QuestlogComment>
+     * @return Collection<int, QuestlogComment>
      */
-    public function getComments(): \Doctrine\Common\Collections\Collection
+    public function getComments(): Collection
     {
         return $this->comments;
     }
@@ -532,9 +535,9 @@ class Questlog
     /**
      * Get favorites.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, User>
+     * @return Collection<int, User>
      */
-    public function getFavorites(): \Doctrine\Common\Collections\Collection
+    public function getFavorites(): Collection
     {
         return $this->favorites;
     }
@@ -560,9 +563,9 @@ class Questlog
     /**
      * Get votes.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, User>
+     * @return Collection<int, User>
      */
-    public function getVotes(): \Doctrine\Common\Collections\Collection
+    public function getVotes(): Collection
     {
         return $this->votes;
     }

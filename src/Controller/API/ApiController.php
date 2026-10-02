@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\API;
 
 use App\Entity\Card;
 use App\Entity\Decklist;
@@ -14,6 +14,8 @@ use App\Repository\PackRepository;
 use App\Repository\ScenarioRepository;
 use App\Repository\UserRepository;
 use App\Services\CardsData;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -75,7 +77,7 @@ class ApiController extends AbstractController
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
         $jsonp = $request->query->get('jsonp');
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         /* @var $list_packs \App\Entity\Pack[] */
         $list_packs = $this->packRepository->findBy([], ['dateRelease' => 'ASC', 'position' => 'ASC']);
@@ -143,7 +145,7 @@ class ApiController extends AbstractController
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
         $jsonp = $request->query->get('jsonp');
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         /* @var $card \App\Entity\Card */
         $card = $this->cardRepository->findOneBy(['code' => $card_code]);
@@ -186,7 +188,7 @@ class ApiController extends AbstractController
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
         $jsonp = $request->query->get('jsonp');
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         /* @var $list_cards \App\Entity\Card[] */
         // Eager-load printings (+ their packs) and the card's pack/type/sphere so
@@ -270,7 +272,7 @@ class ApiController extends AbstractController
 
             return $response;
         }
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         /* @var $pack \App\Entity\Pack */
         $pack = $this->packRepository->findOneBy(['code' => $pack_code]);
@@ -351,7 +353,7 @@ class ApiController extends AbstractController
 
             return $response;
         }
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         /* @var $decklist \App\Entity\Decklist */
         $decklist = $this->decklistRepository->find($decklist_id);
@@ -415,7 +417,7 @@ class ApiController extends AbstractController
 
             return $response;
         }
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $qb = $this->decklistRepository->createQueryBuilder('d');
         $qb->andWhere("d.dateCreation LIKE '{$date}%'");
@@ -492,7 +494,7 @@ class ApiController extends AbstractController
 
             return $response;
         }
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $card = $this->cardRepository->findOneBy(['code' => $card_code]);
         if (!$card) {
@@ -515,7 +517,7 @@ class ApiController extends AbstractController
         // limit 10
         $qb->setMaxResults(10);
         $query = $qb->getQuery();
-        /* @var $decklists \Doctrine\Common\Collections\ArrayCollection */
+        /* @var $decklists ArrayCollection */
         $decklists = $query->getArrayResult();
         $lastModified = null;
         foreach ($decklists as &$decklist) {
@@ -580,7 +582,7 @@ class ApiController extends AbstractController
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
         $jsonp = $request->query->get('jsonp');
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         /* @var $scenario \App\Entity\Scenario */
         $scenario = $scenarioRepository->findOneBy(['id' => $scenario_id]);

@@ -8,6 +8,7 @@ use App\Entity\Deck;
 use App\Entity\Decklist;
 use App\Entity\Decklistsideslot;
 use App\Entity\Decklistslot;
+use App\Entity\Pack;
 use App\Helper\DeckValidationHelper;
 use App\Repository\SphereRepository;
 use App\Services\Texts;
@@ -38,7 +39,7 @@ class DecklistFactory
 
     public function createDecklistFromDeck(Deck $deck, $name = null, $descriptionMd = null): Decklist
     {
-        /* @var $lastPack \App\Entity\Pack */
+        /* @var $lastPack Pack */
         $lastPack = $deck->getLastPack();
         $problem = $this->deckValidationHelper->findProblem($deck, true);
         if ($problem) {

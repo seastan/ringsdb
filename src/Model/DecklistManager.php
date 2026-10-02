@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Entity\Card;
+use App\Entity\Decklist;
 use App\Entity\Sphere;
 use App\Entity\User;
 use App\Repository\CardRepository;
@@ -12,6 +13,7 @@ use App\Repository\SphereRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -127,7 +129,7 @@ class DecklistManager
     /**
      * creates the basic query builder and initializes it.
      */
-    private function getQueryBuilder(): \Doctrine\ORM\QueryBuilder
+    private function getQueryBuilder(): QueryBuilder
     {
         $qb = $this->doctrine->createQueryBuilder();
         $qb->select('d');
@@ -145,9 +147,9 @@ class DecklistManager
     }
 
     /**
-     * @param Query<mixed, \App\Entity\Decklist> $query
+     * @param Query<mixed, Decklist> $query
      *
-     * @return Paginator<\App\Entity\Decklist>
+     * @return Paginator<Decklist>
      */
     private function getPaginator(Query $query): Paginator
     {
@@ -158,7 +160,7 @@ class DecklistManager
     }
 
     /**
-     * @return ArrayCollection<int, \App\Entity\Decklist>
+     * @return ArrayCollection<int, Decklist>
      */
     public function getEmptyList(): ArrayCollection
     {
@@ -168,7 +170,7 @@ class DecklistManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Decklist>
+     * @return Paginator<Decklist>
      */
     public function findDecklistsByPopularity(): Paginator
     {
@@ -183,7 +185,7 @@ class DecklistManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Decklist>
+     * @return Paginator<Decklist>
      */
     public function findDecklistsByAge(): Paginator
     {
@@ -198,7 +200,7 @@ class DecklistManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Decklist>
+     * @return Paginator<Decklist>
      */
     public function findDecklistsByRecentDiscussion(): Paginator
     {
@@ -213,7 +215,7 @@ class DecklistManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Decklist>
+     * @return Paginator<Decklist>
      */
     public function findDecklistsByFavorite(User $user): Paginator
     {
@@ -231,7 +233,7 @@ class DecklistManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Decklist>
+     * @return Paginator<Decklist>
      */
     public function findDecklistsByAuthor(User $user): Paginator
     {
@@ -248,7 +250,7 @@ class DecklistManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Decklist>
+     * @return Paginator<Decklist>
      */
     public function findDecklistsInHallOfFame(): Paginator
     {
@@ -264,7 +266,7 @@ class DecklistManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Decklist>
+     * @return Paginator<Decklist>
      */
     public function findDecklistsInHotTopic(): Paginator
     {
@@ -281,7 +283,7 @@ class DecklistManager
     }
 
     /**
-     * @return Paginator<\App\Entity\Decklist>
+     * @return Paginator<Decklist>
      */
     public function findDecklistsWithComplexSearch(): Paginator
     {

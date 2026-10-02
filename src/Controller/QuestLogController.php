@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Cycle;
 use App\Entity\Deck;
+use App\Entity\Decklist;
 use App\Entity\Questlog;
 use App\Entity\QuestlogComment;
 use App\Entity\QuestlogDeck;
+use App\Entity\Scenario;
+use App\Entity\User;
 use App\Model\QuestLogManager;
 use App\Repository\CycleRepository;
 use App\Repository\DecklistRepository;
@@ -18,7 +22,10 @@ use App\Repository\ScenarioRepository;
 use App\Repository\UserRepository;
 use App\Services\Decks;
 use App\Services\Texts;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -119,12 +126,12 @@ class QuestLogController extends AbstractController
      */
     public function mylistAction($scenario_name_canonical, $quest_mode): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         // $quest_mode = 'normal';
-        /* @var $quests \App\Entity\Scenario[] */
+        /* @var $quests Scenario[] */
         $quests = $this->scenarioRepository->findBy([], ['position' => 'ASC']);
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
@@ -152,7 +159,7 @@ class QuestLogController extends AbstractController
         if (null == $scenario_name_canonical) {
             $show_all = true;
         } else {
-            /* @var $scenario \App\Entity\Scenario */
+            /* @var $scenario Scenario */
             $scenario = $this->scenarioRepository->findOneBy(['nameCanonical' => $scenario_name_canonical]);
             if (null == $scenario) {
                 throw new NotFoundHttpException('This quest does not exist.');
@@ -185,11 +192,11 @@ class QuestLogController extends AbstractController
 
     public function myCompleteListAction(): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $quests \App\Entity\Scenario[] */
+        /* @var $quests Scenario[] */
         $quests = $this->scenarioRepository->findBy([], ['position' => 'ASC']);
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->currentUser();
         // Count played scenarios
         $playedEasy = [];
@@ -224,10 +231,10 @@ class QuestLogController extends AbstractController
      */
     public function newAction($deck1_id, $deck2_id, $deck3_id, $deck4_id, $public): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $response = new Response();
-        /* @var $quests \App\Entity\Scenario[] */
+        /* @var $quests Scenario[] */
         $quests = $this->scenarioRepository->findBy([], ['position' => 'ASC']);
         /* @var $decks \App\Entity\Deck[] */
         $decks = [];
@@ -268,10 +275,10 @@ class QuestLogController extends AbstractController
      */
     public function editAction($questlog_id): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $response = new Response();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->currentUser();
         /* @var $questlog \App\Entity\Questlog */
         $questlog = $this->questlogRepository->find($questlog_id);
@@ -281,7 +288,7 @@ class QuestLogController extends AbstractController
         if ($user->getId() !== $questlog->getUser()->getId()) {
             throw new AccessDeniedHttpException('Access denied to this object.');
         }
-        /* @var $quests \App\Entity\Scenario[] */
+        /* @var $quests Scenario[] */
         $quests = $this->scenarioRepository->findBy([], ['position' => 'ASC']);
         $is_locked_as_public = $questlog->getNbVotes() > 0 || $questlog->getNbFavorites() > 0 || $questlog->getNbComments() > 0;
         $data = ['quests' => $quests, 'pagetitle' => 'Edit Quest Log', 'deck1' => null, 'deck2' => null, 'deck3' => null, 'deck4' => null, 'questlogdeck1_content' => null, 'questlogdeck2_content' => null, 'questlogdeck3_content' => null, 'questlogdeck4_content' => null, 'questlogdeck1_player_name' => null, 'questlogdeck2_player_name' => null, 'questlogdeck3_player_name' => null, 'questlogdeck4_player_name' => null, 'questlog' => $questlog, 'is_locked_as_public' => $is_locked_as_public, 'nbDecks' => $questlog->getNbDecks()];
@@ -345,9 +352,9 @@ class QuestLogController extends AbstractController
      */
     public function saveAction(Request $request): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->currentUser();
         $questlog_id = intval(filter_var($request->request->get('questlog_id'), FILTER_SANITIZE_NUMBER_INT));
         if ($questlog_id) {
@@ -381,7 +388,7 @@ class QuestLogController extends AbstractController
         $public = boolval(filter_var($request->request->get('public'), FILTER_SANITIZE_NUMBER_INT));
         $victory = 'no' == $victory ? false : true;
         $difficulty = in_array($difficulty, ['normal', 'easy', 'nightmare']) ? $difficulty : 'normal';
-        /* @var $scenario \App\Entity\Scenario */
+        /* @var $scenario Scenario */
         $scenario = $this->scenarioRepository->find($quest);
         if (!$scenario) {
             throw new NotFoundHttpException('This scenario does not exists.');
@@ -443,7 +450,7 @@ class QuestLogController extends AbstractController
                         $questlog_deck->setPlayer($player);
                         $questlog->addDeck($questlog_deck);
                     } else {
-                        /* @var $decklist \App\Entity\Decklist */
+                        /* @var $decklist Decklist */
                         $decklist = $this->decklistRepository->find($deck_id);
                         if (!$decklist) {
                             throw new NotFoundHttpException('One of the selected decks does not exist.');
@@ -496,11 +503,11 @@ class QuestLogController extends AbstractController
     /**
      * @Route("/questlog/delete", name="questlog_delete", methods={"POST"})
      */
-    public function deleteAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function deleteAction(Request $request): RedirectResponse
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
@@ -548,7 +555,7 @@ class QuestLogController extends AbstractController
         $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
         $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
         foreach ($list_cycles as $cycle) {
-            /* @var $cycle \App\Entity\Cycle */
+            /* @var $cycle Cycle */
             $size = count($cycle->getPacks());
             $first_pack = $cycle->getPacks()->first();
             if (0 == $cycle->getPosition() || false === $first_pack) {
@@ -580,7 +587,7 @@ class QuestLogController extends AbstractController
         $params['sort_'.$sort] = ' selected="selected"';
         $params['nb_decks_selected'] = $nb_decks;
         if (!empty($cards_code) && is_array($cards_code)) {
-            $cards = $dbh->executeQuery("SELECT\n    \t\t\t\tc.name,\n    \t\t\t\tc.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card c\n                    INNER JOIN sphere s ON s.id = c.sphere_id\n                    INNER JOIN type t ON t.id = c.type_id\n                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 WHERE cp2.card_id = c.id ORDER BY cp2.position ASC, cp2.id ASC LIMIT 1)\n                    INNER JOIN pack p ON p.id = cpr.pack_id\n                    WHERE c.code IN (?)\n    \t\t\t\tORDER BY c.code DESC", [$cards_code], [\Doctrine\DBAL\Connection::PARAM_INT_ARRAY])->fetchAll();
+            $cards = $dbh->executeQuery("SELECT\n    \t\t\t\tc.name,\n    \t\t\t\tc.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card c\n                    INNER JOIN sphere s ON s.id = c.sphere_id\n                    INNER JOIN type t ON t.id = c.type_id\n                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 WHERE cp2.card_id = c.id ORDER BY cp2.position ASC, cp2.id ASC LIMIT 1)\n                    INNER JOIN pack p ON p.id = cpr.pack_id\n                    WHERE c.code IN (?)\n    \t\t\t\tORDER BY c.code DESC", [$cards_code], [Connection::PARAM_INT_ARRAY])->fetchAll();
             $params['cards'] = '';
             foreach ($cards as $card) {
                 $params['cards'] .= $this->renderView('Search/card.html.twig', $card);
@@ -624,7 +631,7 @@ class QuestLogController extends AbstractController
         $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
         $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
         foreach ($list_cycles as $cycle) {
-            /* @var $cycle \App\Entity\Cycle */
+            /* @var $cycle Cycle */
             $size = count($cycle->getPacks());
             $first_pack = $cycle->getPacks()->first();
             if (0 == $cycle->getPosition() || false === $first_pack) {
@@ -660,11 +667,11 @@ class QuestLogController extends AbstractController
     /**
      * @Route("/questlog/delete_list", name="questlog_delete_list", methods={"POST"})
      */
-    public function deleteListAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function deleteListAction(Request $request): RedirectResponse
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
@@ -725,9 +732,9 @@ class QuestLogController extends AbstractController
 
     public function downloadFromSelection($questlog_id, $octgn): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
@@ -790,9 +797,9 @@ class QuestLogController extends AbstractController
      */
     public function favoriteAction(Request $request): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
@@ -803,7 +810,7 @@ class QuestLogController extends AbstractController
         if (!$questlog) {
             throw new NotFoundHttpException('Wrong id');
         }
-        /* @var $author \App\Entity\User */
+        /* @var $author User */
         $author = $questlog->getUser();
         $dbh = $this->getDoctrine()->getConnection();
         $is_favorite = $dbh->executeQuery("SELECT\n\t\t\t\tcount(*)\n\t\t\t\tFROM questlog d\n\t\t\t\tJOIN questlog_favorite f ON f.questlog_id = d.id\n\t\t\t\tWHERE f.user_id = ?\n\t\t\t\tAND d.id = ?", [$user->getId(), $questlog_id])->fetch(\PDO::FETCH_NUM)[0];
@@ -830,11 +837,11 @@ class QuestLogController extends AbstractController
     /**
      * @Route("/user/questlog_comment", name="questlog_comment", methods={"POST"})
      */
-    public function commentAction(Request $request, MailerInterface $mailer, UserRepository $userRepository): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function commentAction(Request $request, MailerInterface $mailer, UserRepository $userRepository): RedirectResponse
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
@@ -879,7 +886,7 @@ class QuestLogController extends AbstractController
                 }
             }
             foreach ($mentionned_usernames as $mentionned_username) {
-                /* @var $mentionned_user \App\Entity\User */
+                /* @var $mentionned_user User */
                 $mentionned_user = $userRepository->findOneBy(['username' => $mentionned_username]);
                 if ($mentionned_user && $mentionned_user->getIsNotifMention()) {
                     if (!isset($spool[$mentionned_user->getEmail()])) {
@@ -910,12 +917,12 @@ class QuestLogController extends AbstractController
      */
     public function hidecommentAction($comment_id, $hidden, QuestlogCommentRepository $questlogCommentRepository): Response
     {
-        /* @var $user \App\Entity\User */
+        /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
             throw $this->createAccessDeniedException('You are not logged in.');
         }
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $comment = $questlogCommentRepository->find($comment_id);
         if (!$comment) {
@@ -938,7 +945,7 @@ class QuestLogController extends AbstractController
      */
     public function voteAction(Request $request): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $user = $this->getUser();
         if (!$user) {
@@ -954,7 +961,7 @@ class QuestLogController extends AbstractController
             $query = $this->questlogRepository->createQueryBuilder('d')->innerJoin('d.votes', 'u')->where('d.id = :questlog_id')->andWhere('u.id = :user_id')->setParameter('questlog_id', $questlog_id)->setParameter('user_id', $user->getId())->getQuery();
             $result = $query->getResult();
             if (empty($result)) {
-                /* @var $author \App\Entity\User */
+                /* @var $author User */
                 $author = $questlog->getUser();
                 $author->setReputation($author->getReputation() + 1);
                 $questlog->addVote($user);
@@ -970,7 +977,7 @@ class QuestLogController extends AbstractController
     /**
      * @Route("/q/{username}", name="questlogs_byauthor", methods={"GET"})
      */
-    public function byauthorAction($username): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function byauthorAction($username): RedirectResponse
     {
         return $this->redirect($this->generateUrl('questlogs_list', ['type' => 'find', 'author' => $username]));
     }

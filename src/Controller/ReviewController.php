@@ -12,6 +12,7 @@ use App\Repository\CardRepository;
 use App\Repository\ReviewRepository;
 use App\Repository\UserRepository;
 use App\Services\Texts;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -48,7 +49,7 @@ class ReviewController extends AbstractController
      */
     public function postAction(Request $request, CardRepository $cardRepository): JsonResponse
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         /* @var $user \App\Entity\User */
         $user = $this->getUser();
@@ -96,7 +97,7 @@ class ReviewController extends AbstractController
      */
     public function editAction(Request $request): Response
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         /* @var $user \App\Entity\User */
         $user = $this->getUser();
@@ -130,7 +131,7 @@ class ReviewController extends AbstractController
      */
     public function likeAction(Request $request): JsonResponse
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $user = $this->getUser();
         if (!$user) {
@@ -166,7 +167,7 @@ class ReviewController extends AbstractController
      */
     public function removeAction($id, Request $request): JsonResponse
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $user = $this->getUser();
         if (!$user || !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
@@ -209,7 +210,7 @@ class ReviewController extends AbstractController
         }
         $start = ($page - 1) * $limit;
         $pagetitle = 'Card Reviews';
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $dql = 'SELECT DISTINCT r FROM App:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC, r.id DESC';
         $query = $em->createQuery($dql)->setFirstResult($start)->setMaxResults($limit);
@@ -255,7 +256,7 @@ class ReviewController extends AbstractController
             $page = 1;
         }
         $start = ($page - 1) * $limit;
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         $user = $userRepository->find($user_id);
         if (!$user) {
@@ -291,7 +292,7 @@ class ReviewController extends AbstractController
      */
     public function commentAction(Request $request): JsonResponse
     {
-        /* @var $em \Doctrine\ORM\EntityManager */
+        /* @var $em EntityManager */
         $em = $this->getDoctrine()->getManager();
         /* @var $user \App\Entity\User */
         $user = $this->getUser();

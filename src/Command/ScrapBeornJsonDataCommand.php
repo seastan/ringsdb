@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Entity\Card;
+use App\Entity\Pack;
 use App\Repository\CardPrintingRepository;
 use App\Repository\PackRepository;
 use App\Repository\SphereRepository;
@@ -134,7 +136,7 @@ class ScrapBeornJsonDataCommand extends Command
             $cardset = $data->CardSet;
             $cardset = str_replace('The Hobbit: ', '', $cardset);
 
-            /* @var $pack \App\Entity\Pack */
+            /* @var $pack Pack */
             $pack = $this->packRepository->findOneBy(['name' => $cardset]);
 
             if (!$pack) {
@@ -142,7 +144,7 @@ class ScrapBeornJsonDataCommand extends Command
                 continue;
             }
 
-            /* @var $card \App\Entity\Card */
+            /* @var $card Card */
             $bjPrinting = $this->cardPrintingRepository->createQueryBuilder('cp')
                 ->join('cp.card', 'c')->where('c.name = :n')->andWhere('cp.pack = :p')
                 ->setParameter('n', $data->Title)->setParameter('p', $pack)->setMaxResults(1)->getQuery()->getOneOrNullResult();

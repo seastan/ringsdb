@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace App\Form;
 
+use App\Entity\Scenario;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @extends AbstractType<\App\Entity\Scenario>
+ * @extends AbstractType<Scenario>
  */
 class ScenarioType extends AbstractType
 {
     /**
-     * @param FormBuilderInterface<\App\Entity\Scenario|null> $builder
-     * @param array<string, mixed>                            $options
+     * @param FormBuilderInterface<Scenario|null> $builder
+     * @param array<string, mixed>                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace App\Form;
 
+use App\Entity\Sphere;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @extends AbstractType<\App\Entity\Sphere>
+ * @extends AbstractType<Sphere>
  */
 class SphereType extends AbstractType
 {
     /**
-     * @param FormBuilderInterface<\App\Entity\Sphere|null> $builder
-     * @param array<string, mixed>                          $options
+     * @param FormBuilderInterface<Sphere|null> $builder
+     * @param array<string, mixed>              $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
