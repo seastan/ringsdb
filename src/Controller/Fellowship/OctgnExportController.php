@@ -30,7 +30,7 @@ class OctgnExportController extends AbstractController
      *     requirements={"fellowship_id"="\d+"}
      * )
      */
-    public function octgnexportAction($fellowship_id): Response
+    public function __invoke($fellowship_id): Response
     {
         return $this->fellowshipArchiver->downloadFromSelection($this->currentUser(), $fellowship_id, true);
     }

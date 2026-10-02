@@ -30,8 +30,6 @@ class ListFellowshipController extends AbstractController
     }
 
     /**
-     * @param int $page
-     *
      * @Route(
      *     "/fellowships/{type}/{page}",
      *     name="fellowships_list",
@@ -40,7 +38,7 @@ class ListFellowshipController extends AbstractController
      *     defaults={"type"="popular", "page"=1}
      * )
      */
-    public function listAction($type, $page = 1, Request $request): Response
+    public function __invoke(Request $request, $type, int $page = 1): Response
     {
         $response = new Response();
         $response->setPublic();

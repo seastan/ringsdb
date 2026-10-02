@@ -1,0 +1,96 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controller\Fellowship;
+
+use App\Entity\Cycle;
+use App\Repository\CycleRepository;
+use Doctrine\DBAL\Connection;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+class SearchFellowshipController extends AbstractController
+{
+    private int $cacheExpiration;
+    private Connection $connection;
+    private CycleRepository $cycleRepository;
+
+    public function __construct(
+        int $cacheExpiration,
+        Connection $connection,
+        CycleRepository $cycleRepository
+    ) {
+        $this->cacheExpiration = $cacheExpiration;
+        $this->connection = $connection;
+        $this->cycleRepository = $cycleRepository;
+    }
+
+    /**
+     * @Route("/fellowships/search", name="fellowships_searchform", methods={"GET"}, priority="2")
+     */
+    public function __invoke(Request $request): Response
+    {
+        $response = new Response();
+        $response->setPublic();
+        $response->setMaxAge($this->cacheExpiration);
+        $spheres = $this->connection->executeQuery('SELECT s.name, s.code FROM sphere s ORDER BY s.name ASC')->fetchAll();
+        $owned_packs = '';
+        if ($this->getUser()) {
+            $owned_packs = $this->getUser()->getOwnedPacks();
+        }
+        if ($owned_packs) {
+            // owned_packs is a per-pack count map ("id" / "id:count", legacy "id-2");
+            // keep the ids whose count is > 0.
+            $packs = [];
+            foreach (explode(',', $owned_packs) as $token) {
+                if (preg_match('/^(\\d+)(?:[:-](\\d+))?$/', trim($token), $m)) {
+                    if (!isset($m[2]) || (int) $m[2] > 0) {
+                        $packs[] = (int) $m[1];
+                    }
+                }
+            }
+        } else {
+            $packs = $this->connection->executeQuery('SELECT id FROM pack WHERE date_release IS NOT NULL')->fetchAll(\PDO::FETCH_COLUMN);
+        }
+        $categories = [];
+        $on = 0;
+        $off = 0;
+        $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
+        $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
+        foreach ($list_cycles as $cycle) {
+            /* @var $cycle Cycle */
+            $size = count($cycle->getPacks());
+            $first_pack = $cycle->getPacks()->first();
+            if (0 == $cycle->getPosition() || false === $first_pack) {
+                continue;
+            }
+            if (1 === $size && $first_pack->getName() == $cycle->getName()) {
+                $checked = count($packs) ? in_array($first_pack->getId(), $packs) : true;
+                if ($checked) {
+                    ++$on;
+                } else {
+                    ++$off;
+                }
+                $categories[0]['packs'][] = ['id' => $first_pack->getId(), 'label' => $first_pack->getName(), 'checked' => $checked, 'future' => null === $first_pack->getDateRelease()];
+            } else {
+                $category = ['label' => $cycle->getName(), 'packs' => []];
+                foreach ($cycle->getPacks() as $pack) {
+                    $checked = count($packs) ? in_array($pack->getId(), $packs) : true;
+                    if ($checked) {
+                        ++$on;
+                    } else {
+                        ++$off;
+                    }
+                    $category['packs'][] = ['id' => $pack->getId(), 'label' => $pack->getName(), 'checked' => $checked, 'future' => null === $pack->getDateRelease()];
+                }
+                $categories[] = $category;
+            }
+        }
+        $searchForm = $this->renderView('Fellowship/form.html.twig', ['spheres' => $spheres, 'allowed' => $categories, 'on' => $on, 'off' => $off, 'author' => '', 'name' => '', 'numcores' => '12', 'numplaysets' => '4']);
+
+        return $this->render('Fellowship/public-fellowships.html.twig', ['pagetitle' => 'Fellowship Search', 'fellowships' => null, 'url' => $request->getRequestUri(), 'header' => $searchForm, 'type' => 'find', 'pages' => null, 'prevurl' => null, 'nexturl' => null], $response);
+    }
+}
