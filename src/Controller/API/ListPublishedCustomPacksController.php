@@ -1,0 +1,46 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controller\API;
+
+use App\Repository\UserCustomPackRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Annotation\Route;
+
+class ListPublishedCustomPacksController extends AbstractController
+{
+    private UserCustomPackRepository $userCustomPackRepository;
+
+    public function __construct(
+        UserCustomPackRepository $userCustomPackRepository
+    ) {
+        $this->userCustomPackRepository = $userCustomPackRepository;
+    }
+
+    /**
+     * @Route(
+     *     "/api/public/custom-packs/published",
+     *     name="api_public_custom_packs_published",
+     *     methods={"GET"}
+     * )
+     */
+    public function __invoke(): JsonResponse
+    {
+        $packs = $this->userCustomPackRepository->findBy(['isPublished' => true], ['createdAt' => 'ASC', 'id' => 'ASC']);
+        $result = [];
+        foreach ($packs as $pack) {
+            $cards = [];
+            foreach ($pack->getCards() as $entry) {
+                $card = $entry->getCard();
+                $sphere = $card->getSphere();
+                $type = $card->getType();
+                $cards[] = ['card_code' => $card->getCode(), 'card_name' => $card->getName(), 'sphere_code' => $sphere->getCode(), 'type_name' => $type->getName(), 'quantity' => $entry->getQuantity()];
+            }
+            $result[] = ['id' => $pack->getId(), 'name' => $pack->getName(), 'owner_name' => $pack->getUser()->getUsername(), 'cards' => $cards];
+        }
+
+        return new JsonResponse($result);
+    }
+}
