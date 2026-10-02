@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\DeckBuilder;
 
+use App\Controller\CurrentUserTrait;
 use App\Entity\Card;
 use App\Entity\Deck;
 use App\Entity\Deckchange;
@@ -181,7 +182,7 @@ class BuilderController extends AbstractController
             $parse = $this->parseTextImport(file_get_contents($filename));
         }
 
-        return $this->forward('App\\Controller\\BuilderController::saveAction', ['name' => str_replace(".{$origext}", '', $origname), 'content' => json_encode($parse['content']), 'description' => $parse['description']]);
+        return $this->forward('App\\Controller\\DeckBuilder\\BuilderController::saveAction', ['name' => str_replace(".{$origext}", '', $origname), 'content' => json_encode($parse['content']), 'description' => $parse['description']]);
     }
 
     /**
@@ -391,7 +392,7 @@ class BuilderController extends AbstractController
             $content['side'][$slot->getCard()->getCode()] = $slot->getQuantity();
         }
 
-        return $this->forward('App\\Controller\\BuilderController::saveAction', ['name' => $deck->getName().' (clone)', 'content' => json_encode($content), 'decklist_id' => $deck->getParent() ? $deck->getParent()->getId() : null]);
+        return $this->forward('App\\Controller\\DeckBuilder\\BuilderController::saveAction', ['name' => $deck->getName().' (clone)', 'content' => json_encode($content), 'decklist_id' => $deck->getParent() ? $deck->getParent()->getId() : null]);
     }
 
     /**
@@ -622,7 +623,7 @@ class BuilderController extends AbstractController
             $content['side'][$slot->getCard()->getCode()] = $slot->getQuantity();
         }
 
-        return $this->forward('App\\Controller\\BuilderController::saveAction', ['name' => $decklist->getName(), 'content' => json_encode($content), 'decklist_id' => $decklist_id]);
+        return $this->forward('App\\Controller\\DeckBuilder\\BuilderController::saveAction', ['name' => $decklist->getName(), 'content' => json_encode($content), 'decklist_id' => $decklist_id]);
     }
 
     /**
