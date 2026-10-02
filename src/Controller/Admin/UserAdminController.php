@@ -2,12 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Admin;
 
-use App\Entity\Comment;
-use App\Entity\Deck;
-use App\Entity\Decklist;
-use App\Entity\User;
 use App\Repository\CommentRepository;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;

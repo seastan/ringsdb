@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Admin;
 
 use App\Command\ScrapBeornScenarioDataCommand;
 use App\Repository\ScenarioRepository;
