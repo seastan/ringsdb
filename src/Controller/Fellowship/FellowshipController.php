@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Fellowship;
 
+use App\Controller\CurrentUserTrait;
 use App\Entity\Cycle;
 use App\Entity\Deck;
 use App\Entity\Decklist;
@@ -813,7 +814,7 @@ class FellowshipController extends AbstractController
         }
         $em->flush();
 
-        return new Response($fellowship->getNbFavorites());
+        return new Response((string) $fellowship->getNbFavorites());
     }
 
     /*
@@ -957,7 +958,7 @@ class FellowshipController extends AbstractController
             }
         }
 
-        return new Response($fellowship->getNbVotes());
+        return new Response((string) $fellowship->getNbVotes());
     }
 
     /**

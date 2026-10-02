@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Social;
 
+use App\Controller\CurrentUserTrait;
 use App\Entity\Comment;
 use App\Entity\Cycle;
 use App\Entity\Deck;

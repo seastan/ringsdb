@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Questlog;
 
+use App\Controller\CurrentUserTrait;
 use App\Entity\Cycle;
 use App\Entity\Deck;
 use App\Entity\Decklist;

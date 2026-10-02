@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Tag;
 
+use App\Controller\CurrentUserTrait;
 use App\Entity\Deck;
 use App\Repository\DeckRepository;
 use App\Services\Decks;

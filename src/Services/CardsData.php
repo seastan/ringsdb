@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Controller\SearchController;
+use App\Controller\CardSearch\SearchController;
 use App\Entity\Card;
 use App\Entity\Review;
 use App\Entity\Sphere;

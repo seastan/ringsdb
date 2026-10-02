@@ -2,10 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\CardSearch;
 
-use App\Entity\Card;
-use App\Entity\CardPrinting;
 use App\Entity\Cycle;
 use App\Entity\Pack;
 use App\Repository\CardPrintingRepository;
@@ -122,7 +120,7 @@ class SearchController extends AbstractController
         $meta = $card->getName().', a '.$card->getSphere()->getName().' '.$card->getType()->getName()." card for {$game_name} from the set ".$card->getPack()->getName()." published by {$publisher_name}.";
         $selectedPackCode = $request->query->get('pack', null);
 
-        return $this->forward('App\\Controller\\SearchController::displayAction', ['_route' => $request->attributes->get('_route'), '_route_params' => $request->attributes->get('_route_params'), 'q' => $card->getCode(), 'view' => 'card', 'sort' => 'set', 'pagetitle' => $card->getName(), 'meta' => $meta, 'selected_pack_code' => $selectedPackCode]);
+        return $this->forward(SearchController::class.'::displayAction', ['_route' => $request->attributes->get('_route'), '_route_params' => $request->attributes->get('_route_params'), 'q' => $card->getCode(), 'view' => 'card', 'sort' => 'set', 'pagetitle' => $card->getName(), 'meta' => $meta, 'selected_pack_code' => $selectedPackCode]);
     }
 
     /**
@@ -143,7 +141,7 @@ class SearchController extends AbstractController
         $meta = $pack->getName().", a set of cards for {$game_name}".($pack->getDateRelease() ? ' published on '.$pack->getDateRelease()->format('Y/m/d') : '')." by {$publisher_name}.";
         $key = array_search('pack', SearchController::$searchKeys);
 
-        return $this->forward('App\\Controller\\SearchController::displayAction', ['_route' => $request->attributes->get('_route'), '_route_params' => $request->attributes->get('_route_params'), 'q' => $key.':'.$pack_code, 'view' => $view, 'sort' => $sort, 'page' => $page, 'pagetitle' => $pack->getName(), 'meta' => $meta]);
+        return $this->forward(SearchController::class.'::displayAction', ['_route' => $request->attributes->get('_route'), '_route_params' => $request->attributes->get('_route_params'), 'q' => $key.':'.$pack_code, 'view' => $view, 'sort' => $sort, 'page' => $page, 'pagetitle' => $pack->getName(), 'meta' => $meta]);
     }
 
     /**
@@ -164,7 +162,7 @@ class SearchController extends AbstractController
         $meta = $cycle->getName().", a cycle of adventure packs for {$game_name} published by {$publisher_name}.";
         $key = array_search('cycle', SearchController::$searchKeys);
 
-        return $this->forward('App\\Controller\\SearchController::displayAction', ['_route' => $request->attributes->get('_route'), '_route_params' => $request->attributes->get('_route_params'), 'q' => $key.':'.$cycle_code, 'view' => $view, 'sort' => $sort, 'page' => $page, 'pagetitle' => $cycle->getName(), 'meta' => $meta]);
+        return $this->forward(SearchController::class.'::displayAction', ['_route' => $request->attributes->get('_route'), '_route_params' => $request->attributes->get('_route_params'), 'q' => $key.':'.$cycle_code, 'view' => $view, 'sort' => $sort, 'page' => $page, 'pagetitle' => $cycle->getName(), 'meta' => $meta]);
     }
 
     /**
@@ -246,7 +244,7 @@ class SearchController extends AbstractController
             }
         }
 
-        return $this->forward('App\\Controller\\SearchController::displayAction', ['q' => $q, 'view' => $view, 'sort' => $sort, 'page' => $page, '_route' => $request->get('_route')]);
+        return $this->forward(SearchController::class.'::displayAction', ['q' => $q, 'view' => $view, 'sort' => $sort, 'page' => $page, '_route' => $request->get('_route')]);
     }
 
     /**

@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Review;
 
 use App\Entity\Card;
 use App\Entity\Review;
 use App\Entity\Reviewcomment;
-use App\Entity\User;
 use App\Repository\CardRepository;
 use App\Repository\ReviewRepository;
 use App\Repository\UserRepository;
