@@ -422,7 +422,6 @@ class SocialController extends AbstractController
         return $this->redirect($this->generateUrl('decklists_list', ['type' => 'find', 'author' => $username]));
     }
 
-
     /*
      * displays the content of a decklist along with comments, siblings, similar, etc.
      */
@@ -800,8 +799,10 @@ class SocialController extends AbstractController
 
         return $this->render('Default/patrons.html.twig', ['pagetitle' => 'The Gracious Patrons', 'patrons' => $users], $response);
     }
+
     /**
-     * displays the lists of decklists
+     * displays the lists of decklists.
+     *
      * @param int $page
      *
      * @return Response

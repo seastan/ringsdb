@@ -3,7 +3,6 @@
 namespace App\Tests\Controller;
 
 use App\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

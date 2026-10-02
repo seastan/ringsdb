@@ -3,7 +3,6 @@
 namespace App\Tests\Controller;
 
 use App\Listener\CoreExceptionListener;
-use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
