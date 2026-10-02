@@ -26,7 +26,7 @@ class CardSearchTest extends WebTestCase
     /**
      * @return string[] the names of the cards found by the API
      */
-    private function search($q)
+    private function search($q): array
     {
         $client = $this->client;
         $client->request('GET', '/api/public/cards/search/'.rawurlencode($q));
@@ -46,10 +46,7 @@ class CardSearchTest extends WebTestCase
         $this->assertSame($expected, $names);
     }
 
-    /**
-     * @return array
-     */
-    public function acronymProvider()
+    public function acronymProvider(): array
     {
         return [
             'initials' => ['LOS', ['Longbeard Orc Slayer']],

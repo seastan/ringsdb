@@ -30,10 +30,8 @@ class ContentHashVersionStrategy implements VersionStrategyInterface
 
     /**
      * @param string $path
-     *
-     * @return string
      */
-    public function getVersion($path)
+    public function getVersion($path): string
     {
         if (!isset($this->versions[$path])) {
             $file = $this->webDir.'/'.ltrim($path, '/');
@@ -46,10 +44,8 @@ class ContentHashVersionStrategy implements VersionStrategyInterface
 
     /**
      * @param string $path
-     *
-     * @return string
      */
-    public function applyVersion($path)
+    public function applyVersion($path): string
     {
         $version = $this->getVersion($path);
 

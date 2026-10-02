@@ -7,19 +7,19 @@ namespace App\Entity;
 class Card
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
-     * @var int
+     * @var int|null
      */
     private $position;
     /**
-     * @var string
+     * @var string|null
      */
     private $code;
     /**
-     * @var string
+     * @var string|null
      */
     private $name;
     /**
@@ -37,7 +37,7 @@ class Card
     /**
      * @var bool
      */
-    private $isUnique;
+    private $isUnique = false;
     /**
      * @var string|null
      */
@@ -87,11 +87,11 @@ class Card
      */
     private $printings;
     /**
-     * @var Type
+     * @var Type|null
      */
     private $type;
     /**
-     * @var Sphere
+     * @var Sphere|null
      */
     private $sphere;
 
@@ -102,14 +102,14 @@ class Card
     {
         $this->reviews = new \Doctrine\Common\Collections\ArrayCollection();
         $this->printings = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->dateCreation = new \DateTime();
+        $this->dateUpdate = new \DateTime();
     }
 
     /**
      * Add printing.
-     *
-     * @return Card
      */
-    public function addPrinting(CardPrinting $printing)
+    public function addPrinting(CardPrinting $printing): Card
     {
         $this->printings[] = $printing;
 
@@ -129,7 +129,7 @@ class Card
      *
      * @return \Doctrine\Common\Collections\Collection<int, CardPrinting>
      */
-    public function getPrintings()
+    public function getPrintings(): \Doctrine\Common\Collections\Collection
     {
         return $this->printings;
     }
@@ -173,10 +173,8 @@ class Card
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -185,10 +183,8 @@ class Card
      * Set position.
      *
      * @param int $position
-     *
-     * @return Card
      */
-    public function setPosition($position)
+    public function setPosition($position): Card
     {
         $this->position = $position;
 
@@ -197,10 +193,8 @@ class Card
 
     /**
      * Get position.
-     *
-     * @return int
      */
-    public function getPosition()
+    public function getPosition(): ?int
     {
         return $this->position;
     }
@@ -209,10 +203,8 @@ class Card
      * Set code.
      *
      * @param string $code
-     *
-     * @return Card
      */
-    public function setCode($code)
+    public function setCode($code): Card
     {
         $this->code = $code;
 
@@ -221,10 +213,8 @@ class Card
 
     /**
      * Get code.
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): ?string
     {
         return $this->code;
     }
@@ -233,10 +223,8 @@ class Card
      * Set name.
      *
      * @param string $name
-     *
-     * @return Card
      */
-    public function setName($name)
+    public function setName($name): Card
     {
         $this->name = $name;
 
@@ -245,18 +233,13 @@ class Card
 
     /**
      * Get name.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @return string
-     */
-    public function getAdminLabel()
+    public function getAdminLabel(): string
     {
         return $this->name.' ('.$this->sphere->getName().', '.$this->type->getName().')';
     }
@@ -265,10 +248,8 @@ class Card
      * Set traits.
      *
      * @param string|null $traits
-     *
-     * @return Card
      */
-    public function setTraits($traits)
+    public function setTraits($traits): Card
     {
         $this->traits = $traits;
 
@@ -277,10 +258,8 @@ class Card
 
     /**
      * Get traits.
-     *
-     * @return string|null
      */
-    public function getTraits()
+    public function getTraits(): ?string
     {
         return $this->traits;
     }
@@ -289,10 +268,8 @@ class Card
      * Set text.
      *
      * @param string|null $text
-     *
-     * @return Card
      */
-    public function setText($text)
+    public function setText($text): Card
     {
         $this->text = $text;
 
@@ -301,10 +278,8 @@ class Card
 
     /**
      * Get text.
-     *
-     * @return string|null
      */
-    public function getText()
+    public function getText(): ?string
     {
         return $this->text;
     }
@@ -313,10 +288,8 @@ class Card
      * Set flavor.
      *
      * @param string|null $flavor
-     *
-     * @return Card
      */
-    public function setFlavor($flavor)
+    public function setFlavor($flavor): Card
     {
         $this->flavor = $flavor;
 
@@ -325,10 +298,8 @@ class Card
 
     /**
      * Get flavor.
-     *
-     * @return string|null
      */
-    public function getFlavor()
+    public function getFlavor(): ?string
     {
         return $this->flavor;
     }
@@ -337,10 +308,8 @@ class Card
      * Set isUnique.
      *
      * @param bool $isUnique
-     *
-     * @return Card
      */
-    public function setIsUnique($isUnique)
+    public function setIsUnique($isUnique): Card
     {
         $this->isUnique = $isUnique;
 
@@ -349,10 +318,8 @@ class Card
 
     /**
      * Get isUnique.
-     *
-     * @return bool
      */
-    public function getIsUnique()
+    public function getIsUnique(): bool
     {
         return $this->isUnique;
     }
@@ -361,10 +328,8 @@ class Card
      * Set cost.
      *
      * @param string|null $cost
-     *
-     * @return Card
      */
-    public function setCost($cost)
+    public function setCost($cost): Card
     {
         $this->cost = $cost;
 
@@ -373,10 +338,8 @@ class Card
 
     /**
      * Get cost.
-     *
-     * @return string|null
      */
-    public function getCost()
+    public function getCost(): ?string
     {
         return $this->cost;
     }
@@ -385,10 +348,8 @@ class Card
      * Set threat.
      *
      * @param int|null $threat
-     *
-     * @return Card
      */
-    public function setThreat($threat)
+    public function setThreat($threat): Card
     {
         $this->threat = $threat;
 
@@ -397,10 +358,8 @@ class Card
 
     /**
      * Get threat.
-     *
-     * @return int|null
      */
-    public function getThreat()
+    public function getThreat(): ?int
     {
         return $this->threat;
     }
@@ -409,10 +368,8 @@ class Card
      * Set willpower.
      *
      * @param int|null $willpower
-     *
-     * @return Card
      */
-    public function setWillpower($willpower)
+    public function setWillpower($willpower): Card
     {
         $this->willpower = $willpower;
 
@@ -421,10 +378,8 @@ class Card
 
     /**
      * Get willpower.
-     *
-     * @return int|null
      */
-    public function getWillpower()
+    public function getWillpower(): ?int
     {
         return $this->willpower;
     }
@@ -433,10 +388,8 @@ class Card
      * Set attack.
      *
      * @param int|null $attack
-     *
-     * @return Card
      */
-    public function setAttack($attack)
+    public function setAttack($attack): Card
     {
         $this->attack = $attack;
 
@@ -445,10 +398,8 @@ class Card
 
     /**
      * Get attack.
-     *
-     * @return int|null
      */
-    public function getAttack()
+    public function getAttack(): ?int
     {
         return $this->attack;
     }
@@ -457,10 +408,8 @@ class Card
      * Set defense.
      *
      * @param int|null $defense
-     *
-     * @return Card
      */
-    public function setDefense($defense)
+    public function setDefense($defense): Card
     {
         $this->defense = $defense;
 
@@ -469,10 +418,8 @@ class Card
 
     /**
      * Get defense.
-     *
-     * @return int|null
      */
-    public function getDefense()
+    public function getDefense(): ?int
     {
         return $this->defense;
     }
@@ -481,10 +428,8 @@ class Card
      * Set health.
      *
      * @param int|null $health
-     *
-     * @return Card
      */
-    public function setHealth($health)
+    public function setHealth($health): Card
     {
         $this->health = $health;
 
@@ -493,10 +438,8 @@ class Card
 
     /**
      * Get health.
-     *
-     * @return int|null
      */
-    public function getHealth()
+    public function getHealth(): ?int
     {
         return $this->health;
     }
@@ -505,10 +448,8 @@ class Card
      * Set victory.
      *
      * @param int|null $victory
-     *
-     * @return Card
      */
-    public function setVictory($victory)
+    public function setVictory($victory): Card
     {
         $this->victory = $victory;
 
@@ -517,10 +458,8 @@ class Card
 
     /**
      * Get victory.
-     *
-     * @return int|null
      */
-    public function getVictory()
+    public function getVictory(): ?int
     {
         return $this->victory;
     }
@@ -537,10 +476,8 @@ class Card
      *
      * @param int|null $deckLimit null (an empty field of the admin form or of a CSV import) for
      *                            the default, 3
-     *
-     * @return Card
      */
-    public function setDeckLimit($deckLimit)
+    public function setDeckLimit($deckLimit): Card
     {
         $this->deckLimit = $deckLimit ?? 3;
 
@@ -549,10 +486,8 @@ class Card
 
     /**
      * Get deckLimit.
-     *
-     * @return int
      */
-    public function getDeckLimit()
+    public function getDeckLimit(): int
     {
         return $this->deckLimit;
     }
@@ -575,10 +510,8 @@ class Card
      * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return Card
      */
-    public function setDateCreation($dateCreation)
+    public function setDateCreation($dateCreation): Card
     {
         $this->dateCreation = $dateCreation;
 
@@ -587,10 +520,8 @@ class Card
 
     /**
      * Get dateCreation.
-     *
-     * @return \DateTime
      */
-    public function getDateCreation()
+    public function getDateCreation(): \DateTime
     {
         return $this->dateCreation;
     }
@@ -599,10 +530,8 @@ class Card
      * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return Card
      */
-    public function setDateUpdate($dateUpdate)
+    public function setDateUpdate($dateUpdate): Card
     {
         $this->dateUpdate = $dateUpdate;
 
@@ -611,20 +540,16 @@ class Card
 
     /**
      * Get dateUpdate.
-     *
-     * @return \DateTime
      */
-    public function getDateUpdate()
+    public function getDateUpdate(): \DateTime
     {
         return $this->dateUpdate;
     }
 
     /**
      * Add review.
-     *
-     * @return Card
      */
-    public function addReview(Review $review)
+    public function addReview(Review $review): Card
     {
         $this->reviews[] = $review;
 
@@ -644,7 +569,7 @@ class Card
      *
      * @return \Doctrine\Common\Collections\Collection<int, Review>
      */
-    public function getReviews()
+    public function getReviews(): \Doctrine\Common\Collections\Collection
     {
         return $this->reviews;
     }
@@ -658,10 +583,8 @@ class Card
 
     /**
      * Set type.
-     *
-     * @return Card
      */
-    public function setType(Type $type)
+    public function setType(Type $type): Card
     {
         $this->type = $type;
 
@@ -670,20 +593,16 @@ class Card
 
     /**
      * Get type.
-     *
-     * @return Type
      */
-    public function getType()
+    public function getType(): ?Type
     {
         return $this->type;
     }
 
     /**
      * Set sphere.
-     *
-     * @return Card
      */
-    public function setSphere(Sphere $sphere)
+    public function setSphere(Sphere $sphere): Card
     {
         $this->sphere = $sphere;
 
@@ -692,10 +611,8 @@ class Card
 
     /**
      * Get sphere.
-     *
-     * @return Sphere
      */
-    public function getSphere()
+    public function getSphere(): ?Sphere
     {
         return $this->sphere;
     }
@@ -709,10 +626,8 @@ class Card
      * Set quest.
      *
      * @param int|null $quest
-     *
-     * @return Card
      */
-    public function setQuest($quest)
+    public function setQuest($quest): Card
     {
         $this->quest = $quest;
 
@@ -721,26 +636,22 @@ class Card
 
     /**
      * Get quest.
-     *
-     * @return int|null
      */
-    public function getQuest()
+    public function getQuest(): ?int
     {
         return $this->quest;
     }
     /**
      * @var bool
      */
-    private $hasErrata;
+    private $hasErrata = false;
 
     /**
      * Set hasErrata.
      *
      * @param bool $hasErrata
-     *
-     * @return Card
      */
-    public function setHasErrata($hasErrata)
+    public function setHasErrata($hasErrata): Card
     {
         $this->hasErrata = $hasErrata;
 
@@ -749,10 +660,8 @@ class Card
 
     /**
      * Get hasErrata.
-     *
-     * @return bool
      */
-    public function getHasErrata()
+    public function getHasErrata(): bool
     {
         return $this->hasErrata;
     }

@@ -7,7 +7,7 @@ namespace App\Entity;
 class UserCustomPackCard
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -23,18 +23,12 @@ class UserCustomPackCard
      */
     private $quantity = 1;
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return UserCustomPack
-     */
-    public function getCustomPack()
+    public function getCustomPack(): UserCustomPack
     {
         return $this->customPack;
     }
@@ -49,10 +43,7 @@ class UserCustomPackCard
         return $this;
     }
 
-    /**
-     * @return Card
-     */
-    public function getCard()
+    public function getCard(): Card
     {
         return $this->card;
     }
@@ -67,10 +58,7 @@ class UserCustomPackCard
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getQuantity()
+    public function getQuantity(): int
     {
         return $this->quantity;
     }

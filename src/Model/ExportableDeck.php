@@ -9,62 +9,38 @@ namespace App\Model;
  */
 abstract class ExportableDeck
 {
-    /**
-     * @return int
-     */
-    abstract public function getId();
+    abstract public function getId(): ?int;
 
-    /**
-     * @return string
-     */
-    abstract public function getName();
+    abstract public function getName(): string;
 
-    /**
-     * @return \DateTime
-     */
-    abstract public function getDateCreation();
+    abstract public function getDateCreation(): \DateTime;
 
-    /**
-     * @return \DateTime
-     */
-    abstract public function getDateUpdate();
+    abstract public function getDateUpdate(): \DateTime;
 
-    /**
-     * @return string
-     */
-    abstract public function getDescriptionMd();
+    abstract public function getDescriptionMd(): ?string;
 
-    /**
-     * @return \App\Entity\User
-     */
-    abstract public function getUser();
+    abstract public function getUser(): \App\Entity\User;
 
-    /**
-     * @return string
-     */
-    abstract public function getVersion();
+    abstract public function getVersion(): string;
 
-    /**
-     * @return \App\Entity\Pack|null
-     */
-    abstract public function getLastPack();
+    abstract public function getLastPack(): ?\App\Entity\Pack;
 
     /**
      * @return SlotCollectionInterface<covariant \App\Model\SlotInterface>
      */
-    abstract public function getSlots();
+    abstract public function getSlots(): SlotCollectionInterface;
 
     /**
      * @return SlotCollectionInterface<covariant \App\Model\SlotInterface>
      */
-    abstract public function getSideslots();
+    abstract public function getSideslots(): SlotCollectionInterface;
 
     /**
      * @param bool $withUnsavedChanges
      *
      * @return array<string, mixed>
      */
-    public function getArrayExport($withUnsavedChanges = false)
+    public function getArrayExport($withUnsavedChanges = false): array
     {
         /* @var $this \App\Entity\Deck */
         $slots = $this->getSlots();
@@ -97,7 +73,7 @@ abstract class ExportableDeck
     /**
      * @return array<string, mixed>
      */
-    public function getTextExport()
+    public function getTextExport(): array
     {
         /* @var $this \App\Entity\Deck */
         $slots = $this->getSlots();

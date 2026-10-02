@@ -7,7 +7,7 @@ namespace App\Entity;
 class Pack
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -47,7 +47,7 @@ class Pack
      */
     private $printings;
     /**
-     * @var Cycle
+     * @var Cycle|null
      */
     private $cycle;
 
@@ -63,10 +63,8 @@ class Pack
      * Set isRepackaged.
      *
      * @param bool $isRepackaged
-     *
-     * @return Pack
      */
-    public function setIsRepackaged($isRepackaged)
+    public function setIsRepackaged($isRepackaged): Pack
     {
         $this->isRepackaged = $isRepackaged;
 
@@ -75,20 +73,16 @@ class Pack
 
     /**
      * Get isRepackaged.
-     *
-     * @return bool
      */
-    public function getIsRepackaged()
+    public function getIsRepackaged(): bool
     {
         return $this->isRepackaged;
     }
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -97,10 +91,8 @@ class Pack
      * Set code.
      *
      * @param string $code
-     *
-     * @return Pack
      */
-    public function setCode($code)
+    public function setCode($code): Pack
     {
         $this->code = $code;
 
@@ -109,10 +101,8 @@ class Pack
 
     /**
      * Get code.
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
@@ -121,10 +111,8 @@ class Pack
      * Set name.
      *
      * @param string $name
-     *
-     * @return Pack
      */
-    public function setName($name)
+    public function setName($name): Pack
     {
         $this->name = $name;
 
@@ -133,10 +121,8 @@ class Pack
 
     /**
      * Get name.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -145,10 +131,8 @@ class Pack
      * Set position.
      *
      * @param int $position
-     *
-     * @return Pack
      */
-    public function setPosition($position)
+    public function setPosition($position): Pack
     {
         $this->position = $position;
 
@@ -157,10 +141,8 @@ class Pack
 
     /**
      * Get position.
-     *
-     * @return int
      */
-    public function getPosition()
+    public function getPosition(): int
     {
         return $this->position;
     }
@@ -169,10 +151,8 @@ class Pack
      * Set size.
      *
      * @param int $size
-     *
-     * @return Pack
      */
-    public function setSize($size)
+    public function setSize($size): Pack
     {
         $this->size = $size;
 
@@ -181,10 +161,8 @@ class Pack
 
     /**
      * Get size.
-     *
-     * @return int
      */
-    public function getSize()
+    public function getSize(): int
     {
         return $this->size;
     }
@@ -193,10 +171,8 @@ class Pack
      * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return Pack
      */
-    public function setDateCreation($dateCreation)
+    public function setDateCreation($dateCreation): Pack
     {
         $this->dateCreation = $dateCreation;
 
@@ -205,10 +181,8 @@ class Pack
 
     /**
      * Get dateCreation.
-     *
-     * @return \DateTime
      */
-    public function getDateCreation()
+    public function getDateCreation(): \DateTime
     {
         return $this->dateCreation;
     }
@@ -217,10 +191,8 @@ class Pack
      * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return Pack
      */
-    public function setDateUpdate($dateUpdate)
+    public function setDateUpdate($dateUpdate): Pack
     {
         $this->dateUpdate = $dateUpdate;
 
@@ -229,10 +201,8 @@ class Pack
 
     /**
      * Get dateUpdate.
-     *
-     * @return \DateTime
      */
-    public function getDateUpdate()
+    public function getDateUpdate(): \DateTime
     {
         return $this->dateUpdate;
     }
@@ -241,10 +211,8 @@ class Pack
      * Set dateRelease.
      *
      * @param \DateTime|null $dateRelease
-     *
-     * @return Pack
      */
-    public function setDateRelease($dateRelease)
+    public function setDateRelease($dateRelease): Pack
     {
         $this->dateRelease = $dateRelease;
 
@@ -253,10 +221,8 @@ class Pack
 
     /**
      * Get dateRelease.
-     *
-     * @return \DateTime|null
      */
-    public function getDateRelease()
+    public function getDateRelease(): ?\DateTime
     {
         return $this->dateRelease;
     }
@@ -264,17 +230,15 @@ class Pack
     /**
      * @return \Doctrine\Common\Collections\Collection<int, Card>
      */
-    public function getCards()
+    public function getCards(): \Doctrine\Common\Collections\Collection
     {
         return $this->printings->map(fn ($p) => $p->getCard());
     }
 
     /**
      * Add printing.
-     *
-     * @return Pack
      */
-    public function addPrinting(CardPrinting $printing)
+    public function addPrinting(CardPrinting $printing): Pack
     {
         $this->printings[] = $printing;
 
@@ -294,17 +258,15 @@ class Pack
      *
      * @return \Doctrine\Common\Collections\Collection<int, CardPrinting>
      */
-    public function getPrintings()
+    public function getPrintings(): \Doctrine\Common\Collections\Collection
     {
         return $this->printings;
     }
 
     /**
      * Set cycle.
-     *
-     * @return Pack
      */
-    public function setCycle(Cycle $cycle)
+    public function setCycle(Cycle $cycle): Pack
     {
         $this->cycle = $cycle;
 
@@ -313,10 +275,8 @@ class Pack
 
     /**
      * Get cycle.
-     *
-     * @return Cycle
      */
-    public function getCycle()
+    public function getCycle(): ?Cycle
     {
         return $this->cycle;
     }

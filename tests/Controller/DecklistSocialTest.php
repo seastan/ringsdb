@@ -47,18 +47,12 @@ class DecklistSocialTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db()
+    private function db(): \Doctrine\DBAL\Connection
     {
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    /**
-     * @return KernelBrowser
-     */
-    private function createAuthenticatedClient($username)
+    private function createAuthenticatedClient($username): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -68,10 +62,7 @@ class DecklistSocialTest extends WebTestCase
         return $client;
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    private function post(KernelBrowser $client, $action, $decklistId)
+    private function post(KernelBrowser $client, $action, $decklistId): \Symfony\Component\HttpFoundation\Response
     {
         $client->request('POST', "/user/$action", ['id' => $decklistId], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
@@ -81,7 +72,7 @@ class DecklistSocialTest extends WebTestCase
     /**
      * @return array<string, mixed>
      */
-    private function state(KernelBrowser $client)
+    private function state(KernelBrowser $client): array
     {
         $connection = $this->db($client);
 
@@ -192,10 +183,7 @@ class DecklistSocialTest extends WebTestCase
         $this->assertSame(['nb_favorites' => '0', 'nb_votes' => '0', 'favorites' => '0', 'votes' => '0', 'author_reputation' => '1'], $this->state($client));
     }
 
-    /**
-     * @return array
-     */
-    public function actionProvider()
+    public function actionProvider(): array
     {
         return ['favorite' => ['favorite'], 'vote' => ['like']];
     }

@@ -64,10 +64,7 @@ class ScrapBeornScenarioDataCommand extends Command
         return 0;
     }
 
-    /**
-     * @return string
-     */
-    public static function command($em, $name, $skip, $customjson)
+    public static function command($em, $name, $skip, $customjson): string
     {
         $res = '';
         $name = $name ?: null;

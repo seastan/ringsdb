@@ -39,20 +39,15 @@ class TagControllerTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db()
+    private function db(): \Doctrine\DBAL\Connection
     {
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
     /**
      * @param string $username
-     *
-     * @return KernelBrowser
      */
-    private function createAuthenticatedClient($username = 'test')
+    private function createAuthenticatedClient($username = 'test'): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -65,7 +60,7 @@ class TagControllerTest extends WebTestCase
     /**
      * @return array the decoded JSON answer
      */
-    private function post(KernelBrowser $client, $action, array $parameters)
+    private function post(KernelBrowser $client, $action, array $parameters): array
     {
         $client->request('POST', "/tag/$action", $parameters, [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -76,7 +71,7 @@ class TagControllerTest extends WebTestCase
     /**
      * @return array<int|string, mixed>
      */
-    private function tags(KernelBrowser $client)
+    private function tags(KernelBrowser $client): array
     {
         return array_column($this->db($client)->fetchAll('SELECT id, tags FROM deck ORDER BY id'), 'tags', 'id');
     }
@@ -168,10 +163,7 @@ class TagControllerTest extends WebTestCase
         $this->assertSame(array_column($this->fixtureDecks, 'tags', 'id'), $this->tags($client));
     }
 
-    /**
-     * @return array
-     */
-    public function actionProvider()
+    public function actionProvider(): array
     {
         return ['add' => ['add'], 'remove' => ['remove'], 'clear' => ['clear']];
     }

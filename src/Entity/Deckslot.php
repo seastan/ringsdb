@@ -7,7 +7,7 @@ namespace App\Entity;
 class Deckslot implements \App\Model\SlotInterface
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -25,10 +25,8 @@ class Deckslot implements \App\Model\SlotInterface
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -37,10 +35,8 @@ class Deckslot implements \App\Model\SlotInterface
      * Set quantity.
      *
      * @param int $quantity
-     *
-     * @return Deckslot
      */
-    public function setQuantity($quantity)
+    public function setQuantity($quantity): Deckslot
     {
         $this->quantity = $quantity;
 
@@ -49,20 +45,16 @@ class Deckslot implements \App\Model\SlotInterface
 
     /**
      * Get quantity.
-     *
-     * @return int
      */
-    public function getQuantity()
+    public function getQuantity(): int
     {
         return $this->quantity;
     }
 
     /**
      * Set deck.
-     *
-     * @return Deckslot
      */
-    public function setDeck(Deck $deck)
+    public function setDeck(Deck $deck): Deckslot
     {
         $this->deck = $deck;
 
@@ -71,20 +63,16 @@ class Deckslot implements \App\Model\SlotInterface
 
     /**
      * Get deck.
-     *
-     * @return Deck
      */
-    public function getDeck()
+    public function getDeck(): Deck
     {
         return $this->deck;
     }
 
     /**
      * Set card.
-     *
-     * @return Deckslot
      */
-    public function setCard(Card $card)
+    public function setCard(Card $card): Deckslot
     {
         $this->card = $card;
 
@@ -93,10 +81,8 @@ class Deckslot implements \App\Model\SlotInterface
 
     /**
      * Get card.
-     *
-     * @return Card
      */
-    public function getCard()
+    public function getCard(): Card
     {
         return $this->card;
     }

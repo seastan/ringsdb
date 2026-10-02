@@ -66,11 +66,9 @@ class ApiController extends AbstractController
      *  },
      * )
      *
-     * @return Response
-     *
      * @Route("/api/public/packs/", name="api_packs", methods={"GET"})
      */
-    public function listPacksAction(Request $request)
+    public function listPacksAction(Request $request): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -130,8 +128,6 @@ class ApiController extends AbstractController
      *  },
      * )
      *
-     * @return Response
-     *
      * @Route(
      *     "/api/public/card/{card_code}.{_format}",
      *     name="api_card",
@@ -140,7 +136,7 @@ class ApiController extends AbstractController
      *     defaults={"_format"="json"}
      * )
      */
-    public function getCardAction($card_code, Request $request)
+    public function getCardAction($card_code, Request $request): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -181,11 +177,9 @@ class ApiController extends AbstractController
      *  },
      * )
      *
-     * @return Response
-     *
      * @Route("/api/public/cards/", name="api_cards", methods={"GET"})
      */
-    public function listCardsAction(Request $request)
+    public function listCardsAction(Request $request): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -255,8 +249,6 @@ class ApiController extends AbstractController
      *  },
      * )
      *
-     * @return Response
-     *
      * @Route(
      *     "/api/public/cards/{pack_code}.{_format}",
      *     name="api_cards_pack",
@@ -265,7 +257,7 @@ class ApiController extends AbstractController
      *     defaults={"_format"="json"}
      * )
      */
-    public function listCardsByPackAction($pack_code, Request $request)
+    public function listCardsByPackAction($pack_code, Request $request): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -338,8 +330,6 @@ class ApiController extends AbstractController
      *  },
      * )
      *
-     * @return Response
-     *
      * @Route(
      *     "/api/public/decklist/{decklist_id}.{_format}",
      *     name="api_decklist",
@@ -348,7 +338,7 @@ class ApiController extends AbstractController
      *     defaults={"_format"="json"}
      * )
      */
-    public function getDecklistAction($decklist_id, Request $request)
+    public function getDecklistAction($decklist_id, Request $request): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -404,8 +394,6 @@ class ApiController extends AbstractController
      *  },
      * )
      *
-     * @return Response
-     *
      * @Route(
      *     "/api/public/decklists/by_date/{date}.{_format}",
      *     name="api_decklists_by_date",
@@ -414,7 +402,7 @@ class ApiController extends AbstractController
      *     defaults={"_format"="json"}
      * )
      */
-    public function listDecklistsByDateAction($date, Request $request, UserRepository $userRepository)
+    public function listDecklistsByDateAction($date, Request $request, UserRepository $userRepository): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -483,8 +471,6 @@ class ApiController extends AbstractController
      *  },
      * )
      *
-     * @return Response
-     *
      * @Route(
      *     "/api/public/decklists/top_by_card/{card_code}.{_format}",
      *     name="api_decklists_by_card",
@@ -493,7 +479,7 @@ class ApiController extends AbstractController
      *     defaults={"_format"="json"}
      * )
      */
-    public function listTopDecklistsByCardAction($card_code, Request $request)
+    public function listTopDecklistsByCardAction($card_code, Request $request): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -579,8 +565,6 @@ class ApiController extends AbstractController
      *  },
      * )
      *
-     * @return Response
-     *
      * @Route(
      *     "/api/public/scenario/{scenario_id}.{_format}",
      *     name="api_scenario",
@@ -589,7 +573,7 @@ class ApiController extends AbstractController
      *     defaults={"_format"="json"}
      * )
      */
-    public function getScenarioAction($scenario_id, Request $request, ScenarioRepository $scenarioRepository)
+    public function getScenarioAction($scenario_id, Request $request, ScenarioRepository $scenarioRepository): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -616,11 +600,9 @@ class ApiController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/api/public/cards/search/{q}", name="api_cards_search", methods={"GET"})
      */
-    public function searchCardsAction($q, Request $request)
+    public function searchCardsAction($q, Request $request): Response
     {
         $response = new Response();
         $response->setPublic();

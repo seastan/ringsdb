@@ -19,21 +19,17 @@ use Symfony\Component\Routing\Annotation\Route;
 class CSVController extends AbstractController
 {
     /**
-     * @return Response
-     *
      * @Route("/admin/csv/upload", name="csv_upload_form", methods={"GET"})
      */
-    public function uploadFormAction()
+    public function uploadFormAction(): Response
     {
         return $this->render('CSV/upload_form.html.twig');
     }
 
     /**
-     * @return Response
-     *
      * @Route("/admin/csv/upload", name="csv_upload_process", methods={"POST"})
      */
-	public function uploadProcessAction(Request $request, CardRepository $cardRepository, CardPrintingRepository $cardPrintingRepository, CycleRepository $cycleRepository, PackRepository $packRepository) {
+	public function uploadProcessAction(Request $request, CardRepository $cardRepository, CardPrintingRepository $cardPrintingRepository, CycleRepository $cycleRepository, PackRepository $packRepository): Response {
 		$inputCode = $request->request->get('code');
 		$inputOldCode = $request->request->get('old_code');
 		$inputName = $request->request->get('name');

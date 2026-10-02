@@ -30,11 +30,9 @@ class PackController extends AbstractController
     /**
      * Lists all Pack entities.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/pack/", name="admin_pack")
      */
-    public function indexAction()
+    public function indexAction(): \Symfony\Component\HttpFoundation\Response
     {
         $entities = $this->packRepository->findAll();
 
@@ -44,11 +42,9 @@ class PackController extends AbstractController
     /**
      * Creates a new Pack entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/pack/create", name="admin_pack_create", methods={"POST"})
      */
-    public function createAction(Request $request)
+    public function createAction(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $entity = new Pack();
         $form = $this->createForm(PackType::class, $entity);
@@ -67,11 +63,9 @@ class PackController extends AbstractController
     /**
      * Displays a form to create a new Pack entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/pack/new", name="admin_pack_new")
      */
-    public function newAction()
+    public function newAction(): \Symfony\Component\HttpFoundation\Response
     {
         $entity = new Pack();
         $form = $this->createForm(PackType::class, $entity);
@@ -82,11 +76,9 @@ class PackController extends AbstractController
     /**
      * Finds and displays a Pack entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/pack/{id}/show", name="admin_pack_show")
      */
-    public function showAction($id)
+    public function showAction($id): \Symfony\Component\HttpFoundation\Response
     {
         $entity = $this->packRepository->find($id);
         if (!$entity) {
@@ -100,11 +92,9 @@ class PackController extends AbstractController
     /**
      * Displays a form to edit an existing Pack entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/pack/{id}/edit", name="admin_pack_edit")
      */
-    public function editAction($id)
+    public function editAction($id): \Symfony\Component\HttpFoundation\Response
     {
         $entity = $this->packRepository->find($id);
         if (!$entity) {
@@ -119,11 +109,9 @@ class PackController extends AbstractController
     /**
      * Edits an existing Pack entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/pack/{id}/update", name="admin_pack_update", methods={"POST", "PUT"})
      */
-    public function updateAction(Request $request, $id)
+    public function updateAction(Request $request, $id): \Symfony\Component\HttpFoundation\Response
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $this->packRepository->find($id);
@@ -146,11 +134,9 @@ class PackController extends AbstractController
     /**
      * Deletes a Pack entity.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/admin/pack/{id}/delete", name="admin_pack_delete", methods={"POST", "DELETE"})
      */
-    public function deleteAction(Request $request, $id)
+    public function deleteAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
@@ -174,7 +160,7 @@ class PackController extends AbstractController
      *
      * @return \Symfony\Component\Form\FormInterface<mixed> The form
      */
-    private function createDeleteForm($id)
+    private function createDeleteForm($id): \Symfony\Component\Form\FormInterface
     {
         return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }

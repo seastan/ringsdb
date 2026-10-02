@@ -30,7 +30,7 @@ class CardStatsCalculator
      *
      * @return array<string, mixed>|null
      */
-    public function computeCards($month, $step)
+    public function computeCards($month, $step): ?array
     {
         $dbh = $this->conn;
 
@@ -495,7 +495,7 @@ FROM (
     /**
      * @return array<int, array<string, mixed>>
      */
-    private function getPacks()
+    private function getPacks(): array
     {
         $dbh = $this->conn;
 
@@ -511,7 +511,7 @@ ORDER BY date_release';
     /**
      * @return array<string, array{string, string}>
      */
-    private function getPackRuless()
+    private function getPackRuless(): array
     {
         $pack_rules = ['Core Set' => ['2000-01-01', '2011-07-21'],
             'Shadows of Mirkwood' => ['2011-07-21', '2012-01-06'],
@@ -531,7 +531,7 @@ ORDER BY date_release';
     /**
      * @return array<int|string, mixed>
      */
-    private function getOctgnIdMapping()
+    private function getOctgnIdMapping(): array
     {
         $dbh = $this->conn;
 

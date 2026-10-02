@@ -6,7 +6,6 @@ namespace App\Tests\Controller;
 
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -61,18 +60,12 @@ class AdminExcelTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db()
+    private function db(): \Doctrine\DBAL\Connection
     {
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    /**
-     * @return Client
-     */
-    private function createAdminClient()
+    private function createAdminClient(): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -84,10 +77,8 @@ class AdminExcelTest extends WebTestCase
 
     /**
      * Downloads the cards of a pack (0 = all the cards), returns the path of the saved file.
-     *
-     * @return string
      */
-    private function download(KernelBrowser $client, $packId)
+    private function download(KernelBrowser $client, $packId): string
     {
         ob_start();
         $client->request('POST', '/admin/excel/download', ['pack' => $packId]);
@@ -104,7 +95,7 @@ class AdminExcelTest extends WebTestCase
     /**
      * @return array [response content, echoed report]
      */
-    private function upload(KernelBrowser $client, $file, array $parameters = [])
+    private function upload(KernelBrowser $client, $file, array $parameters = []): array
     {
         ob_start();
         $client->request('POST', '/admin/excel/upload', $parameters, ['upfile' => new UploadedFile($file, 'cards.xlsx', null, null, true)]);
@@ -113,10 +104,7 @@ class AdminExcelTest extends WebTestCase
         return [$client->getResponse()->getContent(), strip_tags(str_replace(['</h4>', '</p>'], [': ', '; '], $report))];
     }
 
-    /**
-     * @return array
-     */
-    private static function rows($file)
+    private static function rows($file): array
     {
         return IOFactory::load($file)->getActiveSheet()->toArray(null, false, false, false);
     }

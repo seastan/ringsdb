@@ -10,7 +10,7 @@ namespace App\Entity;
 class Comment
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -36,10 +36,8 @@ class Comment
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -48,10 +46,8 @@ class Comment
      * Set text.
      *
      * @param string $text
-     *
-     * @return Comment
      */
-    public function setText($text)
+    public function setText($text): Comment
     {
         $this->text = $text;
 
@@ -60,10 +56,8 @@ class Comment
 
     /**
      * Get text.
-     *
-     * @return string
      */
-    public function getText()
+    public function getText(): string
     {
         return $this->text;
     }
@@ -72,10 +66,8 @@ class Comment
      * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return Comment
      */
-    public function setDateCreation($dateCreation)
+    public function setDateCreation($dateCreation): Comment
     {
         $this->dateCreation = $dateCreation;
 
@@ -84,10 +76,8 @@ class Comment
 
     /**
      * Get dateCreation.
-     *
-     * @return \DateTime
      */
-    public function getDateCreation()
+    public function getDateCreation(): \DateTime
     {
         return $this->dateCreation;
     }
@@ -96,10 +86,8 @@ class Comment
      * Set isHidden.
      *
      * @param bool $isHidden
-     *
-     * @return Comment
      */
-    public function setIsHidden($isHidden)
+    public function setIsHidden($isHidden): Comment
     {
         $this->isHidden = $isHidden;
 
@@ -108,20 +96,16 @@ class Comment
 
     /**
      * Get isHidden.
-     *
-     * @return bool
      */
-    public function getIsHidden()
+    public function getIsHidden(): bool
     {
         return $this->isHidden;
     }
 
     /**
      * Set user.
-     *
-     * @return Comment
      */
-    public function setUser(User $user)
+    public function setUser(User $user): Comment
     {
         $this->user = $user;
 
@@ -130,20 +114,16 @@ class Comment
 
     /**
      * Get user.
-     *
-     * @return User
      */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->user;
     }
 
     /**
      * Set decklist.
-     *
-     * @return Comment
      */
-    public function setDecklist(Decklist $decklist)
+    public function setDecklist(Decklist $decklist): Comment
     {
         $this->decklist = $decklist;
 
@@ -152,10 +132,8 @@ class Comment
 
     /**
      * Get decklist.
-     *
-     * @return Decklist
      */
-    public function getDecklist()
+    public function getDecklist(): Decklist
     {
         return $this->decklist;
     }

@@ -43,7 +43,7 @@ class QuestlogWorkflowTest extends WebTestCase
     /**
      * @return array<int, mixed>
      */
-    private function questlogOneState($connection)
+    private function questlogOneState($connection): array
     {
         return [
             $connection->fetchAssoc('SELECT * FROM questlog WHERE id = 1'),
@@ -79,20 +79,15 @@ class QuestlogWorkflowTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db()
+    private function db(): \Doctrine\DBAL\Connection
     {
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
     /**
      * @param string $username
-     *
-     * @return KernelBrowser
      */
-    private function createAuthenticatedClient($username = 'test')
+    private function createAuthenticatedClient($username = 'test'): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -131,7 +126,7 @@ class QuestlogWorkflowTest extends WebTestCase
      *
      * @return array{\Symfony\Component\DomCrawler\Crawler, Form}
      */
-    private function newForm(KernelBrowser $client, $uri = '/questlog/new/0/0/0/0/0')
+    private function newForm(KernelBrowser $client, $uri = '/questlog/new/0/0/0/0/0'): array
     {
         $crawler = $client->request('GET', $uri);
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -139,10 +134,7 @@ class QuestlogWorkflowTest extends WebTestCase
         return [$crawler, $crawler->filter('#save_form')->form()];
     }
 
-    /**
-     * @return int
-     */
-    private function questlogIdFromRedirect(KernelBrowser $client)
+    private function questlogIdFromRedirect(KernelBrowser $client): int
     {
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $location = self::location($client->getResponse());

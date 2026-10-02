@@ -12,10 +12,7 @@ use FOS\UserBundle\Model\User as BaseUser;
  */
 class User extends BaseUser
 {
-    /**
-     * @return float
-     */
-    public function getMaxNbDecks()
+    public function getMaxNbDecks(): float
     {
         return 5 * (100 + floor($this->reputation / 10));
     }
@@ -113,10 +110,8 @@ class User extends BaseUser
      * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return User
      */
-    public function setDateCreation($dateCreation)
+    public function setDateCreation($dateCreation): User
     {
         $this->dateCreation = $dateCreation;
 
@@ -125,10 +120,8 @@ class User extends BaseUser
 
     /**
      * Get dateCreation.
-     *
-     * @return \DateTime
      */
-    public function getDateCreation()
+    public function getDateCreation(): \DateTime
     {
         return $this->dateCreation;
     }
@@ -137,10 +130,8 @@ class User extends BaseUser
      * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return User
      */
-    public function setDateUpdate($dateUpdate)
+    public function setDateUpdate($dateUpdate): User
     {
         $this->dateUpdate = $dateUpdate;
 
@@ -149,10 +140,8 @@ class User extends BaseUser
 
     /**
      * Get dateUpdate.
-     *
-     * @return \DateTime
      */
-    public function getDateUpdate()
+    public function getDateUpdate(): \DateTime
     {
         return $this->dateUpdate;
     }
@@ -161,10 +150,8 @@ class User extends BaseUser
      * Set reputation.
      *
      * @param int $reputation
-     *
-     * @return User
      */
-    public function setReputation($reputation)
+    public function setReputation($reputation): User
     {
         $this->reputation = $reputation;
 
@@ -173,10 +160,8 @@ class User extends BaseUser
 
     /**
      * Get reputation.
-     *
-     * @return int
      */
-    public function getReputation()
+    public function getReputation(): int
     {
         return $this->reputation;
     }
@@ -185,10 +170,8 @@ class User extends BaseUser
      * Set resume.
      *
      * @param string|null $resume
-     *
-     * @return User
      */
-    public function setResume($resume)
+    public function setResume($resume): User
     {
         $this->resume = $resume;
 
@@ -197,10 +180,8 @@ class User extends BaseUser
 
     /**
      * Get resume.
-     *
-     * @return string|null
      */
-    public function getResume()
+    public function getResume(): ?string
     {
         return $this->resume;
     }
@@ -209,10 +190,8 @@ class User extends BaseUser
      * Set color.
      *
      * @param string|null $color
-     *
-     * @return User
      */
-    public function setColor($color)
+    public function setColor($color): User
     {
         $this->color = $color;
 
@@ -221,10 +200,8 @@ class User extends BaseUser
 
     /**
      * Get color.
-     *
-     * @return string|null
      */
-    public function getColor()
+    public function getColor(): ?string
     {
         return $this->color;
     }
@@ -233,10 +210,8 @@ class User extends BaseUser
      * Set donation.
      *
      * @param int $donation
-     *
-     * @return User
      */
-    public function setDonation($donation)
+    public function setDonation($donation): User
     {
         $this->donation = $donation;
 
@@ -245,10 +220,8 @@ class User extends BaseUser
 
     /**
      * Get donation.
-     *
-     * @return int
      */
-    public function getDonation()
+    public function getDonation(): int
     {
         return $this->donation;
     }
@@ -257,10 +230,8 @@ class User extends BaseUser
      * Set isNotifAuthor.
      *
      * @param bool $isNotifAuthor
-     *
-     * @return User
      */
-    public function setIsNotifAuthor($isNotifAuthor)
+    public function setIsNotifAuthor($isNotifAuthor): User
     {
         $this->isNotifAuthor = $isNotifAuthor;
 
@@ -269,10 +240,8 @@ class User extends BaseUser
 
     /**
      * Get isNotifAuthor.
-     *
-     * @return bool
      */
-    public function getIsNotifAuthor()
+    public function getIsNotifAuthor(): bool
     {
         return $this->isNotifAuthor;
     }
@@ -281,10 +250,8 @@ class User extends BaseUser
      * Set isNotifCommenter.
      *
      * @param bool $isNotifCommenter
-     *
-     * @return User
      */
-    public function setIsNotifCommenter($isNotifCommenter)
+    public function setIsNotifCommenter($isNotifCommenter): User
     {
         $this->isNotifCommenter = $isNotifCommenter;
 
@@ -293,10 +260,8 @@ class User extends BaseUser
 
     /**
      * Get isNotifCommenter.
-     *
-     * @return bool
      */
-    public function getIsNotifCommenter()
+    public function getIsNotifCommenter(): bool
     {
         return $this->isNotifCommenter;
     }
@@ -305,10 +270,8 @@ class User extends BaseUser
      * Set isNotifMention.
      *
      * @param bool $isNotifMention
-     *
-     * @return User
      */
-    public function setIsNotifMention($isNotifMention)
+    public function setIsNotifMention($isNotifMention): User
     {
         $this->isNotifMention = $isNotifMention;
 
@@ -317,10 +280,8 @@ class User extends BaseUser
 
     /**
      * Get isNotifMention.
-     *
-     * @return bool
      */
-    public function getIsNotifMention()
+    public function getIsNotifMention(): bool
     {
         return $this->isNotifMention;
     }
@@ -329,10 +290,8 @@ class User extends BaseUser
      * Set isNotifFollow.
      *
      * @param bool $isNotifFollow
-     *
-     * @return User
      */
-    public function setIsNotifFollow($isNotifFollow)
+    public function setIsNotifFollow($isNotifFollow): User
     {
         $this->isNotifFollow = $isNotifFollow;
 
@@ -341,10 +300,8 @@ class User extends BaseUser
 
     /**
      * Get isNotifFollow.
-     *
-     * @return bool
      */
-    public function getIsNotifFollow()
+    public function getIsNotifFollow(): bool
     {
         return $this->isNotifFollow;
     }
@@ -353,10 +310,8 @@ class User extends BaseUser
      * Set isNotifSuccessor.
      *
      * @param bool $isNotifSuccessor
-     *
-     * @return User
      */
-    public function setIsNotifSuccessor($isNotifSuccessor)
+    public function setIsNotifSuccessor($isNotifSuccessor): User
     {
         $this->isNotifSuccessor = $isNotifSuccessor;
 
@@ -365,10 +320,8 @@ class User extends BaseUser
 
     /**
      * Get isNotifSuccessor.
-     *
-     * @return bool
      */
-    public function getIsNotifSuccessor()
+    public function getIsNotifSuccessor(): bool
     {
         return $this->isNotifSuccessor;
     }
@@ -377,10 +330,8 @@ class User extends BaseUser
      * Set isShareDecks.
      *
      * @param bool $isShareDecks
-     *
-     * @return User
      */
-    public function setIsShareDecks($isShareDecks)
+    public function setIsShareDecks($isShareDecks): User
     {
         $this->isShareDecks = $isShareDecks;
 
@@ -389,10 +340,8 @@ class User extends BaseUser
 
     /**
      * Get isShareDecks.
-     *
-     * @return bool
      */
-    public function getIsShareDecks()
+    public function getIsShareDecks(): bool
     {
         return $this->isShareDecks;
     }
@@ -401,10 +350,8 @@ class User extends BaseUser
      * Set darkMode.
      *
      * @param bool $darkMode
-     *
-     * @return User
      */
-    public function setDarkMode($darkMode)
+    public function setDarkMode($darkMode): User
     {
         $this->darkMode = $darkMode;
 
@@ -413,20 +360,16 @@ class User extends BaseUser
 
     /**
      * Get darkMode.
-     *
-     * @return bool
      */
-    public function getDarkMode()
+    public function getDarkMode(): bool
     {
         return $this->darkMode;
     }
 
     /**
      * Add deck.
-     *
-     * @return User
      */
-    public function addDeck(Deck $deck)
+    public function addDeck(Deck $deck): User
     {
         $this->decks[] = $deck;
 
@@ -446,17 +389,15 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection<int, Deck>
      */
-    public function getDecks()
+    public function getDecks(): \Doctrine\Common\Collections\Collection
     {
         return $this->decks;
     }
 
     /**
      * Add decklist.
-     *
-     * @return User
      */
-    public function addDecklist(Decklist $decklist)
+    public function addDecklist(Decklist $decklist): User
     {
         $this->decklists[] = $decklist;
 
@@ -476,17 +417,15 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection<int, Decklist>
      */
-    public function getDecklists()
+    public function getDecklists(): \Doctrine\Common\Collections\Collection
     {
         return $this->decklists;
     }
 
     /**
      * Add comment.
-     *
-     * @return User
      */
-    public function addComment(Comment $comment)
+    public function addComment(Comment $comment): User
     {
         $this->comments[] = $comment;
 
@@ -506,17 +445,15 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection<int, Comment>
      */
-    public function getComments()
+    public function getComments(): \Doctrine\Common\Collections\Collection
     {
         return $this->comments;
     }
 
     /**
      * Add review.
-     *
-     * @return User
      */
-    public function addReview(Review $review)
+    public function addReview(Review $review): User
     {
         $this->reviews[] = $review;
 
@@ -536,17 +473,15 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection<int, Review>
      */
-    public function getReviews()
+    public function getReviews(): \Doctrine\Common\Collections\Collection
     {
         return $this->reviews;
     }
 
     /**
      * Add favorite.
-     *
-     * @return User
      */
-    public function addFavorite(Decklist $favorite)
+    public function addFavorite(Decklist $favorite): User
     {
         $favorite->addFavorite($this);
         $this->favorites[] = $favorite;
@@ -568,17 +503,15 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection<int, Decklist>
      */
-    public function getFavorites()
+    public function getFavorites(): \Doctrine\Common\Collections\Collection
     {
         return $this->favorites;
     }
 
     /**
      * Add vote.
-     *
-     * @return User
      */
-    public function addVote(Decklist $vote)
+    public function addVote(Decklist $vote): User
     {
         $vote->addVote($this);
         $this->votes[] = $vote;
@@ -600,17 +533,15 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection<int, Decklist>
      */
-    public function getVotes()
+    public function getVotes(): \Doctrine\Common\Collections\Collection
     {
         return $this->votes;
     }
 
     /**
      * Add reviewvote.
-     *
-     * @return User
      */
-    public function addReviewvote(Review $reviewvote)
+    public function addReviewvote(Review $reviewvote): User
     {
         $this->reviewvotes[] = $reviewvote;
 
@@ -630,7 +561,7 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection<int, Review>
      */
-    public function getReviewvotes()
+    public function getReviewvotes(): \Doctrine\Common\Collections\Collection
     {
         return $this->reviewvotes;
     }
@@ -646,10 +577,8 @@ class User extends BaseUser
 
     /**
      * Add following.
-     *
-     * @return User
      */
-    public function addFollowing(User $following)
+    public function addFollowing(User $following): User
     {
         $this->following[] = $following;
 
@@ -669,17 +598,15 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection<int, User>
      */
-    public function getFollowing()
+    public function getFollowing(): \Doctrine\Common\Collections\Collection
     {
         return $this->following;
     }
 
     /**
      * Add follower.
-     *
-     * @return User
      */
-    public function addFollower(User $follower)
+    public function addFollower(User $follower): User
     {
         $this->followers[] = $follower;
 
@@ -699,7 +626,7 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection<int, User>
      */
-    public function getFollowers()
+    public function getFollowers(): \Doctrine\Common\Collections\Collection
     {
         return $this->followers;
     }
@@ -712,10 +639,8 @@ class User extends BaseUser
      * Set ownedPacks.
      *
      * @param string|null $ownedPacks
-     *
-     * @return User
      */
-    public function setOwnedPacks($ownedPacks)
+    public function setOwnedPacks($ownedPacks): User
     {
         $this->ownedPacks = $ownedPacks;
 
@@ -724,10 +649,8 @@ class User extends BaseUser
 
     /**
      * Get ownedPacks.
-     *
-     * @return string|null
      */
-    public function getOwnedPacks()
+    public function getOwnedPacks(): ?string
     {
         return $this->ownedPacks;
     }
@@ -741,10 +664,8 @@ class User extends BaseUser
      * Set artPreferences (JSON map of card code => preferred pack code).
      *
      * @param string|null $artPreferences
-     *
-     * @return User
      */
-    public function setArtPreferences($artPreferences)
+    public function setArtPreferences($artPreferences): User
     {
         $this->artPreferences = $artPreferences;
 
@@ -753,10 +674,8 @@ class User extends BaseUser
 
     /**
      * Get artPreferences.
-     *
-     * @return string|null
      */
-    public function getArtPreferences()
+    public function getArtPreferences(): ?string
     {
         return $this->artPreferences;
     }
@@ -768,10 +687,8 @@ class User extends BaseUser
 
     /**
      * Add fellowship.
-     *
-     * @return User
      */
-    public function addFellowship(Fellowship $fellowship)
+    public function addFellowship(Fellowship $fellowship): User
     {
         $this->fellowships[] = $fellowship;
 
@@ -791,7 +708,7 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection<int, Fellowship>
      */
-    public function getFellowships()
+    public function getFellowships(): \Doctrine\Common\Collections\Collection
     {
         return $this->fellowships;
     }
@@ -799,7 +716,7 @@ class User extends BaseUser
     /**
      * @return ArrayCollection<int, mixed>
      */
-    public function getPublicFellowships()
+    public function getPublicFellowships(): ArrayCollection
     {
         $publicFellowships = [];
 
@@ -828,10 +745,8 @@ class User extends BaseUser
 
     /**
      * Add fellowshipComment.
-     *
-     * @return User
      */
-    public function addFellowshipComment(FellowshipComment $fellowshipComment)
+    public function addFellowshipComment(FellowshipComment $fellowshipComment): User
     {
         $this->fellowship_comments[] = $fellowshipComment;
 
@@ -851,17 +766,15 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection<int, FellowshipComment>
      */
-    public function getFellowshipComments()
+    public function getFellowshipComments(): \Doctrine\Common\Collections\Collection
     {
         return $this->fellowship_comments;
     }
 
     /**
      * Add fellowshipFavorite.
-     *
-     * @return User
      */
-    public function addFellowshipFavorite(Fellowship $fellowshipFavorite)
+    public function addFellowshipFavorite(Fellowship $fellowshipFavorite): User
     {
         $this->fellowship_favorites[] = $fellowshipFavorite;
 
@@ -881,17 +794,15 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection<int, Fellowship>
      */
-    public function getFellowshipFavorites()
+    public function getFellowshipFavorites(): \Doctrine\Common\Collections\Collection
     {
         return $this->fellowship_favorites;
     }
 
     /**
      * Add fellowshipVote.
-     *
-     * @return User
      */
-    public function addFellowshipVote(Fellowship $fellowshipVote)
+    public function addFellowshipVote(Fellowship $fellowshipVote): User
     {
         $this->fellowship_votes[] = $fellowshipVote;
 
@@ -911,7 +822,7 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection<int, Fellowship>
      */
-    public function getFellowshipVotes()
+    public function getFellowshipVotes(): \Doctrine\Common\Collections\Collection
     {
         return $this->fellowship_votes;
     }
@@ -927,10 +838,8 @@ class User extends BaseUser
 
     /**
      * Add questlog.
-     *
-     * @return User
      */
-    public function addQuestlog(Questlog $questlog)
+    public function addQuestlog(Questlog $questlog): User
     {
         $this->questlogs[] = $questlog;
 
@@ -950,17 +859,15 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection<int, Questlog>
      */
-    public function getQuestlogs()
+    public function getQuestlogs(): \Doctrine\Common\Collections\Collection
     {
         return $this->questlogs;
     }
 
     /**
      * Add questlogComment.
-     *
-     * @return User
      */
-    public function addQuestlogComment(QuestlogComment $questlogComment)
+    public function addQuestlogComment(QuestlogComment $questlogComment): User
     {
         $this->questlog_comments[] = $questlogComment;
 
@@ -980,7 +887,7 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection<int, QuestlogComment>
      */
-    public function getQuestlogComments()
+    public function getQuestlogComments(): \Doctrine\Common\Collections\Collection
     {
         return $this->questlog_comments;
     }
@@ -996,10 +903,8 @@ class User extends BaseUser
 
     /**
      * Add questlogFavorite.
-     *
-     * @return User
      */
-    public function addQuestlogFavorite(Questlog $questlogFavorite)
+    public function addQuestlogFavorite(Questlog $questlogFavorite): User
     {
         $this->questlog_favorites[] = $questlogFavorite;
 
@@ -1019,17 +924,15 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection<int, Questlog>
      */
-    public function getQuestlogFavorites()
+    public function getQuestlogFavorites(): \Doctrine\Common\Collections\Collection
     {
         return $this->questlog_favorites;
     }
 
     /**
      * Add questlogVote.
-     *
-     * @return User
      */
-    public function addQuestlogVote(Questlog $questlogVote)
+    public function addQuestlogVote(Questlog $questlogVote): User
     {
         $this->questlog_votes[] = $questlogVote;
 
@@ -1049,7 +952,7 @@ class User extends BaseUser
      *
      * @return \Doctrine\Common\Collections\Collection<int, Questlog>
      */
-    public function getQuestlogVotes()
+    public function getQuestlogVotes(): \Doctrine\Common\Collections\Collection
     {
         return $this->questlog_votes;
     }
@@ -1063,10 +966,8 @@ class User extends BaseUser
      * Set locked.
      *
      * @param bool $locked
-     *
-     * @return User
      */
-    public function setLocked($locked)
+    public function setLocked($locked): User
     {
         $this->locked = (bool) $locked;
 
@@ -1075,10 +976,8 @@ class User extends BaseUser
 
     /**
      * Get locked.
-     *
-     * @return bool
      */
-    public function isLocked()
+    public function isLocked(): bool
     {
         return $this->locked;
     }

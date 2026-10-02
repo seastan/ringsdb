@@ -13,7 +13,7 @@ class DeckValidationHelper
     /**
      * @return list<\App\Entity\Card>
      */
-    public function getInvalidCards($deck)
+    public function getInvalidCards($deck): array
     {
         $invalidCards = [];
 
@@ -28,20 +28,15 @@ class DeckValidationHelper
         return $invalidCards;
     }
 
-    /**
-     * @return bool
-     */
-    public function canIncludeCard($deck, $card)
+    public function canIncludeCard($deck, $card): bool
     {
         return true;
     }
 
     /**
      * @param bool $casualPlay
-     *
-     * @return string|null
      */
-    public function findProblem($deck, $casualPlay = false)
+    public function findProblem($deck, $casualPlay = false): ?string
     {
         /* @var $deck \App\Entity\Deck */
         $heroDeck = $deck->getSlots()->getHeroDeck();
@@ -85,10 +80,7 @@ class DeckValidationHelper
         return null;
     }
 
-    /**
-     * @return string
-     */
-    public function getProblemLabel($problem)
+    public function getProblemLabel($problem): string
     {
         if (!$problem) {
             return '';

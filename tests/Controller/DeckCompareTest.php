@@ -74,20 +74,15 @@ class DeckCompareTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db()
+    private function db(): \Doctrine\DBAL\Connection
     {
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
     /**
      * @param string $username
-     *
-     * @return KernelBrowser
      */
-    private function createAuthenticatedClient($username = 'test')
+    private function createAuthenticatedClient($username = 'test'): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -99,10 +94,8 @@ class DeckCompareTest extends WebTestCase
 
     /**
      * A copy of fixture deck 2 with the given cards ([card id => quantity]).
-     *
-     * @return int
      */
-    private function insertDeck($name, array $main, array $side)
+    private function insertDeck($name, array $main, array $side): int
     {
         $connection = $this->db($this->client);
         $row = $connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
@@ -128,7 +121,7 @@ class DeckCompareTest extends WebTestCase
     /**
      * @return array the text of each line of the two columns of a row of the page
      */
-    private static function columns(Crawler $row)
+    private static function columns(Crawler $row): array
     {
         return $row->filter('.col-xs-6')->each(fn (Crawler $column) => $column->children()->each(fn (Crawler $line) => trim((string) preg_replace('/\s+/u', ' ', $line->text()))));
     }

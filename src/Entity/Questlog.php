@@ -10,15 +10,15 @@ namespace App\Entity;
 class Questlog
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
-     * @var string
+     * @var string|null
      */
     private $name;
     /**
-     * @var string
+     * @var string|null
      */
     private $nameCanonical;
     /**
@@ -30,17 +30,17 @@ class Questlog
      */
     private $descriptionHtml;
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      */
     private $datePlayed;
     /**
-     * @var string
+     * @var string|null
      */
     private $questMode;
     /**
      * @var bool
      */
-    private $success;
+    private $success = false;
     /**
      * @var int|null
      */
@@ -48,23 +48,23 @@ class Questlog
     /**
      * @var int
      */
-    private $nbDecks;
+    private $nbDecks = 0;
     /**
      * @var int
      */
-    private $nbVotes;
+    private $nbVotes = 0;
     /**
      * @var int
      */
-    private $nbFavorites;
+    private $nbFavorites = 0;
     /**
      * @var int
      */
-    private $nbComments;
+    private $nbComments = 0;
     /**
      * @var bool
      */
-    private $isPublic;
+    private $isPublic = false;
     /**
      * @var \DateTime
      */
@@ -82,11 +82,11 @@ class Questlog
      */
     private $comments;
     /**
-     * @var User
+     * @var User|null
      */
     private $user;
     /**
-     * @var Scenario
+     * @var Scenario|null
      */
     private $scenario;
     /**
@@ -107,14 +107,14 @@ class Questlog
         $this->comments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->favorites = new \Doctrine\Common\Collections\ArrayCollection();
         $this->votes = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->dateCreation = new \DateTime();
+        $this->dateUpdate = new \DateTime();
     }
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -123,10 +123,8 @@ class Questlog
      * Set name.
      *
      * @param string $name
-     *
-     * @return Questlog
      */
-    public function setName($name)
+    public function setName($name): Questlog
     {
         $this->name = $name;
 
@@ -135,10 +133,8 @@ class Questlog
 
     /**
      * Get name.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -147,10 +143,8 @@ class Questlog
      * Set nameCanonical.
      *
      * @param string $nameCanonical
-     *
-     * @return Questlog
      */
-    public function setNameCanonical($nameCanonical)
+    public function setNameCanonical($nameCanonical): Questlog
     {
         $this->nameCanonical = $nameCanonical;
 
@@ -159,10 +153,8 @@ class Questlog
 
     /**
      * Get nameCanonical.
-     *
-     * @return string
      */
-    public function getNameCanonical()
+    public function getNameCanonical(): ?string
     {
         return $this->nameCanonical;
     }
@@ -171,10 +163,8 @@ class Questlog
      * Set descriptionMd.
      *
      * @param string|null $descriptionMd
-     *
-     * @return Questlog
      */
-    public function setDescriptionMd($descriptionMd)
+    public function setDescriptionMd($descriptionMd): Questlog
     {
         $this->descriptionMd = $descriptionMd;
 
@@ -183,10 +173,8 @@ class Questlog
 
     /**
      * Get descriptionMd.
-     *
-     * @return string|null
      */
-    public function getDescriptionMd()
+    public function getDescriptionMd(): ?string
     {
         return $this->descriptionMd;
     }
@@ -195,10 +183,8 @@ class Questlog
      * Set descriptionHtml.
      *
      * @param string|null $descriptionHtml
-     *
-     * @return Questlog
      */
-    public function setDescriptionHtml($descriptionHtml)
+    public function setDescriptionHtml($descriptionHtml): Questlog
     {
         $this->descriptionHtml = $descriptionHtml;
 
@@ -207,10 +193,8 @@ class Questlog
 
     /**
      * Get descriptionHtml.
-     *
-     * @return string|null
      */
-    public function getDescriptionHtml()
+    public function getDescriptionHtml(): ?string
     {
         return $this->descriptionHtml;
     }
@@ -219,10 +203,8 @@ class Questlog
      * Set datePlayed.
      *
      * @param \DateTime $datePlayed
-     *
-     * @return Questlog
      */
-    public function setDatePlayed($datePlayed)
+    public function setDatePlayed($datePlayed): Questlog
     {
         $this->datePlayed = $datePlayed;
 
@@ -231,10 +213,8 @@ class Questlog
 
     /**
      * Get datePlayed.
-     *
-     * @return \DateTime
      */
-    public function getDatePlayed()
+    public function getDatePlayed(): ?\DateTime
     {
         return $this->datePlayed;
     }
@@ -243,10 +223,8 @@ class Questlog
      * Set questMode.
      *
      * @param string $questMode
-     *
-     * @return Questlog
      */
-    public function setQuestMode($questMode)
+    public function setQuestMode($questMode): Questlog
     {
         $this->questMode = $questMode;
 
@@ -255,10 +233,8 @@ class Questlog
 
     /**
      * Get questMode.
-     *
-     * @return string
      */
-    public function getQuestMode()
+    public function getQuestMode(): ?string
     {
         return $this->questMode;
     }
@@ -267,10 +243,8 @@ class Questlog
      * Set success.
      *
      * @param bool $success
-     *
-     * @return Questlog
      */
-    public function setSuccess($success)
+    public function setSuccess($success): Questlog
     {
         $this->success = $success;
 
@@ -279,10 +253,8 @@ class Questlog
 
     /**
      * Get success.
-     *
-     * @return bool
      */
-    public function getSuccess()
+    public function getSuccess(): bool
     {
         return $this->success;
     }
@@ -291,10 +263,8 @@ class Questlog
      * Set score.
      *
      * @param int|null $score
-     *
-     * @return Questlog
      */
-    public function setScore($score)
+    public function setScore($score): Questlog
     {
         $this->score = $score;
 
@@ -303,10 +273,8 @@ class Questlog
 
     /**
      * Get score.
-     *
-     * @return int|null
      */
-    public function getScore()
+    public function getScore(): ?int
     {
         return $this->score;
     }
@@ -315,10 +283,8 @@ class Questlog
      * Set nbDecks.
      *
      * @param int $nbDecks
-     *
-     * @return Questlog
      */
-    public function setNbDecks($nbDecks)
+    public function setNbDecks($nbDecks): Questlog
     {
         $this->nbDecks = $nbDecks;
 
@@ -327,10 +293,8 @@ class Questlog
 
     /**
      * Get nbDecks.
-     *
-     * @return int
      */
-    public function getNbDecks()
+    public function getNbDecks(): int
     {
         return $this->nbDecks;
     }
@@ -339,10 +303,8 @@ class Questlog
      * Set nbVotes.
      *
      * @param int $nbVotes
-     *
-     * @return Questlog
      */
-    public function setNbVotes($nbVotes)
+    public function setNbVotes($nbVotes): Questlog
     {
         $this->nbVotes = $nbVotes;
 
@@ -351,10 +313,8 @@ class Questlog
 
     /**
      * Get nbVotes.
-     *
-     * @return int
      */
-    public function getNbVotes()
+    public function getNbVotes(): int
     {
         return $this->nbVotes;
     }
@@ -363,10 +323,8 @@ class Questlog
      * Set nbFavorites.
      *
      * @param int $nbFavorites
-     *
-     * @return Questlog
      */
-    public function setNbFavorites($nbFavorites)
+    public function setNbFavorites($nbFavorites): Questlog
     {
         $this->nbFavorites = $nbFavorites;
 
@@ -375,10 +333,8 @@ class Questlog
 
     /**
      * Get nbFavorites.
-     *
-     * @return int
      */
-    public function getNbFavorites()
+    public function getNbFavorites(): int
     {
         return $this->nbFavorites;
     }
@@ -387,10 +343,8 @@ class Questlog
      * Set nbComments.
      *
      * @param int $nbComments
-     *
-     * @return Questlog
      */
-    public function setNbComments($nbComments)
+    public function setNbComments($nbComments): Questlog
     {
         $this->nbComments = $nbComments;
 
@@ -399,10 +353,8 @@ class Questlog
 
     /**
      * Get nbComments.
-     *
-     * @return int
      */
-    public function getNbComments()
+    public function getNbComments(): int
     {
         return $this->nbComments;
     }
@@ -411,10 +363,8 @@ class Questlog
      * Set isPublic.
      *
      * @param bool $isPublic
-     *
-     * @return Questlog
      */
-    public function setIsPublic($isPublic)
+    public function setIsPublic($isPublic): Questlog
     {
         $this->isPublic = $isPublic;
 
@@ -423,10 +373,8 @@ class Questlog
 
     /**
      * Get isPublic.
-     *
-     * @return bool
      */
-    public function getIsPublic()
+    public function getIsPublic(): bool
     {
         return $this->isPublic;
     }
@@ -435,10 +383,8 @@ class Questlog
      * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return Questlog
      */
-    public function setDateCreation($dateCreation)
+    public function setDateCreation($dateCreation): Questlog
     {
         $this->dateCreation = $dateCreation;
 
@@ -447,10 +393,8 @@ class Questlog
 
     /**
      * Get dateCreation.
-     *
-     * @return \DateTime
      */
-    public function getDateCreation()
+    public function getDateCreation(): \DateTime
     {
         return $this->dateCreation;
     }
@@ -459,10 +403,8 @@ class Questlog
      * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return Questlog
      */
-    public function setDateUpdate($dateUpdate)
+    public function setDateUpdate($dateUpdate): Questlog
     {
         $this->dateUpdate = $dateUpdate;
 
@@ -471,20 +413,16 @@ class Questlog
 
     /**
      * Get dateUpdate.
-     *
-     * @return \DateTime
      */
-    public function getDateUpdate()
+    public function getDateUpdate(): \DateTime
     {
         return $this->dateUpdate;
     }
 
     /**
      * Add deck.
-     *
-     * @return Questlog
      */
-    public function addDeck(QuestlogDeck $deck)
+    public function addDeck(QuestlogDeck $deck): Questlog
     {
         $this->decks[] = $deck;
 
@@ -504,17 +442,15 @@ class Questlog
      *
      * @return \Doctrine\Common\Collections\Collection<int, QuestlogDeck>
      */
-    public function getDecks()
+    public function getDecks(): \Doctrine\Common\Collections\Collection
     {
         return $this->decks;
     }
 
     /**
      * Add comment.
-     *
-     * @return Questlog
      */
-    public function addComment(QuestlogComment $comment)
+    public function addComment(QuestlogComment $comment): Questlog
     {
         $this->comments[] = $comment;
 
@@ -534,17 +470,15 @@ class Questlog
      *
      * @return \Doctrine\Common\Collections\Collection<int, QuestlogComment>
      */
-    public function getComments()
+    public function getComments(): \Doctrine\Common\Collections\Collection
     {
         return $this->comments;
     }
 
     /**
      * Set user.
-     *
-     * @return Questlog
      */
-    public function setUser(User $user)
+    public function setUser(User $user): Questlog
     {
         $this->user = $user;
 
@@ -553,20 +487,16 @@ class Questlog
 
     /**
      * Get user.
-     *
-     * @return User
      */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->user;
     }
 
     /**
      * Set scenario.
-     *
-     * @return Questlog
      */
-    public function setScenario(Scenario $scenario)
+    public function setScenario(Scenario $scenario): Questlog
     {
         $this->scenario = $scenario;
 
@@ -575,20 +505,16 @@ class Questlog
 
     /**
      * Get scenario.
-     *
-     * @return Scenario
      */
-    public function getScenario()
+    public function getScenario(): ?Scenario
     {
         return $this->scenario;
     }
 
     /**
      * Add favorite.
-     *
-     * @return Questlog
      */
-    public function addFavorite(User $favorite)
+    public function addFavorite(User $favorite): Questlog
     {
         $this->favorites[] = $favorite;
 
@@ -608,17 +534,15 @@ class Questlog
      *
      * @return \Doctrine\Common\Collections\Collection<int, User>
      */
-    public function getFavorites()
+    public function getFavorites(): \Doctrine\Common\Collections\Collection
     {
         return $this->favorites;
     }
 
     /**
      * Add vote.
-     *
-     * @return Questlog
      */
-    public function addVote(User $vote)
+    public function addVote(User $vote): Questlog
     {
         $this->votes[] = $vote;
 
@@ -638,7 +562,7 @@ class Questlog
      *
      * @return \Doctrine\Common\Collections\Collection<int, User>
      */
-    public function getVotes()
+    public function getVotes(): \Doctrine\Common\Collections\Collection
     {
         return $this->votes;
     }
@@ -652,10 +576,8 @@ class Questlog
      * Set datePublish.
      *
      * @param \DateTime|null $datePublish
-     *
-     * @return Questlog
      */
-    public function setDatePublish($datePublish)
+    public function setDatePublish($datePublish): Questlog
     {
         $this->datePublish = $datePublish;
 
@@ -664,10 +586,8 @@ class Questlog
 
     /**
      * Get datePublish.
-     *
-     * @return \DateTime|null
      */
-    public function getDatePublish()
+    public function getDatePublish(): ?\DateTime
     {
         return $this->datePublish;
     }

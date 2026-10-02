@@ -11,10 +11,7 @@ use Twig\TwigTest;
 
 class TwigExtension extends AbstractExtension
 {
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'Twig instance of';
     }

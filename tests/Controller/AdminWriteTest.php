@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -65,18 +64,12 @@ class AdminWriteTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db()
+    private function db(): \Doctrine\DBAL\Connection
     {
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    /**
-     * @return Client
-     */
-    private function createAdminClient()
+    private function createAdminClient(): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -86,10 +79,7 @@ class AdminWriteTest extends WebTestCase
         return $client;
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    private function submitForm(KernelBrowser $client, $pageUri, $action, array $values)
+    private function submitForm(KernelBrowser $client, $pageUri, $action, array $values): \Symfony\Component\HttpFoundation\Response
     {
         $crawler = $client->request('GET', $pageUri);
         $this->assertSame(200, $client->getResponse()->getStatusCode(), "GET $pageUri");
@@ -101,7 +91,7 @@ class AdminWriteTest extends WebTestCase
     /**
      * @return array<string, mixed>
      */
-    private static function prefixed($prefix, array $values)
+    private static function prefixed($prefix, array $values): array
     {
         $fields = [];
         foreach ($values as $name => $value) {
@@ -115,10 +105,8 @@ class AdminWriteTest extends WebTestCase
 
     /**
      * [route slug, form name, table, created values, expected columns, updated values, expected columns].
-     *
-     * @return array
      */
-    public function crudProvider()
+    public function crudProvider(): array
     {
         return [
             'cycle' => ['cycle', 'appbundle_cycletype', 'cycle',
@@ -302,10 +290,7 @@ class AdminWriteTest extends WebTestCase
         $this->assertSame($location, $client->getResponse()->headers->get('Location'));
     }
 
-    /**
-     * @return array
-     */
-    public function findUserProvider()
+    public function findUserProvider(): array
     {
         return [
             'by username' => [['username' => 'test'], '/admin/user/show/1'],

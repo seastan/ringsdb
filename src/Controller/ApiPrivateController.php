@@ -32,11 +32,9 @@ class ApiPrivateController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/api/private/decks", name="api_private_my_decks", methods={"GET"})
      */
-    public function listDecksAction(Request $request)
+    public function listDecksAction(Request $request): Response
     {
         $response = new Response();
         /* @var $em \Doctrine\ORM\EntityManager */
@@ -70,11 +68,9 @@ class ApiPrivateController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/api/private/decks_by_user/{username}", name="api_private_user_decks", methods={"GET"})
      */
-    public function listUserDecksAction($username, Request $request, UserRepository $userRepository)
+    public function listUserDecksAction($username, Request $request, UserRepository $userRepository): Response
     {
         $response = new Response();
         /* @var $em \Doctrine\ORM\EntityManager */
@@ -123,8 +119,6 @@ class ApiPrivateController extends AbstractController
      * Get the description of one Deck of the authenticated user
      */
     /**
-     * @return Response
-     *
      * @Route(
      *     "/api/private/deck/load/{id}",
      *     name="api_private_load_deck",
@@ -132,7 +126,7 @@ class ApiPrivateController extends AbstractController
      *     requirements={"id"="\d+"}
      * )
      */
-    public function loadDeckAction($id, Request $request)
+    public function loadDeckAction($id, Request $request): Response
     {
         $response = new Response();
         /* @var $em \Doctrine\ORM\EntityManager */

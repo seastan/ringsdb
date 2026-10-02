@@ -7,7 +7,7 @@ namespace App\Entity;
 class Decklistsideslot implements \App\Model\SlotInterface
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -25,10 +25,8 @@ class Decklistsideslot implements \App\Model\SlotInterface
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -37,10 +35,8 @@ class Decklistsideslot implements \App\Model\SlotInterface
      * Set quantity.
      *
      * @param int $quantity
-     *
-     * @return Decklistsideslot
      */
-    public function setQuantity($quantity)
+    public function setQuantity($quantity): Decklistsideslot
     {
         $this->quantity = $quantity;
 
@@ -49,20 +45,16 @@ class Decklistsideslot implements \App\Model\SlotInterface
 
     /**
      * Get quantity.
-     *
-     * @return int
      */
-    public function getQuantity()
+    public function getQuantity(): int
     {
         return $this->quantity;
     }
 
     /**
      * Set decklist.
-     *
-     * @return Decklistsideslot
      */
-    public function setDecklist(Decklist $decklist)
+    public function setDecklist(Decklist $decklist): Decklistsideslot
     {
         $this->decklist = $decklist;
 
@@ -71,20 +63,16 @@ class Decklistsideslot implements \App\Model\SlotInterface
 
     /**
      * Get decklist.
-     *
-     * @return Decklist
      */
-    public function getDecklist()
+    public function getDecklist(): Decklist
     {
         return $this->decklist;
     }
 
     /**
      * Set card.
-     *
-     * @return Decklistsideslot
      */
-    public function setCard(Card $card)
+    public function setCard(Card $card): Decklistsideslot
     {
         $this->card = $card;
 
@@ -93,10 +81,8 @@ class Decklistsideslot implements \App\Model\SlotInterface
 
     /**
      * Get card.
-     *
-     * @return Card
      */
-    public function getCard()
+    public function getCard(): Card
     {
         return $this->card;
     }

@@ -7,7 +7,7 @@ namespace App\Entity;
 class Type
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -33,10 +33,8 @@ class Type
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -45,10 +43,8 @@ class Type
      * Set code.
      *
      * @param string $code
-     *
-     * @return Type
      */
-    public function setCode($code)
+    public function setCode($code): Type
     {
         $this->code = $code;
 
@@ -57,10 +53,8 @@ class Type
 
     /**
      * Get code.
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
@@ -69,10 +63,8 @@ class Type
      * Set name.
      *
      * @param string $name
-     *
-     * @return Type
      */
-    public function setName($name)
+    public function setName($name): Type
     {
         $this->name = $name;
 
@@ -81,20 +73,16 @@ class Type
 
     /**
      * Get name.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
     /**
      * Add card.
-     *
-     * @return Type
      */
-    public function addCard(Card $card)
+    public function addCard(Card $card): Type
     {
         $this->cards[] = $card;
 
@@ -114,7 +102,7 @@ class Type
      *
      * @return \Doctrine\Common\Collections\Collection<int, Card>
      */
-    public function getCards()
+    public function getCards(): \Doctrine\Common\Collections\Collection
     {
         return $this->cards;
     }

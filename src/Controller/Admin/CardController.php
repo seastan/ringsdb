@@ -36,11 +36,9 @@ class CardController extends AbstractController
     /**
      * Lists all Card entities.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/card/", name="admin_card")
      */
-    public function indexAction()
+    public function indexAction(): \Symfony\Component\HttpFoundation\Response
     {
         $entities = $this->cardRepository->findAll();
 
@@ -50,11 +48,9 @@ class CardController extends AbstractController
     /**
      * Creates a new Card entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/card/create", name="admin_card_create", methods={"POST"})
      */
-    public function createAction(Request $request)
+    public function createAction(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $entity = new Card();
         $form = $this->createForm(CardType::class, $entity);
@@ -73,11 +69,9 @@ class CardController extends AbstractController
     /**
      * Displays a form to create a new Card entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/card/new", name="admin_card_new")
      */
-    public function newAction()
+    public function newAction(): \Symfony\Component\HttpFoundation\Response
     {
         $entity = new Card();
         $form = $this->createForm(CardType::class, $entity);
@@ -88,11 +82,9 @@ class CardController extends AbstractController
     /**
      * Finds and displays a Card entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/card/{id}/show", name="admin_card_show")
      */
-    public function showAction($id)
+    public function showAction($id): \Symfony\Component\HttpFoundation\Response
     {
         $entity = $this->cardRepository->find($id);
         if (!$entity) {
@@ -106,11 +98,9 @@ class CardController extends AbstractController
     /**
      * Displays a form to edit an existing Card entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/card/{id}/edit", name="admin_card_edit")
      */
-    public function editAction($id)
+    public function editAction($id): \Symfony\Component\HttpFoundation\Response
     {
         $entity = $this->cardRepository->find($id);
         if (!$entity) {
@@ -126,11 +116,9 @@ class CardController extends AbstractController
     /**
      * Edits an existing Card entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/card/{id}/update", name="admin_card_update", methods={"POST", "PUT"})
      */
-    public function updateAction(Request $request, $id, Packages $packages)
+    public function updateAction(Request $request, $id, Packages $packages): \Symfony\Component\HttpFoundation\Response
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $this->cardRepository->find($id);
@@ -162,11 +150,9 @@ class CardController extends AbstractController
     /**
      * Deletes a Card entity.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/admin/card/{id}/delete", name="admin_card_delete", methods={"POST", "DELETE"})
      */
-    public function deleteAction(Request $request, $id)
+    public function deleteAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
@@ -186,11 +172,9 @@ class CardController extends AbstractController
     /**
      * Forcibly deletes a Card entity and all its deck/decklist slot references.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/admin/card/{id}/force_delete", name="admin_card_force_delete", methods={"POST", "DELETE"})
      */
-    public function forceDeleteAction(Request $request, $id)
+    public function forceDeleteAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $form = $this->createForceDeleteForm($id);
         $form->handleRequest($request);
@@ -230,7 +214,7 @@ class CardController extends AbstractController
      *
      * @return \Symfony\Component\Form\FormInterface<mixed> The form
      */
-    private function createDeleteForm($id)
+    private function createDeleteForm($id): \Symfony\Component\Form\FormInterface
     {
         return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }
@@ -242,7 +226,7 @@ class CardController extends AbstractController
      *
      * @return \Symfony\Component\Form\FormInterface<mixed> The form
      */
-    private function createForceDeleteForm($id)
+    private function createForceDeleteForm($id): \Symfony\Component\Form\FormInterface
     {
         return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }

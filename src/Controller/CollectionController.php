@@ -18,11 +18,9 @@ class CollectionController extends AbstractController
     /**
      * @param bool $reloaduser
      *
-     * @return Response
-     *
      * @Route("/collection/packs", name="collection_packs", methods={"GET"})
      */
-    public function packsAction($reloaduser = false, CycleRepository $cycleRepository, UserCustomPackRepository $userCustomPackRepository)
+    public function packsAction($reloaduser = false, CycleRepository $cycleRepository, UserCustomPackRepository $userCustomPackRepository): Response
     {
         $categories = [];
         $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
@@ -88,11 +86,9 @@ class CollectionController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/collection/packs/save", name="collection_save_packs", methods={"POST"})
      */
-    public function savePacksAction(Request $request)
+    public function savePacksAction(Request $request): Response
     {
         $selectedPacks = $request->get('selected-packs');
         // accepts "id" / "id:count" tokens (and legacy "id-2"/"id-3")
@@ -113,11 +109,9 @@ class CollectionController extends AbstractController
      * Save the user's preferred art (printing) for a card.
      * POST card_code + pack_code; pack_code empty/"default" clears the preference.
      *
-     * @return Response
-     *
      * @Route("/collection/art/save", name="collection_save_art", methods={"POST"})
      */
-    public function saveArtPreferenceAction(Request $request)
+    public function saveArtPreferenceAction(Request $request): Response
     {
         $user = $this->getUser();
         if (!$user) {

@@ -70,10 +70,8 @@ class CardStatsCalculatorTest extends KernelTestCase
      *
      * @param array $main [card id => quantity]
      * @param array $side [card id => quantity]
-     *
-     * @return int
      */
-    private function insertDeck(array $values, array $main, array $side = [])
+    private function insertDeck(array $values, array $main, array $side = []): int
     {
         $row = $this->connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
         $this->assertNotFalse($row);
@@ -92,10 +90,8 @@ class CardStatsCalculatorTest extends KernelTestCase
 
     /**
      * Inserts a decklist (a copy of fixture decklist 2 with other values), returns its id.
-     *
-     * @return int
      */
-    private function insertDecklist(array $values, array $main)
+    private function insertDecklist(array $values, array $main): int
     {
         $row = $this->connection->fetchAssoc('SELECT * FROM decklist WHERE id = 2');
         $this->assertNotFalse($row);
@@ -112,7 +108,7 @@ class CardStatsCalculatorTest extends KernelTestCase
     /**
      * @return array [code => [columns...]] for the given codes
      */
-    private static function byCode(array $cards, array $codes, array $columns)
+    private static function byCode(array $cards, array $codes, array $columns): array
     {
         $result = [];
         foreach ($cards as $card) {
@@ -146,10 +142,7 @@ class CardStatsCalculatorTest extends KernelTestCase
         $this->assertMatchesJsonSnapshot("stats/cards_2015-08_step$step", json_encode($this->calculator->computeCards('2015-08', $step)));
     }
 
-    /**
-     * @return array
-     */
-    public function stepProvider()
+    public function stepProvider(): array
     {
         return ['full decks' => ['1'], 'limited decks' => ['2'], 'sideboards and totals' => ['3']];
     }
@@ -240,10 +233,7 @@ class CardStatsCalculatorTest extends KernelTestCase
         $this->assertSame(['01001' => ['full_decks' => $counted ? '1' : '0']], self::byCode($cards, ['01001'], ['full_decks']));
     }
 
-    /**
-     * @return array
-     */
-    public function monthRuleProvider()
+    public function monthRuleProvider(): array
     {
         return [
             'before 2022-07: updated in the month' => ['2021-03', '2020-01-01 00:00:00', '2021-03-15 00:00:00', true],
@@ -261,7 +251,7 @@ class CardStatsCalculatorTest extends KernelTestCase
     /**
      * @return array{int, string}
      */
-    private function runCommand(array $input)
+    private function runCommand(array $input): array
     {
         $application = new Application(static::$kernel);
         $tester = new CommandTester($application->find('app:stats:precompute-cards'));

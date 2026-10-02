@@ -17,7 +17,7 @@ class CustomPackFixtures extends Fixture implements DependentFixtureInterface
     /**
      * @return array<int, class-string>
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
         return [
             UserFixtures::class,

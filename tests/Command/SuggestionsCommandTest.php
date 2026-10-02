@@ -61,7 +61,7 @@ class SuggestionsCommandTest extends KernelTestCase
     /**
      * @return array the decoded suggestions.json
      */
-    private function runCommand()
+    private function runCommand(): array
     {
         $application = new Application(static::$kernel);
         $tester = new CommandTester($application->find('app:suggestions'));

@@ -33,21 +33,17 @@ class CustomPackController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/collection/custom-pack/new", name="collection_custom_pack_new", methods={"GET"})
      */
-    public function newFormAction()
+    public function newFormAction(): Response
     {
         return $this->render('Collection/custom_pack_form.html.twig', ['pagetitle' => 'Create Custom Pack', 'pack' => null, 'save_route' => 'collection_custom_pack_save']);
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/collection/custom-pack/save", name="collection_custom_pack_save", methods={"POST"})
      */
-    public function saveAction(Request $request)
+    public function saveAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $user = $this->getUser();
         $em = $this->getDoctrine()->getManager();
@@ -78,8 +74,6 @@ class CustomPackController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/collection/custom-pack/{id}/edit",
      *     name="collection_custom_pack_edit",
@@ -87,7 +81,7 @@ class CustomPackController extends AbstractController
      *     requirements={"id"="\d+"}
      * )
      */
-    public function editFormAction($id)
+    public function editFormAction($id): Response
     {
         $pack = $this->loadOwnedPack($id);
         if (!$pack) {
@@ -98,8 +92,6 @@ class CustomPackController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route(
      *     "/collection/custom-pack/{id}/update",
      *     name="collection_custom_pack_update",
@@ -107,7 +99,7 @@ class CustomPackController extends AbstractController
      *     requirements={"id"="\d+"}
      * )
      */
-    public function updateAction(Request $request, $id)
+    public function updateAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $pack = $this->loadOwnedPack($id);
         if (!$pack) {
@@ -139,8 +131,6 @@ class CustomPackController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route(
      *     "/collection/custom-pack/{id}/delete",
      *     name="collection_custom_pack_delete",
@@ -148,7 +138,7 @@ class CustomPackController extends AbstractController
      *     requirements={"id"="\d+"}
      * )
      */
-    public function deleteAction(Request $request, $id)
+    public function deleteAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $pack = $this->loadOwnedPack($id);
         if (!$pack) {
@@ -163,8 +153,6 @@ class CustomPackController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route(
      *     "/collection/custom-pack/{id}/toggle",
      *     name="collection_custom_pack_toggle",
@@ -172,7 +160,7 @@ class CustomPackController extends AbstractController
      *     requirements={"id"="\d+"}
      * )
      */
-    public function toggleAction(Request $request, $id)
+    public function toggleAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $pack = $this->loadOwnedPack($id);
         if (!$pack) {
@@ -188,8 +176,6 @@ class CustomPackController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route(
      *     "/collection/custom-pack/{id}/publish",
      *     name="collection_custom_pack_publish",
@@ -197,7 +183,7 @@ class CustomPackController extends AbstractController
      *     requirements={"id"="\d+"}
      * )
      */
-    public function publishAction(Request $request, $id)
+    public function publishAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $pack = $this->loadOwnedPack($id);
         if (!$pack) {
@@ -213,15 +199,13 @@ class CustomPackController extends AbstractController
     }
 
     /**
-     * @return JsonResponse
-     *
      * @Route(
      *     "/api/public/custom-packs/published",
      *     name="api_public_custom_packs_published",
      *     methods={"GET"}
      * )
      */
-    public function publishedListAction()
+    public function publishedListAction(): JsonResponse
     {
         $packs = $this->userCustomPackRepository->findBy(['isPublished' => true], ['createdAt' => 'ASC', 'id' => 'ASC']);
         $result = [];
@@ -240,8 +224,6 @@ class CustomPackController extends AbstractController
     }
 
     /**
-     * @return JsonResponse
-     *
      * @Route(
      *     "/collection/custom-pack/{id}/copy",
      *     name="collection_custom_pack_copy",
@@ -249,7 +231,7 @@ class CustomPackController extends AbstractController
      *     requirements={"id"="\d+"}
      * )
      */
-    public function copyAction(Request $request, $id)
+    public function copyAction(Request $request, $id): JsonResponse
     {
         $user = $this->getUser();
         if (!$user) {
@@ -279,11 +261,9 @@ class CustomPackController extends AbstractController
     }
 
     /**
-     * @return JsonResponse
-     *
      * @Route("/api/private/custom-packs", name="api_private_custom_packs", methods={"GET"})
      */
-    public function apiListAction()
+    public function apiListAction(): JsonResponse
     {
         $user = $this->getUser();
         if (!$user) {
@@ -303,10 +283,7 @@ class CustomPackController extends AbstractController
         return new JsonResponse($result);
     }
 
-    /**
-     * @return UserCustomPack|null
-     */
-    private function loadOwnedPack($id)
+    private function loadOwnedPack($id): ?UserCustomPack
     {
         $pack = $this->userCustomPackRepository->find($id);
         if (!$pack || $pack->getUser()->getId() !== $this->currentUser()->getId()) {

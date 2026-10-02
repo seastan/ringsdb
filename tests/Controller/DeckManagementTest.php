@@ -69,20 +69,15 @@ class DeckManagementTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db()
+    private function db(): \Doctrine\DBAL\Connection
     {
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
     /**
      * @param string $username
-     *
-     * @return KernelBrowser
      */
-    private function createAuthenticatedClient($username = 'test')
+    private function createAuthenticatedClient($username = 'test'): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -94,10 +89,8 @@ class DeckManagementTest extends WebTestCase
 
     /**
      * A copy of fixture deck 2 (cards included), plus 2 Feint in the sideboard, returns its id.
-     *
-     * @return int
      */
-    private function insertDeck(KernelBrowser $client, $name, array $values = [])
+    private function insertDeck(KernelBrowser $client, $name, array $values = []): int
     {
         $connection = $this->db();
         $row = $connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
@@ -114,15 +107,12 @@ class DeckManagementTest extends WebTestCase
     /**
      * @return array<int|string, mixed>
      */
-    private function slots(KernelBrowser $client, $table, $deckId)
+    private function slots(KernelBrowser $client, $table, $deckId): array
     {
         return array_column($this->db()->fetchAll("SELECT card_id, quantity FROM $table WHERE deck_id = ? ORDER BY card_id", [$deckId]), 'quantity', 'card_id');
     }
 
-    /**
-     * @return bool
-     */
-    private function deckExists(KernelBrowser $client, $id)
+    private function deckExists(KernelBrowser $client, $id): bool
     {
         return (bool) $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deck WHERE id = ?', [$id]);
     }
@@ -130,15 +120,12 @@ class DeckManagementTest extends WebTestCase
     /**
      * @return array<int, int>
      */
-    private function newDeckIds(KernelBrowser $client)
+    private function newDeckIds(KernelBrowser $client): array
     {
         return array_map('intval', array_column($this->db($client)->fetchAll('SELECT id FROM deck WHERE id > ? ORDER BY id', [$this->maxIds['deck']]), 'id'));
     }
 
-    /**
-     * @return array
-     */
-    private function flashMessages(KernelBrowser $client)
+    private function flashMessages(KernelBrowser $client): array
     {
         preg_match_all("/insert_alert_message\\('(\\w+)', (\"[^\"]*\")\\)/", $client->getResponse()->getContent(), $matches, PREG_SET_ORDER);
 
@@ -229,10 +216,7 @@ class DeckManagementTest extends WebTestCase
         $this->assertSame([['danger', "You can't delete a deck that is member of a fellowship."]], $this->flashMessages($client));
     }
 
-    /**
-     * @return int
-     */
-    private function addToFellowship(KernelBrowser $client, $deckId)
+    private function addToFellowship(KernelBrowser $client, $deckId): int
     {
         $connection = $this->db($client);
         $connection->insert('fellowship', ['user_id' => 1, 'name' => 'PHPUnit', 'name_canonical' => 'phpunit', 'is_public' => 0,
@@ -354,10 +338,7 @@ class DeckManagementTest extends WebTestCase
         $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
     }
 
-    /**
-     * @return array
-     */
-    public function emptyDiffProvider()
+    public function emptyDiffProvider(): array
     {
         return [
             'in 4 parts' => ['[{},{},{},{}]'],
@@ -392,10 +373,7 @@ class DeckManagementTest extends WebTestCase
         $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
     }
 
-    /**
-     * @return array
-     */
-    public function invalidAutosaveProvider()
+    public function invalidAutosaveProvider(): array
     {
         return [
             'unknown deck' => ['test', 999, '[[],[],[],[]]', 500, 'Cannot find deck 999'],
@@ -408,10 +386,8 @@ class DeckManagementTest extends WebTestCase
 
     /**
      * Downloads an export of a fixture deck ("text" or "octgn").
-     *
-     * @return string
      */
-    private function export(KernelBrowser $client, $format, $deckId)
+    private function export(KernelBrowser $client, $format, $deckId): string
     {
         $client->request('GET', "/deck/export/$format/$deckId");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -422,10 +398,8 @@ class DeckManagementTest extends WebTestCase
     /**
      * Posts a zip archive of [name => content] to POST /deck/import/all ("Import from an archive"
      * modal of My Decks).
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
      */
-    private function uploadArchive(KernelBrowser $client, array $entries)
+    private function uploadArchive(KernelBrowser $client, array $entries): \Symfony\Component\HttpFoundation\Response
     {
         $file = self::temporaryFile('archive');
         $zip = new \ZipArchive();
@@ -518,10 +492,7 @@ class DeckManagementTest extends WebTestCase
         $this->assertTrue($this->deckExists($client, 1));
     }
 
-    /**
-     * @return array
-     */
-    public function anonymousRouteProvider()
+    public function anonymousRouteProvider(): array
     {
         return [
             'clone' => ['GET', '/deck/clone/1'],

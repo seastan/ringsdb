@@ -31,11 +31,9 @@ class TagController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/tag/add", name="tag_add", methods={"POST"})
      */
-    public function addAction(Request $request)
+    public function addAction(Request $request): Response
     {
         $list_id = $request->get('ids');
         $list_tag = $this->decks->normalizeTags((array) $request->get('tags'));
@@ -61,11 +59,9 @@ class TagController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/tag/remove", name="tag_remove", methods={"POST"})
      */
-    public function removeAction(Request $request)
+    public function removeAction(Request $request): Response
     {
         $list_id = $request->get('ids');
         $list_tag = $this->decks->normalizeTags((array) $request->get('tags'));
@@ -91,11 +87,9 @@ class TagController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/tag/clear", name="tag_clear", methods={"POST"})
      */
-    public function clearAction(Request $request)
+    public function clearAction(Request $request): Response
     {
         $list_id = $request->get('ids');
         /* @var $em \Doctrine\ORM\EntityManager */

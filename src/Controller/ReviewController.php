@@ -44,11 +44,9 @@ class ReviewController extends AbstractController
     }
 
     /**
-     * @return JsonResponse
-     *
      * @Route("/review/post", name="card_review_post", methods={"POST"})
      */
-    public function postAction(Request $request, CardRepository $cardRepository)
+    public function postAction(Request $request, CardRepository $cardRepository): JsonResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -94,11 +92,9 @@ class ReviewController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/review/edit", name="card_review_edit", methods={"POST"})
      */
-    public function editAction(Request $request)
+    public function editAction(Request $request): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -130,11 +126,9 @@ class ReviewController extends AbstractController
     }
 
     /**
-     * @return JsonResponse
-     *
      * @Route("/review/like", name="card_review_like", methods={"POST"})
      */
-    public function likeAction(Request $request)
+    public function likeAction(Request $request): JsonResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -168,11 +162,9 @@ class ReviewController extends AbstractController
     }
 
     /**
-     * @return JsonResponse
-     *
      * @Route("/review/remove/{id}", name="card_review_remove")
      */
-    public function removeAction($id, Request $request)
+    public function removeAction($id, Request $request): JsonResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -199,8 +191,6 @@ class ReviewController extends AbstractController
     /**
      * @param int $page
      *
-     * @return Response
-     *
      * @Route(
      *     "/reviews/{page}",
      *     name="card_reviews_list",
@@ -208,7 +198,7 @@ class ReviewController extends AbstractController
      *     defaults={"page"=1}
      * )
      */
-    public function listAction($page = 1, Request $request)
+    public function listAction($page = 1, Request $request): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -248,8 +238,6 @@ class ReviewController extends AbstractController
     /**
      * @param int $page
      *
-     * @return Response
-     *
      * @Route(
      *     "/user/reviews/{user_id}/{page}",
      *     name="card_reviews_list_byauthor",
@@ -257,7 +245,7 @@ class ReviewController extends AbstractController
      *     defaults={"page"=1}
      * )
      */
-    public function byauthorAction($user_id, $page = 1, Request $request, UserRepository $userRepository)
+    public function byauthorAction($user_id, $page = 1, Request $request, UserRepository $userRepository): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -299,11 +287,9 @@ class ReviewController extends AbstractController
     }
 
     /**
-     * @return JsonResponse
-     *
      * @Route("/review/comment", name="card_reviewcomment_post", methods={"POST"})
      */
-    public function commentAction(Request $request)
+    public function commentAction(Request $request): JsonResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();

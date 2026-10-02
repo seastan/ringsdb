@@ -18,10 +18,7 @@ use Symfony\Component\DomCrawler\Crawler;
  */
 trait PageSnapshotTrait
 {
-    /**
-     * @return string
-     */
-    private static function pageText(Crawler $crawler)
+    private static function pageText(Crawler $crawler): string
     {
         $crawler->filter('script, style, noscript')->each(function (Crawler $node): void {
             $domNode = $node->getNode(0);

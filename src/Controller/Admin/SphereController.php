@@ -30,11 +30,9 @@ class SphereController extends AbstractController
     /**
      * Lists all Sphere entities.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/sphere/", name="admin_sphere")
      */
-    public function indexAction()
+    public function indexAction(): \Symfony\Component\HttpFoundation\Response
     {
         $entities = $this->sphereRepository->findAll();
 
@@ -44,11 +42,9 @@ class SphereController extends AbstractController
     /**
      * Creates a new Sphere entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/sphere/create", name="admin_sphere_create", methods={"POST"})
      */
-    public function createAction(Request $request)
+    public function createAction(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $entity = new Sphere();
         $form = $this->createCreateForm($entity);
@@ -71,7 +67,7 @@ class SphereController extends AbstractController
      *
      * @return \Symfony\Component\Form\FormInterface<Sphere> The form
      */
-    private function createCreateForm(Sphere $entity)
+    private function createCreateForm(Sphere $entity): \Symfony\Component\Form\FormInterface
     {
         $form = $this->createForm(SphereType::class, $entity, ['action' => $this->generateUrl('admin_sphere_create'), 'method' => 'POST']);
 
@@ -81,11 +77,9 @@ class SphereController extends AbstractController
     /**
      * Displays a form to create a new Sphere entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/sphere/new", name="admin_sphere_new")
      */
-    public function newAction()
+    public function newAction(): \Symfony\Component\HttpFoundation\Response
     {
         $entity = new Sphere();
         $form = $this->createCreateForm($entity);
@@ -96,11 +90,9 @@ class SphereController extends AbstractController
     /**
      * Finds and displays a Sphere entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/sphere/{id}/show", name="admin_sphere_show")
      */
-    public function showAction($id)
+    public function showAction($id): \Symfony\Component\HttpFoundation\Response
     {
         $entity = $this->sphereRepository->find($id);
         if (!$entity) {
@@ -114,11 +106,9 @@ class SphereController extends AbstractController
     /**
      * Displays a form to edit an existing Sphere entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/sphere/{id}/edit", name="admin_sphere_edit")
      */
-    public function editAction($id)
+    public function editAction($id): \Symfony\Component\HttpFoundation\Response
     {
         $entity = $this->sphereRepository->find($id);
         if (!$entity) {
@@ -137,7 +127,7 @@ class SphereController extends AbstractController
      *
      * @return \Symfony\Component\Form\FormInterface<Sphere> The form
      */
-    private function createEditForm(Sphere $entity)
+    private function createEditForm(Sphere $entity): \Symfony\Component\Form\FormInterface
     {
         $form = $this->createForm(SphereType::class, $entity, ['action' => $this->generateUrl('admin_sphere_update', ['id' => $entity->getId()]), 'method' => 'PUT']);
         $form->add('submit', SubmitType::class, ['label' => 'Update']);
@@ -148,11 +138,9 @@ class SphereController extends AbstractController
     /**
      * Edits an existing Sphere entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/sphere/{id}/update", name="admin_sphere_update", methods={"POST", "PUT"})
      */
-    public function updateAction(Request $request, $id)
+    public function updateAction(Request $request, $id): \Symfony\Component\HttpFoundation\Response
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $this->sphereRepository->find($id);
@@ -174,11 +162,9 @@ class SphereController extends AbstractController
     /**
      * Deletes a Sphere entity.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/admin/sphere/{id}/delete", name="admin_sphere_delete", methods={"POST", "DELETE"})
      */
-    public function deleteAction(Request $request, $id)
+    public function deleteAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
@@ -202,7 +188,7 @@ class SphereController extends AbstractController
      *
      * @return \Symfony\Component\Form\FormInterface<mixed> The form
      */
-    private function createDeleteForm($id)
+    private function createDeleteForm($id): \Symfony\Component\Form\FormInterface
     {
         return $this->createFormBuilder()->setAction($this->generateUrl('admin_sphere_delete', ['id' => $id]))->setMethod('DELETE')->getForm();
     }

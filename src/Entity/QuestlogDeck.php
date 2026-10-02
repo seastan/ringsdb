@@ -10,7 +10,7 @@ namespace App\Entity;
 class QuestlogDeck
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -36,10 +36,8 @@ class QuestlogDeck
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -48,10 +46,8 @@ class QuestlogDeck
      * Set deckNumber.
      *
      * @param int $deckNumber
-     *
-     * @return QuestlogDeck
      */
-    public function setDeckNumber($deckNumber)
+    public function setDeckNumber($deckNumber): QuestlogDeck
     {
         $this->deckNumber = $deckNumber;
 
@@ -60,10 +56,8 @@ class QuestlogDeck
 
     /**
      * Get deckNumber.
-     *
-     * @return int
      */
-    public function getDeckNumber()
+    public function getDeckNumber(): int
     {
         return $this->deckNumber;
     }
@@ -72,10 +66,8 @@ class QuestlogDeck
      * Set content.
      *
      * @param string $content
-     *
-     * @return QuestlogDeck
      */
-    public function setContent($content)
+    public function setContent($content): QuestlogDeck
     {
         $this->content = $content;
 
@@ -84,20 +76,16 @@ class QuestlogDeck
 
     /**
      * Get content.
-     *
-     * @return string
      */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
 
     /**
      * Set questlog.
-     *
-     * @return QuestlogDeck
      */
-    public function setQuestlog(Questlog $questlog)
+    public function setQuestlog(Questlog $questlog): QuestlogDeck
     {
         $this->questlog = $questlog;
 
@@ -106,20 +94,16 @@ class QuestlogDeck
 
     /**
      * Get questlog.
-     *
-     * @return Questlog
      */
-    public function getQuestlog()
+    public function getQuestlog(): Questlog
     {
         return $this->questlog;
     }
 
     /**
      * Set deck.
-     *
-     * @return QuestlogDeck
      */
-    public function setDeck(?Deck $deck = null)
+    public function setDeck(?Deck $deck = null): QuestlogDeck
     {
         $this->deck = $deck;
 
@@ -128,20 +112,16 @@ class QuestlogDeck
 
     /**
      * Get deck.
-     *
-     * @return Deck|null
      */
-    public function getDeck()
+    public function getDeck(): ?Deck
     {
         return $this->deck;
     }
 
     /**
      * Set decklist.
-     *
-     * @return QuestlogDeck
      */
-    public function setDecklist(?Decklist $decklist = null)
+    public function setDecklist(?Decklist $decklist = null): QuestlogDeck
     {
         $this->decklist = $decklist;
 
@@ -150,10 +130,8 @@ class QuestlogDeck
 
     /**
      * Get decklist.
-     *
-     * @return Decklist|null
      */
-    public function getDecklist()
+    public function getDecklist(): ?Decklist
     {
         return $this->decklist;
     }
@@ -167,10 +145,8 @@ class QuestlogDeck
      * Set player.
      *
      * @param string|null $player
-     *
-     * @return QuestlogDeck
      */
-    public function setPlayer($player)
+    public function setPlayer($player): QuestlogDeck
     {
         $this->player = $player;
 
@@ -179,10 +155,8 @@ class QuestlogDeck
 
     /**
      * Get player.
-     *
-     * @return string|null
      */
-    public function getPlayer()
+    public function getPlayer(): ?string
     {
         return $this->player;
     }

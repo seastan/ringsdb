@@ -35,10 +35,7 @@ class ScenarioType extends AbstractType
         ]);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'appbundle_scenario';
     }

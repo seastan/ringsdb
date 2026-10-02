@@ -9,7 +9,7 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * @return list<array<string, mixed>>
      */
-    public function getHistory()
+    public function getHistory(): array
     {
         $slots = $this->getSlots();
         $cards = $slots->getContent();
@@ -180,10 +180,7 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
         return $array;
     }
 
-    /**
-     * @return bool
-     */
-    public function getIsUnsaved()
+    public function getIsUnsaved(): bool
     {
         $changes = $this->getChanges();
 
@@ -197,7 +194,7 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
     }
 
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -277,10 +274,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -289,10 +284,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set name.
      *
      * @param string $name
-     *
-     * @return Deck
      */
-    public function setName($name)
+    public function setName($name): Deck
     {
         $this->name = $name;
 
@@ -301,10 +294,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get name.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -313,10 +304,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return Deck
      */
-    public function setDateCreation($dateCreation)
+    public function setDateCreation($dateCreation): Deck
     {
         $this->dateCreation = $dateCreation;
 
@@ -325,10 +314,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get dateCreation.
-     *
-     * @return \DateTime
      */
-    public function getDateCreation()
+    public function getDateCreation(): \DateTime
     {
         return $this->dateCreation;
     }
@@ -337,10 +324,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return Deck
      */
-    public function setDateUpdate($dateUpdate)
+    public function setDateUpdate($dateUpdate): Deck
     {
         $this->dateUpdate = $dateUpdate;
 
@@ -349,10 +334,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get dateUpdate.
-     *
-     * @return \DateTime
      */
-    public function getDateUpdate()
+    public function getDateUpdate(): \DateTime
     {
         return $this->dateUpdate;
     }
@@ -361,10 +344,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set descriptionMd.
      *
      * @param string|null $descriptionMd
-     *
-     * @return Deck
      */
-    public function setDescriptionMd($descriptionMd)
+    public function setDescriptionMd($descriptionMd): Deck
     {
         $this->descriptionMd = $descriptionMd;
 
@@ -373,10 +354,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get descriptionMd.
-     *
-     * @return string|null
      */
-    public function getDescriptionMd()
+    public function getDescriptionMd(): ?string
     {
         return $this->descriptionMd;
     }
@@ -385,10 +364,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set problem.
      *
      * @param string|null $problem
-     *
-     * @return Deck
      */
-    public function setProblem($problem)
+    public function setProblem($problem): Deck
     {
         $this->problem = $problem;
 
@@ -397,10 +374,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get problem.
-     *
-     * @return string|null
      */
-    public function getProblem()
+    public function getProblem(): ?string
     {
         return $this->problem;
     }
@@ -409,10 +384,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set tags.
      *
      * @param string|null $tags
-     *
-     * @return Deck
      */
-    public function setTags($tags)
+    public function setTags($tags): Deck
     {
         $this->tags = $tags;
 
@@ -421,20 +394,16 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get tags.
-     *
-     * @return string|null
      */
-    public function getTags()
+    public function getTags(): ?string
     {
         return $this->tags;
     }
 
     /**
      * Add slot.
-     *
-     * @return Deck
      */
-    public function addSlot(Deckslot $slot)
+    public function addSlot(Deckslot $slot): Deck
     {
         $this->slots[] = $slot;
 
@@ -454,17 +423,15 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return \App\Model\SlotCollectionInterface<Deckslot>
      */
-    public function getSlots()
+    public function getSlots(): \App\Model\SlotCollectionInterface
     {
         return new \App\Model\SlotCollectionDecorator($this->slots);
     }
 
     /**
      * Add sideslot.
-     *
-     * @return Deck
      */
-    public function addSideslot(Decksideslot $sideslot)
+    public function addSideslot(Decksideslot $sideslot): Deck
     {
         $this->sideslots[] = $sideslot;
 
@@ -484,17 +451,15 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return \App\Model\SlotCollectionInterface<Decksideslot>
      */
-    public function getSideslots()
+    public function getSideslots(): \App\Model\SlotCollectionInterface
     {
         return new \App\Model\SlotCollectionDecorator($this->sideslots);
     }
 
     /**
      * Add child.
-     *
-     * @return Deck
      */
-    public function addChild(Decklist $child)
+    public function addChild(Decklist $child): Deck
     {
         $this->children[] = $child;
 
@@ -514,17 +479,15 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return \Doctrine\Common\Collections\Collection<int, Decklist>
      */
-    public function getChildren()
+    public function getChildren(): \Doctrine\Common\Collections\Collection
     {
         return $this->children;
     }
 
     /**
      * Add change.
-     *
-     * @return Deck
      */
-    public function addChange(Deckchange $change)
+    public function addChange(Deckchange $change): Deck
     {
         $this->changes[] = $change;
 
@@ -544,17 +507,15 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return \Doctrine\Common\Collections\Collection<int, Deckchange>
      */
-    public function getChanges()
+    public function getChanges(): \Doctrine\Common\Collections\Collection
     {
         return $this->changes;
     }
 
     /**
      * Set user.
-     *
-     * @return Deck
      */
-    public function setUser(User $user)
+    public function setUser(User $user): Deck
     {
         $this->user = $user;
 
@@ -563,20 +524,16 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get user.
-     *
-     * @return User
      */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->user;
     }
 
     /**
      * Set lastPack.
-     *
-     * @return Deck
      */
-    public function setLastPack(?Pack $lastPack = null)
+    public function setLastPack(?Pack $lastPack = null): Deck
     {
         $this->lastPack = $lastPack;
 
@@ -585,20 +542,16 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get lastPack.
-     *
-     * @return Pack|null
      */
-    public function getLastPack()
+    public function getLastPack(): ?Pack
     {
         return $this->lastPack;
     }
 
     /**
      * Set parent.
-     *
-     * @return Deck
      */
-    public function setParent(?Decklist $parent = null)
+    public function setParent(?Decklist $parent = null): Deck
     {
         $this->parent = $parent;
 
@@ -607,10 +560,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get parent.
-     *
-     * @return Decklist|null
      */
-    public function getParent()
+    public function getParent(): ?Decklist
     {
         return $this->parent;
     }
@@ -619,10 +570,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set majorVersion.
      *
      * @param int $majorVersion
-     *
-     * @return Deck
      */
-    public function setMajorVersion($majorVersion)
+    public function setMajorVersion($majorVersion): Deck
     {
         $this->majorVersion = $majorVersion;
 
@@ -631,10 +580,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get majorVersion.
-     *
-     * @return int
      */
-    public function getMajorVersion()
+    public function getMajorVersion(): int
     {
         return $this->majorVersion;
     }
@@ -643,10 +590,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set minorVersion.
      *
      * @param int $minorVersion
-     *
-     * @return Deck
      */
-    public function setMinorVersion($minorVersion)
+    public function setMinorVersion($minorVersion): Deck
     {
         $this->minorVersion = $minorVersion;
 
@@ -655,18 +600,13 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get minorVersion.
-     *
-     * @return int
      */
-    public function getMinorVersion()
+    public function getMinorVersion(): int
     {
         return $this->minorVersion;
     }
 
-    /**
-     * @return string
-     */
-    public function getVersion()
+    public function getVersion(): string
     {
         return $this->majorVersion.'.'.$this->minorVersion;
     }
@@ -678,10 +618,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Add fellowship.
-     *
-     * @return Deck
      */
-    public function addFellowship(FellowshipDeck $fellowship)
+    public function addFellowship(FellowshipDeck $fellowship): Deck
     {
         $this->fellowships[] = $fellowship;
 
@@ -701,7 +639,7 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return \Doctrine\Common\Collections\Collection<int, FellowshipDeck>
      */
-    public function getFellowships()
+    public function getFellowships(): \Doctrine\Common\Collections\Collection
     {
         return $this->fellowships;
     }
@@ -711,7 +649,7 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return array<int, FellowshipDeck|FellowshipDecklist>
      */
-    public function getAllFellowships()
+    public function getAllFellowships(): array
     {
         $childrenFellowships = $this->getFellowships()->toArray();
 
@@ -729,10 +667,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Add questlog.
-     *
-     * @return Deck
      */
-    public function addQuestlog(QuestlogDeck $questlog)
+    public function addQuestlog(QuestlogDeck $questlog): Deck
     {
         $this->questlogs[] = $questlog;
 
@@ -752,7 +688,7 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return \Doctrine\Common\Collections\Collection<int, QuestlogDeck>
      */
-    public function getQuestlogs()
+    public function getQuestlogs(): \Doctrine\Common\Collections\Collection
     {
         return $this->questlogs;
     }
@@ -762,7 +698,7 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return array<int, QuestlogDeck>
      */
-    public function getAllQuestlogs()
+    public function getAllQuestlogs(): array
     {
         $allQuestlogs = $this->getQuestlogs()->toArray();
 

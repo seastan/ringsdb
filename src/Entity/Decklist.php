@@ -19,7 +19,7 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
     }
 
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -137,10 +137,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -149,10 +147,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set name.
      *
      * @param string $name
-     *
-     * @return Decklist
      */
-    public function setName($name)
+    public function setName($name): Decklist
     {
         $this->name = $name;
 
@@ -161,10 +157,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get name.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -173,10 +167,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set nameCanonical.
      *
      * @param string $nameCanonical
-     *
-     * @return Decklist
      */
-    public function setNameCanonical($nameCanonical)
+    public function setNameCanonical($nameCanonical): Decklist
     {
         $this->nameCanonical = $nameCanonical;
 
@@ -185,10 +177,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get nameCanonical.
-     *
-     * @return string
      */
-    public function getNameCanonical()
+    public function getNameCanonical(): string
     {
         return $this->nameCanonical;
     }
@@ -197,10 +187,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return Decklist
      */
-    public function setDateCreation($dateCreation)
+    public function setDateCreation($dateCreation): Decklist
     {
         $this->dateCreation = $dateCreation;
 
@@ -209,10 +197,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get dateCreation.
-     *
-     * @return \DateTime
      */
-    public function getDateCreation()
+    public function getDateCreation(): \DateTime
     {
         return $this->dateCreation;
     }
@@ -221,10 +207,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return Decklist
      */
-    public function setDateUpdate($dateUpdate)
+    public function setDateUpdate($dateUpdate): Decklist
     {
         $this->dateUpdate = $dateUpdate;
 
@@ -233,10 +217,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get dateUpdate.
-     *
-     * @return \DateTime
      */
-    public function getDateUpdate()
+    public function getDateUpdate(): \DateTime
     {
         return $this->dateUpdate;
     }
@@ -245,10 +227,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set dateLastComment.
      *
      * @param \DateTime|null $dateLastComment
-     *
-     * @return Decklist
      */
-    public function setDateLastComment($dateLastComment)
+    public function setDateLastComment($dateLastComment): Decklist
     {
         $this->dateLastComment = $dateLastComment;
 
@@ -257,10 +237,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get dateLastComment.
-     *
-     * @return \DateTime|null
      */
-    public function getDateLastComment()
+    public function getDateLastComment(): ?\DateTime
     {
         return $this->dateLastComment;
     }
@@ -269,10 +247,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set descriptionMd.
      *
      * @param string|null $descriptionMd
-     *
-     * @return Decklist
      */
-    public function setDescriptionMd($descriptionMd)
+    public function setDescriptionMd($descriptionMd): Decklist
     {
         $this->descriptionMd = $descriptionMd;
 
@@ -281,10 +257,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get descriptionMd.
-     *
-     * @return string|null
      */
-    public function getDescriptionMd()
+    public function getDescriptionMd(): ?string
     {
         return $this->descriptionMd;
     }
@@ -293,10 +267,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set descriptionHtml.
      *
      * @param string|null $descriptionHtml
-     *
-     * @return Decklist
      */
-    public function setDescriptionHtml($descriptionHtml)
+    public function setDescriptionHtml($descriptionHtml): Decklist
     {
         $this->descriptionHtml = $descriptionHtml;
 
@@ -305,10 +277,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get descriptionHtml.
-     *
-     * @return string|null
      */
-    public function getDescriptionHtml()
+    public function getDescriptionHtml(): ?string
     {
         return $this->descriptionHtml;
     }
@@ -317,10 +287,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set signature.
      *
      * @param string $signature
-     *
-     * @return Decklist
      */
-    public function setSignature($signature)
+    public function setSignature($signature): Decklist
     {
         $this->signature = $signature;
 
@@ -329,10 +297,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get signature.
-     *
-     * @return string
      */
-    public function getSignature()
+    public function getSignature(): string
     {
         return $this->signature;
     }
@@ -341,10 +307,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set nbVotes.
      *
      * @param int $nbVotes
-     *
-     * @return Decklist
      */
-    public function setNbVotes($nbVotes)
+    public function setNbVotes($nbVotes): Decklist
     {
         $this->nbVotes = $nbVotes;
 
@@ -353,10 +317,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get nbVotes.
-     *
-     * @return int
      */
-    public function getNbVotes()
+    public function getNbVotes(): int
     {
         return $this->nbVotes;
     }
@@ -365,10 +327,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set nbFavorites.
      *
      * @param int $nbFavorites
-     *
-     * @return Decklist
      */
-    public function setNbFavorites($nbFavorites)
+    public function setNbFavorites($nbFavorites): Decklist
     {
         $this->nbFavorites = $nbFavorites;
 
@@ -377,10 +337,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get nbFavorites.
-     *
-     * @return int
      */
-    public function getNbFavorites()
+    public function getNbFavorites(): int
     {
         return $this->nbFavorites;
     }
@@ -389,10 +347,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set nbComments.
      *
      * @param int $nbComments
-     *
-     * @return Decklist
      */
-    public function setNbComments($nbComments)
+    public function setNbComments($nbComments): Decklist
     {
         $this->nbComments = $nbComments;
 
@@ -401,10 +357,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get nbComments.
-     *
-     * @return int
      */
-    public function getNbComments()
+    public function getNbComments(): int
     {
         return $this->nbComments;
     }
@@ -413,10 +367,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set freezeComments.
      *
      * @param bool|null $freezeComments
-     *
-     * @return Decklist
      */
-    public function setFreezeComments($freezeComments)
+    public function setFreezeComments($freezeComments): Decklist
     {
         $this->freezeComments = $freezeComments;
 
@@ -425,20 +377,16 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get freezeComments.
-     *
-     * @return bool|null
      */
-    public function getFreezeComments()
+    public function getFreezeComments(): ?bool
     {
         return $this->freezeComments;
     }
 
     /**
      * Add slot.
-     *
-     * @return Decklist
      */
-    public function addSlot(Decklistslot $slot)
+    public function addSlot(Decklistslot $slot): Decklist
     {
         $this->slots[] = $slot;
 
@@ -458,17 +406,15 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return \App\Model\SlotCollectionInterface<Decklistslot>
      */
-    public function getSlots()
+    public function getSlots(): \App\Model\SlotCollectionInterface
     {
         return new \App\Model\SlotCollectionDecorator($this->slots);
     }
 
     /**
      * Add sideslot.
-     *
-     * @return Decklist
      */
-    public function addSideslot(Decklistsideslot $sideslots)
+    public function addSideslot(Decklistsideslot $sideslots): Decklist
     {
         $this->sideslots[] = $sideslots;
 
@@ -488,17 +434,15 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return \App\Model\SlotCollectionInterface<Decklistsideslot>
      */
-    public function getSideslots()
+    public function getSideslots(): \App\Model\SlotCollectionInterface
     {
         return new \App\Model\SlotCollectionDecorator($this->sideslots);
     }
 
     /**
      * Add comment.
-     *
-     * @return Decklist
      */
-    public function addComment(Comment $comment)
+    public function addComment(Comment $comment): Decklist
     {
         $this->comments[] = $comment;
 
@@ -518,17 +462,15 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return \Doctrine\Common\Collections\Collection<int, Comment>
      */
-    public function getComments()
+    public function getComments(): \Doctrine\Common\Collections\Collection
     {
         return $this->comments;
     }
 
     /**
      * Add successor.
-     *
-     * @return Decklist
      */
-    public function addSuccessor(Decklist $successor)
+    public function addSuccessor(Decklist $successor): Decklist
     {
         $this->successors[] = $successor;
 
@@ -548,17 +490,15 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return \Doctrine\Common\Collections\Collection<int, Decklist>
      */
-    public function getSuccessors()
+    public function getSuccessors(): \Doctrine\Common\Collections\Collection
     {
         return $this->successors;
     }
 
     /**
      * Add child.
-     *
-     * @return Decklist
      */
-    public function addChild(Deck $child)
+    public function addChild(Deck $child): Decklist
     {
         $this->children[] = $child;
 
@@ -578,17 +518,15 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return \Doctrine\Common\Collections\Collection<int, Deck>
      */
-    public function getChildren()
+    public function getChildren(): \Doctrine\Common\Collections\Collection
     {
         return $this->children;
     }
 
     /**
      * Set user.
-     *
-     * @return Decklist
      */
-    public function setUser(User $user)
+    public function setUser(User $user): Decklist
     {
         $this->user = $user;
 
@@ -597,20 +535,16 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get user.
-     *
-     * @return User
      */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->user;
     }
 
     /**
      * Set lastPack.
-     *
-     * @return Decklist
      */
-    public function setLastPack(?Pack $lastPack = null)
+    public function setLastPack(?Pack $lastPack = null): Decklist
     {
         $this->lastPack = $lastPack;
 
@@ -619,20 +553,16 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get lastPack.
-     *
-     * @return Pack|null
      */
-    public function getLastPack()
+    public function getLastPack(): ?Pack
     {
         return $this->lastPack;
     }
 
     /**
      * Set parent.
-     *
-     * @return Decklist
      */
-    public function setParent(?Deck $parent = null)
+    public function setParent(?Deck $parent = null): Decklist
     {
         $this->parent = $parent;
 
@@ -641,20 +571,16 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get parent.
-     *
-     * @return Deck|null
      */
-    public function getParent()
+    public function getParent(): ?Deck
     {
         return $this->parent;
     }
 
     /**
      * Set precedent.
-     *
-     * @return Decklist
      */
-    public function setPrecedent(?Decklist $precedent = null)
+    public function setPrecedent(?Decklist $precedent = null): Decklist
     {
         $this->precedent = $precedent;
 
@@ -663,20 +589,16 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get precedent.
-     *
-     * @return Decklist|null
      */
-    public function getPrecedent()
+    public function getPrecedent(): ?Decklist
     {
         return $this->precedent;
     }
 
     /**
      * Add favorite.
-     *
-     * @return Decklist
      */
-    public function addFavorite(User $favorite)
+    public function addFavorite(User $favorite): Decklist
     {
         $this->favorites[] = $favorite;
 
@@ -696,17 +618,15 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return \Doctrine\Common\Collections\Collection<int, User>
      */
-    public function getFavorites()
+    public function getFavorites(): \Doctrine\Common\Collections\Collection
     {
         return $this->favorites;
     }
 
     /**
      * Add vote.
-     *
-     * @return Decklist
      */
-    public function addVote(User $vote)
+    public function addVote(User $vote): Decklist
     {
         $this->votes[] = $vote;
 
@@ -726,7 +646,7 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return \Doctrine\Common\Collections\Collection<int, User>
      */
-    public function getVotes()
+    public function getVotes(): \Doctrine\Common\Collections\Collection
     {
         return $this->votes;
     }
@@ -735,10 +655,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set version.
      *
      * @param string $version
-     *
-     * @return Decklist
      */
-    public function setVersion($version)
+    public function setVersion($version): Decklist
     {
         $this->version = $version;
 
@@ -747,10 +665,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get version.
-     *
-     * @return string
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         return $this->version;
     }
@@ -762,10 +678,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Add sphere.
-     *
-     * @return Decklist
      */
-    public function addSphere(Sphere $sphere)
+    public function addSphere(Sphere $sphere): Decklist
     {
         if (!$this->spheres->contains($sphere)) {
             $this->spheres[] = $sphere;
@@ -787,7 +701,7 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return \Doctrine\Common\Collections\Collection<int, Sphere>
      */
-    public function getSpheres()
+    public function getSpheres(): \Doctrine\Common\Collections\Collection
     {
         return $this->spheres;
     }
@@ -799,10 +713,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Set predominantSphere.
-     *
-     * @return Decklist
      */
-    public function setPredominantSphere(?Sphere $predominantSphere = null)
+    public function setPredominantSphere(?Sphere $predominantSphere = null): Decklist
     {
         $this->predominantSphere = $predominantSphere;
 
@@ -811,10 +723,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get predominantSphere.
-     *
-     * @return Sphere|null
      */
-    public function getPredominantSphere()
+    public function getPredominantSphere(): ?Sphere
     {
         return $this->predominantSphere;
     }
@@ -826,10 +736,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Add fellowship.
-     *
-     * @return Decklist
      */
-    public function addFellowship(FellowshipDecklist $fellowship)
+    public function addFellowship(FellowshipDecklist $fellowship): Decklist
     {
         $this->fellowships[] = $fellowship;
 
@@ -849,7 +757,7 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return \Doctrine\Common\Collections\Collection<int, FellowshipDecklist>
      */
-    public function getFellowships()
+    public function getFellowships(): \Doctrine\Common\Collections\Collection
     {
         return $this->fellowships;
     }
@@ -859,7 +767,7 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return array<int, FellowshipDecklist>
      */
-    public function getAllFellowships()
+    public function getAllFellowships(): array
     {
         $allFellowships = $this->getFellowships()->toArray();
 
@@ -875,10 +783,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      * Set startingThreat.
      *
      * @param int $startingThreat
-     *
-     * @return Decklist
      */
-    public function setStartingThreat($startingThreat)
+    public function setStartingThreat($startingThreat): Decklist
     {
         $this->startingThreat = $startingThreat;
 
@@ -887,10 +793,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Get startingThreat.
-     *
-     * @return int
      */
-    public function getStartingThreat()
+    public function getStartingThreat(): int
     {
         return $this->startingThreat;
     }
@@ -901,10 +805,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Add questlog.
-     *
-     * @return Decklist
      */
-    public function addQuestlog(QuestlogDeck $questlog)
+    public function addQuestlog(QuestlogDeck $questlog): Decklist
     {
         $this->questlogs[] = $questlog;
 
@@ -924,7 +826,7 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return \Doctrine\Common\Collections\Collection<int, QuestlogDeck>
      */
-    public function getQuestlogs()
+    public function getQuestlogs(): \Doctrine\Common\Collections\Collection
     {
         return $this->questlogs;
     }
@@ -934,7 +836,7 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
      *
      * @return array<int, QuestlogDeck>
      */
-    public function getAllQuestlogs()
+    public function getAllQuestlogs(): array
     {
         $theseLogs = $this->getQuestlogs()->toArray();
         $parentLogs = [];
@@ -949,7 +851,7 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
     /**
      * @return array{main: array<int|string, int>, side: array<int|string, int>}
      */
-    public function getContent()
+    public function getContent(): array
     {
         $content = [
             'main' => [],

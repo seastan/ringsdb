@@ -74,11 +74,9 @@ class SearchController extends AbstractController
     public static $searchTypes = ['' => 'string', 'f' => 'string', 'i' => 'string', 'k' => 'string', 'x' => 'string', 'e' => 'code', 's' => 'code', 't' => 'code', 'c' => 'code', 'a' => 'integer', 'b' => 'integer', 'd' => 'integer', 'h' => 'integer', 'o' => 'integer', 'w' => 'integer', 'y' => 'integer', 'u' => 'boolean', 'z' => 'boolean'];
 
     /**
-     * @return Response
-     *
      * @Route("/search", name="cards_search")
      */
-    public function formAction(TypeRepository $typeRepository)
+    public function formAction(TypeRepository $typeRepository): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -108,11 +106,9 @@ class SearchController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/card/{card_code}", name="cards_zoom")
      */
-    public function zoomAction($card_code, Request $request, CardRepository $cardRepository)
+    public function zoomAction($card_code, Request $request, CardRepository $cardRepository): Response
     {
         $card = $cardRepository->findOneBy(['code' => $card_code]);
         if (!$card) {
@@ -127,15 +123,13 @@ class SearchController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/set/{pack_code}/{view}/{sort}/{page}",
      *     name="cards_list",
      *     defaults={"view"="list", "sort"="set", "page"=1}
      * )
      */
-    public function listAction($pack_code, $view, $sort, $page, Request $request)
+    public function listAction($pack_code, $view, $sort, $page, Request $request): Response
     {
         $pack = $this->packRepository->findOneBy(['code' => $pack_code]);
         if (!$pack) {
@@ -150,15 +144,13 @@ class SearchController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/cycle/{cycle_code}/{view}/{sort}/{page}",
      *     name="cards_cycle",
      *     defaults={"view"="list", "sort"="sphere", "page"=1}
      * )
      */
-    public function cycleAction($cycle_code, $view, $sort, $page, Request $request)
+    public function cycleAction($cycle_code, $view, $sort, $page, Request $request): Response
     {
         $cycle = $this->cycleRepository->findOneBy(['code' => $cycle_code]);
         if (!$cycle) {
@@ -175,11 +167,9 @@ class SearchController extends AbstractController
     /**
      * Processes the action of the card search form.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/process", name="cards_processSearchForm")
      */
-    public function processAction(Request $request)
+    public function processAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $view = $request->query->get('view') ?: 'list';
         $sort = $request->query->get('sort') ?: 'name';
@@ -261,10 +251,8 @@ class SearchController extends AbstractController
      * @param int    $page
      * @param string $pagetitle
      * @param string $meta
-     *
-     * @return Response
      */
-    public function displayAction($q, $view = 'card', $sort, $page = 1, $pagetitle = '', $meta = '', $selected_pack_code = null)
+    public function displayAction($q, $view = 'card', $sort, $page = 1, $pagetitle = '', $meta = '', $selected_pack_code = null): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -373,10 +361,7 @@ class SearchController extends AbstractController
         return $this->render('Search/display-'.$view.'.html.twig', ['view' => $view, 'sort' => $sort, 'cards' => $cards, 'first' => $first, 'last' => $last, 'searchbar' => $searchbar, 'pagination' => $pagination, 'pagetitle' => $pagetitle, 'metadescription' => $meta, 'includeReviews' => $includeReviews], $response);
     }
 
-    /**
-     * @return string
-     */
-    public function setnavigation($card, $selectedPackCode = null)
+    public function setnavigation($card, $selectedPackCode = null): string
     {
         $em = $this->getDoctrine();
         $selectedPack = null;
@@ -415,18 +400,12 @@ class SearchController extends AbstractController
         return $this->renderView('Search/setnavigation.html.twig', ['prevtitle' => $prev ? $prev->getName() : '', 'prevhref' => $prev ? $this->generateUrl('cards_zoom', array_merge(['card_code' => $prev->getCode()], $packParam)) : '', 'nexttitle' => $next ? $next->getName() : '', 'nexthref' => $next ? $this->generateUrl('cards_zoom', array_merge(['card_code' => $next->getCode()], $packParam)) : '', 'settitle' => $selectedPack->getName(), 'sethref' => $this->generateUrl('cards_list', ['pack_code' => $selectedPack->getCode()])]);
     }
 
-    /**
-     * @return string
-     */
-    public function paginationItem($q = null, $v, $s, $ps, $pi, $total)
+    public function paginationItem($q = null, $v, $s, $ps, $pi, $total): string
     {
         return $this->renderView('Search/paginationitem.html.twig', ['href' => null == $q ? '' : $this->generateUrl('cards_find', ['q' => $q, 'view' => $v, 'sort' => $s, 'page' => $pi]), 'ps' => $ps, 'pi' => $pi, 's' => $ps * ($pi - 1) + 1, 'e' => min($ps * $pi, $total)]);
     }
 
-    /**
-     * @return string
-     */
-    public function pagination($pagesize, $total, $current, $q, $view, $sort)
+    public function pagination($pagesize, $total, $current, $q, $view, $sort): string
     {
         if ($total < $pagesize) {
             $pagesize = $total;

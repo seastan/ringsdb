@@ -10,7 +10,7 @@ namespace App\Entity;
 class Reviewcomment
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -36,10 +36,8 @@ class Reviewcomment
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -48,10 +46,8 @@ class Reviewcomment
      * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return Reviewcomment
      */
-    public function setDateCreation($dateCreation)
+    public function setDateCreation($dateCreation): Reviewcomment
     {
         $this->dateCreation = $dateCreation;
 
@@ -60,10 +56,8 @@ class Reviewcomment
 
     /**
      * Get dateCreation.
-     *
-     * @return \DateTime
      */
-    public function getDateCreation()
+    public function getDateCreation(): \DateTime
     {
         return $this->dateCreation;
     }
@@ -72,10 +66,8 @@ class Reviewcomment
      * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return Reviewcomment
      */
-    public function setDateUpdate($dateUpdate)
+    public function setDateUpdate($dateUpdate): Reviewcomment
     {
         $this->dateUpdate = $dateUpdate;
 
@@ -84,10 +76,8 @@ class Reviewcomment
 
     /**
      * Get dateUpdate.
-     *
-     * @return \DateTime
      */
-    public function getDateUpdate()
+    public function getDateUpdate(): \DateTime
     {
         return $this->dateUpdate;
     }
@@ -96,10 +86,8 @@ class Reviewcomment
      * Set text.
      *
      * @param string $text
-     *
-     * @return Reviewcomment
      */
-    public function setText($text)
+    public function setText($text): Reviewcomment
     {
         $this->text = $text;
 
@@ -108,20 +96,16 @@ class Reviewcomment
 
     /**
      * Get text.
-     *
-     * @return string
      */
-    public function getText()
+    public function getText(): string
     {
         return $this->text;
     }
 
     /**
      * Set user.
-     *
-     * @return Reviewcomment
      */
-    public function setUser(User $user)
+    public function setUser(User $user): Reviewcomment
     {
         $this->user = $user;
 
@@ -130,20 +114,16 @@ class Reviewcomment
 
     /**
      * Get user.
-     *
-     * @return User
      */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->user;
     }
 
     /**
      * Set review.
-     *
-     * @return Reviewcomment
      */
-    public function setReview(Review $review)
+    public function setReview(Review $review): Reviewcomment
     {
         $this->review = $review;
 
@@ -152,10 +132,8 @@ class Reviewcomment
 
     /**
      * Get review.
-     *
-     * @return Review
      */
-    public function getReview()
+    public function getReview(): Review
     {
         return $this->review;
     }

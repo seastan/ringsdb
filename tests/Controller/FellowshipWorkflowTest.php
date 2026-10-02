@@ -47,7 +47,7 @@ class FellowshipWorkflowTest extends WebTestCase
     /**
      * @return array<int, mixed>
      */
-    private function fellowshipOneState($connection)
+    private function fellowshipOneState($connection): array
     {
         return [
             $connection->fetchAssoc('SELECT name, is_public, nb_decks, nb_votes, nb_favorites, nb_comments FROM fellowship WHERE id = 1'),
@@ -97,20 +97,15 @@ class FellowshipWorkflowTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db()
+    private function db(): \Doctrine\DBAL\Connection
     {
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
     /**
      * @param string $username
-     *
-     * @return KernelBrowser
      */
-    private function createAuthenticatedClient($username = 'test')
+    private function createAuthenticatedClient($username = 'test'): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -143,7 +138,7 @@ class FellowshipWorkflowTest extends WebTestCase
     /**
      * @return array [deck number => 'deck:<id>' | 'decklist:<id>']
      */
-    private function fetchFellowshipDecks(KernelBrowser $client, $id)
+    private function fetchFellowshipDecks(KernelBrowser $client, $id): array
     {
         $decks = [];
         foreach ($this->db($client)->fetchAll('SELECT deck_number, deck_id FROM fellowship_deck WHERE fellowship_id = ?', [$id]) as $row) {
@@ -161,10 +156,8 @@ class FellowshipWorkflowTest extends WebTestCase
      * Creates a fellowship through the form, returns its id.
      *
      * @param string $description
-     *
-     * @return int
      */
-    private function createFellowship(KernelBrowser $client, $name, array $decks, $description = '')
+    private function createFellowship(KernelBrowser $client, $name, array $decks, $description = ''): int
     {
         $crawler = $client->request('GET', '/fellowship/new/0/0/0/0');
         $this->assertSame(200, $client->getResponse()->getStatusCode());

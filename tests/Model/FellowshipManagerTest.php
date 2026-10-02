@@ -80,10 +80,7 @@ class FellowshipManagerTest extends KernelTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return int
-     */
-    private function insertFellowship($name, $userId, array $decklistIds, array $values)
+    private function insertFellowship($name, $userId, array $decklistIds, array $values): int
     {
         $this->connection->insert('fellowship', $values + [
             'user_id' => $userId, 'name' => $name, 'name_canonical' => strtolower(str_replace(' ', '-', $name)),
@@ -100,10 +97,8 @@ class FellowshipManagerTest extends KernelTestCase
 
     /**
      * A copy of fixture decklist 2 with the given cards ([card id => quantity]).
-     *
-     * @return int
      */
-    private function insertDecklist(array $slots)
+    private function insertDecklist(array $slots): int
     {
         $row = $this->connection->fetchAssoc('SELECT * FROM decklist WHERE id = 2');
         $this->assertNotFalse($row);
@@ -117,10 +112,7 @@ class FellowshipManagerTest extends KernelTestCase
         return $id;
     }
 
-    /**
-     * @return FellowshipManager
-     */
-    private function manager(array $query = [], $username = null)
+    private function manager(array $query = [], $username = null): FellowshipManager
     {
         $container = static::$kernel->getContainer();
         $container->get('request_stack')->push(Request::create('/fellowships/find', 'GET', $query));
@@ -132,10 +124,7 @@ class FellowshipManagerTest extends KernelTestCase
         return $manager;
     }
 
-    /**
-     * @return User
-     */
-    private function user($username)
+    private function user($username): User
     {
         $user = static::$kernel->getContainer()->get('doctrine')->getRepository(User::class)->findOneBy(['username' => $username]);
         $this->assertNotNull($user);
@@ -146,7 +135,7 @@ class FellowshipManagerTest extends KernelTestCase
     /**
      * @return string[] the names (F1...F5) of the fellowships found, in order
      */
-    private function names($paginator)
+    private function names($paginator): array
     {
         $names = array_flip($this->ids);
         $result = [];
@@ -203,10 +192,7 @@ class FellowshipManagerTest extends KernelTestCase
         $this->assertSame($expected, $this->names($this->manager($query, $username)->findFellowshipsWithComplexSearch()));
     }
 
-    /**
-     * @return array
-     */
-    public function searchProvider()
+    public function searchProvider(): array
     {
         return [
             'no criteria' => [[], ['F2', 'F3', 'F5', 'F1']],

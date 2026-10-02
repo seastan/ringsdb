@@ -43,7 +43,7 @@ class PatronCommandTest extends KernelTestCase
     /**
      * @return string the output, without the leading dates
      */
-    private function runCommand(array $arguments)
+    private function runCommand(array $arguments): string
     {
         $application = new Application(static::$kernel);
         $tester = new CommandTester($application->find('app:patron'));

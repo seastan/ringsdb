@@ -63,7 +63,7 @@ class Scenario implements \JsonSerializable
     }
 
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -101,10 +101,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -113,10 +111,8 @@ class Scenario implements \JsonSerializable
      * Set code.
      *
      * @param string $code
-     *
-     * @return Scenario
      */
-    public function setCode($code)
+    public function setCode($code): Scenario
     {
         $this->code = $code;
 
@@ -125,10 +121,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get code.
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
@@ -137,10 +131,8 @@ class Scenario implements \JsonSerializable
      * Set name.
      *
      * @param string $name
-     *
-     * @return Scenario
      */
-    public function setName($name)
+    public function setName($name): Scenario
     {
         $this->name = $name;
 
@@ -149,10 +141,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get name.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -161,10 +151,8 @@ class Scenario implements \JsonSerializable
      * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return Scenario
      */
-    public function setDateCreation($dateCreation)
+    public function setDateCreation($dateCreation): Scenario
     {
         $this->dateCreation = $dateCreation;
 
@@ -173,10 +161,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get dateCreation.
-     *
-     * @return \DateTime
      */
-    public function getDateCreation()
+    public function getDateCreation(): \DateTime
     {
         return $this->dateCreation;
     }
@@ -185,10 +171,8 @@ class Scenario implements \JsonSerializable
      * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return Scenario
      */
-    public function setDateUpdate($dateUpdate)
+    public function setDateUpdate($dateUpdate): Scenario
     {
         $this->dateUpdate = $dateUpdate;
 
@@ -197,20 +181,16 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get dateUpdate.
-     *
-     * @return \DateTime
      */
-    public function getDateUpdate()
+    public function getDateUpdate(): \DateTime
     {
         return $this->dateUpdate;
     }
 
     /**
      * Set pack.
-     *
-     * @return Scenario
      */
-    public function setPack(?Pack $pack = null)
+    public function setPack(?Pack $pack = null): Scenario
     {
         $this->pack = $pack;
 
@@ -219,20 +199,16 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get pack.
-     *
-     * @return Pack|null
      */
-    public function getPack()
+    public function getPack(): ?Pack
     {
         return $this->pack;
     }
 
     /**
      * Add encounter.
-     *
-     * @return Scenario
      */
-    public function addEncounter(Encounter $encounter)
+    public function addEncounter(Encounter $encounter): Scenario
     {
         $this->encounters[] = $encounter;
 
@@ -252,7 +228,7 @@ class Scenario implements \JsonSerializable
      *
      * @return \Doctrine\Common\Collections\Collection<int, Encounter>
      */
-    public function getEncounters()
+    public function getEncounters(): \Doctrine\Common\Collections\Collection
     {
         return $this->encounters;
     }
@@ -266,10 +242,8 @@ class Scenario implements \JsonSerializable
      * Set position.
      *
      * @param int $position
-     *
-     * @return Scenario
      */
-    public function setPosition($position)
+    public function setPosition($position): Scenario
     {
         $this->position = $position;
 
@@ -278,10 +252,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get position.
-     *
-     * @return int
      */
-    public function getPosition()
+    public function getPosition(): int
     {
         return $this->position;
     }
@@ -407,10 +379,8 @@ class Scenario implements \JsonSerializable
      * Set hasEasy.
      *
      * @param bool $hasEasy
-     *
-     * @return Scenario
      */
-    public function setHasEasy($hasEasy)
+    public function setHasEasy($hasEasy): Scenario
     {
         $this->hasEasy = $hasEasy;
 
@@ -419,10 +389,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get hasEasy.
-     *
-     * @return bool
      */
-    public function getHasEasy()
+    public function getHasEasy(): bool
     {
         return $this->hasEasy;
     }
@@ -431,10 +399,8 @@ class Scenario implements \JsonSerializable
      * Set hasNightmare.
      *
      * @param bool $hasNightmare
-     *
-     * @return Scenario
      */
-    public function setHasNightmare($hasNightmare)
+    public function setHasNightmare($hasNightmare): Scenario
     {
         $this->hasNightmare = $hasNightmare;
 
@@ -443,10 +409,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get hasNightmare.
-     *
-     * @return bool
      */
-    public function getHasNightmare()
+    public function getHasNightmare(): bool
     {
         return $this->hasNightmare;
     }
@@ -455,10 +419,8 @@ class Scenario implements \JsonSerializable
      * Set easyCards.
      *
      * @param int $easyCards
-     *
-     * @return Scenario
      */
-    public function setEasyCards($easyCards)
+    public function setEasyCards($easyCards): Scenario
     {
         $this->easyCards = $easyCards;
 
@@ -467,10 +429,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get easyCards.
-     *
-     * @return int
      */
-    public function getEasyCards()
+    public function getEasyCards(): int
     {
         return $this->easyCards;
     }
@@ -479,10 +439,8 @@ class Scenario implements \JsonSerializable
      * Set easyEnemies.
      *
      * @param int $easyEnemies
-     *
-     * @return Scenario
      */
-    public function setEasyEnemies($easyEnemies)
+    public function setEasyEnemies($easyEnemies): Scenario
     {
         $this->easyEnemies = $easyEnemies;
 
@@ -491,10 +449,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get easyEnemies.
-     *
-     * @return int
      */
-    public function getEasyEnemies()
+    public function getEasyEnemies(): int
     {
         return $this->easyEnemies;
     }
@@ -503,10 +459,8 @@ class Scenario implements \JsonSerializable
      * Set easyLocations.
      *
      * @param int $easyLocations
-     *
-     * @return Scenario
      */
-    public function setEasyLocations($easyLocations)
+    public function setEasyLocations($easyLocations): Scenario
     {
         $this->easyLocations = $easyLocations;
 
@@ -515,10 +469,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get easyLocations.
-     *
-     * @return int
      */
-    public function getEasyLocations()
+    public function getEasyLocations(): int
     {
         return $this->easyLocations;
     }
@@ -527,10 +479,8 @@ class Scenario implements \JsonSerializable
      * Set easyTreacheries.
      *
      * @param int $easyTreacheries
-     *
-     * @return Scenario
      */
-    public function setEasyTreacheries($easyTreacheries)
+    public function setEasyTreacheries($easyTreacheries): Scenario
     {
         $this->easyTreacheries = $easyTreacheries;
 
@@ -539,10 +489,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get easyTreacheries.
-     *
-     * @return int
      */
-    public function getEasyTreacheries()
+    public function getEasyTreacheries(): int
     {
         return $this->easyTreacheries;
     }
@@ -551,10 +499,8 @@ class Scenario implements \JsonSerializable
      * Set easyObjectiveAllies.
      *
      * @param int $easyObjectiveAllies
-     *
-     * @return Scenario
      */
-    public function setEasyObjectiveAllies($easyObjectiveAllies)
+    public function setEasyObjectiveAllies($easyObjectiveAllies): Scenario
     {
         $this->easyObjectiveAllies = $easyObjectiveAllies;
 
@@ -563,10 +509,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get easyObjectiveAllies.
-     *
-     * @return int
      */
-    public function getEasyObjectiveAllies()
+    public function getEasyObjectiveAllies(): int
     {
         return $this->easyObjectiveAllies;
     }
@@ -575,10 +519,8 @@ class Scenario implements \JsonSerializable
      * Set easyObjectiveLocations.
      *
      * @param int $easyObjectiveLocations
-     *
-     * @return Scenario
      */
-    public function setEasyObjectiveLocations($easyObjectiveLocations)
+    public function setEasyObjectiveLocations($easyObjectiveLocations): Scenario
     {
         $this->easyObjectiveLocations = $easyObjectiveLocations;
 
@@ -587,10 +529,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get easyObjectiveLocations.
-     *
-     * @return int
      */
-    public function getEasyObjectiveLocations()
+    public function getEasyObjectiveLocations(): int
     {
         return $this->easyObjectiveLocations;
     }
@@ -599,10 +539,8 @@ class Scenario implements \JsonSerializable
      * Set easySurges.
      *
      * @param int $easySurges
-     *
-     * @return Scenario
      */
-    public function setEasySurges($easySurges)
+    public function setEasySurges($easySurges): Scenario
     {
         $this->easySurges = $easySurges;
 
@@ -611,10 +549,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get easySurges.
-     *
-     * @return int
      */
-    public function getEasySurges()
+    public function getEasySurges(): int
     {
         return $this->easySurges;
     }
@@ -623,10 +559,8 @@ class Scenario implements \JsonSerializable
      * Set easyShadows.
      *
      * @param int $easyShadows
-     *
-     * @return Scenario
      */
-    public function setEasyShadows($easyShadows)
+    public function setEasyShadows($easyShadows): Scenario
     {
         $this->easyShadows = $easyShadows;
 
@@ -635,10 +569,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get easyShadows.
-     *
-     * @return int
      */
-    public function getEasyShadows()
+    public function getEasyShadows(): int
     {
         return $this->easyShadows;
     }
@@ -647,10 +579,8 @@ class Scenario implements \JsonSerializable
      * Set easyEncounterSideQuests.
      *
      * @param int $easyEncounterSideQuests
-     *
-     * @return Scenario
      */
-    public function setEasyEncounterSideQuests($easyEncounterSideQuests)
+    public function setEasyEncounterSideQuests($easyEncounterSideQuests): Scenario
     {
         $this->easyEncounterSideQuests = $easyEncounterSideQuests;
 
@@ -659,10 +589,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get easyEncounterSideQuests.
-     *
-     * @return int
      */
-    public function getEasyEncounterSideQuests()
+    public function getEasyEncounterSideQuests(): int
     {
         return $this->easyEncounterSideQuests;
     }
@@ -671,10 +599,8 @@ class Scenario implements \JsonSerializable
      * Set normalCards.
      *
      * @param int $normalCards
-     *
-     * @return Scenario
      */
-    public function setNormalCards($normalCards)
+    public function setNormalCards($normalCards): Scenario
     {
         $this->normalCards = $normalCards;
 
@@ -683,10 +609,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get normalCards.
-     *
-     * @return int
      */
-    public function getNormalCards()
+    public function getNormalCards(): int
     {
         return $this->normalCards;
     }
@@ -695,10 +619,8 @@ class Scenario implements \JsonSerializable
      * Set normalEnemies.
      *
      * @param int $normalEnemies
-     *
-     * @return Scenario
      */
-    public function setNormalEnemies($normalEnemies)
+    public function setNormalEnemies($normalEnemies): Scenario
     {
         $this->normalEnemies = $normalEnemies;
 
@@ -707,10 +629,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get normalEnemies.
-     *
-     * @return int
      */
-    public function getNormalEnemies()
+    public function getNormalEnemies(): int
     {
         return $this->normalEnemies;
     }
@@ -719,10 +639,8 @@ class Scenario implements \JsonSerializable
      * Set normalLocations.
      *
      * @param int $normalLocations
-     *
-     * @return Scenario
      */
-    public function setNormalLocations($normalLocations)
+    public function setNormalLocations($normalLocations): Scenario
     {
         $this->normalLocations = $normalLocations;
 
@@ -731,10 +649,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get normalLocations.
-     *
-     * @return int
      */
-    public function getNormalLocations()
+    public function getNormalLocations(): int
     {
         return $this->normalLocations;
     }
@@ -743,10 +659,8 @@ class Scenario implements \JsonSerializable
      * Set normalTreacheries.
      *
      * @param int $normalTreacheries
-     *
-     * @return Scenario
      */
-    public function setNormalTreacheries($normalTreacheries)
+    public function setNormalTreacheries($normalTreacheries): Scenario
     {
         $this->normalTreacheries = $normalTreacheries;
 
@@ -755,10 +669,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get normalTreacheries.
-     *
-     * @return int
      */
-    public function getNormalTreacheries()
+    public function getNormalTreacheries(): int
     {
         return $this->normalTreacheries;
     }
@@ -767,10 +679,8 @@ class Scenario implements \JsonSerializable
      * Set normalObjectiveAllies.
      *
      * @param int $normalObjectiveAllies
-     *
-     * @return Scenario
      */
-    public function setNormalObjectiveAllies($normalObjectiveAllies)
+    public function setNormalObjectiveAllies($normalObjectiveAllies): Scenario
     {
         $this->normalObjectiveAllies = $normalObjectiveAllies;
 
@@ -779,10 +689,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get normalObjectiveAllies.
-     *
-     * @return int
      */
-    public function getNormalObjectiveAllies()
+    public function getNormalObjectiveAllies(): int
     {
         return $this->normalObjectiveAllies;
     }
@@ -791,10 +699,8 @@ class Scenario implements \JsonSerializable
      * Set normalObjectiveLocations.
      *
      * @param int $normalObjectiveLocations
-     *
-     * @return Scenario
      */
-    public function setNormalObjectiveLocations($normalObjectiveLocations)
+    public function setNormalObjectiveLocations($normalObjectiveLocations): Scenario
     {
         $this->normalObjectiveLocations = $normalObjectiveLocations;
 
@@ -803,10 +709,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get normalObjectiveLocations.
-     *
-     * @return int
      */
-    public function getNormalObjectiveLocations()
+    public function getNormalObjectiveLocations(): int
     {
         return $this->normalObjectiveLocations;
     }
@@ -815,10 +719,8 @@ class Scenario implements \JsonSerializable
      * Set normalSurges.
      *
      * @param int $normalSurges
-     *
-     * @return Scenario
      */
-    public function setNormalSurges($normalSurges)
+    public function setNormalSurges($normalSurges): Scenario
     {
         $this->normalSurges = $normalSurges;
 
@@ -827,10 +729,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get normalSurges.
-     *
-     * @return int
      */
-    public function getNormalSurges()
+    public function getNormalSurges(): int
     {
         return $this->normalSurges;
     }
@@ -839,10 +739,8 @@ class Scenario implements \JsonSerializable
      * Set normalShadows.
      *
      * @param int $normalShadows
-     *
-     * @return Scenario
      */
-    public function setNormalShadows($normalShadows)
+    public function setNormalShadows($normalShadows): Scenario
     {
         $this->normalShadows = $normalShadows;
 
@@ -851,10 +749,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get normalShadows.
-     *
-     * @return int
      */
-    public function getNormalShadows()
+    public function getNormalShadows(): int
     {
         return $this->normalShadows;
     }
@@ -863,10 +759,8 @@ class Scenario implements \JsonSerializable
      * Set normalEncounterSideQuests.
      *
      * @param int $normalEncounterSideQuests
-     *
-     * @return Scenario
      */
-    public function setNormalEncounterSideQuests($normalEncounterSideQuests)
+    public function setNormalEncounterSideQuests($normalEncounterSideQuests): Scenario
     {
         $this->normalEncounterSideQuests = $normalEncounterSideQuests;
 
@@ -875,10 +769,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get normalEncounterSideQuests.
-     *
-     * @return int
      */
-    public function getNormalEncounterSideQuests()
+    public function getNormalEncounterSideQuests(): int
     {
         return $this->normalEncounterSideQuests;
     }
@@ -887,10 +779,8 @@ class Scenario implements \JsonSerializable
      * Set nightmareCards.
      *
      * @param int $nightmareCards
-     *
-     * @return Scenario
      */
-    public function setNightmareCards($nightmareCards)
+    public function setNightmareCards($nightmareCards): Scenario
     {
         $this->nightmareCards = $nightmareCards;
 
@@ -899,10 +789,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get nightmareCards.
-     *
-     * @return int
      */
-    public function getNightmareCards()
+    public function getNightmareCards(): int
     {
         return $this->nightmareCards;
     }
@@ -911,10 +799,8 @@ class Scenario implements \JsonSerializable
      * Set nightmareEnemies.
      *
      * @param int $nightmareEnemies
-     *
-     * @return Scenario
      */
-    public function setNightmareEnemies($nightmareEnemies)
+    public function setNightmareEnemies($nightmareEnemies): Scenario
     {
         $this->nightmareEnemies = $nightmareEnemies;
 
@@ -923,10 +809,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get nightmareEnemies.
-     *
-     * @return int
      */
-    public function getNightmareEnemies()
+    public function getNightmareEnemies(): int
     {
         return $this->nightmareEnemies;
     }
@@ -935,10 +819,8 @@ class Scenario implements \JsonSerializable
      * Set nightmareLocations.
      *
      * @param int $nightmareLocations
-     *
-     * @return Scenario
      */
-    public function setNightmareLocations($nightmareLocations)
+    public function setNightmareLocations($nightmareLocations): Scenario
     {
         $this->nightmareLocations = $nightmareLocations;
 
@@ -947,10 +829,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get nightmareLocations.
-     *
-     * @return int
      */
-    public function getNightmareLocations()
+    public function getNightmareLocations(): int
     {
         return $this->nightmareLocations;
     }
@@ -959,10 +839,8 @@ class Scenario implements \JsonSerializable
      * Set nightmareTreacheries.
      *
      * @param int $nightmareTreacheries
-     *
-     * @return Scenario
      */
-    public function setNightmareTreacheries($nightmareTreacheries)
+    public function setNightmareTreacheries($nightmareTreacheries): Scenario
     {
         $this->nightmareTreacheries = $nightmareTreacheries;
 
@@ -971,10 +849,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get nightmareTreacheries.
-     *
-     * @return int
      */
-    public function getNightmareTreacheries()
+    public function getNightmareTreacheries(): int
     {
         return $this->nightmareTreacheries;
     }
@@ -983,10 +859,8 @@ class Scenario implements \JsonSerializable
      * Set nightmareObjectiveAllies.
      *
      * @param int $nightmareObjectiveAllies
-     *
-     * @return Scenario
      */
-    public function setNightmareObjectiveAllies($nightmareObjectiveAllies)
+    public function setNightmareObjectiveAllies($nightmareObjectiveAllies): Scenario
     {
         $this->nightmareObjectiveAllies = $nightmareObjectiveAllies;
 
@@ -995,10 +869,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get nightmareObjectiveAllies.
-     *
-     * @return int
      */
-    public function getNightmareObjectiveAllies()
+    public function getNightmareObjectiveAllies(): int
     {
         return $this->nightmareObjectiveAllies;
     }
@@ -1007,10 +879,8 @@ class Scenario implements \JsonSerializable
      * Set nightmareObjectiveLocations.
      *
      * @param int $nightmareObjectiveLocations
-     *
-     * @return Scenario
      */
-    public function setNightmareObjectiveLocations($nightmareObjectiveLocations)
+    public function setNightmareObjectiveLocations($nightmareObjectiveLocations): Scenario
     {
         $this->nightmareObjectiveLocations = $nightmareObjectiveLocations;
 
@@ -1019,10 +889,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get nightmareObjectiveLocations.
-     *
-     * @return int
      */
-    public function getNightmareObjectiveLocations()
+    public function getNightmareObjectiveLocations(): int
     {
         return $this->nightmareObjectiveLocations;
     }
@@ -1031,10 +899,8 @@ class Scenario implements \JsonSerializable
      * Set nightmareSurges.
      *
      * @param int $nightmareSurges
-     *
-     * @return Scenario
      */
-    public function setNightmareSurges($nightmareSurges)
+    public function setNightmareSurges($nightmareSurges): Scenario
     {
         $this->nightmareSurges = $nightmareSurges;
 
@@ -1043,10 +909,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get nightmareSurges.
-     *
-     * @return int
      */
-    public function getNightmareSurges()
+    public function getNightmareSurges(): int
     {
         return $this->nightmareSurges;
     }
@@ -1055,10 +919,8 @@ class Scenario implements \JsonSerializable
      * Set nightmareShadows.
      *
      * @param int $nightmareShadows
-     *
-     * @return Scenario
      */
-    public function setNightmareShadows($nightmareShadows)
+    public function setNightmareShadows($nightmareShadows): Scenario
     {
         $this->nightmareShadows = $nightmareShadows;
 
@@ -1067,10 +929,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get nightmareShadows.
-     *
-     * @return int
      */
-    public function getNightmareShadows()
+    public function getNightmareShadows(): int
     {
         return $this->nightmareShadows;
     }
@@ -1079,10 +939,8 @@ class Scenario implements \JsonSerializable
      * Set nightmareEncounterSideQuests.
      *
      * @param int $nightmareEncounterSideQuests
-     *
-     * @return Scenario
      */
-    public function setNightmareEncounterSideQuests($nightmareEncounterSideQuests)
+    public function setNightmareEncounterSideQuests($nightmareEncounterSideQuests): Scenario
     {
         $this->nightmareEncounterSideQuests = $nightmareEncounterSideQuests;
 
@@ -1091,10 +949,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get nightmareEncounterSideQuests.
-     *
-     * @return int
      */
-    public function getNightmareEncounterSideQuests()
+    public function getNightmareEncounterSideQuests(): int
     {
         return $this->nightmareEncounterSideQuests;
     }
@@ -1116,10 +972,8 @@ class Scenario implements \JsonSerializable
      * Set easyObjectives.
      *
      * @param int $easyObjectives
-     *
-     * @return Scenario
      */
-    public function setEasyObjectives($easyObjectives)
+    public function setEasyObjectives($easyObjectives): Scenario
     {
         $this->easyObjectives = $easyObjectives;
 
@@ -1128,10 +982,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get easyObjectives.
-     *
-     * @return int
      */
-    public function getEasyObjectives()
+    public function getEasyObjectives(): int
     {
         return $this->easyObjectives;
     }
@@ -1140,10 +992,8 @@ class Scenario implements \JsonSerializable
      * Set normalObjectives.
      *
      * @param int $normalObjectives
-     *
-     * @return Scenario
      */
-    public function setNormalObjectives($normalObjectives)
+    public function setNormalObjectives($normalObjectives): Scenario
     {
         $this->normalObjectives = $normalObjectives;
 
@@ -1152,10 +1002,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get normalObjectives.
-     *
-     * @return int
      */
-    public function getNormalObjectives()
+    public function getNormalObjectives(): int
     {
         return $this->normalObjectives;
     }
@@ -1164,10 +1012,8 @@ class Scenario implements \JsonSerializable
      * Set nightmareObjectives.
      *
      * @param int $nightmareObjectives
-     *
-     * @return Scenario
      */
-    public function setNightmareObjectives($nightmareObjectives)
+    public function setNightmareObjectives($nightmareObjectives): Scenario
     {
         $this->nightmareObjectives = $nightmareObjectives;
 
@@ -1176,10 +1022,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get nightmareObjectives.
-     *
-     * @return int
      */
-    public function getNightmareObjectives()
+    public function getNightmareObjectives(): int
     {
         return $this->nightmareObjectives;
     }
@@ -1191,10 +1035,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Add questlog.
-     *
-     * @return Scenario
      */
-    public function addQuestlog(Questlog $questlog)
+    public function addQuestlog(Questlog $questlog): Scenario
     {
         $this->questlogs[] = $questlog;
 
@@ -1214,7 +1056,7 @@ class Scenario implements \JsonSerializable
      *
      * @return \Doctrine\Common\Collections\Collection<int, Questlog>
      */
-    public function getQuestlogs()
+    public function getQuestlogs(): \Doctrine\Common\Collections\Collection
     {
         return $this->questlogs;
     }
@@ -1228,10 +1070,8 @@ class Scenario implements \JsonSerializable
      * Set nameCanonical.
      *
      * @param string $nameCanonical
-     *
-     * @return Scenario
      */
-    public function setNameCanonical($nameCanonical)
+    public function setNameCanonical($nameCanonical): Scenario
     {
         $this->nameCanonical = $nameCanonical;
 
@@ -1240,10 +1080,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Get nameCanonical.
-     *
-     * @return string
      */
-    public function getNameCanonical()
+    public function getNameCanonical(): string
     {
         return $this->nameCanonical;
     }

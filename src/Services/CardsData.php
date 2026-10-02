@@ -73,10 +73,8 @@ class CardsData
      * Searches for and replaces symbol tokens with markup in a given text.
      *
      * @param string $text
-     *
-     * @return string
      */
-    public function replaceSymbols($text)
+    public function replaceSymbols($text): string
     {
         /** @var array<string, string> $displayTextReplacements */
         static $displayTextReplacements = [
@@ -97,10 +95,7 @@ class CardsData
         return str_replace(array_keys($displayTextReplacements), array_values($displayTextReplacements), $text);
     }
 
-    /**
-     * @return string
-     */
-    public function splitInParagraphs($text)
+    public function splitInParagraphs($text): string
     {
         if (empty($text)) {
             return '';
@@ -112,7 +107,7 @@ class CardsData
     /**
      * @return list<array<string, mixed>>
      */
-    public function allSetsData()
+    public function allSetsData(): array
     {
         $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
         $cycles = [];
@@ -163,7 +158,7 @@ class CardsData
     /**
      * @return array<int, Sphere>
      */
-    public function getPrimarySpheres()
+    public function getPrimarySpheres(): array
     {
         $spheres = $this->sphereRepository->findBy(['is_primary' => true], ['code' => 'ASC']);
 
@@ -175,7 +170,7 @@ class CardsData
      *
      * @return array<int, Card>
      */
-    public function get_search_rows($conditions, $sortorder, $forceempty = false)
+    public function get_search_rows($conditions, $sortorder, $forceempty = false): array
     {
         $i = 0;
 
@@ -474,7 +469,7 @@ class CardsData
      *
      * @return array<string, mixed>
      */
-    public function getCardInfo($card, $api = false)
+    public function getCardInfo($card, $api = false): array
     {
         $cardinfo = [];
 
@@ -580,7 +575,7 @@ class CardsData
     /**
      * @return list<array<int, string>>
      */
-    public function syntax($query)
+    public function syntax($query): array
     {
         // renvoie une liste de conditions (array)
         // chaque condition est un tableau à n>1 éléments
@@ -659,7 +654,7 @@ class CardsData
     /**
      * @return array<int, mixed>
      */
-    public function validateConditions($conditions)
+    public function validateConditions($conditions): array
     {
         // suppression des conditions invalides
         $numeric = ['<', '>'];
@@ -677,10 +672,7 @@ class CardsData
         return array_values($conditions);
     }
 
-    /**
-     * @return string
-     */
-    public function buildQueryFromConditions($conditions)
+    public function buildQueryFromConditions($conditions): string
     {
         return implode(' ', array_map(fn ($l) => ($l[0] ? $l[0].$l[1] : '').implode('|', array_map(fn ($s) => preg_match("/^[\p{L}\p{N}\-\&]+$/u", $s) ? $s : "\"$s\"", array_slice($l, 2))), $conditions));
     }
@@ -688,7 +680,7 @@ class CardsData
     /**
      * @return array<int, Review>
      */
-    public function get_reviews($card)
+    public function get_reviews($card): array
     {
         $reviews = $this->reviewRepository->findBy(['card' => $card], ['nbVotes' => 'DESC', 'id' => 'ASC']);
 
@@ -700,7 +692,7 @@ class CardsData
     /**
      * @return array<string, int>
      */
-    public function getDistinctTraits()
+    public function getDistinctTraits(): array
     {
         $qb = $this->em->createQueryBuilder();
         $qb->from('App:Card', 'c');

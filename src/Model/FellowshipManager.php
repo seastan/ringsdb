@@ -102,20 +102,15 @@ class FellowshipManager
         $this->start = ($this->page - 1) * $this->limit;
     }
 
-    /**
-     * @return int
-     */
-    public function getMaxCount()
+    public function getMaxCount(): int
     {
         return $this->maxcount;
     }
 
     /**
      * creates the basic query builder and initializes it.
-     *
-     * @return \Doctrine\ORM\QueryBuilder
      */
-    private function getQueryBuilder()
+    private function getQueryBuilder(): \Doctrine\ORM\QueryBuilder
     {
         $qb = $this->doctrine->createQueryBuilder();
         $qb->select('d');
@@ -135,7 +130,7 @@ class FellowshipManager
      *
      * @return Paginator<\App\Entity\Fellowship>
      */
-    private function getPaginator(Query $query)
+    private function getPaginator(Query $query): Paginator
     {
         $paginator = new Paginator($query, $fetchJoinCollection = false);
         $this->maxcount = $paginator->count();
@@ -146,7 +141,7 @@ class FellowshipManager
     /**
      * @return ArrayCollection<int, \App\Entity\Fellowship>
      */
-    public function getEmptyList()
+    public function getEmptyList(): ArrayCollection
     {
         $this->maxcount = 0;
 
@@ -156,7 +151,7 @@ class FellowshipManager
     /**
      * @return Paginator<\App\Entity\Fellowship>
      */
-    public function findFellowshipsByPopularity()
+    public function findFellowshipsByPopularity(): Paginator
     {
         $qb = $this->getQueryBuilder();
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.datePublish), 2)) AS HIDDEN popularity');
@@ -171,7 +166,7 @@ class FellowshipManager
     /**
      * @return Paginator<\App\Entity\Fellowship>
      */
-    public function findFellowshipsByAge()
+    public function findFellowshipsByAge(): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -186,7 +181,7 @@ class FellowshipManager
     /**
      * @return Paginator<\App\Entity\Fellowship>
      */
-    public function findFellowshipsByRecentDiscussion()
+    public function findFellowshipsByRecentDiscussion(): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -202,7 +197,7 @@ class FellowshipManager
     /**
      * @return Paginator<\App\Entity\Fellowship>
      */
-    public function findFellowshipsByFavorite(User $user)
+    public function findFellowshipsByFavorite(User $user): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -220,7 +215,7 @@ class FellowshipManager
     /**
      * @return Paginator<\App\Entity\Fellowship>
      */
-    public function findFellowshipsByAuthor(User $user)
+    public function findFellowshipsByAuthor(User $user): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -237,7 +232,7 @@ class FellowshipManager
     /**
      * @return Paginator<\App\Entity\Fellowship>
      */
-    public function findFellowshipsInHallOfFame()
+    public function findFellowshipsInHallOfFame(): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -253,7 +248,7 @@ class FellowshipManager
     /**
      * @return Paginator<\App\Entity\Fellowship>
      */
-    public function findFellowshipsInHotTopic()
+    public function findFellowshipsInHotTopic(): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -270,7 +265,7 @@ class FellowshipManager
     /**
      * @return Paginator<\App\Entity\Fellowship>
      */
-    public function findFellowshipsWithComplexSearch()
+    public function findFellowshipsWithComplexSearch(): Paginator
     {
         $request = $this->currentRequest();
 
@@ -423,10 +418,7 @@ class FellowshipManager
         return $this->getPaginator($qb->getQuery());
     }
 
-    /**
-     * @return int
-     */
-    public function getNumberOfPages()
+    public function getNumberOfPages(): int
     {
         return intval(ceil($this->maxcount / $this->limit));
     }
@@ -434,7 +426,7 @@ class FellowshipManager
     /**
      * @return list<array{numero: int, url: string, current: bool}>
      */
-    public function getAllPages()
+    public function getAllPages(): array
     {
         $request = $this->currentRequest();
         $route = $request->get('_route');
@@ -459,7 +451,7 @@ class FellowshipManager
     /**
      * @return array<int, mixed>
      */
-    public function getClosePages()
+    public function getClosePages(): array
     {
         $allPages = $this->getAllPages();
         $numero_courant = $this->page - 1;
@@ -473,10 +465,7 @@ class FellowshipManager
         return $pages;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getPreviousUrl()
+    public function getPreviousUrl(): ?string
     {
         if (1 === $this->page) {
             return null;
@@ -495,10 +484,7 @@ class FellowshipManager
         return $this->router->generate($route, $params);
     }
 
-    /**
-     * @return string|null
-     */
-    public function getNextUrl()
+    public function getNextUrl(): ?string
     {
         if ($this->page === $this->getNumberOfPages()) {
             return null;

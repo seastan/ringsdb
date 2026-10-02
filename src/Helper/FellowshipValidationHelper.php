@@ -10,10 +10,7 @@ class FellowshipValidationHelper
     {
     }
 
-    /**
-     * @return string|null
-     */
-    public function findProblem($fellowship)
+    public function findProblem($fellowship): ?string
     {
         $heroes = [];
         $count = 0;
@@ -57,10 +54,7 @@ class FellowshipValidationHelper
         return null;
     }
 
-    /**
-     * @return string
-     */
-    public function getProblemLabel($problem)
+    public function getProblemLabel($problem): string
     {
         if (!$problem) {
             return '';

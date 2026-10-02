@@ -82,11 +82,9 @@ class FellowshipController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/myfellowships", name="myfellowships_list", methods={"GET"})
      */
-    public function mylistAction()
+    public function mylistAction(): Response
     {
         /* @var $user \App\Entity\User */
         $user = $this->currentUser();
@@ -100,8 +98,6 @@ class FellowshipController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/fellowship/new/{deck1_id}/{deck2_id}/{deck3_id}/{deck4_id}",
      *     name="fellowship_new",
@@ -110,7 +106,7 @@ class FellowshipController extends AbstractController
      *     defaults={"deck1_id"=null, "deck2_id"=null, "deck3_id"=null, "deck4_id"=null}
      * )
      */
-    public function newAction($deck1_id, $deck2_id, $deck3_id, $deck4_id)
+    public function newAction($deck1_id, $deck2_id, $deck3_id, $deck4_id): Response
     {
         $response = new Response();
         $decks = [];
@@ -134,8 +130,6 @@ class FellowshipController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/fellowship/edit/{fellowship_id}",
      *     name="fellowship_edit",
@@ -143,7 +137,7 @@ class FellowshipController extends AbstractController
      *     requirements={"fellowship_id"="\d+"}
      * )
      */
-    public function editAction($fellowship_id)
+    public function editAction($fellowship_id): Response
     {
         $response = new Response();
         /* @var $user \App\Entity\User */
@@ -172,8 +166,6 @@ class FellowshipController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/fellowship/view/{fellowship_id}/{fellowship_name}",
      *     name="fellowship_view",
@@ -182,7 +174,7 @@ class FellowshipController extends AbstractController
      *     defaults={"fellowship_name"=null}
      * )
      */
-    public function viewAction($fellowship_id)
+    public function viewAction($fellowship_id): Response
     {
         /* @var $fellowship \App\Entity\Fellowship */
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
@@ -219,11 +211,9 @@ class FellowshipController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/fellowship/save", name="fellowship_save", methods={"POST"})
      */
-    public function saveAction(Request $request, Decks $decks)
+    public function saveAction(Request $request, Decks $decks): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -330,8 +320,6 @@ class FellowshipController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/fellowship/publish/{fellowship_id}",
      *     name="fellowship_publish_form",
@@ -339,7 +327,7 @@ class FellowshipController extends AbstractController
      *     requirements={"fellowship_id"="\d+"}
      * )
      */
-    public function publishFormAction($fellowship_id)
+    public function publishFormAction($fellowship_id): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -406,11 +394,9 @@ class FellowshipController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/fellowship/publish", name="fellowship_publish", methods={"POST"})
      */
-    public function publishAction(Request $request, DecklistFactory $decklistFactory)
+    public function publishAction(Request $request, DecklistFactory $decklistFactory): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -479,11 +465,9 @@ class FellowshipController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/fellowship/delete", name="fellowship_delete", methods={"POST"})
      */
-    public function deleteAction(Request $request)
+    public function deleteAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -522,11 +506,9 @@ class FellowshipController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/fellowship/delete_list", name="fellowship_delete_list", methods={"POST"})
      */
-    public function deleteListAction(Request $request)
+    public function deleteListAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -568,10 +550,7 @@ class FellowshipController extends AbstractController
         return $this->redirect($this->generateUrl('myfellowships_list'));
     }
 
-    /**
-     * @return string
-     */
-    private function searchForm(Request $request)
+    private function searchForm(Request $request): string
     {
         $dbh = $this->getDoctrine()->getConnection();
         $cards_code = $request->query->get('cards');
@@ -634,11 +613,9 @@ class FellowshipController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/fellowships/search", name="fellowships_searchform", methods={"GET"})
      */
-    public function searchAction(Request $request)
+    public function searchAction(Request $request): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -703,8 +680,6 @@ class FellowshipController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/fellowship/export/octgn/{fellowship_id}",
      *     name="fellowship_export_octgn",
@@ -712,14 +687,12 @@ class FellowshipController extends AbstractController
      *     requirements={"fellowship_id"="\d+"}
      * )
      */
-    public function octgnexportAction($fellowship_id)
+    public function octgnexportAction($fellowship_id): Response
     {
         return $this->downloadFromSelection($fellowship_id, true);
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/fellowship/export/text/{fellowship_id}",
      *     name="fellowship_export_text",
@@ -727,15 +700,12 @@ class FellowshipController extends AbstractController
      *     requirements={"fellowship_id"="\d+"}
      * )
      */
-    public function textexportAction($fellowship_id)
+    public function textexportAction($fellowship_id): Response
     {
         return $this->downloadFromSelection($fellowship_id, false);
     }
 
-    /**
-     * @return Response
-     */
-    public function downloadFromSelection($fellowship_id, $octgn)
+    public function downloadFromSelection($fellowship_id, $octgn): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -798,11 +768,9 @@ class FellowshipController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/user/fellowship_favorite", name="fellowship_favorite", methods={"POST"})
      */
-    public function favoriteAction(Request $request)
+    public function favoriteAction(Request $request): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -845,11 +813,9 @@ class FellowshipController extends AbstractController
      * records a user's comment
      */
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/user/fellowship_comment", name="fellowship_comment", methods={"POST"})
      */
-    public function commentAction(Request $request, MailerInterface $mailer, UserRepository $userRepository)
+    public function commentAction(Request $request, MailerInterface $mailer, UserRepository $userRepository): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -922,15 +888,13 @@ class FellowshipController extends AbstractController
      * hides a comment, or if $hidden is false, unhide a comment
      */
     /**
-     * @return Response
-     *
      * @Route(
      *     "/user/fellowship_hidecomment/{comment_id}/{hidden}",
      *     name="fellowship_comment_hide",
      *     methods={"POST"}
      * )
      */
-    public function hidecommentAction($comment_id, $hidden, FellowshipCommentRepository $fellowshipCommentRepository)
+    public function hidecommentAction($comment_id, $hidden, FellowshipCommentRepository $fellowshipCommentRepository): Response
     {
         /* @var $user \App\Entity\User */
         $user = $this->getUser();
@@ -956,11 +920,9 @@ class FellowshipController extends AbstractController
      * records a user's vote
      */
     /**
-     * @return Response
-     *
      * @Route("/user/fellowship_like", name="fellowship_like", methods={"POST"})
      */
-    public function voteAction(Request $request)
+    public function voteAction(Request $request): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -992,19 +954,15 @@ class FellowshipController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/f/{username}", name="fellowship_byauthor", methods={"GET"})
      */
-    public function byauthorAction($username)
+    public function byauthorAction($username): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         return $this->redirect($this->generateUrl('fellowships_list', ['type' => 'find', 'author' => $username]));
     }
 
     /**
      * @param int $page
-     *
-     * @return Response
      *
      * @Route(
      *     "/fellowships/{type}/{page}",
@@ -1014,7 +972,7 @@ class FellowshipController extends AbstractController
      *     defaults={"type"="popular", "page"=1}
      * )
      */
-    public function listAction($type, $page = 1, Request $request, FellowshipManager $fellowshipManager)
+    public function listAction($type, $page = 1, Request $request, FellowshipManager $fellowshipManager): Response
     {
         $response = new Response();
         $response->setPublic();

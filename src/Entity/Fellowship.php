@@ -10,7 +10,7 @@ namespace App\Entity;
 class Fellowship
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -96,10 +96,8 @@ class Fellowship
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -108,10 +106,8 @@ class Fellowship
      * Set name.
      *
      * @param string $name
-     *
-     * @return Fellowship
      */
-    public function setName($name)
+    public function setName($name): Fellowship
     {
         $this->name = $name;
 
@@ -120,10 +116,8 @@ class Fellowship
 
     /**
      * Get name.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -132,10 +126,8 @@ class Fellowship
      * Set nameCanonical.
      *
      * @param string $nameCanonical
-     *
-     * @return Fellowship
      */
-    public function setNameCanonical($nameCanonical)
+    public function setNameCanonical($nameCanonical): Fellowship
     {
         $this->nameCanonical = $nameCanonical;
 
@@ -144,10 +136,8 @@ class Fellowship
 
     /**
      * Get nameCanonical.
-     *
-     * @return string
      */
-    public function getNameCanonical()
+    public function getNameCanonical(): string
     {
         return $this->nameCanonical;
     }
@@ -156,10 +146,8 @@ class Fellowship
      * Set descriptionMd.
      *
      * @param string|null $descriptionMd
-     *
-     * @return Fellowship
      */
-    public function setDescriptionMd($descriptionMd)
+    public function setDescriptionMd($descriptionMd): Fellowship
     {
         $this->descriptionMd = $descriptionMd;
 
@@ -168,10 +156,8 @@ class Fellowship
 
     /**
      * Get descriptionMd.
-     *
-     * @return string|null
      */
-    public function getDescriptionMd()
+    public function getDescriptionMd(): ?string
     {
         return $this->descriptionMd;
     }
@@ -180,10 +166,8 @@ class Fellowship
      * Set descriptionHtml.
      *
      * @param string|null $descriptionHtml
-     *
-     * @return Fellowship
      */
-    public function setDescriptionHtml($descriptionHtml)
+    public function setDescriptionHtml($descriptionHtml): Fellowship
     {
         $this->descriptionHtml = $descriptionHtml;
 
@@ -192,10 +176,8 @@ class Fellowship
 
     /**
      * Get descriptionHtml.
-     *
-     * @return string|null
      */
-    public function getDescriptionHtml()
+    public function getDescriptionHtml(): ?string
     {
         return $this->descriptionHtml;
     }
@@ -204,10 +186,8 @@ class Fellowship
      * Set isPublic.
      *
      * @param bool $isPublic
-     *
-     * @return Fellowship
      */
-    public function setIsPublic($isPublic)
+    public function setIsPublic($isPublic): Fellowship
     {
         $this->isPublic = $isPublic;
 
@@ -216,10 +196,8 @@ class Fellowship
 
     /**
      * Get isPublic.
-     *
-     * @return bool
      */
-    public function getIsPublic()
+    public function getIsPublic(): bool
     {
         return $this->isPublic;
     }
@@ -228,10 +206,8 @@ class Fellowship
      * Set nbVotes.
      *
      * @param int $nbVotes
-     *
-     * @return Fellowship
      */
-    public function setNbVotes($nbVotes)
+    public function setNbVotes($nbVotes): Fellowship
     {
         $this->nbVotes = $nbVotes;
 
@@ -240,10 +216,8 @@ class Fellowship
 
     /**
      * Get nbVotes.
-     *
-     * @return int
      */
-    public function getNbVotes()
+    public function getNbVotes(): int
     {
         return $this->nbVotes;
     }
@@ -252,10 +226,8 @@ class Fellowship
      * Set nbFavorites.
      *
      * @param int $nbFavorites
-     *
-     * @return Fellowship
      */
-    public function setNbFavorites($nbFavorites)
+    public function setNbFavorites($nbFavorites): Fellowship
     {
         $this->nbFavorites = $nbFavorites;
 
@@ -264,10 +236,8 @@ class Fellowship
 
     /**
      * Get nbFavorites.
-     *
-     * @return int
      */
-    public function getNbFavorites()
+    public function getNbFavorites(): int
     {
         return $this->nbFavorites;
     }
@@ -276,10 +246,8 @@ class Fellowship
      * Set nbComments.
      *
      * @param int $nbComments
-     *
-     * @return Fellowship
      */
-    public function setNbComments($nbComments)
+    public function setNbComments($nbComments): Fellowship
     {
         $this->nbComments = $nbComments;
 
@@ -288,10 +256,8 @@ class Fellowship
 
     /**
      * Get nbComments.
-     *
-     * @return int
      */
-    public function getNbComments()
+    public function getNbComments(): int
     {
         return $this->nbComments;
     }
@@ -300,10 +266,8 @@ class Fellowship
      * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return Fellowship
      */
-    public function setDateCreation($dateCreation)
+    public function setDateCreation($dateCreation): Fellowship
     {
         $this->dateCreation = $dateCreation;
 
@@ -312,10 +276,8 @@ class Fellowship
 
     /**
      * Get dateCreation.
-     *
-     * @return \DateTime
      */
-    public function getDateCreation()
+    public function getDateCreation(): \DateTime
     {
         return $this->dateCreation;
     }
@@ -324,10 +286,8 @@ class Fellowship
      * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return Fellowship
      */
-    public function setDateUpdate($dateUpdate)
+    public function setDateUpdate($dateUpdate): Fellowship
     {
         $this->dateUpdate = $dateUpdate;
 
@@ -336,10 +296,8 @@ class Fellowship
 
     /**
      * Get dateUpdate.
-     *
-     * @return \DateTime
      */
-    public function getDateUpdate()
+    public function getDateUpdate(): \DateTime
     {
         return $this->dateUpdate;
     }
@@ -348,10 +306,8 @@ class Fellowship
      * Set dateLastComment.
      *
      * @param \DateTime|null $dateLastComment
-     *
-     * @return Fellowship
      */
-    public function setDateLastComment($dateLastComment)
+    public function setDateLastComment($dateLastComment): Fellowship
     {
         $this->dateLastComment = $dateLastComment;
 
@@ -360,20 +316,16 @@ class Fellowship
 
     /**
      * Get dateLastComment.
-     *
-     * @return \DateTime|null
      */
-    public function getDateLastComment()
+    public function getDateLastComment(): ?\DateTime
     {
         return $this->dateLastComment;
     }
 
     /**
      * Add deck.
-     *
-     * @return Fellowship
      */
-    public function addDeck(FellowshipDeck $deck)
+    public function addDeck(FellowshipDeck $deck): Fellowship
     {
         $this->decks[] = $deck;
 
@@ -393,17 +345,15 @@ class Fellowship
      *
      * @return \Doctrine\Common\Collections\Collection<int, FellowshipDeck>
      */
-    public function getDecks()
+    public function getDecks(): \Doctrine\Common\Collections\Collection
     {
         return $this->decks;
     }
 
     /**
      * Add decklist.
-     *
-     * @return Fellowship
      */
-    public function addDecklist(FellowshipDecklist $decklist)
+    public function addDecklist(FellowshipDecklist $decklist): Fellowship
     {
         $this->decklists[] = $decklist;
 
@@ -423,17 +373,15 @@ class Fellowship
      *
      * @return \Doctrine\Common\Collections\Collection<int, FellowshipDecklist>
      */
-    public function getDecklists()
+    public function getDecklists(): \Doctrine\Common\Collections\Collection
     {
         return $this->decklists;
     }
 
     /**
      * Add comment.
-     *
-     * @return Fellowship
      */
-    public function addComment(FellowshipComment $comment)
+    public function addComment(FellowshipComment $comment): Fellowship
     {
         $this->comments[] = $comment;
 
@@ -453,17 +401,15 @@ class Fellowship
      *
      * @return \Doctrine\Common\Collections\Collection<int, FellowshipComment>
      */
-    public function getComments()
+    public function getComments(): \Doctrine\Common\Collections\Collection
     {
         return $this->comments;
     }
 
     /**
      * Set user.
-     *
-     * @return Fellowship
      */
-    public function setUser(User $user)
+    public function setUser(User $user): Fellowship
     {
         $this->user = $user;
 
@@ -472,20 +418,16 @@ class Fellowship
 
     /**
      * Get user.
-     *
-     * @return User
      */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->user;
     }
 
     /**
      * Add favorite.
-     *
-     * @return Fellowship
      */
-    public function addFavorite(User $favorite)
+    public function addFavorite(User $favorite): Fellowship
     {
         $this->favorites[] = $favorite;
 
@@ -505,17 +447,15 @@ class Fellowship
      *
      * @return \Doctrine\Common\Collections\Collection<int, User>
      */
-    public function getFavorites()
+    public function getFavorites(): \Doctrine\Common\Collections\Collection
     {
         return $this->favorites;
     }
 
     /**
      * Add vote.
-     *
-     * @return Fellowship
      */
-    public function addVote(User $vote)
+    public function addVote(User $vote): Fellowship
     {
         $this->votes[] = $vote;
 
@@ -535,7 +475,7 @@ class Fellowship
      *
      * @return \Doctrine\Common\Collections\Collection<int, User>
      */
-    public function getVotes()
+    public function getVotes(): \Doctrine\Common\Collections\Collection
     {
         return $this->votes;
     }
@@ -549,10 +489,8 @@ class Fellowship
      * Set nbDecks.
      *
      * @param int $nbDecks
-     *
-     * @return Fellowship
      */
-    public function setNbDecks($nbDecks)
+    public function setNbDecks($nbDecks): Fellowship
     {
         $this->nbDecks = $nbDecks;
 
@@ -561,10 +499,8 @@ class Fellowship
 
     /**
      * Get nbDecks.
-     *
-     * @return int
      */
-    public function getNbDecks()
+    public function getNbDecks(): int
     {
         return $this->nbDecks;
     }
@@ -578,10 +514,8 @@ class Fellowship
      * Set datePublish.
      *
      * @param \DateTime|null $datePublish
-     *
-     * @return Fellowship
      */
-    public function setDatePublish($datePublish)
+    public function setDatePublish($datePublish): Fellowship
     {
         $this->datePublish = $datePublish;
 
@@ -590,10 +524,8 @@ class Fellowship
 
     /**
      * Get datePublish.
-     *
-     * @return \DateTime|null
      */
-    public function getDatePublish()
+    public function getDatePublish(): ?\DateTime
     {
         return $this->datePublish;
     }

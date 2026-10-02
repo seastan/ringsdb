@@ -10,7 +10,7 @@ namespace App\Entity;
 class QuestlogComment
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -36,10 +36,8 @@ class QuestlogComment
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -48,10 +46,8 @@ class QuestlogComment
      * Set text.
      *
      * @param string $text
-     *
-     * @return QuestlogComment
      */
-    public function setText($text)
+    public function setText($text): QuestlogComment
     {
         $this->text = $text;
 
@@ -60,10 +56,8 @@ class QuestlogComment
 
     /**
      * Get text.
-     *
-     * @return string
      */
-    public function getText()
+    public function getText(): string
     {
         return $this->text;
     }
@@ -72,10 +66,8 @@ class QuestlogComment
      * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return QuestlogComment
      */
-    public function setDateCreation($dateCreation)
+    public function setDateCreation($dateCreation): QuestlogComment
     {
         $this->dateCreation = $dateCreation;
 
@@ -84,10 +76,8 @@ class QuestlogComment
 
     /**
      * Get dateCreation.
-     *
-     * @return \DateTime
      */
-    public function getDateCreation()
+    public function getDateCreation(): \DateTime
     {
         return $this->dateCreation;
     }
@@ -96,10 +86,8 @@ class QuestlogComment
      * Set isHidden.
      *
      * @param bool $isHidden
-     *
-     * @return QuestlogComment
      */
-    public function setIsHidden($isHidden)
+    public function setIsHidden($isHidden): QuestlogComment
     {
         $this->isHidden = $isHidden;
 
@@ -108,20 +96,16 @@ class QuestlogComment
 
     /**
      * Get isHidden.
-     *
-     * @return bool
      */
-    public function getIsHidden()
+    public function getIsHidden(): bool
     {
         return $this->isHidden;
     }
 
     /**
      * Set user.
-     *
-     * @return QuestlogComment
      */
-    public function setUser(User $user)
+    public function setUser(User $user): QuestlogComment
     {
         $this->user = $user;
 
@@ -130,20 +114,16 @@ class QuestlogComment
 
     /**
      * Get user.
-     *
-     * @return User
      */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->user;
     }
 
     /**
      * Set questlog.
-     *
-     * @return QuestlogComment
      */
-    public function setQuestlog(Questlog $questlog)
+    public function setQuestlog(Questlog $questlog): QuestlogComment
     {
         $this->questlog = $questlog;
 
@@ -152,10 +132,8 @@ class QuestlogComment
 
     /**
      * Get questlog.
-     *
-     * @return Questlog
      */
-    public function getQuestlog()
+    public function getQuestlog(): Questlog
     {
         return $this->questlog;
     }

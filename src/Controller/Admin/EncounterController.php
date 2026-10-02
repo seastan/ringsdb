@@ -30,11 +30,9 @@ class EncounterController extends AbstractController
     /**
      * Lists all Encounter entities.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/encounter/", name="admin_encounter")
      */
-    public function indexAction()
+    public function indexAction(): \Symfony\Component\HttpFoundation\Response
     {
         $entities = $this->encounterRepository->findAll();
 
@@ -44,11 +42,9 @@ class EncounterController extends AbstractController
     /**
      * Creates a new Encounter entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/encounter/create", name="admin_encounter_create", methods={"POST"})
      */
-    public function createAction(Request $request)
+    public function createAction(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $entity = new Encounter();
         $form = $this->createForm(EncounterType::class, $entity);
@@ -67,11 +63,9 @@ class EncounterController extends AbstractController
     /**
      * Displays a form to create a new Encounter entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/encounter/new", name="admin_encounter_new")
      */
-    public function newAction()
+    public function newAction(): \Symfony\Component\HttpFoundation\Response
     {
         $entity = new Encounter();
         $form = $this->createForm(EncounterType::class, $entity);
@@ -82,11 +76,9 @@ class EncounterController extends AbstractController
     /**
      * Finds and displays a Encounter entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/encounter/{id}/show", name="admin_encounter_show")
      */
-    public function showAction($id)
+    public function showAction($id): \Symfony\Component\HttpFoundation\Response
     {
         $entity = $this->encounterRepository->find($id);
         if (!$entity) {
@@ -100,11 +92,9 @@ class EncounterController extends AbstractController
     /**
      * Displays a form to edit an existing Encounter entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/encounter/{id}/edit", name="admin_encounter_edit")
      */
-    public function editAction($id)
+    public function editAction($id): \Symfony\Component\HttpFoundation\Response
     {
         $entity = $this->encounterRepository->find($id);
         if (!$entity) {
@@ -119,11 +109,9 @@ class EncounterController extends AbstractController
     /**
      * Edits an existing Encounter entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/encounter/{id}/update", name="admin_encounter_update", methods={"POST", "PUT"})
      */
-    public function updateAction(Request $request, $id)
+    public function updateAction(Request $request, $id): \Symfony\Component\HttpFoundation\Response
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $this->encounterRepository->find($id);
@@ -146,11 +134,9 @@ class EncounterController extends AbstractController
     /**
      * Deletes a Encounter entity.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/admin/encounter/{id}/delete", name="admin_encounter_delete", methods={"POST", "DELETE"})
      */
-    public function deleteAction(Request $request, $id)
+    public function deleteAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
@@ -174,7 +160,7 @@ class EncounterController extends AbstractController
      *
      * @return \Symfony\Component\Form\FormInterface<mixed> The form
      */
-    private function createDeleteForm($id)
+    private function createDeleteForm($id): \Symfony\Component\Form\FormInterface
     {
         return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }

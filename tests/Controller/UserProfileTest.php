@@ -44,18 +44,12 @@ class UserProfileTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db()
+    private function db(): \Doctrine\DBAL\Connection
     {
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    /**
-     * @return bool
-     */
-    private function login(KernelBrowser $client, $username, $password)
+    private function login(KernelBrowser $client, $username, $password): bool
     {
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $password]));
@@ -65,10 +59,8 @@ class UserProfileTest extends WebTestCase
 
     /**
      * @param string $username
-     *
-     * @return KernelBrowser
      */
-    private function createAuthenticatedClient($username = 'test')
+    private function createAuthenticatedClient($username = 'test'): KernelBrowser
     {
         $client = $this->client;
         $this->assertTrue($this->login($client, $username, $username), "Login as $username failed");
@@ -84,10 +76,7 @@ class UserProfileTest extends WebTestCase
         return $this->db($client)->fetchAssoc('SELECT * FROM user WHERE id = ?', [$id]);
     }
 
-    /**
-     * @return ChoiceFormField
-     */
-    private static function checkbox(Form $form, string $name)
+    private static function checkbox(Form $form, string $name): ChoiceFormField
     {
         $field = $form[$name];
         if (!$field instanceof ChoiceFormField) {
@@ -97,10 +86,7 @@ class UserProfileTest extends WebTestCase
         return $field;
     }
 
-    /**
-     * @return Form
-     */
-    private function profileForm(KernelBrowser $client)
+    private function profileForm(KernelBrowser $client): Form
     {
         $crawler = $client->request('GET', '/user/profile_edit');
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -271,10 +257,7 @@ class UserProfileTest extends WebTestCase
         $this->assertSame($this->fixtureUsers[0]['password'], $this->fetchUser($client)['password']);
     }
 
-    /**
-     * @return array
-     */
-    public function invalidPasswordChangeProvider()
+    public function invalidPasswordChangeProvider(): array
     {
         return [
             'wrong current password' => ['wrong', 'secret123', 'secret123', 'The entered password is invalid.'],

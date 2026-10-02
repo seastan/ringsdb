@@ -51,7 +51,7 @@ class SuggestionsCommand extends Command
     /**
      * @return list<array{int, int}>
      */
-    private function getAllPairs($arr)
+    private function getAllPairs($arr): array
     {
         $pairs = [];
         for ($i = 0; $i < count($arr); ++$i) {
@@ -72,7 +72,7 @@ class SuggestionsCommand extends Command
      *
      * @return array{index: array<int, string>, matrix: array<int, array<int, float|int>>}
      */
-    private function getSuggestions()
+    private function getSuggestions(): array
     {
         $matrix = [];
 

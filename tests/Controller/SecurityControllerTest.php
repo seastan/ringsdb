@@ -40,10 +40,7 @@ class SecurityControllerTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return User|null
-     */
-    private function findUser(KernelBrowser $client, $username)
+    private function findUser(KernelBrowser $client, $username): ?User
     {
         $em = $client->getContainer()->get('doctrine')->getManager();
         $em->clear();
@@ -53,10 +50,8 @@ class SecurityControllerTest extends WebTestCase
 
     /**
      * @param bool $withProfiler
-     *
-     * @return \Symfony\Component\DomCrawler\Crawler
      */
-    private function submitRegistration(KernelBrowser $client, $username, $email, $password, $confirmation = null, $withProfiler = false)
+    private function submitRegistration(KernelBrowser $client, $username, $email, $password, $confirmation = null, $withProfiler = false): \Symfony\Component\DomCrawler\Crawler
     {
         $crawler = $client->request('GET', '/register/');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
@@ -76,10 +71,8 @@ class SecurityControllerTest extends WebTestCase
 
     /**
      * @param bool $rememberMe
-     *
-     * @return \Symfony\Component\DomCrawler\Crawler
      */
-    private function login(KernelBrowser $client, $username, $password, $rememberMe = false)
+    private function login(KernelBrowser $client, $username, $password, $rememberMe = false): \Symfony\Component\DomCrawler\Crawler
     {
         $crawler = $client->request('GET', '/login');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
@@ -210,10 +203,7 @@ class SecurityControllerTest extends WebTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function invalidRegistrationProvider()
+    public function invalidRegistrationProvider(): array
     {
         return [
             'password mismatch' => [self::PREFIX.'sam', 'phpunit_sam@example.com', 'secret123', 'other123', 'The entered passwords don'],
@@ -297,10 +287,7 @@ class SecurityControllerTest extends WebTestCase
         $this->assertAnonymous($client);
     }
 
-    /**
-     * @return array
-     */
-    public function invalidCredentialsProvider()
+    public function invalidCredentialsProvider(): array
     {
         return [
             'wrong password' => ['test', 'wrong'],

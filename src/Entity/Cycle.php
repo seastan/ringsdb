@@ -7,7 +7,7 @@ namespace App\Entity;
 class Cycle
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -53,10 +53,8 @@ class Cycle
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -65,10 +63,8 @@ class Cycle
      * Set code.
      *
      * @param string $code
-     *
-     * @return Cycle
      */
-    public function setCode($code)
+    public function setCode($code): Cycle
     {
         $this->code = $code;
 
@@ -77,10 +73,8 @@ class Cycle
 
     /**
      * Get code.
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
@@ -89,10 +83,8 @@ class Cycle
      * Set name.
      *
      * @param string $name
-     *
-     * @return Cycle
      */
-    public function setName($name)
+    public function setName($name): Cycle
     {
         $this->name = $name;
 
@@ -101,10 +93,8 @@ class Cycle
 
     /**
      * Get name.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -113,10 +103,8 @@ class Cycle
      * Set position.
      *
      * @param int $position
-     *
-     * @return Cycle
      */
-    public function setPosition($position)
+    public function setPosition($position): Cycle
     {
         $this->position = $position;
 
@@ -125,10 +113,8 @@ class Cycle
 
     /**
      * Get position.
-     *
-     * @return int
      */
-    public function getPosition()
+    public function getPosition(): int
     {
         return $this->position;
     }
@@ -137,10 +123,8 @@ class Cycle
      * Set isBox.
      *
      * @param bool $isBox
-     *
-     * @return Cycle
      */
-    public function setIsBox($isBox)
+    public function setIsBox($isBox): Cycle
     {
         $this->isBox = $isBox;
 
@@ -149,10 +133,8 @@ class Cycle
 
     /**
      * Get isBox.
-     *
-     * @return bool
      */
-    public function getIsBox()
+    public function getIsBox(): bool
     {
         return $this->isBox;
     }
@@ -161,10 +143,8 @@ class Cycle
      * Set isSaga.
      *
      * @param bool $isSaga
-     *
-     * @return Cycle
      */
-    public function setIsSaga($isSaga)
+    public function setIsSaga($isSaga): Cycle
     {
         $this->isSaga = $isSaga;
 
@@ -173,10 +153,8 @@ class Cycle
 
     /**
      * Get isSaga.
-     *
-     * @return bool
      */
-    public function getIsSaga()
+    public function getIsSaga(): bool
     {
         return $this->isSaga;
     }
@@ -185,10 +163,8 @@ class Cycle
      * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return Cycle
      */
-    public function setDateCreation($dateCreation)
+    public function setDateCreation($dateCreation): Cycle
     {
         $this->dateCreation = $dateCreation;
 
@@ -197,10 +173,8 @@ class Cycle
 
     /**
      * Get dateCreation.
-     *
-     * @return \DateTime
      */
-    public function getDateCreation()
+    public function getDateCreation(): \DateTime
     {
         return $this->dateCreation;
     }
@@ -209,10 +183,8 @@ class Cycle
      * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return Cycle
      */
-    public function setDateUpdate($dateUpdate)
+    public function setDateUpdate($dateUpdate): Cycle
     {
         $this->dateUpdate = $dateUpdate;
 
@@ -221,20 +193,16 @@ class Cycle
 
     /**
      * Get dateUpdate.
-     *
-     * @return \DateTime
      */
-    public function getDateUpdate()
+    public function getDateUpdate(): \DateTime
     {
         return $this->dateUpdate;
     }
 
     /**
      * Add pack.
-     *
-     * @return Cycle
      */
-    public function addPack(Pack $pack)
+    public function addPack(Pack $pack): Cycle
     {
         $this->packs[] = $pack;
 
@@ -254,7 +222,7 @@ class Cycle
      *
      * @return \Doctrine\Common\Collections\Collection<int, Pack>
      */
-    public function getPacks()
+    public function getPacks(): \Doctrine\Common\Collections\Collection
     {
         return $this->packs;
     }

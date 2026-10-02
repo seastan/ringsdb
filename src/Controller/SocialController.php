@@ -72,11 +72,9 @@ class SocialController extends AbstractController
      * Checks to see if a deck can be published in its current saved state
      * If it is, displays the decklist edit form for initial publication of a deck.
      *
-     * @return Response
-     *
      * @Route("/deck/publish/{deck_id}", name="deck_publish_form", methods={"GET"})
      */
-    public function publishFormAction($deck_id, DeckValidationHelper $deckValidationHelper)
+    public function publishFormAction($deck_id, DeckValidationHelper $deckValidationHelper): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -144,11 +142,9 @@ class SocialController extends AbstractController
     /**
      * creates a new decklist from a deck (publish action).
      *
-     * @return Response
-     *
      * @Route("/decklist/create", name="decklist_create", methods={"POST"})
      */
-    public function createAction(Request $request)
+    public function createAction(Request $request): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -212,11 +208,9 @@ class SocialController extends AbstractController
     /**
      * Displays the decklist edit form.
      *
-     * @return Response
-     *
      * @Route("/decklist/edit/{decklist_id}", name="decklist_edit", requirements={"decklist_id"="\d+"})
      */
-    public function editFormAction($decklist_id)
+    public function editFormAction($decklist_id): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -240,8 +234,6 @@ class SocialController extends AbstractController
      * save the name and description of a decklist by its publisher
      */
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route(
      *     "/decklist/save/{decklist_id}",
      *     name="decklist_save",
@@ -249,7 +241,7 @@ class SocialController extends AbstractController
      *     requirements={"decklist_id"="\d+"}
      * )
      */
-    public function saveAction($decklist_id, Request $request)
+    public function saveAction($decklist_id, Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -295,8 +287,6 @@ class SocialController extends AbstractController
     /**
      * deletes a decklist if it has no comment, no vote, no favorite.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route(
      *     "/decklist/delete/{decklist_id}",
      *     name="decklist_delete",
@@ -304,7 +294,7 @@ class SocialController extends AbstractController
      *     requirements={"decklist_id"="\d+"}
      * )
      */
-    public function deleteAction($decklist_id)
+    public function deleteAction($decklist_id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -336,10 +326,7 @@ class SocialController extends AbstractController
         return $this->redirect($this->generateUrl('decklists_list', ['type' => 'mine']));
     }
 
-    /**
-     * @return string
-     */
-    private function searchForm(Request $request)
+    private function searchForm(Request $request): string
     {
         $dbh = $this->getDoctrine()->getConnection();
         $cards_code = $request->query->get('cards');
@@ -415,11 +402,9 @@ class SocialController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/d/{username}", name="decklist_byauthor", methods={"GET"})
      */
-    public function byauthorAction($username)
+    public function byauthorAction($username): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         return $this->redirect($this->generateUrl('decklists_list', ['type' => 'find', 'author' => $username]));
     }
@@ -428,8 +413,6 @@ class SocialController extends AbstractController
      * displays the content of a decklist along with comments, siblings, similar, etc.
      */
     /**
-     * @return Response
-     *
      * @Route(
      *     "/decklist/view/{decklist_id}/{decklist_name}",
      *     name="decklist_detail",
@@ -438,7 +421,7 @@ class SocialController extends AbstractController
      *     defaults={"decklist_name"=null}
      * )
      */
-    public function viewAction($decklist_id)
+    public function viewAction($decklist_id): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -465,11 +448,9 @@ class SocialController extends AbstractController
      * adds a decklist to a user's list of favorites
      */
     /**
-     * @return Response
-     *
      * @Route("/user/favorite", name="decklist_favorite", methods={"POST"})
      */
-    public function favoriteAction(Request $request)
+    public function favoriteAction(Request $request): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -509,11 +490,9 @@ class SocialController extends AbstractController
      * records a user's comment
      */
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/user/comment", name="decklist_comment", methods={"POST"})
      */
-    public function commentAction(Request $request, MailerInterface $mailer, UserRepository $userRepository)
+    public function commentAction(Request $request, MailerInterface $mailer, UserRepository $userRepository): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         /* @var $user User */
         $user = $this->getUser();
@@ -584,11 +563,9 @@ class SocialController extends AbstractController
      * hides a comment, or if $hidden is false, unhide a comment
      */
     /**
-     * @return Response
-     *
      * @Route("/user/hidecomment/{comment_id}/{hidden}", name="decklist_comment_hide", methods={"POST"})
      */
-    public function hidecommentAction($comment_id, $hidden, CommentRepository $commentRepository)
+    public function hidecommentAction($comment_id, $hidden, CommentRepository $commentRepository): Response
     {
         /* @var $user User */
         $user = $this->getUser();
@@ -614,11 +591,9 @@ class SocialController extends AbstractController
      * records a user's vote
      */
     /**
-     * @return Response
-     *
      * @Route("/user/like", name="decklist_like", methods={"POST"})
      */
-    public function voteAction(Request $request)
+    public function voteAction(Request $request): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -652,8 +627,6 @@ class SocialController extends AbstractController
      * returns a text file with the content of a decklist
      */
     /**
-     * @return Response
-     *
      * @Route(
      *     "/decklist/export/text/{decklist_id}",
      *     name="decklist_export_text",
@@ -661,7 +634,7 @@ class SocialController extends AbstractController
      *     requirements={"decklist_id"="\d+"}
      * )
      */
-    public function textexportAction($decklist_id)
+    public function textexportAction($decklist_id): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -687,8 +660,6 @@ class SocialController extends AbstractController
      * returns a octgn file with the content of a decklist
      */
     /**
-     * @return Response
-     *
      * @Route(
      *     "/decklist/export/octgn/{decklist_id}",
      *     name="decklist_export_octgn",
@@ -696,7 +667,7 @@ class SocialController extends AbstractController
      *     requirements={"decklist_id"="\d+"}
      * )
      */
-    public function octgnexportAction($decklist_id)
+    public function octgnexportAction($decklist_id): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -718,11 +689,9 @@ class SocialController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/decklists/search", name="decklists_searchform", methods={"GET"})
      */
-    public function searchAction(Request $request)
+    public function searchAction(Request $request): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -787,11 +756,9 @@ class SocialController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/patrons", name="patrons", methods={"GET"})
      */
-    public function patronsAction()
+    public function patronsAction(): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -807,8 +774,6 @@ class SocialController extends AbstractController
      *
      * @param int $page
      *
-     * @return Response
-     *
      * @Route(
      *     "/decklists/{type}/{page}",
      *     name="decklists_list",
@@ -817,7 +782,7 @@ class SocialController extends AbstractController
      *     defaults={"type"="popular", "page"=1}
      * )
      */
-    public function listAction($type, $page = 1, Request $request, DecklistManager $decklistManager)
+    public function listAction($type, $page = 1, Request $request, DecklistManager $decklistManager): Response
     {
         $response = new Response();
         $response->setPublic();

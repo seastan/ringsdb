@@ -80,10 +80,7 @@ class QuestLogManagerTest extends KernelTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return int
-     */
-    private function insertQuestlog($name, $userId, array $deckIds, array $values)
+    private function insertQuestlog($name, $userId, array $deckIds, array $values): int
     {
         $this->connection->insert('questlog', $values + [
             'user_id' => $userId, 'scenario_id' => 1, 'name' => $name, 'name_canonical' => strtolower(str_replace(' ', '-', $name)),
@@ -102,10 +99,8 @@ class QuestLogManagerTest extends KernelTestCase
 
     /**
      * A copy of fixture deck 2 with the given cards ([card id => quantity]).
-     *
-     * @return int
      */
-    private function insertDeck(array $slots)
+    private function insertDeck(array $slots): int
     {
         $row = $this->connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
         $this->assertNotFalse($row);
@@ -119,10 +114,7 @@ class QuestLogManagerTest extends KernelTestCase
         return $id;
     }
 
-    /**
-     * @return QuestLogManager
-     */
-    private function manager(array $query = [], $username = null)
+    private function manager(array $query = [], $username = null): QuestLogManager
     {
         $container = static::$kernel->getContainer();
         $container->get('request_stack')->push(Request::create('/questlogs/find', 'GET', $query));
@@ -134,10 +126,7 @@ class QuestLogManagerTest extends KernelTestCase
         return $manager;
     }
 
-    /**
-     * @return User
-     */
-    private function user($username)
+    private function user($username): User
     {
         $user = static::$kernel->getContainer()->get('doctrine')->getRepository(User::class)->findOneBy(['username' => $username]);
         $this->assertNotNull($user);
@@ -148,7 +137,7 @@ class QuestLogManagerTest extends KernelTestCase
     /**
      * @return string[] the names (Q1...Q5) of the quest logs found, in order
      */
-    private function names($paginator)
+    private function names($paginator): array
     {
         $names = array_flip($this->ids);
         $result = [];
@@ -204,10 +193,7 @@ class QuestLogManagerTest extends KernelTestCase
         $this->assertSame($expected, $this->names($this->manager($query, $username)->findQuestLogsWithComplexSearch()));
     }
 
-    /**
-     * @return array
-     */
-    public function searchProvider()
+    public function searchProvider(): array
     {
         return [
             'no criteria' => [[], ['Q2', 'Q3', 'Q5', 'Q1']],

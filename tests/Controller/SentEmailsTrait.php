@@ -15,10 +15,7 @@ use Symfony\Component\Mime\Email;
  */
 trait SentEmailsTrait
 {
-    /**
-     * @return MessageEvents
-     */
-    private function sentMessageEvents(KernelBrowser $client)
+    private function sentMessageEvents(KernelBrowser $client): MessageEvents
     {
         $profile = $client->getProfile();
         self::assertNotFalse($profile, 'the profiler is not enabled');

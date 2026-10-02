@@ -30,11 +30,9 @@ class TypeController extends AbstractController
     /**
      * Lists all Type entities.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/type/", name="admin_type")
      */
-    public function indexAction()
+    public function indexAction(): \Symfony\Component\HttpFoundation\Response
     {
         $entities = $this->typeRepository->findAll();
 
@@ -44,11 +42,9 @@ class TypeController extends AbstractController
     /**
      * Creates a new Type entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/type/create", name="admin_type_create", methods={"POST"})
      */
-    public function createAction(Request $request)
+    public function createAction(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $entity = new Type();
         $form = $this->createCreateForm($entity);
@@ -71,7 +67,7 @@ class TypeController extends AbstractController
      *
      * @return \Symfony\Component\Form\FormInterface<Type> The form
      */
-    private function createCreateForm(Type $entity)
+    private function createCreateForm(Type $entity): \Symfony\Component\Form\FormInterface
     {
         $form = $this->createForm(TypeType::class, $entity, ['action' => $this->generateUrl('admin_type_create'), 'method' => 'POST']);
 
@@ -81,11 +77,9 @@ class TypeController extends AbstractController
     /**
      * Displays a form to create a new Type entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/type/new", name="admin_type_new")
      */
-    public function newAction()
+    public function newAction(): \Symfony\Component\HttpFoundation\Response
     {
         $entity = new Type();
         $form = $this->createCreateForm($entity);
@@ -96,11 +90,9 @@ class TypeController extends AbstractController
     /**
      * Finds and displays a Type entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/type/{id}/show", name="admin_type_show")
      */
-    public function showAction($id)
+    public function showAction($id): \Symfony\Component\HttpFoundation\Response
     {
         $entity = $this->typeRepository->find($id);
         if (!$entity) {
@@ -114,11 +106,9 @@ class TypeController extends AbstractController
     /**
      * Displays a form to edit an existing Type entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/type/{id}/edit", name="admin_type_edit")
      */
-    public function editAction($id)
+    public function editAction($id): \Symfony\Component\HttpFoundation\Response
     {
         $entity = $this->typeRepository->find($id);
         if (!$entity) {
@@ -137,7 +127,7 @@ class TypeController extends AbstractController
      *
      * @return \Symfony\Component\Form\FormInterface<Type> The form
      */
-    private function createEditForm(Type $entity)
+    private function createEditForm(Type $entity): \Symfony\Component\Form\FormInterface
     {
         $form = $this->createForm(TypeType::class, $entity, ['action' => $this->generateUrl('admin_type_update', ['id' => $entity->getId()]), 'method' => 'PUT']);
         $form->add('submit', SubmitType::class, ['label' => 'Update']);
@@ -148,11 +138,9 @@ class TypeController extends AbstractController
     /**
      * Edits an existing Type entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/type/{id}/update", name="admin_type_update", methods={"POST", "PUT"})
      */
-    public function updateAction(Request $request, $id)
+    public function updateAction(Request $request, $id): \Symfony\Component\HttpFoundation\Response
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $this->typeRepository->find($id);
@@ -174,11 +162,9 @@ class TypeController extends AbstractController
     /**
      * Deletes a Type entity.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/admin/type/{id}/delete", name="admin_type_delete", methods={"POST", "DELETE"})
      */
-    public function deleteAction(Request $request, $id)
+    public function deleteAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
@@ -202,7 +188,7 @@ class TypeController extends AbstractController
      *
      * @return \Symfony\Component\Form\FormInterface<mixed> The form
      */
-    private function createDeleteForm($id)
+    private function createDeleteForm($id): \Symfony\Component\Form\FormInterface
     {
         return $this->createFormBuilder()->setAction($this->generateUrl('admin_type_delete', ['id' => $id]))->setMethod('DELETE')->getForm();
     }

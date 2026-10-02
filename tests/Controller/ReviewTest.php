@@ -66,18 +66,12 @@ class ReviewTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db()
+    private function db(): \Doctrine\DBAL\Connection
     {
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    /**
-     * @return KernelBrowser
-     */
-    private function createAuthenticatedClient($username)
+    private function createAuthenticatedClient($username): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -89,10 +83,8 @@ class ReviewTest extends WebTestCase
 
     /**
      * @param string $method
-     *
-     * @return Response
      */
-    private function ajax(KernelBrowser $client, $uri, array $parameters, $method = 'POST')
+    private function ajax(KernelBrowser $client, $uri, array $parameters, $method = 'POST'): Response
     {
         $client->request($method, $uri, $parameters, [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
@@ -114,10 +106,7 @@ class ReviewTest extends WebTestCase
         );
     }
 
-    /**
-     * @return string
-     */
-    private static function reviewText()
+    private static function reviewText(): string
     {
         return "Théodred is a **cheap** hero: he gives a resource to a questing hero.\n\nSee http://example.com/theodred";
     }
@@ -162,10 +151,7 @@ class ReviewTest extends WebTestCase
         $this->assertSame([], $this->newReviews($client));
     }
 
-    /**
-     * @return array
-     */
-    public function refusedReviewProvider()
+    public function refusedReviewProvider(): array
     {
         $text = self::reviewText();
 
@@ -245,10 +231,7 @@ class ReviewTest extends WebTestCase
         $this->assertSame($this->fixtureReview['text_md'], $this->db($client)->fetchColumn('SELECT text_md FROM review WHERE id = 1'));
     }
 
-    /**
-     * @return array
-     */
-    public function refusedEditProvider()
+    public function refusedEditProvider(): array
     {
         return [
             'another user\'s review' => ['admin', 1, 'You cannot edit this review.'],
@@ -325,10 +308,7 @@ class ReviewTest extends WebTestCase
         $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM reviewcomment'));
     }
 
-    /**
-     * @return array
-     */
-    public function refusedCommentProvider()
+    public function refusedCommentProvider(): array
     {
         return [
             'empty comment' => [['comment_review_id' => 1, 'comment' => ' '], 'Your comment is empty.'],

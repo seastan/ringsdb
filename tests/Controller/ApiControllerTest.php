@@ -31,10 +31,7 @@ class ApiControllerTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return Response
-     */
-    private function get(KernelBrowser $client, $uri, array $headers = [])
+    private function get(KernelBrowser $client, $uri, array $headers = []): Response
     {
         $client->request('GET', $uri, [], [], $headers);
 
@@ -53,10 +50,8 @@ class ApiControllerTest extends WebTestCase
 
     /**
      * [snapshot name, uri, expected Last-Modified header (null if none)].
-     *
-     * @return array
      */
-    public function jsonEndpointProvider()
+    public function jsonEndpointProvider(): array
     {
         return [
             'packs' => ['packs', '/api/public/packs/', 'Wed, 25 Mar 2026 16:18:09 GMT'],
@@ -144,7 +139,7 @@ class ApiControllerTest extends WebTestCase
     /**
      * @return array<string, array{string}>
      */
-    public function invalidJsonpProvider()
+    public function invalidJsonpProvider(): array
     {
         return [
             'script injection' => ['alert(document.cookie)//'],
@@ -175,10 +170,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertStringStartsWith('{', (string) $response->getContent());
     }
 
-    /**
-     * @return array
-     */
-    public function jsonpEndpointProvider()
+    public function jsonpEndpointProvider(): array
     {
         return [
             'packs' => ['packs', '/api/public/packs/'],
@@ -210,10 +202,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertNotEmpty($response->getContent());
     }
 
-    /**
-     * @return array
-     */
-    public function cachedEndpointProvider()
+    public function cachedEndpointProvider(): array
     {
         return [
             'packs' => ['/api/public/packs/', 'Wed, 25 Mar 2026 16:18:09 GMT'],
@@ -240,10 +229,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertSame($expectedStatus, $response->getStatusCode());
     }
 
-    /**
-     * @return array
-     */
-    public function errorProvider()
+    public function errorProvider(): array
     {
         return [
             'unknown pack' => ['/api/public/cards/nope', 404],
@@ -269,10 +255,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertSame("$format format not supported. Only json is supported.", $response->getContent());
     }
 
-    /**
-     * @return array
-     */
-    public function unsupportedFormatProvider()
+    public function unsupportedFormatProvider(): array
     {
         return [
             'xml' => ['xml', 'text/xml; charset=UTF-8'],

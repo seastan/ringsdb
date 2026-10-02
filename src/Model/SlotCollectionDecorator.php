@@ -28,12 +28,12 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         $this->slots = $slots;
     }
 
-    public function add($element)
+    public function add($element): bool
     {
         return $this->slots->add($element);
     }
 
-    public function removeElement($element)
+    public function removeElement($element): bool
     {
         return $this->slots->removeElement($element);
     }
@@ -68,7 +68,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         $this->slots->offsetUnset($offset);
     }
 
-    public function countCards()
+    public function countCards(): int
     {
         $count = 0;
         foreach ($this->slots as $slot) {
@@ -78,7 +78,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         return $count;
     }
 
-    public function getIncludedPacks()
+    public function getIncludedPacks(): array
     {
         $packs = [];
         foreach ($this->slots as $slot) {
@@ -116,7 +116,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         return array_values($packs);
     }
 
-    public function getSlotsByType()
+    public function getSlotsByType(): array
     {
         $slotsByType = ['hero' => [], 'ally' => [], 'attachment' => [], 'event' => [], 'player-side-quest' => [], 'player-objective' => [], 'contract' => [], 'treasure' => []];
         foreach ($this->slots as $slot) {
@@ -129,7 +129,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         return $slotsByType;
     }
 
-    public function getCountByType()
+    public function getCountByType(): array
     {
         $countByType = ['hero' => 0, 'ally' => 0, 'attachment' => 0, 'event' => 0, 'player-side-quest' => 0, 'player-objective' => 0, 'contract' => 0, 'treasure' => 0];
         foreach ($this->slots as $slot) {
@@ -155,7 +155,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         return $countBySphere;
     }
 
-    public function getHeroDeck()
+    public function getHeroDeck(): SlotCollectionInterface
     {
         $heroDeck = [];
         foreach ($this->slots as $slot) {
@@ -168,7 +168,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         return new SlotCollectionDecorator(new ArrayCollection($heroDeck));
     }
 
-    public function getDrawDeck()
+    public function getDrawDeck(): SlotCollectionInterface
     {
         $drawDeck = [];
         foreach ($this->slots as $slot) {
@@ -181,7 +181,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         return new SlotCollectionDecorator(new ArrayCollection($drawDeck));
     }
 
-    public function getStartingThreat()
+    public function getStartingThreat(): int
     {
         $heroDeck = $this->getHeroDeck();
         $threat = 0;
@@ -226,7 +226,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
     /**
      * @return array<string, array{copies: int, deck_limit: int}>
      */
-    public function getCopiesAndDeckLimit()
+    public function getCopiesAndDeckLimit(): array
     {
         $copiesAndDeckLimit = [];
         foreach ($this->slots as $slot) {
@@ -251,12 +251,12 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         return $copiesAndDeckLimit;
     }
 
-    public function getSlots()
+    public function getSlots(): \Doctrine\Common\Collections\Collection
     {
         return $this->slots;
     }
 
-    public function getContent()
+    public function getContent(): array
     {
         $arr = [];
         foreach ($this->slots as $slot) {

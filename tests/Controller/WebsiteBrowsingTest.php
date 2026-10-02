@@ -30,10 +30,7 @@ class WebsiteBrowsingTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return KernelBrowser
-     */
-    private function createAuthenticatedClient()
+    private function createAuthenticatedClient(): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -60,10 +57,8 @@ class WebsiteBrowsingTest extends WebTestCase
 
     /**
      * [uri, snapshot name, <title>].
-     *
-     * @return array
      */
-    public function publicPageProvider()
+    public function publicPageProvider(): array
     {
         return [
             'home' => ['/', 'index', 'Deckbuilder · RingsDB'],
@@ -119,10 +114,8 @@ class WebsiteBrowsingTest extends WebTestCase
 
     /**
      * [uri, snapshot name, <title>].
-     *
-     * @return array
      */
-    public function memberPageProvider()
+    public function memberPageProvider(): array
     {
         return [
             'my decks' => ['/decks', 'decks', 'My Decks · RingsDB'],
@@ -164,10 +157,8 @@ class WebsiteBrowsingTest extends WebTestCase
 
     /**
      * Pages anonymous visitors cannot see: [uri, expected status, expected Location or error title].
-     *
-     * @return array
      */
-    public function anonymousAccessProvider()
+    public function anonymousAccessProvider(): array
     {
         $login = 'http://localhost/login';
 
@@ -224,10 +215,8 @@ class WebsiteBrowsingTest extends WebTestCase
 
     /**
      * [uri, expected Location].
-     *
-     * @return array
      */
-    public function redirectProvider()
+    public function redirectProvider(): array
     {
         return [
             'search matching a pack' => ['/find?q=e:Core', '/set/Core/list/name'],
@@ -252,10 +241,8 @@ class WebsiteBrowsingTest extends WebTestCase
 
     /**
      * [uri, error title].
-     *
-     * @return array
      */
-    public function notFoundProvider()
+    public function notFoundProvider(): array
     {
         return [
             'unknown pack' => ['/set/nope', 'This pack does not exist (404 Not Found)'],
@@ -282,10 +269,8 @@ class WebsiteBrowsingTest extends WebTestCase
 
     /**
      * [uri, snapshot file, Content-Type, Content-Disposition, authenticated].
-     *
-     * @return array
      */
-    public function downloadProvider()
+    public function downloadProvider(): array
     {
         return [
             'decklist as text' => ['/decklist/export/text/1', 'decklist_1.txt', 'text/plain; charset=UTF-8', 'attachment; filename=dwarfloreleadershiptactics-1.0.txt', false],
@@ -314,10 +299,8 @@ class WebsiteBrowsingTest extends WebTestCase
      * Zip archives: the content is checked entry by entry (zip metadata contains timestamps).
      *
      * [uri, expected entries => snapshot file]
-     *
-     * @return array
      */
-    public function zipDownloadProvider()
+    public function zipDownloadProvider(): array
     {
         return [
             'decks as text' => ['/deck/export/text/list?ids[]=1&ids[]=2', [

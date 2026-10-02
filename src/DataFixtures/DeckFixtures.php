@@ -28,7 +28,7 @@ class DeckFixtures extends Fixture implements ContainerAwareInterface, Dependent
     /**
      * @return array<int, class-string>
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
         return [
             UserFixtures::class,

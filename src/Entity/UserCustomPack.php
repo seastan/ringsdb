@@ -9,7 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 class UserCustomPack
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -52,18 +52,12 @@ class UserCustomPack
         $this->updatedAt = new \DateTime();
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return User
-     */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->user;
     }
@@ -78,10 +72,7 @@ class UserCustomPack
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -96,10 +87,7 @@ class UserCustomPack
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
@@ -114,10 +102,7 @@ class UserCustomPack
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getIsEnabled()
+    public function getIsEnabled(): bool
     {
         return $this->isEnabled;
     }
@@ -132,10 +117,7 @@ class UserCustomPack
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getIsPublished()
+    public function getIsPublished(): bool
     {
         return $this->isPublished;
     }
@@ -150,10 +132,7 @@ class UserCustomPack
         return $this;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getCreatedAt()
+    public function getCreatedAt(): \DateTime
     {
         return $this->createdAt;
     }
@@ -168,10 +147,7 @@ class UserCustomPack
         return $this;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): \DateTime
     {
         return $this->updatedAt;
     }
@@ -189,7 +165,7 @@ class UserCustomPack
     /**
      * @return \Doctrine\Common\Collections\Collection<int, UserCustomPackCard>
      */
-    public function getCards()
+    public function getCards(): \Doctrine\Common\Collections\Collection
     {
         return $this->cards;
     }

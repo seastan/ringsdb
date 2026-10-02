@@ -10,7 +10,7 @@ namespace App\Entity;
 class Review
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -65,10 +65,8 @@ class Review
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -77,10 +75,8 @@ class Review
      * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return Review
      */
-    public function setDateCreation($dateCreation)
+    public function setDateCreation($dateCreation): Review
     {
         $this->dateCreation = $dateCreation;
 
@@ -89,10 +85,8 @@ class Review
 
     /**
      * Get dateCreation.
-     *
-     * @return \DateTime
      */
-    public function getDateCreation()
+    public function getDateCreation(): \DateTime
     {
         return $this->dateCreation;
     }
@@ -101,10 +95,8 @@ class Review
      * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return Review
      */
-    public function setDateUpdate($dateUpdate)
+    public function setDateUpdate($dateUpdate): Review
     {
         $this->dateUpdate = $dateUpdate;
 
@@ -113,10 +105,8 @@ class Review
 
     /**
      * Get dateUpdate.
-     *
-     * @return \DateTime
      */
-    public function getDateUpdate()
+    public function getDateUpdate(): \DateTime
     {
         return $this->dateUpdate;
     }
@@ -125,10 +115,8 @@ class Review
      * Set dateLastComment.
      *
      * @param \DateTime|null $dateLastComment
-     *
-     * @return Review
      */
-    public function setDateLastComment($dateLastComment)
+    public function setDateLastComment($dateLastComment): Review
     {
         $this->dateLastComment = $dateLastComment;
 
@@ -137,10 +125,8 @@ class Review
 
     /**
      * Get dateLastComment.
-     *
-     * @return \DateTime|null
      */
-    public function getDateLastComment()
+    public function getDateLastComment(): ?\DateTime
     {
         return $this->dateLastComment;
     }
@@ -149,10 +135,8 @@ class Review
      * Set textMd.
      *
      * @param string $textMd
-     *
-     * @return Review
      */
-    public function setTextMd($textMd)
+    public function setTextMd($textMd): Review
     {
         $this->textMd = $textMd;
 
@@ -161,10 +145,8 @@ class Review
 
     /**
      * Get textMd.
-     *
-     * @return string
      */
-    public function getTextMd()
+    public function getTextMd(): string
     {
         return $this->textMd;
     }
@@ -173,10 +155,8 @@ class Review
      * Set textHtml.
      *
      * @param string $textHtml
-     *
-     * @return Review
      */
-    public function setTextHtml($textHtml)
+    public function setTextHtml($textHtml): Review
     {
         $this->textHtml = $textHtml;
 
@@ -185,10 +165,8 @@ class Review
 
     /**
      * Get textHtml.
-     *
-     * @return string
      */
-    public function getTextHtml()
+    public function getTextHtml(): string
     {
         return $this->textHtml;
     }
@@ -197,10 +175,8 @@ class Review
      * Set nbVotes.
      *
      * @param int $nbVotes
-     *
-     * @return Review
      */
-    public function setNbVotes($nbVotes)
+    public function setNbVotes($nbVotes): Review
     {
         $this->nbVotes = $nbVotes;
 
@@ -209,20 +185,16 @@ class Review
 
     /**
      * Get nbVotes.
-     *
-     * @return int
      */
-    public function getNbVotes()
+    public function getNbVotes(): int
     {
         return $this->nbVotes;
     }
 
     /**
      * Add comment.
-     *
-     * @return Review
      */
-    public function addComment(Reviewcomment $comment)
+    public function addComment(Reviewcomment $comment): Review
     {
         $this->comments[] = $comment;
 
@@ -242,17 +214,15 @@ class Review
      *
      * @return \Doctrine\Common\Collections\Collection<int, Reviewcomment>
      */
-    public function getComments()
+    public function getComments(): \Doctrine\Common\Collections\Collection
     {
         return $this->comments;
     }
 
     /**
      * Set card.
-     *
-     * @return Review
      */
-    public function setCard(Card $card)
+    public function setCard(Card $card): Review
     {
         $this->card = $card;
 
@@ -261,20 +231,16 @@ class Review
 
     /**
      * Get card.
-     *
-     * @return Card
      */
-    public function getCard()
+    public function getCard(): Card
     {
         return $this->card;
     }
 
     /**
      * Set user.
-     *
-     * @return Review
      */
-    public function setUser(User $user)
+    public function setUser(User $user): Review
     {
         $this->user = $user;
 
@@ -283,20 +249,16 @@ class Review
 
     /**
      * Get user.
-     *
-     * @return User
      */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->user;
     }
 
     /**
      * Add vote.
-     *
-     * @return Review
      */
-    public function addVote(User $vote)
+    public function addVote(User $vote): Review
     {
         $this->votes[] = $vote;
 
@@ -316,7 +278,7 @@ class Review
      *
      * @return \Doctrine\Common\Collections\Collection<int, User>
      */
-    public function getVotes()
+    public function getVotes(): \Doctrine\Common\Collections\Collection
     {
         return $this->votes;
     }

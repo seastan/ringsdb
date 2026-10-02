@@ -5,6 +5,11 @@ parameters:
     ignoreErrors:
         -
             identifier: doctrine.dql
+        -
+            identifier: doctrine.columnType
+        -
+            identifier: doctrine.associationType
+
     # phpstan/phpstan-symfony: the service types, read from the container dumped in debug mode
     # (make phpstan warms up the test cache first)
     symfony:

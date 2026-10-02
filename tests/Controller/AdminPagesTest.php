@@ -29,10 +29,7 @@ class AdminPagesTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return KernelBrowser
-     */
-    private function createAuthenticatedClient($username)
+    private function createAuthenticatedClient($username): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -42,20 +39,15 @@ class AdminPagesTest extends WebTestCase
         return $client;
     }
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db()
+    private function db(): \Doctrine\DBAL\Connection
     {
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
     /**
      * GET pages of the admin area: [uri, snapshot name or null].
-     *
-     * @return array
      */
-    public function adminPageProvider()
+    public function adminPageProvider(): array
     {
         $pages = [
             'home' => ['/admin/', 'index'],
@@ -124,10 +116,7 @@ class AdminPagesTest extends WebTestCase
         $this->assertSame($before, $this->db($client)->fetchAll('SELECT id, name FROM cycle ORDER BY id'));
     }
 
-    /**
-     * @return array
-     */
-    public function writeRouteProvider()
+    public function writeRouteProvider(): array
     {
         return [
             'create' => ['POST', '/admin/cycle/create', ['appbundle_cycle' => ['code' => 'X', 'name' => 'Hacked', 'position' => 99]]],
@@ -176,10 +165,7 @@ class AdminPagesTest extends WebTestCase
         $this->assertCount((int) $this->db($client)->fetchColumn("SELECT COUNT(*) FROM $table"), $crawler->filter('table tbody tr'));
     }
 
-    /**
-     * @return array
-     */
-    public function bigListProvider()
+    public function bigListProvider(): array
     {
         return [
             'cards' => ['/admin/card/', 'card'],
@@ -202,10 +188,7 @@ class AdminPagesTest extends WebTestCase
         $this->assertMatchesJsonSnapshot("admin/$snapshot", $client->getResponse()->getContent());
     }
 
-    /**
-     * @return array
-     */
-    public function statisticsProvider()
+    public function statisticsProvider(): array
     {
         return [
             'decks and users by cycle' => ['/admin/stat?month=2015-08', 'stat_2015-08'],

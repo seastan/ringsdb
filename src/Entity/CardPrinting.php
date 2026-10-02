@@ -7,7 +7,7 @@ namespace App\Entity;
 class CardPrinting
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -79,20 +79,18 @@ class CardPrinting
      */
     private $dateUpdate;
     /**
-     * @var Card
+     * @var Card|null
      */
     private $card;
     /**
-     * @var Pack
+     * @var Pack|null
      */
     private $pack;
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -101,10 +99,8 @@ class CardPrinting
      * Set position.
      *
      * @param int $position
-     *
-     * @return CardPrinting
      */
-    public function setPosition($position)
+    public function setPosition($position): CardPrinting
     {
         $this->position = $position;
 
@@ -113,10 +109,8 @@ class CardPrinting
 
     /**
      * Get position.
-     *
-     * @return int
      */
-    public function getPosition()
+    public function getPosition(): int
     {
         return $this->position;
     }
@@ -125,10 +119,8 @@ class CardPrinting
      * Set quantity.
      *
      * @param int $quantity
-     *
-     * @return CardPrinting
      */
-    public function setQuantity($quantity)
+    public function setQuantity($quantity): CardPrinting
     {
         $this->quantity = $quantity;
 
@@ -137,10 +129,8 @@ class CardPrinting
 
     /**
      * Get quantity.
-     *
-     * @return int
      */
-    public function getQuantity()
+    public function getQuantity(): int
     {
         return $this->quantity;
     }
@@ -149,10 +139,8 @@ class CardPrinting
      * Set illustrator.
      *
      * @param string|null $illustrator
-     *
-     * @return CardPrinting
      */
-    public function setIllustrator($illustrator)
+    public function setIllustrator($illustrator): CardPrinting
     {
         $this->illustrator = $illustrator;
 
@@ -161,10 +149,8 @@ class CardPrinting
 
     /**
      * Get illustrator.
-     *
-     * @return string|null
      */
-    public function getIllustrator()
+    public function getIllustrator(): ?string
     {
         return $this->illustrator;
     }
@@ -173,10 +159,8 @@ class CardPrinting
      * Set octgnid.
      *
      * @param string|null $octgnid
-     *
-     * @return CardPrinting
      */
-    public function setOctgnid($octgnid)
+    public function setOctgnid($octgnid): CardPrinting
     {
         $this->octgnid = $octgnid;
 
@@ -185,10 +169,8 @@ class CardPrinting
 
     /**
      * Get octgnid.
-     *
-     * @return string|null
      */
-    public function getOctgnid()
+    public function getOctgnid(): ?string
     {
         return $this->octgnid;
     }
@@ -197,10 +179,8 @@ class CardPrinting
      * Set imageCode.
      *
      * @param string $imageCode
-     *
-     * @return CardPrinting
      */
-    public function setImageCode($imageCode)
+    public function setImageCode($imageCode): CardPrinting
     {
         $this->imageCode = $imageCode;
 
@@ -209,10 +189,8 @@ class CardPrinting
 
     /**
      * Get imageCode.
-     *
-     * @return string
      */
-    public function getImageCode()
+    public function getImageCode(): string
     {
         return $this->imageCode;
     }
@@ -221,10 +199,8 @@ class CardPrinting
      * Set traits.
      *
      * @param string|null $traits
-     *
-     * @return CardPrinting
      */
-    public function setTraits($traits)
+    public function setTraits($traits): CardPrinting
     {
         $this->traits = $traits;
 
@@ -233,10 +209,8 @@ class CardPrinting
 
     /**
      * Get traits.
-     *
-     * @return string|null
      */
-    public function getTraits()
+    public function getTraits(): ?string
     {
         return $this->traits;
     }
@@ -245,10 +219,8 @@ class CardPrinting
      * Set text.
      *
      * @param string|null $text
-     *
-     * @return CardPrinting
      */
-    public function setText($text)
+    public function setText($text): CardPrinting
     {
         $this->text = $text;
 
@@ -257,10 +229,8 @@ class CardPrinting
 
     /**
      * Get text.
-     *
-     * @return string|null
      */
-    public function getText()
+    public function getText(): ?string
     {
         return $this->text;
     }
@@ -269,10 +239,8 @@ class CardPrinting
      * Set cost.
      *
      * @param string|null $cost
-     *
-     * @return CardPrinting
      */
-    public function setCost($cost)
+    public function setCost($cost): CardPrinting
     {
         $this->cost = $cost;
 
@@ -281,10 +249,8 @@ class CardPrinting
 
     /**
      * Get cost.
-     *
-     * @return string|null
      */
-    public function getCost()
+    public function getCost(): ?string
     {
         return $this->cost;
     }
@@ -293,10 +259,8 @@ class CardPrinting
      * Set threat.
      *
      * @param int|null $threat
-     *
-     * @return CardPrinting
      */
-    public function setThreat($threat)
+    public function setThreat($threat): CardPrinting
     {
         $this->threat = $threat;
 
@@ -305,10 +269,8 @@ class CardPrinting
 
     /**
      * Get threat.
-     *
-     * @return int|null
      */
-    public function getThreat()
+    public function getThreat(): ?int
     {
         return $this->threat;
     }
@@ -317,10 +279,8 @@ class CardPrinting
      * Set willpower.
      *
      * @param int|null $willpower
-     *
-     * @return CardPrinting
      */
-    public function setWillpower($willpower)
+    public function setWillpower($willpower): CardPrinting
     {
         $this->willpower = $willpower;
 
@@ -329,10 +289,8 @@ class CardPrinting
 
     /**
      * Get willpower.
-     *
-     * @return int|null
      */
-    public function getWillpower()
+    public function getWillpower(): ?int
     {
         return $this->willpower;
     }
@@ -341,10 +299,8 @@ class CardPrinting
      * Set attack.
      *
      * @param int|null $attack
-     *
-     * @return CardPrinting
      */
-    public function setAttack($attack)
+    public function setAttack($attack): CardPrinting
     {
         $this->attack = $attack;
 
@@ -353,10 +309,8 @@ class CardPrinting
 
     /**
      * Get attack.
-     *
-     * @return int|null
      */
-    public function getAttack()
+    public function getAttack(): ?int
     {
         return $this->attack;
     }
@@ -365,10 +319,8 @@ class CardPrinting
      * Set defense.
      *
      * @param int|null $defense
-     *
-     * @return CardPrinting
      */
-    public function setDefense($defense)
+    public function setDefense($defense): CardPrinting
     {
         $this->defense = $defense;
 
@@ -377,10 +329,8 @@ class CardPrinting
 
     /**
      * Get defense.
-     *
-     * @return int|null
      */
-    public function getDefense()
+    public function getDefense(): ?int
     {
         return $this->defense;
     }
@@ -389,10 +339,8 @@ class CardPrinting
      * Set health.
      *
      * @param int|null $health
-     *
-     * @return CardPrinting
      */
-    public function setHealth($health)
+    public function setHealth($health): CardPrinting
     {
         $this->health = $health;
 
@@ -401,10 +349,8 @@ class CardPrinting
 
     /**
      * Get health.
-     *
-     * @return int|null
      */
-    public function getHealth()
+    public function getHealth(): ?int
     {
         return $this->health;
     }
@@ -413,10 +359,8 @@ class CardPrinting
      * Set victory.
      *
      * @param int|null $victory
-     *
-     * @return CardPrinting
      */
-    public function setVictory($victory)
+    public function setVictory($victory): CardPrinting
     {
         $this->victory = $victory;
 
@@ -425,10 +369,8 @@ class CardPrinting
 
     /**
      * Get victory.
-     *
-     * @return int|null
      */
-    public function getVictory()
+    public function getVictory(): ?int
     {
         return $this->victory;
     }
@@ -437,10 +379,8 @@ class CardPrinting
      * Set quest.
      *
      * @param int|null $quest
-     *
-     * @return CardPrinting
      */
-    public function setQuest($quest)
+    public function setQuest($quest): CardPrinting
     {
         $this->quest = $quest;
 
@@ -449,10 +389,8 @@ class CardPrinting
 
     /**
      * Get quest.
-     *
-     * @return int|null
      */
-    public function getQuest()
+    public function getQuest(): ?int
     {
         return $this->quest;
     }
@@ -461,10 +399,8 @@ class CardPrinting
      * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return CardPrinting
      */
-    public function setDateCreation($dateCreation)
+    public function setDateCreation($dateCreation): CardPrinting
     {
         $this->dateCreation = $dateCreation;
 
@@ -473,10 +409,8 @@ class CardPrinting
 
     /**
      * Get dateCreation.
-     *
-     * @return \DateTime
      */
-    public function getDateCreation()
+    public function getDateCreation(): \DateTime
     {
         return $this->dateCreation;
     }
@@ -485,10 +419,8 @@ class CardPrinting
      * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return CardPrinting
      */
-    public function setDateUpdate($dateUpdate)
+    public function setDateUpdate($dateUpdate): CardPrinting
     {
         $this->dateUpdate = $dateUpdate;
 
@@ -497,20 +429,16 @@ class CardPrinting
 
     /**
      * Get dateUpdate.
-     *
-     * @return \DateTime
      */
-    public function getDateUpdate()
+    public function getDateUpdate(): \DateTime
     {
         return $this->dateUpdate;
     }
 
     /**
      * Set card.
-     *
-     * @return CardPrinting
      */
-    public function setCard(Card $card)
+    public function setCard(Card $card): CardPrinting
     {
         $this->card = $card;
 
@@ -519,20 +447,16 @@ class CardPrinting
 
     /**
      * Get card.
-     *
-     * @return Card
      */
-    public function getCard()
+    public function getCard(): ?Card
     {
         return $this->card;
     }
 
     /**
      * Set pack.
-     *
-     * @return CardPrinting
      */
-    public function setPack(Pack $pack)
+    public function setPack(Pack $pack): CardPrinting
     {
         $this->pack = $pack;
 
@@ -541,10 +465,8 @@ class CardPrinting
 
     /**
      * Get pack.
-     *
-     * @return Pack
      */
-    public function getPack()
+    public function getPack(): ?Pack
     {
         return $this->pack;
     }

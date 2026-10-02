@@ -30,21 +30,17 @@ class UserAdminController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/user/find", name="admin_find_user", methods={"GET"})
      */
-    public function findAction()
+    public function findAction(): \Symfony\Component\HttpFoundation\Response
     {
         return $this->render('Admin/find_user.html.twig', ['pagetitle' => 'Admin']);
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/admin/user/find_process", name="admin_find_user_process", methods={"POST"})
      */
-    public function processAction(Request $request)
+    public function processAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $user = null;
         if ($request->request->get('username')) {
@@ -64,11 +60,9 @@ class UserAdminController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/user/show/{user_id}", name="admin_show_user", methods={"GET"})
      */
-    public function showAction($user_id)
+    public function showAction($user_id): \Symfony\Component\HttpFoundation\Response
     {
         /* @var $user \App\Entity\User */
         $user = $this->userRepository->find($user_id);
@@ -80,11 +74,9 @@ class UserAdminController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/admin/user/toggle_locked/{user_id}", name="admin_user_locked_toggle", methods={"GET"})
      */
-    public function toggleLockedAction($user_id)
+    public function toggleLockedAction($user_id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $em = $this->getDoctrine()->getManager();
         /* @var $user \App\Entity\User */
@@ -99,11 +91,9 @@ class UserAdminController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/user/decklists/{user_id}", name="admin_user_decklists_show", methods={"GET"})
      */
-    public function decklistsAction($user_id)
+    public function decklistsAction($user_id): \Symfony\Component\HttpFoundation\Response
     {
         /* @var $user \App\Entity\User */
         $user = $this->userRepository->find($user_id);
@@ -115,11 +105,9 @@ class UserAdminController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/admin/decklist/delete/{decklist_id}", name="admin_decklist_delete", methods={"GET"})
      */
-    public function deleteDecklistAction($decklist_id, DeckRepository $deckRepository, DecklistRepository $decklistRepository)
+    public function deleteDecklistAction($decklist_id, DeckRepository $deckRepository, DecklistRepository $decklistRepository): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $em = $this->getDoctrine()->getManager();
         /* @var $decklist \App\Entity\Decklist */
@@ -147,11 +135,9 @@ class UserAdminController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/user/comments/{user_id}", name="admin_user_comments_show", methods={"GET"})
      */
-    public function commentsAction($user_id)
+    public function commentsAction($user_id): \Symfony\Component\HttpFoundation\Response
     {
         /* @var $user \App\Entity\User */
         $user = $this->userRepository->find($user_id);
@@ -163,15 +149,13 @@ class UserAdminController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route(
      *     "/admin/comment/toggle_hidden/{comment_id}",
      *     name="admin_comment_hidden_toggle",
      *     methods={"GET"}
      * )
      */
-    public function toggleHiddenCommentAction($comment_id)
+    public function toggleHiddenCommentAction($comment_id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $em = $this->getDoctrine()->getManager();
         /* @var $comment \App\Entity\Comment */
@@ -186,11 +170,9 @@ class UserAdminController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/admin/comment/delete/{comment_id}", name="admin_comment_delete", methods={"GET"})
      */
-    public function deleteCommentAction($comment_id)
+    public function deleteCommentAction($comment_id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $em = $this->getDoctrine()->getManager();
         /* @var $comment \App\Entity\Comment */

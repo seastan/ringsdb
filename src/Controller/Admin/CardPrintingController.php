@@ -31,11 +31,9 @@ class CardPrintingController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/card-printing/", name="admin_card_printing")
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $em = $this->getDoctrine()->getManager();
         $packId = $request->query->get('pack');
@@ -54,11 +52,9 @@ class CardPrintingController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/card-printing/{id}/show", name="admin_card_printing_show")
      */
-    public function showAction($id)
+    public function showAction($id): \Symfony\Component\HttpFoundation\Response
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $this->cardPrintingRepository->find($id);
@@ -71,11 +67,9 @@ class CardPrintingController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/card-printing/new", name="admin_card_printing_new")
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $em = $this->getDoctrine()->getManager();
         $filterPack = $this->resolveFilterPack($request, $em);
@@ -86,11 +80,9 @@ class CardPrintingController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/card-printing/create", name="admin_card_printing_create", methods={"POST"})
      */
-    public function createAction(Request $request)
+    public function createAction(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $em = $this->getDoctrine()->getManager();
         $filterPack = $this->resolveFilterPack($request, $em);
@@ -108,11 +100,9 @@ class CardPrintingController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/card-printing/{id}/edit", name="admin_card_printing_edit")
      */
-    public function editAction(Request $request, $id)
+    public function editAction(Request $request, $id): \Symfony\Component\HttpFoundation\Response
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $this->cardPrintingRepository->find($id);
@@ -127,15 +117,13 @@ class CardPrintingController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route(
      *     "/admin/card-printing/{id}/update",
      *     name="admin_card_printing_update",
      *     methods={"POST", "PUT"}
      * )
      */
-    public function updateAction(Request $request, $id)
+    public function updateAction(Request $request, $id): \Symfony\Component\HttpFoundation\Response
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $this->cardPrintingRepository->find($id);
@@ -157,15 +145,13 @@ class CardPrintingController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route(
      *     "/admin/card-printing/{id}/delete",
      *     name="admin_card_printing_delete",
      *     methods={"POST", "DELETE"}
      * )
      */
-    public function deleteAction(Request $request, $id)
+    public function deleteAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
@@ -195,7 +181,7 @@ class CardPrintingController extends AbstractController
     /**
      * @return \Symfony\Component\Form\FormInterface<mixed>
      */
-    private function createDeleteForm($id)
+    private function createDeleteForm($id): \Symfony\Component\Form\FormInterface
     {
         return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }

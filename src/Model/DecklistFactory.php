@@ -36,10 +36,7 @@ class DecklistFactory
         $this->sphereRepository = $sphereRepository;
     }
 
-    /**
-     * @return Decklist
-     */
-    public function createDecklistFromDeck(Deck $deck, $name = null, $descriptionMd = null)
+    public function createDecklistFromDeck(Deck $deck, $name = null, $descriptionMd = null): Decklist
     {
         /* @var $lastPack \App\Entity\Pack */
         $lastPack = $deck->getLastPack();

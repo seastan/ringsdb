@@ -21,7 +21,7 @@ class Encounter implements \JsonSerializable
     }
 
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -59,10 +59,8 @@ class Encounter implements \JsonSerializable
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -71,10 +69,8 @@ class Encounter implements \JsonSerializable
      * Set code.
      *
      * @param string $code
-     *
-     * @return Encounter
      */
-    public function setCode($code)
+    public function setCode($code): Encounter
     {
         $this->code = $code;
 
@@ -83,10 +79,8 @@ class Encounter implements \JsonSerializable
 
     /**
      * Get code.
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
@@ -95,10 +89,8 @@ class Encounter implements \JsonSerializable
      * Set name.
      *
      * @param string $name
-     *
-     * @return Encounter
      */
-    public function setName($name)
+    public function setName($name): Encounter
     {
         $this->name = $name;
 
@@ -107,10 +99,8 @@ class Encounter implements \JsonSerializable
 
     /**
      * Get name.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -119,10 +109,8 @@ class Encounter implements \JsonSerializable
      * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return Encounter
      */
-    public function setDateCreation($dateCreation)
+    public function setDateCreation($dateCreation): Encounter
     {
         $this->dateCreation = $dateCreation;
 
@@ -131,10 +119,8 @@ class Encounter implements \JsonSerializable
 
     /**
      * Get dateCreation.
-     *
-     * @return \DateTime
      */
-    public function getDateCreation()
+    public function getDateCreation(): \DateTime
     {
         return $this->dateCreation;
     }
@@ -143,10 +129,8 @@ class Encounter implements \JsonSerializable
      * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return Encounter
      */
-    public function setDateUpdate($dateUpdate)
+    public function setDateUpdate($dateUpdate): Encounter
     {
         $this->dateUpdate = $dateUpdate;
 
@@ -155,20 +139,16 @@ class Encounter implements \JsonSerializable
 
     /**
      * Get dateUpdate.
-     *
-     * @return \DateTime
      */
-    public function getDateUpdate()
+    public function getDateUpdate(): \DateTime
     {
         return $this->dateUpdate;
     }
 
     /**
      * Set pack.
-     *
-     * @return Encounter
      */
-    public function setPack(?Pack $pack = null)
+    public function setPack(?Pack $pack = null): Encounter
     {
         $this->pack = $pack;
 
@@ -177,10 +157,8 @@ class Encounter implements \JsonSerializable
 
     /**
      * Get pack.
-     *
-     * @return Pack|null
      */
-    public function getPack()
+    public function getPack(): ?Pack
     {
         return $this->pack;
     }

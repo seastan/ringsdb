@@ -41,10 +41,7 @@ class ApiPrivateControllerTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return KernelBrowser
-     */
-    private function createAuthenticatedClient($username)
+    private function createAuthenticatedClient($username): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -54,10 +51,7 @@ class ApiPrivateControllerTest extends WebTestCase
         return $client;
     }
 
-    /**
-     * @return Response
-     */
-    private function ajax(KernelBrowser $client, $uri, array $headers = [])
+    private function ajax(KernelBrowser $client, $uri, array $headers = []): Response
     {
         $client->request('GET', $uri, [], [], $headers + ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
@@ -91,10 +85,8 @@ class ApiPrivateControllerTest extends WebTestCase
 
     /**
      * [user, uri, snapshot name].
-     *
-     * @return array
      */
-    public function cacheableEndpointProvider()
+    public function cacheableEndpointProvider(): array
     {
         return [
             'my decks: decklists then decks' => ['test', '/api/private/decks', 'private/decks_test'],
@@ -119,10 +111,8 @@ class ApiPrivateControllerTest extends WebTestCase
 
     /**
      * [user, uri, expected JSON].
-     *
-     * @return array
      */
-    public function uncachedEndpointProvider()
+    public function uncachedEndpointProvider(): array
     {
         $notShared = 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.';
 
@@ -192,10 +182,7 @@ class ApiPrivateControllerTest extends WebTestCase
 
     /* ----------------------------------------------------------- security */
 
-    /**
-     * @return array
-     */
-    public function privateUriProvider()
+    public function privateUriProvider(): array
     {
         return [
             'my decks' => ['/api/private/decks'],

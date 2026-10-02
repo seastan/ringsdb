@@ -71,11 +71,9 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/deck/new", name="deck_buildform", methods={"GET"})
      */
-    public function newAction()
+    public function newAction(): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -94,11 +92,9 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/deck/edit/{deck_id}", name="deck_edit", methods={"GET"}, requirements={"deck_id"="\d+"})
      */
-    public function editAction($deck_id)
+    public function editAction($deck_id): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -115,8 +111,6 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/deck/view/{deck_id}",
      *     name="deck_view",
@@ -125,7 +119,7 @@ class BuilderController extends AbstractController
      *     defaults={"deck_id"=0}
      * )
      */
-    public function viewAction($deck_id)
+    public function viewAction($deck_id): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -143,11 +137,9 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/deck/import", name="deck_import", methods={"GET"})
      */
-    public function importAction()
+    public function importAction(): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -157,11 +149,9 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/deck/fileimport", name="deck_fileimport", methods={"POST"})
      */
-    public function fileimportAction(Request $request)
+    public function fileimportAction(Request $request): Response
     {
         $filetype = filter_var($request->get('type'), FILTER_SANITIZE_STRING);
         $uploadedFile = $request->files->get('upfile');
@@ -193,7 +183,7 @@ class BuilderController extends AbstractController
     /**
      * @return array{content: array{main: array<int|string, int>, side: array<int|string, int>}, description: string}
      */
-    public function parseTextImport($text)
+    public function parseTextImport($text): array
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -266,7 +256,7 @@ class BuilderController extends AbstractController
     /**
      * @return array{content: array{main: array<int|string, int>, side: array<int|string, int>}, description: string}
      */
-    public function parseOctgnImport($octgn)
+    public function parseOctgnImport($octgn): array
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -313,8 +303,6 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/deck/export/text/{deck_id}",
      *     name="deck_export_text",
@@ -322,7 +310,7 @@ class BuilderController extends AbstractController
      *     requirements={"deck_id"="\d+"}
      * )
      */
-    public function textexportAction($deck_id)
+    public function textexportAction($deck_id): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -346,8 +334,6 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/deck/export/octgn/{deck_id}",
      *     name="deck_export_octgn",
@@ -355,7 +341,7 @@ class BuilderController extends AbstractController
      *     requirements={"deck_id"="\d+"}
      * )
      */
-    public function octgnexportAction($deck_id)
+    public function octgnexportAction($deck_id): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -378,11 +364,9 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/deck/clone/{deck_id}", name="deck_clone", methods={"GET"}, requirements={"deck_id"="\d+"})
      */
-    public function cloneAction($deck_id)
+    public function cloneAction($deck_id): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -407,11 +391,9 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/deck/save", name="deck_save", methods={"POST"})
      */
-    public function saveAction(Request $request)
+    public function saveAction(Request $request): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -462,11 +444,9 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return JsonResponse
-     *
      * @Route("/deck/save-ajax", name="deck_save_ajax", methods={"POST"})
      */
-    public function saveAjaxAction(Request $request)
+    public function saveAjaxAction(Request $request): JsonResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -506,11 +486,9 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/deck/delete", name="deck_delete", methods={"POST"})
      */
-    public function deleteAction(Request $request)
+    public function deleteAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -538,11 +516,9 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/deck/delete_list", name="deck_delete_list", methods={"POST"})
      */
-    public function deleteListAction(Request $request)
+    public function deleteListAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -568,8 +544,6 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/deck/compare/{deck1_id}/{deck2_id}",
      *     name="decks_diff",
@@ -577,7 +551,7 @@ class BuilderController extends AbstractController
      *     requirements={"deck1_id"="\d+", "deck2_id"="\d+"}
      * )
      */
-    public function compareAction($deck1_id, $deck2_id, Diff $diffService)
+    public function compareAction($deck1_id, $deck2_id, Diff $diffService): Response
     {
         /* @var $deck1 \App\Entity\Deck */
         $deck1 = $this->deckRepository->find($deck1_id);
@@ -599,11 +573,9 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/decks", name="decks_list", methods={"GET"})
      */
-    public function listAction(Request $request)
+    public function listAction(Request $request): Response
     {
         /* @var $user \App\Entity\User */
         $user = $this->currentUser();
@@ -627,11 +599,9 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/deck/copy/{decklist_id}", name="deck_copy", requirements={"decklist_id"="\d+"})
      */
-    public function copyAction($decklist_id, DecklistRepository $decklistRepository)
+    public function copyAction($decklist_id, DecklistRepository $decklistRepository): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -652,11 +622,9 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/deck/export/octgn/list", name="deck_export_octgn_list", methods={"GET"})
      */
-    public function octgnexportListAction(Request $request)
+    public function octgnexportListAction(Request $request): Response
     {
         $list_id = $request->get('ids');
 
@@ -664,21 +632,16 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/deck/export/text/list", name="deck_export_text_list", methods={"GET"})
      */
-    public function textexportListAction(Request $request)
+    public function textexportListAction(Request $request): Response
     {
         $list_id = $request->get('ids');
 
         return $this->downloadFromSelection($list_id, false);
     }
 
-    /**
-     * @return Response
-     */
-    public function downloadFromSelection($list_id, $octgn)
+    public function downloadFromSelection($list_id, $octgn): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -722,11 +685,9 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/deck/import/all", name="decks_upload_all", methods={"POST"})
      */
-    public function uploadallAction(Request $request)
+    public function uploadallAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -772,11 +733,9 @@ class BuilderController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/deck/autosave", name="deck_autosave", methods={"POST"})
      */
-    public function autosaveAction(Request $request, LoggerInterface $logger)
+    public function autosaveAction(Request $request, LoggerInterface $logger): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();

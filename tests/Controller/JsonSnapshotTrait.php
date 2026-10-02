@@ -16,10 +16,7 @@ namespace App\Tests\Controller;
  */
 trait JsonSnapshotTrait
 {
-    /**
-     * @return string
-     */
-    private static function normalizeJson($json)
+    private static function normalizeJson($json): string
     {
         $data = json_decode($json);
         if (JSON_ERROR_NONE !== json_last_error()) {

@@ -110,8 +110,6 @@ class QuestLogController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/myquestlogs/{scenario_name_canonical}/{quest_mode}",
      *     name="myquestlogs_list",
@@ -119,7 +117,7 @@ class QuestLogController extends AbstractController
      *     defaults={"scenario_name_canonical"=null, "quest_mode"="normal"}
      * )
      */
-    public function mylistAction($scenario_name_canonical, $quest_mode)
+    public function mylistAction($scenario_name_canonical, $quest_mode): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -185,10 +183,7 @@ class QuestLogController extends AbstractController
         return $this->render('QuestLog/my-questlogs.html.twig', ['pagetitle' => 'My Quest Logs', 'pagedescription' => 'Log a new quest.', 'quests' => $quests, 'played_easy' => $playedEasy, 'played_normal' => $playedNormal, 'played_nightmare' => $playedNightmare, 'questlogs' => $questlogs, 'quest_mode' => $quest_mode, 'selected_scenario' => $scenario, 'victories' => $victories, 'defeats' => $defeats, 'total' => $total, 'ratio' => $total ? sprintf('%.0f%%', 100 * $victories / $total) : '-', 'compact' => false]);
     }
 
-    /**
-     * @return Response
-     */
-    public function myCompleteListAction()
+    public function myCompleteListAction(): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -219,8 +214,6 @@ class QuestLogController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/questlog/new/{public}/{deck1_id}/{deck2_id}/{deck3_id}/{deck4_id}",
      *     name="questlog_new",
@@ -229,7 +222,7 @@ class QuestLogController extends AbstractController
      *     defaults={"public"=0, "deck1_id"=null, "deck2_id"=null, "deck3_id"=null, "deck4_id"=null}
      * )
      */
-    public function newAction($deck1_id, $deck2_id, $deck3_id, $deck4_id, $public)
+    public function newAction($deck1_id, $deck2_id, $deck3_id, $deck4_id, $public): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -266,8 +259,6 @@ class QuestLogController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/questlog/edit/{questlog_id}",
      *     name="questlog_edit",
@@ -275,7 +266,7 @@ class QuestLogController extends AbstractController
      *     requirements={"questlog_id"="\d+"}
      * )
      */
-    public function editAction($questlog_id)
+    public function editAction($questlog_id): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -306,8 +297,6 @@ class QuestLogController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/questlog/view/{questlog_id}/{questlog_name}",
      *     name="questlog_view",
@@ -316,7 +305,7 @@ class QuestLogController extends AbstractController
      *     defaults={"questlog_name"=null}
      * )
      */
-    public function viewAction($questlog_id)
+    public function viewAction($questlog_id): Response
     {
         /* @var $questlog \App\Entity\Questlog */
         $questlog = $this->questlogRepository->find($questlog_id);
@@ -352,11 +341,9 @@ class QuestLogController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/questlog/save", name="questlog_save", methods={"POST"})
      */
-    public function saveAction(Request $request)
+    public function saveAction(Request $request): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -507,11 +494,9 @@ class QuestLogController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/questlog/delete", name="questlog_delete", methods={"POST"})
      */
-    public function deleteAction(Request $request)
+    public function deleteAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -544,10 +529,7 @@ class QuestLogController extends AbstractController
         return $this->redirect($this->generateUrl('myquestlogs_list'));
     }
 
-    /**
-     * @return string
-     */
-    private function searchForm(Request $request)
+    private function searchForm(Request $request): string
     {
         $dbh = $this->getDoctrine()->getConnection();
         $cards_code = $request->query->get('cards');
@@ -609,11 +591,9 @@ class QuestLogController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/questlogs/search", name="questlogs_searchform", methods={"GET"})
      */
-    public function searchAction(Request $request)
+    public function searchAction(Request $request): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -678,11 +658,9 @@ class QuestLogController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/questlog/delete_list", name="questlog_delete_list", methods={"POST"})
      */
-    public function deleteListAction(Request $request)
+    public function deleteListAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -720,8 +698,6 @@ class QuestLogController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/questlog/export/octgn/{questlog_id}",
      *     name="questlog_export_octgn",
@@ -729,14 +705,12 @@ class QuestLogController extends AbstractController
      *     requirements={"questlog_id"="\d+"}
      * )
      */
-    public function octgnexportAction($questlog_id)
+    public function octgnexportAction($questlog_id): Response
     {
         return $this->downloadFromSelection($questlog_id, true);
     }
 
     /**
-     * @return Response
-     *
      * @Route(
      *     "/questlog/export/text/{questlog_id}",
      *     name="questlog_export_text",
@@ -744,15 +718,12 @@ class QuestLogController extends AbstractController
      *     requirements={"questlog_id"="\d+"}
      * )
      */
-    public function textexportAction($questlog_id)
+    public function textexportAction($questlog_id): Response
     {
         return $this->downloadFromSelection($questlog_id, false);
     }
 
-    /**
-     * @return Response
-     */
-    public function downloadFromSelection($questlog_id, $octgn)
+    public function downloadFromSelection($questlog_id, $octgn): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -815,11 +786,9 @@ class QuestLogController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/user/questlog_favorite", name="questlog_favorite", methods={"POST"})
      */
-    public function favoriteAction(Request $request)
+    public function favoriteAction(Request $request): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -859,11 +828,9 @@ class QuestLogController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/user/questlog_comment", name="questlog_comment", methods={"POST"})
      */
-    public function commentAction(Request $request, MailerInterface $mailer, UserRepository $userRepository)
+    public function commentAction(Request $request, MailerInterface $mailer, UserRepository $userRepository): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -935,15 +902,13 @@ class QuestLogController extends AbstractController
      * hides a comment, or if $hidden is false, unhide a comment
      */
     /**
-     * @return Response
-     *
      * @Route(
      *     "/user/questlog_hidecomment/{comment_id}/{hidden}",
      *     name="questlog_comment_hide",
      *     methods={"POST"}
      * )
      */
-    public function hidecommentAction($comment_id, $hidden, QuestlogCommentRepository $questlogCommentRepository)
+    public function hidecommentAction($comment_id, $hidden, QuestlogCommentRepository $questlogCommentRepository): Response
     {
         /* @var $user \App\Entity\User */
         $user = $this->getUser();
@@ -969,11 +934,9 @@ class QuestLogController extends AbstractController
      * records a user's vote
      */
     /**
-     * @return Response
-     *
      * @Route("/user/questlog_like", name="questlog_like", methods={"POST"})
      */
-    public function voteAction(Request $request)
+    public function voteAction(Request $request): Response
     {
         /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
@@ -1005,19 +968,15 @@ class QuestLogController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/q/{username}", name="questlogs_byauthor", methods={"GET"})
      */
-    public function byauthorAction($username)
+    public function byauthorAction($username): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         return $this->redirect($this->generateUrl('questlogs_list', ['type' => 'find', 'author' => $username]));
     }
 
     /**
      * @param int $page
-     *
-     * @return Response
      *
      * @Route(
      *     "/questlogs/{type}/{page}",
@@ -1027,7 +986,7 @@ class QuestLogController extends AbstractController
      *     defaults={"type"="popular", "page"=1}
      * )
      */
-    public function listAction($type, $page = 1, Request $request, QuestLogManager $questLogManager)
+    public function listAction($type, $page = 1, Request $request, QuestLogManager $questLogManager): Response
     {
         $response = new Response();
         $response->setPublic();

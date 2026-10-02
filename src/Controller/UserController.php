@@ -42,8 +42,6 @@ class UserController extends AbstractController
      * displays details about a user and the list of decklists he published
      */
     /**
-     * @return Response
-     *
      * @Route(
      *     "/user/profile/{user_id}/{user_name}/{page}",
      *     name="user_profile_public",
@@ -52,7 +50,7 @@ class UserController extends AbstractController
      *     defaults={"page"=1}
      * )
      */
-    public function publicProfileAction($user_id, $user_name, $page, Request $request)
+    public function publicProfileAction($user_id, $user_name, $page, Request $request): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -69,11 +67,9 @@ class UserController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/user/profile_edit", name="user_profile_edit", methods={"GET"})
      */
-    public function editProfileAction(SphereRepository $sphereRepository)
+    public function editProfileAction(SphereRepository $sphereRepository): Response
     {
         $user = $this->getUser();
         $spheres = $sphereRepository->findAll();
@@ -82,11 +78,9 @@ class UserController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/user/profile_save", name="user_profile_save", methods={"POST"})
      */
-    public function saveProfileAction(Request $request)
+    public function saveProfileAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         /* @var $user \App\Entity\User */
         $user = $this->currentUser();
@@ -131,11 +125,9 @@ class UserController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/api/private/user/info", name="api_private_user_info")
      */
-    public function infoAction(Request $request, CardRepository $cardRepository, DecklistRepository $decklistRepository, FellowshipRepository $fellowshipRepository, QuestlogRepository $questlogRepository)
+    public function infoAction(Request $request, CardRepository $cardRepository, DecklistRepository $decklistRepository, FellowshipRepository $fellowshipRepository, QuestlogRepository $questlogRepository): Response
     {
         $jsonp = $request->query->get('jsonp');
         $decklist_id = $request->query->get('decklist_id');
@@ -222,11 +214,9 @@ class UserController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/user/remind/{username}", name="remind_email")
      */
-    public function remindAction($username, MailerInterface $userMailer, UserManagerInterface $userManager)
+    public function remindAction($username, MailerInterface $userMailer, UserManagerInterface $userManager): Response
     {
         /** @var User|null $user */
         $user = $userManager->findUserByUsername($username);

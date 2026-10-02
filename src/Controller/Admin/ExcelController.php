@@ -37,11 +37,9 @@ class ExcelController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/admin/excel/download", name="excel_download_form", methods={"GET"})
      */
-    public function downloadFormAction()
+    public function downloadFormAction(): Response
     {
         $packs = $this->packRepository->findBy([], ['dateRelease' => 'ASC', 'name' => 'ASC']);
 
@@ -49,11 +47,9 @@ class ExcelController extends AbstractController
     }
 
     /**
-     * @return StreamedResponse
-     *
      * @Route("/admin/excel/download", name="excel_download_process", methods={"POST"})
      */
-    public function downloadProcessAction(Request $request, Texts $texts, CardPrintingRepository $cardPrintingRepository)
+    public function downloadProcessAction(Request $request, Texts $texts, CardPrintingRepository $cardPrintingRepository): StreamedResponse
     {
         $ignoredFields = ['id', 'dateCreation', 'dateUpdate'];
         $em = $this->getDoctrine()->getManager();
@@ -142,21 +138,17 @@ class ExcelController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/admin/excel/upload", name="excel_upload_form", methods={"GET"})
      */
-    public function uploadFormAction()
+    public function uploadFormAction(): Response
     {
         return $this->render('Excel/upload_form.html.twig');
     }
 
     /**
-     * @return Response
-     *
      * @Route("/admin/excel/upload", name="excel_upload_process", methods={"POST"})
      */
-    public function uploadProcessAction(Request $request)
+    public function uploadProcessAction(Request $request): Response
     {
         /* @var $uploadedFile \Symfony\Component\HttpFoundation\File\UploadedFile */
         $uploadedFile = $request->files->get('upfile');

@@ -30,11 +30,9 @@ class CycleController extends AbstractController
     /**
      * Lists all Cycle entities.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/cycle/", name="admin_cycle")
      */
-    public function indexAction()
+    public function indexAction(): \Symfony\Component\HttpFoundation\Response
     {
         $entities = $this->cycleRepository->findAll();
 
@@ -44,11 +42,9 @@ class CycleController extends AbstractController
     /**
      * Creates a new Cycle entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/cycle/create", name="admin_cycle_create", methods={"POST"})
      */
-    public function createAction(Request $request)
+    public function createAction(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $entity = new Cycle();
         $form = $this->createForm(CycleType::class, $entity);
@@ -67,11 +63,9 @@ class CycleController extends AbstractController
     /**
      * Displays a form to create a new Cycle entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/cycle/new", name="admin_cycle_new")
      */
-    public function newAction()
+    public function newAction(): \Symfony\Component\HttpFoundation\Response
     {
         $entity = new Cycle();
         $form = $this->createForm(CycleType::class, $entity);
@@ -82,11 +76,9 @@ class CycleController extends AbstractController
     /**
      * Finds and displays a Cycle entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/cycle/{id}/show", name="admin_cycle_show")
      */
-    public function showAction($id)
+    public function showAction($id): \Symfony\Component\HttpFoundation\Response
     {
         $entity = $this->cycleRepository->find($id);
         if (!$entity) {
@@ -100,11 +92,9 @@ class CycleController extends AbstractController
     /**
      * Displays a form to edit an existing Cycle entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/cycle/{id}/edit", name="admin_cycle_edit")
      */
-    public function editAction($id)
+    public function editAction($id): \Symfony\Component\HttpFoundation\Response
     {
         $entity = $this->cycleRepository->find($id);
         if (!$entity) {
@@ -119,11 +109,9 @@ class CycleController extends AbstractController
     /**
      * Edits an existing Cycle entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/cycle/{id}/update", name="admin_cycle_update", methods={"POST", "PUT"})
      */
-    public function updateAction(Request $request, $id)
+    public function updateAction(Request $request, $id): \Symfony\Component\HttpFoundation\Response
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $this->cycleRepository->find($id);
@@ -146,11 +134,9 @@ class CycleController extends AbstractController
     /**
      * Deletes a Cycle entity.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/admin/cycle/{id}/delete", name="admin_cycle_delete", methods={"POST", "DELETE"})
      */
-    public function deleteAction(Request $request, $id)
+    public function deleteAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
@@ -174,7 +160,7 @@ class CycleController extends AbstractController
      *
      * @return \Symfony\Component\Form\FormInterface<mixed> The form
      */
-    private function createDeleteForm($id)
+    private function createDeleteForm($id): \Symfony\Component\Form\FormInterface
     {
         return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }

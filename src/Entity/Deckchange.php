@@ -10,7 +10,7 @@ namespace App\Entity;
 class Deckchange
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -36,10 +36,8 @@ class Deckchange
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -48,10 +46,8 @@ class Deckchange
      * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return Deckchange
      */
-    public function setDateCreation($dateCreation)
+    public function setDateCreation($dateCreation): Deckchange
     {
         $this->dateCreation = $dateCreation;
 
@@ -60,10 +56,8 @@ class Deckchange
 
     /**
      * Get dateCreation.
-     *
-     * @return \DateTime
      */
-    public function getDateCreation()
+    public function getDateCreation(): \DateTime
     {
         return $this->dateCreation;
     }
@@ -72,10 +66,8 @@ class Deckchange
      * Set variation.
      *
      * @param string $variation
-     *
-     * @return Deckchange
      */
-    public function setVariation($variation)
+    public function setVariation($variation): Deckchange
     {
         $this->variation = $variation;
 
@@ -84,10 +76,8 @@ class Deckchange
 
     /**
      * Get variation.
-     *
-     * @return string
      */
-    public function getVariation()
+    public function getVariation(): string
     {
         return $this->variation;
     }
@@ -96,10 +86,8 @@ class Deckchange
      * Set isSaved.
      *
      * @param bool $isSaved
-     *
-     * @return Deckchange
      */
-    public function setIsSaved($isSaved)
+    public function setIsSaved($isSaved): Deckchange
     {
         $this->isSaved = $isSaved;
 
@@ -108,20 +96,16 @@ class Deckchange
 
     /**
      * Get isSaved.
-     *
-     * @return bool
      */
-    public function getIsSaved()
+    public function getIsSaved(): bool
     {
         return $this->isSaved;
     }
 
     /**
      * Set deck.
-     *
-     * @return Deckchange
      */
-    public function setDeck(Deck $deck)
+    public function setDeck(Deck $deck): Deckchange
     {
         $this->deck = $deck;
 
@@ -130,10 +114,8 @@ class Deckchange
 
     /**
      * Get deck.
-     *
-     * @return Deck
      */
-    public function getDeck()
+    public function getDeck(): Deck
     {
         return $this->deck;
     }
@@ -142,10 +124,8 @@ class Deckchange
      * Set version.
      *
      * @param string|null $version
-     *
-     * @return Deckchange
      */
-    public function setVersion($version)
+    public function setVersion($version): Deckchange
     {
         $this->version = $version;
 
@@ -154,10 +134,8 @@ class Deckchange
 
     /**
      * Get version.
-     *
-     * @return string|null
      */
-    public function getVersion()
+    public function getVersion(): ?string
     {
         return $this->version;
     }

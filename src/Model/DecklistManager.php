@@ -119,20 +119,15 @@ class DecklistManager
         $this->start = ($this->page - 1) * $this->limit;
     }
 
-    /**
-     * @return int
-     */
-    public function getMaxCount()
+    public function getMaxCount(): int
     {
         return $this->maxcount;
     }
 
     /**
      * creates the basic query builder and initializes it.
-     *
-     * @return \Doctrine\ORM\QueryBuilder
      */
-    private function getQueryBuilder()
+    private function getQueryBuilder(): \Doctrine\ORM\QueryBuilder
     {
         $qb = $this->doctrine->createQueryBuilder();
         $qb->select('d');
@@ -154,7 +149,7 @@ class DecklistManager
      *
      * @return Paginator<\App\Entity\Decklist>
      */
-    private function getPaginator(Query $query)
+    private function getPaginator(Query $query): Paginator
     {
         $paginator = new Paginator($query, $fetchJoinCollection = false);
         $this->maxcount = $paginator->count();
@@ -165,7 +160,7 @@ class DecklistManager
     /**
      * @return ArrayCollection<int, \App\Entity\Decklist>
      */
-    public function getEmptyList()
+    public function getEmptyList(): ArrayCollection
     {
         $this->maxcount = 0;
 
@@ -175,7 +170,7 @@ class DecklistManager
     /**
      * @return Paginator<\App\Entity\Decklist>
      */
-    public function findDecklistsByPopularity()
+    public function findDecklistsByPopularity(): Paginator
     {
         $qb = $this->getQueryBuilder();
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
@@ -190,7 +185,7 @@ class DecklistManager
     /**
      * @return Paginator<\App\Entity\Decklist>
      */
-    public function findDecklistsByAge()
+    public function findDecklistsByAge(): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -205,7 +200,7 @@ class DecklistManager
     /**
      * @return Paginator<\App\Entity\Decklist>
      */
-    public function findDecklistsByRecentDiscussion()
+    public function findDecklistsByRecentDiscussion(): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -220,7 +215,7 @@ class DecklistManager
     /**
      * @return Paginator<\App\Entity\Decklist>
      */
-    public function findDecklistsByFavorite(User $user)
+    public function findDecklistsByFavorite(User $user): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -238,7 +233,7 @@ class DecklistManager
     /**
      * @return Paginator<\App\Entity\Decklist>
      */
-    public function findDecklistsByAuthor(User $user)
+    public function findDecklistsByAuthor(User $user): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -255,7 +250,7 @@ class DecklistManager
     /**
      * @return Paginator<\App\Entity\Decklist>
      */
-    public function findDecklistsInHallOfFame()
+    public function findDecklistsInHallOfFame(): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -271,7 +266,7 @@ class DecklistManager
     /**
      * @return Paginator<\App\Entity\Decklist>
      */
-    public function findDecklistsInHotTopic()
+    public function findDecklistsInHotTopic(): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -288,7 +283,7 @@ class DecklistManager
     /**
      * @return Paginator<\App\Entity\Decklist>
      */
-    public function findDecklistsWithComplexSearch()
+    public function findDecklistsWithComplexSearch(): Paginator
     {
         $request = $this->currentRequest();
 
@@ -543,10 +538,7 @@ class DecklistManager
         return $this->getPaginator($qb->getQuery());
     }
 
-    /**
-     * @return int
-     */
-    public function getNumberOfPages()
+    public function getNumberOfPages(): int
     {
         return intval(ceil($this->maxcount / $this->limit));
     }
@@ -554,7 +546,7 @@ class DecklistManager
     /**
      * @return list<array{numero: int, url: string, current: bool}>
      */
-    public function getAllPages()
+    public function getAllPages(): array
     {
         $request = $this->currentRequest();
         $route = $request->get('_route');
@@ -579,7 +571,7 @@ class DecklistManager
     /**
      * @return array<int, mixed>
      */
-    public function getClosePages()
+    public function getClosePages(): array
     {
         $allPages = $this->getAllPages();
         $numero_courant = $this->page - 1;
@@ -593,10 +585,7 @@ class DecklistManager
         return $pages;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getPreviousUrl()
+    public function getPreviousUrl(): ?string
     {
         if (1 === $this->page) {
             return null;
@@ -615,10 +604,7 @@ class DecklistManager
         return $this->router->generate($route, $params);
     }
 
-    /**
-     * @return string|null
-     */
-    public function getNextUrl()
+    public function getNextUrl(): ?string
     {
         if ($this->page === $this->getNumberOfPages()) {
             return null;

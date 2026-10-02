@@ -11,24 +11,18 @@ interface SlotInterface
 {
     /**
      * Get card.
-     *
-     * @return \App\Entity\Card
      */
-    public function getCard();
+    public function getCard(): \App\Entity\Card;
 
     /**
      * Get quantity.
-     *
-     * @return int
      */
-    public function getQuantity();
+    public function getQuantity(): int;
 
     /**
      * Set quantity.
      *
      * @param int $quantity
-     *
-     * @return self
      */
-    public function setQuantity($quantity);
+    public function setQuantity($quantity): self;
 }

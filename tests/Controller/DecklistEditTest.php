@@ -66,20 +66,15 @@ class DecklistEditTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db()
+    private function db(): \Doctrine\DBAL\Connection
     {
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
     /**
      * @param string $username
-     *
-     * @return KernelBrowser
      */
-    private function createAuthenticatedClient($username = 'test')
+    private function createAuthenticatedClient($username = 'test'): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -96,10 +91,8 @@ class DecklistEditTest extends WebTestCase
 
     /**
      * A copy of fixture decklist 2 (with its cards), returns its id.
-     *
-     * @return int
      */
-    private function insertDecklist(KernelBrowser $client, $name, array $values = [])
+    private function insertDecklist(KernelBrowser $client, $name, array $values = []): int
     {
         $connection = $this->db($client);
         $row = $connection->fetchAssoc('SELECT * FROM decklist WHERE id = 2');
@@ -112,10 +105,7 @@ class DecklistEditTest extends WebTestCase
         return $id;
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    private function saveForm(KernelBrowser $client, $decklistId, array $values)
+    private function saveForm(KernelBrowser $client, $decklistId, array $values): \Symfony\Component\HttpFoundation\Response
     {
         $crawler = $client->request('GET', "/decklist/edit/$decklistId");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -172,10 +162,7 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame($expected, $this->fetchDecklist($client, 1)['name']);
     }
 
-    /**
-     * @return array
-     */
-    public function nameProvider()
+    public function nameProvider(): array
     {
         return [
             'empty' => ['  ', 'Untitled'],
@@ -197,10 +184,7 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame($expected, $this->fetchDecklist($client, 1)['precedent_decklist_id']);
     }
 
-    /**
-     * @return array
-     */
-    public function precedentProvider()
+    public function precedentProvider(): array
     {
         return [
             'id' => ['3', '3'],
@@ -226,10 +210,7 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame('Dwarf Lore/Leadership/Tactics', $this->fetchDecklist($client, 1)['name']);
     }
 
-    /**
-     * @return array
-     */
-    public function editRouteProvider()
+    public function editRouteProvider(): array
     {
         return [
             'edit form' => ['GET', '/decklist/edit/1'],
@@ -314,10 +295,7 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame('4', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM decklist'));
     }
 
-    /**
-     * @return array
-     */
-    public function refusedDeleteProvider()
+    public function refusedDeleteProvider(): array
     {
         return [
             'with a comment' => ['test', 1],

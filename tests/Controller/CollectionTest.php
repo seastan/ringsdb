@@ -61,20 +61,15 @@ class CollectionTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db()
+    private function db(): \Doctrine\DBAL\Connection
     {
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
     /**
      * @param string $username
-     *
-     * @return KernelBrowser
      */
-    private function createAuthenticatedClient($username = 'test')
+    private function createAuthenticatedClient($username = 'test'): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -87,7 +82,7 @@ class CollectionTest extends WebTestCase
     /**
      * @return array<int|string, int>
      */
-    private function packCards(KernelBrowser $client, $packId)
+    private function packCards(KernelBrowser $client, $packId): array
     {
         $rows = $this->db($client)->fetchAll('SELECT c.code, e.quantity FROM user_custom_pack_card e JOIN card c ON c.id = e.card_id WHERE e.custom_pack_id = ? ORDER BY e.id', [$packId]);
 
@@ -102,10 +97,8 @@ class CollectionTest extends WebTestCase
     /**
      * Submits the custom pack form; the page's JavaScript serializes the card list into the
      * hidden "cards_json" field.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
      */
-    private function submitPackForm(KernelBrowser $client, $pageUri, $name, array $cards)
+    private function submitPackForm(KernelBrowser $client, $pageUri, $name, array $cards): \Symfony\Component\HttpFoundation\Response
     {
         $crawler = $client->request('GET', $pageUri);
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -252,10 +245,7 @@ class CollectionTest extends WebTestCase
         $this->assertSame(['01001' => 1, '01016' => 3], $this->packCards($client, 1));
     }
 
-    /**
-     * @return array
-     */
-    public function foreignPackRouteProvider()
+    public function foreignPackRouteProvider(): array
     {
         return [
             'edit form' => ['GET', '/collection/custom-pack/1/edit'],
@@ -303,10 +293,7 @@ class CollectionTest extends WebTestCase
         $this->assertSame('http://localhost/login', $client->getResponse()->headers->get('Location'));
     }
 
-    /**
-     * @return array
-     */
-    public function anonymousRouteProvider()
+    public function anonymousRouteProvider(): array
     {
         return [
             'owned packs' => ['/collection/packs/save'],

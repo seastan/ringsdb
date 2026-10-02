@@ -14,11 +14,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class CommandController extends AbstractController
 {
     /**
-     * @return Response
-     *
      * @Route("/admin/command/", name="command_form", methods={"GET"})
      */
-    public function formAction(ScenarioRepository $scenarioRepository)
+    public function formAction(ScenarioRepository $scenarioRepository): Response
     {
         $entities = $scenarioRepository->findAll();
 
@@ -26,11 +24,9 @@ class CommandController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/admin/command/", name="command_run", methods={"POST"})
      */
-    public function runAction(Request $request)
+    public function runAction(Request $request): Response
     {
         $command = $request->request->get('command');
         $scenario = $request->request->get('scenario');

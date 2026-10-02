@@ -10,7 +10,7 @@ namespace App\Entity;
 class FellowshipDecklist
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -28,10 +28,8 @@ class FellowshipDecklist
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -40,10 +38,8 @@ class FellowshipDecklist
      * Set deckNumber.
      *
      * @param int $deckNumber
-     *
-     * @return FellowshipDecklist
      */
-    public function setDeckNumber($deckNumber)
+    public function setDeckNumber($deckNumber): FellowshipDecklist
     {
         $this->deckNumber = $deckNumber;
 
@@ -52,20 +48,16 @@ class FellowshipDecklist
 
     /**
      * Get deckNumber.
-     *
-     * @return int
      */
-    public function getDeckNumber()
+    public function getDeckNumber(): int
     {
         return $this->deckNumber;
     }
 
     /**
      * Set fellowship.
-     *
-     * @return FellowshipDecklist
      */
-    public function setFellowship(Fellowship $fellowship)
+    public function setFellowship(Fellowship $fellowship): FellowshipDecklist
     {
         $this->fellowship = $fellowship;
 
@@ -74,30 +66,24 @@ class FellowshipDecklist
 
     /**
      * Get fellowship.
-     *
-     * @return Fellowship
      */
-    public function getFellowship()
+    public function getFellowship(): Fellowship
     {
         return $this->fellowship;
     }
 
     /**
      * Get decklist.
-     *
-     * @return Decklist
      */
-    public function getDecklist()
+    public function getDecklist(): Decklist
     {
         return $this->decklist;
     }
 
     /**
      * Set decklist.
-     *
-     * @return FellowshipDecklist
      */
-    public function setDecklist(Decklist $decklist)
+    public function setDecklist(Decklist $decklist): FellowshipDecklist
     {
         $this->decklist = $decklist;
 

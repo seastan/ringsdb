@@ -70,7 +70,7 @@ class Diff
     /**
      * @return array{array<int, array<int|string, int>>, array<int|string, int>}
      */
-    public function diffContents($decks)
+    public function diffContents($decks): array
     {
         // n flat lists of the cards of each decklist
         $ensembles = [];

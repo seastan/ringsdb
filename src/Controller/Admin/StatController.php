@@ -12,11 +12,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class StatController extends AbstractController
 {
     /**
-     * @return Response
-     *
      * @Route("/admin/stat", name="app_stat", methods={"GET"})
      */
-    public function getStatAction(Request $request)
+    public function getStatAction(Request $request): Response
     {
         $month = $request->query->get('month');
         if (!$month) {
@@ -40,11 +38,9 @@ class StatController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/admin/stat_cards", name="app_stat_cards", methods={"GET"})
      */
-    public function getStatCardsAction(Request $request)
+    public function getStatCardsAction(Request $request): Response
     {
         // Per-card stats are too heavy to compute on a request worker (they scan a
         // whole month of decklistslot/deckslot and would saturate the shared
@@ -71,11 +67,9 @@ class StatController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/admin/stat_packs", name="app_stat_packs", methods={"GET"})
      */
-    public function getStatPacksAction(Request $request)
+    public function getStatPacksAction(Request $request): Response
     {
         /* @var $dbh \Doctrine\DBAL\Connection */
         $packs = $this->getPacks();
@@ -91,7 +85,7 @@ class StatController extends AbstractController
     /**
      * @return array<int, array<string, mixed>>
      */
-    public function getPacks()
+    public function getPacks(): array
     {
         $dbh = $this->getDoctrine()->getConnection();
         $query = "SELECT name, date_release\nFROM pack\nWHERE date_release IS NOT NULL\nORDER BY date_release";
@@ -103,7 +97,7 @@ class StatController extends AbstractController
     /**
      * @return array<string, array{string, string}>
      */
-    public function getPackRuless()
+    public function getPackRuless(): array
     {
         $pack_rules = ['Core Set' => ['2000-01-01', '2011-07-21'], 'Shadows of Mirkwood' => ['2011-07-21', '2012-01-06'], 'Dwarrowdelf' => ['2012-01-06', '2012-08-17'], 'Against the Shadow' => ['2012-08-17', '2014-02-21'], 'The Ring-maker' => ['2014-02-21', '2015-04-03'], 'Angmar Awakened' => ['2015-04-03', '2016-02-11'], 'Dream-chaser' => ['2016-02-11', '2016-11-23'], 'Haradrim' => ['2016-11-23', '2018-06-14'], 'Ered Mithrin' => ['2018-06-14', '2019-08-02'], 'Vengeance of Mordor' => ['2019-08-02', '2021-03-21'], 'ALeP - Oaths of the Rohirrim' => ['2021-03-21', '2099-12-31']];
 
@@ -113,7 +107,7 @@ class StatController extends AbstractController
     /**
      * @return array<int, array<string, mixed>>
      */
-    public function getQuests()
+    public function getQuests(): array
     {
         $dbh = $this->getDoctrine()->getConnection();
         $query = "SELECT p.name, GROUP_CONCAT(s.name SEPARATOR ';') AS quests\nFROM scenario s\nJOIN pack p\nON s.pack_id = p.id\nGROUP BY p.name\nORDER BY p.name";
@@ -128,7 +122,7 @@ class StatController extends AbstractController
     /**
      * @return array<int|string, mixed>
      */
-    public function getOctgnIdMapping()
+    public function getOctgnIdMapping(): array
     {
         $dbh = $this->getDoctrine()->getConnection();
         $query = "SELECT cprim1.octgnid AS id1,\n  cprim2.octgnid AS id2\nFROM card c1\nJOIN (SELECT cpx.card_id, cpx.pack_id, cpx.octgnid FROM card_printing cpx WHERE cpx.id = (SELECT cpy.id FROM card_printing cpy JOIN pack py ON py.id = cpy.pack_id WHERE cpy.card_id = cpx.card_id ORDER BY (py.date_release IS NULL), py.date_release, cpy.position, cpy.id LIMIT 1)) cprim1 ON cprim1.card_id = c1.id\nJOIN pack p\nON p.id = cprim1.pack_id\nJOIN card c2\nON source_code(c1.code, p.name) = c2.code\nJOIN (SELECT cpx.card_id, cpx.pack_id, cpx.octgnid FROM card_printing cpx WHERE cpx.id = (SELECT cpy.id FROM card_printing cpy JOIN pack py ON py.id = cpy.pack_id WHERE cpy.card_id = cpx.card_id ORDER BY (py.date_release IS NULL), py.date_release, cpy.position, cpy.id LIMIT 1)) cprim2 ON cprim2.card_id = c2.id\nWHERE c1.code != c2.code\nORDER BY CAST(c1.code AS UNSIGNED)";

@@ -52,18 +52,12 @@ class DecklistCommentTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db()
+    private function db(): \Doctrine\DBAL\Connection
     {
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    /**
-     * @return KernelBrowser
-     */
-    private function createAuthenticatedClient($username)
+    private function createAuthenticatedClient($username): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -76,10 +70,8 @@ class DecklistCommentTest extends WebTestCase
     /**
      * Posts the comment form as the JavaScript does it (AJAX), with the profiler enabled to
      * inspect the notification emails.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
      */
-    private function postComment(KernelBrowser $client, $decklistId, $text)
+    private function postComment(KernelBrowser $client, $decklistId, $text): \Symfony\Component\HttpFoundation\Response
     {
         $client->enableProfiler();
         $client->request('POST', '/user/comment', ['id' => $decklistId, 'comment' => $text], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
@@ -98,7 +90,7 @@ class DecklistCommentTest extends WebTestCase
     /**
      * @return array [recipient => subject]
      */
-    private function sentEmails(KernelBrowser $client)
+    private function sentEmails(KernelBrowser $client): array
     {
         $emails = [];
         foreach ($this->sentMessages($client) as $message) {
@@ -212,10 +204,7 @@ class DecklistCommentTest extends WebTestCase
         $this->assertSame($expectedHtml, $comments[0]['text']);
     }
 
-    /**
-     * @return array
-     */
-    public function markdownProvider()
+    public function markdownProvider(): array
     {
         return [
             'bare URLs become links' => ['See http://example.com/page', '<p>See <a href="http://example.com/page">example.com</a></p>'],

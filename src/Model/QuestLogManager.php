@@ -101,20 +101,15 @@ class QuestLogManager
         $this->start = ($this->page - 1) * $this->limit;
     }
 
-    /**
-     * @return int
-     */
-    public function getMaxCount()
+    public function getMaxCount(): int
     {
         return $this->maxcount;
     }
 
     /**
      * creates the basic query builder and initializes it.
-     *
-     * @return \Doctrine\ORM\QueryBuilder
      */
-    private function getQueryBuilder()
+    private function getQueryBuilder(): \Doctrine\ORM\QueryBuilder
     {
         $qb = $this->doctrine->createQueryBuilder();
         $qb->select('d');
@@ -134,7 +129,7 @@ class QuestLogManager
      *
      * @return Paginator<\App\Entity\Questlog>
      */
-    private function getPaginator(Query $query)
+    private function getPaginator(Query $query): Paginator
     {
         $paginator = new Paginator($query, $fetchJoinCollection = false);
         $this->maxcount = $paginator->count();
@@ -145,7 +140,7 @@ class QuestLogManager
     /**
      * @return ArrayCollection<int, \App\Entity\Questlog>
      */
-    public function getEmptyList()
+    public function getEmptyList(): ArrayCollection
     {
         $this->maxcount = 0;
 
@@ -155,7 +150,7 @@ class QuestLogManager
     /**
      * @return Paginator<\App\Entity\Questlog>
      */
-    public function findQuestLogsByPopularity()
+    public function findQuestLogsByPopularity(): Paginator
     {
         $qb = $this->getQueryBuilder();
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.datePublish), 2)) AS HIDDEN popularity');
@@ -170,7 +165,7 @@ class QuestLogManager
     /**
      * @return Paginator<\App\Entity\Questlog>
      */
-    public function findQuestLogsByAge()
+    public function findQuestLogsByAge(): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -185,7 +180,7 @@ class QuestLogManager
     /**
      * @return Paginator<\App\Entity\Questlog>
      */
-    public function findQuestLogsByFavorite(User $user)
+    public function findQuestLogsByFavorite(User $user): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -203,7 +198,7 @@ class QuestLogManager
     /**
      * @return Paginator<\App\Entity\Questlog>
      */
-    public function findQuestLogsByAuthor(User $user)
+    public function findQuestLogsByAuthor(User $user): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -220,7 +215,7 @@ class QuestLogManager
     /**
      * @return Paginator<\App\Entity\Questlog>
      */
-    public function findQuestLogsInHallOfFame()
+    public function findQuestLogsInHallOfFame(): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -236,7 +231,7 @@ class QuestLogManager
     /**
      * @return Paginator<\App\Entity\Questlog>
      */
-    public function findQuestLogsInHotTopic()
+    public function findQuestLogsInHotTopic(): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -253,7 +248,7 @@ class QuestLogManager
     /**
      * @return Paginator<\App\Entity\Questlog>
      */
-    public function findQuestLogsWithComplexSearch()
+    public function findQuestLogsWithComplexSearch(): Paginator
     {
         $request = $this->currentRequest();
 
@@ -376,10 +371,7 @@ class QuestLogManager
         return $this->getPaginator($qb->getQuery());
     }
 
-    /**
-     * @return int
-     */
-    public function getNumberOfPages()
+    public function getNumberOfPages(): int
     {
         return intval(ceil($this->maxcount / $this->limit));
     }
@@ -387,7 +379,7 @@ class QuestLogManager
     /**
      * @return list<array{numero: int, url: string, current: bool}>
      */
-    public function getAllPages()
+    public function getAllPages(): array
     {
         $request = $this->currentRequest();
         $route = $request->get('_route');
@@ -412,7 +404,7 @@ class QuestLogManager
     /**
      * @return array<int, mixed>
      */
-    public function getClosePages()
+    public function getClosePages(): array
     {
         $allPages = $this->getAllPages();
         $numero_courant = $this->page - 1;
@@ -426,10 +418,7 @@ class QuestLogManager
         return $pages;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getPreviousUrl()
+    public function getPreviousUrl(): ?string
     {
         if (1 === $this->page) {
             return null;
@@ -448,10 +437,7 @@ class QuestLogManager
         return $this->router->generate($route, $params);
     }
 
-    /**
-     * @return string|null
-     */
-    public function getNextUrl()
+    public function getNextUrl(): ?string
     {
         if ($this->page === $this->getNumberOfPages()) {
             return null;

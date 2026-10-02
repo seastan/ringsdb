@@ -30,11 +30,9 @@ class ScenarioController extends AbstractController
     /**
      * Lists all Scenario entities.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/scenario/", name="admin_scenario")
      */
-    public function indexAction()
+    public function indexAction(): \Symfony\Component\HttpFoundation\Response
     {
         $entities = $this->scenarioRepository->findAll();
 
@@ -44,11 +42,9 @@ class ScenarioController extends AbstractController
     /**
      * Creates a new Scenario entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/scenario/create", name="admin_scenario_create", methods={"POST"})
      */
-    public function createAction(Request $request)
+    public function createAction(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $entity = new Scenario();
         $form = $this->createForm(ScenarioType::class, $entity);
@@ -103,11 +99,9 @@ class ScenarioController extends AbstractController
     /**
      * Displays a form to create a new Scenario entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/scenario/new", name="admin_scenario_new")
      */
-    public function newAction()
+    public function newAction(): \Symfony\Component\HttpFoundation\Response
     {
         $entity = new Scenario();
         $form = $this->createForm(ScenarioType::class, $entity);
@@ -118,11 +112,9 @@ class ScenarioController extends AbstractController
     /**
      * Finds and displays a Scenario entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/scenario/{id}/show", name="admin_scenario_show")
      */
-    public function showAction($id)
+    public function showAction($id): \Symfony\Component\HttpFoundation\Response
     {
         $entity = $this->scenarioRepository->find($id);
         if (!$entity) {
@@ -136,11 +128,9 @@ class ScenarioController extends AbstractController
     /**
      * Displays a form to edit an existing Scenario entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/scenario/{id}/edit", name="admin_scenario_edit")
      */
-    public function editAction($id)
+    public function editAction($id): \Symfony\Component\HttpFoundation\Response
     {
         $entity = $this->scenarioRepository->find($id);
         if (!$entity) {
@@ -155,11 +145,9 @@ class ScenarioController extends AbstractController
     /**
      * Edits an existing Scenario entity.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @Route("/admin/scenario/{id}/update", name="admin_scenario_update", methods={"POST", "PUT"})
      */
-    public function updateAction(Request $request, $id)
+    public function updateAction(Request $request, $id): \Symfony\Component\HttpFoundation\Response
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $this->scenarioRepository->find($id);
@@ -184,11 +172,9 @@ class ScenarioController extends AbstractController
     /**
      * Deletes a Scenario entity.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @Route("/admin/scenario/{id}/delete", name="admin_scenario_delete", methods={"POST", "DELETE"})
      */
-    public function deleteAction(Request $request, $id)
+    public function deleteAction(Request $request, $id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
@@ -212,7 +198,7 @@ class ScenarioController extends AbstractController
      *
      * @return \Symfony\Component\Form\FormInterface<mixed> The form
      */
-    private function createDeleteForm($id)
+    private function createDeleteForm($id): \Symfony\Component\Form\FormInterface
     {
         return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }

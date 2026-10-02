@@ -7,7 +7,7 @@ namespace App\Entity;
 class Sphere
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -37,10 +37,8 @@ class Sphere
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -49,10 +47,8 @@ class Sphere
      * Set code.
      *
      * @param string $code
-     *
-     * @return Sphere
      */
-    public function setCode($code)
+    public function setCode($code): Sphere
     {
         $this->code = $code;
 
@@ -61,10 +57,8 @@ class Sphere
 
     /**
      * Get code.
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
@@ -73,10 +67,8 @@ class Sphere
      * Set name.
      *
      * @param string $name
-     *
-     * @return Sphere
      */
-    public function setName($name)
+    public function setName($name): Sphere
     {
         $this->name = $name;
 
@@ -85,10 +77,8 @@ class Sphere
 
     /**
      * Get name.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -97,10 +87,8 @@ class Sphere
      * Set isPrimary.
      *
      * @param bool $isPrimary
-     *
-     * @return Sphere
      */
-    public function setIsPrimary($isPrimary)
+    public function setIsPrimary($isPrimary): Sphere
     {
         $this->is_primary = $isPrimary;
 
@@ -109,20 +97,16 @@ class Sphere
 
     /**
      * Get isPrimary.
-     *
-     * @return bool
      */
-    public function getIsPrimary()
+    public function getIsPrimary(): bool
     {
         return $this->is_primary;
     }
 
     /**
      * Add card.
-     *
-     * @return Sphere
      */
-    public function addCard(Card $card)
+    public function addCard(Card $card): Sphere
     {
         $this->cards[] = $card;
 
@@ -142,7 +126,7 @@ class Sphere
      *
      * @return \Doctrine\Common\Collections\Collection<int, Card>
      */
-    public function getCards()
+    public function getCards(): \Doctrine\Common\Collections\Collection
     {
         return $this->cards;
     }

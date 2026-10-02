@@ -42,20 +42,16 @@ class DefaultController extends AbstractController
      *
      * @param array<string, mixed> $a
      * @param array<string, mixed> $b
-     *
-     * @return int
      */
-    public function orderNew($a, $b)
+    public function orderNew($a, $b): int
     {
         return $b['dateCreation'] <=> $a['dateCreation'];
     }
 
     /**
-     * @return Response
-     *
      * @Route("/", name="index", methods={"GET"})
      */
-    public function indexAction(DecklistManager $decklistManager, FellowshipManager $fellowshipManager, ScenarioRepository $scenarioRepository, TypeRepository $typeRepository)
+    public function indexAction(DecklistManager $decklistManager, FellowshipManager $fellowshipManager, ScenarioRepository $scenarioRepository, TypeRepository $typeRepository): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -300,10 +296,7 @@ class DefaultController extends AbstractController
         return $this->render('Default/index.html.twig', ['pagetitle' => "{$game_name} Deckbuilder", 'pagedescription' => "Build your deck for {$game_name} by {$publisher_name}. Browse the cards and the thousand of decklists submitted by the community. Publish your own decks and get feedback.", 'decklists_trending' => $decklists_trending, 'fellowships_trending' => $fellowships_trending, 'decklists_new' => $decklists_new, 'fellowships_new' => $fellowships_new, 'all_comments' => $all_comments, 'daily_challenge' => $daily_challenge], $response);
     }
 
-    /**
-     * @return Response
-     */
-    public function rulesAction(CardsData $cardsData)
+    public function rulesAction(CardsData $cardsData): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -316,11 +309,9 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/about", name="about")
      */
-    public function aboutAction()
+    public function aboutAction(): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -330,11 +321,9 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @Route("/api/", name="api_intro")
      */
-    public function apiIntroAction()
+    public function apiIntroAction(): Response
     {
         $response = new Response();
         $response->setPublic();

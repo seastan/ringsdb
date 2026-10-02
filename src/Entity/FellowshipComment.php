@@ -10,7 +10,7 @@ namespace App\Entity;
 class FellowshipComment
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
     /**
@@ -36,10 +36,8 @@ class FellowshipComment
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -48,10 +46,8 @@ class FellowshipComment
      * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return FellowshipComment
      */
-    public function setDateCreation($dateCreation)
+    public function setDateCreation($dateCreation): FellowshipComment
     {
         $this->dateCreation = $dateCreation;
 
@@ -60,10 +56,8 @@ class FellowshipComment
 
     /**
      * Get dateCreation.
-     *
-     * @return \DateTime
      */
-    public function getDateCreation()
+    public function getDateCreation(): \DateTime
     {
         return $this->dateCreation;
     }
@@ -72,10 +66,8 @@ class FellowshipComment
      * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return FellowshipComment
      */
-    public function setDateUpdate($dateUpdate)
+    public function setDateUpdate($dateUpdate): FellowshipComment
     {
         $this->dateUpdate = $dateUpdate;
 
@@ -84,10 +76,8 @@ class FellowshipComment
 
     /**
      * Get dateUpdate.
-     *
-     * @return \DateTime
      */
-    public function getDateUpdate()
+    public function getDateUpdate(): \DateTime
     {
         return $this->dateUpdate;
     }
@@ -96,10 +86,8 @@ class FellowshipComment
      * Set text.
      *
      * @param string $text
-     *
-     * @return FellowshipComment
      */
-    public function setText($text)
+    public function setText($text): FellowshipComment
     {
         $this->text = $text;
 
@@ -108,20 +96,16 @@ class FellowshipComment
 
     /**
      * Get text.
-     *
-     * @return string
      */
-    public function getText()
+    public function getText(): string
     {
         return $this->text;
     }
 
     /**
      * Set user.
-     *
-     * @return FellowshipComment
      */
-    public function setUser(User $user)
+    public function setUser(User $user): FellowshipComment
     {
         $this->user = $user;
 
@@ -130,20 +114,16 @@ class FellowshipComment
 
     /**
      * Get user.
-     *
-     * @return User
      */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->user;
     }
 
     /**
      * Set fellowship.
-     *
-     * @return FellowshipComment
      */
-    public function setFellowship(Fellowship $fellowship)
+    public function setFellowship(Fellowship $fellowship): FellowshipComment
     {
         $this->fellowship = $fellowship;
 
@@ -152,10 +132,8 @@ class FellowshipComment
 
     /**
      * Get fellowship.
-     *
-     * @return Fellowship
      */
-    public function getFellowship()
+    public function getFellowship(): Fellowship
     {
         return $this->fellowship;
     }
@@ -169,10 +147,8 @@ class FellowshipComment
      * Set isHidden.
      *
      * @param bool $isHidden
-     *
-     * @return FellowshipComment
      */
-    public function setIsHidden($isHidden)
+    public function setIsHidden($isHidden): FellowshipComment
     {
         $this->isHidden = $isHidden;
 
@@ -181,10 +157,8 @@ class FellowshipComment
 
     /**
      * Get isHidden.
-     *
-     * @return bool
      */
-    public function getIsHidden()
+    public function getIsHidden(): bool
     {
         return $this->isHidden;
     }

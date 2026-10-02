@@ -18,54 +18,48 @@ interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \Array
      * Add a slot.
      *
      * @param T $element
-     *
-     * @return bool
      */
-    public function add($element);
+    public function add($element): bool;
 
     /**
      * Remove a slot.
      *
      * @param T $element
-     *
-     * @return bool
      */
-    public function removeElement($element);
+    public function removeElement($element): bool;
 
     /**
      * Get the underlying collection of slots.
      *
      * @return \Doctrine\Common\Collections\Collection<int, T>
      */
-    public function getSlots();
+    public function getSlots(): \Doctrine\Common\Collections\Collection;
 
     /**
      * Get quantity of cards.
-     *
-     * @return int
      */
-    public function countCards();
+    public function countCards(): int;
 
     /**
      * Get included packs, by release date: ['pack' => Pack, 'nb' => number of copies of the pack needed].
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getIncludedPacks();
+    public function getIncludedPacks(): array;
 
     /**
      * Get all slots sorted by type code.
      *
      * @return array<string, list<T>>
      */
-    public function getSlotsByType();
+    public function getSlotsByType(): array;
 
     /**
      * Get all slot counts sorted by type code.
      *
      * @return array<string, int>
      */
-    public function getCountByType();
+    public function getCountByType(): array;
 
     /**
      * Get all slot counts sorted by sphere code.
@@ -79,26 +73,24 @@ interface SlotCollectionInterface extends \Countable, \IteratorAggregate, \Array
      *
      * @return SlotCollectionInterface<T>
      */
-    public function getHeroDeck();
+    public function getHeroDeck(): SlotCollectionInterface;
 
     /**
      * Get the draw deck.
      *
      * @return SlotCollectionInterface<T>
      */
-    public function getDrawDeck();
+    public function getDrawDeck(): SlotCollectionInterface;
 
     /**
      * Get the content as an array card_code => qty.
      *
      * @return array<int|string, int>
      */
-    public function getContent();
+    public function getContent(): array;
 
     /**
      * Get the starting threat.
-     *
-     * @return int
      */
-    public function getStartingThreat();
+    public function getStartingThreat(): int;
 }
