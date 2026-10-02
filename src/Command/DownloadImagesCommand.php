@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Repository\CardRepository;
@@ -40,10 +42,7 @@ class DownloadImagesCommand extends Command
         $this->cardRepository = $cardRepository;
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
         ->setName('app:download-images')

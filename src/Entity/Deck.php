@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
@@ -441,10 +443,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Remove slot.
-     *
-     * @return void
      */
-    public function removeSlot(Deckslot $slot)
+    public function removeSlot(Deckslot $slot): void
     {
         $this->slots->removeElement($slot);
     }
@@ -473,10 +473,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Remove sideslot.
-     *
-     * @return void
      */
-    public function removeSideslot(Decksideslot $sideslot)
+    public function removeSideslot(Decksideslot $sideslot): void
     {
         $this->sideslots->removeElement($sideslot);
     }
@@ -505,10 +503,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Remove child.
-     *
-     * @return void
      */
-    public function removeChild(Decklist $child)
+    public function removeChild(Decklist $child): void
     {
         $this->children->removeElement($child);
     }
@@ -537,10 +533,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Remove change.
-     *
-     * @return void
      */
-    public function removeChange(Deckchange $change)
+    public function removeChange(Deckchange $change): void
     {
         $this->changes->removeElement($change);
     }
@@ -696,10 +690,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Remove fellowship.
-     *
-     * @return void
      */
-    public function removeFellowship(FellowshipDeck $fellowship)
+    public function removeFellowship(FellowshipDeck $fellowship): void
     {
         $this->fellowships->removeElement($fellowship);
     }
@@ -749,10 +741,8 @@ class Deck extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Remove questlog.
-     *
-     * @return void
      */
-    public function removeQuestlog(QuestlogDeck $questlog)
+    public function removeQuestlog(QuestlogDeck $questlog): void
     {
         $this->questlogs->removeElement($questlog);
     }

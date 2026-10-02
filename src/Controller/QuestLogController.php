@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Deck;
@@ -84,10 +86,7 @@ class QuestLogController extends AbstractController
     }
 
     // Set the deck content to the QuestlogDeck snapshot
-    /**
-     * @return void
-     */
-    public function setSnapshot($questlog)
+    public function setSnapshot($questlog): void
     {
         $questlog_decks = $questlog->getDecks();
         $decks_service = $this->decks;
@@ -103,10 +102,7 @@ class QuestLogController extends AbstractController
         }
     }
 
-    /**
-     * @return void
-     */
-    public function setSnapshots($questlogs)
+    public function setSnapshots($questlogs): void
     {
         foreach ($questlogs as $questlog) {
             $this->setSnapshot($questlog);
@@ -483,7 +479,7 @@ class QuestLogController extends AbstractController
                     // deck_id == 0 occurs if:
                     // 1. the deck slot in the builder is empty
                     // 2. the deck being referenced was deleted
-                    $content = (array) json_decode($request->get('deck'.$i.'_content'));
+                    $content = json_decode($request->get('deck'.$i.'_content') ?? '', true);
                     if (!isset($content['main']) || empty($content['main'])) {
                         // Deck slot was empty
                         ++$skip;

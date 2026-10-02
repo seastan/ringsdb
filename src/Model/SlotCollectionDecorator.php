@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -56,12 +58,12 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         return $this->slots->offsetGet($offset);
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->slots->offsetSet($offset, $value);
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         $this->slots->offsetUnset($offset);
     }

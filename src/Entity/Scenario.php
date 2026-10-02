@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 /**
@@ -239,10 +241,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Remove encounter.
-     *
-     * @return void
      */
-    public function removeEncounter(Encounter $encounter)
+    public function removeEncounter(Encounter $encounter): void
     {
         $this->encounters->removeElement($encounter);
     }
@@ -1203,10 +1203,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * Remove questlog.
-     *
-     * @return void
      */
-    public function removeQuestlog(Questlog $questlog)
+    public function removeQuestlog(Questlog $questlog): void
     {
         $this->questlogs->removeElement($questlog);
     }

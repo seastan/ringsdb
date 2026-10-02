@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 /**
@@ -380,10 +382,8 @@ class Fellowship
 
     /**
      * Remove deck.
-     *
-     * @return void
      */
-    public function removeDeck(FellowshipDeck $deck)
+    public function removeDeck(FellowshipDeck $deck): void
     {
         $this->decks->removeElement($deck);
     }
@@ -412,10 +412,8 @@ class Fellowship
 
     /**
      * Remove decklist.
-     *
-     * @return void
      */
-    public function removeDecklist(FellowshipDecklist $decklist)
+    public function removeDecklist(FellowshipDecklist $decklist): void
     {
         $this->decklists->removeElement($decklist);
     }
@@ -444,10 +442,8 @@ class Fellowship
 
     /**
      * Remove comment.
-     *
-     * @return void
      */
-    public function removeComment(FellowshipComment $comment)
+    public function removeComment(FellowshipComment $comment): void
     {
         $this->comments->removeElement($comment);
     }
@@ -498,10 +494,8 @@ class Fellowship
 
     /**
      * Remove favorite.
-     *
-     * @return void
      */
-    public function removeFavorite(User $favorite)
+    public function removeFavorite(User $favorite): void
     {
         $this->favorites->removeElement($favorite);
     }
@@ -530,10 +524,8 @@ class Fellowship
 
     /**
      * Remove vote.
-     *
-     * @return void
      */
-    public function removeVote(User $vote)
+    public function removeVote(User $vote): void
     {
         $this->votes->removeElement($vote);
     }

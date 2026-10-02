@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Repository\CardPrintingRepository;
@@ -64,10 +66,7 @@ class ScrapBeornJsonDataCommand extends Command
         $this->typeRepository = $typeRepository;
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('app:beorn:json')
              ->setDescription('Download new card data from Hall of Beorn JSON Export')

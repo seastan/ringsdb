@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 class Pack
@@ -264,7 +266,7 @@ class Pack
      */
     public function getCards()
     {
-        return $this->printings->map(function ($p) { return $p->getCard(); });
+        return $this->printings->map(fn ($p) => $p->getCard());
     }
 
     /**
@@ -281,10 +283,8 @@ class Pack
 
     /**
      * Remove printing.
-     *
-     * @return void
      */
-    public function removePrinting(CardPrinting $printing)
+    public function removePrinting(CardPrinting $printing): void
     {
         $this->printings->removeElement($printing);
     }

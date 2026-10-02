@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Model;
 
 use App\Entity\Card;
@@ -96,34 +98,22 @@ class DecklistManager
         return $request;
     }
 
-    /**
-     * @return void
-     */
-    public function setUser($user)
+    public function setUser($user): void
     {
         $this->user = $user;
     }
 
-    /**
-     * @return void
-     */
-    public function setPredominantSphere(?Sphere $predominantSphere = null)
+    public function setPredominantSphere(?Sphere $predominantSphere = null): void
     {
         $this->predominantSphere = $predominantSphere;
     }
 
-    /**
-     * @return void
-     */
-    public function setLimit($limit)
+    public function setLimit($limit): void
     {
         $this->limit = $limit;
     }
 
-    /**
-     * @return void
-     */
-    public function setPage($page)
+    public function setPage($page): void
     {
         $this->page = max($page, 1);
         $this->start = ($this->page - 1) * $this->limit;

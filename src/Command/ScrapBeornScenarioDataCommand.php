@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Entity\Scenario;
@@ -23,10 +25,7 @@ class ScrapBeornScenarioDataCommand extends Command
         $this->em = $em;
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('app:beorn:scenario')
             ->setDescription('Download scenario statistics data from Hall of Beorn')

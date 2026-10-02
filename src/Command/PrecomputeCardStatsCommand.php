@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Stats\CardStatsCalculator;
@@ -41,10 +43,7 @@ class PrecomputeCardStatsCommand extends Command
         $this->cardStats = $cardStats;
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('app:stats:precompute-cards')

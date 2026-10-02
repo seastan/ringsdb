@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
@@ -445,10 +447,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Remove slot.
-     *
-     * @return void
      */
-    public function removeSlot(Decklistslot $slot)
+    public function removeSlot(Decklistslot $slot): void
     {
         $this->slots->removeElement($slot);
     }
@@ -477,10 +477,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Remove sideslot.
-     *
-     * @return void
      */
-    public function removeSideslot(Decklistsideslot $sideslots)
+    public function removeSideslot(Decklistsideslot $sideslots): void
     {
         $this->sideslots->removeElement($sideslots);
     }
@@ -509,10 +507,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Remove comment.
-     *
-     * @return void
      */
-    public function removeComment(Comment $comment)
+    public function removeComment(Comment $comment): void
     {
         $this->comments->removeElement($comment);
     }
@@ -541,10 +537,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Remove successor.
-     *
-     * @return void
      */
-    public function removeSuccessor(Decklist $successor)
+    public function removeSuccessor(Decklist $successor): void
     {
         $this->successors->removeElement($successor);
     }
@@ -573,10 +567,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Remove child.
-     *
-     * @return void
      */
-    public function removeChild(Deck $child)
+    public function removeChild(Deck $child): void
     {
         $this->children->removeElement($child);
     }
@@ -693,10 +685,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Remove favorite.
-     *
-     * @return void
      */
-    public function removeFavorite(User $favorite)
+    public function removeFavorite(User $favorite): void
     {
         $this->favorites->removeElement($favorite);
     }
@@ -725,10 +715,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Remove vote.
-     *
-     * @return void
      */
-    public function removeVote(User $vote)
+    public function removeVote(User $vote): void
     {
         $this->votes->removeElement($vote);
     }
@@ -788,10 +776,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Remove sphere.
-     *
-     * @return void
      */
-    public function removeSphere(Sphere $sphere)
+    public function removeSphere(Sphere $sphere): void
     {
         $this->spheres->removeElement($sphere);
     }
@@ -852,10 +838,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Remove fellowship.
-     *
-     * @return void
      */
-    public function removeFellowship(FellowshipDecklist $fellowship)
+    public function removeFellowship(FellowshipDecklist $fellowship): void
     {
         $this->fellowships->removeElement($fellowship);
     }
@@ -879,9 +863,7 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
     {
         $allFellowships = $this->getFellowships()->toArray();
 
-        return array_filter($allFellowships, function ($k) {
-            return $k->getFellowship()->getIsPublic();
-        });
+        return array_filter($allFellowships, fn ($k) => $k->getFellowship()->getIsPublic());
     }
 
     /**
@@ -931,10 +913,8 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
 
     /**
      * Remove questlog.
-     *
-     * @return void
      */
-    public function removeQuestlog(QuestlogDeck $questlog)
+    public function removeQuestlog(QuestlogDeck $questlog): void
     {
         $this->questlogs->removeElement($questlog);
     }
@@ -963,9 +943,7 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable
         }
         $allQuestlogs = array_unique(array_merge($theseLogs, $parentLogs), SORT_REGULAR);
 
-        return array_filter($allQuestlogs, function ($k) {
-            return $k->getQuestlog()->getIsPublic();
-        });
+        return array_filter($allQuestlogs, fn ($k) => $k->getQuestlog()->getIsPublic());
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -433,10 +435,8 @@ class User extends BaseUser
 
     /**
      * Remove deck.
-     *
-     * @return void
      */
-    public function removeDeck(Deck $deck)
+    public function removeDeck(Deck $deck): void
     {
         $this->decks->removeElement($deck);
     }
@@ -465,10 +465,8 @@ class User extends BaseUser
 
     /**
      * Remove decklist.
-     *
-     * @return void
      */
-    public function removeDecklist(Decklist $decklist)
+    public function removeDecklist(Decklist $decklist): void
     {
         $this->decklists->removeElement($decklist);
     }
@@ -497,10 +495,8 @@ class User extends BaseUser
 
     /**
      * Remove comment.
-     *
-     * @return void
      */
-    public function removeComment(Comment $comment)
+    public function removeComment(Comment $comment): void
     {
         $this->comments->removeElement($comment);
     }
@@ -529,10 +525,8 @@ class User extends BaseUser
 
     /**
      * Remove review.
-     *
-     * @return void
      */
-    public function removeReview(Review $review)
+    public function removeReview(Review $review): void
     {
         $this->reviews->removeElement($review);
     }
@@ -562,10 +556,8 @@ class User extends BaseUser
 
     /**
      * Remove favorite.
-     *
-     * @return void
      */
-    public function removeFavorite(Decklist $favorite)
+    public function removeFavorite(Decklist $favorite): void
     {
         $favorite->removeFavorite($this);
         $this->favorites->removeElement($favorite);
@@ -596,10 +588,8 @@ class User extends BaseUser
 
     /**
      * Remove vote.
-     *
-     * @return void
      */
-    public function removeVote(Decklist $vote)
+    public function removeVote(Decklist $vote): void
     {
         $vote->removeVote($this);
         $this->votes->removeElement($vote);
@@ -629,10 +619,8 @@ class User extends BaseUser
 
     /**
      * Remove reviewvote.
-     *
-     * @return void
      */
-    public function removeReviewvote(Review $reviewvote)
+    public function removeReviewvote(Review $reviewvote): void
     {
         $this->reviewvotes->removeElement($reviewvote);
     }
@@ -670,10 +658,8 @@ class User extends BaseUser
 
     /**
      * Remove following.
-     *
-     * @return void
      */
-    public function removeFollowing(User $following)
+    public function removeFollowing(User $following): void
     {
         $this->following->removeElement($following);
     }
@@ -702,10 +688,8 @@ class User extends BaseUser
 
     /**
      * Remove follower.
-     *
-     * @return void
      */
-    public function removeFollower(User $follower)
+    public function removeFollower(User $follower): void
     {
         $this->followers->removeElement($follower);
     }
@@ -796,10 +780,8 @@ class User extends BaseUser
 
     /**
      * Remove fellowship.
-     *
-     * @return void
      */
-    public function removeFellowship(Fellowship $fellowship)
+    public function removeFellowship(Fellowship $fellowship): void
     {
         $this->fellowships->removeElement($fellowship);
     }
@@ -858,10 +840,8 @@ class User extends BaseUser
 
     /**
      * Remove fellowshipComment.
-     *
-     * @return void
      */
-    public function removeFellowshipComment(FellowshipComment $fellowshipComment)
+    public function removeFellowshipComment(FellowshipComment $fellowshipComment): void
     {
         $this->fellowship_comments->removeElement($fellowshipComment);
     }
@@ -890,10 +870,8 @@ class User extends BaseUser
 
     /**
      * Remove fellowshipFavorite.
-     *
-     * @return void
      */
-    public function removeFellowshipFavorite(Fellowship $fellowshipFavorite)
+    public function removeFellowshipFavorite(Fellowship $fellowshipFavorite): void
     {
         $this->fellowship_favorites->removeElement($fellowshipFavorite);
     }
@@ -922,10 +900,8 @@ class User extends BaseUser
 
     /**
      * Remove fellowshipVote.
-     *
-     * @return void
      */
-    public function removeFellowshipVote(Fellowship $fellowshipVote)
+    public function removeFellowshipVote(Fellowship $fellowshipVote): void
     {
         $this->fellowship_votes->removeElement($fellowshipVote);
     }
@@ -963,10 +939,8 @@ class User extends BaseUser
 
     /**
      * Remove questlog.
-     *
-     * @return void
      */
-    public function removeQuestlog(Questlog $questlog)
+    public function removeQuestlog(Questlog $questlog): void
     {
         $this->questlogs->removeElement($questlog);
     }
@@ -995,10 +969,8 @@ class User extends BaseUser
 
     /**
      * Remove questlogComment.
-     *
-     * @return void
      */
-    public function removeQuestlogComment(QuestlogComment $questlogComment)
+    public function removeQuestlogComment(QuestlogComment $questlogComment): void
     {
         $this->questlog_comments->removeElement($questlogComment);
     }
@@ -1036,10 +1008,8 @@ class User extends BaseUser
 
     /**
      * Remove questlogFavorite.
-     *
-     * @return void
      */
-    public function removeQuestlogFavorite(Questlog $questlogFavorite)
+    public function removeQuestlogFavorite(Questlog $questlogFavorite): void
     {
         $this->questlog_favorites->removeElement($questlogFavorite);
     }
@@ -1068,10 +1038,8 @@ class User extends BaseUser
 
     /**
      * Remove questlogVote.
-     *
-     * @return void
      */
-    public function removeQuestlogVote(Questlog $questlogVote)
+    public function removeQuestlogVote(Questlog $questlogVote): void
     {
         $this->questlog_votes->removeElement($questlogVote);
     }

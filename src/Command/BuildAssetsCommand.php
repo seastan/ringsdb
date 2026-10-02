@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Asset\AssetBundles;
@@ -28,10 +30,7 @@ class BuildAssetsCommand extends Command
         $this->publicDir = $publicDir;
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('app:assets')
              ->setDescription('Build the JavaScript and CSS files loaded by every page into public/');
@@ -42,9 +41,7 @@ class BuildAssetsCommand extends Command
         $sourceDir = __DIR__.'/../Resources/public';
         $bundles = [];
         foreach (AssetBundles::JAVASCRIPTS as $target => $sources) {
-            $bundles[$target] = function (string $source, string $content): string {
-                return $content;
-            };
+            $bundles[$target] = fn (string $source, string $content): string => $content;
         }
         foreach (AssetBundles::STYLESHEETS as $target => $sources) {
             $bundles[$target] = function (string $source, string $content) use ($sourceDir, $target): string {

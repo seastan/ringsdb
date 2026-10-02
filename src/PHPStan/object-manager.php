@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // The entity manager of the test environment, for phpstan-doctrine (doctrine.objectManagerLoader
 // in phpstan.neon): the entity metadata comes from the YAML mappings.
 

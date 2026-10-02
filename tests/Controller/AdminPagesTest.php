@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -147,9 +149,7 @@ class AdminPagesTest extends WebTestCase
      */
     public function snapshotPageProvider()
     {
-        return array_filter($this->adminPageProvider(), function (array $page) {
-            return null !== $page[1];
-        });
+        return array_filter($this->adminPageProvider(), fn (array $page) => null !== $page[1]);
     }
 
     /**

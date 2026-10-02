@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Controller;
 
 use PhpOffice\PhpSpreadsheet\Cell\DataType;

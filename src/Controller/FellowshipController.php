@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Fellowship;
@@ -433,7 +435,7 @@ class FellowshipController extends AbstractController
         if (empty($name)) {
             $name = 'Untitled Fellowship';
         }
-        $descriptionMd = trim($request->request->get('descriptionMd'));
+        $descriptionMd = trim($request->request->get('descriptionMd') ?? '');
         $descriptionHtml = $this->texts->markdown($descriptionMd);
         $fellowship->setName($name);
         $fellowship->setNameCanonical($this->texts->slugify($name));

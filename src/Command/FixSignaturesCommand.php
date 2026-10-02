@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Repository\DecklistRepository;
@@ -27,10 +29,7 @@ class FixSignaturesCommand extends Command
         $this->decklistRepository = $decklistRepository;
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('app:fix-signatures')
              ->setDescription('Fix canonical names for decklists');

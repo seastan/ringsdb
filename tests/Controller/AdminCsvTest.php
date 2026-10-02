@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -260,9 +262,7 @@ class AdminCsvTest extends WebTestCase
     public function testCardsMissingFromTheCsvAreMarkedDeleted(): void
     {
         $client = $this->createAdminClient();
-        $file = $this->sampleVariant(function (array $row) {
-            return 'Bilbo Baggins' === $row['name'] ? null : $row;
-        });
+        $file = $this->sampleVariant(fn (array $row) => 'Bilbo Baggins' === $row['name'] ? null : $row);
 
         $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, $file, 'THo', 'ALeP - The Hobbit'));
 
@@ -303,9 +303,7 @@ class AdminCsvTest extends WebTestCase
     public function testCsvWithoutCards(): void
     {
         $client = $this->createAdminClient();
-        $file = $this->sampleVariant(function () {
-            return null;
-        });
+        $file = $this->sampleVariant(fn () => null);
 
         $this->assertSame('No cards found in the CSV file', $this->upload($client, $file, 'THo', 'ALeP - The Hobbit'));
     }

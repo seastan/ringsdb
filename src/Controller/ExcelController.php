@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Card;
@@ -65,9 +67,7 @@ class ExcelController extends AbstractController
                 throw $this->createNotFoundException('Pack not found.');
             }
             $printings = $cardPrintingRepository->findBy(['pack' => $pack], ['position' => 'ASC']);
-            $cards = array_values(array_unique(array_map(function ($p) {
-                return $p->getCard();
-            }, $printings), SORT_REGULAR));
+            $cards = array_values(array_unique(array_map(fn ($p) => $p->getCard(), $printings), SORT_REGULAR));
             $pack_name = $pack->getName();
         }
         $fieldNames = $em->getClassMetadata(Card::class)->getFieldNames();

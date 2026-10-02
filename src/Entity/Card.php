@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 class Card
@@ -116,10 +118,8 @@ class Card
 
     /**
      * Remove printing.
-     *
-     * @return void
      */
-    public function removePrinting(CardPrinting $printing)
+    public function removePrinting(CardPrinting $printing): void
     {
         $this->printings->removeElement($printing);
     }
@@ -633,10 +633,8 @@ class Card
 
     /**
      * Remove review.
-     *
-     * @return void
      */
-    public function removeReview(Review $review)
+    public function removeReview(Review $review): void
     {
         $this->reviews->removeElement($review);
     }

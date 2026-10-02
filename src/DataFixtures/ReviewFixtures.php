@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataFixtures;
 
 use App\Entity\Card;
@@ -18,10 +20,7 @@ class ReviewFixtures extends Fixture implements ContainerAwareInterface, Depende
      */
     private $container;
 
-    /**
-     * @return void
-     */
-    public function setContainer(?ContainerInterface $container = null)
+    public function setContainer(?ContainerInterface $container = null): void
     {
         $this->container = $container;
     }
@@ -36,10 +35,7 @@ class ReviewFixtures extends Fixture implements ContainerAwareInterface, Depende
         ];
     }
 
-    /**
-     * @return void
-     */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         /** @var User $user */
         $user = $this->getReference('test-user');

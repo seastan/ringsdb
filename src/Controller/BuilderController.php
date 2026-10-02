@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Card;
@@ -451,7 +453,7 @@ class BuilderController extends AbstractController
             $name = 'Untitled Deck';
         }
         $decklist_id = filter_var($request->get('decklist_id'), FILTER_SANITIZE_NUMBER_INT);
-        $description = trim($request->get('description'));
+        $description = trim($request->get('description') ?? '');
         $tags = filter_var($request->get('tags'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
         $this->decks->saveDeck($this->getUser(), $deck, $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);
         $em->flush();
@@ -495,7 +497,7 @@ class BuilderController extends AbstractController
             $name = 'Untitled Deck';
         }
         $decklist_id = filter_var($request->get('decklist_id'), FILTER_SANITIZE_NUMBER_INT);
-        $description = trim($request->get('description'));
+        $description = trim($request->get('description') ?? '');
         $tags = filter_var($request->get('tags'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
         $this->decks->saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);
         $em->flush();
@@ -796,9 +798,7 @@ class BuilderController extends AbstractController
             throw new UnprocessableEntityHttpException('Wrong content '.json_encode($diff));
         }
         // [main added, main removed, side added, side removed], the side parts may be missing
-        $parts = array_map(function ($part) {
-            return is_array($part) ? count($part) : 0;
-        }, $diff);
+        $parts = array_map(fn ($part) => is_array($part) ? count($part) : 0, $diff);
         if (array_sum($parts) > 0) {
             /* @var $change \App\Entity\Deckchange */
             $change = new Deckchange();

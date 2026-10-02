@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 class Cycle
@@ -241,10 +243,8 @@ class Cycle
 
     /**
      * Remove pack.
-     *
-     * @return void
      */
-    public function removePack(Pack $pack)
+    public function removePack(Pack $pack): void
     {
         $this->packs->removeElement($pack);
     }

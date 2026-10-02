@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Helper;
 
 use App\Entity\Deck;
@@ -20,12 +22,8 @@ class TwigExtension extends AbstractExtension
     public function getTests()
     {
         return [
-            new TwigTest('decklist', function ($event) {
-                return $event instanceof Decklist;
-            }),
-            new TwigTest('deck', function ($event) {
-                return $event instanceof Deck;
-            }),
+            new TwigTest('decklist', fn ($event) => $event instanceof Decklist),
+            new TwigTest('deck', fn ($event) => $event instanceof Deck),
         ];
     }
 }

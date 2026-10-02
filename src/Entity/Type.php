@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 class Type
@@ -101,10 +103,8 @@ class Type
 
     /**
      * Remove card.
-     *
-     * @return void
      */
-    public function removeCard(Card $card)
+    public function removeCard(Card $card): void
     {
         $this->cards->removeElement($card);
     }

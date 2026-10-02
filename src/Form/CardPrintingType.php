@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
 use Doctrine\ORM\EntityRepository;
@@ -14,10 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CardPrintingType extends AbstractType
 {
-    /**
-     * @return void
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $filterPack = $options['filter_pack'];
 
@@ -59,10 +58,7 @@ class CardPrintingType extends AbstractType
             ->add('quest', null, ['required' => false, 'label' => 'Quest override']);
     }
 
-    /**
-     * @return void
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => 'App\Entity\CardPrinting',

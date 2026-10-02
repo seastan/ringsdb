@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -140,9 +142,7 @@ class DeckManagementTest extends WebTestCase
     {
         preg_match_all("/insert_alert_message\\('(\\w+)', (\"[^\"]*\")\\)/", $client->getResponse()->getContent(), $matches, PREG_SET_ORDER);
 
-        return array_map(function ($match) {
-            return [$match[1], json_decode($match[2])];
-        }, $matches);
+        return array_map(fn ($match) => [$match[1], json_decode($match[2])], $matches);
     }
 
     /* -------------------------------------------------------------- clone */

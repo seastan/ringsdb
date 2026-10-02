@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Stats;
 
 use App\Stats\CardStatsCalculator;
@@ -277,9 +279,7 @@ class CardStatsCalculatorTest extends KernelTestCase
         $this->assertContains("Computing 2015-07 ...\n", $display);
         $this->assertStringEndsWith("done\n", $display);
         $rows = $this->connection->fetchAll("SELECT month, step, payload FROM stat_cards_cache WHERE month IN ('2015-07', '2015-08') ORDER BY month, step");
-        $this->assertSame([['2015-07', '1'], ['2015-07', '2'], ['2015-07', '3'], ['2015-08', '1'], ['2015-08', '2'], ['2015-08', '3']], array_map(function ($row) {
-            return [$row['month'], $row['step']];
-        }, $rows));
+        $this->assertSame([['2015-07', '1'], ['2015-07', '2'], ['2015-07', '3'], ['2015-08', '1'], ['2015-08', '2'], ['2015-08', '3']], array_map(fn ($row) => [$row['month'], $row['step']], $rows));
         // the payload is the JSON of computeCards()
         $this->assertSame(json_encode($this->calculator->computeCards('2015-08', '2')), $rows[4]['payload']);
 

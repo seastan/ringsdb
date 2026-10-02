@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Repository\ScenarioRepository;
@@ -34,10 +36,7 @@ class FixCanonicalNamesCommand extends Command
         $this->scenarioRepository = $scenarioRepository;
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('app:fix-canonical-names')
              ->setDescription('Fix canonical names for scenarios');

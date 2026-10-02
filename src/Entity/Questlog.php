@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 /**
@@ -491,10 +493,8 @@ class Questlog
 
     /**
      * Remove deck.
-     *
-     * @return void
      */
-    public function removeDeck(QuestlogDeck $deck)
+    public function removeDeck(QuestlogDeck $deck): void
     {
         $this->decks->removeElement($deck);
     }
@@ -523,10 +523,8 @@ class Questlog
 
     /**
      * Remove comment.
-     *
-     * @return void
      */
-    public function removeComment(QuestlogComment $comment)
+    public function removeComment(QuestlogComment $comment): void
     {
         $this->comments->removeElement($comment);
     }
@@ -599,10 +597,8 @@ class Questlog
 
     /**
      * Remove favorite.
-     *
-     * @return void
      */
-    public function removeFavorite(User $favorite)
+    public function removeFavorite(User $favorite): void
     {
         $this->favorites->removeElement($favorite);
     }
@@ -631,10 +627,8 @@ class Questlog
 
     /**
      * Remove vote.
-     *
-     * @return void
      */
-    public function removeVote(User $vote)
+    public function removeVote(User $vote): void
     {
         $this->votes->removeElement($vote);
     }

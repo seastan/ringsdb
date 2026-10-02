@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Entity\Sphere;
@@ -70,10 +72,7 @@ class ScrapBeornCardDataCommand extends Command
         $this->typeRepository = $typeRepository;
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('app:beorn:html')
              ->setDescription('Download new card data from Hall of Beorn')
@@ -312,17 +311,13 @@ class ScrapBeornCardDataCommand extends Command
                 $traits = implode(' ', $traits);
                 $output->writeln('11');
 
-                $text = $c->filter('p:not(.flavor-text)')->each(function (Crawler $node, $i) {
-                    return $node->html();
-                });
+                $text = $c->filter('p:not(.flavor-text)')->each(fn (Crawler $node, $i) => $node->html());
                 $output->writeln('12');
 
                 $text = implode('<br>', $text);
                 $output->writeln('13');
 
-                $flavor = $c->filter('p.flavor-text')->each(function (Crawler $node, $i) {
-                    return $node->html();
-                });
+                $flavor = $c->filter('p.flavor-text')->each(fn (Crawler $node, $i) => $node->html());
                 $output->writeln('14');
 
                 $flavor = implode('<br>', $flavor);
@@ -384,9 +379,7 @@ class ScrapBeornCardDataCommand extends Command
                     $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', '\'', '\''], $text);
                     $text = (string) preg_replace('/<a title="Search:.*?>(.*?)<\/a>/', '\\1', $text);
                     $text = (string) preg_replace('/<a title="Keyword:.*?>(.*?)<\/a>/', '\\1', $text);
-                    $text = (string) preg_replace_callback('/<img .*?src="\/Images\/(.*?)\..*?>/', function ($m) {
-                        return strtolower("[$m[1]]");
-                    }, $text);
+                    $text = (string) preg_replace_callback('/<img .*?src="\/Images\/(.*?)\..*?>/', fn ($m) => strtolower("[$m[1]]"), $text);
                     $text = str_replace(['<br />', '<br>'], ["\n", "\n"], $text);
                     $text = str_replace('</b><b>', ' ', $text);
                     $text = str_replace('</b>: ', ':</b> ', $text);

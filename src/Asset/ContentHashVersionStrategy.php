@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Asset;
 
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;

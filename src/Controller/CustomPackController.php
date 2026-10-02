@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\UserCustomPack;
@@ -316,10 +318,8 @@ class CustomPackController extends AbstractController
 
     /**
      * @param array<int|string, mixed> $cardEntries
-     *
-     * @return void
      */
-    private function attachCards($em, UserCustomPack $pack, array $cardEntries)
+    private function attachCards($em, UserCustomPack $pack, array $cardEntries): void
     {
         $cardRepo = $this->cardRepository;
         $seen = [];

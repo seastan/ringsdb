@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataFixtures;
 
 use App\Entity\Decklist;
@@ -24,10 +26,7 @@ class QuestlogFixtures extends Fixture implements DependentFixtureInterface
         ];
     }
 
-    /**
-     * @return void
-     */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         /** @var User $user */
         $user = $this->getReference('test-user');

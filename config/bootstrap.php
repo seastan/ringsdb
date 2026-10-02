@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // Loads the environment variables from the .env files, then sets APP_ENV and APP_DEBUG. Required by
 // public/index.php, bin/console and the PHPUnit bootstrap.
 //

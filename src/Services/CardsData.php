@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Entity\Card;
@@ -104,9 +106,7 @@ class CardsData
             return '';
         }
 
-        return implode(array_map(function ($l) {
-            return "<p>$l</p>";
-        }, preg_split('/[\r?\n]+/', $text) ?: []));
+        return implode('', array_map(fn ($l) => "<p>$l</p>", preg_split('/[\r?\n]+/', $text) ?: []));
     }
 
     /**
@@ -567,9 +567,7 @@ class CardsData
 
         if ($api) {
             unset($cardinfo['id']);
-            $cardinfo = array_filter($cardinfo, function ($var) {
-                return isset($var);
-            });
+            $cardinfo = array_filter($cardinfo, fn ($var) => isset($var));
         } else {
             $cardinfo['text'] = $this->replaceSymbols($cardinfo['text']);
             $cardinfo['text'] = $this->splitInParagraphs($cardinfo['text']);
@@ -684,11 +682,7 @@ class CardsData
      */
     public function buildQueryFromConditions($conditions)
     {
-        return implode(' ', array_map(function ($l) {
-            return ($l[0] ? $l[0].$l[1] : '').implode('|', array_map(function ($s) {
-                return preg_match("/^[\p{L}\p{N}\-\&]+$/u", $s) ? $s : "\"$s\"";
-            }, array_slice($l, 2)));
-        }, $conditions));
+        return implode(' ', array_map(fn ($l) => ($l[0] ? $l[0].$l[1] : '').implode('|', array_map(fn ($s) => preg_match("/^[\p{L}\p{N}\-\&]+$/u", $s) ? $s : "\"$s\"", array_slice($l, 2))), $conditions));
     }
 
     /**

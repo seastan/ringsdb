@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -284,9 +286,7 @@ class DecklistCommentTest extends WebTestCase
 
         $crawler = $client->request('GET', '/decklists/hottopics');
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $links = array_unique($crawler->filter('a[href^="/decklist/view/"]')->each(function ($link) {
-            return $link->attr('href');
-        }));
+        $links = array_unique($crawler->filter('a[href^="/decklist/view/"]')->each(fn ($link) => $link->attr('href')));
 
         $this->assertSame([
             '/decklist/view/3/noldorrohanlorespirit-1.0',

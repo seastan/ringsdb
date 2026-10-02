@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 /**
@@ -229,10 +231,8 @@ class Review
 
     /**
      * Remove comment.
-     *
-     * @return void
      */
-    public function removeComment(Reviewcomment $comment)
+    public function removeComment(Reviewcomment $comment): void
     {
         $this->comments->removeElement($comment);
     }
@@ -305,10 +305,8 @@ class Review
 
     /**
      * Remove vote.
-     *
-     * @return void
      */
-    public function removeVote(User $vote)
+    public function removeVote(User $vote): void
     {
         $this->votes->removeElement($vote);
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Card;
@@ -100,9 +102,7 @@ class SearchController extends AbstractController
         $traits = array_filter(array_keys($traits));
         sort($traits);
         $list_illustrators = $dbh->executeQuery("SELECT DISTINCT illustrator FROM card_printing WHERE illustrator IS NOT NULL AND illustrator != '' ORDER BY illustrator")->fetchAll();
-        $illustrators = array_map(function ($card) {
-            return $card['illustrator'];
-        }, $list_illustrators);
+        $illustrators = array_map(fn ($card) => $card['illustrator'], $list_illustrators);
 
         return $this->render('Search/searchform.html.twig', ['pagetitle' => 'Card Search', 'pagedescription' => 'Find all the cards of the game, easily searchable.', 'packs' => $packs, 'cycles' => $cycles, 'types' => $types, 'spheres' => $spheres, 'traits' => $traits, 'illustrators' => $illustrators, 'allsets' => $this->renderView('Default/allsets.html.twig', ['data' => $this->cardsData->allSetsData()])], $response);
     }
@@ -196,9 +196,7 @@ class SearchController extends AbstractController
                     if ('sphere' == $searchName && count($val) == count($spheres)) {
                         continue;
                     }
-                    $params[] = $key.':'.implode('|', array_map(function ($s) {
-                        return false !== strstr($s, ' ') ? "\"{$s}\"" : $s;
-                    }, $val));
+                    $params[] = $key.':'.implode('|', array_map(fn ($s) => false !== strstr($s, ' ') ? "\"{$s}\"" : $s, $val));
                 } else {
                     if ('date_release' == $searchName) {
                         $op = '';

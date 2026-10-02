@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -15,10 +17,8 @@ class EncounterType extends AbstractType
     /**
      * @param FormBuilderInterface<\App\Entity\Encounter|null> $builder
      * @param array<string, mixed>                             $options
-     *
-     * @return void
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('code')
@@ -26,10 +26,7 @@ class EncounterType extends AbstractType
             ->add('pack', EntityType::class, ['class' => 'App:Pack', 'choice_label' => 'name']);
     }
 
-    /**
-     * @return void
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => 'App\Entity\Encounter',

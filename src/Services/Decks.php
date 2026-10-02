@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Entity\CardPrinting;
@@ -439,7 +441,7 @@ class Decks
     /**
      * @return void
      */
-    public function setSlots(&$deck, $content)
+    public function setSlots(&$deck, $content): void
     {
         /* @var $deck \App\Entity\Deck */
         /* @var $latestPack \App\Entity\Pack */
@@ -518,10 +520,7 @@ class Decks
         }
     }
 
-    /**
-     * @return void
-     */
-    public function revertDeck($deck)
+    public function revertDeck($deck): void
     {
         /* @var $deck \App\Entity\Deck */
         $changes = $this->getUnsavedChanges($deck);

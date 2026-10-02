@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataFixtures;
 
 use App\Entity\Deck;
@@ -17,10 +19,7 @@ class DecklistFixtures extends Fixture implements ContainerAwareInterface, Depen
      */
     private $container;
 
-    /**
-     * @return void
-     */
-    public function setContainer(?ContainerInterface $container = null)
+    public function setContainer(?ContainerInterface $container = null): void
     {
         $this->container = $container;
     }
@@ -35,10 +34,7 @@ class DecklistFixtures extends Fixture implements ContainerAwareInterface, Depen
         ];
     }
 
-    /**
-     * @return void
-     */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         if (null === $this->container) {
             throw new \LogicException('The container is not set.');

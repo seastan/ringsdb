@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Comment;
@@ -500,7 +502,7 @@ class SocialController extends AbstractController
         }
         $this->getDoctrine()->getManager()->flush();
 
-        return new Response($decklist->getNbFavorites());
+        return new Response((string) $decklist->getNbFavorites());
     }
 
     /*
@@ -643,7 +645,7 @@ class SocialController extends AbstractController
             }
         }
 
-        return new Response($decklist->getNbVotes());
+        return new Response((string) $decklist->getNbVotes());
     }
 
     /*

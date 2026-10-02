@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -15,10 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CardType extends AbstractType
 {
-    /**
-     * @return void
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('position')
@@ -43,10 +42,7 @@ class CardType extends AbstractType
             ->add('file', FileType::class, ['label' => 'Image File', 'mapped' => false, 'required' => false]);
     }
 
-    /**
-     * @return void
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => 'App\Entity\Card',
