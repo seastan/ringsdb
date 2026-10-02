@@ -92,8 +92,12 @@ class AdminCsvTest extends WebTestCase
         $copy = self::temporaryFile('csv');
         $this->files[] = $copy;
         copy($file, $copy);
-        $client->request('POST', '/admin/csv/upload', ['code' => $code, 'old_code' => $oldCode, 'name' => $name],
-            ['upfile' => new UploadedFile($copy, 'pack.csv', 'text/csv', null, true)]);
+        $client->request(
+            'POST',
+            '/admin/csv/upload',
+            ['code' => $code, 'old_code' => $oldCode, 'name' => $name],
+            ['upfile' => new UploadedFile($copy, 'pack.csv', 'text/csv', null, true)]
+        );
         $this->assertSame(200, $client->getResponse()->getStatusCode());
 
         return (string) $client->getResponse()->getContent();
@@ -232,15 +236,19 @@ class AdminCsvTest extends WebTestCase
 
         $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, $file, 'PHPU', 'PHPUnit Pack'));
 
-        $this->assertSame([$counts[0] + 21, $counts[1] + 21, $counts[2] + 1],
-            [$this->rowCount($client, 'card'), $this->rowCount($client, 'card_printing'), $this->rowCount($client, 'pack')]);
+        $this->assertSame(
+            [$counts[0] + 21, $counts[1] + 21, $counts[2] + 1],
+            [$this->rowCount($client, 'card'), $this->rowCount($client, 'card_printing'), $this->rowCount($client, 'pack')]
+        );
         $pack = $this->db($client)->fetchAssoc('SELECT p.name, p.position, p.size, p.date_release, y.code AS cycle FROM pack p JOIN cycle y ON y.id = p.cycle_id WHERE p.code = ?', ['PHPU']);
         $lastCycle = $this->db($client)->fetchColumn('SELECT code FROM cycle ORDER BY id DESC LIMIT 1');
         $this->assertSame(['name' => 'PHPUnit Pack', 'position' => '1', 'size' => '1', 'date_release' => '2030-02-01', 'cycle' => $lastCycle], $pack);
 
         $beorn = $this->fetchPrinting($client, 'PHPU', 'Beorn');
-        $this->assertSame(['993991', 'Hero', 'Tactics', '10', '1', 'Steven Shan', 'phpunit-2570109c-b9ed-4af5-9f26-4cb8712605c9'],
-            [$beorn['code'], $beorn['type'], $beorn['sphere'], $beorn['health'], $beorn['quantity'], $beorn['illustrator'], $beorn['octgnid']]);
+        $this->assertSame(
+            ['993991', 'Hero', 'Tactics', '10', '1', 'Steven Shan', 'phpunit-2570109c-b9ed-4af5-9f26-4cb8712605c9'],
+            [$beorn['code'], $beorn['type'], $beorn['sphere'], $beorn['health'], $beorn['quantity'], $beorn['illustrator'], $beorn['octgnid']]
+        );
         // the line break of the text is kept, the lines of the file are not mixed up
         $this->assertSame("Sentinel. Cannot have attachments. Immune to player card effects.\nBeorn does not exhaust to defend.", $beorn['text']);
     }

@@ -192,8 +192,11 @@ class CardStatsCalculatorTest extends KernelTestCase
     public function testCountingRules(): void
     {
         // cards: 1 Aragorn, 13 Guard of the Citadel, 14 Faramir, 20 Ever Vigilant, 985 (MotK) Faramir
-        $this->insertDeck(['date_creation' => '2023-05-10 12:00:00', 'date_update' => '2023-05-10 12:00:00'],
-            [1 => 1, 13 => 5, 985 => 1], [20 => 2]);
+        $this->insertDeck(
+            ['date_creation' => '2023-05-10 12:00:00', 'date_update' => '2023-05-10 12:00:00'],
+            [1 => 1, 13 => 5, 985 => 1],
+            [20 => 2]
+        );
         $this->insertDecklist(['date_creation' => '2023-05-20 12:00:00'], [13 => 2, 14 => 1]);
         // not counted: invalid deck, deck of another month, deck with an old last pack (limited)
         $this->insertDeck(['date_creation' => '2023-05-11 12:00:00', 'problem' => 'too_few_cards'], [1 => 1]);
@@ -267,7 +270,7 @@ class CardStatsCalculatorTest extends KernelTestCase
 
     public function testPrecomputeCommand(): void
     {
-        list($status, $display) = $this->runCommand(['month' => '2015-08', '--months' => '2']);
+        [$status, $display] = $this->runCommand(['month' => '2015-08', '--months' => '2']);
 
         $this->assertSame(0, $status);
         $this->assertContains("Computing 2015-08 ...\n", $display);
@@ -287,7 +290,7 @@ class CardStatsCalculatorTest extends KernelTestCase
 
     public function testPrecomputeCommandRefusesAnInvalidMonth(): void
     {
-        list($status, $display) = $this->runCommand(['month' => "2015-08' OR '1"]);
+        [$status, $display] = $this->runCommand(['month' => "2015-08' OR '1"]);
 
         $this->assertSame(1, $status);
         $this->assertContains("month must be YYYY-MM, got '2015-08' OR '1'", $display);

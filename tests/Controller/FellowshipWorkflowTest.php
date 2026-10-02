@@ -78,7 +78,7 @@ class FellowshipWorkflowTest extends WebTestCase
         }
         // fellowship 1 of the fixtures, if a test changed it
         if ($this->fellowshipOneState($connection) != $this->fixtureFellowship) {
-            list($fellowship, $decks, $decklists) = $this->fixtureFellowship;
+            [$fellowship, $decks, $decklists] = $this->fixtureFellowship;
             $connection->update('fellowship', $fellowship, ['id' => 1]);
             $connection->exec('DELETE FROM fellowship_deck WHERE fellowship_id = 1');
             $connection->exec('DELETE FROM fellowship_decklist WHERE fellowship_id = 1');

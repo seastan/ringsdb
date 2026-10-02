@@ -41,7 +41,7 @@ class CollectionTest extends WebTestCase
         $connection = $this->db($this->client);
         $connection->exec("DELETE FROM user_custom_pack_card WHERE custom_pack_id > {$this->maxIds['user_custom_pack']} OR id > {$this->maxIds['user_custom_pack_card']}");
         $connection->exec("DELETE FROM user_custom_pack WHERE id > {$this->maxIds['user_custom_pack']}");
-        list($pack, $cards) = $this->fixturePack;
+        [$pack, $cards] = $this->fixturePack;
         if (!$connection->fetchColumn('SELECT COUNT(*) FROM user_custom_pack WHERE id = 1')) {
             $connection->insert('user_custom_pack', $pack);
         } else {

@@ -35,9 +35,9 @@ class CollectionController extends AbstractController
             foreach (explode(',', $owned_packs) as $token) {
                 $token = trim($token);
                 if (preg_match('/^(\\d+):(\\d+)$/', $token, $m)) {
-                    $countById[$m[1]] = (isset($countById[$m[1]]) ? $countById[$m[1]] : 0) + (int) $m[2];
+                    $countById[$m[1]] = ($countById[$m[1]] ?? 0) + (int) $m[2];
                 } elseif (preg_match('/^(\\d+)(?:-\\d+)?$/', $token, $m)) {
-                    $countById[$m[1]] = (isset($countById[$m[1]]) ? $countById[$m[1]] : 0) + 1;
+                    $countById[$m[1]] = ($countById[$m[1]] ?? 0) + 1;
                 }
             }
         }

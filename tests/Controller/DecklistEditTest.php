@@ -149,8 +149,10 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame('/decklist/view/1/phpunitrenamed-1.0', $response->headers->get('Location'));
         $decklist = $this->fetchDecklist($client, 1);
-        $this->assertSame(['PHPUnit Renamed', 'phpunitrenamed-1.0', 'Now **bold**', '<p>Now <strong>bold</strong></p>', '2'],
-            [$decklist['name'], $decklist['name_canonical'], $decklist['description_md'], $decklist['description_html'], $decklist['precedent_decklist_id']]);
+        $this->assertSame(
+            ['PHPUnit Renamed', 'phpunitrenamed-1.0', 'Now **bold**', '<p>Now <strong>bold</strong></p>', '2'],
+            [$decklist['name'], $decklist['name_canonical'], $decklist['description_md'], $decklist['description_html'], $decklist['precedent_decklist_id']]
+        );
         $this->assertGreaterThan('2015-08-16 00:00:00', $decklist['date_update']);
 
         $crawler = $client->followRedirect();

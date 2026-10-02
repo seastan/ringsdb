@@ -90,7 +90,7 @@ class SuggestionsCommandTest extends KernelTestCase
     {
         $i = array_search($code1, $suggestions['index'], true);
         $j = array_search($code2, $suggestions['index'], true);
-        list($i, $j) = [max($i, $j), min($i, $j)];
+        [$i, $j] = [max($i, $j), min($i, $j)];
 
         return $suggestions['matrix'][$i][$j];
     }

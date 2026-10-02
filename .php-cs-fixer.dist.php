@@ -12,6 +12,7 @@ $finder = (new PhpCsFixer\Finder())
 return (new PhpCsFixer\Config())
     ->setRules([
         '@Symfony' => true,
+        '@PHP7x4Migration' => true,
     ])
     ->setFinder($finder)
 ;

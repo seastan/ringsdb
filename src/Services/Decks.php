@@ -344,12 +344,12 @@ class Decks
         // on the deck content
         if ($source_deck) {
             // compute diff between current content and saved content
-            list($listings) = $this->diff->diffContents([
+            [$listings] = $this->diff->diffContents([
                 $content['main'],
                 $source_deck->getSlots()->getContent(),
             ]);
 
-            list($sideListings) = $this->diff->diffContents([
+            [$sideListings] = $this->diff->diffContents([
                 $content['side'],
                 $source_deck->getSideslots()->getContent(),
             ]);

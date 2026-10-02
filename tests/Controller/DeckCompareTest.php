@@ -47,12 +47,16 @@ class DeckCompareTest extends WebTestCase
         $this->client = static::createClient();
         $connection = $this->db($this->client);
         $this->maxDeckId = (int) $connection->fetchColumn('SELECT MAX(id) FROM deck');
-        $this->deckA = $this->insertDeck('PHPUnit Deck A',
+        $this->deckA = $this->insertDeck(
+            'PHPUnit Deck A',
             [self::GIMLI => 1, self::LEGOLAS => 1, self::VETERAN_AXEHAND => 3, self::GONDORIAN_SPEARMAN => 2],
-            [self::FEINT => 2]);
-        $this->deckB = $this->insertDeck('PHPUnit Deck B',
+            [self::FEINT => 2]
+        );
+        $this->deckB = $this->insertDeck(
+            'PHPUnit Deck B',
             [self::GIMLI => 1, self::ARAGORN => 1, self::VETERAN_AXEHAND => 1, self::GUARD_OF_THE_CITADEL => 3],
-            [self::FEINT => 1, self::QUICK_STRIKE => 1]);
+            [self::FEINT => 1, self::QUICK_STRIKE => 1]
+        );
     }
 
     protected function tearDown(): void

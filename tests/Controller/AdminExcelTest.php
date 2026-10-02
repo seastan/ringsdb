@@ -129,8 +129,11 @@ class AdminExcelTest extends WebTestCase
         foreach ($changes as $row => $values) {
             foreach ($values as $column => $value) {
                 // PhpSpreadsheet columns start at 1
-                $sheet->setCellValueExplicit([(int) array_search($column, self::HEADER) + 1, $row], $value,
-                    is_int($value) ? DataType::TYPE_NUMERIC : DataType::TYPE_STRING);
+                $sheet->setCellValueExplicit(
+                    [(int) array_search($column, self::HEADER) + 1, $row],
+                    $value,
+                    is_int($value) ? DataType::TYPE_NUMERIC : DataType::TYPE_STRING
+                );
             }
         }
         IOFactory::createWriter($spreadsheet, 'Xlsx')->save($file);
@@ -184,12 +187,12 @@ class AdminExcelTest extends WebTestCase
         $client = $this->createAdminClient();
         $file = $this->download($client, 1);
 
-        list($response, $report) = $this->upload($client, $file);
+        [$response, $report] = $this->upload($client, $file);
         $this->assertSame('7 cards changed or added', $response);
         $this->assertContains('Legolas: field [text] changed; field [flavor] changed;', $report);
         $this->assertNotContains("\r", $this->db($client)->fetchColumn("SELECT text FROM card WHERE code = '01005'"));
 
-        list($response) = $this->upload($client, $file);
+        [$response] = $this->upload($client, $file);
         $this->assertSame('0 cards changed or added', $response);
     }
 
@@ -205,11 +208,11 @@ class AdminExcelTest extends WebTestCase
         copy(__DIR__.'/../Resources/fixtures/import/core-set.xlsx', $file);
         $this->assertSame(self::HEADER, self::rows($file)[0]);
 
-        list($response, $report) = $this->upload($client, $file);
+        [$response, $report] = $this->upload($client, $file);
         $this->assertSame('7 cards changed or added', $response);
         $this->assertContains('Legolas: field [text] changed; field [flavor] changed;', $report);
 
-        list($response) = $this->upload($client, $file);
+        [$response] = $this->upload($client, $file);
         $this->assertSame('0 cards changed or added', $response);
     }
 
@@ -221,12 +224,14 @@ class AdminExcelTest extends WebTestCase
 
         // Aragorn (row 2): new name, cost and sphere
         self::edit($file, [2 => ['name' => 'PHPUnit Aragorn', 'cost' => 4, 'sphere' => 'Tactics']]);
-        list($response, $report) = $this->upload($client, $file);
+        [$response, $report] = $this->upload($client, $file);
 
         $this->assertSame('1 cards changed or added', $response);
         $this->assertSame('PHPUnit Aragorn: association [sphere] changed; field [name] changed; field [cost] changed; ', $report);
-        $this->assertSame(['name' => 'PHPUnit Aragorn', 'cost' => '4', 'type' => 'Hero', 'sphere' => 'Tactics'],
-            array_diff_key($this->fetchCard($client, '01001'), ['text' => 0]));
+        $this->assertSame(
+            ['name' => 'PHPUnit Aragorn', 'cost' => '4', 'type' => 'Hero', 'sphere' => 'Tactics'],
+            array_diff_key($this->fetchCard($client, '01001'), ['text' => 0])
+        );
     }
 
     public function testUnknownCardsAreOnlyCreatedOnRequest(): void
@@ -238,11 +243,11 @@ class AdminExcelTest extends WebTestCase
         self::edit($file, [$row => ['type' => 'Ally', 'sphere' => 'Lore', 'position' => 999, 'code' => '99901', 'name' => 'PHPUnit Ally',
             'traits' => 'Test.', 'text' => 'Does nothing.', 'cost' => 2, 'willpower' => 1, 'attack' => 1, 'defense' => 1, 'health' => 2, 'deckLimit' => 3]]);
 
-        list($response) = $this->upload($client, $file);
+        [$response] = $this->upload($client, $file);
         $this->assertSame('0 cards changed or added', $response);
         $this->assertFalse($this->fetchCard($client, '99901'));
 
-        list($response) = $this->upload($client, $file, ['create' => '1']);
+        [$response] = $this->upload($client, $file, ['create' => '1']);
         $this->assertSame('1 cards changed or added', $response);
         $this->assertSame(['name' => 'PHPUnit Ally', 'cost' => '2', 'text' => 'Does nothing.', 'type' => 'Ally', 'sphere' => 'Lore'], $this->fetchCard($client, '99901'));
     }

@@ -64,7 +64,7 @@ class QuestlogWorkflowTest extends WebTestCase
             $connection->exec($sql);
         }
         if ($this->questlogOneState($connection) != $this->fixtureQuestlog) {
-            list($questlog, $decks) = $this->fixtureQuestlog;
+            [$questlog, $decks] = $this->fixtureQuestlog;
             $connection->update('questlog', $questlog, ['id' => 1]);
             $connection->exec('DELETE FROM questlog_deck WHERE questlog_id = 1');
             foreach ($decks as $row) {
@@ -173,7 +173,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $deck2 = $this->deckContent($client, 2);
 
         // 1. the form opened from 2 decks is prefilled with the player names
-        list($crawler, $form) = $this->newForm($client, '/questlog/new/0/1/2/0/0');
+        [$crawler, $form] = $this->newForm($client, '/questlog/new/0/1/2/0/0');
         $this->assertSame('Log a Quest · RingsDB', trim($crawler->filter('title')->text()));
         $this->assertSame('', self::field($form, 'questlog_id')->getValue());
         $this->assertSame('test', self::field($form, 'questlogdeck1_player_name')->getValue());
@@ -221,7 +221,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $this->assertSame('Journey Along the Anduin - Quest Log · RingsDB', trim($crawler->filter('title')->text()));
 
         // 2. edit: the form is prefilled; publish it, and log decklist 3 in slot 3 instead of deck 2
-        list($crawler, $form) = $this->newForm($client, "/questlog/edit/$id");
+        [$crawler, $form] = $this->newForm($client, "/questlog/edit/$id");
         $this->assertSame('Edit Quest Log · RingsDB', trim($crawler->filter('title')->text()));
         $this->assertSame((string) $id, self::field($form, 'questlog_id')->getValue());
         $this->assertSame('2', self::field($form, 'quest')->getValue());
@@ -287,7 +287,7 @@ class QuestlogWorkflowTest extends WebTestCase
     public function testLoggedContentIsKept(): void
     {
         $client = $this->createAuthenticatedClient();
-        list(, $form) = $this->newForm($client);
+        [, $form] = $this->newForm($client);
         $form['quest'] = '1';
         $played = json_encode(['main' => ['01001' => 1, '01013' => 3], 'side' => new \stdClass()]);
         self::selectDecks($form, [1 => [1, false, $played]]);
@@ -306,7 +306,7 @@ class QuestlogWorkflowTest extends WebTestCase
     public function testUnknownCardOfTheLoggedContentIsSkipped(): void
     {
         $client = $this->createAuthenticatedClient();
-        list(, $form) = $this->newForm($client);
+        [, $form] = $this->newForm($client);
         $form['quest'] = '1';
         $played = json_encode(['main' => ['01001' => 1, '99999' => 2], 'side' => ['99998' => 1]]);
         self::selectDecks($form, [1 => [1, false, $played]]);
@@ -321,7 +321,7 @@ class QuestlogWorkflowTest extends WebTestCase
     public function testInvalidValuesAreReplacedByDefaults(): void
     {
         $client = $this->createAuthenticatedClient();
-        list(, $form) = $this->newForm($client);
+        [, $form] = $this->newForm($client);
         $values = $form->getValues();
         $values['quest'] = '1';
         $values['difficulty'] = 'legendary';
@@ -341,7 +341,7 @@ class QuestlogWorkflowTest extends WebTestCase
     public function testQuestlogWithoutDeckIsRefused(): void
     {
         $client = $this->createAuthenticatedClient();
-        list(, $form) = $this->newForm($client);
+        [, $form] = $this->newForm($client);
         $form['quest'] = '1';
         self::selectDecks($form, []);
         $client->submit($form);
@@ -353,7 +353,7 @@ class QuestlogWorkflowTest extends WebTestCase
     public function testDeckWithoutContentIsRefused(): void
     {
         $client = $this->createAuthenticatedClient();
-        list(, $form) = $this->newForm($client);
+        [, $form] = $this->newForm($client);
         $form['quest'] = '1';
         self::selectDecks($form, [1 => [1, false, '']]);
         $client->submit($form);
@@ -366,7 +366,7 @@ class QuestlogWorkflowTest extends WebTestCase
     public function testUnknownScenarioIsRefused(): void
     {
         $client = $this->createAuthenticatedClient();
-        list(, $form) = $this->newForm($client);
+        [, $form] = $this->newForm($client);
         $values = $form->getValues();
         $values['quest'] = '9999';
         $values['deck1_id'] = '1';
@@ -383,7 +383,7 @@ class QuestlogWorkflowTest extends WebTestCase
     public function testContentWithoutDeckIsDropped(): void
     {
         $client = $this->createAuthenticatedClient();
-        list(, $form) = $this->newForm($client);
+        [, $form] = $this->newForm($client);
         $form['quest'] = '1';
         self::selectDecks($form, [1 => [1, false, $this->deckContent($client, 1)], 2 => [0, false, $this->deckContent($client, 2)]]);
         $client->submit($form);
@@ -401,7 +401,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $this->db($client)->update('questlog', ['nb_favorites' => 1], ['id' => 1]);
         $decks = $this->fetchQuestlogDecks($client, 1);
 
-        list($crawler, $form) = $this->newForm($client, '/questlog/edit/1');
+        [$crawler, $form] = $this->newForm($client, '/questlog/edit/1');
         $this->assertTrue(self::field($form, 'public')->isDisabled());
         $form['name'] = 'PHPUnit Renamed';
         self::selectDecks($form, [1 => [4, false, $this->deckContent($client, 4)]]);
@@ -418,7 +418,7 @@ class QuestlogWorkflowTest extends WebTestCase
     public function testUsingAnotherUsersDeckRequiresSharing(): void
     {
         $client = $this->createAuthenticatedClient('admin');
-        list(, $form) = $this->newForm($client);
+        [, $form] = $this->newForm($client);
         $form['quest'] = '1';
         self::selectDecks($form, [1 => [1, false, $this->deckContent($client, 1)]]);
 
@@ -439,7 +439,7 @@ class QuestlogWorkflowTest extends WebTestCase
     public function testPrivateQuestlogVisibility(): void
     {
         $client = $this->createAuthenticatedClient();
-        list(, $form) = $this->newForm($client);
+        [, $form] = $this->newForm($client);
         $form['quest'] = '1';
         $form['name'] = 'PHPUnit Private';
         self::selectDecks($form, [1 => [1, false, $this->deckContent($client, 1)]]);
@@ -477,7 +477,7 @@ class QuestlogWorkflowTest extends WebTestCase
     public function testDeleteQuestlog(): void
     {
         $client = $this->createAuthenticatedClient();
-        list(, $form) = $this->newForm($client);
+        [, $form] = $this->newForm($client);
         $form['quest'] = '1';
         self::selectDecks($form, [1 => [1, false, $this->deckContent($client, 1)]]);
         $client->submit($form);
@@ -510,7 +510,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $client = $this->createAuthenticatedClient();
         $ids = [];
         foreach ([1, 2] as $deckId) {
-            list(, $form) = $this->newForm($client);
+            [, $form] = $this->newForm($client);
             $form['quest'] = '1';
             self::selectDecks($form, [1 => [$deckId, false, $this->deckContent($client, $deckId)]]);
             $client->submit($form);
