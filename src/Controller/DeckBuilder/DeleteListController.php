@@ -30,7 +30,7 @@ class DeleteListController extends AbstractController
     /**
      * @Route("/deck/delete_list", name="deck_delete_list", methods={"POST"})
      */
-    public function deleteListAction(Request $request): RedirectResponse
+    public function __invoke(Request $request): RedirectResponse
     {
         $list_id = explode('-', $request->get('ids'));
         foreach ($list_id as $id) {

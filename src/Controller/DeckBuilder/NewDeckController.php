@@ -24,7 +24,7 @@ class NewDeckController extends AbstractController
     /**
      * @Route("/deck/new", name="deck_buildform", methods={"GET"})
      */
-    public function newAction(): RedirectResponse
+    public function __invoke(): RedirectResponse
     {
         /* @var $deck \App\Entity\Deck */
         $deck = new Deck();

@@ -23,19 +23,22 @@ class AutosaveController extends AbstractController
 
     private DeckRepository $deckRepository;
     private EntityManagerInterface $entityManager;
+    private LoggerInterface $logger;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        DeckRepository $deckRepository
+        DeckRepository $deckRepository,
+        LoggerInterface $logger
     ) {
         $this->entityManager = $entityManager;
         $this->deckRepository = $deckRepository;
+        $this->logger = $logger;
     }
 
     /**
      * @Route("/deck/autosave", name="deck_autosave", methods={"POST"})
      */
-    public function autosaveAction(Request $request, LoggerInterface $logger): Response
+    public function __invoke(Request $request): Response
     {
         /* @var $user User */
         $user = $this->currentUser();
@@ -51,7 +54,7 @@ class AutosaveController extends AbstractController
         // decoded as arrays: count() of an object is a warning since PHP 7.2
         $diff = json_decode((string) $request->get('diff'), true);
         if (!is_array($diff) || 4 != count($diff) && 2 != count($diff)) {
-            $logger->error('cannot use diff', (array) $diff);
+            $this->logger->error('cannot use diff', (array) $diff);
             throw new UnprocessableEntityHttpException('Wrong content '.json_encode($diff));
         }
         // [main added, main removed, side added, side removed], the side parts may be missing

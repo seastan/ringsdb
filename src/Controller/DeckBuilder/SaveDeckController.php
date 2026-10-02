@@ -38,7 +38,7 @@ class SaveDeckController extends AbstractController
     /**
      * @Route("/deck/save", name="deck_save", methods={"POST"})
      */
-    public function saveAction(Request $request): Response
+    public function __invoke(Request $request): Response
     {
         /* @var $user User */
         $user = $this->currentUser();

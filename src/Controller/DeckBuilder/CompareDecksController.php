@@ -15,11 +15,14 @@ use Symfony\Component\Routing\Annotation\Route;
 class CompareDecksController extends AbstractController
 {
     private DeckRepository $deckRepository;
+    private Diff $diffService;
 
     public function __construct(
-        DeckRepository $deckRepository
+        DeckRepository $deckRepository,
+        Diff $diffService
     ) {
         $this->deckRepository = $deckRepository;
+        $this->diffService = $diffService;
     }
 
     /**
@@ -30,7 +33,7 @@ class CompareDecksController extends AbstractController
      *     requirements={"deck1_id"="\d+", "deck2_id"="\d+"}
      * )
      */
-    public function compareAction($deck1_id, $deck2_id, Diff $diffService): Response
+    public function __invoke($deck1_id, $deck2_id): Response
     {
         /* @var $deck1 \App\Entity\Deck */
         $deck1 = $this->deckRepository->find($deck1_id);
@@ -48,6 +51,30 @@ class CompareDecksController extends AbstractController
             throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
         }
 
-        return $this->render('Compare/deck_compare.html.twig', ['deck1' => $deck1, 'deck2' => $deck2, 'hero_deck' => $diffService->compareSlots([$deck1->getSlots()->getHeroDeck(), $deck2->getSlots()->getHeroDeck()]), 'draw_deck' => $diffService->compareSlots([$deck1->getSlots()->getDrawDeck(), $deck2->getSlots()->getDrawDeck()]), 'sideboard' => $diffService->compareSlots([$deck1->getSideSlots(), $deck2->getSideSlots()])]);
+        $heroDeck = $this->diffService->compareSlots([
+            $deck1->getSlots()->getHeroDeck(),
+            $deck2->getSlots()->getHeroDeck(),
+        ]);
+
+        $drawDeck = $this->diffService->compareSlots([
+            $deck1->getSlots()->getDrawDeck(),
+            $deck2->getSlots()->getDrawDeck(),
+        ]);
+
+        $sideboard = $this->diffService->compareSlots([
+            $deck1->getSideSlots(),
+            $deck2->getSideSlots(),
+        ]);
+
+        return $this->render(
+            'Compare/deck_compare.html.twig',
+            [
+                'deck1' => $deck1,
+                'deck2' => $deck2,
+                'hero_deck' => $heroDeck,
+                'draw_deck' => $drawDeck,
+                'sideboard' => $sideboard,
+            ]
+        );
     }
 }

@@ -31,7 +31,7 @@ class DeleteDeckController extends AbstractController
     /**
      * @Route("/deck/delete", name="deck_delete", methods={"POST"})
      */
-    public function deleteAction(Request $request): RedirectResponse
+    public function __invoke(Request $request): RedirectResponse
     {
         $deck_id = filter_var($request->get('deck_id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $deck \App\Entity\Deck */

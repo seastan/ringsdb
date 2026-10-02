@@ -26,7 +26,7 @@ class ListDecksController extends AbstractController
     /**
      * @Route("/decks", name="decks_list", methods={"GET"})
      */
-    public function listAction(Request $request): Response
+    public function __invoke(Request $request): Response
     {
         /* @var $user User */
         $user = $this->currentUser();

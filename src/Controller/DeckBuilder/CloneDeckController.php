@@ -23,7 +23,7 @@ class CloneDeckController extends AbstractController
     /**
      * @Route("/deck/clone/{deck_id}", name="deck_clone", methods={"GET"}, requirements={"deck_id"="\d+"})
      */
-    public function cloneAction($deck_id): Response
+    public function __invoke($deck_id): Response
     {
         /* @var $deck \App\Entity\Deck */
         $deck = $this->deckRepository->find($deck_id);
@@ -42,6 +42,6 @@ class CloneDeckController extends AbstractController
             $content['side'][$slot->getCard()->getCode()] = $slot->getQuantity();
         }
 
-        return $this->forward(SaveDeckController::class.'::saveAction', ['name' => $deck->getName().' (clone)', 'content' => json_encode($content), 'decklist_id' => $deck->getParent() ? $deck->getParent()->getId() : null]);
+        return $this->forward(SaveDeckController::class, ['name' => $deck->getName().' (clone)', 'content' => json_encode($content), 'decklist_id' => $deck->getParent() ? $deck->getParent()->getId() : null]);
     }
 }

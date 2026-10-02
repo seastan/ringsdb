@@ -36,7 +36,7 @@ class AjaxSaveController extends AbstractController
     /**
      * @Route("/deck/save-ajax", name="deck_save_ajax", methods={"POST"})
      */
-    public function saveAjaxAction(Request $request): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
         /* @var $user User */
         $user = $this->currentUser();

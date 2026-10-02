@@ -33,7 +33,7 @@ class ImportAllController extends AbstractController
     /**
      * @Route("/deck/import/all", name="decks_upload_all", methods={"POST"})
      */
-    public function uploadallAction(Request $request): RedirectResponse
+    public function __invoke(Request $request): RedirectResponse
     {
         // time-consuming task
         ini_set('max_execution_time', '300');

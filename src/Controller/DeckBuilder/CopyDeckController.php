@@ -24,7 +24,7 @@ class CopyDeckController extends AbstractController
     /**
      * @Route("/deck/copy/{decklist_id}", name="deck_copy", requirements={"decklist_id"="\d+"})
      */
-    public function copyAction($decklist_id): Response
+    public function __invoke($decklist_id): Response
     {
         /* @var $decklist Decklist */
         $decklist = $this->decklistRepository->find($decklist_id);
@@ -39,6 +39,6 @@ class CopyDeckController extends AbstractController
             $content['side'][$slot->getCard()->getCode()] = $slot->getQuantity();
         }
 
-        return $this->forward(SaveDeckController::class.'::saveAction', ['name' => $decklist->getName(), 'content' => json_encode($content), 'decklist_id' => $decklist_id]);
+        return $this->forward(SaveDeckController::class, ['name' => $decklist->getName(), 'content' => json_encode($content), 'decklist_id' => $decklist_id]);
     }
 }

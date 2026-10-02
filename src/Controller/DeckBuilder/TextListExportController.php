@@ -25,7 +25,7 @@ class TextListExportController extends AbstractController
     /**
      * @Route("/deck/export/text/list", name="deck_export_text_list", methods={"GET"})
      */
-    public function textexportListAction(Request $request): Response
+    public function __invoke(Request $request): Response
     {
         $list_id = $request->get('ids');
 

@@ -21,7 +21,7 @@ class ImportDeckController extends AbstractController
     /**
      * @Route("/deck/import", name="deck_import", methods={"GET"})
      */
-    public function importAction(): Response
+    public function __invoke(): Response
     {
         $response = new Response();
         $response->setPublic();

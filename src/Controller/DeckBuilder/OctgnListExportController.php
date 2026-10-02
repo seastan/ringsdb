@@ -25,7 +25,7 @@ class OctgnListExportController extends AbstractController
     /**
      * @Route("/deck/export/octgn/list", name="deck_export_octgn_list", methods={"GET"})
      */
-    public function octgnexportListAction(Request $request): Response
+    public function __invoke(Request $request): Response
     {
         $list_id = $request->get('ids');
 

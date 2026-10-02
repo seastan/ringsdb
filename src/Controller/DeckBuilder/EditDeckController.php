@@ -26,7 +26,7 @@ class EditDeckController extends AbstractController
     /**
      * @Route("/deck/edit/{deck_id}", name="deck_edit", methods={"GET"}, requirements={"deck_id"="\d+"})
      */
-    public function editAction($deck_id): Response
+    public function __invoke($deck_id): Response
     {
         /* @var $deck \App\Entity\Deck */
         $deck = $this->deckRepository->find($deck_id);

@@ -34,7 +34,7 @@ class TextDeckExportController extends AbstractController
      *     requirements={"deck_id"="\d+"}
      * )
      */
-    public function textexportAction($deck_id): Response
+    public function __invoke($deck_id): Response
     {
         /* @var $deck \App\Entity\Deck */
         $deck = $this->deckRepository->find($deck_id);

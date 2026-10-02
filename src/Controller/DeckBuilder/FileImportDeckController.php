@@ -23,7 +23,7 @@ class FileImportDeckController extends AbstractController
     /**
      * @Route("/deck/fileimport", name="deck_fileimport", methods={"POST"})
      */
-    public function fileimportAction(Request $request): Response
+    public function __invoke(Request $request): Response
     {
         $filetype = filter_var($request->get('type'), FILTER_SANITIZE_STRING);
         $uploadedFile = $request->files->get('upfile');
@@ -49,6 +49,6 @@ class FileImportDeckController extends AbstractController
             $parse = $this->deckImporter->parseTextImport(file_get_contents($filename));
         }
 
-        return $this->forward(SaveDeckController::class.'::saveAction', ['name' => str_replace(".{$origext}", '', $origname), 'content' => json_encode($parse['content']), 'description' => $parse['description']]);
+        return $this->forward(SaveDeckController::class, ['name' => str_replace(".{$origext}", '', $origname), 'content' => json_encode($parse['content']), 'description' => $parse['description']]);
     }
 }
