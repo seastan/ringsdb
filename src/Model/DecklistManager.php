@@ -376,8 +376,8 @@ class DecklistManager
 
         $useCustomPacks = !empty($customPackCodes) && $this->user;
 
-        if (!empty($cards_code) || !empty($packs) || $useCustomPacks) {
-            if (!empty($cards_code)) {
+        if (count($cards_code) > 0 || count($packs) > 0 || $useCustomPacks) {
+            if ($cards_code > 0) {
                 foreach ($cards_code as $i => $card_code) {
                     /* @var $card \App\Entity\Card */
                     $card = $this->cardRepository->findOneBy(['code' => $card_code]);
@@ -391,7 +391,7 @@ class DecklistManager
                     // $packs[] = $card->getPack()->getId();
                 }
             }
-            if (!empty($packs) || $useCustomPacks) {
+            if (count($packs) > 0 || $useCustomPacks) {
                 // A decklist matches iff every slot's card can be supplied in sufficient
                 // quantity by the allowed official packs OR by the user's custom packs.
                 $cores = max(1, (int) $numcores);
@@ -410,7 +410,7 @@ class DecklistManager
                 // card than exist in total (unbuildable with any collection anyway) are no longer
                 // filtered out — this keeps the short-circuit table-free with no per-request scan.
                 $skipBuildable = false;
-                if (!empty($packs) && !$useCustomPacks) {
+                if (count($packs) > 0 && !$useCustomPacks) {
                     $packsWithCards = array_map('intval', $this->doctrine->getConnection()
                         ->executeQuery('SELECT DISTINCT pack_id FROM card_printing')
                         ->fetchAll(\PDO::FETCH_COLUMN));
@@ -432,7 +432,7 @@ class DecklistManager
                     // Custom-only: same nested NOT EXISTS but with official_copies = 0, expressed
                     //   as ucpc.quantity >= s.quantity (left-side arithmetic becomes s.quantity - ucpc.quantity <= 0).
                     $officialSubquery = '';
-                    if (!empty($packs)) {
+                    if (count($packs) > 0) {
                         $officialSubquery =
                             '(SELECT COALESCE(SUM(CASE WHEN cp.pack = 1 THEN cp.quantity * :numcores ELSE cp.quantity END), 0) '.
                             'FROM App:CardPrinting cp '.
@@ -446,7 +446,7 @@ class DecklistManager
                         $qb->setParameter('customPackUser', $this->user);
                     }
 
-                    if (!empty($packs) && $useCustomPacks) {
+                    if (count($packs) > 0 && $useCustomPacks) {
                         // Inner version of the official subquery uses alias cp2 so it doesn't
                         // collide with cp from the outer official-check occurrence.
                         $officialSubquery2 = str_replace(
@@ -469,7 +469,7 @@ class DecklistManager
                                 'AND ucp.user = :customPackUser '.
                                 'AND CASE WHEN s.quantity >= ucpc.quantity THEN s.quantity - ucpc.quantity ELSE 0 END <= '.$officialSubquery2.
                             ')';
-                    } elseif (!empty($packs)) {
+                    } elseif (count($packs) > 0) {
                         $uncoveredCondition = 's.quantity > '.$officialSubquery;
                     } else {
                         // Custom-only: custom pack must fully supply the slot on its own.
@@ -492,7 +492,7 @@ class DecklistManager
                     );
                 }
             }
-            if (!empty($cards_to_exclude)) {
+            if (count($cards_to_exclude) > 0) {
                 $sub = $this->doctrine->createQueryBuilder();
                 $sub->select('k');
                 $sub->from('App:Card', 'k');

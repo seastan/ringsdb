@@ -312,11 +312,11 @@ class FellowshipManager
 
         $useCustomPacks = !empty($customPackCodes) && $this->user;
 
-        if (!empty($cards_code) || !empty($packs) || $useCustomPacks) {
+        if (count($cards_code) > 0 || count($packs) > 0 || $useCustomPacks) {
             $qb->innerJoin('d.decklists', 'l');
             $qb->innerJoin('l.decklist', 'ld');
 
-            if (!empty($cards_code)) {
+            if (count($cards_code) > 0) {
                 foreach ($cards_code as $i => $card_code) {
                     /* @var $card \App\Entity\Card */
                     $card = $this->cardRepository->findOneBy(['code' => $card_code]);
@@ -331,7 +331,7 @@ class FellowshipManager
                     // $packs[] = $card->getPack()->getId();
                 }
             }
-            if (!empty($packs) || $useCustomPacks) {
+            if (count($packs) > 0 || $useCustomPacks) {
                 // A card is "not covered" if it has no printing in the official allowed
                 // packs AND is not present in any selected custom pack.
                 $sub = $this->doctrine->createQueryBuilder();
@@ -340,7 +340,7 @@ class FellowshipManager
                 $sub->innerJoin('App:Decklistslot', 's', 'WITH', 's.card = c');
                 $sub->where('s.decklist = ld');
 
-                if (!empty($packs)) {
+                if (count($packs) > 0) {
                     $sub->andWhere('NOT EXISTS (SELECT cpfm.id FROM App:CardPrinting cpfm WHERE cpfm.card = c AND cpfm.pack IN (:fm_packs))');
                     $qb->setParameter('fm_packs', $packs);
                 }

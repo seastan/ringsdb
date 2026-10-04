@@ -294,11 +294,11 @@ class QuestLogManager
 
         $useCustomPacks = !empty($customPackCodes) && $this->user;
 
-        if (!empty($cards_code) || !empty($packs) || $useCustomPacks) {
+        if (count($cards_code) > 0 || count($packs) > 0 || $useCustomPacks) {
             $qb->innerJoin('d.decks', 'l');
             $qb->innerJoin('l.deck', 'ld');
 
-            if (!empty($cards_code)) {
+            if (count($cards_code) > 0) {
                 foreach ($cards_code as $i => $card_code) {
                     /* @var $card Card */
                     $card = $this->cardRepository->findOneBy(['code' => $card_code]);
@@ -313,14 +313,14 @@ class QuestLogManager
                     // $packs[] = $card->getPack()->getId();
                 }
             }
-            if (!empty($packs) || $useCustomPacks) {
+            if (count($packs) > 0 || $useCustomPacks) {
                 $sub = $this->doctrine->createQueryBuilder();
                 $sub->select('c');
                 $sub->from('App:Card', 'c');
                 $sub->innerJoin('App:Deckslot', 's', 'WITH', 's.card = c');
                 $sub->where('s.deck = ld');
 
-                if (!empty($packs)) {
+                if (count($packs) > 0) {
                     $sub->andWhere('NOT EXISTS (SELECT cpqlm.id FROM App:CardPrinting cpqlm WHERE cpqlm.card = c AND cpqlm.pack IN (:qlm_packs))');
                     $qb->setParameter('qlm_packs', $packs);
                 }
