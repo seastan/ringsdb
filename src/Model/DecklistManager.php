@@ -377,7 +377,7 @@ class DecklistManager
         $useCustomPacks = !empty($customPackCodes) && $this->user;
 
         if (count($cards_code) > 0 || count($packs) > 0 || $useCustomPacks) {
-            if ($cards_code > 0) {
+            if (count($cards_code) > 0) {
                 foreach ($cards_code as $i => $card_code) {
                     /* @var $card \App\Entity\Card */
                     $card = $this->cardRepository->findOneBy(['code' => $card_code]);

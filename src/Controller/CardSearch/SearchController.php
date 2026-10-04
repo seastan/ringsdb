@@ -184,7 +184,7 @@ class SearchController extends AbstractController
             $val = $request->query->get($key);
             if (isset($val) && '' != $val) {
                 if (is_array($val)) {
-                    if ('sphere' == $searchName && count($val) == count($spheres)) {
+                    if ('sphere' === $searchName && count($val) === count($spheres)) {
                         continue;
                     }
                     $params[] = $key.':'.implode('|', array_map(fn ($s) => false !== strstr($s, ' ') ? "\"{$s}\"" : $s, $val));
