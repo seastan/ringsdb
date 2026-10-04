@@ -148,8 +148,7 @@ class SaveFellowshipController extends AbstractController
             }
             $fellowship->setNbDecks($nb_decks);
         }
-        // BUG, pinned by the tests (see MIGRATION.md, "Fellowships"): a collection is never empty()
-        if ($auto_publish && empty($fellowship->getDecks())) {
+        if ($auto_publish && $fellowship->getDecks()->isEmpty()) {
             $fellowship->setIsPublic(true);
             $fellowship->setDatePublish(new \DateTime());
         }

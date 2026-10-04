@@ -102,8 +102,8 @@ class ListDecklistController extends AbstractController
     private function searchForm(Request $request): string
     {
         $dbh = $this->getDoctrine()->getConnection();
-        $cards_code = $request->query->get('cards');
-        $cards_to_exclude = $request->query->get('cards_to_exclude');
+        $cards_code = $request->query->all('cards');
+        $cards_to_exclude = $request->query->all('cards_to_exclude');
         $sphere_code = filter_var($request->query->get('sphere'), FILTER_SANITIZE_STRING);
         $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
         $decklist_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
@@ -114,8 +114,8 @@ class ListDecklistController extends AbstractController
         $numcores = $request->query->get('numcores');
         $require_description = $request->query->get('require_description');
         $sort = $request->query->get('sort');
-        $packs = $request->query->get('packs');
-        if (!is_array($packs)) {
+        $packs = $request->query->all('packs');
+        if (0 === count($packs)) {
             $packs = $dbh->executeQuery('SELECT id FROM pack')->fetchAll(\PDO::FETCH_COLUMN);
         }
         $categories = [];
@@ -156,14 +156,14 @@ class ListDecklistController extends AbstractController
         $params['sort_'.$sort] = ' selected="selected"';
         $params['spheres'] = $dbh->executeQuery("SELECT\n                s.name,\n                s.code\n                FROM sphere s\n                ORDER BY s.name ASC")->fetchAll();
         $params['sphere_selected'] = $sphere_code;
-        if (!empty($cards_code) && is_array($cards_code)) {
+        if (count($cards_code) > 0) {
             $cards = $dbh->executeQuery("SELECT\n    \t\t\t\tc.name,\n    \t\t\t\tc.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card c\n                    INNER JOIN sphere s ON s.id = c.sphere_id\n                    INNER JOIN type t ON t.id = c.type_id\n                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 JOIN pack pp ON pp.id = cp2.pack_id WHERE cp2.card_id = c.id ORDER BY (pp.date_release IS NULL), pp.date_release, cp2.position, cp2.id LIMIT 1)\n                    INNER JOIN pack p ON p.id = cpr.pack_id\n                    WHERE c.code IN (?)\n    \t\t\t\tORDER BY c.code DESC", [$cards_code], [Connection::PARAM_INT_ARRAY])->fetchAll();
             $params['cards'] = '';
             foreach ($cards as $card) {
                 $params['cards'] .= $this->renderView('Search/card.html.twig', $card);
             }
         }
-        if (!empty($cards_to_exclude) && is_array($cards_to_exclude)) {
+        if (count($cards_to_exclude) > 0) {
             $cards_to_exclude = $dbh->executeQuery("SELECT\n    \t\t\t\tk.name,\n    \t\t\t\tk.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card k\n                    INNER JOIN sphere s ON s.id = k.sphere_id\n                    INNER JOIN type t ON t.id = k.type_id\n                    INNER JOIN card_printing kpr ON kpr.id = (SELECT cp2.id FROM card_printing cp2 JOIN pack pp ON pp.id = cp2.pack_id WHERE cp2.card_id = k.id ORDER BY (pp.date_release IS NULL), pp.date_release, cp2.position, cp2.id LIMIT 1)\n                    INNER JOIN pack p ON p.id = kpr.pack_id\n                    WHERE k.code IN (?)\n    \t\t\t\tORDER BY k.code DESC", [$cards_to_exclude], [Connection::PARAM_INT_ARRAY])->fetchAll();
             $params['cards_to_exclude'] = '';
             foreach ($cards_to_exclude as $card_to_exclude) {

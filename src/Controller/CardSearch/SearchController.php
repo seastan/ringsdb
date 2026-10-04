@@ -6,7 +6,6 @@ namespace App\Controller\CardSearch;
 
 use App\Entity\Cycle;
 use App\Entity\Pack;
-use App\Repository\CardPrintingRepository;
 use App\Repository\CardRepository;
 use App\Repository\CycleRepository;
 use App\Repository\PackRepository;
@@ -38,10 +37,6 @@ class SearchController extends AbstractController
      */
     private $publisherName;
     /**
-     * @var CardPrintingRepository
-     */
-    private $cardPrintingRepository;
-    /**
      * @var CycleRepository
      */
     private $cycleRepository;
@@ -54,13 +49,12 @@ class SearchController extends AbstractController
      */
     private $sphereRepository;
 
-    public function __construct(CardsData $cardsData, int $cacheExpiration, ?string $gameName, ?string $publisherName, CardPrintingRepository $cardPrintingRepository, CycleRepository $cycleRepository, PackRepository $packRepository, SphereRepository $sphereRepository)
+    public function __construct(CardsData $cardsData, int $cacheExpiration, ?string $gameName, ?string $publisherName, CycleRepository $cycleRepository, PackRepository $packRepository, SphereRepository $sphereRepository)
     {
         $this->cardsData = $cardsData;
         $this->cacheExpiration = $cacheExpiration;
         $this->gameName = $gameName;
         $this->publisherName = $publisherName;
-        $this->cardPrintingRepository = $cardPrintingRepository;
         $this->cycleRepository = $cycleRepository;
         $this->packRepository = $packRepository;
         $this->sphereRepository = $sphereRepository;
@@ -181,27 +175,28 @@ class SearchController extends AbstractController
             $params[] = $request->query->get('q');
         }
         foreach (SearchController::$searchKeys as $key => $searchName) {
+            if ('sphere' === $searchName) {
+                $val = $request->query->all($key);
+                if (count($val) > 0 && count($val) < count($spheres)) {
+                    $params[] = $key.':'.implode('|', array_map(fn ($s) => false !== strstr($s, ' ') ? "\"{$s}\"" : $s, $val));
+                }
+                continue;
+            }
+
             $val = $request->query->get($key);
             if (isset($val) && '' != $val) {
-                if (is_array($val)) {
-                    if ('sphere' === $searchName && count($val) === count($spheres)) {
-                        continue;
-                    }
-                    $params[] = $key.':'.implode('|', array_map(fn ($s) => false !== strstr($s, ' ') ? "\"{$s}\"" : $s, $val));
+                if ('date_release' == $searchName) {
+                    $op = '';
                 } else {
-                    if ('date_release' == $searchName) {
-                        $op = '';
-                    } else {
-                        if (!preg_match('/^[\\p{L}\\p{N}\\_\\-\\&]+$/u', $val, $match)) {
-                            $val = "\"{$val}\"";
-                        }
-                        $op = $request->query->get($key.'o');
-                        if (!in_array($op, $operators)) {
-                            $op = ':';
-                        }
+                    if (!preg_match('/^[\\p{L}\\p{N}\\_\\-\\&]+$/u', $val, $match)) {
+                        $val = "\"{$val}\"";
                     }
-                    $params[] = "{$key}{$op}{$val}";
+                    $op = $request->query->get($key.'o');
+                    if (!in_array($op, $operators)) {
+                        $op = ':';
+                    }
                 }
+                $params[] = "{$key}{$op}{$val}";
             }
         }
         $find = ['q' => implode(' ', $params)];

@@ -9,7 +9,6 @@ use App\Entity\Scenario;
 use App\Entity\User;
 use App\Repository\QuestlogRepository;
 use App\Repository\ScenarioRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -20,16 +19,13 @@ class EditQuestlogController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private EntityManagerInterface $entityManager;
     private QuestlogRepository $questlogRepository;
     private ScenarioRepository $scenarioRepository;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
         QuestlogRepository $questlogRepository,
         ScenarioRepository $scenarioRepository
     ) {
-        $this->entityManager = $entityManager;
         $this->questlogRepository = $questlogRepository;
         $this->scenarioRepository = $scenarioRepository;
     }

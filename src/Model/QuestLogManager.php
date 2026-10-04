@@ -255,22 +255,16 @@ class QuestLogManager
     {
         $request = $this->currentRequest();
 
-        $cards_code = $request->query->get('cards');
-        if (!is_array($cards_code)) {
-            $cards_code = [];
-        }
+        $cards_code = $request->query->all('cards');
 
         $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
         $questlog_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
         $nb_decks = intval(filter_var($request->query->get('nb_decks'), FILTER_SANITIZE_NUMBER_INT));
 
         $sort = $request->query->get('sort');
-        $packs = $request->query->get('packs');
-        if (!is_array($packs)) {
-            $packs = [];
-        }
+        $packs = $request->query->all('packs');
 
-        $customPackCodes = array_values(array_filter((array) $request->query->get('custom_packs', []), 'is_string'));
+        $customPackCodes = array_values(array_filter($request->query->all('custom_packs'), 'is_string'));
 
         $qb = $this->getQueryBuilder();
         $joinTables = [];

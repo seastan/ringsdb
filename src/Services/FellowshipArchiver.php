@@ -31,9 +31,6 @@ class FellowshipArchiver
 
     public function downloadFromSelection(User $user, $fellowship_id, $octgn): Response
     {
-        if (!$user) {
-            throw new AccessDeniedHttpException('You must be logged in for this operation.');
-        }
         /* @var $fellowship \App\Entity\Fellowship */
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
         if (!$fellowship) {

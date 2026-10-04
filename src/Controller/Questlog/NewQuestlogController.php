@@ -9,9 +9,7 @@ use App\Entity\Questlog;
 use App\Entity\Scenario;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
-use App\Repository\QuestlogRepository;
 use App\Repository\ScenarioRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,22 +18,16 @@ class NewQuestlogController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private EntityManagerInterface $entityManager;
     private ScenarioRepository $scenarioRepository;
-    private QuestlogRepository $questlogRepository;
     private DecklistRepository $decklistRepository;
     private DeckRepository $deckRepository;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
         ScenarioRepository $scenarioRepository,
-        QuestlogRepository $questlogRepository,
         DecklistRepository $decklistRepository,
         DeckRepository $deckRepository
     ) {
-        $this->entityManager = $entityManager;
         $this->scenarioRepository = $scenarioRepository;
-        $this->questlogRepository = $questlogRepository;
         $this->decklistRepository = $decklistRepository;
         $this->deckRepository = $deckRepository;
     }

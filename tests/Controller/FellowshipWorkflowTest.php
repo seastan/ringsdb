@@ -281,11 +281,7 @@ class FellowshipWorkflowTest extends WebTestCase
         $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM decklist WHERE id > ?', [$this->maxIds['decklist']]));
     }
 
-    /**
-     * BUG: "Save and Publish" (auto_publish) never publishes: saveAction tests
-     * empty($fellowship->getDecks()), and a Doctrine collection is never empty().
-     */
-    public function testSaveAndPublishDoesNotPublish(): void
+    public function testSaveAndPublishDoesPublish(): void
     {
         $client = $this->createAuthenticatedClient();
         $crawler = $client->request('GET', '/fellowship/new/0/0/0/0');
@@ -298,7 +294,7 @@ class FellowshipWorkflowTest extends WebTestCase
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $id = (int) substr(self::location($client->getResponse()), strlen('/fellowship/view/'));
         $fellowship = $this->fetchFellowship($client, $id);
-        $this->assertSame(['0', '0'], [$fellowship['is_public'], $fellowship['published']]);
+        $this->assertSame(['1', '1'], [$fellowship['is_public'], $fellowship['published']]);
     }
 
     public function testHeroConflictsPreventPublishing(): void

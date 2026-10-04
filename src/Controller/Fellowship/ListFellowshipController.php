@@ -98,15 +98,15 @@ class ListFellowshipController extends AbstractController
     private function searchForm(Request $request): string
     {
         $dbh = $this->getDoctrine()->getConnection();
-        $cards_code = $request->query->get('cards');
+        $cards_code = $request->query->all('cards');
         $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
         $fellowship_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
         $nb_decks = intval(filter_var($request->query->get('nb_decks'), FILTER_SANITIZE_NUMBER_INT));
         $numcores = $request->query->get('numcores');
         $numplaysets = $request->query->get('numplaysets');
         $sort = $request->query->get('sort');
-        $packs = $request->query->get('packs');
-        if (!is_array($packs)) {
+        $packs = $request->query->all('packs');
+        if (0 === count($packs)) {
             $packs = $dbh->executeQuery('SELECT id FROM pack')->fetchAll(\PDO::FETCH_COLUMN);
         }
         $categories = [];
@@ -146,7 +146,7 @@ class ListFellowshipController extends AbstractController
         $params = ['allowed' => $categories, 'on' => $on, 'off' => $off, 'author' => $author_name, 'name' => $fellowship_name, 'numcores' => $numcores, 'numplaysets' => $numplaysets];
         $params['sort_'.$sort] = ' selected="selected"';
         $params['nb_decks_selected'] = $nb_decks;
-        if (!empty($cards_code) && is_array($cards_code)) {
+        if (count($cards_code) > 0) {
             $cards = $dbh->executeQuery("SELECT\n    \t\t\t\tc.name,\n    \t\t\t\tc.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card c\n                    INNER JOIN sphere s ON s.id = c.sphere_id\n                    INNER JOIN type t ON t.id = c.type_id\n                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 WHERE cp2.card_id = c.id ORDER BY cp2.position ASC, cp2.id ASC LIMIT 1)\n                    INNER JOIN pack p ON p.id = cpr.pack_id\n                    WHERE c.code IN (?)\n    \t\t\t\tORDER BY c.code DESC", [$cards_code], [Connection::PARAM_INT_ARRAY])->fetchAll();
             $params['cards'] = '';
             foreach ($cards as $card) {

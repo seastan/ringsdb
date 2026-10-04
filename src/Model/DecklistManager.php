@@ -289,14 +289,8 @@ class DecklistManager
     {
         $request = $this->currentRequest();
 
-        $cards_code = $request->query->get('cards');
-        if (!is_array($cards_code)) {
-            $cards_code = [];
-        }
-        $cards_to_exclude = $request->query->get('cards_to_exclude');
-        if (!is_array($cards_to_exclude)) {
-            $cards_to_exclude = [];
-        }
+        $cards_code = $request->query->all('cards');
+        $cards_to_exclude = $request->query->all('cards_to_exclude');
 
         $sphere_code = filter_var($request->query->get('sphere'), FILTER_SANITIZE_STRING);
         if ($sphere_code) {
@@ -311,10 +305,7 @@ class DecklistManager
 
         $sort = $request->query->get('sort');
 
-        $packs = $request->query->get('packs');
-        if (!is_array($packs)) {
-            $packs = [];
-        }
+        $packs = $request->query->all('packs');
 
         $customPackCodes = array_values(array_filter((array) $request->query->get('custom_packs', []), 'is_string'));
 

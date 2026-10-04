@@ -11,7 +11,6 @@ use App\Repository\QuestlogRepository;
 use App\Repository\ScenarioRepository;
 use App\Services\SnapshotManager;
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -26,10 +25,8 @@ class MyListQuestlogController extends AbstractController
     private Connection $connection;
     private QuestlogRepository $questlogRepository;
     private SnapshotManager $snapshotManager;
-    private EntityManagerInterface $entityManager;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
         Connection $connection,
         ScenarioRepository $scenarioRepository,
         QuestlogRepository $questlogRepository,
@@ -39,7 +36,6 @@ class MyListQuestlogController extends AbstractController
         $this->connection = $connection;
         $this->questlogRepository = $questlogRepository;
         $this->snapshotManager = $snapshotManager;
-        $this->entityManager = $entityManager;
     }
 
     /**
