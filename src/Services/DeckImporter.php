@@ -6,7 +6,6 @@ use App\Entity\Card;
 use App\Entity\Pack;
 use App\Repository\CardRepository;
 use App\Repository\PackRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -109,7 +108,7 @@ class DeckImporter
         }
         $content = [];
         foreach ($octgnids as $octgnid => $qty) {
-            $card = $this->findCardByOctgnid($this->entityManager, $octgnid);
+            $card = $this->findCardByOctgnid($octgnid);
             if ($card) {
                 // several printings of a card can have their own octgnid
                 $content[$card->getCode()] = ($content[$card->getCode()] ?? 0) + $qty;
@@ -117,7 +116,7 @@ class DeckImporter
         }
         $sidecontent = [];
         foreach ($sideoctgnids as $octgnid => $qty) {
-            $card = $this->findCardByOctgnid($this->entityManager, $octgnid);
+            $card = $this->findCardByOctgnid($octgnid);
             if ($card) {
                 $sidecontent[$card->getCode()] = ($sidecontent[$card->getCode()] ?? 0) + $qty;
             }
@@ -134,9 +133,9 @@ class DeckImporter
      *
      * @param string $octgnid
      */
-    private function findCardByOctgnid(EntityManager $em, $octgnid): ?Card
+    private function findCardByOctgnid($octgnid): ?Card
     {
-        $printing = $em->createQueryBuilder()->select('cp')->from('App:CardPrinting', 'cp')->join('cp.card', 'c')->where('cp.octgnid = :octgnid')->setParameter('octgnid', $octgnid)->orderBy('c.id', 'ASC')->setMaxResults(1)->getQuery()->getOneOrNullResult();
+        $printing = $this->entityManager->createQueryBuilder()->select('cp')->from('App:CardPrinting', 'cp')->join('cp.card', 'c')->where('cp.octgnid = :octgnid')->setParameter('octgnid', $octgnid)->orderBy('c.id', 'ASC')->setMaxResults(1)->getQuery()->getOneOrNullResult();
 
         return $printing ? $printing->getCard() : null;
     }

@@ -307,7 +307,7 @@ class DecklistManager
 
         $packs = $request->query->all('packs');
 
-        $customPackCodes = array_values(array_filter((array) $request->query->get('custom_packs', []), 'is_string'));
+        $customPackCodes = array_values(array_filter((array) $request->query->all('custom_packs'), 'is_string'));
 
         $threat_op = $request->query->get('threato');
         $threat = $request->query->get('threat');
