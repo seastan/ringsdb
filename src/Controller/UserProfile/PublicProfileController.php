@@ -35,17 +35,16 @@ class PublicProfileController extends AbstractController
      *     "/user/profile/{user_id}/{user_name}/{page}",
      *     name="user_profile_public",
      *     methods={"GET"},
-     *     requirements={"user_id"="\d+"},
+     *     requirements={"user_id"="\d+","page"="\d+"},
      *     defaults={"page"=1}
      * )
      */
-    public function __invoke($user_id, $user_name, $page): Response
+    public function __invoke(int $user_id, string $user_name, int $page): Response
     {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
         /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
         /* @var $user \App\Entity\User */
         $user = $this->userRepository->find($user_id);
         if (!$user) {

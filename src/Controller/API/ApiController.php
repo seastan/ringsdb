@@ -16,6 +16,7 @@ use App\Repository\UserRepository;
 use App\Services\CardsData;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,14 +47,22 @@ class ApiController extends AbstractController
      * @var PackRepository
      */
     private $packRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(CardsData $cardsData, int $cacheExpiration, CardRepository $cardRepository, DecklistRepository $decklistRepository, PackRepository $packRepository)
-    {
+    public function __construct(
+        CardsData $cardsData,
+        int $cacheExpiration,
+        CardRepository $cardRepository,
+        DecklistRepository $decklistRepository,
+        PackRepository $packRepository,
+        EntityManagerInterface $entityManager
+    ) {
         $this->cardsData = $cardsData;
         $this->cacheExpiration = $cacheExpiration;
         $this->cardRepository = $cardRepository;
         $this->decklistRepository = $decklistRepository;
         $this->packRepository = $packRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -78,7 +87,6 @@ class ApiController extends AbstractController
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
         $jsonp = $request->query->get('jsonp');
         /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
         /* @var $list_packs \App\Entity\Pack[] */
         $list_packs = $this->packRepository->findBy([], ['dateRelease' => 'ASC', 'position' => 'ASC']);
         // check the last-modified-since header
@@ -138,7 +146,7 @@ class ApiController extends AbstractController
      *     defaults={"_format"="json"}
      * )
      */
-    public function getCardAction($card_code, Request $request): Response
+    public function getCardAction(Request $request, string $card_code): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -146,7 +154,6 @@ class ApiController extends AbstractController
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
         $jsonp = $request->query->get('jsonp');
         /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
         /* @var $card \App\Entity\Card */
         $card = $this->cardRepository->findOneBy(['code' => $card_code]);
         if (!$card instanceof Card) {
@@ -189,7 +196,6 @@ class ApiController extends AbstractController
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
         $jsonp = $request->query->get('jsonp');
         /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
         /* @var $list_cards \App\Entity\Card[] */
         // Eager-load printings (+ their packs) and the card's pack/type/sphere so
         // getCardInfo doesn't issue N+1 queries while building packs[] for every card.
@@ -203,7 +209,7 @@ class ApiController extends AbstractController
                 $lastModified = $card->getDateUpdate();
             }
         }
-        $printingMax = $em->createQuery('SELECT MAX(cp.dateUpdate) FROM App:CardPrinting cp')->getSingleScalarResult();
+        $printingMax = $this->entityManager->createQuery('SELECT MAX(cp.dateUpdate) FROM App:CardPrinting cp')->getSingleScalarResult();
         if ($printingMax) {
             $printingMax = new \DateTime((string) $printingMax);
             if (!$lastModified || $lastModified < $printingMax) {
@@ -259,7 +265,7 @@ class ApiController extends AbstractController
      *     defaults={"_format"="json"}
      * )
      */
-    public function listCardsByPackAction($pack_code, Request $request): Response
+    public function listCardsByPackAction(Request $request, string $pack_code): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -273,7 +279,6 @@ class ApiController extends AbstractController
             return $response;
         }
         /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
         /* @var $pack \App\Entity\Pack */
         $pack = $this->packRepository->findOneBy(['code' => $pack_code]);
         if (!$pack) {
@@ -340,7 +345,7 @@ class ApiController extends AbstractController
      *     defaults={"_format"="json"}
      * )
      */
-    public function getDecklistAction($decklist_id, Request $request): Response
+    public function getDecklistAction(Request $request, int $decklist_id): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -354,7 +359,6 @@ class ApiController extends AbstractController
             return $response;
         }
         /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
         /* @var $decklist \App\Entity\Decklist */
         $decklist = $this->decklistRepository->find($decklist_id);
         if (!$decklist) {
@@ -404,7 +408,7 @@ class ApiController extends AbstractController
      *     defaults={"_format"="json"}
      * )
      */
-    public function listDecklistsByDateAction($date, Request $request, UserRepository $userRepository): Response
+    public function listDecklistsByDateAction(Request $request, UserRepository $userRepository, string $date): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -418,7 +422,6 @@ class ApiController extends AbstractController
             return $response;
         }
         /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
         $qb = $this->decklistRepository->createQueryBuilder('d');
         $qb->andWhere("d.dateCreation LIKE '{$date}%'");
         $decklists = $qb->getQuery()->getResult();
@@ -481,7 +484,7 @@ class ApiController extends AbstractController
      *     defaults={"_format"="json"}
      * )
      */
-    public function listTopDecklistsByCardAction($card_code, Request $request): Response
+    public function listTopDecklistsByCardAction(Request $request, string $card_code): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -495,14 +498,13 @@ class ApiController extends AbstractController
             return $response;
         }
         /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
         $card = $this->cardRepository->findOneBy(['code' => $card_code]);
         if (!$card) {
             $response->setContent('[]');
 
             return $response;
         }
-        $qb = $em->createQueryBuilder();
+        $qb = $this->entityManager->createQueryBuilder();
         // Select decklists
         $qb->select('d.id, d.name, d.nameCanonical, d.dateCreation, d.dateUpdate');
         $qb->from('App:Decklist', 'd');
@@ -575,7 +577,7 @@ class ApiController extends AbstractController
      *     defaults={"_format"="json"}
      * )
      */
-    public function getScenarioAction($scenario_id, Request $request, ScenarioRepository $scenarioRepository): Response
+    public function getScenarioAction(Request $request, ScenarioRepository $scenarioRepository, int $scenario_id): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -583,7 +585,6 @@ class ApiController extends AbstractController
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
         $jsonp = $request->query->get('jsonp');
         /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
         /* @var $scenario \App\Entity\Scenario */
         $scenario = $scenarioRepository->findOneBy(['id' => $scenario_id]);
         if (!$scenario instanceof Scenario) {
@@ -604,7 +605,7 @@ class ApiController extends AbstractController
     /**
      * @Route("/api/public/cards/search/{q}", name="api_cards_search", methods={"GET"})
      */
-    public function searchCardsAction($q, Request $request): Response
+    public function searchCardsAction(Request $request, string $q): Response
     {
         $response = new Response();
         $response->setPublic();

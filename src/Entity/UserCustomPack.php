@@ -66,7 +66,7 @@ class UserCustomPack
     /**
      * @return $this
      */
-    public function setUser($user)
+    public function setUser(User $user)
     {
         $this->user = $user;
 
@@ -81,7 +81,7 @@ class UserCustomPack
     /**
      * @return $this
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = $name;
 
@@ -96,7 +96,7 @@ class UserCustomPack
     /**
      * @return $this
      */
-    public function setCode($code)
+    public function setCode(string $code)
     {
         $this->code = $code;
 
@@ -111,7 +111,7 @@ class UserCustomPack
     /**
      * @return $this
      */
-    public function setIsEnabled($isEnabled)
+    public function setIsEnabled(bool $isEnabled)
     {
         $this->isEnabled = (bool) $isEnabled;
 
@@ -126,7 +126,7 @@ class UserCustomPack
     /**
      * @return $this
      */
-    public function setIsPublished($isPublished)
+    public function setIsPublished(bool $isPublished)
     {
         $this->isPublished = (bool) $isPublished;
 
@@ -141,7 +141,7 @@ class UserCustomPack
     /**
      * @return $this
      */
-    public function setCreatedAt($createdAt)
+    public function setCreatedAt(\DateTime $createdAt)
     {
         $this->createdAt = $createdAt;
 
@@ -156,7 +156,7 @@ class UserCustomPack
     /**
      * @return $this
      */
-    public function setUpdatedAt($updatedAt)
+    public function setUpdatedAt(\DateTime $updatedAt)
     {
         $this->updatedAt = $updatedAt;
 

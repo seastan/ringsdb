@@ -35,7 +35,7 @@ class OctgnExportDecklistController extends AbstractController
      *     requirements={"decklist_id"="\d+"}
      * )
      */
-    public function __invoke($decklist_id): Response
+    public function __invoke(int $decklist_id): Response
     {
         $response = new Response();
         $response->setPublic();

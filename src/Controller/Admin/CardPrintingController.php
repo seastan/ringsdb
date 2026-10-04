@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Entity\CardPrinting;
+use App\Entity\Pack;
 use App\Form\CardPrintingType;
 use App\Repository\CardPrintingRepository;
 use App\Repository\PackRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormInterface;
@@ -26,11 +28,16 @@ class CardPrintingController extends AbstractController
      * @var PackRepository
      */
     private $packRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(CardPrintingRepository $cardPrintingRepository, PackRepository $packRepository)
-    {
+    public function __construct(
+        CardPrintingRepository $cardPrintingRepository,
+        PackRepository $packRepository,
+        EntityManagerInterface $entityManager
+    ) {
         $this->cardPrintingRepository = $cardPrintingRepository;
         $this->packRepository = $packRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -38,10 +45,9 @@ class CardPrintingController extends AbstractController
      */
     public function indexAction(Request $request): Response
     {
-        $em = $this->getDoctrine()->getManager();
         $packId = $request->query->get('pack');
         $cardName = $request->query->get('card');
-        $qb = $em->createQueryBuilder()->select('cp', 'c', 'p')->from('App:CardPrinting', 'cp')->join('cp.card', 'c')->join('cp.pack', 'p')->orderBy('p.dateRelease', 'ASC')->addOrderBy('p.name', 'ASC')->addOrderBy('cp.position', 'ASC');
+        $qb = $this->entityManager->createQueryBuilder()->select('cp', 'c', 'p')->from('App:CardPrinting', 'cp')->join('cp.card', 'c')->join('cp.pack', 'p')->orderBy('p.dateRelease', 'ASC')->addOrderBy('p.name', 'ASC')->addOrderBy('cp.position', 'ASC');
         if ($packId) {
             $qb->andWhere('p.id = :pack')->setParameter('pack', $packId);
         }
@@ -57,9 +63,8 @@ class CardPrintingController extends AbstractController
     /**
      * @Route("/admin/card-printing/{id}/show", name="admin_card_printing_show")
      */
-    public function showAction($id): Response
+    public function showAction(int $id): Response
     {
-        $em = $this->getDoctrine()->getManager();
         $entity = $this->cardPrintingRepository->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find CardPrinting entity.');
@@ -74,8 +79,7 @@ class CardPrintingController extends AbstractController
      */
     public function newAction(Request $request): Response
     {
-        $em = $this->getDoctrine()->getManager();
-        $filterPack = $this->resolveFilterPack($request, $em);
+        $filterPack = $this->resolveFilterPack($request);
         $entity = new CardPrinting();
         $form = $this->createForm(CardPrintingType::class, $entity, ['filter_pack' => $filterPack]);
 
@@ -87,14 +91,13 @@ class CardPrintingController extends AbstractController
      */
     public function createAction(Request $request): Response
     {
-        $em = $this->getDoctrine()->getManager();
-        $filterPack = $this->resolveFilterPack($request, $em);
+        $filterPack = $this->resolveFilterPack($request);
         $entity = new CardPrinting();
         $form = $this->createForm(CardPrintingType::class, $entity, ['filter_pack' => $filterPack]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em->persist($entity);
-            $em->flush();
+            $this->entityManager->persist($entity);
+            $this->entityManager->flush();
 
             return $this->redirect($this->generateUrl('admin_card_printing_show', ['id' => $entity->getId()]));
         }
@@ -105,14 +108,13 @@ class CardPrintingController extends AbstractController
     /**
      * @Route("/admin/card-printing/{id}/edit", name="admin_card_printing_edit")
      */
-    public function editAction(Request $request, $id): Response
+    public function editAction(Request $request, int $id): Response
     {
-        $em = $this->getDoctrine()->getManager();
         $entity = $this->cardPrintingRepository->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find CardPrinting entity.');
         }
-        $filterPack = $this->resolveFilterPack($request, $em);
+        $filterPack = $this->resolveFilterPack($request);
         $editForm = $this->createForm(CardPrintingType::class, $entity, ['filter_pack' => $filterPack, 'method' => 'PUT']);
         $deleteForm = $this->createDeleteForm($id);
 
@@ -126,20 +128,19 @@ class CardPrintingController extends AbstractController
      *     methods={"POST", "PUT"}
      * )
      */
-    public function updateAction(Request $request, $id): Response
+    public function updateAction(Request $request, int $id): Response
     {
-        $em = $this->getDoctrine()->getManager();
         $entity = $this->cardPrintingRepository->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find CardPrinting entity.');
         }
-        $filterPack = $this->resolveFilterPack($request, $em);
+        $filterPack = $this->resolveFilterPack($request);
         $deleteForm = $this->createDeleteForm($id);
         $editForm = $this->createForm(CardPrintingType::class, $entity, ['filter_pack' => $filterPack, 'method' => 'PUT']);
         $editForm->handleRequest($request);
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $em->persist($entity);
-            $em->flush();
+            $this->entityManager->persist($entity);
+            $this->entityManager->flush();
 
             return $this->redirect($this->generateUrl('admin_card_printing_edit', ['id' => $id]));
         }
@@ -154,24 +155,23 @@ class CardPrintingController extends AbstractController
      *     methods={"POST", "DELETE"}
      * )
      */
-    public function deleteAction(Request $request, $id): RedirectResponse
+    public function deleteAction(Request $request, int $id): RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
             $entity = $this->cardPrintingRepository->find($id);
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find CardPrinting entity.');
             }
-            $em->remove($entity);
-            $em->flush();
+            $this->entityManager->remove($entity);
+            $this->entityManager->flush();
         }
 
         return $this->redirect($this->generateUrl('admin_card_printing'));
     }
 
-    private function resolveFilterPack(Request $request, $em)
+    private function resolveFilterPack(Request $request): ?Pack
     {
         $id = $request->query->get('filter_pack');
         if (!$id) {
@@ -184,7 +184,7 @@ class CardPrintingController extends AbstractController
     /**
      * @return FormInterface<mixed>
      */
-    private function createDeleteForm($id): FormInterface
+    private function createDeleteForm(int $id): FormInterface
     {
         return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }

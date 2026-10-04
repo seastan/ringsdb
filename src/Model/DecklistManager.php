@@ -100,7 +100,7 @@ class DecklistManager
         return $request;
     }
 
-    public function setUser($user): void
+    public function setUser(?User $user): void
     {
         $this->user = $user;
     }
@@ -110,12 +110,12 @@ class DecklistManager
         $this->predominantSphere = $predominantSphere;
     }
 
-    public function setLimit($limit): void
+    public function setLimit(int $limit): void
     {
         $this->limit = $limit;
     }
 
-    public function setPage($page): void
+    public function setPage(int $page): void
     {
         $this->page = max($page, 1);
         $this->start = ($this->page - 1) * $this->limit;

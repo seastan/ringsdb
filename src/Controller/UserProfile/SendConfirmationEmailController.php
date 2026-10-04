@@ -28,7 +28,7 @@ class SendConfirmationEmailController extends AbstractController
     /**
      * @Route("/user/remind/{username}", name="remind_email")
      */
-    public function __invoke($username): Response
+    public function __invoke(string $username): Response
     {
         /** @var User|null $user */
         $user = $this->userManager->findUserByUsername($username);

@@ -6,6 +6,7 @@ namespace App\Controller\Admin;
 
 use App\Command\ScrapBeornScenarioDataCommand;
 use App\Repository\ScenarioRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,6 +14,14 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class CommandController extends AbstractController
 {
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(
+        EntityManagerInterface $entityManager
+    ) {
+        $this->entityManager = $entityManager;
+    }
+
     /**
      * @Route("/admin/command/", name="command_form", methods={"GET"})
      */
@@ -31,9 +40,8 @@ class CommandController extends AbstractController
         $command = $request->request->get('command');
         $scenario = $request->request->get('scenario');
         $customjson = $request->request->get('customjson');
-        $em = $this->getDoctrine()->getManager();
         if ('scenario' == $command) {
-            $res = ScrapBeornScenarioDataCommand::command($em, $scenario, 0, $customjson);
+            $res = ScrapBeornScenarioDataCommand::command($this->entityManager, $scenario, 0, $customjson);
         } else {
             $res = '';
         }

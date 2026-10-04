@@ -49,9 +49,11 @@ class SuggestionsCommand extends Command
     }
 
     /**
+     * @param list<array{card_id:int}> $arr
+     *
      * @return list<array{int, int}>
      */
-    private function getAllPairs($arr): array
+    private function getAllPairs(array $arr): array
     {
         $pairs = [];
         for ($i = 0; $i < count($arr); ++$i) {

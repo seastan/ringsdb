@@ -137,7 +137,7 @@ class Card
         return $this->printings;
     }
 
-    public function getPrimaryPrinting()
+    public function getPrimaryPrinting(): ?CardPrinting
     {
         $primary = null;
         foreach ($this->printings as $p) {
@@ -467,7 +467,7 @@ class Card
         return $this->victory;
     }
 
-    public function getQuantity()
+    public function getQuantity(): ?int
     {
         $p = $this->getPrimaryPrinting();
 
@@ -495,14 +495,14 @@ class Card
         return $this->deckLimit;
     }
 
-    public function getIllustrator()
+    public function getIllustrator(): ?string
     {
         $p = $this->getPrimaryPrinting();
 
         return $p ? $p->getIllustrator() : null;
     }
 
-    public function getOctgnid()
+    public function getOctgnid(): ?string
     {
         $p = $this->getPrimaryPrinting();
 
@@ -577,7 +577,7 @@ class Card
         return $this->reviews;
     }
 
-    public function getPack()
+    public function getPack(): ?Pack
     {
         $p = $this->getPrimaryPrinting();
 

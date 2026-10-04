@@ -29,7 +29,7 @@ class FellowshipArchiver
         $this->fellowshipRepository = $fellowshipRepository;
     }
 
-    public function downloadFromSelection(User $user, $fellowship_id, $octgn): Response
+    public function downloadFromSelection(User $user, int $fellowship_id, bool $octgn): Response
     {
         /* @var $fellowship \App\Entity\Fellowship */
         $fellowship = $this->fellowshipRepository->find($fellowship_id);

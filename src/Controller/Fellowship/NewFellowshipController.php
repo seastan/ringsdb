@@ -33,7 +33,7 @@ class NewFellowshipController extends AbstractController
      *     defaults={"deck1_id"=null, "deck2_id"=null, "deck3_id"=null, "deck4_id"=null}
      * )
      */
-    public function __invoke($deck1_id, $deck2_id, $deck3_id, $deck4_id): Response
+    public function __invoke(int $deck1_id, int $deck2_id, int $deck3_id, int $deck4_id): Response
     {
         $response = new Response();
         $decks = [];

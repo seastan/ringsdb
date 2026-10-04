@@ -7,6 +7,7 @@ namespace App\Controller\Admin;
 use App\Entity\Pack;
 use App\Form\PackType;
 use App\Repository\PackRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormInterface;
@@ -24,10 +25,14 @@ class PackController extends AbstractController
      * @var PackRepository
      */
     private $packRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(PackRepository $packRepository)
-    {
+    public function __construct(
+        PackRepository $packRepository,
+        EntityManagerInterface $entityManager
+    ) {
         $this->packRepository = $packRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -53,9 +58,8 @@ class PackController extends AbstractController
         $form = $this->createForm(PackType::class, $entity);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($entity);
-            $em->flush();
+            $this->entityManager->persist($entity);
+            $this->entityManager->flush();
 
             return $this->redirect($this->generateUrl('admin_pack_show', ['id' => $entity->getId()]));
         }
@@ -81,7 +85,7 @@ class PackController extends AbstractController
      *
      * @Route("/admin/pack/{id}/show", name="admin_pack_show")
      */
-    public function showAction($id): Response
+    public function showAction(int $id): Response
     {
         $entity = $this->packRepository->find($id);
         if (!$entity) {
@@ -97,7 +101,7 @@ class PackController extends AbstractController
      *
      * @Route("/admin/pack/{id}/edit", name="admin_pack_edit")
      */
-    public function editAction($id): Response
+    public function editAction(int $id): Response
     {
         $entity = $this->packRepository->find($id);
         if (!$entity) {
@@ -114,9 +118,8 @@ class PackController extends AbstractController
      *
      * @Route("/admin/pack/{id}/update", name="admin_pack_update", methods={"POST", "PUT"})
      */
-    public function updateAction(Request $request, $id): Response
+    public function updateAction(Request $request, int $id): Response
     {
-        $em = $this->getDoctrine()->getManager();
         $entity = $this->packRepository->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Pack entity.');
@@ -125,8 +128,8 @@ class PackController extends AbstractController
         $editForm = $this->createForm(PackType::class, $entity, ['method' => 'PUT']);
         $editForm->handleRequest($request);
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $em->persist($entity);
-            $em->flush();
+            $this->entityManager->persist($entity);
+            $this->entityManager->flush();
 
             return $this->redirect($this->generateUrl('admin_pack_edit', ['id' => $id]));
         }
@@ -139,18 +142,17 @@ class PackController extends AbstractController
      *
      * @Route("/admin/pack/{id}/delete", name="admin_pack_delete", methods={"POST", "DELETE"})
      */
-    public function deleteAction(Request $request, $id): RedirectResponse
+    public function deleteAction(Request $request, int $id): RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
             $entity = $this->packRepository->find($id);
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Pack entity.');
             }
-            $em->remove($entity);
-            $em->flush();
+            $this->entityManager->remove($entity);
+            $this->entityManager->flush();
         }
 
         return $this->redirect($this->generateUrl('admin_pack'));
@@ -159,11 +161,9 @@ class PackController extends AbstractController
     /**
      * Creates a form to delete a Pack entity by id.
      *
-     * @param mixed $id The entity id
-     *
      * @return FormInterface<mixed> The form
      */
-    private function createDeleteForm($id): FormInterface
+    private function createDeleteForm(int $id): FormInterface
     {
         return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }

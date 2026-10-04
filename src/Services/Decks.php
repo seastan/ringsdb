@@ -21,7 +21,6 @@ use App\Repository\CardRepository;
 use App\Repository\DeckchangeRepository;
 use App\Repository\DecklistRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Decks
@@ -42,11 +41,6 @@ class Decks
     private $diff;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var CardRepository
      */
     private $cardRepository;
@@ -61,12 +55,17 @@ class Decks
      */
     private $decklistRepository;
 
-    public function __construct(EntityManagerInterface $doctrine, DeckValidationHelper $deck_validation_helper, Diff $diff, LoggerInterface $logger, CardRepository $cardRepository, DeckchangeRepository $deckchangeRepository, DecklistRepository $decklistRepository)
-    {
+    public function __construct(
+        EntityManagerInterface $doctrine,
+        DeckValidationHelper $deck_validation_helper,
+        Diff $diff,
+        CardRepository $cardRepository,
+        DeckchangeRepository $deckchangeRepository,
+        DecklistRepository $decklistRepository
+    ) {
         $this->doctrine = $doctrine;
         $this->deck_validation_helper = $deck_validation_helper;
         $this->diff = $diff;
-        $this->logger = $logger;
         $this->cardRepository = $cardRepository;
         $this->deckchangeRepository = $deckchangeRepository;
         $this->decklistRepository = $decklistRepository;
@@ -75,14 +74,13 @@ class Decks
     /**
      * @return array<int, mixed>
      */
-    public function getByUser($user): array
+    public function getByUser(User $user): array
     {
-        /* @var $user User */
         $decks = $user->getDecks();
         $list = [];
 
         foreach ($decks as $deck) {
-            $list[] = $deck->jsonSerialize(false);
+            $list[] = $deck->jsonSerialize();
         }
 
         return $list;
@@ -91,7 +89,7 @@ class Decks
     /**
      * @return list<array<string, mixed>>
      */
-    public function getDecksWithSlotsForUser($user, $limit = null): array
+    public function getDecksWithSlotsForUser(User $user, ?int $limit = null): array
     {
         // Step 1: get the right deck IDs with no collection join so LIMIT works correctly
         $idQuery = $this->doctrine->createQuery(
@@ -191,14 +189,14 @@ class Decks
         return array_values($decks);
     }
 
-    public function countDecksForUser($user): int
+    public function countDecksForUser(User $user): int
     {
         return (int) $this->doctrine->createQuery(
             'SELECT COUNT(d.id) FROM App\Entity\Deck d WHERE d.user = :user'
         )->setParameter('user', $user)->getSingleScalarResult();
     }
 
-    public function cloneDeck($deck, $user): Deck
+    public function cloneDeck(?Deck $deck, User $user): Deck
     {
         /* @var $deck \App\Entity\Deck */
         if (!$deck) {
@@ -250,11 +248,11 @@ class Decks
         return array_values(array_unique($tags));
     }
 
-    public function saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, $source_deck)
+    /**
+     * @param array{main: array<int|string, int>, side: array<int|string, int>} $content
+     */
+    public function saveDeck(User $user, Deck $deck, ?int $decklist_id, ?string $name, ?string $description, ?string $tags, array $content, ?Deck $source_deck): ?int
     {
-        /* @var $deck \App\Entity\Deck */
-        /* @var $source_deck \App\Entity\Deck */
-
         if ($decklist_id) {
             /* @var $decklist Decklist */
             $decklist = $this->decklistRepository->find($decklist_id);
@@ -304,11 +302,7 @@ class Decks
             }
 
             if ($qty > $card->getDeckLimit()) {
-                if (is_array($content['main'])) {
-                    $content['main'][$card_code] = $card->getDeckLimit();
-                } else {
-                    $content['main']->$card_code = $card->getDeckLimit();
-                }
+                $content['main'][$card_code] = $card->getDeckLimit();
             }
         }
 
@@ -322,11 +316,7 @@ class Decks
             $cards[$card_code] = $card;
 
             if ($qty > $card->getDeckLimit()) {
-                if (is_array($content['side'])) {
-                    $content['side'][$card_code] = $card->getDeckLimit();
-                } else {
-                    $content['side']->$card_code = $card->getDeckLimit();
-                }
+                $content['side'][$card_code] = $card->getDeckLimit();
             }
         }
 
@@ -436,11 +426,10 @@ class Decks
     }
 
     /**
-     * @return void
+     * @param array{main: array<string, int>, side: array<string, int>} $content
      */
-    public function setSlots(&$deck, $content): void
+    public function setSlots(Deck $deck, $content): void
     {
-        /* @var $deck \App\Entity\Deck */
         /* @var $latestPack Pack */
 
         $cards = [];
@@ -456,11 +445,7 @@ class Decks
             $cards[$card_code] = $card;
 
             if ($qty > $card->getDeckLimit()) {
-                if (is_array($content['main'])) {
-                    $content['main'][$card_code] = $card->getDeckLimit();
-                } else {
-                    $content['main']->$card_code = $card->getDeckLimit();
-                }
+                $content['main'][$card_code] = $card->getDeckLimit();
             }
         }
 
@@ -474,11 +459,7 @@ class Decks
             $cards[$card_code] = $card;
 
             if ($qty > $card->getDeckLimit()) {
-                if (is_array($content['side'])) {
-                    $content['side'][$card_code] = $card->getDeckLimit();
-                } else {
-                    $content['side']->$card_code = $card->getDeckLimit();
-                }
+                $content['side'][$card_code] = $card->getDeckLimit();
             }
         }
 
@@ -517,9 +498,8 @@ class Decks
         }
     }
 
-    public function revertDeck($deck): void
+    public function revertDeck(Deck $deck): void
     {
-        /* @var $deck \App\Entity\Deck */
         $changes = $this->getUnsavedChanges($deck);
 
         foreach ($changes as $change) {
@@ -536,7 +516,7 @@ class Decks
     /**
      * @return array<int, Deckchange>
      */
-    public function getUnsavedChanges($deck): array
+    public function getUnsavedChanges(Deck $deck): array
     {
         return $this->deckchangeRepository->findBy([
             'deck' => $deck,

@@ -427,9 +427,9 @@ class Deck extends ExportableDeck implements \JsonSerializable
     /**
      * Get slots.
      *
-     * @return SlotCollectionInterface<Deckslot>
+     * @return SlotCollectionDecorator<Deckslot>
      */
-    public function getSlots(): SlotCollectionInterface
+    public function getSlots(): SlotCollectionDecorator
     {
         return new SlotCollectionDecorator($this->slots);
     }

@@ -42,7 +42,6 @@ class ApiPrivateController extends AbstractController
     {
         $response = new Response();
         /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
         /* @var $decklists Decklist[] */
         $decklists = $this->decklistRepository->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC', 'id' => 'DESC']);
         foreach ($decklists as &$decklist) {
@@ -74,11 +73,10 @@ class ApiPrivateController extends AbstractController
     /**
      * @Route("/api/private/decks_by_user/{username}", name="api_private_user_decks", methods={"GET"})
      */
-    public function listUserDecksAction($username, Request $request, UserRepository $userRepository): Response
+    public function listUserDecksAction(Request $request, UserRepository $userRepository, string $username): Response
     {
         $response = new Response();
         /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
         /* @var $user User */
         $user = $userRepository->findOneBy(['username' => $username]);
         if (!$user) {
@@ -130,11 +128,10 @@ class ApiPrivateController extends AbstractController
      *     requirements={"id"="\d+"}
      * )
      */
-    public function loadDeckAction($id, Request $request): Response
+    public function loadDeckAction(Request $request, int $id): Response
     {
         $response = new Response();
         /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
         /* @var $deck \App\Entity\Deck */
         $deck = $this->deckRepository->find($id);
         if (!$deck) {

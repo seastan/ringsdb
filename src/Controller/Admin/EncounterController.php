@@ -7,6 +7,7 @@ namespace App\Controller\Admin;
 use App\Entity\Encounter;
 use App\Form\EncounterType;
 use App\Repository\EncounterRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormInterface;
@@ -24,10 +25,14 @@ class EncounterController extends AbstractController
      * @var EncounterRepository
      */
     private $encounterRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(EncounterRepository $encounterRepository)
-    {
+    public function __construct(
+        EncounterRepository $encounterRepository,
+        EntityManagerInterface $entityManager
+    ) {
         $this->encounterRepository = $encounterRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -53,9 +58,8 @@ class EncounterController extends AbstractController
         $form = $this->createForm(EncounterType::class, $entity);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($entity);
-            $em->flush();
+            $this->entityManager->persist($entity);
+            $this->entityManager->flush();
 
             return $this->redirect($this->generateUrl('admin_encounter_show', ['id' => $entity->getId()]));
         }
@@ -81,7 +85,7 @@ class EncounterController extends AbstractController
      *
      * @Route("/admin/encounter/{id}/show", name="admin_encounter_show")
      */
-    public function showAction($id): Response
+    public function showAction(int $id): Response
     {
         $entity = $this->encounterRepository->find($id);
         if (!$entity) {
@@ -97,7 +101,7 @@ class EncounterController extends AbstractController
      *
      * @Route("/admin/encounter/{id}/edit", name="admin_encounter_edit")
      */
-    public function editAction($id): Response
+    public function editAction(int $id): Response
     {
         $entity = $this->encounterRepository->find($id);
         if (!$entity) {
@@ -114,9 +118,8 @@ class EncounterController extends AbstractController
      *
      * @Route("/admin/encounter/{id}/update", name="admin_encounter_update", methods={"POST", "PUT"})
      */
-    public function updateAction(Request $request, $id): Response
+    public function updateAction(Request $request, int $id): Response
     {
-        $em = $this->getDoctrine()->getManager();
         $entity = $this->encounterRepository->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Encounter entity.');
@@ -125,8 +128,8 @@ class EncounterController extends AbstractController
         $editForm = $this->createForm(EncounterType::class, $entity, ['method' => 'PUT']);
         $editForm->handleRequest($request);
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $em->persist($entity);
-            $em->flush();
+            $this->entityManager->persist($entity);
+            $this->entityManager->flush();
 
             return $this->redirect($this->generateUrl('admin_encounter_edit', ['id' => $id]));
         }
@@ -139,18 +142,17 @@ class EncounterController extends AbstractController
      *
      * @Route("/admin/encounter/{id}/delete", name="admin_encounter_delete", methods={"POST", "DELETE"})
      */
-    public function deleteAction(Request $request, $id): RedirectResponse
+    public function deleteAction(Request $request, int $id): RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
             $entity = $this->encounterRepository->find($id);
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Encounter entity.');
             }
-            $em->remove($entity);
-            $em->flush();
+            $this->entityManager->remove($entity);
+            $this->entityManager->flush();
         }
 
         return $this->redirect($this->generateUrl('admin_encounter'));
@@ -159,11 +161,9 @@ class EncounterController extends AbstractController
     /**
      * Creates a form to delete a Encounter entity by id.
      *
-     * @param mixed $id The entity id
-     *
      * @return FormInterface<mixed> The form
      */
-    private function createDeleteForm($id): FormInterface
+    private function createDeleteForm(int $id): FormInterface
     {
         return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }

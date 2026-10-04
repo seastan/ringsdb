@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Entity\Scenario;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,12 +17,12 @@ class ScrapBeornScenarioDataCommand extends Command
     /**
      * @var EntityManagerInterface
      */
-    private $em;
+    private $entityManager;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $entityManager)
     {
         parent::__construct();
-        $this->em = $em;
+        $this->entityManager = $entityManager;
     }
 
     protected function configure(): void
@@ -53,19 +52,16 @@ class ScrapBeornScenarioDataCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $name = $input->getOption('name');
-        $skip = $input->getOption('skip');
+        $skip = (int) $input->getOption('skip');
         $customjson = $input->getOption('customjson');
 
-        /* @var $em EntityManager */
-        $em = $this->em;
-
-        $this->command($em, $name, $skip, $customjson);
+        $this->command($this->entityManager, $name, $skip, $customjson);
         $output->writeln('Done.');
 
         return 0;
     }
 
-    public static function command($em, $name, $skip, $customjson): string
+    public static function command(EntityManagerInterface $em, string $name, ?int $skip, ?string $customjson): string
     {
         $res = '';
         $name = $name ?: null;

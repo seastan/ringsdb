@@ -33,7 +33,7 @@ class CompareDecksController extends AbstractController
      *     requirements={"deck1_id"="\d+", "deck2_id"="\d+"}
      * )
      */
-    public function __invoke($deck1_id, $deck2_id): Response
+    public function __invoke(int $deck1_id, int $deck2_id): Response
     {
         /* @var $deck1 \App\Entity\Deck */
         $deck1 = $this->deckRepository->find($deck1_id);

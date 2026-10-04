@@ -33,7 +33,7 @@ class ViewDeckController extends AbstractController
      *     defaults={"deck_id"=0}
      * )
      */
-    public function __invoke($deck_id): Response
+    public function __invoke(int $deck_id): Response
     {
         /* @var $deck \App\Entity\Deck */
         $deck = $this->deckRepository->find($deck_id);

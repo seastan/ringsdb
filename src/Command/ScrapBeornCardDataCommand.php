@@ -28,7 +28,7 @@ class ScrapBeornCardDataCommand extends Command
     /**
      * @var EntityManagerInterface
      */
-    private $em;
+    private $entityManager;
 
     /**
      * @var Packages
@@ -60,10 +60,10 @@ class ScrapBeornCardDataCommand extends Command
      */
     private $typeRepository;
 
-    public function __construct(EntityManagerInterface $em, Packages $packages, string $publicDir, CardPrintingRepository $cardPrintingRepository, PackRepository $packRepository, SphereRepository $sphereRepository, TypeRepository $typeRepository)
+    public function __construct(EntityManagerInterface $entityManager, Packages $packages, string $publicDir, CardPrintingRepository $cardPrintingRepository, PackRepository $packRepository, SphereRepository $sphereRepository, TypeRepository $typeRepository)
     {
         parent::__construct();
-        $this->em = $em;
+        $this->entityManager = $entityManager;
         $this->packages = $packages;
         $this->publicDir = $publicDir;
         $this->cardPrintingRepository = $cardPrintingRepository;
@@ -115,8 +115,6 @@ class ScrapBeornCardDataCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $em = $this->em;
-
         $questionHelper = $this->getHelper('question');
 
         $assets_helper = $this->packages;
@@ -458,7 +456,7 @@ class ScrapBeornCardDataCommand extends Command
                 } // end of force-data
 
                 $output->writeln('30');
-                $em->persist($card);
+                $this->entityManager->persist($card);
 
                 $output->writeln('31');
                 // trying to download image file
@@ -488,12 +486,12 @@ class ScrapBeornCardDataCommand extends Command
                     $output->writeln('37');
                 }
                 $output->writeln('38');
-                $em->flush();
+                $this->entityManager->flush();
                 $output->writeln('39');
             }
         }
 
-        $em->flush();
+        $this->entityManager->flush();
         $output->writeln('Done.');
 
         return 0;

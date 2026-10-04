@@ -19,7 +19,7 @@ class DeleteDecklistCommand extends Command
     /**
      * @var EntityManagerInterface
      */
-    private $em;
+    private $entityManager;
 
     /**
      * @var DeckRepository
@@ -31,10 +31,10 @@ class DeleteDecklistCommand extends Command
      */
     private $decklistRepository;
 
-    public function __construct(EntityManagerInterface $em, DeckRepository $deckRepository, DecklistRepository $decklistRepository)
+    public function __construct(EntityManagerInterface $entityManager, DeckRepository $deckRepository, DecklistRepository $decklistRepository)
     {
         parent::__construct();
-        $this->em = $em;
+        $this->entityManager = $entityManager;
         $this->deckRepository = $deckRepository;
         $this->decklistRepository = $decklistRepository;
     }
@@ -53,8 +53,6 @@ class DeleteDecklistCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $em = $this->em;
-
         $decklist_id = $input->getArgument('decklist_id');
         $decklist = $this->decklistRepository->find($decklist_id);
         if (!$decklist) {
@@ -81,9 +79,9 @@ class DeleteDecklistCommand extends Command
             $child->setParent(null);
         }
 
-        $em->flush();
-        $em->remove($decklist);
-        $em->flush();
+        $this->entityManager->flush();
+        $this->entityManager->remove($decklist);
+        $this->entityManager->flush();
 
         $output->writeln('Decklist deleted');
 

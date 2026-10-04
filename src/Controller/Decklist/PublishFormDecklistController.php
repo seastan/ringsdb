@@ -18,15 +18,18 @@ class PublishFormDecklistController extends AbstractController
     private DeckRepository $deckRepository;
     private DecklistRepository $decklistRepository;
     private DecklistFactory $decklistFactory;
+    private DeckValidationHelper $deckValidationHelper;
 
     public function __construct(
         DeckRepository $deckRepository,
         DecklistRepository $decklistRepository,
-        DecklistFactory $decklistFactory
+        DecklistFactory $decklistFactory,
+        DeckValidationHelper $deckValidationHelper
     ) {
         $this->deckRepository = $deckRepository;
         $this->decklistRepository = $decklistRepository;
         $this->decklistFactory = $decklistFactory;
+        $this->deckValidationHelper = $deckValidationHelper;
     }
 
     /**
@@ -35,7 +38,7 @@ class PublishFormDecklistController extends AbstractController
      *
      * @Route("/deck/publish/{deck_id}", name="deck_publish_form", methods={"GET"})
      */
-    public function __invoke($deck_id, DeckValidationHelper $deckValidationHelper): Response
+    public function __invoke(int $deck_id): Response
     {
         /* @var $user \App\Entity\User */
         $user = $this->getUser();
@@ -47,7 +50,7 @@ class PublishFormDecklistController extends AbstractController
             throw $this->createAccessDeniedException("You don't have access to this decklist.");
         }
 
-        $problem = $deckValidationHelper->findProblem($deck, true);
+        $problem = $this->deckValidationHelper->findProblem($deck, true);
         if ($problem) {
             $this->get('session')->getFlashBag()->set('error', 'This deck cannot be published because it is invalid.');
 

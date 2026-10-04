@@ -18,17 +18,17 @@ class PatronCommand extends Command
     /**
      * @var EntityManagerInterface
      */
-    private $em;
+    private $entityManager;
 
     /**
      * @var UserRepository
      */
     private $userRepository;
 
-    public function __construct(EntityManagerInterface $em, UserRepository $userRepository)
+    public function __construct(EntityManagerInterface $entityManager, UserRepository $userRepository)
     {
         parent::__construct();
-        $this->em = $em;
+        $this->entityManager = $entityManager;
         $this->userRepository = $userRepository;
     }
 
@@ -54,7 +54,6 @@ class PatronCommand extends Command
         $email = self::stringArgument($input, 'email');
         $donation = (int) $input->getArgument('donation');
 
-        $em = $this->em;
         $repo = $this->userRepository;
         $user = $repo->findOneBy(['email' => $email]);
 
@@ -65,7 +64,7 @@ class PatronCommand extends Command
         if ($user) {
             if ($donation) {
                 $user->setDonation($donation + $user->getDonation());
-                $em->flush();
+                $this->entityManager->flush();
                 $output->writeln(date('c').' Success');
             } else {
                 $output->writeln(date('c').' User '.$user->getUsername().' donated '.$user->getDonation());

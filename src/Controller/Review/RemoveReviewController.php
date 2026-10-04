@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Controller\Review;
+
+use App\Entity\Review;
+use App\Repository\ReviewRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+
+class RemoveReviewController extends AbstractController
+{
+    private ReviewRepository $reviewRepository;
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(
+        ReviewRepository $reviewRepository,
+        EntityManagerInterface $entityManager
+    ) {
+        $this->reviewRepository = $reviewRepository;
+        $this->entityManager = $entityManager;
+    }
+
+    /**
+     * @Route("/review/remove/{id}", name="card_review_remove")
+     */
+    public function removeAction(Request $request, int $id): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user || !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+            throw $this->createAccessDeniedException('No user or not admin');
+        }
+        $review_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
+        /* @var $review Review */
+        $review = $this->reviewRepository->find($review_id);
+        if (!$review) {
+            throw new \Exception('Unable to find review.');
+        }
+        $votes = $review->getVotes();
+        foreach ($votes as $vote) {
+            $review->removeVote($vote);
+        }
+        $this->entityManager->remove($review);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['success' => true]);
+    }
+}

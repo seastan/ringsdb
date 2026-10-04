@@ -37,7 +37,7 @@ class CopyCustomPackController extends AbstractController
      *     requirements={"id"="\d+"}
      * )
      */
-    public function __invoke(Request $request, $id): JsonResponse
+    public function __invoke(Request $request, int $id): JsonResponse
     {
         $user = $this->getUser();
         if (!$user) {

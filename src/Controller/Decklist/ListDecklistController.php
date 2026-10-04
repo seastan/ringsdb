@@ -32,8 +32,6 @@ class ListDecklistController extends AbstractController
     /**
      * displays the lists of decklists.
      *
-     * @param int $page
-     *
      * @Route(
      *     "/decklists/{type}/{page}",
      *     name="decklists_list",
@@ -42,7 +40,7 @@ class ListDecklistController extends AbstractController
      *     defaults={"type"="popular", "page"=1}
      * )
      */
-    public function __invoke(Request $request, $type, $page = 1): Response
+    public function __invoke(Request $request, string $type, int $page = 1): Response
     {
         $response = new Response();
         $response->setPublic();

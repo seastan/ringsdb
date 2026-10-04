@@ -38,7 +38,7 @@ class EditQuestlogController extends AbstractController
      *     requirements={"questlog_id"="\d+"}
      * )
      */
-    public function __invoke($questlog_id): Response
+    public function __invoke(int $questlog_id): Response
     {
         $response = new Response();
         /* @var $user User */

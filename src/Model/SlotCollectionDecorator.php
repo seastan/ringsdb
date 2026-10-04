@@ -40,7 +40,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         return $this->slots->removeElement($element);
     }
 
-    public function count($mode = null)
+    public function count()
     {
         return $this->slots->count();
     }
@@ -258,6 +258,9 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         return $this->slots;
     }
 
+    /**
+     * @return array<string, int>
+     */
     public function getContent(): array
     {
         $arr = [];

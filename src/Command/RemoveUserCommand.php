@@ -19,7 +19,7 @@ class RemoveUserCommand extends Command
     /**
      * @var EntityManagerInterface
      */
-    private $em;
+    private $entityManager;
 
     /**
      * @var DeckRepository
@@ -36,10 +36,10 @@ class RemoveUserCommand extends Command
      */
     private $userRepository;
 
-    public function __construct(EntityManagerInterface $em, DeckRepository $deckRepository, DecklistRepository $decklistRepository, UserRepository $userRepository)
+    public function __construct(EntityManagerInterface $entityManager, DeckRepository $deckRepository, DecklistRepository $decklistRepository, UserRepository $userRepository)
     {
         parent::__construct();
-        $this->em = $em;
+        $this->entityManager = $entityManager;
         $this->deckRepository = $deckRepository;
         $this->decklistRepository = $decklistRepository;
         $this->userRepository = $userRepository;
@@ -59,8 +59,6 @@ class RemoveUserCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $em = $this->em;
-
         $user_id = $input->getArgument('user_id');
         $user = $this->userRepository->find($user_id);
 
@@ -87,7 +85,7 @@ class RemoveUserCommand extends Command
                 $child->setParent(null);
             }
 
-            $em->remove($deck);
+            $this->entityManager->remove($deck);
         }
 
         $output->writeln('Decks deleted');
@@ -114,7 +112,7 @@ class RemoveUserCommand extends Command
                 $child->setParent(null);
             }
 
-            $em->remove($decklist);
+            $this->entityManager->remove($decklist);
         }
 
         $output->writeln('Decklists deleted');
@@ -123,7 +121,7 @@ class RemoveUserCommand extends Command
 
         $output->writeln('User locked');
 
-        $em->flush();
+        $this->entityManager->flush();
 
         return 0;
     }

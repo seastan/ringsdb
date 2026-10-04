@@ -13,35 +13,13 @@ class DeckValidationHelper
     {
     }
 
-    /**
-     * @return list<Card>
-     */
-    public function getInvalidCards($deck): array
-    {
-        $invalidCards = [];
-
-        /*
-        foreach ($deck->getSlots() as $slot) {
-            if (!$this->canIncludeCard($deck, $slot->getCard())) {
-                $invalidCards[] = $slot->getCard();
-            }
-        }
-        */
-
-        return $invalidCards;
-    }
-
-    public function canIncludeCard($deck, $card): bool
+    public function canIncludeCard(Deck $deck, Card $card): bool
     {
         return true;
     }
 
-    /**
-     * @param bool $casualPlay
-     */
-    public function findProblem($deck, $casualPlay = false): ?string
+    public function findProblem(Deck $deck, bool $casualPlay = false): ?string
     {
-        /* @var $deck Deck */
         $heroDeck = $deck->getSlots()->getHeroDeck();
         $heroDeckSize = $heroDeck->countCards();
 
@@ -76,14 +54,10 @@ class DeckValidationHelper
             }
         }
 
-        if (!empty($this->getInvalidCards($deck))) {
-            return 'invalid_cards';
-        }
-
         return null;
     }
 
-    public function getProblemLabel($problem): string
+    public function getProblemLabel(string $problem): string
     {
         if (!$problem) {
             return '';

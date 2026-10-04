@@ -13,7 +13,7 @@ class ByAuthorQuestlogController extends AbstractController
     /**
      * @Route("/q/{username}", name="questlogs_byauthor", methods={"GET"})
      */
-    public function __invoke($username): RedirectResponse
+    public function __invoke(string $username): RedirectResponse
     {
         return $this->redirect($this->generateUrl('questlogs_list', ['type' => 'find', 'author' => $username]));
     }

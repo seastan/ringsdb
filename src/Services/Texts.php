@@ -40,7 +40,7 @@ class Texts
     /**
      * Returns the processed version of a markdown text.
      */
-    public function markdown($string): string
+    public function markdown(string $string): string
     {
         return $this->purify($this->img_responsive($this->transform($string)));
     }
@@ -48,7 +48,7 @@ class Texts
     /**
      * removes any dangerous code from a HTML string.
      */
-    public function purify($string): string
+    public function purify(string $string): string
     {
         return $this->purifier_service->purify($string);
     }
@@ -56,7 +56,7 @@ class Texts
     /**
      * turns a Markdown string into a HTML string.
      */
-    public function transform($string): string
+    public function transform(string $string): string
     {
         return $this->markdown_service->text($string);
     }
@@ -64,17 +64,15 @@ class Texts
     /**
      * adds class="img-responsive" to every <img> tag.
      */
-    public function img_responsive($string): string
+    public function img_responsive(string $string): string
     {
         return preg_replace('/<img/', '<img class="img-responsive"', $string);
     }
 
     /**
      * Transforms the string into a valid filename, lower-case, no spaces, pure ASCII, etc.
-     *
-     * @param string $filename
      */
-    public function slugify($filename): string
+    public function slugify(string $filename): string
     {
         $filename = (string) preg_replace('[^\w\-]', '-', $filename);
         // //TRANSLIT is not supported by every iconv implementation (e.g. musl on Alpine)

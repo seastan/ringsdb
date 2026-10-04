@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 class AjaxSaveController extends AbstractController
@@ -56,7 +57,7 @@ class AjaxSaveController extends AbstractController
         } else {
             $deck = new Deck();
         }
-        $content = (array) json_decode($request->get('content'));
+        $content = json_decode($request->get('content'), true);
         if (!isset($content['main']) || empty($content['main'])) {
             return new JsonResponse(['success' => false, 'error' => 'Cannot save an empty deck.'], 422);
         }
@@ -65,9 +66,12 @@ class AjaxSaveController extends AbstractController
             $name = 'Untitled Deck';
         }
         $decklist_id = filter_var($request->get('decklist_id'), FILTER_SANITIZE_NUMBER_INT);
+        if (false === $decklist_id) {
+            throw new BadRequestHttpException('Wrong decklist_id');
+        }
         $description = trim($request->get('description') ?? '');
         $tags = filter_var($request->get('tags'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
-        $this->decks->saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);
+        $this->decks->saveDeck($user, $deck, (int) $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);
         $this->entityManager->flush();
 
         return new JsonResponse(['success' => true, 'id' => $deck->getId()]);

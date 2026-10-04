@@ -38,7 +38,7 @@ class PublishFormFellowshipController extends AbstractController
      *     requirements={"fellowship_id"="\d+"}
      * )
      */
-    public function __invoke($fellowship_id): Response
+    public function __invoke(int $fellowship_id): Response
     {
         /* @var $user User */
         $user = $this->getUser();

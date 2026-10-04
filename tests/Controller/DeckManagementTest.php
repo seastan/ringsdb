@@ -313,7 +313,7 @@ class DeckManagementTest extends WebTestCase
         // saving the deck replaces the unsaved entries by a saved one
         $crawler = $client->request('GET', "/deck/edit/$id");
         $form = $crawler->filter('#save_form')->form();
-        $form['content'] = (string) json_encode(['main' => ['01001' => 1, '01002' => 1, '01003' => 1], 'side' => new \stdClass()]);
+        $form['content'] = (string) json_encode(['main' => ['01001' => 1, '01002' => 1, '01003' => 1], 'side' => []]);
         $client->submit($form);
         $changes = $this->db($client)->fetchAll('SELECT is_saved FROM deckchange WHERE deck_id = ?', [$id]);
         $this->assertSame([['is_saved' => '1']], $changes);

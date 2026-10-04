@@ -30,7 +30,7 @@ class CardStatsCalculator
      *
      * @return array<string, mixed>|null
      */
-    public function computeCards($month, $step): ?array
+    public function computeCards(string $month, string $step): ?array
     {
         $dbh = $this->conn;
 

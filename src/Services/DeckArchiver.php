@@ -7,6 +7,9 @@ use App\Repository\DeckRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 class DeckArchiver
 {
@@ -27,7 +30,14 @@ class DeckArchiver
         $this->texts = $texts;
     }
 
-    public function downloadFromSelection(User $user, $list_id, $octgn): Response
+    /**
+     * @param array<int> $list_id
+     *
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
+    public function downloadFromSelection(User $user, array $list_id, bool $octgn): Response
     {
         $tmpDir = $this->cacheDir;
         $file = tempnam($tmpDir, 'zip');

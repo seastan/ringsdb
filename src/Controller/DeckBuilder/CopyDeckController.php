@@ -24,7 +24,7 @@ class CopyDeckController extends AbstractController
     /**
      * @Route("/deck/copy/{decklist_id}", name="deck_copy", requirements={"decklist_id"="\d+"})
      */
-    public function __invoke($decklist_id): Response
+    public function __invoke(int $decklist_id): Response
     {
         /* @var $decklist Decklist */
         $decklist = $this->decklistRepository->find($decklist_id);

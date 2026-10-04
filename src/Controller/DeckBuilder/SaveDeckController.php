@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -69,8 +70,8 @@ class SaveDeckController extends AbstractController
             /* @var $deck \App\Entity\Deck */
             $deck = new Deck();
         }
-        $content = (array) json_decode($request->get('content'));
-        if (!isset($content['main']) || empty($content['main'])) {
+        $content = json_decode($request->get('content'), true);
+        if (!isset($content['main']) || !is_array($content['main'])) {
             return new Response('Cannot import an empty deck');
         }
         $name = filter_var($request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
@@ -78,9 +79,12 @@ class SaveDeckController extends AbstractController
             $name = 'Untitled Deck';
         }
         $decklist_id = filter_var($request->get('decklist_id'), FILTER_SANITIZE_NUMBER_INT);
+        if (false === $decklist_id) {
+            throw new BadRequestHttpException('Wrong decklist_id');
+        }
         $description = trim($request->get('description') ?? '');
         $tags = filter_var($request->get('tags'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
-        $this->decks->saveDeck($this->getUser(), $deck, $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);
+        $this->decks->saveDeck($user, $deck, (int) $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);
         $this->entityManager->flush();
 
         return $this->redirect($this->generateUrl('decks_list'));

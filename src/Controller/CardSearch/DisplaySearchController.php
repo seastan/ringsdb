@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\CardSearch;
 
+use App\Entity\Card;
 use App\Entity\Pack;
 use App\Repository\CardPrintingRepository;
 use App\Repository\CycleRepository;
@@ -36,13 +37,8 @@ class DisplaySearchController extends AbstractController
 
     /**
      * No route for this controller, it's called internally only.
-     *
-     * @param string $view
-     * @param int    $page
-     * @param string $pagetitle
-     * @param string $meta
      */
-    public function __invoke($q, $view = 'card', $sort, $page = 1, $pagetitle = '', $meta = '', $selected_pack_code = null): Response
+    public function __invoke(string $q, string $view = 'card', string $sort = 'set', int $page = 1, string $pagetitle = '', string $meta = '', ?string $selected_pack_code = null): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -114,7 +110,7 @@ class DisplaySearchController extends AbstractController
                     }
                 }
                 if ($includeReviews) {
-                    $cardinfo['reviews'] = $this->cardsData->get_reviews($card);
+                    $cardinfo['reviews'] = $this->cardsData->getReviews($card);
                 }
                 $cards[] = $cardinfo;
             }
@@ -151,7 +147,7 @@ class DisplaySearchController extends AbstractController
         return $this->render('Search/display-'.$view.'.html.twig', ['view' => $view, 'sort' => $sort, 'cards' => $cards, 'first' => $first, 'last' => $last, 'searchbar' => $searchbar, 'pagination' => $pagination, 'pagetitle' => $pagetitle, 'metadescription' => $meta, 'includeReviews' => $includeReviews], $response);
     }
 
-    public function setNavigation($card, $selectedPackCode = null): string
+    public function setNavigation(Card $card, ?string $selectedPackCode = null): string
     {
         $em = $this->getDoctrine();
         $selectedPack = null;
@@ -190,18 +186,18 @@ class DisplaySearchController extends AbstractController
         return $this->renderView('Search/setnavigation.html.twig', ['prevtitle' => $prev ? $prev->getName() : '', 'prevhref' => $prev ? $this->generateUrl('cards_zoom', array_merge(['card_code' => $prev->getCode()], $packParam)) : '', 'nexttitle' => $next ? $next->getName() : '', 'nexthref' => $next ? $this->generateUrl('cards_zoom', array_merge(['card_code' => $next->getCode()], $packParam)) : '', 'settitle' => $selectedPack->getName(), 'sethref' => $this->generateUrl('cards_list', ['pack_code' => $selectedPack->getCode()])]);
     }
 
-    public function paginationItem($q = null, $v, $s, $ps, $pi, $total): string
+    public function paginationItem(?string $q = null, string $v, string $s, int $ps, int $pi, int $total): string
     {
         return $this->renderView('Search/paginationitem.html.twig', ['href' => null == $q ? '' : $this->generateUrl('cards_find', ['q' => $q, 'view' => $v, 'sort' => $s, 'page' => $pi]), 'ps' => $ps, 'pi' => $pi, 's' => $ps * ($pi - 1) + 1, 'e' => min($ps * $pi, $total)]);
     }
 
-    public function pagination($pagesize, $total, $current, $q, $view, $sort): string
+    public function pagination(int $pagesize, int $total, int $current, string $q, string $view, string $sort): string
     {
         if ($total < $pagesize) {
             $pagesize = $total;
         }
-        $pagecount = ceil($total / $pagesize);
-        $pageindex = ceil($current / $pagesize);
+        $pagecount = (int) ceil($total / $pagesize);
+        $pageindex = (int) ceil($current / $pagesize);
         // 1-based
         $first = '';
         if ($pageindex > 2) {

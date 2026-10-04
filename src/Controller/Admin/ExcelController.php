@@ -11,7 +11,7 @@ use App\Repository\CardPrintingRepository;
 use App\Repository\CardRepository;
 use App\Repository\PackRepository;
 use App\Services\Texts;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -33,11 +33,16 @@ class ExcelController extends AbstractController
      * @var PackRepository
      */
     private $packRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(CardRepository $cardRepository, PackRepository $packRepository)
-    {
+    public function __construct(
+        CardRepository $cardRepository,
+        PackRepository $packRepository,
+        EntityManagerInterface $entityManager
+    ) {
         $this->cardRepository = $cardRepository;
         $this->packRepository = $packRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -56,7 +61,6 @@ class ExcelController extends AbstractController
     public function downloadProcessAction(Request $request, Texts $texts, CardPrintingRepository $cardPrintingRepository): StreamedResponse
     {
         $ignoredFields = ['id', 'dateCreation', 'dateUpdate'];
-        $em = $this->getDoctrine()->getManager();
         $pack_id = $request->request->get('pack');
         if (0 == $pack_id) {
             $cards = $this->cardRepository->findBy([], ['code' => 'ASC']);
@@ -70,8 +74,8 @@ class ExcelController extends AbstractController
             $cards = array_values(array_unique(array_map(fn ($p) => $p->getCard(), $printings), SORT_REGULAR));
             $pack_name = $pack->getName();
         }
-        $fieldNames = $em->getClassMetadata(Card::class)->getFieldNames();
-        $associationMappings = $em->getClassMetadata(Card::class)->getAssociationMappings();
+        $fieldNames = $this->entityManager->getClassMetadata(Card::class)->getFieldNames();
+        $associationMappings = $this->entityManager->getClassMetadata(Card::class)->getAssociationMappings();
         $lastModified = null;
         /* @var $card \App\Entity\Card */
         foreach ($cards as $card) {
@@ -117,7 +121,7 @@ class ExcelController extends AbstractController
                 if (!isset($value)) {
                     $value = '';
                 }
-                $type = $em->getClassMetadata(Card::class)->getTypeOfField($fieldName);
+                $type = $this->entityManager->getClassMetadata(Card::class)->getTypeOfField($fieldName);
                 $phpCell = $phpActiveSheet->getCell([$col_index++, $row_index + 2]);
                 if ('code' == $fieldName) {
                     $phpCell->setValueExplicit($value, DataType::TYPE_STRING);
@@ -189,10 +193,8 @@ class ExcelController extends AbstractController
                 $cards[] = $card;
             }
         }
-        /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
         $repo = $this->cardRepository;
-        $metaData = $em->getClassMetadata(Card::class);
+        $metaData = $this->entityManager->getClassMetadata(Card::class);
         $fieldNames = $metaData->getFieldNames();
         $associationMappings = $metaData->getAssociationMappings();
         $counter = 0;
@@ -218,7 +220,7 @@ class ExcelController extends AbstractController
                     $associationMapping = $associationMappings[$colName];
                     /** @var class-string<Type|Sphere> $targetEntity */
                     $targetEntity = $associationMapping['targetEntity'];
-                    $associationRepository = $em->getRepository($targetEntity);
+                    $associationRepository = $this->entityManager->getRepository($targetEntity);
                     /** @var Type|Sphere|null $associationEntity */
                     $associationEntity = $associationRepository->findOneBy(['name' => $value]);
                     if (!$associationEntity) {
@@ -244,12 +246,12 @@ class ExcelController extends AbstractController
                 }
             }
             if ($changed) {
-                $em->persist($entity);
+                $this->entityManager->persist($entity);
                 ++$counter;
                 echo implode('', $output);
             }
         }
-        $em->flush();
+        $this->entityManager->flush();
 
         return new Response($counter.' cards changed or added');
     }

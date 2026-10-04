@@ -110,9 +110,8 @@ class DeckWorkflowTest extends WebTestCase
         $form['name'] = $name;
         $form['description'] = $description;
         $form['tags'] = $tags;
-        $form['content'] = (string) json_encode(['main' => (object) $main, 'side' => new \stdClass()]);
+        $form['content'] = (string) json_encode(['main' => $main, 'side' => []]);
         $client->submit($form);
-
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/decks', $client->getResponse()->headers->get('Location'));
     }
@@ -326,8 +325,7 @@ class DeckWorkflowTest extends WebTestCase
     public function refusedContentProvider(): array
     {
         return [
-            'main as an empty array' => [json_encode(['main' => [], 'side' => []])],
-            'no main' => [json_encode(['side' => new \stdClass()])],
+            'no main' => [json_encode(['side' => []])],
             'empty field' => [''],
             'invalid JSON' => ['{"main":'],
         ];
@@ -352,23 +350,22 @@ class DeckWorkflowTest extends WebTestCase
             return $client->getResponse();
         };
 
-        $response = $post(json_encode(['side' => new \stdClass()]));
+        $response = $post(json_encode(['side' => []]));
         $this->assertSame(422, $response->getStatusCode());
         $this->assertSame(['success' => false, 'error' => 'Cannot save an empty deck.'], json_decode($response->getContent(), true));
         $this->assertSame('New Deck', $this->fetchDeck($client, $deckId)['name']);
 
         $main = self::coreLeadershipDeck();
-        $response = $post(json_encode(['main' => $main, 'side' => new \stdClass()]));
+        $response = $post(json_encode(['main' => $main, 'side' => []]));
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame(['success' => true, 'id' => $deckId], json_decode($response->getContent(), true));
         $deck = $this->fetchDeck($client, $deckId);
         $this->assertSame(['PHPUnit Ajax', null, '1'], [$deck['name'], $deck['problem'], $deck['minor_version']]);
         $this->assertSame($main, $this->fetchSlots($client, 'deckslot', 'deck_id', $deckId));
 
-        // what the builder sends for an empty deck is accepted, as on /deck/save
-        $response = $post(json_encode(['main' => new \stdClass(), 'side' => new \stdClass()]));
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame([], $this->fetchSlots($client, 'deckslot', 'deck_id', $deckId));
+        // what the builder sends for an empty deck is rejected, as on /deck/save
+        $response = $post(json_encode(['main' => [], 'side' => []]));
+        $this->assertSame(422, $response->getStatusCode());
     }
 
     /* -------------------------------------------------------------- import */
@@ -455,14 +452,6 @@ class DeckWorkflowTest extends WebTestCase
         unlink($path);
 
         $ids = $this->newDeckIds($client, $maxId);
-        if (null === $expectedSlots) {
-            $this->assertSame(200, $client->getResponse()->getStatusCode());
-            $this->assertSame('Cannot import an empty deck', $client->getResponse()->getContent());
-            $this->assertSame([], $ids);
-
-            return;
-        }
-
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/decks', $client->getResponse()->headers->get('Location'));
         $this->assertCount(1, $ids);
@@ -477,7 +466,7 @@ class DeckWorkflowTest extends WebTestCase
             'text file' => ['PHPUnit Text.txt', "1x Aragorn\n3x Guard of the Citadel\n", ['01001' => 1, '01013' => 3], 'too_few_cards'],
             // BUG: parseTextImport() queries the Card.pack field removed by the card printings refactor
             'text file with pack names' => ['PHPUnit Packs.txt', "1x Aragorn (Core Set)\n3x Guard of the Citadel (Core Set)\n", ['01001' => 1, '01013' => 3], 'too_few_cards'],
-            'text file without any card' => ['PHPUnit Nothing.txt', "Nothing to see here\n", null],
+            'text file without any card' => ['PHPUnit Nothing.txt', "Nothing to see here\n", [], 'too_few_heroes'],
         ];
     }
 
@@ -674,7 +663,7 @@ class DeckWorkflowTest extends WebTestCase
             'id' => $deckId,
             'name' => 'PHPUnit Tags',
             'tags' => $tags,
-            'content' => json_encode(['main' => self::coreLeadershipDeck(), 'side' => new \stdClass()]),
+            'content' => json_encode(['main' => self::coreLeadershipDeck(), 'side' => []]),
         ]);
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());

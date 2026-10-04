@@ -93,4 +93,25 @@ abstract class ExportableDeck
             'sideslots_by_type' => $sideslots->getSlotsByType(),
         ];
     }
+
+    /**
+     * @return array{main: array<string, int>, side: array<string, int>}
+     */
+    public function getContent(): array
+    {
+        $content = [
+            'main' => [],
+            'side' => [],
+        ];
+
+        foreach ($this->getSlots() as $slot) {
+            $content['main'][$slot->getCard()->getCode()] = $slot->getQuantity();
+        }
+
+        foreach ($this->getSideslots() as $slot) {
+            $content['side'][$slot->getCard()->getCode()] = $slot->getQuantity();
+        }
+
+        return $content;
+    }
 }

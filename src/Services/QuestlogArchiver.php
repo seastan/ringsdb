@@ -31,7 +31,7 @@ class QuestlogArchiver
         $this->texts = $texts;
     }
 
-    public function downloadFromSelection(User $user, $questlog_id, $octgn): Response
+    public function downloadFromSelection(User $user, int $questlog_id, bool $octgn): Response
     {
         /* @var $questlog \App\Entity\QuestLog */
         $questlog = $this->questlogRepository->find($questlog_id);

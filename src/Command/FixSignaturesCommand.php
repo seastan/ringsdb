@@ -16,17 +16,17 @@ class FixSignaturesCommand extends Command
     /**
      * @var EntityManagerInterface
      */
-    private $em;
+    private $entityManager;
 
     /**
      * @var DecklistRepository
      */
     private $decklistRepository;
 
-    public function __construct(EntityManagerInterface $em, DecklistRepository $decklistRepository)
+    public function __construct(EntityManagerInterface $entityManager, DecklistRepository $decklistRepository)
     {
         parent::__construct();
-        $this->em = $em;
+        $this->entityManager = $entityManager;
         $this->decklistRepository = $decklistRepository;
     }
 
@@ -38,8 +38,6 @@ class FixSignaturesCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $em = $this->em;
-
         $count = 0;
 
         /* @var $decklists Decklist[] */
@@ -60,7 +58,7 @@ class FixSignaturesCommand extends Command
             }
         }
 
-        $em->flush();
+        $this->entityManager->flush();
         $output->writeln(date('c')." Fixed $count decklist signatures.");
 
         return 0;

@@ -25,7 +25,7 @@ class EditFormDecklistController extends AbstractController
      *
      * @Route("/decklist/edit/{decklist_id}", name="decklist_edit", requirements={"decklist_id"="\d+"})
      */
-    public function __invoke($decklist_id): Response
+    public function __invoke(int $decklist_id): Response
     {
         /* @var $user \App\Entity\User */
         $user = $this->getUser();

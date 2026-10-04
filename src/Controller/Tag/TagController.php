@@ -9,6 +9,7 @@ use App\Entity\Deck;
 use App\Repository\DeckRepository;
 use App\Services\Decks;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,6 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class TagController extends AbstractController
 {
     use CurrentUserTrait;
+
     /**
      * @var Decks
      */
@@ -25,11 +27,16 @@ class TagController extends AbstractController
      * @var DeckRepository
      */
     private $deckRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(Decks $decks, DeckRepository $deckRepository)
-    {
+    public function __construct(
+        Decks $decks,
+        DeckRepository $deckRepository,
+        EntityManagerInterface $entityManager
+    ) {
         $this->decks = $decks;
         $this->deckRepository = $deckRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -40,7 +47,6 @@ class TagController extends AbstractController
         $list_id = $request->get('ids');
         $list_tag = $this->decks->normalizeTags((array) $request->get('tags'));
         /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
         $response = ['success' => true];
         foreach ($list_id as $id) {
             /* @var $deck Deck */
@@ -55,7 +61,7 @@ class TagController extends AbstractController
             $response['tags'][$deck->getId()] = $tags;
             $deck->setTags(implode(' ', $tags));
         }
-        $em->flush();
+        $this->entityManager->flush();
 
         return new Response(json_encode($response));
     }
@@ -68,7 +74,6 @@ class TagController extends AbstractController
         $list_id = $request->get('ids');
         $list_tag = $this->decks->normalizeTags((array) $request->get('tags'));
         /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
         $response = ['success' => true];
         foreach ($list_id as $id) {
             /* @var $deck Deck */
@@ -83,7 +88,7 @@ class TagController extends AbstractController
             $response['tags'][$deck->getId()] = $tags;
             $deck->setTags(implode(' ', $tags));
         }
-        $em->flush();
+        $this->entityManager->flush();
 
         return new Response(json_encode($response));
     }
@@ -95,7 +100,6 @@ class TagController extends AbstractController
     {
         $list_id = $request->get('ids');
         /* @var $em EntityManager */
-        $em = $this->getDoctrine()->getManager();
         $response = ['success' => true];
         foreach ($list_id as $id) {
             /* @var $deck Deck */
@@ -109,7 +113,7 @@ class TagController extends AbstractController
             $response['tags'][$deck->getId()] = [];
             $deck->setTags('');
         }
-        $em->flush();
+        $this->entityManager->flush();
 
         return new Response(json_encode($response));
     }

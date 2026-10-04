@@ -129,7 +129,7 @@ class SaveQuestlogController extends AbstractController
                 $deck_id = intval(filter_var($request->request->get('deck'.$i.'_id'), FILTER_SANITIZE_NUMBER_INT));
                 $is_decklist = 'true' == filter_var($request->get('deck'.$i.'_is_decklist'), FILTER_SANITIZE_STRING);
                 $player = trim((string) filter_var($request->get('questlogdeck'.$i.'_player_name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
-                $content = (array) json_decode($request->get('questlogdeck'.$i.'_content'));
+                $content = (array) json_decode($request->get('questlogdeck'.$i.'_content'), true);
                 if ($deck_id) {
                     if (!$is_decklist) {
                         /* @var $deck \App\Entity\Deck */

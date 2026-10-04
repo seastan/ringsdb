@@ -46,7 +46,7 @@ class MyListQuestlogController extends AbstractController
      *     defaults={"scenario_name_canonical"=null, "quest_mode"="normal"}
      * )
      */
-    public function __invoke($scenario_name_canonical, $quest_mode): Response
+    public function __invoke(?string $scenario_name_canonical, ?string $quest_mode): Response
     {
         // $quest_mode = 'normal';
         /* @var $quests Scenario[] */

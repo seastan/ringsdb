@@ -30,7 +30,7 @@ class EditCustomPackController extends AbstractController
      *     requirements={"id"="\d+"}
      * )
      */
-    public function __invoke($id): Response
+    public function __invoke(int $id): Response
     {
         $pack = $this->customPackManager->loadOwnedPack($this->currentUser(), $id);
         if (!$pack) {

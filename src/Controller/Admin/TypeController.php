@@ -7,6 +7,7 @@ namespace App\Controller\Admin;
 use App\Entity\Type;
 use App\Form\TypeType;
 use App\Repository\TypeRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormInterface;
@@ -24,10 +25,14 @@ class TypeController extends AbstractController
      * @var TypeRepository
      */
     private $typeRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(TypeRepository $typeRepository)
-    {
+    public function __construct(
+        TypeRepository $typeRepository,
+        EntityManagerInterface $entityManager
+    ) {
         $this->typeRepository = $typeRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -53,9 +58,8 @@ class TypeController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($entity);
-            $em->flush();
+            $this->entityManager->persist($entity);
+            $this->entityManager->flush();
 
             return $this->redirect($this->generateUrl('admin_type_show', ['id' => $entity->getId()]));
         }
@@ -95,7 +99,7 @@ class TypeController extends AbstractController
      *
      * @Route("/admin/type/{id}/show", name="admin_type_show")
      */
-    public function showAction($id): Response
+    public function showAction(int $id): Response
     {
         $entity = $this->typeRepository->find($id);
         if (!$entity) {
@@ -111,7 +115,7 @@ class TypeController extends AbstractController
      *
      * @Route("/admin/type/{id}/edit", name="admin_type_edit")
      */
-    public function editAction($id): Response
+    public function editAction(int $id): Response
     {
         $entity = $this->typeRepository->find($id);
         if (!$entity) {
@@ -143,9 +147,8 @@ class TypeController extends AbstractController
      *
      * @Route("/admin/type/{id}/update", name="admin_type_update", methods={"POST", "PUT"})
      */
-    public function updateAction(Request $request, $id): Response
+    public function updateAction(Request $request, int $id): Response
     {
-        $em = $this->getDoctrine()->getManager();
         $entity = $this->typeRepository->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Type entity.');
@@ -154,7 +157,7 @@ class TypeController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $em->flush();
+            $this->entityManager->flush();
 
             return $this->redirect($this->generateUrl('admin_type_edit', ['id' => $id]));
         }
@@ -167,18 +170,17 @@ class TypeController extends AbstractController
      *
      * @Route("/admin/type/{id}/delete", name="admin_type_delete", methods={"POST", "DELETE"})
      */
-    public function deleteAction(Request $request, $id): RedirectResponse
+    public function deleteAction(Request $request, int $id): RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
             $entity = $this->typeRepository->find($id);
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Type entity.');
             }
-            $em->remove($entity);
-            $em->flush();
+            $this->entityManager->remove($entity);
+            $this->entityManager->flush();
         }
 
         return $this->redirect($this->generateUrl('admin_type'));
@@ -187,11 +189,9 @@ class TypeController extends AbstractController
     /**
      * Creates a form to delete a Type entity by id.
      *
-     * @param mixed $id The entity id
-     *
      * @return FormInterface<mixed> The form
      */
-    private function createDeleteForm($id): FormInterface
+    private function createDeleteForm(int $id): FormInterface
     {
         return $this->createFormBuilder()->setAction($this->generateUrl('admin_type_delete', ['id' => $id]))->setMethod('DELETE')->getForm();
     }

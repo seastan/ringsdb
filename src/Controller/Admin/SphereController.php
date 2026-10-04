@@ -7,6 +7,7 @@ namespace App\Controller\Admin;
 use App\Entity\Sphere;
 use App\Form\SphereType;
 use App\Repository\SphereRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormInterface;
@@ -24,10 +25,14 @@ class SphereController extends AbstractController
      * @var SphereRepository
      */
     private $sphereRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(SphereRepository $sphereRepository)
-    {
+    public function __construct(
+        SphereRepository $sphereRepository,
+        EntityManagerInterface $entityManager
+    ) {
         $this->sphereRepository = $sphereRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -53,9 +58,8 @@ class SphereController extends AbstractController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($entity);
-            $em->flush();
+            $this->entityManager->persist($entity);
+            $this->entityManager->flush();
 
             return $this->redirect($this->generateUrl('admin_sphere_show', ['id' => $entity->getId()]));
         }
@@ -95,7 +99,7 @@ class SphereController extends AbstractController
      *
      * @Route("/admin/sphere/{id}/show", name="admin_sphere_show")
      */
-    public function showAction($id): Response
+    public function showAction(int $id): Response
     {
         $entity = $this->sphereRepository->find($id);
         if (!$entity) {
@@ -111,7 +115,7 @@ class SphereController extends AbstractController
      *
      * @Route("/admin/sphere/{id}/edit", name="admin_sphere_edit")
      */
-    public function editAction($id): Response
+    public function editAction(int $id): Response
     {
         $entity = $this->sphereRepository->find($id);
         if (!$entity) {
@@ -143,9 +147,8 @@ class SphereController extends AbstractController
      *
      * @Route("/admin/sphere/{id}/update", name="admin_sphere_update", methods={"POST", "PUT"})
      */
-    public function updateAction(Request $request, $id): Response
+    public function updateAction(Request $request, int $id): Response
     {
-        $em = $this->getDoctrine()->getManager();
         $entity = $this->sphereRepository->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Sphere entity.');
@@ -154,7 +157,7 @@ class SphereController extends AbstractController
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $em->flush();
+            $this->entityManager->flush();
 
             return $this->redirect($this->generateUrl('admin_sphere_edit', ['id' => $id]));
         }
@@ -167,18 +170,17 @@ class SphereController extends AbstractController
      *
      * @Route("/admin/sphere/{id}/delete", name="admin_sphere_delete", methods={"POST", "DELETE"})
      */
-    public function deleteAction(Request $request, $id): RedirectResponse
+    public function deleteAction(Request $request, int $id): RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
             $entity = $this->sphereRepository->find($id);
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Sphere entity.');
             }
-            $em->remove($entity);
-            $em->flush();
+            $this->entityManager->remove($entity);
+            $this->entityManager->flush();
         }
 
         return $this->redirect($this->generateUrl('admin_sphere'));
@@ -187,11 +189,9 @@ class SphereController extends AbstractController
     /**
      * Creates a form to delete a Sphere entity by id.
      *
-     * @param mixed $id The entity id
-     *
      * @return FormInterface<mixed> The form
      */
-    private function createDeleteForm($id): FormInterface
+    private function createDeleteForm(int $id): FormInterface
     {
         return $this->createFormBuilder()->setAction($this->generateUrl('admin_sphere_delete', ['id' => $id]))->setMethod('DELETE')->getForm();
     }

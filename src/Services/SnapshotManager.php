@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Deck;
+use App\Entity\Questlog;
 
 class SnapshotManager
 {
@@ -15,7 +16,7 @@ class SnapshotManager
         $this->decks = $decks;
     }
 
-    public function setSnapshot($questlog): void
+    public function setSnapshot(Questlog $questlog): void
     {
         $questlog_decks = $questlog->getDecks();
         $decks_service = $this->decks;
@@ -26,12 +27,15 @@ class SnapshotManager
                 $deck->setName('[deleted]');
                 $questlog_deck->setDeck($deck);
             }
-            $questlogdeck_content = (array) json_decode($questlog_deck->getContent());
+            $questlogdeck_content = json_decode($questlog_deck->getContent(), true);
             $decks_service->setSlots($deck, $questlogdeck_content);
         }
     }
 
-    public function setSnapshots($questlogs): void
+    /**
+     * @param array<Questlog> $questlogs
+     */
+    public function setSnapshots(array $questlogs): void
     {
         foreach ($questlogs as $questlog) {
             $this->setSnapshot($questlog);

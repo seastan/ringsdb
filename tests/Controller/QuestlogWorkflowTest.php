@@ -106,7 +106,7 @@ class QuestlogWorkflowTest extends WebTestCase
     {
         $rows = $this->db($client)->fetchAll('SELECT c.code, s.quantity FROM deckslot s JOIN card c ON c.id = s.card_id WHERE s.deck_id = ? ORDER BY c.code', [$deckId]);
 
-        return json_encode(['main' => (object) array_map('intval', array_column($rows, 'quantity', 'code')), 'side' => new \stdClass()]);
+        return json_encode(['main' => array_map('intval', array_column($rows, 'quantity', 'code')), 'side' => []]);
     }
 
     /**
@@ -283,7 +283,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $client = $this->createAuthenticatedClient();
         [, $form] = $this->newForm($client);
         $form['quest'] = '1';
-        $played = json_encode(['main' => ['01001' => 1, '01013' => 3], 'side' => new \stdClass()]);
+        $played = json_encode(['main' => ['01001' => 1, '01013' => 3], 'side' => []]);
         self::selectDecks($form, [1 => [1, false, $played]]);
         $client->submit($form);
 

@@ -16,7 +16,7 @@ class FixCanonicalNamesCommand extends Command
     /**
      * @var EntityManagerInterface
      */
-    private $em;
+    private $entityManager;
 
     /**
      * @var Texts
@@ -28,10 +28,10 @@ class FixCanonicalNamesCommand extends Command
      */
     private $scenarioRepository;
 
-    public function __construct(EntityManagerInterface $em, Texts $texts, ScenarioRepository $scenarioRepository)
+    public function __construct(EntityManagerInterface $entityManager, Texts $texts, ScenarioRepository $scenarioRepository)
     {
         parent::__construct();
-        $this->em = $em;
+        $this->entityManager = $entityManager;
         $this->texts = $texts;
         $this->scenarioRepository = $scenarioRepository;
     }
@@ -44,8 +44,6 @@ class FixCanonicalNamesCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $em = $this->em;
-
         $texts = $this->texts;
         $count = 0;
 
@@ -59,7 +57,7 @@ class FixCanonicalNamesCommand extends Command
             }
         }
 
-        $em->flush();
+        $this->entityManager->flush();
         $output->writeln(date('c')." Fixed $count scenario canonical names.");
 
         return 0;

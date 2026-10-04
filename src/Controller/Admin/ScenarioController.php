@@ -7,6 +7,7 @@ namespace App\Controller\Admin;
 use App\Entity\Scenario;
 use App\Form\ScenarioType;
 use App\Repository\ScenarioRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormInterface;
@@ -24,10 +25,14 @@ class ScenarioController extends AbstractController
      * @var ScenarioRepository
      */
     private $scenarioRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(ScenarioRepository $scenarioRepository)
-    {
+    public function __construct(
+        ScenarioRepository $scenarioRepository,
+        EntityManagerInterface $entityManager
+    ) {
         $this->scenarioRepository = $scenarioRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -89,9 +94,8 @@ class ScenarioController extends AbstractController
             $entity->setNightmareObjectiveLocations(0);
             $entity->setNightmareSurges(0);
             $entity->setNightmareEncounterSideQuests(0);
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($entity);
-            $em->flush();
+            $this->entityManager->persist($entity);
+            $this->entityManager->flush();
 
             return $this->redirect($this->generateUrl('admin_scenario_show', ['id' => $entity->getId()]));
         }
@@ -117,7 +121,7 @@ class ScenarioController extends AbstractController
      *
      * @Route("/admin/scenario/{id}/show", name="admin_scenario_show")
      */
-    public function showAction($id): Response
+    public function showAction(int $id): Response
     {
         $entity = $this->scenarioRepository->find($id);
         if (!$entity) {
@@ -133,7 +137,7 @@ class ScenarioController extends AbstractController
      *
      * @Route("/admin/scenario/{id}/edit", name="admin_scenario_edit")
      */
-    public function editAction($id): Response
+    public function editAction(int $id): Response
     {
         $entity = $this->scenarioRepository->find($id);
         if (!$entity) {
@@ -150,9 +154,8 @@ class ScenarioController extends AbstractController
      *
      * @Route("/admin/scenario/{id}/update", name="admin_scenario_update", methods={"POST", "PUT"})
      */
-    public function updateAction(Request $request, $id): Response
+    public function updateAction(Request $request, int $id): Response
     {
-        $em = $this->getDoctrine()->getManager();
         $entity = $this->scenarioRepository->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Scenario entity.');
@@ -163,8 +166,8 @@ class ScenarioController extends AbstractController
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             //            $texts = $this->getContainer()->get('texts');
             //            $entity->setCanonicalName($texts->slugify($entity->getName()));
-            $em->persist($entity);
-            $em->flush();
+            $this->entityManager->persist($entity);
+            $this->entityManager->flush();
 
             return $this->redirect($this->generateUrl('admin_scenario_edit', ['id' => $id]));
         }
@@ -177,18 +180,17 @@ class ScenarioController extends AbstractController
      *
      * @Route("/admin/scenario/{id}/delete", name="admin_scenario_delete", methods={"POST", "DELETE"})
      */
-    public function deleteAction(Request $request, $id): RedirectResponse
+    public function deleteAction(Request $request, int $id): RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
             $entity = $this->scenarioRepository->find($id);
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Scenario entity.');
             }
-            $em->remove($entity);
-            $em->flush();
+            $this->entityManager->remove($entity);
+            $this->entityManager->flush();
         }
 
         return $this->redirect($this->generateUrl('admin_scenario'));
@@ -197,11 +199,9 @@ class ScenarioController extends AbstractController
     /**
      * Creates a form to delete a Scenario entity by id.
      *
-     * @param mixed $id The entity id
-     *
      * @return FormInterface<mixed> The form
      */
-    private function createDeleteForm($id): FormInterface
+    private function createDeleteForm(int $id): FormInterface
     {
         return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }

@@ -30,7 +30,7 @@ class ViewQuestlogController extends AbstractController
      *     defaults={"questlog_name"=null}
      * )
      */
-    public function __invoke($questlog_id): Response
+    public function __invoke(int $questlog_id): Response
     {
         /* @var $questlog \App\Entity\Questlog */
         $questlog = $this->questlogRepository->find($questlog_id);

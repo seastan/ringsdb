@@ -34,7 +34,7 @@ class HideCommentQuestlogController extends AbstractController
      *     methods={"POST"}
      * )
      */
-    public function __invoke($comment_id, $hidden): Response
+    public function __invoke(int $comment_id, int $hidden): Response
     {
         /* @var $user User */
         $user = $this->getUser();

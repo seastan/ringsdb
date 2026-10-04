@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Helper;
 
+use App\Entity\Fellowship;
 use App\Entity\FellowshipDeck;
 use App\Entity\FellowshipDecklist;
 use App\Model\SlotCollectionInterface;
@@ -15,7 +16,7 @@ class FellowshipValidationHelper
     {
     }
 
-    public function findProblem($fellowship): ?string
+    public function findProblem(Fellowship $fellowship): ?string
     {
         $heroes = [];
         $count = 0;
@@ -59,7 +60,7 @@ class FellowshipValidationHelper
         return null;
     }
 
-    public function getProblemLabel($problem): string
+    public function getProblemLabel(string $problem): string
     {
         if (!$problem) {
             return '';

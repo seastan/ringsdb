@@ -8,6 +8,7 @@ use App\Entity\Card;
 use App\Form\CardType;
 use App\Repository\CardRepository;
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -31,11 +32,16 @@ class CardController extends AbstractController
      * @var CardRepository
      */
     private $cardRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(string $publicDir, CardRepository $cardRepository)
-    {
+    public function __construct(
+        string $publicDir,
+        CardRepository $cardRepository,
+        EntityManagerInterface $entityManager
+    ) {
         $this->publicDir = $publicDir;
         $this->cardRepository = $cardRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -61,9 +67,8 @@ class CardController extends AbstractController
         $form = $this->createForm(CardType::class, $entity);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($entity);
-            $em->flush();
+            $this->entityManager->persist($entity);
+            $this->entityManager->flush();
 
             return $this->redirect($this->generateUrl('admin_card_show', ['id' => $entity->getId()]));
         }
@@ -89,7 +94,7 @@ class CardController extends AbstractController
      *
      * @Route("/admin/card/{id}/show", name="admin_card_show")
      */
-    public function showAction($id): Response
+    public function showAction(int $id): Response
     {
         $entity = $this->cardRepository->find($id);
         if (!$entity) {
@@ -105,7 +110,7 @@ class CardController extends AbstractController
      *
      * @Route("/admin/card/{id}/edit", name="admin_card_edit")
      */
-    public function editAction($id): Response
+    public function editAction(int $id): Response
     {
         $entity = $this->cardRepository->find($id);
         if (!$entity) {
@@ -123,9 +128,8 @@ class CardController extends AbstractController
      *
      * @Route("/admin/card/{id}/update", name="admin_card_update", methods={"POST", "PUT"})
      */
-    public function updateAction(Request $request, $id, Packages $packages): Response
+    public function updateAction(Request $request, int $id, Packages $packages): Response
     {
-        $em = $this->getDoctrine()->getManager();
         $entity = $this->cardRepository->find($id);
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Card entity.');
@@ -135,8 +139,8 @@ class CardController extends AbstractController
         $editForm = $this->createForm(CardType::class, $entity, ['method' => 'PUT']);
         $editForm->handleRequest($request);
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $em->persist($entity);
-            $em->flush();
+            $this->entityManager->persist($entity);
+            $this->entityManager->flush();
             /* @var $file UploadedFile */
             $file = $editForm->get('file')->getData();
             if ($file) {
@@ -157,18 +161,17 @@ class CardController extends AbstractController
      *
      * @Route("/admin/card/{id}/delete", name="admin_card_delete", methods={"POST", "DELETE"})
      */
-    public function deleteAction(Request $request, $id): RedirectResponse
+    public function deleteAction(Request $request, int $id): RedirectResponse
     {
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
             $entity = $this->cardRepository->find($id);
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Card entity.');
             }
-            $em->remove($entity);
-            $em->flush();
+            $this->entityManager->remove($entity);
+            $this->entityManager->flush();
         }
 
         return $this->redirect($this->generateUrl('admin_card'));
@@ -179,12 +182,11 @@ class CardController extends AbstractController
      *
      * @Route("/admin/card/{id}/force_delete", name="admin_card_force_delete", methods={"POST", "DELETE"})
      */
-    public function forceDeleteAction(Request $request, $id): RedirectResponse
+    public function forceDeleteAction(Request $request, int $id): RedirectResponse
     {
         $form = $this->createForceDeleteForm($id);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
             $entity = $this->cardRepository->find($id);
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Card entity.');
@@ -205,8 +207,8 @@ class CardController extends AbstractController
             $dbh->executeQuery($query, []);
             $query = 'DELETE FROM review WHERE card_id = '.$id;
             $dbh->executeQuery($query, []);
-            $em->remove($entity);
-            $em->flush();
+            $this->entityManager->remove($entity);
+            $this->entityManager->flush();
         }
 
         return $this->redirect($this->generateUrl('admin_card'));
@@ -215,11 +217,9 @@ class CardController extends AbstractController
     /**
      * Creates a form to delete a Card entity by id.
      *
-     * @param mixed $id The entity id
-     *
      * @return FormInterface<mixed> The form
      */
-    private function createDeleteForm($id): FormInterface
+    private function createDeleteForm(int $id): FormInterface
     {
         return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }
@@ -227,11 +227,9 @@ class CardController extends AbstractController
     /**
      * Creates a form to forcibly delete a Card entity by id.
      *
-     * @param mixed $id The entity id
-     *
      * @return FormInterface<mixed> The form
      */
-    private function createForceDeleteForm($id): FormInterface
+    private function createForceDeleteForm(int $id): FormInterface
     {
         return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }

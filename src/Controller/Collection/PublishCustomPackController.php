@@ -34,7 +34,7 @@ class PublishCustomPackController extends AbstractController
      *     requirements={"id"="\d+"}
      * )
      */
-    public function __invoke($id): RedirectResponse
+    public function __invoke(int $id): RedirectResponse
     {
         $pack = $this->customPackManager->loadOwnedPack($this->currentUser(), $id);
         if (!$pack) {

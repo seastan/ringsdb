@@ -36,7 +36,7 @@ class DeleteDecklistController extends AbstractController
      *     requirements={"decklist_id"="\d+"}
      * )
      */
-    public function __invoke($decklist_id): RedirectResponse
+    public function __invoke(int $decklist_id): RedirectResponse
     {
         $user = $this->getUser();
         if (!$user) {

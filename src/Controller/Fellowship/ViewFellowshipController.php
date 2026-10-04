@@ -30,7 +30,7 @@ class ViewFellowshipController extends AbstractController
      *     defaults={"fellowship_name"=null}
      * )
      */
-    public function __invoke($fellowship_id): Response
+    public function __invoke(int $fellowship_id): Response
     {
         /* @var $fellowship \App\Entity\Fellowship */
         $fellowship = $this->fellowshipRepository->find($fellowship_id);

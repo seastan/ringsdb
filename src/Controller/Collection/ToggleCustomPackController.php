@@ -35,7 +35,7 @@ class ToggleCustomPackController extends AbstractController
      *     requirements={"id"="\d+"}
      * )
      */
-    public function __invoke(Request $request, $id): RedirectResponse
+    public function __invoke(Request $request, int $id): RedirectResponse
     {
         $pack = $this->customPackManager->loadOwnedPack($this->currentUser(), $id);
         if (!$pack) {

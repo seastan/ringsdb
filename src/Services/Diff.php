@@ -68,9 +68,11 @@ class Diff
     }
 
     /**
+     * @param array<array<string, int>> $decks
+     *
      * @return array{array<int, array<int|string, int>>, array<int|string, int>}
      */
-    public function diffContents($decks): array
+    public function diffContents(array $decks): array
     {
         // n flat lists of the cards of each decklist
         $ensembles = [];

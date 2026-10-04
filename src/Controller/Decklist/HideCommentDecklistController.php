@@ -16,11 +16,14 @@ use Symfony\Component\Routing\Annotation\Route;
 class HideCommentDecklistController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+    private CommentRepository $commentRepository;
 
     public function __construct(
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        CommentRepository $commentRepository
     ) {
         $this->entityManager = $entityManager;
+        $this->commentRepository = $commentRepository;
     }
 
     /**
@@ -28,14 +31,14 @@ class HideCommentDecklistController extends AbstractController
      *
      * @Route("/user/hidecomment/{comment_id}/{hidden}", name="decklist_comment_hide", methods={"POST"})
      */
-    public function __invoke($comment_id, $hidden, CommentRepository $commentRepository): Response
+    public function __invoke(int $comment_id, int $hidden): Response
     {
         /* @var $user User */
         $user = $this->getUser();
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
-        $comment = $commentRepository->find($comment_id);
+        $comment = $this->commentRepository->find($comment_id);
         if (!$comment) {
             throw new BadRequestHttpException('Unable to find comment');
         }

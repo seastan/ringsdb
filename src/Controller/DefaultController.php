@@ -10,6 +10,7 @@ use App\Model\FellowshipManager;
 use App\Repository\ScenarioRepository;
 use App\Repository\TypeRepository;
 use App\Services\CardsData;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,12 +30,18 @@ class DefaultController extends AbstractController
      * @var string|null
      */
     private $publisherName;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(int $cacheExpiration, ?string $gameName, ?string $publisherName)
-    {
+    public function __construct(
+        int $cacheExpiration,
+        ?string $gameName,
+        ?string $publisherName,
+        EntityManagerInterface $entityManager
+    ) {
         $this->cacheExpiration = $cacheExpiration;
         $this->gameName = $gameName;
         $this->publisherName = $publisherName;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -59,7 +66,6 @@ class DefaultController extends AbstractController
         // Managers
         $decklist_manager = $decklistManager;
         $fellowship_manager = $fellowshipManager;
-        $em = $this->getDoctrine()->getManager();
         $typeNames = [];
         foreach ($typeRepository->findAll() as $type) {
             $typeNames[$type->getCode()] = $type->getName();
@@ -78,7 +84,7 @@ class DefaultController extends AbstractController
         $daily_challenge = 'Daily Challenge: Play '.$randquest->getName().' '.$randchallenge.'.';
         // Trending Decks
         $num_trending = 3;
-        $qb = $em->createQueryBuilder();
+        $qb = $this->entityManager->createQueryBuilder();
         $qb->select('d');
         $qb->from('App:Decklist', 'd');
         $qb->setMaxResults($num_trending);
@@ -91,7 +97,7 @@ class DefaultController extends AbstractController
         $decklists_trending = iterator_to_array($paginator->getIterator());
         // Trending Fellowships
         $num_trending_fellowships = 1;
-        $qb = $em->createQueryBuilder();
+        $qb = $this->entityManager->createQueryBuilder();
         $qb->select('d');
         $qb->from('App:Fellowship', 'd');
         $qb->setMaxResults($num_trending_fellowships);
@@ -108,7 +114,7 @@ class DefaultController extends AbstractController
         // We want to be able to skip new decks that are trending,
         // so we grab $num_new+$num_trending recent decklists
         $num_trending = 3;
-        $qb = $em->createQueryBuilder();
+        $qb = $this->entityManager->createQueryBuilder();
         $qb->select('d');
         $qb->from('App:Decklist', 'd');
         $qb->setMaxResults($num_new + $num_trending);
@@ -133,7 +139,7 @@ class DefaultController extends AbstractController
         }
         // New Fellowships
         $num_new_fellowships = 1;
-        $qb = $em->createQueryBuilder();
+        $qb = $this->entityManager->createQueryBuilder();
         $qb->select('d');
         $qb->from('App:Fellowship', 'd');
         $qb->setMaxResults($num_new_fellowships + $num_trending_fellowships);
@@ -215,7 +221,7 @@ class DefaultController extends AbstractController
         }
         // Get recent card reviews
         $dql = 'SELECT DISTINCT r FROM App:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC, r.id DESC';
-        $query = $em->createQuery($dql)->setMaxResults($num_comments);
+        $query = $this->entityManager->createQuery($dql)->setMaxResults($num_comments);
         $paginator = new Paginator($query, false);
         $reviews_recent = iterator_to_array($paginator->getIterator());
         for ($i = 0; $i < min($num_comments, count($reviews_recent)); ++$i) {
@@ -233,9 +239,8 @@ class DefaultController extends AbstractController
             }
         }
         // Recent review comments
-        $em = $this->getDoctrine()->getManager();
         $dql = 'SELECT DISTINCT r FROM App:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateLastComment DESC, r.id DESC';
-        $query = $em->createQuery($dql)->setMaxResults($num_comments);
+        $query = $this->entityManager->createQuery($dql)->setMaxResults($num_comments);
         $paginator = new Paginator($query, false);
         $reviews_recent_discussion = iterator_to_array($paginator->getIterator());
         for ($i = 0; $i < min($num_comments, count($reviews_recent_discussion)); ++$i) {

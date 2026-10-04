@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Controller\CardSearch\SearchController;
 use App\Entity\Card;
 use App\Entity\Review;
 use App\Entity\Sphere;
@@ -12,6 +11,8 @@ use App\Repository\CardRepository;
 use App\Repository\CycleRepository;
 use App\Repository\ReviewRepository;
 use App\Repository\SphereRepository;
+use App\Search\SearchKeys;
+use App\Search\SearchTypes;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -21,7 +22,7 @@ class CardsData
     /**
      * @var EntityManagerInterface
      */
-    private $em;
+    private $entityManager;
 
     /**
      * @var UrlGeneratorInterface
@@ -58,9 +59,17 @@ class CardsData
      */
     private $sphereRepository;
 
-    public function __construct(EntityManagerInterface $em, UrlGeneratorInterface $router, Packages $assets_packages, $publicDir, CardRepository $cardRepository, CycleRepository $cycleRepository, ReviewRepository $reviewRepository, SphereRepository $sphereRepository)
-    {
-        $this->em = $em;
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        UrlGeneratorInterface $router,
+        Packages $assets_packages,
+        string $publicDir,
+        CardRepository $cardRepository,
+        CycleRepository $cycleRepository,
+        ReviewRepository $reviewRepository,
+        SphereRepository $sphereRepository
+    ) {
+        $this->entityManager = $entityManager;
         $this->router = $router;
         $this->assets_packages = $assets_packages;
         $this->publicDir = $publicDir;
@@ -96,7 +105,7 @@ class CardsData
         return str_replace(array_keys($displayTextReplacements), array_values($displayTextReplacements), $text);
     }
 
-    public function splitInParagraphs($text): string
+    public function splitInParagraphs(string $text): string
     {
         if (empty($text)) {
             return '';
@@ -167,11 +176,11 @@ class CardsData
     }
 
     /**
-     * @param bool $forceempty
+     * @param array<array<string>> $conditions
      *
      * @return array<int, Card>
      */
-    public function get_search_rows($conditions, $sortorder, $forceempty = false): array
+    public function get_search_rows(array $conditions, string $sortorder, bool $forceempty = false): array
     {
         $i = 0;
 
@@ -185,13 +194,13 @@ class CardsData
             $operator = array_shift($condition);
 
             $searchName = '';
-            if (isset(SearchController::$searchKeys[$searchCode])) {
-                $searchName = SearchController::$searchKeys[$searchCode];
+            if (isset(SearchKeys::$searchKeys[$searchCode])) {
+                $searchName = SearchKeys::$searchKeys[$searchCode];
             }
 
             $searchType = '';
-            if (isset(SearchController::$searchTypes[$searchCode])) {
-                $searchType = SearchController::$searchTypes[$searchCode];
+            if (isset(SearchTypes::$searchTypes[$searchCode])) {
+                $searchType = SearchTypes::$searchTypes[$searchCode];
             }
 
             switch ($searchType) {
@@ -474,7 +483,7 @@ class CardsData
     {
         $cardinfo = [];
 
-        $metadata = $this->em->getClassMetadata(Card::class);
+        $metadata = $this->entityManager->getClassMetadata(Card::class);
         $fieldNames = $metadata->getFieldNames();
         $associationMappings = $metadata->getAssociationMappings();
 
@@ -576,7 +585,7 @@ class CardsData
     /**
      * @return list<array<int, string>>
      */
-    public function syntax($query): array
+    public function syntax(string $query): array
     {
         // renvoie une liste de conditions (array)
         // chaque condition est un tableau à n>1 éléments
@@ -653,9 +662,11 @@ class CardsData
     }
 
     /**
+     * @param list<array<int, string>> $conditions
+     *
      * @return array<int, mixed>
      */
-    public function validateConditions($conditions): array
+    public function validateConditions(array $conditions): array
     {
         // suppression des conditions invalides
         $numeric = ['<', '>'];
@@ -664,7 +675,7 @@ class CardsData
             $searchCode = $l[0];
             $searchOp = $l[1];
 
-            if (in_array($searchOp, $numeric) && 'integer' !== SearchController::$searchTypes[$searchCode] && 'date' !== SearchController::$searchTypes[$searchCode]) {
+            if (in_array($searchOp, $numeric) && 'integer' !== SearchTypes::$searchTypes[$searchCode] && 'date' !== SearchTypes::$searchTypes[$searchCode]) {
                 // operator is numeric but searched property is not
                 unset($conditions[$i]);
             }
@@ -673,21 +684,35 @@ class CardsData
         return array_values($conditions);
     }
 
-    public function buildQueryFromConditions($conditions): string
+    /**
+     * @param array<array<string>> $conditions
+     */
+    public function buildQueryFromConditions(array $conditions): string
     {
-        return implode(' ', array_map(fn ($l) => ($l[0] ? $l[0].$l[1] : '').implode('|', array_map(fn ($s) => preg_match("/^[\p{L}\p{N}\-\&]+$/u", $s) ? $s : "\"$s\"", array_slice($l, 2))), $conditions));
+        return implode(
+            ' ',
+            array_map(
+                fn ($l) => ($l[0] ? $l[0].$l[1] : '')
+                    .implode(
+                        '|',
+                        array_map(
+                            fn ($s) => preg_match("/^[\p{L}\p{N}\-\&]+$/u", $s)
+                                ? $s
+                                : "\"$s\"",
+                            array_slice($l, 2)
+                        )
+                    ),
+                $conditions
+            )
+        );
     }
 
     /**
      * @return array<int, Review>
      */
-    public function get_reviews($card): array
+    public function getReviews(Card $card): array
     {
-        $reviews = $this->reviewRepository->findBy(['card' => $card], ['nbVotes' => 'DESC', 'id' => 'ASC']);
-
-        $response = $reviews;
-
-        return $response;
+        return $this->reviewRepository->findBy(['card' => $card], ['nbVotes' => 'DESC', 'id' => 'ASC']);
     }
 
     /**
@@ -695,7 +720,7 @@ class CardsData
      */
     public function getDistinctTraits(): array
     {
-        $qb = $this->em->createQueryBuilder();
+        $qb = $this->entityManager->createQueryBuilder();
         $qb->from('App:Card', 'c');
         $qb->select('c.traits');
         $qb->distinct();

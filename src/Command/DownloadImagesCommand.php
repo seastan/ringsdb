@@ -6,8 +6,6 @@ namespace App\Command;
 
 use App\Entity\ReviewRepository;
 use App\Repository\CardRepository;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,11 +13,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DownloadImagesCommand extends Command
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
     /**
      * @var Packages
      */
@@ -35,10 +28,9 @@ class DownloadImagesCommand extends Command
      */
     private $cardRepository;
 
-    public function __construct(EntityManagerInterface $em, Packages $packages, string $publicDir, CardRepository $cardRepository)
+    public function __construct(Packages $packages, string $publicDir, CardRepository $cardRepository)
     {
         parent::__construct();
-        $this->em = $em;
         $this->packages = $packages;
         $this->publicDir = $publicDir;
         $this->cardRepository = $cardRepository;
@@ -55,9 +47,6 @@ class DownloadImagesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $assets_helper = $this->packages;
-
-        /* @var $em EntityManager */
-        $em = $this->em;
 
         /* @var $repo ReviewRepository */
         $repo = $this->cardRepository;

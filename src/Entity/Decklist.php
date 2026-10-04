@@ -853,25 +853,4 @@ class Decklist extends ExportableDeck implements \JsonSerializable
 
         return array_filter($allQuestlogs, fn ($k) => $k->getQuestlog()->getIsPublic());
     }
-
-    /**
-     * @return array{main: array<int|string, int>, side: array<int|string, int>}
-     */
-    public function getContent(): array
-    {
-        $content = [
-            'main' => [],
-            'side' => [],
-        ];
-
-        foreach ($this->getSlots() as $slot) {
-            $content['main'][$slot->getCard()->getCode()] = $slot->getQuantity();
-        }
-
-        foreach ($this->getSideslots() as $slot) {
-            $content['side'][$slot->getCard()->getCode()] = $slot->getQuantity();
-        }
-
-        return $content;
-    }
 }

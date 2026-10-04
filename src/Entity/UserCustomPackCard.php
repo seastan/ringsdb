@@ -66,7 +66,7 @@ class UserCustomPackCard
     /**
      * @return $this
      */
-    public function setQuantity($quantity)
+    public function setQuantity(int $quantity)
     {
         $this->quantity = max(1, (int) $quantity);
 

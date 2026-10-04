@@ -24,7 +24,7 @@ class ScrapBeornJsonDataCommand extends Command
     /**
      * @var EntityManagerInterface
      */
-    private $em;
+    private $entityManager;
 
     /**
      * @var Packages
@@ -56,10 +56,17 @@ class ScrapBeornJsonDataCommand extends Command
      */
     private $typeRepository;
 
-    public function __construct(EntityManagerInterface $em, Packages $packages, string $publicDir, CardPrintingRepository $cardPrintingRepository, PackRepository $packRepository, SphereRepository $sphereRepository, TypeRepository $typeRepository)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        Packages $packages,
+        string $publicDir,
+        CardPrintingRepository $cardPrintingRepository,
+        PackRepository $packRepository,
+        SphereRepository $sphereRepository,
+        TypeRepository $typeRepository
+    ) {
         parent::__construct();
-        $this->em = $em;
+        $this->entityManager = $entityManager;
         $this->packages = $packages;
         $this->publicDir = $publicDir;
         $this->cardPrintingRepository = $cardPrintingRepository;
@@ -100,8 +107,6 @@ class ScrapBeornJsonDataCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $em = $this->em;
-
         $questionHelper = $this->getHelper('question');
 
         $assets_helper = $this->packages;
@@ -216,7 +221,7 @@ class ScrapBeornJsonDataCommand extends Command
             $card->setIllustrator($data->Artist);
         }
 
-        $em->flush();
+        $this->entityManager->flush();
         $output->writeln('Done.');
 
         return 0;

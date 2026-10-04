@@ -12,6 +12,7 @@ use App\Repository\CommentRepository;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,11 +29,16 @@ class UserAdminController extends AbstractController
      * @var UserRepository
      */
     private $userRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(CommentRepository $commentRepository, UserRepository $userRepository)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        CommentRepository $commentRepository,
+        UserRepository $userRepository
+    ) {
         $this->commentRepository = $commentRepository;
         $this->userRepository = $userRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -68,7 +74,7 @@ class UserAdminController extends AbstractController
     /**
      * @Route("/admin/user/show/{user_id}", name="admin_show_user", methods={"GET"})
      */
-    public function showAction($user_id): Response
+    public function showAction(int $user_id): Response
     {
         /* @var $user User */
         $user = $this->userRepository->find($user_id);
@@ -82,16 +88,15 @@ class UserAdminController extends AbstractController
     /**
      * @Route("/admin/user/toggle_locked/{user_id}", name="admin_user_locked_toggle", methods={"GET"})
      */
-    public function toggleLockedAction($user_id): RedirectResponse
+    public function toggleLockedAction(int $user_id): RedirectResponse
     {
-        $em = $this->getDoctrine()->getManager();
         /* @var $user User */
         $user = $this->userRepository->find($user_id);
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
         $user->setLocked(!$user->isLocked());
-        $em->flush();
+        $this->entityManager->flush();
 
         return $this->redirect($this->generateUrl('admin_show_user', ['user_id' => $user->getId()]));
     }
@@ -99,7 +104,7 @@ class UserAdminController extends AbstractController
     /**
      * @Route("/admin/user/decklists/{user_id}", name="admin_user_decklists_show", methods={"GET"})
      */
-    public function decklistsAction($user_id): Response
+    public function decklistsAction(int $user_id): Response
     {
         /* @var $user User */
         $user = $this->userRepository->find($user_id);
@@ -113,9 +118,8 @@ class UserAdminController extends AbstractController
     /**
      * @Route("/admin/decklist/delete/{decklist_id}", name="admin_decklist_delete", methods={"GET"})
      */
-    public function deleteDecklistAction($decklist_id, DeckRepository $deckRepository, DecklistRepository $decklistRepository): RedirectResponse
+    public function deleteDecklistAction(int $decklist_id, DeckRepository $deckRepository, DecklistRepository $decklistRepository): RedirectResponse
     {
-        $em = $this->getDoctrine()->getManager();
         /* @var $decklist Decklist */
         $decklist = $decklistRepository->find($decklist_id);
         if (!$decklist) {
@@ -132,10 +136,10 @@ class UserAdminController extends AbstractController
             /* @var $child Deck */
             $child->setParent(null);
         }
-        $em->flush();
+        $this->entityManager->flush();
         // then we remove the decklist itself
-        $em->remove($decklist);
-        $em->flush();
+        $this->entityManager->remove($decklist);
+        $this->entityManager->flush();
 
         return $this->redirect($this->generateUrl('admin_user_decklists_show', ['user_id' => $decklist->getUser()->getId()]));
     }
@@ -143,7 +147,7 @@ class UserAdminController extends AbstractController
     /**
      * @Route("/admin/user/comments/{user_id}", name="admin_user_comments_show", methods={"GET"})
      */
-    public function commentsAction($user_id): Response
+    public function commentsAction(int $user_id): Response
     {
         /* @var $user User */
         $user = $this->userRepository->find($user_id);
@@ -161,16 +165,15 @@ class UserAdminController extends AbstractController
      *     methods={"GET"}
      * )
      */
-    public function toggleHiddenCommentAction($comment_id): RedirectResponse
+    public function toggleHiddenCommentAction(int $comment_id): RedirectResponse
     {
-        $em = $this->getDoctrine()->getManager();
         /* @var $comment Comment */
         $comment = $this->commentRepository->find($comment_id);
         if (!$comment) {
             throw $this->createNotFoundException('Comment not found');
         }
         $comment->setIsHidden(!$comment->getIsHidden());
-        $em->flush();
+        $this->entityManager->flush();
 
         return $this->redirect($this->generateUrl('admin_user_comments_show', ['user_id' => $comment->getUser()->getId()]));
     }
@@ -178,16 +181,15 @@ class UserAdminController extends AbstractController
     /**
      * @Route("/admin/comment/delete/{comment_id}", name="admin_comment_delete", methods={"GET"})
      */
-    public function deleteCommentAction($comment_id): RedirectResponse
+    public function deleteCommentAction(int $comment_id): RedirectResponse
     {
-        $em = $this->getDoctrine()->getManager();
         /* @var $comment Comment */
         $comment = $this->commentRepository->find($comment_id);
         if (!$comment) {
             throw $this->createNotFoundException('Comment not found');
         }
-        $em->remove($comment);
-        $em->flush();
+        $this->entityManager->remove($comment);
+        $this->entityManager->flush();
 
         return $this->redirect($this->generateUrl('admin_user_comments_show', ['user_id' => $comment->getUser()->getId()]));
     }

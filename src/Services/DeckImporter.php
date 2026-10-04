@@ -25,7 +25,7 @@ class DeckImporter
     /**
      * @return array{content: array{main: array<int|string, int>, side: array<int|string, int>}, description: string}
      */
-    public function parseTextImport($text): array
+    public function parseTextImport(string $text): array
     {
         $content = ['main' => [], 'side' => []];
         $addToSideboard = false;
@@ -82,7 +82,7 @@ class DeckImporter
     /**
      * @return array{content: array{main: array<int|string, int>, side: array<int|string, int>}, description: string}
      */
-    public function parseOctgnImport($octgn): array
+    public function parseOctgnImport(string $octgn): array
     {
         $crawler = new Crawler();
         $crawler->addXmlContent($octgn);

@@ -15,17 +15,17 @@ class DeleteInactiveCommand extends Command
     /**
      * @var EntityManagerInterface
      */
-    private $em;
+    private $entityManager;
 
     /**
      * @var UserRepository
      */
     private $userRepository;
 
-    public function __construct(EntityManagerInterface $em, UserRepository $userRepository)
+    public function __construct(EntityManagerInterface $entityManager, UserRepository $userRepository)
     {
         parent::__construct();
-        $this->em = $em;
+        $this->entityManager = $entityManager;
         $this->userRepository = $userRepository;
     }
 
@@ -38,7 +38,6 @@ class DeleteInactiveCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $em = $this->em;
         $limit = new \DateTime();
         $limit->sub(new \DateInterval('PT48H'));
         $count = 0;
@@ -48,10 +47,10 @@ class DeleteInactiveCommand extends Command
             /* @var $user App\Entity\User */
             if ($user->getDateCreation() < $limit) {
                 ++$count;
-                $em->remove($user);
+                $this->entityManager->remove($user);
             }
         }
-        $em->flush();
+        $this->entityManager->flush();
         $output->writeln(date('c')." Delete $count inactive users.");
 
         return 0;
