@@ -31,12 +31,8 @@ class CommentFixtures extends Fixture implements DependentFixtureInterface
         /** @var Decklist $decklist */
         $decklist = $this->getReference('test-decklist-1');
 
-        $comment = new Comment();
-        $comment->setText('Comment test');
+        $comment = new Comment($user, $decklist, 'Comment test');
         $comment->setDateCreation(new \DateTime('2015-08-16'));
-        $comment->setUser($user);
-        $comment->setDecklist($decklist);
-        $comment->setIsHidden(false);
 
         $decklist->setDateUpdate(new \DateTime('2015-08-16'));
         $decklist->setDateLastComment(new \DateTime('2015-08-16'));

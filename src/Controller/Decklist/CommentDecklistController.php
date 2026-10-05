@@ -73,12 +73,7 @@ class CommentDecklistController extends AbstractController
 
             $comment_html = $this->texts->markdown($comment_text);
             $now = new \DateTime();
-            $comment = new Comment();
-            $comment->setText($comment_html);
-            $comment->setDateCreation($now);
-            $comment->setUser($user);
-            $comment->setDecklist($decklist);
-            $comment->setIsHidden(false);
+            $comment = new Comment($user, $decklist, $comment_html);
             $this->getDoctrine()->getManager()->persist($comment);
             $decklist->setDateUpdate($now);
             $decklist->setDateLastComment($comment->getDateCreation());
