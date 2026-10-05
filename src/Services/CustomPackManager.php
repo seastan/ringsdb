@@ -47,10 +47,7 @@ class CustomPackManager
             }
 
             $seen[$code] = true;
-            $packCard = new UserCustomPackCard();
-            $packCard->setCustomPack($pack);
-            $packCard->setCard($card);
-            $packCard->setQuantity($qty);
+            $packCard = new UserCustomPackCard($pack, $card, $qty);
             $pack->addCard($packCard);
             $this->entityManager->persist($packCard);
         }

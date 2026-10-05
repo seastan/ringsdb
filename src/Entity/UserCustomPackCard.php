@@ -11,20 +11,18 @@ class UserCustomPackCard
      */
     private $id;
 
-    /**
-     * @var UserCustomPack
-     */
-    private $customPack;
+    private UserCustomPack $customPack;
 
-    /**
-     * @var Card
-     */
-    private $card;
+    private Card $card;
 
-    /**
-     * @var int
-     */
-    private $quantity = 1;
+    public int $quantity;
+
+    public function __construct(UserCustomPack $customPack, Card $card, int $quantity)
+    {
+        $this->customPack = $customPack;
+        $this->card = $card;
+        $this->quantity = $quantity;
+    }
 
     public function getId(): ?int
     {
@@ -36,10 +34,7 @@ class UserCustomPackCard
         return $this->customPack;
     }
 
-    /**
-     * @return $this
-     */
-    public function setCustomPack(UserCustomPack $customPack)
+    public function setCustomPack(UserCustomPack $customPack): self
     {
         $this->customPack = $customPack;
 
@@ -51,10 +46,7 @@ class UserCustomPackCard
         return $this->card;
     }
 
-    /**
-     * @return $this
-     */
-    public function setCard(Card $card)
+    public function setCard(Card $card): self
     {
         $this->card = $card;
 
@@ -66,10 +58,7 @@ class UserCustomPackCard
         return $this->quantity;
     }
 
-    /**
-     * @return $this
-     */
-    public function setQuantity(int $quantity)
+    public function setQuantity(int $quantity): self
     {
         $this->quantity = max(1, $quantity);
 

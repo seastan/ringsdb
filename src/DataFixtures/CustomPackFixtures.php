@@ -40,15 +40,11 @@ class CustomPackFixtures extends Fixture implements DependentFixtureInterface
         $pack->setUpdatedAt(new \DateTime('2015-08-16'));
 
         foreach (['01001' => 1, '01016' => 3] as $code => $quantity) {
-            $entry = new UserCustomPackCard();
-            $entry->setCustomPack($pack);
             $card = $cardRepo->findOneBy(['code' => $code]);
             if (!$card instanceof Card) {
                 throw new \LogicException("Card $code is missing.");
             }
-
-            $entry->setCard($card);
-            $entry->setQuantity($quantity);
+            $entry = new UserCustomPackCard($pack, $card, $quantity);
             $pack->addCard($entry);
         }
 
