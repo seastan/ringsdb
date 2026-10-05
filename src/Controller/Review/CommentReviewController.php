@@ -49,10 +49,7 @@ class CommentReviewController extends AbstractController
             throw new \Exception('Your comment is empty.');
         }
 
-        $comment = new Reviewcomment();
-        $comment->setReview($review);
-        $comment->setUser($user);
-        $comment->setText($comment_text);
+        $comment = new Reviewcomment($user, $review, $comment_text);
 
         $now = new \DateTime();
         $review->setDateLastComment($now);

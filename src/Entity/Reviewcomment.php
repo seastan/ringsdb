@@ -24,20 +24,18 @@ class Reviewcomment
      */
     private $dateUpdate;
 
-    /**
-     * @var string
-     */
-    private $text;
+    private string $text;
 
-    /**
-     * @var User
-     */
-    private $user;
+    private \App\Entity\User $user;
 
-    /**
-     * @var Review
-     */
-    private $review;
+    private \App\Entity\Review $review;
+
+    public function __construct(User $user, Review $review, string $text)
+    {
+        $this->user = $user;
+        $this->review = $review;
+        $this->text = $text;
+    }
 
     /**
      * Get id.

@@ -12,57 +12,6 @@ use Doctrine\Common\Collections\Collection;
  */
 class Scenario implements \JsonSerializable
 {
-    public function jsonSerialize()
-    {
-        $encounters = $this->getEncounters()->toArray();
-        $pack = $this->getPack();
-
-        return [
-            'id' => $this->getId(),
-            'code' => $this->getCode(),
-            'name' => $this->getName(),
-            'nameCanonical' => $this->getNameCanonical(),
-            'pack' => $pack instanceof Pack ? $pack->getName() : '',
-            'date_creation' => $this->getDateCreation()->format('c'),
-            'date_update' => $this->getDateUpdate()->format('c'),
-            'encounters' => $encounters,
-            'has_easy' => $this->getHasEasy(),
-            'has_nightmare' => $this->getHasNightmare(),
-            'easy_cards' => $this->getEasyCards(),
-            'easy_enemies' => $this->getEasyEnemies(),
-            'easy_locations' => $this->getEasyLocations(),
-            'easy_treacheries' => $this->getEasyTreacheries(),
-            'easy_shadows' => $this->getEasyShadows(),
-            'easy_objectives' => $this->getEasyObjectives(),
-            'easy_objective_allies' => $this->getEasyObjectiveAllies(),
-            'easy_objective_locations' => $this->getEasyObjectiveLocations(),
-            'easy_surges' => $this->getEasySurges(),
-            'easy_encounter_side_quests' => $this->getEasyEncounterSideQuests(),
-
-            'normal_cards' => $this->getNormalCards(),
-            'normal_enemies' => $this->getNormalEnemies(),
-            'normal_locations' => $this->getNormalLocations(),
-            'normal_treacheries' => $this->getNormalTreacheries(),
-            'normal_shadows' => $this->getNormalShadows(),
-            'normal_objectives' => $this->getNormalObjectives(),
-            'normal_objective_allies' => $this->getNormalObjectiveAllies(),
-            'normal_objective_locations' => $this->getNormalObjectiveLocations(),
-            'normal_surges' => $this->getNormalSurges(),
-            'normal_encounter_side_quests' => $this->getNormalEncounterSideQuests(),
-
-            'nightmare_cards' => $this->getNightmareCards(),
-            'nightmare_enemies' => $this->getNightmareEnemies(),
-            'nightmare_locations' => $this->getNightmareLocations(),
-            'nightmare_treacheries' => $this->getNightmareTreacheries(),
-            'nightmare_shadows' => $this->getNightmareShadows(),
-            'nightmare_objectives' => $this->getNightmareObjectives(),
-            'nightmare_objective_allies' => $this->getNightmareObjectiveAllies(),
-            'nightmare_objective_locations' => $this->getNightmareObjectiveLocations(),
-            'nightmare_surges' => $this->getNightmareSurges(),
-            'nightmare_encounter_side_quests' => $this->getNightmareEncounterSideQuests(),
-        ];
-    }
-
     /**
      * @var int|null
      */
@@ -88,10 +37,7 @@ class Scenario implements \JsonSerializable
      */
     private $dateUpdate;
 
-    /**
-     * @var Pack|null
-     */
-    private $pack;
+    private ?\App\Entity\Pack $pack = null;
 
     /**
      * @var Collection<int, Encounter>
@@ -99,11 +45,17 @@ class Scenario implements \JsonSerializable
     private $encounters;
 
     /**
+     * @var Collection<int, Questlog>
+     */
+    private $questlogs;
+
+    /**
      * Constructor.
      */
     public function __construct()
     {
         $this->encounters = new ArrayCollection();
+        $this->questlogs = new ArrayCollection();
     }
 
     /**
@@ -1066,11 +1018,6 @@ class Scenario implements \JsonSerializable
     }
 
     /**
-     * @var Collection<int, Questlog>
-     */
-    private $questlogs;
-
-    /**
      * Add questlog.
      */
     public function addQuestlog(Questlog $questlog): Scenario
@@ -1121,5 +1068,56 @@ class Scenario implements \JsonSerializable
     public function getNameCanonical(): string
     {
         return $this->nameCanonical;
+    }
+
+    public function jsonSerialize()
+    {
+        $encounters = $this->getEncounters()->toArray();
+        $pack = $this->getPack();
+
+        return [
+            'id' => $this->getId(),
+            'code' => $this->getCode(),
+            'name' => $this->getName(),
+            'nameCanonical' => $this->getNameCanonical(),
+            'pack' => $pack instanceof Pack ? $pack->getName() : '',
+            'date_creation' => $this->getDateCreation()->format('c'),
+            'date_update' => $this->getDateUpdate()->format('c'),
+            'encounters' => $encounters,
+            'has_easy' => $this->getHasEasy(),
+            'has_nightmare' => $this->getHasNightmare(),
+            'easy_cards' => $this->getEasyCards(),
+            'easy_enemies' => $this->getEasyEnemies(),
+            'easy_locations' => $this->getEasyLocations(),
+            'easy_treacheries' => $this->getEasyTreacheries(),
+            'easy_shadows' => $this->getEasyShadows(),
+            'easy_objectives' => $this->getEasyObjectives(),
+            'easy_objective_allies' => $this->getEasyObjectiveAllies(),
+            'easy_objective_locations' => $this->getEasyObjectiveLocations(),
+            'easy_surges' => $this->getEasySurges(),
+            'easy_encounter_side_quests' => $this->getEasyEncounterSideQuests(),
+
+            'normal_cards' => $this->getNormalCards(),
+            'normal_enemies' => $this->getNormalEnemies(),
+            'normal_locations' => $this->getNormalLocations(),
+            'normal_treacheries' => $this->getNormalTreacheries(),
+            'normal_shadows' => $this->getNormalShadows(),
+            'normal_objectives' => $this->getNormalObjectives(),
+            'normal_objective_allies' => $this->getNormalObjectiveAllies(),
+            'normal_objective_locations' => $this->getNormalObjectiveLocations(),
+            'normal_surges' => $this->getNormalSurges(),
+            'normal_encounter_side_quests' => $this->getNormalEncounterSideQuests(),
+
+            'nightmare_cards' => $this->getNightmareCards(),
+            'nightmare_enemies' => $this->getNightmareEnemies(),
+            'nightmare_locations' => $this->getNightmareLocations(),
+            'nightmare_treacheries' => $this->getNightmareTreacheries(),
+            'nightmare_shadows' => $this->getNightmareShadows(),
+            'nightmare_objectives' => $this->getNightmareObjectives(),
+            'nightmare_objective_allies' => $this->getNightmareObjectiveAllies(),
+            'nightmare_objective_locations' => $this->getNightmareObjectiveLocations(),
+            'nightmare_surges' => $this->getNightmareSurges(),
+            'nightmare_encounter_side_quests' => $this->getNightmareEncounterSideQuests(),
+        ];
     }
 }
