@@ -128,10 +128,7 @@ class SaveFellowshipController extends AbstractController
                             $deck = $this->decks->cloneDeck($deck, $user);
                         }
 
-                        $fellowship_deck = new FellowshipDeck();
-                        $fellowship_deck->setDeck($deck);
-                        $fellowship_deck->setDeckNumber($i - $skip);
-                        $fellowship_deck->setFellowship($fellowship);
+                        $fellowship_deck = new FellowshipDeck($fellowship, $deck, $i - $skip);
                         $fellowship->addDeck($fellowship_deck);
                     } else {
                         /* @var $decklist Decklist */

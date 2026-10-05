@@ -14,20 +14,18 @@ class FellowshipDeck
      */
     private $id;
 
-    /**
-     * @var int
-     */
-    private $deckNumber;
+    private int $deckNumber;
 
-    /**
-     * @var Fellowship
-     */
-    private $fellowship;
+    private \App\Entity\Fellowship $fellowship;
 
-    /**
-     * @var Deck
-     */
-    private $deck;
+    private \App\Entity\Deck $deck;
+
+    public function __construct(Fellowship $fellowship, Deck $deck, int $deckNumber)
+    {
+        $this->fellowship = $fellowship;
+        $this->deck = $deck;
+        $this->deckNumber = $deckNumber;
+    }
 
     /**
      * Get id.

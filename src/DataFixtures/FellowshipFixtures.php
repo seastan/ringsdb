@@ -45,10 +45,7 @@ class FellowshipFixtures extends Fixture implements DependentFixtureInterface
         for ($i = 1; $i < 5; ++$i) {
             /** @var Deck $deck */
             $deck = $this->getReference('test-deck-'.$i);
-            $fellowship_deck = new FellowshipDeck();
-            $fellowship_deck->setDeck($deck);
-            $fellowship_deck->setDeckNumber($i);
-            $fellowship_deck->setFellowship($fellowship);
+            $fellowship_deck = new FellowshipDeck($fellowship, $deck, $i);
             $fellowship->addDeck($fellowship_deck);
         }
 
