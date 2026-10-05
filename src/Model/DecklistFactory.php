@@ -82,20 +82,14 @@ class DecklistFactory
         $new_content = (string) json_encode($content);
         $new_signature = md5($new_content);
 
-        $decklist = new Decklist();
+        $decklist = new Decklist($deck->getUser());
         $decklist->setName($name);
         $decklist->setVersion($deck->getVersion());
         $decklist->setNameCanonical($this->texts->slugify($name).'-'.$decklist->getVersion());
         $decklist->setDescriptionMd($descriptionMd);
         $decklist->setDescriptionHtml($description);
-        $decklist->setDateCreation(new \DateTime());
-        $decklist->setDateUpdate(new \DateTime());
         $decklist->setSignature($new_signature);
         $decklist->setLastPack($deck->getLastPack());
-        $decklist->setNbVotes(0);
-        $decklist->setNbfavorites(0);
-        $decklist->setNbcomments(0);
-        $decklist->setUser($deck->getUser());
 
         foreach ($deck->getSlots() as $slot) {
             $decklistslot = new Decklistslot($decklist, $slot->getCard(), $slot->getQuantity());

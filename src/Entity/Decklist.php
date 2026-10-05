@@ -12,18 +12,6 @@ use Doctrine\Common\Collections\Collection;
 
 class Decklist extends ExportableDeck implements \JsonSerializable
 {
-    public function jsonSerialize()
-    {
-        $array = parent::getArrayExport();
-        $array['is_published'] = true;
-        $array['nb_votes'] = $this->getNbVotes();
-        $array['nb_favorites'] = $this->getNbFavorites();
-        $array['nb_comments'] = $this->getNbComments();
-        $array['starting_threat'] = $this->getStartingThreat();
-
-        return $array;
-    }
-
     /**
      * @var int|null
      */
@@ -39,15 +27,9 @@ class Decklist extends ExportableDeck implements \JsonSerializable
      */
     private $nameCanonical;
 
-    /**
-     * @var \DateTime
-     */
-    private $dateCreation;
+    private \DateTime $dateCreation;
 
-    /**
-     * @var \DateTime
-     */
-    private $dateUpdate;
+    private \DateTime $dateUpdate;
 
     /**
      * @var \DateTime|null
@@ -72,17 +54,17 @@ class Decklist extends ExportableDeck implements \JsonSerializable
     /**
      * @var int
      */
-    private $nbVotes;
+    private $nbVotes = 0;
 
     /**
      * @var int
      */
-    private $nbFavorites;
+    private $nbFavorites = 0;
 
     /**
      * @var int
      */
-    private $nbComments;
+    private $nbComments = 0;
 
     /**
      * @var bool|null
@@ -119,25 +101,13 @@ class Decklist extends ExportableDeck implements \JsonSerializable
      */
     private $children;
 
-    /**
-     * @var User
-     */
-    private $user;
+    private \App\Entity\User $user;
 
-    /**
-     * @var Pack|null
-     */
-    private $lastPack;
+    private ?\App\Entity\Pack $lastPack = null;
 
-    /**
-     * @var Deck|null
-     */
-    private $parent;
+    private ?\App\Entity\Deck $parent = null;
 
-    /**
-     * @var Decklist|null
-     */
-    private $precedent;
+    private ?\App\Entity\Decklist $precedent = null;
 
     /**
      * @var Collection<int, User>
@@ -150,10 +120,33 @@ class Decklist extends ExportableDeck implements \JsonSerializable
     private $votes;
 
     /**
+     * @var Collection<int, QuestlogDeck>
+     */
+    private $questlogs;
+
+    /**
+     * @var int
+     */
+    private $startingThreat;
+
+    /**
+     * @var Collection<int, FellowshipDecklist>
+     */
+    private $fellowships;
+
+    private ?\App\Entity\Sphere $predominantSphere = null;
+
+    /**
+     * @var Collection<int, Sphere>
+     */
+    private $spheres;
+
+    /**
      * Constructor.
      */
-    public function __construct()
+    public function __construct(User $user)
     {
+        $this->user = $user;
         $this->slots = new ArrayCollection();
         $this->sideslots = new ArrayCollection();
         $this->comments = new ArrayCollection();
@@ -163,6 +156,9 @@ class Decklist extends ExportableDeck implements \JsonSerializable
         $this->votes = new ArrayCollection();
         $this->spheres = new ArrayCollection();
         $this->fellowships = new ArrayCollection();
+        $this->questlogs = new ArrayCollection();
+        $this->dateCreation = new \DateTime();
+        $this->dateUpdate = new \DateTime();
     }
 
     /**
@@ -702,11 +698,6 @@ class Decklist extends ExportableDeck implements \JsonSerializable
     }
 
     /**
-     * @var Collection<int, Sphere>
-     */
-    private $spheres;
-
-    /**
      * Add sphere.
      */
     public function addSphere(Sphere $sphere): Decklist
@@ -737,11 +728,6 @@ class Decklist extends ExportableDeck implements \JsonSerializable
     }
 
     /**
-     * @var Sphere|null
-     */
-    private $predominantSphere;
-
-    /**
      * Set predominantSphere.
      */
     public function setPredominantSphere(?Sphere $predominantSphere = null): Decklist
@@ -758,11 +744,6 @@ class Decklist extends ExportableDeck implements \JsonSerializable
     {
         return $this->predominantSphere;
     }
-
-    /**
-     * @var Collection<int, FellowshipDecklist>
-     */
-    private $fellowships;
 
     /**
      * Add fellowship.
@@ -801,13 +782,8 @@ class Decklist extends ExportableDeck implements \JsonSerializable
     {
         $allFellowships = $this->getFellowships()->toArray();
 
-        return array_filter($allFellowships, fn ($k) => $k->getFellowship()->getIsPublic());
+        return array_filter($allFellowships, fn (\App\Entity\FellowshipDecklist $k): bool => $k->getFellowship()->getIsPublic());
     }
-
-    /**
-     * @var int
-     */
-    private $startingThreat;
 
     /**
      * Set startingThreat.
@@ -828,11 +804,6 @@ class Decklist extends ExportableDeck implements \JsonSerializable
     {
         return $this->startingThreat;
     }
-
-    /**
-     * @var Collection<int, QuestlogDeck>
-     */
-    private $questlogs;
 
     /**
      * Add questlog.
@@ -877,6 +848,18 @@ class Decklist extends ExportableDeck implements \JsonSerializable
 
         $allQuestlogs = array_unique(array_merge($theseLogs, $parentLogs), SORT_REGULAR);
 
-        return array_filter($allQuestlogs, fn ($k) => $k->getQuestlog()->getIsPublic());
+        return array_filter($allQuestlogs, fn (\App\Entity\QuestlogDeck $k): bool => $k->getQuestlog()->getIsPublic());
+    }
+
+    public function jsonSerialize()
+    {
+        $array = parent::getArrayExport();
+        $array['is_published'] = true;
+        $array['nb_votes'] = $this->getNbVotes();
+        $array['nb_favorites'] = $this->getNbFavorites();
+        $array['nb_comments'] = $this->getNbComments();
+        $array['starting_threat'] = $this->getStartingThreat();
+
+        return $array;
     }
 }
