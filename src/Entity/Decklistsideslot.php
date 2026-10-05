@@ -29,6 +29,18 @@ class Decklistsideslot implements SlotInterface
     private $card;
 
     /**
+     * @param Decklist $decklist
+     * @param Card $card
+     * @param int $quantity
+     */
+    public function __construct(Decklist $decklist, Card $card, int $quantity)
+    {
+        $this->decklist = $decklist;
+        $this->card = $card;
+        $this->quantity = $quantity;
+    }
+
+    /**
      * Get id.
      */
     public function getId(): ?int

@@ -388,10 +388,7 @@ class Decks
                 continue;
             }
             $card = $cards[$card_code];
-            $slot = new Decksideslot();
-            $slot->setQuantity($qty);
-            $slot->setCard($card);
-            $slot->setDeck($deck);
+            $slot = new Decksideslot($card, $deck, $qty);
             $deck->addSideslot($slot);
         }
 
@@ -480,10 +477,7 @@ class Decks
             }
 
             $card = $cards[$card_code];
-            $slot = new Decksideslot();
-            $slot->setQuantity($qty);
-            $slot->setCard($card);
-            $slot->setDeck($deck);
+            $slot = new Decksideslot($deck, $card, $qty);
             $deck->addSideslot($slot);
         }
     }

@@ -13,20 +13,18 @@ class Decksideslot implements SlotInterface
      */
     private $id;
 
-    /**
-     * @var int
-     */
-    private $quantity;
+    private int $quantity;
 
-    /**
-     * @var Deck
-     */
-    private $deck;
+    private \App\Entity\Deck $deck;
 
-    /**
-     * @var Card
-     */
-    private $card;
+    private \App\Entity\Card $card;
+
+    public function __construct(Deck $deck, Card $card, int $quantity)
+    {
+        $this->deck = $deck;
+        $this->card = $card;
+        $this->quantity = $quantity;
+    }
 
     /**
      * Get id.

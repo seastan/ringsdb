@@ -98,18 +98,12 @@ class DecklistFactory
         $decklist->setUser($deck->getUser());
 
         foreach ($deck->getSlots() as $slot) {
-            $decklistslot = new Decklistslot();
-            $decklistslot->setQuantity($slot->getQuantity());
-            $decklistslot->setCard($slot->getCard());
-            $decklistslot->setDecklist($decklist);
+            $decklistslot = new Decklistslot($decklist, $slot->getCard(), $slot->getQuantity());
             $decklist->getSlots()->add($decklistslot);
         }
 
         foreach ($deck->getSideslots() as $slot) {
-            $decklistslot = new Decklistsideslot();
-            $decklistslot->setQuantity($slot->getQuantity());
-            $decklistslot->setCard($slot->getCard());
-            $decklistslot->setDecklist($decklist);
+            $decklistslot = new Decklistsideslot($decklist, $slot->getCard(), $slot->getQuantity());
             $decklist->getSideslots()->add($decklistslot);
         }
 
