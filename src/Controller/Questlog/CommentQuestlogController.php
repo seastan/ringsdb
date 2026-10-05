@@ -66,15 +66,9 @@ class CommentQuestlogController extends AbstractController
             }
 
             $comment_html = $this->texts->markdown($comment_text);
-            $now = new \DateTime();
-            $comment = new QuestlogComment();
-            $comment->setText($comment_html);
-            $comment->setDateCreation($now);
-            $comment->setUser($user);
-            $comment->setQuestlog($questlog);
-            $comment->setIsHidden(false);
+            $comment = new QuestlogComment($user, $questlog, $comment_html);
             $this->entityManager->persist($comment);
-            $questlog->setDateUpdate($now);
+            $questlog->setDateUpdate(new \DateTime());
             $questlog->setNbcomments($questlog->getNbcomments() + 1);
             $this->entityManager->flush();
             // send emails

@@ -14,30 +14,26 @@ class QuestlogComment
      */
     private $id;
 
-    /**
-     * @var string
-     */
-    private $text;
+    private string $text;
 
-    /**
-     * @var \DateTime
-     */
-    private $dateCreation;
+    private \DateTime $dateCreation;
 
     /**
      * @var bool
      */
-    private $isHidden;
+    private $isHidden = false;
 
-    /**
-     * @var User
-     */
-    private $user;
+    private \App\Entity\User $user;
 
-    /**
-     * @var Questlog
-     */
-    private $questlog;
+    private \App\Entity\Questlog $questlog;
+
+    public function __construct(User $user, Questlog $questlog, string $text)
+    {
+        $this->user = $user;
+        $this->questlog = $questlog;
+        $this->text = $text;
+        $this->dateCreation = new \DateTime();
+    }
 
     /**
      * Get id.
