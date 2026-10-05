@@ -69,7 +69,7 @@ class CSVController extends AbstractController
             $row = str_getcsv($row);
 
             for ($i = 0; $i < count($row); ++$i) {
-                $card[$columns[$i]] = (string) str_replace('<br/>', "\n", (string) $row[$i]);
+                $card[$columns[$i]] = str_replace('<br/>', "\n", (string) $row[$i]);
             }
 
             $newCodes[$card['code']] = 1;
@@ -259,7 +259,7 @@ class CSVController extends AbstractController
                     }
                 } elseif (in_array($colName, $cardFieldNames) && !$isReprint) {
                     // Scalar field on Card.
-                    $type = $cardMeta->getTypeOfField((string) $colName);
+                    $type = $cardMeta->getTypeOfField($colName);
 
                     if ('boolean' === $type) {
                         $value = (bool) $value;
@@ -277,7 +277,7 @@ class CSVController extends AbstractController
                     }
                 } elseif (in_array($colName, $printingFieldNames)) {
                     // Scalar field on CardPrinting (quantity, illustrator, imageCode, …).
-                    $type = $printingMeta->getTypeOfField((string) $colName);
+                    $type = $printingMeta->getTypeOfField($colName);
 
                     if ('boolean' === $type) {
                         $value = (bool) $value;

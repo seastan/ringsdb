@@ -113,7 +113,7 @@ class UserCustomPack
      */
     public function setIsEnabled(bool $isEnabled)
     {
-        $this->isEnabled = (bool) $isEnabled;
+        $this->isEnabled = $isEnabled;
 
         return $this;
     }
@@ -128,7 +128,7 @@ class UserCustomPack
      */
     public function setIsPublished(bool $isPublished)
     {
-        $this->isPublished = (bool) $isPublished;
+        $this->isPublished = $isPublished;
 
         return $this;
     }

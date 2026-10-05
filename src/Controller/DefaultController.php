@@ -277,7 +277,7 @@ class DefaultController extends AbstractController
                     $text = substr($text.' ', 0, strrpos($text, '<'));
                 }
                 $text = (string) preg_replace('/\\s+?(\\S+)?$/', '', $text);
-                $text = $text.'...';
+                $text .= '...';
                 // Fix unclosed html tags
                 libxml_use_internal_errors(true);
                 $dom = new \DOMDocument();

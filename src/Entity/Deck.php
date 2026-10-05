@@ -56,7 +56,7 @@ class Deck extends ExportableDeck implements \JsonSerializable
             // applying variation to create 'next' (older) preversion
             foreach ($variation[0] as $code => $qty) {
                 if (isset($preversion[$code])) {
-                    $preversion[$code] = $preversion[$code] - $qty;
+                    $preversion[$code] -= $qty;
                     if (0 == $preversion[$code]) {
                         unset($preversion[$code]);
                     }
@@ -65,14 +65,14 @@ class Deck extends ExportableDeck implements \JsonSerializable
 
             foreach ($variation[1] as $code => $qty) {
                 $preversion[$code] ??= 0;
-                $preversion[$code] = $preversion[$code] + $qty;
+                $preversion[$code] += $qty;
             }
 
             $variation[2] ??= [];
 
             foreach ($variation[2] as $code => $qty) {
                 if (isset($sidepreversion[$code])) {
-                    $sidepreversion[$code] = $sidepreversion[$code] - $qty;
+                    $sidepreversion[$code] -= $qty;
                     if (0 == $sidepreversion[$code]) {
                         unset($sidepreversion[$code]);
                     }
@@ -83,7 +83,7 @@ class Deck extends ExportableDeck implements \JsonSerializable
 
             foreach ($variation[3] as $code => $qty) {
                 $sidepreversion[$code] ??= 0;
-                $sidepreversion[$code] = $sidepreversion[$code] + $qty;
+                $sidepreversion[$code] += $qty;
             }
 
             ksort($preversion);
@@ -118,11 +118,11 @@ class Deck extends ExportableDeck implements \JsonSerializable
             // applying variation to postversion
             foreach ($variation[0] as $code => $qty) {
                 $postversion[$code] ??= 0;
-                $postversion[$code] = $postversion[$code] + $qty;
+                $postversion[$code] += $qty;
             }
 
             foreach ($variation[1] as $code => $qty) {
-                $postversion[$code] = $postversion[$code] - $qty;
+                $postversion[$code] -= $qty;
                 if (0 == $postversion[$code]) {
                     unset($postversion[$code]);
                 }
@@ -132,13 +132,13 @@ class Deck extends ExportableDeck implements \JsonSerializable
 
             foreach ($variation[2] as $code => $qty) {
                 $sidepostversion[$code] ??= 0;
-                $sidepostversion[$code] = $sidepostversion[$code] + $qty;
+                $sidepostversion[$code] += $qty;
             }
 
             $variation[3] ??= [];
 
             foreach ($variation[3] as $code => $qty) {
-                $sidepostversion[$code] = $sidepostversion[$code] - $qty;
+                $sidepostversion[$code] -= $qty;
                 if (0 == $sidepostversion[$code]) {
                     unset($sidepostversion[$code]);
                 }

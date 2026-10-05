@@ -54,7 +54,7 @@ class Encounter implements \JsonSerializable
 
     public function __toString()
     {
-        return (string) $this->getName();
+        return $this->getName();
     }
 
     /**

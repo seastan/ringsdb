@@ -98,7 +98,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
                 $pos = 'U';
             }
 
-            $pos = $pos.$pack->getPosition();
+            $pos .= $pack->getPosition();
 
             $packs[$pos] ??= [
                 'pack' => $pack,
@@ -132,6 +132,9 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         return $slotsByType;
     }
 
+    /**
+     * @return array<string, int>
+     */
     public function getCountByType(): array
     {
         $countByType = ['hero' => 0, 'ally' => 0, 'attachment' => 0, 'event' => 0, 'player-side-quest' => 0, 'player-objective' => 0, 'contract' => 0, 'treasure' => 0];
@@ -146,7 +149,10 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         return $countByType;
     }
 
-    public function getCountBySphere()
+    /**
+     * @return array<string, int>
+     */
+    public function getCountBySphere(): array
     {
         $countBySphere = ['spirit' => 0, 'tactics' => 0, 'leadership' => 0, 'lore' => 0];
         foreach ($this->slots as $slot) {
@@ -239,7 +245,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
             $cardName = $card->getName() ?? '';
 
             if ($card->getType() instanceof Type && 'hero' === $card->getType()->getCode()) {
-                $cardName = $cardName.'Hero';
+                $cardName .= 'Hero';
             }
 
             if (!array_key_exists($cardName, $copiesAndDeckLimit)) {
