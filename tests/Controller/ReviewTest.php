@@ -28,13 +28,11 @@ class ReviewTest extends WebTestCase
     private KernelBrowser $client;
 
     /** @var int[] */
-    private $maxIds = [];
+    private array $maxIds = [];
 
-    /** @var array */
-    private $fixtureReview;
+    private array $fixtureReview;
 
-    /** @var array */
-    private $fixtureUsers;
+    private array $fixtureUsers;
 
     protected function setUp(): void
     {
@@ -76,7 +74,7 @@ class ReviewTest extends WebTestCase
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    private function createAuthenticatedClient($username): KernelBrowser
+    private function createAuthenticatedClient(string $username): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -86,17 +84,14 @@ class ReviewTest extends WebTestCase
         return $client;
     }
 
-    /**
-     * @param string $method
-     */
-    private function ajax(KernelBrowser $client, $uri, array $parameters, $method = 'POST'): Response
+    private function ajax(KernelBrowser $client, string $uri, array $parameters, string $method = 'POST'): Response
     {
         $client->request($method, $uri, $parameters, [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
         return $client->getResponse();
     }
 
-    private function assertJsonAnswer(Response $response, $status, array $expected): void
+    private function assertJsonAnswer(Response $response, int $status, array $expected): void
     {
         $this->assertSame($status, $response->getStatusCode());
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
@@ -145,7 +140,7 @@ class ReviewTest extends WebTestCase
      *
      * @dataProvider refusedReviewProvider
      */
-    public function testRefusedReview($username, $reputation, array $parameters, $message): void
+    public function testRefusedReview(string $username, int $reputation, array $parameters, string $message): void
     {
         $client = $this->createAuthenticatedClient($username);
         $this->db()->update('user', ['reputation' => $reputation], ['username' => $username]);
@@ -226,7 +221,7 @@ class ReviewTest extends WebTestCase
     /**
      * @dataProvider refusedEditProvider
      */
-    public function testRefusedEdit($username, $reviewId, $message): void
+    public function testRefusedEdit(string $username, int $reviewId, string $message): void
     {
         $client = $this->createAuthenticatedClient($username);
 
@@ -306,7 +301,7 @@ class ReviewTest extends WebTestCase
     /**
      * @dataProvider refusedCommentProvider
      */
-    public function testRefusedComment(array $parameters, $message): void
+    public function testRefusedComment(array $parameters, string $message): void
     {
         $client = $this->createAuthenticatedClient('admin');
 

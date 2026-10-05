@@ -30,14 +30,12 @@ class AdminExcelTest extends WebTestCase
     public const HEADER = ['type', 'sphere', 'position', 'code', 'name', 'traits', 'text', 'flavor', 'isUnique', 'cost', 'threat',
         'willpower', 'attack', 'defense', 'health', 'victory', 'quest', 'deckLimit', 'hasErrata'];
 
-    /** @var int */
-    private $maxCardId;
+    private int $maxCardId;
 
-    /** @var array */
-    private $coreCards;
+    private array $coreCards;
 
     /** @var string[] */
-    private $files = [];
+    private array $files = [];
 
     protected function setUp(): void
     {
@@ -82,7 +80,7 @@ class AdminExcelTest extends WebTestCase
     /**
      * Downloads the cards of a pack (0 = all the cards), returns the path of the saved file.
      */
-    private function download(KernelBrowser $client, $packId): string
+    private function download(KernelBrowser $client, int $packId): string
     {
         ob_start();
         $client->request('POST', '/admin/excel/download', ['pack' => $packId]);
@@ -99,7 +97,7 @@ class AdminExcelTest extends WebTestCase
     /**
      * @return array [response content, echoed report]
      */
-    private function upload(KernelBrowser $client, $file, array $parameters = []): array
+    private function upload(KernelBrowser $client, string $file, array $parameters = []): array
     {
         ob_start();
         $client->request('POST', '/admin/excel/upload', $parameters, ['upfile' => new UploadedFile($file, 'cards.xlsx', null, null, true)]);
@@ -108,7 +106,7 @@ class AdminExcelTest extends WebTestCase
         return [$client->getResponse()->getContent(), strip_tags(str_replace(['</h4>', '</p>'], [': ', '; '], $report))];
     }
 
-    private function rows($file): array
+    private function rows(string $file): array
     {
         return IOFactory::load($file)->getActiveSheet()->toArray(null, false, false, false);
     }
@@ -116,7 +114,7 @@ class AdminExcelTest extends WebTestCase
     /**
      * Changes the file with PhpSpreadsheet: [row (1 = header) => [column name => value]].
      */
-    private function edit($file, array $changes): void
+    private function edit(string $file, array $changes): void
     {
         $spreadsheet = IOFactory::load($file);
         $sheet = $spreadsheet->getActiveSheet();
@@ -134,7 +132,7 @@ class AdminExcelTest extends WebTestCase
         IOFactory::createWriter($spreadsheet, 'Xlsx')->save($file);
     }
 
-    private function fetchCard($code)
+    private function fetchCard(string $code)
     {
         return $this->db()->fetchAssoc('SELECT c.name, c.cost, c.text, t.name AS type, s.name AS sphere FROM card c JOIN type t ON t.id = c.type_id JOIN sphere s ON s.id = c.sphere_id WHERE c.code = ?', [$code]);
     }

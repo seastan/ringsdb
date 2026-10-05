@@ -26,7 +26,7 @@ class DeckWorkflowTest extends WebTestCase
     private KernelBrowser $client;
 
     /** @var int[] */
-    private $deckIds = [];
+    private array $deckIds = [];
 
     protected function setUp(): void
     {
@@ -92,7 +92,7 @@ class DeckWorkflowTest extends WebTestCase
     /**
      * @return array<int|string, int>
      */
-    private function fetchSlots($table, $column, $id): array
+    private function fetchSlots(string $table, string $column, $id): array
     {
         $rows = $this->db()->fetchAll(
             "SELECT c.code, s.quantity FROM $table s JOIN card c ON c.id = s.card_id WHERE s.$column = ? ORDER BY c.code",
@@ -102,7 +102,7 @@ class DeckWorkflowTest extends WebTestCase
         return array_map('intval', array_column($rows, 'quantity', 'code'));
     }
 
-    private function saveDeck(KernelBrowser $client, $deckId, $name, $description, $tags, array $main): void
+    private function saveDeck(KernelBrowser $client, int $deckId, string $name, string $description, string $tags, array $main): void
     {
         $crawler = $client->request('GET', "/deck/edit/$deckId");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -377,7 +377,7 @@ class DeckWorkflowTest extends WebTestCase
      *
      * @return array<int, int>
      */
-    private function newDeckIds($maxId): array
+    private function newDeckIds(int $maxId): array
     {
         $ids = array_map('intval', array_column($this->db()->fetchAll('SELECT id FROM deck WHERE id > ? ORDER BY id', [$maxId]), 'id'));
         $this->deckIds = array_merge($this->deckIds, $ids);
@@ -397,7 +397,7 @@ class DeckWorkflowTest extends WebTestCase
      *
      * @dataProvider importProvider
      */
-    public function testImportPage($content, $expectedSlots): void
+    public function testImportPage($content, ?array $expectedSlots): void
     {
         $client = $this->createAuthenticatedClient();
         $maxId = $this->maxDeckId();
@@ -442,7 +442,7 @@ class DeckWorkflowTest extends WebTestCase
      *
      * @dataProvider fileImportProvider
      */
-    public function testFileImport($filename, $fileContent, $expectedSlots, $expectedProblem = null): void
+    public function testFileImport(string $filename, string $fileContent, array $expectedSlots, string $expectedProblem = null): void
     {
         $client = $this->createAuthenticatedClient();
         $maxId = $this->maxDeckId();
@@ -477,7 +477,7 @@ class DeckWorkflowTest extends WebTestCase
      *
      * @dataProvider fixtureDeckProvider
      */
-    public function testTextExportCanBeImportedBack($deckId): void
+    public function testTextExportCanBeImportedBack(int $deckId): void
     {
         $client = $this->createAuthenticatedClient();
         $client->request('GET', "/deck/export/text/$deckId");
@@ -506,7 +506,7 @@ class DeckWorkflowTest extends WebTestCase
      *
      * @dataProvider fixtureDeckProvider
      */
-    public function testOctgnExportCanBeImportedBack($deckId): void
+    public function testOctgnExportCanBeImportedBack(int $deckId): void
     {
         $client = $this->createAuthenticatedClient();
         $client->request('GET', "/deck/export/octgn/$deckId");
@@ -546,7 +546,7 @@ class DeckWorkflowTest extends WebTestCase
      * Copy a decklist into a new deck (GET /deck/copy/{decklist_id}, "Copy" button of the
      * decklist toolbar). Returns the new deck id.
      */
-    private function copyDecklist(KernelBrowser $client, $decklistId): int
+    private function copyDecklist(KernelBrowser $client, int $decklistId): int
     {
         $maxId = $this->maxDeckId();
         $client->request('GET', "/deck/copy/$decklistId");
@@ -656,7 +656,7 @@ class DeckWorkflowTest extends WebTestCase
      *
      * @dataProvider tagsProvider
      */
-    public function testSavedTags($tags, $expected): void
+    public function testSavedTags(string $tags, string $expected): void
     {
         $client = $this->createAuthenticatedClient();
         $deckId = $this->createDeck($client);

@@ -27,13 +27,13 @@ class AdminCsvTest extends WebTestCase
     public const SAMPLE = __DIR__.'/../Resources/fixtures/import/alep-the-hobbit.csv';
 
     /** @var int[] */
-    private $maxIds = [];
+    private array $maxIds = [];
 
     /** @var array[] rows to restore, by table */
-    private $backup = [];
+    private array $backup = [];
 
     /** @var string[] */
-    private $files = [];
+    private array $files = [];
 
     protected function setUp(): void
     {
@@ -207,7 +207,7 @@ class AdminCsvTest extends WebTestCase
     {
         $client = $this->createAdminClient();
         $beorn = $this->fetchPrinting('THo', 'Beorn');
-        $file = $this->sampleVariant(function (array $row) {
+        $file = $this->sampleVariant(function (array $row): array {
             if ('Beorn' === $row['name']) {
                 $row['illustrator'] = 'PHPUnit Artist';
                 $row['position'] = '992';
@@ -234,7 +234,7 @@ class AdminCsvTest extends WebTestCase
     {
         $client = $this->createAdminClient();
         $counts = [$this->rowCount('card'), $this->rowCount('card_printing'), $this->rowCount('pack')];
-        $file = $this->sampleVariant(function (array $row) {
+        $file = $this->sampleVariant(function (array $row): array {
             $row['pack'] = 'PHPUnit Pack';
             $row['code'] = '99'.substr($row['code'], 2);
             $row['octgnid'] = 'phpunit-'.$row['octgnid'];

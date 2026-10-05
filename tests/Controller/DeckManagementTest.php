@@ -25,13 +25,11 @@ class DeckManagementTest extends WebTestCase
     private KernelBrowser $client;
 
     /** @var int[] */
-    private $maxIds = [];
+    private array $maxIds = [];
 
-    /** @var array */
-    private $fixtureDecklists;
+    private array $fixtureDecklists;
 
-    /** @var array */
-    private $fixtureUsers;
+    private array $fixtureUsers;
 
     protected function setUp(): void
     {
@@ -80,10 +78,7 @@ class DeckManagementTest extends WebTestCase
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    /**
-     * @param string $username
-     */
-    private function createAuthenticatedClient($username = 'test'): KernelBrowser
+    private function createAuthenticatedClient(string $username = 'test'): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -96,7 +91,7 @@ class DeckManagementTest extends WebTestCase
     /**
      * A copy of fixture deck 2 (cards included), plus 2 Feint in the sideboard, returns its id.
      */
-    private function insertDeck($name, array $values = []): int
+    private function insertDeck(string $name, array $values = []): int
     {
         $connection = $this->db();
         $row = $connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
@@ -113,12 +108,12 @@ class DeckManagementTest extends WebTestCase
     /**
      * @return array<int|string, mixed>
      */
-    private function slots($table, $deckId): array
+    private function slots(string $table, $deckId): array
     {
         return array_column($this->db()->fetchAll("SELECT card_id, quantity FROM $table WHERE deck_id = ? ORDER BY card_id", [$deckId]), 'quantity', 'card_id');
     }
 
-    private function deckExists($id): bool
+    private function deckExists(int $id): bool
     {
         return (bool) $this->db()->fetchColumn('SELECT COUNT(*) FROM deck WHERE id = ?', [$id]);
     }
@@ -135,7 +130,7 @@ class DeckManagementTest extends WebTestCase
     {
         preg_match_all("/insert_alert_message\\('(\\w+)', (\"[^\"]*\")\\)/", $client->getResponse()->getContent(), $matches, PREG_SET_ORDER);
 
-        return array_map(fn ($match): array => [$match[1], json_decode($match[2])], $matches);
+        return array_map(fn (array $match): array => [$match[1], json_decode($match[2])], $matches);
     }
 
     /* -------------------------------------------------------------- clone */
@@ -222,7 +217,7 @@ class DeckManagementTest extends WebTestCase
         $this->assertSame([['danger', "You can't delete a deck that is member of a fellowship."]], $this->flashMessages($client));
     }
 
-    private function addToFellowship($deckId): int
+    private function addToFellowship(int $deckId): int
     {
         $connection = $this->db();
         $connection->insert('fellowship', ['user_id' => 1, 'name' => 'PHPUnit', 'name_canonical' => 'phpunit', 'is_public' => 0,
@@ -366,7 +361,7 @@ class DeckManagementTest extends WebTestCase
     /**
      * @dataProvider invalidAutosaveProvider
      */
-    public function testInvalidAutosave($username, $deckId, $diff, $status, $message): void
+    public function testInvalidAutosave(string $username, ?int $deckId, string $diff, int $status, string $message): void
     {
         $client = $this->createAuthenticatedClient($username);
         $id = $this->insertDeck('PHPUnit Autosave');
@@ -393,7 +388,7 @@ class DeckManagementTest extends WebTestCase
     /**
      * Downloads an export of a fixture deck ("text" or "octgn").
      */
-    private function export(KernelBrowser $client, $format, $deckId): string
+    private function export(KernelBrowser $client, string $format, int $deckId): string
     {
         $client->request('GET', "/deck/export/$format/$deckId");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -489,7 +484,7 @@ class DeckManagementTest extends WebTestCase
     /**
      * @dataProvider anonymousRouteProvider
      */
-    public function testAnonymousIsRedirectedToLogin($method, $uri): void
+    public function testAnonymousIsRedirectedToLogin(string $method, string $uri): void
     {
         $client = $this->client;
         $client->request($method, $uri, ['deck_id' => 1, 'ids' => '1', 'diff' => '[[],[],[],[]]']);

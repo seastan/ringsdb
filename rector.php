@@ -17,5 +17,9 @@ return RectorConfig::configure()
         SetList::DEAD_CODE,
         SetList::CODE_QUALITY,
         SetList::CODING_STYLE,
+        SetList::TYPE_DECLARATION,
+    ])
+    ->withSkip([
+        Rector\CodeQuality\Rector\For_\ForRepeatedCountToOwnVariableRector::class,
     ])
 ;

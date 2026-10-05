@@ -40,7 +40,7 @@ class SecurityControllerTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    private function findUser(KernelBrowser $client, $username): ?User
+    private function findUser(KernelBrowser $client, string $username): ?User
     {
         $em = $client->getContainer()->get('doctrine')->getManager();
         $em->clear();
@@ -48,10 +48,7 @@ class SecurityControllerTest extends WebTestCase
         return $em->getRepository(User::class)->findOneBy(['username' => $username]);
     }
 
-    /**
-     * @param bool $withProfiler
-     */
-    private function submitRegistration(KernelBrowser $client, $username, $email, $password, $confirmation = null, $withProfiler = false): \Symfony\Component\DomCrawler\Crawler
+    private function submitRegistration(KernelBrowser $client, string $username, string $email, string $password, ?string $confirmation = null, bool $withProfiler = false): \Symfony\Component\DomCrawler\Crawler
     {
         $crawler = $client->request('GET', '/register/');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
@@ -69,10 +66,7 @@ class SecurityControllerTest extends WebTestCase
         return $client->submit($form);
     }
 
-    /**
-     * @param bool $rememberMe
-     */
-    private function login(KernelBrowser $client, $username, $password, $rememberMe = false): \Symfony\Component\DomCrawler\Crawler
+    private function login(KernelBrowser $client, string $username, string $password, bool $rememberMe = false): \Symfony\Component\DomCrawler\Crawler
     {
         $crawler = $client->request('GET', '/login');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
@@ -87,7 +81,7 @@ class SecurityControllerTest extends WebTestCase
         return $client->submit($form);
     }
 
-    private function assertRedirectsTo(KernelBrowser $client, $pathPattern): void
+    private function assertRedirectsTo(KernelBrowser $client, string $pathPattern): void
     {
         $response = $client->getResponse();
         $this->assertTrue($response->isRedirect(), 'Expected a redirect, got '.$response->getStatusCode());
@@ -100,7 +94,7 @@ class SecurityControllerTest extends WebTestCase
         $this->assertRedirectsTo($client, '#/login$#');
     }
 
-    private function assertAuthenticatedAs(KernelBrowser $client, $username): void
+    private function assertAuthenticatedAs(KernelBrowser $client, string $username): void
     {
         $client->request('GET', '/decks');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
@@ -190,7 +184,7 @@ class SecurityControllerTest extends WebTestCase
     /**
      * @dataProvider invalidRegistrationProvider
      */
-    public function testRegistrationValidationErrors($username, $email, $password, $confirmation, $expectedError): void
+    public function testRegistrationValidationErrors(string $username, string $email, string $password, ?string $confirmation, string $expectedError): void
     {
         $client = $this->client;
         $crawler = $this->submitRegistration($client, $username, $email, $password, $confirmation);
@@ -276,7 +270,7 @@ class SecurityControllerTest extends WebTestCase
     /**
      * @dataProvider invalidCredentialsProvider
      */
-    public function testLoginWithInvalidCredentials($username, $password): void
+    public function testLoginWithInvalidCredentials(string $username, string $password): void
     {
         $client = $this->client;
         $this->login($client, $username, $password);

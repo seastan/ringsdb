@@ -28,7 +28,7 @@ class AdminWriteTest extends WebTestCase
     private KernelBrowser $client;
 
     /** @var int[] */
-    private $maxIds = [];
+    private array $maxIds = [];
 
     protected function setUp(): void
     {
@@ -82,7 +82,7 @@ class AdminWriteTest extends WebTestCase
         return $client;
     }
 
-    private function submitForm(KernelBrowser $client, $pageUri, $action, array $values): \Symfony\Component\HttpFoundation\Response
+    private function submitForm(KernelBrowser $client, string $pageUri, string $action, array $values): \Symfony\Component\HttpFoundation\Response
     {
         $crawler = $client->request('GET', $pageUri);
         $this->assertSame(200, $client->getResponse()->getStatusCode(), "GET $pageUri");
@@ -94,7 +94,7 @@ class AdminWriteTest extends WebTestCase
     /**
      * @return array<string, mixed>
      */
-    private function prefixed($prefix, array $values): array
+    private function prefixed(string $prefix, array $values): array
     {
         $fields = [];
         foreach ($values as $name => $value) {
@@ -166,7 +166,7 @@ class AdminWriteTest extends WebTestCase
     /**
      * @dataProvider crudProvider
      */
-    public function testCreateEditDelete($slug, $formName, $table, array $created, array $expectedCreated, array $updated, array $expectedUpdated): void
+    public function testCreateEditDelete(string $slug, string $formName, string $table, array $created, array $expectedCreated, array $updated, array $expectedUpdated): void
     {
         $client = $this->createAdminClient();
         $columns = implode(', ', array_keys($expectedCreated));
@@ -284,7 +284,7 @@ class AdminWriteTest extends WebTestCase
     /**
      * @dataProvider findUserProvider
      */
-    public function testFindUser(array $values, $location): void
+    public function testFindUser(array $values, string $location): void
     {
         $client = $this->createAdminClient();
         $client->request('POST', '/admin/user/find_process', $values);

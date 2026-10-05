@@ -18,14 +18,12 @@ class CollectionTest extends WebTestCase
 {
     private KernelBrowser $client;
 
-    /** @var array */
-    private $fixtureUsers;
+    private array $fixtureUsers;
 
-    /** @var array */
-    private $fixturePack;
+    private array $fixturePack;
 
     /** @var int[] */
-    private $maxIds = [];
+    private array $maxIds = [];
 
     protected function setUp(): void
     {
@@ -72,10 +70,7 @@ class CollectionTest extends WebTestCase
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    /**
-     * @param string $username
-     */
-    private function createAuthenticatedClient($username = 'test'): KernelBrowser
+    private function createAuthenticatedClient(string $username = 'test'): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -88,14 +83,14 @@ class CollectionTest extends WebTestCase
     /**
      * @return array<int|string, int>
      */
-    private function packCards($packId): array
+    private function packCards(int $packId): array
     {
         $rows = $this->db()->fetchAll('SELECT c.code, e.quantity FROM user_custom_pack_card e JOIN card c ON c.id = e.card_id WHERE e.custom_pack_id = ? ORDER BY e.id', [$packId]);
 
         return array_map('intval', array_column($rows, 'quantity', 'code'));
     }
 
-    private function fetchPack($id)
+    private function fetchPack(int $id)
     {
         return $this->db()->fetchAssoc('SELECT p.name, p.code, p.is_enabled, p.is_published, u.username FROM user_custom_pack p JOIN user u ON u.id = p.user_id WHERE p.id = ?', [$id]);
     }
@@ -104,7 +99,7 @@ class CollectionTest extends WebTestCase
      * Submits the custom pack form; the page's JavaScript serializes the card list into the
      * hidden "cards_json" field.
      */
-    private function submitPackForm(KernelBrowser $client, $pageUri, $name, array $cards): \Symfony\Component\HttpFoundation\Response
+    private function submitPackForm(KernelBrowser $client, string $pageUri, string $name, array $cards): \Symfony\Component\HttpFoundation\Response
     {
         $crawler = $client->request('GET', $pageUri);
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -241,7 +236,7 @@ class CollectionTest extends WebTestCase
     /**
      * @dataProvider foreignPackRouteProvider
      */
-    public function testCannotChangeAnotherUsersPack($method, $uri): void
+    public function testCannotChangeAnotherUsersPack(string $method, string $uri): void
     {
         $client = $this->createAuthenticatedClient('admin');
         $client->request($method, $uri, ['name' => 'Hacked', 'cards_json' => '[]']);
@@ -290,7 +285,7 @@ class CollectionTest extends WebTestCase
     /**
      * @dataProvider anonymousRouteProvider
      */
-    public function testAnonymousIsRedirectedToLogin($uri): void
+    public function testAnonymousIsRedirectedToLogin(string $uri): void
     {
         $client = $this->client;
         $client->request('POST', $uri, ['selected-packs' => '1', 'card_code' => '01001', 'name' => 'Anonymous']);

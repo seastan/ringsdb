@@ -27,17 +27,13 @@ class SuggestionsCommandTest extends KernelTestCase
 
     public const GIMLI = 4;
 
-    /** @var Connection */
-    private $connection;
+    private \Doctrine\DBAL\Connection $connection;
 
-    /** @var string */
-    private $file;
+    private string $file;
 
-    /** @var string|null */
-    private $backup;
+    private ?string $backup;
 
-    /** @var int */
-    private $maxDeckId;
+    private int $maxDeckId;
 
     protected function setUp(): void
     {
@@ -93,7 +89,7 @@ class SuggestionsCommandTest extends KernelTestCase
     /**
      * The value of the matrix for two card codes.
      */
-    private function value(array $suggestions, $code1, $code2)
+    private function value(array $suggestions, string $code1, string $code2)
     {
         $i = array_search($code1, $suggestions['index'], true);
         $j = array_search($code2, $suggestions['index'], true);

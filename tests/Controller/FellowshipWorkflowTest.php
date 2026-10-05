@@ -27,13 +27,11 @@ class FellowshipWorkflowTest extends WebTestCase
     private KernelBrowser $client;
 
     /** @var int[] max ids before the test, by table */
-    private $maxIds = [];
+    private array $maxIds = [];
 
-    /** @var array */
-    private $fixtureDecks;
+    private array $fixtureDecks;
 
-    /** @var array */
-    private $fixtureFellowship;
+    private array $fixtureFellowship;
 
     protected function setUp(): void
     {
@@ -50,7 +48,7 @@ class FellowshipWorkflowTest extends WebTestCase
     /**
      * @return array<int, mixed>
      */
-    private function fellowshipOneState($connection): array
+    private function fellowshipOneState(\Doctrine\DBAL\Connection $connection): array
     {
         return [
             $connection->fetchAssoc('SELECT name, is_public, nb_decks, nb_votes, nb_favorites, nb_comments FROM fellowship WHERE id = 1'),
@@ -109,10 +107,7 @@ class FellowshipWorkflowTest extends WebTestCase
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    /**
-     * @param string $username
-     */
-    private function createAuthenticatedClient($username = 'test'): KernelBrowser
+    private function createAuthenticatedClient(string $username = 'test'): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -133,7 +128,7 @@ class FellowshipWorkflowTest extends WebTestCase
         }
     }
 
-    private function fetchFellowship($id)
+    private function fetchFellowship(int $id)
     {
         return $this->db()->fetchAssoc(
             'SELECT f.name, f.name_canonical, f.description_md, f.description_html, f.is_public, f.nb_decks, u.username, f.date_publish IS NOT NULL AS published
@@ -145,7 +140,7 @@ class FellowshipWorkflowTest extends WebTestCase
     /**
      * @return array [deck number => 'deck:<id>' | 'decklist:<id>']
      */
-    private function fetchFellowshipDecks($id): array
+    private function fetchFellowshipDecks(int $id): array
     {
         $decks = [];
         foreach ($this->db()->fetchAll('SELECT deck_number, deck_id FROM fellowship_deck WHERE fellowship_id = ?', [$id]) as $row) {
@@ -163,10 +158,8 @@ class FellowshipWorkflowTest extends WebTestCase
 
     /**
      * Creates a fellowship through the form, returns its id.
-     *
-     * @param string $description
      */
-    private function createFellowship(KernelBrowser $client, $name, array $decks, $description = ''): int
+    private function createFellowship(KernelBrowser $client, string $name, array $decks, string $description = ''): int
     {
         $crawler = $client->request('GET', '/fellowship/new/0/0/0/0');
         $this->assertSame(200, $client->getResponse()->getStatusCode());

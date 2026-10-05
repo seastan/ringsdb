@@ -19,8 +19,7 @@ class TagControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
 
-    /** @var array */
-    private $fixtureDecks;
+    private array $fixtureDecks;
 
     protected function setUp(): void
     {
@@ -45,10 +44,7 @@ class TagControllerTest extends WebTestCase
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    /**
-     * @param string $username
-     */
-    private function createAuthenticatedClient($username = 'test'): KernelBrowser
+    private function createAuthenticatedClient(string $username = 'test'): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -61,7 +57,7 @@ class TagControllerTest extends WebTestCase
     /**
      * @return array the decoded JSON answer
      */
-    private function post(KernelBrowser $client, $action, array $parameters): array
+    private function post(KernelBrowser $client, string $action, array $parameters): array
     {
         $client->request('POST', "/tag/$action", $parameters, [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -153,7 +149,7 @@ class TagControllerTest extends WebTestCase
      *
      * @dataProvider actionProvider
      */
-    public function testForeignAndUnknownDecksAreSkipped($action): void
+    public function testForeignAndUnknownDecksAreSkipped(string $action): void
     {
         $client = $this->createAuthenticatedClient('admin');
 
@@ -174,7 +170,7 @@ class TagControllerTest extends WebTestCase
      *
      * @dataProvider actionProvider
      */
-    public function testAnonymousAjaxIsDenied($action): void
+    public function testAnonymousAjaxIsDenied(string $action): void
     {
         $client = $this->client;
         $client->request('POST', "/tag/$action", ['ids' => ['1'], 'tags' => ['hacked']], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
@@ -187,7 +183,7 @@ class TagControllerTest extends WebTestCase
     /**
      * @dataProvider actionProvider
      */
-    public function testAnonymousIsRedirectedToLogin($action): void
+    public function testAnonymousIsRedirectedToLogin(string $action): void
     {
         $client = $this->client;
         $client->request('POST', "/tag/$action", ['ids' => ['1'], 'tags' => ['hacked']]);

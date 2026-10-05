@@ -26,10 +26,9 @@ class QuestlogWorkflowTest extends WebTestCase
     private KernelBrowser $client;
 
     /** @var int[] max ids before the test, by table */
-    private $maxIds = [];
+    private array $maxIds = [];
 
-    /** @var array */
-    private $fixtureQuestlog;
+    private array $fixtureQuestlog;
 
     protected function setUp(): void
     {
@@ -45,7 +44,7 @@ class QuestlogWorkflowTest extends WebTestCase
     /**
      * @return array<int, mixed>
      */
-    private function questlogOneState($connection): array
+    private function questlogOneState(\Doctrine\DBAL\Connection $connection): array
     {
         return [
             $connection->fetchAssoc('SELECT * FROM questlog WHERE id = 1'),
@@ -88,10 +87,7 @@ class QuestlogWorkflowTest extends WebTestCase
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    /**
-     * @param string $username
-     */
-    private function createAuthenticatedClient($username = 'test'): KernelBrowser
+    private function createAuthenticatedClient(string $username = 'test'): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -106,7 +102,7 @@ class QuestlogWorkflowTest extends WebTestCase
      *
      * @return bool|string
      */
-    private function deckContent($deckId)
+    private function deckContent(int $deckId)
     {
         $rows = $this->db()->fetchAll('SELECT c.code, s.quantity FROM deckslot s JOIN card c ON c.id = s.card_id WHERE s.deck_id = ? ORDER BY c.code', [$deckId]);
 
@@ -126,11 +122,9 @@ class QuestlogWorkflowTest extends WebTestCase
     }
 
     /**
-     * @param string $uri
-     *
      * @return array{\Symfony\Component\DomCrawler\Crawler, Form}
      */
-    private function newForm(KernelBrowser $client, $uri = '/questlog/new/0/0/0/0/0'): array
+    private function newForm(KernelBrowser $client, string $uri = '/questlog/new/0/0/0/0/0'): array
     {
         $crawler = $client->request('GET', $uri);
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -147,7 +141,7 @@ class QuestlogWorkflowTest extends WebTestCase
         return (int) explode('/', $location)[3];
     }
 
-    private function fetchQuestlog($id)
+    private function fetchQuestlog(int $id)
     {
         return $this->db()->fetchAssoc(
             'SELECT q.name, q.name_canonical, q.description_md, q.description_html, s.name AS scenario, q.date_played, q.quest_mode,
@@ -157,7 +151,7 @@ class QuestlogWorkflowTest extends WebTestCase
         );
     }
 
-    private function fetchQuestlogDecks($id)
+    private function fetchQuestlogDecks(int $id)
     {
         return $this->db()->fetchAll('SELECT deck_number, deck_id, decklist_id, player, content FROM questlog_deck WHERE questlog_id = ? ORDER BY deck_number', [$id]);
     }

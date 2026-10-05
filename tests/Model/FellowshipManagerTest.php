@@ -26,17 +26,15 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class FellowshipManagerTest extends KernelTestCase
 {
-    /** @var Connection */
-    private $connection;
+    private \Doctrine\DBAL\Connection $connection;
 
     /** @var int[] */
-    private $maxIds = [];
+    private array $maxIds = [];
 
     /** @var int[] name => id */
-    private $ids = [];
+    private array $ids = [];
 
-    /** @var array */
-    private $fixtureUsers;
+    private array $fixtureUsers;
 
     protected function setUp(): void
     {
@@ -86,7 +84,7 @@ class FellowshipManagerTest extends KernelTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    private function insertFellowship($name, $userId, array $decklistIds, array $values): int
+    private function insertFellowship(string $name, int $userId, array $decklistIds, array $values): int
     {
         $this->connection->insert('fellowship', $values + [
             'user_id' => $userId, 'name' => $name, 'name_canonical' => strtolower(str_replace(' ', '-', $name)),
@@ -118,7 +116,7 @@ class FellowshipManagerTest extends KernelTestCase
         return $id;
     }
 
-    private function manager(array $query = [], $username = null): FellowshipManager
+    private function manager(array $query = [], ?string $username = null): FellowshipManager
     {
         $container = static::$kernel->getContainer();
         $container->get('request_stack')->push(Request::create('/fellowships/find', 'GET', $query));
@@ -130,7 +128,7 @@ class FellowshipManagerTest extends KernelTestCase
         return $manager;
     }
 
-    private function user($username): User
+    private function user(string $username): User
     {
         $user = static::$kernel->getContainer()->get('doctrine')->getRepository(User::class)->findOneBy(['username' => $username]);
         $this->assertNotNull($user);
@@ -141,7 +139,7 @@ class FellowshipManagerTest extends KernelTestCase
     /**
      * @return string[] the names (F1...F5) of the fellowships found, in order
      */
-    private function names($paginator): array
+    private function names(\Doctrine\ORM\Tools\Pagination\Paginator $paginator): array
     {
         $names = array_flip($this->ids);
         $result = [];
@@ -194,7 +192,7 @@ class FellowshipManagerTest extends KernelTestCase
     /**
      * @dataProvider searchProvider
      */
-    public function testComplexSearch(array $query, array $expected, $username = null): void
+    public function testComplexSearch(array $query, array $expected, string $username = null): void
     {
         $this->assertSame($expected, $this->names($this->manager($query, $username)->findFellowshipsWithComplexSearch()));
     }

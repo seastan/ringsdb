@@ -26,11 +26,9 @@ class DecklistCommentTest extends WebTestCase
 
     private KernelBrowser $client;
 
-    /** @var int */
-    private $maxCommentId;
+    private int $maxCommentId;
 
-    /** @var array */
-    private $decklists;
+    private array $decklists;
 
     protected function setUp(): void
     {
@@ -59,7 +57,7 @@ class DecklistCommentTest extends WebTestCase
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    private function createAuthenticatedClient($username): KernelBrowser
+    private function createAuthenticatedClient(string $username): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -73,7 +71,7 @@ class DecklistCommentTest extends WebTestCase
      * Posts the comment form as the JavaScript does it (AJAX), with the profiler enabled to
      * inspect the notification emails.
      */
-    private function postComment(KernelBrowser $client, $decklistId, $text): \Symfony\Component\HttpFoundation\Response
+    private function postComment(KernelBrowser $client, int $decklistId, string $text): \Symfony\Component\HttpFoundation\Response
     {
         $client->enableProfiler();
         $client->request('POST', '/user/comment', ['id' => $decklistId, 'comment' => $text], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
@@ -196,7 +194,7 @@ class DecklistCommentTest extends WebTestCase
     /**
      * @dataProvider markdownProvider
      */
-    public function testCommentMarkdown($text, $expectedHtml): void
+    public function testCommentMarkdown(string $text, string $expectedHtml): void
     {
         $client = $this->createAuthenticatedClient('test');
         $this->postComment($client, 1, $text);

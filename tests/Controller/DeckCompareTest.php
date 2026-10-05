@@ -44,14 +44,11 @@ class DeckCompareTest extends WebTestCase
 
     private KernelBrowser $client;
 
-    /** @var int */
-    private $maxDeckId;
+    private int $maxDeckId;
 
-    /** @var int */
-    private $deckA;
+    private int $deckA;
 
-    /** @var int */
-    private $deckB;
+    private int $deckB;
 
     protected function setUp(): void
     {
@@ -89,10 +86,7 @@ class DeckCompareTest extends WebTestCase
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    /**
-     * @param string $username
-     */
-    private function createAuthenticatedClient($username = 'test'): KernelBrowser
+    private function createAuthenticatedClient(string $username = 'test'): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -105,7 +99,7 @@ class DeckCompareTest extends WebTestCase
     /**
      * A copy of fixture deck 2 with the given cards ([card id => quantity]).
      */
-    private function insertDeck($name, array $main, array $side): int
+    private function insertDeck(string $name, array $main, array $side): int
     {
         $connection = $this->db();
         $row = $connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
@@ -124,7 +118,7 @@ class DeckCompareTest extends WebTestCase
         return $id;
     }
 
-    private function slots($table, $deckId)
+    private function slots(string $table, $deckId)
     {
         return $this->db()->fetchAll("SELECT card_id, quantity FROM $table WHERE deck_id = ? ORDER BY card_id", [$deckId]);
     }

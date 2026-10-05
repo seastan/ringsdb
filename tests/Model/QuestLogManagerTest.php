@@ -26,17 +26,15 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class QuestLogManagerTest extends KernelTestCase
 {
-    /** @var Connection */
-    private $connection;
+    private \Doctrine\DBAL\Connection $connection;
 
     /** @var int[] */
-    private $maxIds = [];
+    private array $maxIds = [];
 
     /** @var int[] name => id */
-    private $ids = [];
+    private array $ids = [];
 
-    /** @var array */
-    private $fixtureUsers;
+    private array $fixtureUsers;
 
     protected function setUp(): void
     {
@@ -86,7 +84,7 @@ class QuestLogManagerTest extends KernelTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    private function insertQuestlog($name, $userId, array $deckIds, array $values): int
+    private function insertQuestlog(string $name, int $userId, array $deckIds, array $values): int
     {
         $this->connection->insert('questlog', $values + [
             'user_id' => $userId, 'scenario_id' => 1, 'name' => $name, 'name_canonical' => strtolower(str_replace(' ', '-', $name)),
@@ -120,7 +118,7 @@ class QuestLogManagerTest extends KernelTestCase
         return $id;
     }
 
-    private function manager(array $query = [], $username = null): QuestLogManager
+    private function manager(array $query = [], ?string $username = null): QuestLogManager
     {
         $container = static::$kernel->getContainer();
         $container->get('request_stack')->push(Request::create('/questlogs/find', 'GET', $query));
@@ -132,7 +130,7 @@ class QuestLogManagerTest extends KernelTestCase
         return $manager;
     }
 
-    private function user($username): User
+    private function user(string $username): User
     {
         $user = static::$kernel->getContainer()->get('doctrine')->getRepository(User::class)->findOneBy(['username' => $username]);
         $this->assertNotNull($user);
@@ -143,7 +141,7 @@ class QuestLogManagerTest extends KernelTestCase
     /**
      * @return string[] the names (Q1...Q5) of the quest logs found, in order
      */
-    private function names($paginator): array
+    private function names(\Doctrine\ORM\Tools\Pagination\Paginator $paginator): array
     {
         $names = array_flip($this->ids);
         $result = [];
@@ -195,7 +193,7 @@ class QuestLogManagerTest extends KernelTestCase
     /**
      * @dataProvider searchProvider
      */
-    public function testComplexSearch(array $query, array $expected, $username = null): void
+    public function testComplexSearch(array $query, array $expected, string $username = null): void
     {
         $this->assertSame($expected, $this->names($this->manager($query, $username)->findQuestLogsWithComplexSearch()));
     }

@@ -21,14 +21,12 @@ class DecklistEditTest extends WebTestCase
 
     private KernelBrowser $client;
 
-    /** @var array */
-    private $fixtureDecklists;
+    private array $fixtureDecklists;
 
-    /** @var array */
-    private $fixtureUsers;
+    private array $fixtureUsers;
 
     /** @var int[] */
-    private $maxIds = [];
+    private array $maxIds = [];
 
     protected function setUp(): void
     {
@@ -76,10 +74,7 @@ class DecklistEditTest extends WebTestCase
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    /**
-     * @param string $username
-     */
-    private function createAuthenticatedClient($username = 'test'): KernelBrowser
+    private function createAuthenticatedClient(string $username = 'test'): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -89,7 +84,7 @@ class DecklistEditTest extends WebTestCase
         return $client;
     }
 
-    private function fetchDecklist($id)
+    private function fetchDecklist(int $id)
     {
         return $this->db()->fetchAssoc('SELECT name, name_canonical, description_md, description_html, precedent_decklist_id, date_update FROM decklist WHERE id = ?', [$id]);
     }
@@ -97,7 +92,7 @@ class DecklistEditTest extends WebTestCase
     /**
      * A copy of fixture decklist 2 (with its cards), returns its id.
      */
-    private function insertDecklist($name, array $values = []): int
+    private function insertDecklist(string $name, array $values = []): int
     {
         $connection = $this->db();
         $row = $connection->fetchAssoc('SELECT * FROM decklist WHERE id = 2');
@@ -110,7 +105,7 @@ class DecklistEditTest extends WebTestCase
         return $id;
     }
 
-    private function saveForm(KernelBrowser $client, $decklistId, array $values): \Symfony\Component\HttpFoundation\Response
+    private function saveForm(KernelBrowser $client, int $decklistId, array $values): \Symfony\Component\HttpFoundation\Response
     {
         $crawler = $client->request('GET', "/decklist/edit/$decklistId");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -159,7 +154,7 @@ class DecklistEditTest extends WebTestCase
     /**
      * @dataProvider nameProvider
      */
-    public function testName($name, $expected): void
+    public function testName(string $name, string $expected): void
     {
         $client = $this->createAuthenticatedClient();
         $this->saveForm($client, 1, ['name' => $name]);
@@ -181,7 +176,7 @@ class DecklistEditTest extends WebTestCase
      *
      * @dataProvider precedentProvider
      */
-    public function testPrecedent($precedent, $expected): void
+    public function testPrecedent(string $precedent, ?string $expected): void
     {
         $client = $this->createAuthenticatedClient();
         $this->saveForm($client, 1, ['precedent' => $precedent]);
@@ -206,7 +201,7 @@ class DecklistEditTest extends WebTestCase
     /**
      * @dataProvider editRouteProvider
      */
-    public function testAnotherUserCannotEdit($method, $uri): void
+    public function testAnotherUserCannotEdit(string $method, string $uri): void
     {
         $client = $this->createAuthenticatedClient('admin');
         $client->request($method, $uri, ['name' => 'Hacked']);
@@ -241,7 +236,7 @@ class DecklistEditTest extends WebTestCase
     /**
      * @dataProvider editRouteProvider
      */
-    public function testAnonymousIsRedirectedToLogin($method, $uri): void
+    public function testAnonymousIsRedirectedToLogin(string $method, string $uri): void
     {
         $client = $this->client;
         $client->request($method, $uri, ['name' => 'Hacked']);
@@ -291,7 +286,7 @@ class DecklistEditTest extends WebTestCase
      *
      * @dataProvider refusedDeleteProvider
      */
-    public function testRefusedDelete($username, $decklist): void
+    public function testRefusedDelete(?string $username, int $decklist): void
     {
         $client = $username ? $this->createAuthenticatedClient($username) : $this->client;
         $client->request('POST', "/decklist/delete/$decklist");

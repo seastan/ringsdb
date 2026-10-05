@@ -40,7 +40,7 @@ class WebsiteBrowsingTest extends WebTestCase
         return $client;
     }
 
-    private function assertPage(KernelBrowser $client, $uri, $snapshot, $title): void
+    private function assertPage(KernelBrowser $client, string $uri, string $snapshot, string $title): void
     {
         $crawler = $client->request('GET', $uri);
         $response = $client->getResponse();
@@ -97,7 +97,7 @@ class WebsiteBrowsingTest extends WebTestCase
     /**
      * @dataProvider publicPageProvider
      */
-    public function testPublicPageAsAnonymous($uri, $snapshot, $title): void
+    public function testPublicPageAsAnonymous(string $uri, string $snapshot, string $title): void
     {
         $this->assertPage($this->client, $uri, 'anonymous/'.$snapshot, $title);
     }
@@ -105,7 +105,7 @@ class WebsiteBrowsingTest extends WebTestCase
     /**
      * @dataProvider publicPageProvider
      */
-    public function testPublicPageAsUser($uri, $snapshot, $title): void
+    public function testPublicPageAsUser(string $uri, string $snapshot, string $title): void
     {
         $this->assertPage($this->createAuthenticatedClient(), $uri, 'user/'.$snapshot, $title);
     }
@@ -148,7 +148,7 @@ class WebsiteBrowsingTest extends WebTestCase
     /**
      * @dataProvider memberPageProvider
      */
-    public function testMemberPage($uri, $snapshot, $title): void
+    public function testMemberPage(string $uri, string $snapshot, string $title): void
     {
         $this->assertPage($this->createAuthenticatedClient(), $uri, 'user/'.$snapshot, $title);
     }
@@ -191,7 +191,7 @@ class WebsiteBrowsingTest extends WebTestCase
     /**
      * @dataProvider anonymousAccessProvider
      */
-    public function testAnonymousAccessIsDenied($uri, $status, $expected): void
+    public function testAnonymousAccessIsDenied(string $uri, int $status, string $expected): void
     {
         $client = $this->client;
         $crawler = $client->request('GET', $uri);
@@ -230,7 +230,7 @@ class WebsiteBrowsingTest extends WebTestCase
     /**
      * @dataProvider redirectProvider
      */
-    public function testRedirect($uri, $location): void
+    public function testRedirect(string $uri, string $location): void
     {
         $client = $this->client;
         $client->request('GET', $uri);
@@ -256,7 +256,7 @@ class WebsiteBrowsingTest extends WebTestCase
     /**
      * @dataProvider notFoundProvider
      */
-    public function testNotFound($uri, $title): void
+    public function testNotFound(string $uri, string $title): void
     {
         $client = $this->client;
         $crawler = $client->request('GET', $uri);
@@ -283,7 +283,7 @@ class WebsiteBrowsingTest extends WebTestCase
     /**
      * @dataProvider downloadProvider
      */
-    public function testDownload($uri, $snapshot, $contentType, $disposition, $authenticated): void
+    public function testDownload(string $uri, string $snapshot, string $contentType, string $disposition, bool $authenticated): void
     {
         $client = $authenticated ? $this->createAuthenticatedClient() : $this->client;
         $client->request('GET', $uri);
@@ -338,7 +338,7 @@ class WebsiteBrowsingTest extends WebTestCase
     /**
      * @dataProvider zipDownloadProvider
      */
-    public function testZipDownload($uri, array $entries): void
+    public function testZipDownload(string $uri, array $entries): void
     {
         $client = $this->createAuthenticatedClient();
         $client->request('GET', $uri);

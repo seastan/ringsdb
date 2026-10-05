@@ -29,7 +29,7 @@ class AdminPagesTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    private function createAuthenticatedClient($username): KernelBrowser
+    private function createAuthenticatedClient(string $username): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -80,7 +80,7 @@ class AdminPagesTest extends WebTestCase
     /**
      * @dataProvider adminPageProvider
      */
-    public function testAnonymousIsRedirectedToLogin($uri): void
+    public function testAnonymousIsRedirectedToLogin(string $uri): void
     {
         $client = $this->client;
         $client->request('GET', $uri);
@@ -92,7 +92,7 @@ class AdminPagesTest extends WebTestCase
     /**
      * @dataProvider adminPageProvider
      */
-    public function testUsersAreDenied($uri): void
+    public function testUsersAreDenied(string $uri): void
     {
         $client = $this->createAuthenticatedClient('test');
         $client->request('GET', $uri);
@@ -105,7 +105,7 @@ class AdminPagesTest extends WebTestCase
      *
      * @dataProvider writeRouteProvider
      */
-    public function testUsersCannotWrite($method, $uri, array $parameters): void
+    public function testUsersCannotWrite(string $method, string $uri, array $parameters): void
     {
         $client = $this->createAuthenticatedClient('test');
         $before = $this->db()->fetchAll('SELECT id, name FROM cycle ORDER BY id');
@@ -129,14 +129,11 @@ class AdminPagesTest extends WebTestCase
     }
 
     /* ------------------------------------------------------ admin pages */
-
     /**
      * The pages with a text snapshot (the big lists are checked by testBigLists, the statistics
      * by testStatistics).
-     *
-     * @return (array|null)
      */
-    public function snapshotPageProvider()
+    public function snapshotPageProvider(): array
     {
         return array_filter($this->adminPageProvider(), fn (array $page): bool => null !== $page[1]);
     }
@@ -144,7 +141,7 @@ class AdminPagesTest extends WebTestCase
     /**
      * @dataProvider snapshotPageProvider
      */
-    public function testAdminPage($uri, $snapshot): void
+    public function testAdminPage(string $uri, $snapshot): void
     {
         $client = $this->createAuthenticatedClient('admin');
         $crawler = $client->request('GET', $uri);
@@ -156,7 +153,7 @@ class AdminPagesTest extends WebTestCase
     /**
      * @dataProvider bigListProvider
      */
-    public function testBigLists($uri, $table): void
+    public function testBigLists(string $uri, string $table): void
     {
         $client = $this->createAuthenticatedClient('admin');
         $crawler = $client->request('GET', $uri);
@@ -178,7 +175,7 @@ class AdminPagesTest extends WebTestCase
      *
      * @dataProvider statisticsProvider
      */
-    public function testStatistics($uri, $snapshot): void
+    public function testStatistics(string $uri, string $snapshot): void
     {
         $client = $this->createAuthenticatedClient('admin');
         $client->request('GET', $uri);

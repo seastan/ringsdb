@@ -24,8 +24,7 @@ class UserProfileTest extends WebTestCase
 
     private KernelBrowser $client;
 
-    /** @var array */
-    private $fixtureUsers;
+    private array $fixtureUsers;
 
     protected function setUp(): void
     {
@@ -243,7 +242,7 @@ class UserProfileTest extends WebTestCase
     /**
      * @dataProvider invalidPasswordChangeProvider
      */
-    public function testInvalidPasswordChange($current, $first, $second, $error): void
+    public function testInvalidPasswordChange(string $current, string $first, string $second, string $error): void
     {
         $client = $this->createAuthenticatedClient();
         $crawler = $client->request('GET', '/profile/change-password');

@@ -19,11 +19,9 @@ class DecklistSocialTest extends WebTestCase
 {
     private KernelBrowser $client;
 
-    /** @var array */
-    private $fixtureDecklists;
+    private array $fixtureDecklists;
 
-    /** @var array */
-    private $fixtureUsers;
+    private array $fixtureUsers;
 
     protected function setUp(): void
     {
@@ -56,7 +54,7 @@ class DecklistSocialTest extends WebTestCase
         return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    private function createAuthenticatedClient($username): KernelBrowser
+    private function createAuthenticatedClient(string $username): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -66,7 +64,7 @@ class DecklistSocialTest extends WebTestCase
         return $client;
     }
 
-    private function post(KernelBrowser $client, $action, $decklistId): \Symfony\Component\HttpFoundation\Response
+    private function post(KernelBrowser $client, string $action, int $decklistId): \Symfony\Component\HttpFoundation\Response
     {
         $client->request('POST', "/user/$action", ['id' => $decklistId], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
@@ -177,7 +175,7 @@ class DecklistSocialTest extends WebTestCase
     /**
      * @dataProvider actionProvider
      */
-    public function testAnonymousAjaxIsDenied($action): void
+    public function testAnonymousAjaxIsDenied(string $action): void
     {
         $client = $this->client;
         $response = $this->post($client, $action, 2);
@@ -195,7 +193,7 @@ class DecklistSocialTest extends WebTestCase
     /**
      * @dataProvider actionProvider
      */
-    public function testGetIsNotAllowed($action): void
+    public function testGetIsNotAllowed(string $action): void
     {
         $client = $this->createAuthenticatedClient('admin');
         $client->request('GET', "/user/$action?id=2");

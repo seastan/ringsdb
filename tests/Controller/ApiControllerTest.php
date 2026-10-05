@@ -31,14 +31,14 @@ class ApiControllerTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    private function get(KernelBrowser $client, $uri, array $headers = []): Response
+    private function get(KernelBrowser $client, string $uri, array $headers = []): Response
     {
         $client->request('GET', $uri, [], [], $headers);
 
         return $client->getResponse();
     }
 
-    private function assertApiHeaders(Response $response, $contentType, $lastModified): void
+    private function assertApiHeaders(Response $response, string $contentType, ?string $lastModified): void
     {
         $this->assertSame($contentType, $response->headers->get('Content-Type'));
         $this->assertSame(self::CACHE_CONTROL, $response->headers->get('Cache-Control'));
@@ -76,7 +76,7 @@ class ApiControllerTest extends WebTestCase
     /**
      * @dataProvider jsonEndpointProvider
      */
-    public function testJsonEndpoint($snapshot, $uri, $lastModified): void
+    public function testJsonEndpoint(string $snapshot, string $uri, ?string $lastModified): void
     {
         $client = $this->client;
         $response = $this->get($client, $uri);
@@ -107,7 +107,7 @@ class ApiControllerTest extends WebTestCase
     /**
      * @dataProvider jsonpEndpointProvider
      */
-    public function testJsonp($snapshot, $uri): void
+    public function testJsonp(string $snapshot, string $uri): void
     {
         $client = $this->client;
         $response = $this->get($client, $uri.'?jsonp=myCallback');
@@ -190,7 +190,7 @@ class ApiControllerTest extends WebTestCase
     /**
      * @dataProvider cachedEndpointProvider
      */
-    public function testNotModifiedSince($uri, $lastModified): void
+    public function testNotModifiedSince(string $uri, string $lastModified): void
     {
         $client = $this->client;
 
@@ -222,7 +222,7 @@ class ApiControllerTest extends WebTestCase
     /**
      * @dataProvider errorProvider
      */
-    public function testErrors($uri, $expectedStatus): void
+    public function testErrors(string $uri, int $expectedStatus): void
     {
         $client = $this->client;
         $response = $this->get($client, $uri);
@@ -246,7 +246,7 @@ class ApiControllerTest extends WebTestCase
     /**
      * @dataProvider unsupportedFormatProvider
      */
-    public function testUnsupportedFormatOnCardsByPack($format, $contentType): void
+    public function testUnsupportedFormatOnCardsByPack(string $format, string $contentType): void
     {
         $client = $this->client;
         $response = $this->get($client, '/api/public/cards/Core.'.$format);

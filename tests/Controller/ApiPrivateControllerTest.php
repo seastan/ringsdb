@@ -41,7 +41,7 @@ class ApiPrivateControllerTest extends WebTestCase
 
     /* ------------------------------------------------------------ helpers */
 
-    private function createAuthenticatedClient($username): KernelBrowser
+    private function createAuthenticatedClient(string $username): KernelBrowser
     {
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
@@ -51,7 +51,7 @@ class ApiPrivateControllerTest extends WebTestCase
         return $client;
     }
 
-    private function ajax(KernelBrowser $client, $uri, array $headers = []): Response
+    private function ajax(KernelBrowser $client, string $uri, array $headers = []): Response
     {
         $client->request('GET', $uri, [], [], $headers + ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
@@ -100,7 +100,7 @@ class ApiPrivateControllerTest extends WebTestCase
     /**
      * @dataProvider cacheableEndpointProvider
      */
-    public function testCacheableEndpoint($user, $uri, $snapshot): void
+    public function testCacheableEndpoint(string $user, string $uri, string $snapshot): void
     {
         $client = $this->createAuthenticatedClient($user);
         $response = $this->ajax($client, $uri);
@@ -131,7 +131,7 @@ class ApiPrivateControllerTest extends WebTestCase
      *
      * @dataProvider uncachedEndpointProvider
      */
-    public function testUncachedEndpoint($user, $uri, $expected): void
+    public function testUncachedEndpoint(string $user, string $uri, array $expected): void
     {
         $client = $this->createAuthenticatedClient($user);
         $response = $this->ajax($client, $uri);
@@ -168,7 +168,7 @@ class ApiPrivateControllerTest extends WebTestCase
     /**
      * @dataProvider cacheableEndpointProvider
      */
-    public function testNotModifiedSince($user, $uri): void
+    public function testNotModifiedSince(string $user, string $uri): void
     {
         $client = $this->createAuthenticatedClient($user);
 
@@ -195,7 +195,7 @@ class ApiPrivateControllerTest extends WebTestCase
     /**
      * @dataProvider privateUriProvider
      */
-    public function testAnonymousAjaxIsDenied($uri): void
+    public function testAnonymousAjaxIsDenied(string $uri): void
     {
         $client = $this->client;
         $response = $this->ajax($client, $uri);
@@ -208,7 +208,7 @@ class ApiPrivateControllerTest extends WebTestCase
     /**
      * @dataProvider privateUriProvider
      */
-    public function testAnonymousIsRedirectedToLogin($uri): void
+    public function testAnonymousIsRedirectedToLogin(string $uri): void
     {
         $client = $this->client;
         $client->request('GET', $uri);

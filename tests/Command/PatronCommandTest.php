@@ -18,11 +18,9 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class PatronCommandTest extends KernelTestCase
 {
-    /** @var Connection */
-    private $connection;
+    private \Doctrine\DBAL\Connection $connection;
 
-    /** @var array */
-    private $fixtureUsers;
+    private array $fixtureUsers;
 
     protected function setUp(): void
     {
@@ -57,7 +55,7 @@ class PatronCommandTest extends KernelTestCase
         return (string) preg_replace('/^\S+ /m', '', $display);
     }
 
-    private function donation($username)
+    private function donation(string $username)
     {
         return $this->connection->fetchColumn('SELECT donation FROM user WHERE username = ?', [$username]);
     }

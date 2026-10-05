@@ -30,14 +30,12 @@ class CardStatsCalculatorTest extends KernelTestCase
 
     public const WAR_OF_DALE = 68;
 
-    /** @var Connection */
-    private $connection;
+    private \Doctrine\DBAL\Connection $connection;
 
-    /** @var CardStatsCalculator */
-    private $calculator;
+    private \App\Stats\CardStatsCalculator $calculator;
 
     /** @var int[] */
-    private $maxIds = [];
+    private array $maxIds = [];
 
     protected function setUp(): void
     {
@@ -142,7 +140,7 @@ class CardStatsCalculatorTest extends KernelTestCase
     /**
      * @dataProvider stepProvider
      */
-    public function testFixtureMonthSnapshot($step): void
+    public function testFixtureMonthSnapshot(string $step): void
     {
         $this->assertMatchesJsonSnapshot("stats/cards_2015-08_step$step", json_encode($this->calculator->computeCards('2015-08', $step)));
     }
@@ -230,7 +228,7 @@ class CardStatsCalculatorTest extends KernelTestCase
      *
      * @dataProvider monthRuleProvider
      */
-    public function testMonthRuleForPrivateDecks($month, $created, $updated, $counted): void
+    public function testMonthRuleForPrivateDecks(string $month, string $created, string $updated, bool $counted): void
     {
         $this->insertDeck(['date_creation' => $created, 'date_update' => $updated], [1 => 1]);
 
@@ -274,7 +272,7 @@ class CardStatsCalculatorTest extends KernelTestCase
         $this->assertContains("Computing 2015-07 ...\n", $display);
         $this->assertStringEndsWith("done\n", $display);
         $rows = $this->connection->fetchAll("SELECT month, step, payload FROM stat_cards_cache WHERE month IN ('2015-07', '2015-08') ORDER BY month, step");
-        $this->assertSame([['2015-07', '1'], ['2015-07', '2'], ['2015-07', '3'], ['2015-08', '1'], ['2015-08', '2'], ['2015-08', '3']], array_map(fn ($row): array => [$row['month'], $row['step']], $rows));
+        $this->assertSame([['2015-07', '1'], ['2015-07', '2'], ['2015-07', '3'], ['2015-08', '1'], ['2015-08', '2'], ['2015-08', '3']], array_map(fn (array $row): array => [$row['month'], $row['step']], $rows));
         // the payload is the JSON of computeCards()
         $this->assertSame(json_encode($this->calculator->computeCards('2015-08', '2')), $rows[4]['payload']);
 
