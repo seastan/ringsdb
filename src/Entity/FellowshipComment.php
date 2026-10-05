@@ -14,30 +14,31 @@ class FellowshipComment
      */
     private $id;
 
-    /**
-     * @var \DateTime
-     */
-    private $dateCreation;
+    private \DateTime $dateCreation;
 
     /**
      * @var \DateTime
      */
     private $dateUpdate;
 
-    /**
-     * @var string
-     */
-    private $text;
+    private string $text;
 
     /**
-     * @var User
+     * @var bool
      */
-    private $user;
+    private $isHidden = false;
 
-    /**
-     * @var Fellowship
-     */
-    private $fellowship;
+    private \App\Entity\User $user;
+
+    private \App\Entity\Fellowship $fellowship;
+
+    public function __construct(User $user, Fellowship $fellowship, string $text)
+    {
+        $this->user = $user;
+        $this->fellowship = $fellowship;
+        $this->text = $text;
+        $this->dateCreation = new \DateTime();
+    }
 
     /**
      * Get id.
@@ -142,11 +143,6 @@ class FellowshipComment
     {
         return $this->fellowship;
     }
-
-    /**
-     * @var bool
-     */
-    private $isHidden;
 
     /**
      * Set isHidden.

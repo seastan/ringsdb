@@ -76,15 +76,9 @@ class CommentFellowshipController extends AbstractController
             }
 
             $comment_html = $this->texts->markdown($comment_text);
-            $now = new \DateTime();
-            $comment = new FellowshipComment();
-            $comment->setText($comment_html);
-            $comment->setDateCreation($now);
-            $comment->setUser($user);
-            $comment->setFellowship($fellowship);
-            $comment->setIsHidden(false);
+            $comment = new FellowshipComment($user, $fellowship, $comment_html);
             $this->entityManager->persist($comment);
-            $fellowship->setDateUpdate($now);
+            $fellowship->setDateUpdate(new \DateTime());
             $fellowship->setDateLastComment($comment->getDateCreation());
             $fellowship->setNbcomments($fellowship->getNbcomments() + 1);
             $this->entityManager->flush();
