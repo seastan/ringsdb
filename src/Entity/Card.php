@@ -89,15 +89,9 @@ class Card
      */
     private $deckLimit = 3;
 
-    /**
-     * @var \DateTime
-     */
-    private $dateCreation;
+    private \DateTime $dateCreation;
 
-    /**
-     * @var \DateTime
-     */
-    private $dateUpdate;
+    private \DateTime $dateUpdate;
 
     /**
      * @var Collection<int, Review>
@@ -109,15 +103,9 @@ class Card
      */
     private $printings;
 
-    /**
-     * @var Type|null
-     */
-    private $type;
+    private ?\App\Entity\Type $type = null;
 
-    /**
-     * @var Sphere|null
-     */
-    private $sphere;
+    private ?\App\Entity\Sphere $sphere = null;
 
     /**
      * Constructor.

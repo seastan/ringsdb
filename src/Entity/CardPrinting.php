@@ -96,15 +96,9 @@ class CardPrinting
      */
     private $dateUpdate;
 
-    /**
-     * @var Card|null
-     */
-    private $card;
+    private ?\App\Entity\Card $card = null;
 
-    /**
-     * @var Pack|null
-     */
-    private $pack;
+    private ?\App\Entity\Pack $pack = null;
 
     /**
      * Get id.

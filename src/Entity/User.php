@@ -28,10 +28,7 @@ class User extends BaseUser
      */
     private $dateUpdate;
 
-    /**
-     * @var int
-     */
-    private $reputation;
+    private int $reputation;
 
     /**
      * @var string|null
@@ -43,10 +40,7 @@ class User extends BaseUser
      */
     private $color;
 
-    /**
-     * @var int
-     */
-    private $donation;
+    private int $donation;
 
     /**
      * @var bool
@@ -124,6 +118,23 @@ class User extends BaseUser
 
         $this->reputation = 1;
         $this->donation = 0;
+        $this->decks = new ArrayCollection();
+        $this->decklists = new ArrayCollection();
+        $this->comments = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
+        $this->favorites = new ArrayCollection();
+        $this->votes = new ArrayCollection();
+        $this->reviewvotes = new ArrayCollection();
+        $this->following = new ArrayCollection();
+        $this->followers = new ArrayCollection();
+        $this->fellowships = new ArrayCollection();
+        $this->fellowship_comments = new ArrayCollection();
+        $this->fellowship_favorites = new ArrayCollection();
+        $this->fellowship_votes = new ArrayCollection();
+        $this->questlogs = new ArrayCollection();
+        $this->questlog_comments = new ArrayCollection();
+        $this->questlog_favorites = new ArrayCollection();
+        $this->questlog_votes = new ArrayCollection();
     }
 
     /**
