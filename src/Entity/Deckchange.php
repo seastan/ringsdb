@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-/**
- * Deckchange.
- */
 class Deckchange
 {
     /**
@@ -34,10 +31,12 @@ class Deckchange
      */
     private $version;
 
-    /**
-     * @var Deck
-     */
-    private $deck;
+    private \App\Entity\Deck $deck;
+
+    public function __construct(Deck $deck)
+    {
+        $this->deck = $deck;
+    }
 
     /**
      * Get id.

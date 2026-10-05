@@ -350,8 +350,7 @@ class Decks
             $this->doctrine->flush();
             // save new change unless empty
             if (count($listings[0]) || count($listings[1]) || count($listings[2]) || count($listings[3])) {
-                $change = new Deckchange();
-                $change->setDeck($deck);
+                $change = new Deckchange($deck);
                 $change->setVariation((string) json_encode($listings));
                 $change->setIsSaved(true);
                 $change->setVersion($deck->getVersion());

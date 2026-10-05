@@ -66,8 +66,7 @@ class AutosaveController extends AbstractController
         $parts = array_map(fn ($part): int => is_array($part) ? count($part) : 0, $diff);
         if (array_sum($parts) > 0) {
             /* @var $change \App\Entity\Deckchange */
-            $change = new Deckchange();
-            $change->setDeck($deck);
+            $change = new Deckchange($deck);
             $change->setVariation((string) json_encode($diff));
             $change->setIsSaved(false);
             $this->entityManager->persist($change);
