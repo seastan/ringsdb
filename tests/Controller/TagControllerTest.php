@@ -90,8 +90,7 @@ class TagControllerTest extends WebTestCase
             4 => ['tactics', 'dwarf'],
         ]], $answer);
         $this->assertSame(['1' => 'tactics leadership lore dwarf', '2' => 'leadership spirit', '3' => 'spirit lore', '4' => 'tactics dwarf'], $this->tags($client));
-        // not JSON for the Content-Type (the JavaScript asks for dataType: 'json')
-        $this->assertSame('text/html; charset=UTF-8', $client->getResponse()->headers->get('Content-Type'));
+        $this->assertSame('application/json', $client->getResponse()->headers->get('Content-Type'));
     }
 
     public function testAddTagsToADeckWithoutTags(): void

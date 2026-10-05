@@ -83,7 +83,7 @@ class SaveDeckController extends AbstractController
             throw new BadRequestHttpException('Wrong decklist_id');
         }
         $description = trim($request->get('description') ?? '');
-        $tags = filter_var($request->get('tags'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+        $tags = filter_var($request->get('tags'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES) ?: '';
         $this->decks->saveDeck($user, $deck, (int) $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);
         $this->entityManager->flush();
 

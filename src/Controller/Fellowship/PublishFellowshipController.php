@@ -70,7 +70,7 @@ class PublishFellowshipController extends AbstractController
         if (empty($name)) {
             $name = 'Untitled Fellowship';
         }
-        $descriptionMd = trim($request->request->get('descriptionMd') ?? '');
+        $descriptionMd = trim((string) $request->request->get('descriptionMd'));
         $descriptionHtml = $this->texts->markdown($descriptionMd);
         $fellowship->setName($name);
         $fellowship->setNameCanonical($this->texts->slugify($name));

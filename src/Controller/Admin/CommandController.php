@@ -38,8 +38,8 @@ class CommandController extends AbstractController
     public function runAction(Request $request): Response
     {
         $command = $request->request->get('command');
-        $scenario = $request->request->get('scenario');
-        $customjson = $request->request->get('customjson');
+        $scenario = (string) $request->request->get('scenario');
+        $customjson = (string) $request->request->get('customjson');
         if ('scenario' == $command) {
             $res = ScrapBeornScenarioDataCommand::command($this->entityManager, $scenario, 0, $customjson);
         } else {

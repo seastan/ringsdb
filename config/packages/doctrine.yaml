@@ -27,8 +27,8 @@ doctrine:
                 # the 'App:Card' aliases of the DQL and the forms, until they are replaced with the
                 # class names (aliases are removed in ORM 3)
                 alias:     App
-        dql:
-            string_functions:
-                replace: App\DQL\ReplaceFunction
+        dql: # see https://github.com/beberlei/DoctrineExtensions/blob/master/config/mysql.yml
             numeric_functions:
-                power: App\DQL\PowerFunction
+                power: DoctrineExtensions\Query\Mysql\Power
+            string_functions:
+                replace: DoctrineExtensions\Query\Mysql\Replace

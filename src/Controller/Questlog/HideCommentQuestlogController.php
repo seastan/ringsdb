@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Repository\QuestlogCommentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
@@ -46,11 +47,11 @@ class HideCommentQuestlogController extends AbstractController
             throw new BadRequestHttpException('Unable to find comment');
         }
         if ($comment->getQuestlog()->getUser()->getId() !== $user->getId()) {
-            return new Response(json_encode("You don't have permission to edit this comment."));
+            return new JsonResponse("You don't have permission to edit this comment.");
         }
         $comment->setIsHidden((bool) $hidden);
         $this->entityManager->flush();
 
-        return new Response(json_encode(true));
+        return new JsonResponse(true);
     }
 }

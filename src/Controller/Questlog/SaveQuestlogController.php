@@ -85,7 +85,7 @@ class SaveQuestlogController extends AbstractController
         if (empty($name)) {
             $name = 'Untitled Questlog';
         }
-        $descriptionMd = trim($request->request->get('descriptionMd'));
+        $descriptionMd = trim((string) $request->request->get('descriptionMd'));
         $descriptionHtml = $this->texts->markdown($descriptionMd);
         $quest = intval(filter_var($request->request->get('quest'), FILTER_SANITIZE_NUMBER_INT));
         $date = trim((string) filter_var($request->request->get('date'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));

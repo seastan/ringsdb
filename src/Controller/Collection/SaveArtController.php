@@ -7,6 +7,7 @@ namespace App\Controller\Collection;
 use App\Controller\CurrentUserTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -33,12 +34,12 @@ class SaveArtController extends AbstractController
     {
         $user = $this->getUser();
         if (!$user) {
-            return new Response(json_encode(['success' => false, 'error' => 'not logged in']), 403, ['Content-Type' => 'application/json']);
+            return new JsonResponse(['success' => false, 'error' => 'not logged in'], 403);
         }
         $cardCode = (string) preg_replace('/[^0-9]/', '', $request->get('card_code'));
         $packCode = (string) preg_replace('/[^A-Za-z0-9_-]/', '', $request->get('pack_code'));
         if (!$cardCode) {
-            return new Response(json_encode(['success' => false, 'error' => 'missing card_code']), 400, ['Content-Type' => 'application/json']);
+            return new JsonResponse(['success' => false, 'error' => 'missing card_code'], 400);
         }
         $prefs = json_decode($user->getArtPreferences() ?: '{}', true);
         if (!is_array($prefs)) {
@@ -54,6 +55,6 @@ class SaveArtController extends AbstractController
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        return new Response(json_encode(['success' => true]), 200, ['Content-Type' => 'application/json']);
+        return new JsonResponse(['success' => true]);
     }
 }

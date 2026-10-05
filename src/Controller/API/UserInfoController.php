@@ -16,6 +16,7 @@ use App\Repository\FellowshipRepository;
 use App\Repository\QuestlogRepository;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -96,16 +97,11 @@ class UserInfoController extends AbstractController
                 }
             }
         }
-        $content = json_encode($content);
-        $response = new Response();
-        $response->setPrivate();
+
+        $response = new JsonResponse($content);
         if (isset($jsonp)) {
-            $content = "{$jsonp}({$content})";
-            $response->headers->set('Content-Type', 'application/javascript');
-        } else {
-            $response->headers->set('Content-Type', 'application/json');
+            $response->setCallback($jsonp);
         }
-        $response->setContent($content);
 
         return $response;
     }

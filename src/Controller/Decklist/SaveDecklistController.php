@@ -57,9 +57,9 @@ class SaveDecklistController extends AbstractController
         if (empty($name)) {
             $name = 'Untitled';
         }
-        $descriptionMd = trim($request->request->get('descriptionMd'));
+        $descriptionMd = trim((string) $request->request->get('descriptionMd'));
         $descriptionHtml = $this->texts->markdown($descriptionMd);
-        $precedent_id = trim($request->request->get('precedent'));
+        $precedent_id = trim((string) $request->request->get('precedent'));
         if (!preg_match('/^\\d+$/', $precedent_id)) {
             // route decklist_detail hard-coded
             if (preg_match('/view\\/(\\d+)/', $precedent_id, $matches)) {

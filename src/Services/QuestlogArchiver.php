@@ -80,7 +80,11 @@ class QuestlogArchiver
         $response->headers->set('Content-Type', 'application/zip');
         $response->headers->set('Content-Length', (string) filesize($file));
         $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->texts->slugify('RingsDB - Quest Log '.$questlog_id).'.zip'));
-        $response->setContent(file_get_contents($file));
+        $contents = file_get_contents($file);
+        if (false === $contents) {
+            throw new \RuntimeException('Cannot read tmp file '.$file);
+        }
+        $response->setContent($contents);
         unlink($file);
 
         return $response;

@@ -56,10 +56,14 @@ class ImportAllController extends AbstractController
         if (true === $res) {
             for ($i = 0; $i < $zip->numFiles; ++$i) {
                 $name = (string) $zip->getNameIndex($i);
+                $data = $zip->getFromIndex($i);
+                if (false === $data) {
+                    throw new \RuntimeException('Cannot read from zip file '.$filename);
+                }
                 if ('o8d' == pathinfo($name, PATHINFO_EXTENSION)) {
-                    $parse = $this->deckImporter->parseOctgnImport($zip->getFromIndex($i));
+                    $parse = $this->deckImporter->parseOctgnImport($data);
                 } else {
-                    $parse = $this->deckImporter->parseTextImport($zip->getFromIndex($i));
+                    $parse = $this->deckImporter->parseTextImport($data);
                 }
                 $deckname = pathinfo($name, PATHINFO_FILENAME);
                 // one deck per file, even without any card (an empty deck)

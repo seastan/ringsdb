@@ -42,9 +42,9 @@ class CSVController extends AbstractController
      */
     public function uploadProcessAction(Request $request, CardRepository $cardRepository, CardPrintingRepository $cardPrintingRepository, CycleRepository $cycleRepository, PackRepository $packRepository): Response
     {
-        $inputCode = $request->request->get('code');
-        $inputOldCode = $request->request->get('old_code');
-        $inputName = $request->request->get('name');
+        $inputCode = (string) $request->request->get('code');
+        $inputOldCode = (string) $request->request->get('old_code');
+        $inputName = (string) $request->request->get('name');
         $inputFileName = $request->files->get('upfile')->getPathname();
         $content = str_replace("\xEF\xBB\xBF", '', trim((string) file_get_contents($inputFileName)));
         $content = str_replace("\r", "\n", str_replace("\n", '<br/>', str_replace("\r\n", "\r", $content)));

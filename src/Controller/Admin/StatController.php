@@ -6,6 +6,7 @@ namespace App\Controller\Admin;
 
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -32,10 +33,8 @@ class StatController extends AbstractController
         $query = "SELECT '".$month."' AS month,\n  c.cycle,\n  IFNULL(d.number, 0) AS number_quests,\n  IFNULL(u.number, 0) AS number_users\nFROM (\n  SELECT 'Core Set' AS cycle\n  UNION\n  SELECT 'Shadows of Mirkwood' AS cycle\n  UNION\n  SELECT 'Dwarrowdelf' AS cycle\n  UNION\n  SELECT 'Against the Shadow' AS cycle\n  UNION\n  SELECT 'The Ring-maker' AS cycle\n  UNION\n  SELECT 'Angmar Awakened' AS cycle\n  UNION\n  SELECT 'Dream-chaser' AS cycle\n  UNION\n  SELECT 'Haradrim' AS cycle\n  UNION\n  SELECT 'Ered Mithrin' AS cycle\n  UNION\n  SELECT 'Vengeance of Mordor' AS cycle\n  UNION\n  SELECT 'ALeP - Oaths of the Rohirrim' AS cycle\n) c\nLEFT JOIN (\n  SELECT CASE\n      WHEN p.date_release < '2011-07-21' THEN 'Core Set'\n      WHEN p.date_release >= '2011-07-21' and p.date_release < '2012-01-06' THEN 'Shadows of Mirkwood'\n      WHEN p.date_release >= '2012-01-06' and p.date_release < '2012-08-17' THEN 'Dwarrowdelf'\n      WHEN p.date_release >= '2012-08-17' and p.date_release < '2014-02-21' THEN 'Against the Shadow'\n      WHEN p.date_release >= '2014-02-21' and p.date_release < '2015-04-03' THEN 'The Ring-maker'\n      WHEN p.date_release >= '2015-04-03' and p.date_release < '2016-02-11' THEN 'Angmar Awakened'\n      WHEN p.date_release >= '2016-02-11' and p.date_release < '2016-11-23' THEN 'Dream-chaser'\n      WHEN p.date_release >= '2016-11-23' and p.date_release < '2018-06-14' THEN 'Haradrim'\n      WHEN p.date_release >= '2018-06-14' and p.date_release < '2019-08-02' THEN 'Ered Mithrin'\n      WHEN p.date_release >= '2019-08-02' and p.date_release < '2021-03-21' THEN 'Vengeance of Mordor'\n      ELSE 'ALeP - Oaths of the Rohirrim'\n    END AS cycle,\n    COUNT(*) AS number\n  FROM (\n    SELECT s.pack_id AS last_pack_id\n    FROM questlog q\n    JOIN scenario s\n    ON q.scenario_id = s.id\n    WHERE q.date_played LIKE '".$month."-%'\n  ) d\n  JOIN pack p\n  ON d.last_pack_id = p.id\n  GROUP BY cycle\n) d\nON c.cycle = d.cycle\nLEFT JOIN (\n  SELECT CASE\n      WHEN date_release < '2011-07-21' THEN 'Core Set'\n      WHEN date_release >= '2011-07-21' and date_release < '2012-01-06' THEN 'Shadows of Mirkwood'\n      WHEN date_release >= '2012-01-06' and date_release < '2012-08-17' THEN 'Dwarrowdelf'\n      WHEN date_release >= '2012-08-17' and date_release < '2014-02-21' THEN 'Against the Shadow'\n      WHEN date_release >= '2014-02-21' and date_release < '2015-04-03' THEN 'The Ring-maker'\n      WHEN date_release >= '2015-04-03' and date_release < '2016-02-11' THEN 'Angmar Awakened'\n      WHEN date_release >= '2016-02-11' and date_release < '2016-11-23' THEN 'Dream-chaser'\n      WHEN date_release >= '2016-11-23' and date_release < '2018-06-14' THEN 'Haradrim'\n      WHEN date_release >= '2018-06-14' and date_release < '2019-08-02' THEN 'Ered Mithrin'\n      WHEN date_release >= '2019-08-02' and date_release < '2021-03-21' THEN 'Vengeance of Mordor'\n      ELSE 'ALeP - Oaths of the Rohirrim'\n    END AS cycle,\n    COUNT(*) AS number\n  FROM (\n    SELECT MAX(p.date_release) AS date_release,\n      d.user_id\n    FROM (\n      SELECT s.pack_id AS last_pack_id,\n        q.user_id\n      FROM questlog q\n      JOIN scenario s\n      ON q.scenario_id = s.id\n      WHERE q.date_played LIKE '".$month."-%'\n    ) d\n    JOIN pack p\n    ON d.last_pack_id = p.id\n    GROUP BY d.user_id\n  ) t\n  GROUP BY cycle\n) u\nON c.cycle = u.cycle";
         $res_quests_played = $dbh->executeQuery($query, [])->fetchAll(\PDO::FETCH_ASSOC);
         $res = ['decks_created' => $res_decks_created, 'decks_played' => $res_decks_played, 'quests_played' => $res_quests_played, 'packs' => $packs, 'pack_rules' => $pack_rules];
-        $response = new Response(json_encode($res));
-        $response->headers->set('Content-Type', 'application/json');
 
-        return $response;
+        return new JsonResponse($res);
     }
 
     /**
@@ -77,10 +76,8 @@ class StatController extends AbstractController
         $pack_rules = $this->getPackRuless();
         $quests = $this->getQuests();
         $res = ['packs' => $packs, 'pack_rules' => $pack_rules, 'quests' => $quests];
-        $response = new Response(json_encode($res));
-        $response->headers->set('Content-Type', 'application/json');
 
-        return $response;
+        return new JsonResponse($res);
     }
 
     /**

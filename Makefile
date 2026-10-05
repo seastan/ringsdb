@@ -20,7 +20,7 @@ install:
 	docker compose exec -it -u www-data symfony composer install
 
 fixtures:
-	docker compose exec -it -u www-data symfony php bin/console doctrine:database:drop --force
+	docker compose exec -it -u www-data symfony php bin/console doctrine:database:drop --force --if-exists
 	docker compose exec -it -u www-data symfony php bin/console doctrine:database:create
 	docker compose exec -T mysql mysql -u symfony -ppasswd ringsdb < ringsdb_bootstrap.sql
 	docker compose exec -T mysql mysql -u symfony -ppasswd ringsdb < ringsdb_reset_auto_increment.sql
@@ -30,7 +30,7 @@ fixtures:
 	docker compose exec -it -u www-data symfony php bin/console doctrine:fixtures:load --append
 
 test-fixtures:
-	docker compose exec -it -u www-data symfony php bin/console doctrine:database:drop --env=test --force
+	docker compose exec -it -u www-data symfony php bin/console doctrine:database:drop --env=test --force --if-exists
 	docker compose exec -it -u www-data symfony php bin/console doctrine:database:create --env=test
 	docker compose exec -T mysql_test mysql -u symfony -ppasswd ringsdb_test < ringsdb_bootstrap.sql
 	docker compose exec -T mysql_test mysql -u symfony -ppasswd ringsdb_test < ringsdb_reset_auto_increment.sql

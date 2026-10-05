@@ -68,7 +68,7 @@ class Diff
     }
 
     /**
-     * @param array<array<string, int>> $decks
+     * @param array<int, array<int|string, int>> $decks
      *
      * @return array{array<int, array<int|string, int>>, array<int|string, int>}
      */

@@ -4,8 +4,8 @@
          bootstrap="tests/bootstrap.php"
          beStrictAboutOutputDuringTests="true"
          beStrictAboutTodoAnnotatedTests="true"
-         stopOnError="true"
-         stopOnFailure="true"
+         stopOnError="false"
+         stopOnFailure="false"
          verbose="true">
     <testsuites>
         <testsuite name="default">

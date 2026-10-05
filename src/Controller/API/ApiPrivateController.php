@@ -13,6 +13,7 @@ use App\Repository\DeckRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -40,8 +41,6 @@ class ApiPrivateController extends AbstractController
      */
     public function listDecksAction(Request $request): Response
     {
-        $response = new Response();
-        /* @var $em EntityManager */
         /* @var $decklists Decklist[] */
         $decklists = $this->decklistRepository->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC', 'id' => 'DESC']);
         foreach ($decklists as &$decklist) {
@@ -53,19 +52,22 @@ class ApiPrivateController extends AbstractController
             $deck->setDescriptionMd('');
         }
         $decklists = array_merge($decklists, $decks);
+
         $dateUpdates = array_map(function ($deck) {
             /* @var $deck \App\Entity\Deck */
             return $deck->getDateUpdate();
         }, $decklists);
+
+        $response = new JsonResponse();
+
         if (count($dateUpdates)) {
             $response->setLastModified(max($dateUpdates));
             if ($response->isNotModified($request)) {
                 return $response;
             }
         }
-        $content = json_encode($decklists);
-        $response->headers->set('Content-Type', 'application/json');
-        $response->setContent($content);
+
+        $response->setData($decklists);
 
         return $response;
     }
@@ -75,16 +77,11 @@ class ApiPrivateController extends AbstractController
      */
     public function listUserDecksAction(Request $request, UserRepository $userRepository, string $username): Response
     {
-        $response = new Response();
         /* @var $em EntityManager */
         /* @var $user User */
         $user = $userRepository->findOneBy(['username' => $username]);
         if (!$user) {
-            $content = json_encode(['success' => false, 'error' => 'This user does not exist.']);
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent($content);
-
-            return $response;
+            return new JsonResponse(['success' => false, 'error' => 'This user does not exist.']);
         }
         $show_private_decks = $user->getId() == $this->currentUser()->getId();
         /* @var $decklists Decklist[] */
@@ -104,15 +101,16 @@ class ApiPrivateController extends AbstractController
             /* @var $deck \App\Entity\Deck */
             return $deck->getDateUpdate();
         }, $decklists);
+
+        $response = new JsonResponse();
+
         if (count($dateUpdates)) {
             $response->setLastModified(max($dateUpdates));
             if ($response->isNotModified($request)) {
                 return $response;
             }
         }
-        $content = json_encode($decklists);
-        $response->headers->set('Content-Type', 'application/json');
-        $response->setContent($content);
+        $response->setData($decklists);
 
         return $response;
     }
@@ -130,33 +128,26 @@ class ApiPrivateController extends AbstractController
      */
     public function loadDeckAction(Request $request, int $id): Response
     {
-        $response = new Response();
-        /* @var $em EntityManager */
         /* @var $deck \App\Entity\Deck */
         $deck = $this->deckRepository->find($id);
         if (!$deck) {
-            $content = json_encode(['success' => false, 'error' => 'This deck does not exists.']);
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent($content);
-
-            return $response;
+            return new JsonResponse(['success' => false, 'error' => 'This deck does not exists.']);
         }
+
         /* @var $user User */
         $user = $deck->getUser();
         if (!$user->getIsShareDecks() && $user != $this->getUser()) {
-            $content = json_encode(['success' => false, 'error' => 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.']);
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setContent($content);
-
-            return $response;
+            return new JsonResponse(['success' => false, 'error' => 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.']);
         }
+
+        $response = new JsonResponse();
+
         $response->setLastModified($deck->getDateUpdate());
         if ($response->isNotModified($request)) {
             return $response;
         }
-        $content = json_encode($deck);
-        $response->headers->set('Content-Type', 'application/json');
-        $response->setContent($content);
+
+        $response->setData($deck);
 
         return $response;
     }

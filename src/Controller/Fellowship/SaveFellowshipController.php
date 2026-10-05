@@ -83,7 +83,7 @@ class SaveFellowshipController extends AbstractController
             $name = 'Untitled Fellowship';
         }
         $auto_publish = boolval(filter_var($request->request->get('auto_publish'), FILTER_SANITIZE_NUMBER_INT));
-        $descriptionMd = trim($request->request->get('descriptionMd'));
+        $descriptionMd = trim((string) $request->request->get('descriptionMd'));
         $descriptionHtml = $this->texts->markdown($descriptionMd);
         $fellowship->setUser($user);
         $fellowship->setName($name);

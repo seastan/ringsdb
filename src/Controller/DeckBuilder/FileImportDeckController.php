@@ -43,10 +43,14 @@ class FileImportDeckController extends AbstractController
                 throw new UnprocessableEntityHttpException('Bad file');
             }
         }
+        $contents = file_get_contents($filename);
+        if (false === $contents) {
+            throw new \RuntimeException('Cannot read from uploaded file '.$filename);
+        }
         if ('octgn' == $filetype || 'auto' == $filetype && 'o8d' == $origext) {
-            $parse = $this->deckImporter->parseOctgnImport(file_get_contents($filename));
+            $parse = $this->deckImporter->parseOctgnImport($contents);
         } else {
-            $parse = $this->deckImporter->parseTextImport(file_get_contents($filename));
+            $parse = $this->deckImporter->parseTextImport($contents);
         }
 
         return $this->forward(SaveDeckController::class, ['name' => str_replace(".{$origext}", '', $origname), 'content' => json_encode($parse['content']), 'description' => $parse['description']]);

@@ -96,7 +96,7 @@ class ListQuestlogController extends AbstractController
                 $pagetitle = 'Popular Quest Logs';
                 break;
         }
-        $this->snapshotManager->setSnapshots($paginator->getIterator()->getArrayCopy());
+        $this->snapshotManager->setSnapshots($paginator);
 
         return $this->render('QuestLog/public-questlogs.html.twig', ['pagetitle' => $pagetitle, 'pagedescription' => 'Browse the collection of thousands of premade decks.', 'questlogs' => $paginator, 'url' => $request->getRequestUri(), 'header' => $header, 'type' => $type, 'pages' => $this->questlogManager->getClosePages(), 'prevurl' => $this->questlogManager->getPreviousUrl(), 'nexturl' => $this->questlogManager->getNextUrl()], $response);
     }

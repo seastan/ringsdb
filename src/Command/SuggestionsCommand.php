@@ -115,6 +115,7 @@ class SuggestionsCommand extends Command
         foreach ($decks as $deck_id) {
             $stmt->bindValue(1, $deck_id['id']);
             $stmt->execute();
+            /** @var list<array{card_id: int}> $slots */
             $slots = $stmt->fetchAll();
             $pairs = $this->getAllPairs($slots);
             /*

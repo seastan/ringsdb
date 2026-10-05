@@ -57,9 +57,9 @@ class CreateDecklistController extends AbstractController
         if ($user->getId() !== $deck->getUser()->getId()) {
             throw $this->createAccessDeniedException('Access denied to this object.');
         }
-        $name = filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
-        $descriptionMd = trim($request->request->get('descriptionMd'));
-        $precedent_id = trim($request->request->get('precedent'));
+        $name = filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES) ?: '';
+        $descriptionMd = trim((string) $request->request->get('descriptionMd'));
+        $precedent_id = trim((string) $request->request->get('precedent'));
         if (!preg_match('/^\\d+$/', $precedent_id)) {
             // route decklist_detail hard-coded
             if (preg_match('/view\\/(\\d+)/', $precedent_id, $matches)) {

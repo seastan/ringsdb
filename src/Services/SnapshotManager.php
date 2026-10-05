@@ -33,9 +33,9 @@ class SnapshotManager
     }
 
     /**
-     * @param array<Questlog> $questlogs
+     * @param iterable<Questlog> $questlogs
      */
-    public function setSnapshots(array $questlogs): void
+    public function setSnapshots($questlogs): void
     {
         foreach ($questlogs as $questlog) {
             $this->setSnapshot($questlog);

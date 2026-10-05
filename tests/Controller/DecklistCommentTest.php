@@ -315,7 +315,7 @@ class DecklistCommentTest extends WebTestCase
         $client->request('POST', '/user/hidecomment/1/1');
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertSame('"You don\'t have permission to edit this comment."', $client->getResponse()->getContent());
+        $this->assertSame('"You don\u0027t have permission to edit this comment."', $client->getResponse()->getContent());
         $this->assertSame('0', $this->db($client)->fetchColumn('SELECT is_hidden FROM comment WHERE id = 1'));
     }
 
