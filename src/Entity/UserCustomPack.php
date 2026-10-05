@@ -14,48 +14,30 @@ class UserCustomPack
      */
     private $id;
 
-    /**
-     * @var User
-     */
-    private $user;
+    private User $user;
 
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
-    /**
-     * @var string
-     */
-    private $code;
+    private string $code;
 
-    /**
-     * @var bool
-     */
-    private $isEnabled = true;
+    private bool $isEnabled = true;
 
-    /**
-     * @var bool
-     */
-    private $isPublished = false;
+    private bool $isPublished = false;
 
-    /**
-     * @var \DateTime
-     */
-    private $createdAt;
+    private \DateTime $createdAt;
 
-    /**
-     * @var \DateTime
-     */
-    private $updatedAt;
+    private \DateTime $updatedAt;
 
     /**
      * @var Collection<int, UserCustomPackCard>
      */
-    private $cards;
+    private Collection $cards;
 
-    public function __construct()
+    public function __construct(User $user, string $name, string $code)
     {
+        $this->user = $user;
+        $this->name = $name;
+        $this->code = $code;
         $this->cards = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
@@ -71,10 +53,7 @@ class UserCustomPack
         return $this->user;
     }
 
-    /**
-     * @return $this
-     */
-    public function setUser(User $user)
+    public function setUser(User $user): self
     {
         $this->user = $user;
 
@@ -86,10 +65,7 @@ class UserCustomPack
         return $this->name;
     }
 
-    /**
-     * @return $this
-     */
-    public function setName(string $name)
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -101,10 +77,7 @@ class UserCustomPack
         return $this->code;
     }
 
-    /**
-     * @return $this
-     */
-    public function setCode(string $code)
+    public function setCode(string $code): self
     {
         $this->code = $code;
 
@@ -116,10 +89,7 @@ class UserCustomPack
         return $this->isEnabled;
     }
 
-    /**
-     * @return $this
-     */
-    public function setIsEnabled(bool $isEnabled)
+    public function setIsEnabled(bool $isEnabled): self
     {
         $this->isEnabled = $isEnabled;
 
@@ -131,10 +101,7 @@ class UserCustomPack
         return $this->isPublished;
     }
 
-    /**
-     * @return $this
-     */
-    public function setIsPublished(bool $isPublished)
+    public function setIsPublished(bool $isPublished): self
     {
         $this->isPublished = $isPublished;
 
@@ -146,10 +113,7 @@ class UserCustomPack
         return $this->createdAt;
     }
 
-    /**
-     * @return $this
-     */
-    public function setCreatedAt(\DateTime $createdAt)
+    public function setCreatedAt(\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
@@ -161,10 +125,7 @@ class UserCustomPack
         return $this->updatedAt;
     }
 
-    /**
-     * @return $this
-     */
-    public function setUpdatedAt(\DateTime $updatedAt)
+    public function setUpdatedAt(\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
@@ -179,20 +140,14 @@ class UserCustomPack
         return $this->cards;
     }
 
-    /**
-     * @return $this
-     */
-    public function clearCards()
+    public function clearCards(): self
     {
         $this->cards->clear();
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function addCard(UserCustomPackCard $card)
+    public function addCard(UserCustomPackCard $card): self
     {
         $this->cards->add($card);
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Collection;
 
+use App\Controller\CurrentUserTrait;
 use App\Entity\UserCustomPack;
 use App\Repository\UserCustomPackRepository;
 use App\Services\CustomPackManager;
@@ -15,6 +16,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class CopyCustomPackController extends AbstractController
 {
+    use CurrentUserTrait;
+
     private UserCustomPackRepository $userCustomPackRepository;
 
     private EntityManagerInterface $entityManager;
@@ -41,20 +44,14 @@ class CopyCustomPackController extends AbstractController
      */
     public function __invoke(Request $request, int $id): JsonResponse
     {
-        $user = $this->getUser();
-        if (!$user) {
-            return new JsonResponse(['error' => 'Not authenticated'], 401);
-        }
+        $user = $this->currentUser();
 
         $source = $this->userCustomPackRepository->findOneBy(['id' => $id, 'isPublished' => true]);
         if (!$source) {
             return new JsonResponse(['error' => 'Pack not found'], 404);
         }
 
-        $copy = new UserCustomPack();
-        $copy->setUser($user);
-        $copy->setName($source->getName());
-        $copy->setCode('tmp');
+        $copy = new UserCustomPack($user, $source->getName(), 'tmp');
 
         $this->entityManager->persist($copy);
         $this->entityManager->flush();

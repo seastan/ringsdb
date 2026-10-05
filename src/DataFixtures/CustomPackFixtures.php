@@ -30,10 +30,7 @@ class CustomPackFixtures extends Fixture implements DependentFixtureInterface
         $user = $this->getReference('test-user');
         $cardRepo = $manager->getRepository(Card::class);
 
-        $pack = new UserCustomPack();
-        $pack->setUser($user);
-        $pack->setName('Test Custom Pack');
-        $pack->setCode('custom_test');
+        $pack = new UserCustomPack($user, 'Test Custom Pack', 'custom_test');
         $pack->setIsEnabled(true);
         $pack->setIsPublished(true);
         $pack->setCreatedAt(new \DateTime('2015-08-16'));

@@ -48,10 +48,7 @@ class SaveCustomPackController extends AbstractController
             $cardEntries = [];
         }
 
-        $pack = new UserCustomPack();
-        $pack->setUser($user);
-        $pack->setName($name);
-        $pack->setCode('tmp');
+        $pack = new UserCustomPack($user, $name, 'tmp');
 
         $this->entityManager->persist($pack);
         $this->entityManager->flush();
