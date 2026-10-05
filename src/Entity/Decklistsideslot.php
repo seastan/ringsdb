@@ -13,20 +13,11 @@ class Decklistsideslot implements SlotInterface
      */
     private $id;
 
-    /**
-     * @var int
-     */
-    private $quantity;
+    private int $quantity;
 
-    /**
-     * @var Decklist
-     */
-    private $decklist;
+    private \App\Entity\Decklist $decklist;
 
-    /**
-     * @var Card
-     */
-    private $card;
+    private \App\Entity\Card $card;
 
     public function __construct(Decklist $decklist, Card $card, int $quantity)
     {

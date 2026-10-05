@@ -179,10 +179,8 @@ class User extends BaseUser
 
     /**
      * Set reputation.
-     *
-     * @param int $reputation
      */
-    public function setReputation($reputation): User
+    public function setReputation(int $reputation): User
     {
         $this->reputation = $reputation;
 
@@ -239,10 +237,8 @@ class User extends BaseUser
 
     /**
      * Set donation.
-     *
-     * @param int $donation
      */
-    public function setDonation($donation): User
+    public function setDonation(int $donation): User
     {
         $this->donation = $donation;
 

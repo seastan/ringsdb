@@ -211,10 +211,8 @@ class Decklist extends ExportableDeck implements \JsonSerializable
 
     /**
      * Set dateCreation.
-     *
-     * @param \DateTime $dateCreation
      */
-    public function setDateCreation($dateCreation): Decklist
+    public function setDateCreation(\DateTime $dateCreation): Decklist
     {
         $this->dateCreation = $dateCreation;
 
@@ -231,10 +229,8 @@ class Decklist extends ExportableDeck implements \JsonSerializable
 
     /**
      * Set dateUpdate.
-     *
-     * @param \DateTime $dateUpdate
      */
-    public function setDateUpdate($dateUpdate): Decklist
+    public function setDateUpdate(\DateTime $dateUpdate): Decklist
     {
         $this->dateUpdate = $dateUpdate;
 

@@ -50,10 +50,8 @@ class FellowshipComment
 
     /**
      * Set dateCreation.
-     *
-     * @param \DateTime $dateCreation
      */
-    public function setDateCreation($dateCreation): FellowshipComment
+    public function setDateCreation(\DateTime $dateCreation): FellowshipComment
     {
         $this->dateCreation = $dateCreation;
 
@@ -90,10 +88,8 @@ class FellowshipComment
 
     /**
      * Set text.
-     *
-     * @param string $text
      */
-    public function setText($text): FellowshipComment
+    public function setText(string $text): FellowshipComment
     {
         $this->text = $text;
 

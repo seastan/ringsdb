@@ -37,10 +37,8 @@ class FellowshipDeck
 
     /**
      * Set deckNumber.
-     *
-     * @param int $deckNumber
      */
-    public function setDeckNumber($deckNumber): FellowshipDeck
+    public function setDeckNumber(int $deckNumber): FellowshipDeck
     {
         $this->deckNumber = $deckNumber;
 

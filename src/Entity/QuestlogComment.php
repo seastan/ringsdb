@@ -45,10 +45,8 @@ class QuestlogComment
 
     /**
      * Set text.
-     *
-     * @param string $text
      */
-    public function setText($text): QuestlogComment
+    public function setText(string $text): QuestlogComment
     {
         $this->text = $text;
 
@@ -65,10 +63,8 @@ class QuestlogComment
 
     /**
      * Set dateCreation.
-     *
-     * @param \DateTime $dateCreation
      */
-    public function setDateCreation($dateCreation): QuestlogComment
+    public function setDateCreation(\DateTime $dateCreation): QuestlogComment
     {
         $this->dateCreation = $dateCreation;
 

@@ -526,10 +526,8 @@ class Card
 
     /**
      * Set dateCreation.
-     *
-     * @param \DateTime $dateCreation
      */
-    public function setDateCreation($dateCreation): Card
+    public function setDateCreation(\DateTime $dateCreation): Card
     {
         $this->dateCreation = $dateCreation;
 
@@ -546,10 +544,8 @@ class Card
 
     /**
      * Set dateUpdate.
-     *
-     * @param \DateTime $dateUpdate
      */
-    public function setDateUpdate($dateUpdate): Card
+    public function setDateUpdate(\DateTime $dateUpdate): Card
     {
         $this->dateUpdate = $dateUpdate;
 

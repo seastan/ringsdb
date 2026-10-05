@@ -571,10 +571,8 @@ class Deck extends ExportableDeck implements \JsonSerializable
 
     /**
      * Set majorVersion.
-     *
-     * @param int $majorVersion
      */
-    public function setMajorVersion($majorVersion): Deck
+    public function setMajorVersion(int $majorVersion): Deck
     {
         $this->majorVersion = $majorVersion;
 
@@ -591,10 +589,8 @@ class Deck extends ExportableDeck implements \JsonSerializable
 
     /**
      * Set minorVersion.
-     *
-     * @param int $minorVersion
      */
-    public function setMinorVersion($minorVersion): Deck
+    public function setMinorVersion(int $minorVersion): Deck
     {
         $this->minorVersion = $minorVersion;
 

@@ -19,15 +19,9 @@ class FellowshipDecklist
      */
     private $deckNumber;
 
-    /**
-     * @var Fellowship
-     */
-    private $fellowship;
+    private \App\Entity\Fellowship $fellowship;
 
-    /**
-     * @var Decklist
-     */
-    private $decklist;
+    private \App\Entity\Decklist $decklist;
 
     public function __construct(Decklist $decklist, Fellowship $fellowship)
     {

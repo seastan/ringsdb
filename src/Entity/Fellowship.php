@@ -283,10 +283,8 @@ class Fellowship
 
     /**
      * Set dateCreation.
-     *
-     * @param \DateTime $dateCreation
      */
-    public function setDateCreation($dateCreation): Fellowship
+    public function setDateCreation(\DateTime $dateCreation): Fellowship
     {
         $this->dateCreation = $dateCreation;
 
@@ -303,10 +301,8 @@ class Fellowship
 
     /**
      * Set dateUpdate.
-     *
-     * @param \DateTime $dateUpdate
      */
-    public function setDateUpdate($dateUpdate): Fellowship
+    public function setDateUpdate(\DateTime $dateUpdate): Fellowship
     {
         $this->dateUpdate = $dateUpdate;
 

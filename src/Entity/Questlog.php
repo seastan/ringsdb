@@ -394,10 +394,8 @@ class Questlog
 
     /**
      * Set dateCreation.
-     *
-     * @param \DateTime $dateCreation
      */
-    public function setDateCreation($dateCreation): Questlog
+    public function setDateCreation(\DateTime $dateCreation): Questlog
     {
         $this->dateCreation = $dateCreation;
 
@@ -414,10 +412,8 @@ class Questlog
 
     /**
      * Set dateUpdate.
-     *
-     * @param \DateTime $dateUpdate
      */
-    public function setDateUpdate($dateUpdate): Questlog
+    public function setDateUpdate(\DateTime $dateUpdate): Questlog
     {
         $this->dateUpdate = $dateUpdate;
 

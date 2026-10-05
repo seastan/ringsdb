@@ -87,10 +87,8 @@ class Reviewcomment
 
     /**
      * Set text.
-     *
-     * @param string $text
      */
-    public function setText($text): Reviewcomment
+    public function setText(string $text): Reviewcomment
     {
         $this->text = $text;
 

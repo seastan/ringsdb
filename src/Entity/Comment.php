@@ -45,10 +45,8 @@ class Comment
 
     /**
      * Set text.
-     *
-     * @param string $text
      */
-    public function setText($text): Comment
+    public function setText(string $text): Comment
     {
         $this->text = $text;
 
@@ -65,10 +63,8 @@ class Comment
 
     /**
      * Set dateCreation.
-     *
-     * @param \DateTime $dateCreation
      */
-    public function setDateCreation($dateCreation): Comment
+    public function setDateCreation(\DateTime $dateCreation): Comment
     {
         $this->dateCreation = $dateCreation;
 

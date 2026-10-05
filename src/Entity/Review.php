@@ -136,10 +136,8 @@ class Review
 
     /**
      * Set textMd.
-     *
-     * @param string $textMd
      */
-    public function setTextMd($textMd): Review
+    public function setTextMd(string $textMd): Review
     {
         $this->textMd = $textMd;
 
@@ -156,10 +154,8 @@ class Review
 
     /**
      * Set textHtml.
-     *
-     * @param string $textHtml
      */
-    public function setTextHtml($textHtml): Review
+    public function setTextHtml(string $textHtml): Review
     {
         $this->textHtml = $textHtml;
 
@@ -176,10 +172,8 @@ class Review
 
     /**
      * Set nbVotes.
-     *
-     * @param int $nbVotes
      */
-    public function setNbVotes($nbVotes): Review
+    public function setNbVotes(int $nbVotes): Review
     {
         $this->nbVotes = $nbVotes;
 
