@@ -21,7 +21,7 @@ class ControllerGetUserReturnTypeExtension implements DynamicMethodReturnTypeExt
 {
     public function getClass(): string
     {
-        return 'Symfony\Bundle\FrameworkBundle\Controller\AbstractController';
+        return \Symfony\Bundle\FrameworkBundle\Controller\AbstractController::class;
     }
 
     public function isMethodSupported(MethodReflection $methodReflection): bool
@@ -31,6 +31,6 @@ class ControllerGetUserReturnTypeExtension implements DynamicMethodReturnTypeExt
 
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): Type
     {
-        return TypeCombinator::union(new ObjectType('App\Entity\User'), new NullType());
+        return TypeCombinator::union(new ObjectType(\App\Entity\User::class), new NullType());
     }
 }

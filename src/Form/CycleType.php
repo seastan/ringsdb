@@ -29,7 +29,7 @@ class CycleType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => 'App\Entity\Cycle',
+            'data_class' => Cycle::class,
         ]);
     }
 

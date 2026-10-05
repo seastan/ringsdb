@@ -25,12 +25,12 @@ class TagControllerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $this->fixtureDecks = $this->db($this->client)->fetchAll('SELECT id, user_id, tags, date_update FROM deck ORDER BY id');
+        $this->fixtureDecks = $this->db()->fetchAll('SELECT id, user_id, tags, date_update FROM deck ORDER BY id');
     }
 
     protected function tearDown(): void
     {
-        $connection = $this->db($this->client);
+        $connection = $this->db();
         foreach ($this->fixtureDecks as $deck) {
             $connection->update('deck', $deck, ['id' => $deck['id']]);
         }
@@ -73,7 +73,7 @@ class TagControllerTest extends WebTestCase
      */
     private function tags(KernelBrowser $client): array
     {
-        return array_column($this->db($client)->fetchAll('SELECT id, tags FROM deck ORDER BY id'), 'tags', 'id');
+        return array_column($this->db()->fetchAll('SELECT id, tags FROM deck ORDER BY id'), 'tags', 'id');
     }
 
     /* -------------------------------------------------------------- tests */
@@ -96,7 +96,7 @@ class TagControllerTest extends WebTestCase
     public function testAddTagsToADeckWithoutTags(): void
     {
         $client = $this->createAuthenticatedClient();
-        $this->db($client)->update('deck', ['tags' => ''], ['id' => 2]);
+        $this->db()->update('deck', ['tags' => ''], ['id' => 2]);
 
         $answer = $this->post($client, 'add', ['ids' => ['2'], 'tags' => ['gondor']]);
 
@@ -111,13 +111,13 @@ class TagControllerTest extends WebTestCase
     public function testEmptyAndSpacedTagsAreIgnored(): void
     {
         $client = $this->createAuthenticatedClient();
-        $this->db($client)->update('deck', ['tags' => ' tactics  lore '], ['id' => 4]);
+        $this->db()->update('deck', ['tags' => ' tactics  lore '], ['id' => 4]);
 
         $answer = $this->post($client, 'add', ['ids' => ['4'], 'tags' => ['', 'dwarf', '', ' two  words ']]);
         $this->assertSame([4 => ['tactics', 'lore', 'dwarf', 'two', 'words']], $answer['tags']);
         $this->assertSame('tactics lore dwarf two words', $this->tags($client)['4']);
 
-        $this->db($client)->update('deck', ['tags' => ' tactics  lore '], ['id' => 4]);
+        $this->db()->update('deck', ['tags' => ' tactics  lore '], ['id' => 4]);
         $answer = $this->post($client, 'remove', ['ids' => ['4'], 'tags' => ['', 'lore']]);
         $this->assertSame([4 => ['tactics']], $answer['tags']);
         $this->assertSame('tactics', $this->tags($client)['4']);

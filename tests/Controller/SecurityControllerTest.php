@@ -60,7 +60,7 @@ class SecurityControllerTest extends WebTestCase
             'fos_user_registration_form[email]' => $email,
             'fos_user_registration_form[username]' => $username,
             'fos_user_registration_form[plainPassword][first]' => $password,
-            'fos_user_registration_form[plainPassword][second]' => null === $confirmation ? $password : $confirmation,
+            'fos_user_registration_form[plainPassword][second]' => $confirmation ?? $password,
         ]);
         if ($withProfiler) {
             $client->enableProfiler();

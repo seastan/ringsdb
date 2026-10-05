@@ -20,15 +20,15 @@ use PHPStan\Type\Type;
 class DoctrineRegistryReturnTypeExtension implements DynamicMethodReturnTypeExtension
 {
     public const RETURN_TYPES = [
-        'getManager' => 'Doctrine\ORM\EntityManager',
-        'getManagerForClass' => 'Doctrine\ORM\EntityManager',
-        'resetManager' => 'Doctrine\ORM\EntityManager',
-        'getConnection' => 'Doctrine\DBAL\Connection',
+        'getManager' => \Doctrine\ORM\EntityManager::class,
+        'getManagerForClass' => \Doctrine\ORM\EntityManager::class,
+        'resetManager' => \Doctrine\ORM\EntityManager::class,
+        'getConnection' => \Doctrine\DBAL\Connection::class,
     ];
 
     public function getClass(): string
     {
-        return 'Doctrine\Persistence\ManagerRegistry';
+        return \Doctrine\Persistence\ManagerRegistry::class;
     }
 
     public function isMethodSupported(MethodReflection $methodReflection): bool

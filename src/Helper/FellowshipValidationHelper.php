@@ -70,10 +70,6 @@ class FellowshipValidationHelper
             'hero_conflicts' => 'MHero conflicts between selected decks',
         ];
 
-        if (isset($labels[$problem])) {
-            return $labels[$problem];
-        }
-
-        return '';
+        return $labels[$problem] ?? '';
     }
 }

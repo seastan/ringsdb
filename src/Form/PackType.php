@@ -34,7 +34,7 @@ class PackType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => 'App\Entity\Pack',
+            'data_class' => Pack::class,
         ]);
     }
 

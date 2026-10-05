@@ -100,12 +100,10 @@ class SlotCollectionDecorator implements SlotCollectionInterface
 
             $pos = $pos.$pack->getPosition();
 
-            if (!isset($packs[$pos])) {
-                $packs[$pos] = [
-                    'pack' => $pack,
-                    'nb' => 0,
-                ];
-            }
+            $packs[$pos] ??= [
+                'pack' => $pack,
+                'nb' => 0,
+            ];
 
             $qty = $card->getQuantity();
             if ($qty) {

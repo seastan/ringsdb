@@ -117,9 +117,7 @@ class ExcelController extends AbstractController
                 }
                 $getter = str_replace(' ', '', ucwords(str_replace('_', ' ', "get_{$fieldName}")));
                 $value = $card->{$getter}();
-                if (!isset($value)) {
-                    $value = '';
-                }
+                $value ??= '';
                 $type = $this->entityManager->getClassMetadata(Card::class)->getTypeOfField($fieldName);
                 $phpCell = $phpActiveSheet->getCell([$col_index++, $row_index + 2]);
                 if ('code' == $fieldName) {

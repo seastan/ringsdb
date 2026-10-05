@@ -33,7 +33,7 @@ class AdminWriteTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $connection = $this->db($this->client);
+        $connection = $this->db();
         foreach (array_merge(self::TABLES, ['comment', 'decklist', 'deck']) as $table) {
             $this->maxIds[$table] = 'scenario_encounter' === $table ? 0 : (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
         }
@@ -41,7 +41,7 @@ class AdminWriteTest extends WebTestCase
 
     protected function tearDown(): void
     {
-        $connection = $this->db($this->client);
+        $connection = $this->db();
         $max = $this->maxIds;
         $connection->exec("DELETE FROM scenario_encounter WHERE scenario_id > {$max['scenario']} OR encounter_id > {$max['encounter']}");
         foreach (['decklist_spheres', 'decklistslot', 'decklistsideslot'] as $table) {
@@ -174,7 +174,7 @@ class AdminWriteTest extends WebTestCase
         $this->assertRegExp("#^/admin/$slug/\\d+/show$#", self::location($response));
         $id = (int) explode('/', self::location($response))[3];
         $this->assertGreaterThan($this->maxIds[$table], $id);
-        $this->assertEquals($expectedCreated, $this->db($client)->fetchAssoc("SELECT $columns FROM $table WHERE id = ?", [$id]));
+        $this->assertEquals($expectedCreated, $this->db()->fetchAssoc("SELECT $columns FROM $table WHERE id = ?", [$id]));
 
         $client->followRedirect();
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -183,13 +183,13 @@ class AdminWriteTest extends WebTestCase
         $response = $this->submitForm($client, "/admin/$slug/$id/edit", "/admin/$slug/$id/update", self::prefixed($formName, $updated));
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame("/admin/$slug/$id/edit", $response->headers->get('Location'));
-        $this->assertEquals($expectedUpdated, $this->db($client)->fetchAssoc("SELECT $columns FROM $table WHERE id = ?", [$id]));
+        $this->assertEquals($expectedUpdated, $this->db()->fetchAssoc("SELECT $columns FROM $table WHERE id = ?", [$id]));
 
         // delete: redirect to the list
         $response = $this->submitForm($client, "/admin/$slug/$id/edit", "/admin/$slug/$id/delete", []);
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame("/admin/$slug/", $response->headers->get('Location'));
-        $this->assertSame('0', $this->db($client)->fetchColumn("SELECT COUNT(*) FROM $table WHERE id = ?", [$id]));
+        $this->assertSame('0', $this->db()->fetchColumn("SELECT COUNT(*) FROM $table WHERE id = ?", [$id]));
     }
 
     public function testScenarioEncounters(): void
@@ -206,7 +206,7 @@ class AdminWriteTest extends WebTestCase
         $client->submit($form);
 
         $id = (int) explode('/', self::location($client->getResponse()))[3];
-        $encounters = $this->db($client)->fetchAll('SELECT encounter_id FROM scenario_encounter WHERE scenario_id = ? ORDER BY encounter_id', [$id]);
+        $encounters = $this->db()->fetchAll('SELECT encounter_id FROM scenario_encounter WHERE scenario_id = ? ORDER BY encounter_id', [$id]);
         $this->assertSame(['1', '3'], array_column($encounters, 'encounter_id'));
     }
 
@@ -232,7 +232,7 @@ class AdminWriteTest extends WebTestCase
         // the delete form is invalid without its CSRF token: nothing is deleted
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/admin/type/', $client->getResponse()->headers->get('Location'));
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM type WHERE id = 1'));
+        $this->assertSame('1', $this->db()->fetchColumn('SELECT COUNT(*) FROM type WHERE id = 1'));
     }
 
     /**
@@ -246,7 +246,7 @@ class AdminWriteTest extends WebTestCase
             'position' => '1', 'deck_limit' => '3', 'code' => '99901', 'type' => '2', 'sphere' => '1', 'name' => 'PHPUnit Card',
         ]));
         $cardId = (int) explode('/', self::location($response))[3];
-        $connection = $this->db($client);
+        $connection = $this->db();
         $connection->insert('card_printing', ['card_id' => $cardId, 'pack_id' => 1, 'position' => 999, 'quantity' => 1, 'image_code' => '99901', 'date_creation' => '2015-08-16 00:00:00', 'date_update' => '2015-08-16 00:00:00']);
         $connection->insert('deckslot', ['deck_id' => 1, 'card_id' => $cardId, 'quantity' => 1]);
 
@@ -273,7 +273,7 @@ class AdminWriteTest extends WebTestCase
         $response = $this->submitForm($client, '/admin/cycle/1/edit', '/admin/cycle/1/delete', []);
 
         $this->assertSame(500, $response->getStatusCode());
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM cycle WHERE id = 1'));
+        $this->assertSame('1', $this->db()->fetchColumn('SELECT COUNT(*) FROM cycle WHERE id = 1'));
     }
 
     /* -------------------------------------------------------- moderation */
@@ -305,16 +305,16 @@ class AdminWriteTest extends WebTestCase
 
         $client->request('GET', '/admin/comment/toggle_hidden/1');
         $this->assertSame('/admin/user/comments/1', $client->getResponse()->headers->get('Location'));
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT is_hidden FROM comment WHERE id = 1'));
+        $this->assertSame('1', $this->db()->fetchColumn('SELECT is_hidden FROM comment WHERE id = 1'));
         $client->request('GET', '/admin/comment/toggle_hidden/1');
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT is_hidden FROM comment WHERE id = 1'));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT is_hidden FROM comment WHERE id = 1'));
 
         // delete a comment created for the test
-        $this->db($client)->insert('comment', ['decklist_id' => 1, 'user_id' => 2, 'text' => 'Spam', 'date_creation' => '2015-08-16 00:00:00', 'is_hidden' => 0]);
-        $commentId = (int) $this->db($client)->lastInsertId();
+        $this->db()->insert('comment', ['decklist_id' => 1, 'user_id' => 2, 'text' => 'Spam', 'date_creation' => '2015-08-16 00:00:00', 'is_hidden' => 0]);
+        $commentId = (int) $this->db()->lastInsertId();
         $client->request('GET', "/admin/comment/delete/$commentId");
         $this->assertSame('/admin/user/comments/2', $client->getResponse()->headers->get('Location'));
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM comment WHERE id = ?', [$commentId]));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM comment WHERE id = ?', [$commentId]));
     }
 
     /**
@@ -323,7 +323,7 @@ class AdminWriteTest extends WebTestCase
     public function testDeleteADecklist(): void
     {
         $client = $this->createAdminClient();
-        $connection = $this->db($client);
+        $connection = $this->db();
         // a copy of decklist 1, derived from it, with a deck copied from the copy
         $row = $connection->fetchAssoc('SELECT * FROM decklist WHERE id = 1');
         $this->assertNotFalse($row);

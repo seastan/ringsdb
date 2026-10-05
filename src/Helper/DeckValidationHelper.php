@@ -72,10 +72,6 @@ class DeckValidationHelper
             'invalid_cards' => 'Contains forbidden cards',
         ];
 
-        if (isset($labels[$problem])) {
-            return $labels[$problem];
-        }
-
-        return '';
+        return $labels[$problem] ?? '';
     }
 }

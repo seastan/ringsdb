@@ -37,7 +37,7 @@ class ReviewTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $connection = $this->db($this->client);
+        $connection = $this->db();
         foreach (['review', 'reviewcomment'] as $table) {
             $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
         }
@@ -49,7 +49,7 @@ class ReviewTest extends WebTestCase
 
     protected function tearDown(): void
     {
-        $connection = $this->db($this->client);
+        $connection = $this->db();
         $connection->exec("DELETE FROM reviewcomment WHERE id > {$this->maxIds['reviewcomment']}");
         $connection->exec("DELETE FROM reviewvote WHERE review_id > {$this->maxIds['review']} OR review_id = 1");
         $connection->exec("DELETE FROM review WHERE id > {$this->maxIds['review']}");
@@ -100,7 +100,7 @@ class ReviewTest extends WebTestCase
 
     private function newReviews(KernelBrowser $client)
     {
-        return $this->db($client)->fetchAll(
+        return $this->db()->fetchAll(
             'SELECT c.code, u.username, r.text_md, r.text_html, r.nb_votes FROM review r JOIN card c ON c.id = r.card_id JOIN user u ON u.id = r.user_id WHERE r.id > ? ORDER BY r.id',
             [$this->maxIds['review']]
         );
@@ -143,7 +143,7 @@ class ReviewTest extends WebTestCase
     public function testRefusedReview($username, $reputation, array $parameters, $message): void
     {
         $client = $this->createAuthenticatedClient($username);
-        $this->db($client)->update('user', ['reputation' => $reputation], ['username' => $username]);
+        $this->db()->update('user', ['reputation' => $reputation], ['username' => $username]);
 
         $response = $this->ajax($client, '/review/post', $parameters + ['review_id' => '']);
 
@@ -171,7 +171,7 @@ class ReviewTest extends WebTestCase
     public function testNoReviewOnUnreleasedCards(): void
     {
         $client = $this->createAuthenticatedClient('admin');
-        $connection = $this->db($client);
+        $connection = $this->db();
         $releaseDate = $connection->fetchColumn("SELECT date_release FROM pack WHERE code = 'HfG'");
         try {
             $connection->update('pack', ['date_release' => null], ['code' => 'HfG']);
@@ -201,7 +201,7 @@ class ReviewTest extends WebTestCase
         $response = $this->ajax($client, '/review/edit', ['card_id' => 1, 'review_id' => 1, 'review' => 'Aragorn is *still* great.']);
 
         $this->assertJsonAnswer($response, 200, ['success' => true]);
-        $review = $this->db($client)->fetchAssoc('SELECT text_md, text_html FROM review WHERE id = 1');
+        $review = $this->db()->fetchAssoc('SELECT text_md, text_html FROM review WHERE id = 1');
         $this->assertSame(['text_md' => 'Aragorn is *still* great.', 'text_html' => '<p>Aragorn is <em>still</em> great.</p>'], $review);
     }
 
@@ -214,7 +214,7 @@ class ReviewTest extends WebTestCase
         // not JSON, unlike the other answers
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('Your review is empty.', $response->getContent());
-        $this->assertSame($this->fixtureReview['text_md'], $this->db($client)->fetchColumn('SELECT text_md FROM review WHERE id = 1'));
+        $this->assertSame($this->fixtureReview['text_md'], $this->db()->fetchColumn('SELECT text_md FROM review WHERE id = 1'));
     }
 
     /**
@@ -228,7 +228,7 @@ class ReviewTest extends WebTestCase
 
         // BUG (CoreExceptionListener): the 403 / 400 HTTP exceptions become 500s for AJAX requests
         $this->assertJsonAnswer($response, 500, ['success' => false, 'message' => $message]);
-        $this->assertSame($this->fixtureReview['text_md'], $this->db($client)->fetchColumn('SELECT text_md FROM review WHERE id = 1'));
+        $this->assertSame($this->fixtureReview['text_md'], $this->db()->fetchColumn('SELECT text_md FROM review WHERE id = 1'));
     }
 
     public function refusedEditProvider(): array
@@ -247,14 +247,14 @@ class ReviewTest extends WebTestCase
 
         $this->assertJsonAnswer($this->ajax($client, '/review/like', ['id' => 1]), 200, ['success' => true, 'nbVotes' => 1]);
 
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT nb_votes FROM review WHERE id = 1'));
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
+        $this->assertSame('1', $this->db()->fetchColumn('SELECT nb_votes FROM review WHERE id = 1'));
+        $this->assertSame('1', $this->db()->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
         // the author earns 1 reputation point
-        $this->assertSame('2', $this->db($client)->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
+        $this->assertSame('2', $this->db()->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
 
         // liking twice does nothing
         $this->assertJsonAnswer($this->ajax($client, '/review/like', ['id' => 1]), 200, ['success' => true, 'nbVotes' => 1]);
-        $this->assertSame('2', $this->db($client)->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
+        $this->assertSame('2', $this->db()->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
     }
 
     public function testCannotLikeOwnReview(): void
@@ -263,8 +263,8 @@ class ReviewTest extends WebTestCase
 
         $this->assertJsonAnswer($this->ajax($client, '/review/like', ['id' => 1]), 200, ['success' => true, 'nbVotes' => 0]);
 
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
-        $this->assertSame('1', $this->db($client)->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
+        $this->assertSame('1', $this->db()->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
     }
 
     public function testLikeAnUnknownReview(): void
@@ -284,9 +284,9 @@ class ReviewTest extends WebTestCase
 
         $this->assertJsonAnswer($response, 200, ['success' => true]);
         // comments are plain text, HTML-escaped
-        $comment = $this->db($client)->fetchAssoc('SELECT c.text, u.username FROM reviewcomment c JOIN user u ON u.id = c.user_id WHERE c.review_id = 1');
+        $comment = $this->db()->fetchAssoc('SELECT c.text, u.username FROM reviewcomment c JOIN user u ON u.id = c.user_id WHERE c.review_id = 1');
         $this->assertSame(['text' => 'Agreed &lt;b&gt;100%&lt;/b&gt;', 'username' => 'admin'], $comment);
-        $this->assertGreaterThan('2015-08-16 00:00:00', $this->db($client)->fetchColumn('SELECT date_last_comment FROM review WHERE id = 1'));
+        $this->assertGreaterThan('2015-08-16 00:00:00', $this->db()->fetchColumn('SELECT date_last_comment FROM review WHERE id = 1'));
 
         // BUG: escaped once more by Twig when displayed, the entities are shown as is
         $crawler = $client->request('GET', self::CARD_URL);
@@ -305,7 +305,7 @@ class ReviewTest extends WebTestCase
         $client = $this->createAuthenticatedClient('admin');
 
         $this->assertJsonAnswer($this->ajax($client, '/review/comment', $parameters), 500, ['success' => false, 'message' => $message]);
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM reviewcomment'));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM reviewcomment'));
     }
 
     public function refusedCommentProvider(): array
@@ -325,15 +325,15 @@ class ReviewTest extends WebTestCase
     {
         $client = $this->createAuthenticatedClient('admin');
         $this->assertJsonAnswer($this->ajax($client, '/review/remove/1', []), 403, ['success' => false, 'message' => 'No user or not admin']);
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM review WHERE id = 1'));
+        $this->assertSame('1', $this->db()->fetchColumn('SELECT COUNT(*) FROM review WHERE id = 1'));
 
-        $this->db($client)->update('user', ['roles' => serialize(['ROLE_SUPER_ADMIN'])], ['username' => 'admin']);
+        $this->db()->update('user', ['roles' => serialize(['ROLE_SUPER_ADMIN'])], ['username' => 'admin']);
         $client = $this->createAuthenticatedClient('admin');
         $this->ajax($client, '/review/like', ['id' => 1]);
 
         // the route accepts any method, GET included
         $this->assertJsonAnswer($this->ajax($client, '/review/remove/1', [], 'GET'), 200, ['success' => true]);
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM review WHERE id = 1'));
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM review WHERE id = 1'));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
     }
 }

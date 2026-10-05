@@ -43,10 +43,11 @@ class ViewFellowshipController extends AbstractController
             throw new AccessDeniedHttpException('You are not allowed to view this fellowship. To get access, you can ask it\'s owner to enable "Share my decks" on their account.');
         }
         if ($is_public) {
-            $commenters = array_map(function ($comment) {
+            $commenters = array_map(
                 /* @var $comment \App\Entity\FellowshipComment */
-                return $comment->getUser()->getUsername();
-            }, $fellowship->getComments()->getValues());
+                fn ($comment) => $comment->getUser()->getUsername(),
+                $fellowship->getComments()->getValues()
+            );
             $commenters[] = $fellowship->getUser()->getUsername();
         } else {
             $commenters = [];

@@ -43,10 +43,11 @@ class ViewQuestlogController extends AbstractController
             throw new AccessDeniedHttpException('You are not allowed to view this questlog. To get access, you can ask it\'s owner to enable "Share my decks" on their account.');
         }
         if ($is_public) {
-            $commenters = array_map(function ($comment) {
+            $commenters = array_map(
                 /* @var $comment \App\Entity\QuestlogComment */
-                return $comment->getUser()->getUsername();
-            }, $questlog->getComments()->getValues());
+                fn ($comment) => $comment->getUser()->getUsername(),
+                $questlog->getComments()->getValues()
+            );
             if ($questlog->getUser()) {
                 $commenters[] = $questlog->getUser()->getUsername();
             }

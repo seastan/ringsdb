@@ -47,10 +47,11 @@ class ViewDecklistController extends AbstractController
         if (!$duplicate || $duplicate->getDateCreation() >= $decklist->getDateCreation() || $duplicate->getId() === $decklist->getId()) {
             $duplicate = null;
         }
-        $commenters = array_map(function ($comment) {
+        $commenters = array_map(
             /* @var $comment \App\Entity\Comment */
-            return $comment->getUser()->getUsername();
-        }, $decklist->getComments()->getValues());
+            fn ($comment) => $comment->getUser()->getUsername(),
+            $decklist->getComments()->getValues()
+        );
         $commenters[] = $decklist->getUser()->getUsername();
         $versions = $this->decklistRepository->findBy(['parent' => $decklist->getParent()], ['version' => 'DESC', 'id' => 'DESC']);
 

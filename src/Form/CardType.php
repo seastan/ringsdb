@@ -46,7 +46,7 @@ class CardType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => 'App\Entity\Card',
+            'data_class' => Card::class,
         ]);
     }
 

@@ -29,7 +29,7 @@ class SphereType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => 'App\Entity\Sphere',
+            'data_class' => Sphere::class,
         ]);
     }
 

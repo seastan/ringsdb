@@ -30,12 +30,12 @@ class UserProfileTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $this->fixtureUsers = $this->db($this->client)->fetchAll('SELECT * FROM user ORDER BY id');
+        $this->fixtureUsers = $this->db()->fetchAll('SELECT * FROM user ORDER BY id');
     }
 
     protected function tearDown(): void
     {
-        $connection = $this->db($this->client);
+        $connection = $this->db();
         foreach ($this->fixtureUsers as $user) {
             $connection->update('user', $user, ['id' => $user['id']]);
         }
@@ -73,7 +73,7 @@ class UserProfileTest extends WebTestCase
      */
     private function fetchUser(KernelBrowser $client, $id = 1)
     {
-        return $this->db($client)->fetchAssoc('SELECT * FROM user WHERE id = ?', [$id]);
+        return $this->db()->fetchAssoc('SELECT * FROM user WHERE id = ?', [$id]);
     }
 
     private static function checkbox(Form $form, string $name): ChoiceFormField

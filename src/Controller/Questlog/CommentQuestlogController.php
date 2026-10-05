@@ -81,18 +81,14 @@ class CommentQuestlogController extends AbstractController
                 /* @var $comment \App\Entity\QuestlogComment */
                 $commenter = $comment->getUser();
                 if ($commenter->getIsNotifCommenter()) {
-                    if (!isset($spool[$commenter->getEmail()])) {
-                        $spool[$commenter->getEmail()] = 'Emails/newquestlogcomment_commenter.html.twig';
-                    }
+                    $spool[$commenter->getEmail()] ??= 'Emails/newquestlogcomment_commenter.html.twig';
                 }
             }
             foreach ($mentionned_usernames as $mentionned_username) {
                 /* @var $mentionned_user User */
                 $mentionned_user = $userRepository->findOneBy(['username' => $mentionned_username]);
                 if ($mentionned_user && $mentionned_user->getIsNotifMention()) {
-                    if (!isset($spool[$mentionned_user->getEmail()])) {
-                        $spool[$mentionned_user->getEmail()] = 'Emails/newquestlogcomment_mentionned.html.twig';
-                    }
+                    $spool[$mentionned_user->getEmail()] ??= 'Emails/newquestlogcomment_mentionned.html.twig';
                 }
             }
             unset($spool[$user->getEmail()]);

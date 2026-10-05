@@ -64,15 +64,11 @@ class Deck extends ExportableDeck implements \JsonSerializable
             }
 
             foreach ($variation[1] as $code => $qty) {
-                if (!isset($preversion[$code])) {
-                    $preversion[$code] = 0;
-                }
+                $preversion[$code] ??= 0;
                 $preversion[$code] = $preversion[$code] + $qty;
             }
 
-            if (!isset($variation[2])) {
-                $variation[2] = [];
-            }
+            $variation[2] ??= [];
 
             foreach ($variation[2] as $code => $qty) {
                 if (isset($sidepreversion[$code])) {
@@ -83,14 +79,10 @@ class Deck extends ExportableDeck implements \JsonSerializable
                 }
             }
 
-            if (!isset($variation[3])) {
-                $variation[3] = [];
-            }
+            $variation[3] ??= [];
 
             foreach ($variation[3] as $code => $qty) {
-                if (!isset($sidepreversion[$code])) {
-                    $sidepreversion[$code] = 0;
-                }
+                $sidepreversion[$code] ??= 0;
                 $sidepreversion[$code] = $sidepreversion[$code] + $qty;
             }
 
@@ -125,9 +117,7 @@ class Deck extends ExportableDeck implements \JsonSerializable
 
             // applying variation to postversion
             foreach ($variation[0] as $code => $qty) {
-                if (!isset($postversion[$code])) {
-                    $postversion[$code] = 0;
-                }
+                $postversion[$code] ??= 0;
                 $postversion[$code] = $postversion[$code] + $qty;
             }
 
@@ -138,20 +128,14 @@ class Deck extends ExportableDeck implements \JsonSerializable
                 }
             }
 
-            if (!isset($variation[2])) {
-                $variation[2] = [];
-            }
+            $variation[2] ??= [];
 
             foreach ($variation[2] as $code => $qty) {
-                if (!isset($sidepostversion[$code])) {
-                    $sidepostversion[$code] = 0;
-                }
+                $sidepostversion[$code] ??= 0;
                 $sidepostversion[$code] = $sidepostversion[$code] + $qty;
             }
 
-            if (!isset($variation[3])) {
-                $variation[3] = [];
-            }
+            $variation[3] ??= [];
 
             foreach ($variation[3] as $code => $qty) {
                 $sidepostversion[$code] = $sidepostversion[$code] - $qty;

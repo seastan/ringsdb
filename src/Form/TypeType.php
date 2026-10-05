@@ -26,7 +26,7 @@ class TypeType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => 'App\Entity\Type',
+            'data_class' => Type::class,
         ]);
     }
 

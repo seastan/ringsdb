@@ -55,7 +55,7 @@ class ScrapBeornScenarioDataCommand extends Command
         $skip = (int) $input->getOption('skip');
         $customjson = $input->getOption('customjson');
 
-        $this->command($this->entityManager, $name, $skip, $customjson);
+        static::command($this->entityManager, $name, $skip, $customjson);
         $output->writeln('Done.');
 
         return 0;

@@ -34,7 +34,7 @@ class DeckManagementTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $connection = $this->db($this->client);
+        $connection = $this->db();
         foreach (['deck', 'deckchange', 'fellowship', 'questlog'] as $table) {
             $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
         }
@@ -44,7 +44,7 @@ class DeckManagementTest extends WebTestCase
 
     protected function tearDown(): void
     {
-        $connection = $this->db($this->client);
+        $connection = $this->db();
         $max = $this->maxIds;
         foreach ($this->fixtureDecklists as $decklist) {
             $connection->update('decklist', $decklist, ['id' => $decklist['id']]);
@@ -114,7 +114,7 @@ class DeckManagementTest extends WebTestCase
 
     private function deckExists(KernelBrowser $client, $id): bool
     {
-        return (bool) $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deck WHERE id = ?', [$id]);
+        return (bool) $this->db()->fetchColumn('SELECT COUNT(*) FROM deck WHERE id = ?', [$id]);
     }
 
     /**
@@ -122,7 +122,7 @@ class DeckManagementTest extends WebTestCase
      */
     private function newDeckIds(KernelBrowser $client): array
     {
-        return array_map('intval', array_column($this->db($client)->fetchAll('SELECT id FROM deck WHERE id > ? ORDER BY id', [$this->maxIds['deck']]), 'id'));
+        return array_map('intval', array_column($this->db()->fetchAll('SELECT id FROM deck WHERE id > ? ORDER BY id', [$this->maxIds['deck']]), 'id'));
     }
 
     private function flashMessages(KernelBrowser $client): array
@@ -145,7 +145,7 @@ class DeckManagementTest extends WebTestCase
         $this->assertSame('/decks', $client->getResponse()->headers->get('Location'));
         $clone = array_values(array_diff($this->newDeckIds($client), [$source]));
         $this->assertCount(1, $clone);
-        $deck = $this->db($client)->fetchAssoc('SELECT d.name, d.parent_decklist_id, d.major_version, d.minor_version, u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$clone[0]]);
+        $deck = $this->db()->fetchAssoc('SELECT d.name, d.parent_decklist_id, d.major_version, d.minor_version, u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$clone[0]]);
         // a new deck, derived from the same decklist as its source
         $this->assertSame(['name' => 'PHPUnit Source (clone)', 'parent_decklist_id' => '2', 'major_version' => '0', 'minor_version' => '1', 'username' => 'test'], $deck);
         $this->assertSame($this->slots($client, 'deckslot', $source), $this->slots($client, 'deckslot', $clone[0]));
@@ -163,11 +163,11 @@ class DeckManagementTest extends WebTestCase
         $this->assertSame([$source], $this->newDeckIds($client));
 
         // shared: the clone belongs to the current user
-        $this->db($client)->update('user', ['is_share_decks' => 1], ['username' => 'test']);
+        $this->db()->update('user', ['is_share_decks' => 1], ['username' => 'test']);
         $client->request('GET', "/deck/clone/$source");
         $this->assertSame('/decks', $client->getResponse()->headers->get('Location'));
         $clone = array_values(array_diff($this->newDeckIds($client), [$source]))[0];
-        $this->assertSame('admin', $this->db($client)->fetchColumn('SELECT u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$clone]));
+        $this->assertSame('admin', $this->db()->fetchColumn('SELECT u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$clone]));
     }
 
     public function testCloneUnknownDeck(): void
@@ -185,8 +185,8 @@ class DeckManagementTest extends WebTestCase
         $client = $this->createAuthenticatedClient();
         $id = $this->insertDeck($client, 'PHPUnit Delete');
         // a decklist published from it
-        $this->db($client)->update('decklist', ['parent_deck_id' => $id], ['id' => 4]);
-        $this->db($client)->insert('deckchange', ['deck_id' => $id, 'date_creation' => '2015-08-16 00:00:00', 'variation' => '[{},{},{},{}]', 'is_saved' => 1]);
+        $this->db()->update('decklist', ['parent_deck_id' => $id], ['id' => 4]);
+        $this->db()->insert('deckchange', ['deck_id' => $id, 'date_creation' => '2015-08-16 00:00:00', 'variation' => '[{},{},{},{}]', 'is_saved' => 1]);
 
         $client->request('POST', '/deck/delete', ['deck_id' => $id]);
 
@@ -195,9 +195,9 @@ class DeckManagementTest extends WebTestCase
         $this->assertFalse($this->deckExists($client, $id));
         $this->assertSame([], $this->slots($client, 'deckslot', $id));
         $this->assertSame([], $this->slots($client, 'decksideslot', $id));
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
         // the decklist stays, detached from the deck
-        $this->assertNull($this->db($client)->fetchColumn('SELECT parent_deck_id FROM decklist WHERE id = 4'));
+        $this->assertNull($this->db()->fetchColumn('SELECT parent_deck_id FROM decklist WHERE id = 4'));
         $client->followRedirect();
         $this->assertSame([['success', 'Deck deleted.']], $this->flashMessages($client));
     }
@@ -218,7 +218,7 @@ class DeckManagementTest extends WebTestCase
 
     private function addToFellowship(KernelBrowser $client, $deckId): int
     {
-        $connection = $this->db($client);
+        $connection = $this->db();
         $connection->insert('fellowship', ['user_id' => 1, 'name' => 'PHPUnit', 'name_canonical' => 'phpunit', 'is_public' => 0,
             'nb_decks' => 1, 'nb_votes' => 0, 'nb_favorites' => 0, 'nb_comments' => 0,
             'date_creation' => '2015-08-16 00:00:00', 'date_update' => '2015-08-16 00:00:00']);
@@ -283,8 +283,8 @@ class DeckManagementTest extends WebTestCase
 
         $this->assertSame('/decks', $client->getResponse()->headers->get('Location'));
         $this->assertFalse($this->deckExists($client, $id));
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM fellowship_deck WHERE fellowship_id = ?', [$fellowship]));
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT nb_decks FROM fellowship WHERE id = ?', [$fellowship]));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM fellowship_deck WHERE fellowship_id = ?', [$fellowship]));
+        $this->assertSame('1', $this->db()->fetchColumn('SELECT nb_decks FROM fellowship WHERE id = ?', [$fellowship]));
     }
 
     /* ----------------------------------------------------------- autosave */
@@ -305,7 +305,7 @@ class DeckManagementTest extends WebTestCase
         // the answer is the date of the change
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertRegExp('/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d:\d\d$/', $client->getResponse()->getContent());
-        $changes = $this->db($client)->fetchAll('SELECT variation, is_saved FROM deckchange WHERE deck_id = ?', [$id]);
+        $changes = $this->db()->fetchAll('SELECT variation, is_saved FROM deckchange WHERE deck_id = ?', [$id]);
         $this->assertSame([['variation' => json_encode($diff), 'is_saved' => '0']], $changes);
         // the deck itself is not changed
         $this->assertSame($this->slots($client, 'deckslot', 2), $this->slots($client, 'deckslot', $id));
@@ -315,7 +315,7 @@ class DeckManagementTest extends WebTestCase
         $form = $crawler->filter('#save_form')->form();
         $form['content'] = (string) json_encode(['main' => ['01001' => 1, '01002' => 1, '01003' => 1], 'side' => []]);
         $client->submit($form);
-        $changes = $this->db($client)->fetchAll('SELECT is_saved FROM deckchange WHERE deck_id = ?', [$id]);
+        $changes = $this->db()->fetchAll('SELECT is_saved FROM deckchange WHERE deck_id = ?', [$id]);
         $this->assertSame([['is_saved' => '1']], $changes);
     }
 
@@ -335,7 +335,7 @@ class DeckManagementTest extends WebTestCase
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertSame('', $client->getResponse()->getContent());
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
     }
 
     public function emptyDiffProvider(): array
@@ -354,7 +354,7 @@ class DeckManagementTest extends WebTestCase
         $client->request('POST', '/deck/autosave', ['deck_id' => $id, 'diff' => '[{"01001":1},[]]'], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertSame('[{"01001":1},[]]', $this->db($client)->fetchColumn('SELECT variation FROM deckchange WHERE deck_id = ?', [$id]));
+        $this->assertSame('[{"01001":1},[]]', $this->db()->fetchColumn('SELECT variation FROM deckchange WHERE deck_id = ?', [$id]));
     }
 
     /**
@@ -370,7 +370,7 @@ class DeckManagementTest extends WebTestCase
         // BUG (CoreExceptionListener): the 422 / 403 HTTP exceptions become 500s for AJAX requests
         $this->assertSame($status, $client->getResponse()->getStatusCode());
         $this->assertSame(['success' => false, 'message' => $message], json_decode($client->getResponse()->getContent(), true));
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
     }
 
     public function invalidAutosaveProvider(): array
@@ -430,7 +430,7 @@ class DeckManagementTest extends WebTestCase
 
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame('/decks', $response->headers->get('Location'));
-        $decks = $this->db($client)->fetchAll('SELECT id, name, user_id FROM deck WHERE id > ? ORDER BY id', [$this->maxIds['deck']]);
+        $decks = $this->db()->fetchAll('SELECT id, name, user_id FROM deck WHERE id > ? ORDER BY id', [$this->maxIds['deck']]);
         $this->assertSame(['Dwarves', 'Gondor', 'Nothing'], array_column($decks, 'name'));
         $this->assertSame(['1', '1', '1'], array_column($decks, 'user_id'));
         // the cards of the exported decks come back; a file without any card gives an empty deck
@@ -455,7 +455,7 @@ class DeckManagementTest extends WebTestCase
         ]);
 
         $this->assertSame(302, $response->getStatusCode());
-        $decks = $this->db($client)->fetchAll('SELECT id, name FROM deck WHERE id > ? ORDER BY id', [$this->maxIds['deck']]);
+        $decks = $this->db()->fetchAll('SELECT id, name FROM deck WHERE id > ? ORDER BY id', [$this->maxIds['deck']]);
         $this->assertSame(['Dwarves', 'Noldor'], array_column($decks, 'name'));
         $this->assertSame($this->slots($client, 'deckslot', 1), $this->slots($client, 'deckslot', $decks[0]['id']));
         $this->assertSame($this->slots($client, 'deckslot', 3), $this->slots($client, 'deckslot', $decks[1]['id']));

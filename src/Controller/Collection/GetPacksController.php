@@ -54,7 +54,7 @@ class GetPacksController extends AbstractController
         }
         $countOf = function ($pack) use ($hasCollection, $countById) {
             if ($hasCollection) {
-                return isset($countById[$pack->getId()]) ? $countById[$pack->getId()] : 0;
+                return $countById[$pack->getId()] ?? 0;
             }
 
             // no collection set => default to owning one of each released pack

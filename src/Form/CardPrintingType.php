@@ -62,7 +62,7 @@ class CardPrintingType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => 'App\Entity\CardPrinting',
+            'data_class' => CardPrinting::class,
             'filter_pack' => null,
         ]);
     }

@@ -161,7 +161,7 @@ class AdminExcelTest extends WebTestCase
         $file = $this->download($client, 0);
 
         $this->assertSame('attachment; filename=lotrlcgcards.xlsx', $client->getResponse()->headers->get('Content-Disposition'));
-        $this->assertCount(1 + (int) $this->db($client)->fetchColumn('SELECT COUNT(*) FROM card'), self::rows($file));
+        $this->assertCount(1 + (int) $this->db()->fetchColumn('SELECT COUNT(*) FROM card'), self::rows($file));
     }
 
     /* ------------------------------------------------------------- upload */
@@ -180,7 +180,7 @@ class AdminExcelTest extends WebTestCase
         [$response, $report] = $this->upload($client, $file);
         $this->assertSame('7 cards changed or added', $response);
         $this->assertContains('Legolas: field [text] changed; field [flavor] changed;', $report);
-        $this->assertNotContains("\r", $this->db($client)->fetchColumn("SELECT text FROM card WHERE code = '01005'"));
+        $this->assertNotContains("\r", $this->db()->fetchColumn("SELECT text FROM card WHERE code = '01005'"));
 
         [$response] = $this->upload($client, $file);
         $this->assertSame('0 cards changed or added', $response);

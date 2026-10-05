@@ -108,12 +108,12 @@ class AdminPagesTest extends WebTestCase
     public function testUsersCannotWrite($method, $uri, array $parameters): void
     {
         $client = $this->createAuthenticatedClient('test');
-        $before = $this->db($client)->fetchAll('SELECT id, name FROM cycle ORDER BY id');
+        $before = $this->db()->fetchAll('SELECT id, name FROM cycle ORDER BY id');
 
         $client->request($method, $uri, $parameters);
 
         $this->assertSame(403, $client->getResponse()->getStatusCode());
-        $this->assertSame($before, $this->db($client)->fetchAll('SELECT id, name FROM cycle ORDER BY id'));
+        $this->assertSame($before, $this->db()->fetchAll('SELECT id, name FROM cycle ORDER BY id'));
     }
 
     public function writeRouteProvider(): array
@@ -162,7 +162,7 @@ class AdminPagesTest extends WebTestCase
         $crawler = $client->request('GET', $uri);
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertCount((int) $this->db($client)->fetchColumn("SELECT COUNT(*) FROM $table"), $crawler->filter('table tbody tr'));
+        $this->assertCount((int) $this->db()->fetchColumn("SELECT COUNT(*) FROM $table"), $crawler->filter('table tbody tr'));
     }
 
     public function bigListProvider(): array
@@ -242,15 +242,15 @@ class AdminPagesTest extends WebTestCase
             $client->request('GET', '/admin/user/toggle_locked/1');
             $this->assertSame(302, $client->getResponse()->getStatusCode());
             $this->assertSame('/admin/user/show/1', $client->getResponse()->headers->get('Location'));
-            $this->assertSame('1', $this->db($client)->fetchColumn('SELECT locked FROM user WHERE id = 1'));
+            $this->assertSame('1', $this->db()->fetchColumn('SELECT locked FROM user WHERE id = 1'));
 
             $crawler = $client->followRedirect();
             $this->assertSame('Unblock', trim($crawler->filter('a[href="/admin/user/toggle_locked/1"]')->text()));
 
             $client->request('GET', '/admin/user/toggle_locked/1');
-            $this->assertSame('0', $this->db($client)->fetchColumn('SELECT locked FROM user WHERE id = 1'));
+            $this->assertSame('0', $this->db()->fetchColumn('SELECT locked FROM user WHERE id = 1'));
         } finally {
-            $this->db($client)->update('user', ['locked' => 0], ['id' => 1]);
+            $this->db()->update('user', ['locked' => 0], ['id' => 1]);
         }
     }
 
@@ -271,7 +271,7 @@ class AdminPagesTest extends WebTestCase
             $this->assertSame(302, $client->getResponse()->getStatusCode());
             $this->assertSame('/login', parse_url((string) $client->getResponse()->headers->get('Location'), PHP_URL_PATH));
         } finally {
-            $this->db($client)->update('user', ['locked' => 0], ['username' => 'test']);
+            $this->db()->update('user', ['locked' => 0], ['username' => 'test']);
         }
     }
 }

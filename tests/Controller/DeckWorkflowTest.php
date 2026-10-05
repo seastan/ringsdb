@@ -80,7 +80,7 @@ class DeckWorkflowTest extends WebTestCase
 
     private function fetchDeck(KernelBrowser $client, $id)
     {
-        return $this->db($client)->fetchAssoc(
+        return $this->db()->fetchAssoc(
             'SELECT d.name, d.description_md, d.tags, d.problem, d.major_version, d.minor_version, d.user_id, p.code AS last_pack
              FROM deck d LEFT JOIN pack p ON p.id = d.last_pack_id WHERE d.id = ?',
             [$id]
@@ -92,7 +92,7 @@ class DeckWorkflowTest extends WebTestCase
      */
     private function fetchSlots(KernelBrowser $client, $table, $column, $id): array
     {
-        $rows = $this->db($client)->fetchAll(
+        $rows = $this->db()->fetchAll(
             "SELECT c.code, s.quantity FROM $table s JOIN card c ON c.id = s.card_id WHERE s.$column = ? ORDER BY c.code",
             [$id]
         );
@@ -149,7 +149,7 @@ class DeckWorkflowTest extends WebTestCase
     public function testCreateEditPublishDeck(): void
     {
         $client = $this->createAuthenticatedClient();
-        $userId = (int) $this->db($client)->fetchColumn("SELECT id FROM user WHERE username = 'test'");
+        $userId = (int) $this->db()->fetchColumn("SELECT id FROM user WHERE username = 'test'");
 
         // 1. create: an empty deck is created, then the builder opens
         $deckId = $this->createDeck($client);
@@ -211,7 +211,7 @@ class DeckWorkflowTest extends WebTestCase
         ], $this->fetchDeck($client, $deckId));
         $this->assertSame($expected, $this->fetchSlots($client, 'deckslot', 'deck_id', $deckId));
 
-        $changes = $this->db($client)->fetchAll('SELECT variation, is_saved, version FROM deckchange WHERE deck_id = ? ORDER BY id', [$deckId]);
+        $changes = $this->db()->fetchAll('SELECT variation, is_saved, version FROM deckchange WHERE deck_id = ? ORDER BY id', [$deckId]);
         // one history entry per save: [main added, main removed, side added, side removed]
         $this->assertSame([
             [
@@ -245,7 +245,7 @@ class DeckWorkflowTest extends WebTestCase
         preg_match('#/view/(\d+)/#', $location, $matches);
         $decklistId = (int) ($matches[1] ?? 0);
 
-        $decklist = $this->db($client)->fetchAssoc(
+        $decklist = $this->db()->fetchAssoc(
             'SELECT name, name_canonical, version, description_md, description_html, user_id, parent_deck_id, precedent_decklist_id, nb_votes, nb_favorites, nb_comments
              FROM decklist WHERE id = ?',
             [$decklistId]
@@ -377,7 +377,7 @@ class DeckWorkflowTest extends WebTestCase
      */
     private function newDeckIds(KernelBrowser $client, $maxId): array
     {
-        $ids = array_map('intval', array_column($this->db($client)->fetchAll('SELECT id FROM deck WHERE id > ? ORDER BY id', [$maxId]), 'id'));
+        $ids = array_map('intval', array_column($this->db()->fetchAll('SELECT id FROM deck WHERE id > ? ORDER BY id', [$maxId]), 'id'));
         $this->deckIds = array_merge($this->deckIds, $ids);
 
         return $ids;
@@ -385,7 +385,7 @@ class DeckWorkflowTest extends WebTestCase
 
     private function maxDeckId(KernelBrowser $client): int
     {
-        return (int) $this->db($client)->fetchColumn('SELECT MAX(id) FROM deck');
+        return (int) $this->db()->fetchColumn('SELECT MAX(id) FROM deck');
     }
 
     /**
@@ -563,7 +563,7 @@ class DeckWorkflowTest extends WebTestCase
     public function testCopyDecklistEditAndPublishAgain(): void
     {
         $client = $this->createAuthenticatedClient();
-        $userId = (string) $this->db($client)->fetchColumn("SELECT id FROM user WHERE username = 'test'");
+        $userId = (string) $this->db()->fetchColumn("SELECT id FROM user WHERE username = 'test'");
         $original = $this->fetchSlots($client, 'decklistslot', 'decklist_id', 1);
 
         // 1. copy: a new deck, with the decklist's name and cards, derived from the decklist
@@ -578,7 +578,7 @@ class DeckWorkflowTest extends WebTestCase
             'user_id' => $userId,
             'last_pack' => 'TMV',
         ], $this->fetchDeck($client, $deckId));
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT parent_decklist_id FROM deck WHERE id = ?', [$deckId]));
+        $this->assertSame('1', $this->db()->fetchColumn('SELECT parent_decklist_id FROM deck WHERE id = ?', [$deckId]));
         $this->assertSame($original, $this->fetchSlots($client, 'deckslot', 'deck_id', $deckId));
 
         $crawler = $client->request('GET', "/deck/view/$deckId");
@@ -591,7 +591,7 @@ class DeckWorkflowTest extends WebTestCase
         $edited['01039'] = 1;
         ksort($edited);
         $this->saveDeck($client, $deckId, 'PHPUnit Dwarves Remix', 'Remixed', 'dwarf', $edited);
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT parent_decklist_id FROM deck WHERE id = ?', [$deckId]));
+        $this->assertSame('1', $this->db()->fetchColumn('SELECT parent_decklist_id FROM deck WHERE id = ?', [$deckId]));
 
         // 3. publish: the new decklist is derived from decklist 1
         $crawler = $client->request('GET', "/deck/publish/$deckId");
@@ -602,7 +602,7 @@ class DeckWorkflowTest extends WebTestCase
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $location = self::location($client->getResponse());
         $this->assertRegExp('#^/decklist/view/\d+/phpunitdwarvesremix-1\.0$#', $location);
-        $decklist = $this->db($client)->fetchAssoc('SELECT id, name, parent_deck_id, precedent_decklist_id FROM decklist WHERE parent_deck_id = ?', [$deckId]);
+        $decklist = $this->db()->fetchAssoc('SELECT id, name, parent_deck_id, precedent_decklist_id FROM decklist WHERE parent_deck_id = ?', [$deckId]);
         $this->assertNotFalse($decklist);
         $this->assertSame(['PHPUnit Dwarves Remix', (string) $deckId, '1'], [$decklist['name'], $decklist['parent_deck_id'], $decklist['precedent_decklist_id']]);
         $this->assertSame($edited, $this->fetchSlots($client, 'decklistslot', 'decklist_id', $decklist['id']));
@@ -619,7 +619,7 @@ class DeckWorkflowTest extends WebTestCase
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => 'admin', '_password' => 'admin']));
-        $adminId = (string) $this->db($client)->fetchColumn("SELECT id FROM user WHERE username = 'admin'");
+        $adminId = (string) $this->db()->fetchColumn("SELECT id FROM user WHERE username = 'admin'");
 
         $deckId = $this->copyDecklist($client, 2);
 
@@ -695,7 +695,7 @@ class DeckWorkflowTest extends WebTestCase
         $this->assertSame("/deck/view/$deckId", $client->getResponse()->headers->get('Location'));
         $crawler = $client->followRedirect();
         $this->assertContains('This deck cannot be published because it is invalid.', $crawler->filter('body')->text());
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM decklist WHERE parent_deck_id = ?', [$deckId]));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM decklist WHERE parent_deck_id = ?', [$deckId]));
     }
 
     /**
@@ -707,7 +707,7 @@ class DeckWorkflowTest extends WebTestCase
         $client->request('POST', '/decklist/create', $parameters + ['name' => 'PHPUnit Unknown']);
 
         $this->assertSame(400, $client->getResponse()->getStatusCode());
-        $this->assertSame('0', $this->db($client)->fetchColumn("SELECT COUNT(*) FROM decklist WHERE name = 'PHPUnit Unknown'"));
+        $this->assertSame('0', $this->db()->fetchColumn("SELECT COUNT(*) FROM decklist WHERE name = 'PHPUnit Unknown'"));
     }
 
     public function invalidDeckIdProvider(): array
@@ -721,7 +721,7 @@ class DeckWorkflowTest extends WebTestCase
     public function testCannotEditOrPublishAnotherUsersDeck(): void
     {
         $client = $this->createAuthenticatedClient();
-        $connection = $this->db($client);
+        $connection = $this->db();
         $adminId = $connection->fetchColumn("SELECT id FROM user WHERE username = 'admin'");
         try {
             // deck 1 of the fixtures belongs to "test": give it temporarily to "admin"

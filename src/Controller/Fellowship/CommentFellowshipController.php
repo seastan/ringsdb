@@ -90,18 +90,14 @@ class CommentFellowshipController extends AbstractController
                 /* @var $comment \App\Entity\FellowshipComment */
                 $commenter = $comment->getUser();
                 if ($commenter->getIsNotifCommenter()) {
-                    if (!isset($spool[$commenter->getEmail()])) {
-                        $spool[$commenter->getEmail()] = 'Emails/newfellowshipcomment_commenter.html.twig';
-                    }
+                    $spool[$commenter->getEmail()] ??= 'Emails/newfellowshipcomment_commenter.html.twig';
                 }
             }
             foreach ($mentionned_usernames as $mentionned_username) {
                 /* @var $mentionned_user User */
                 $mentionned_user = $this->userRepository->findOneBy(['username' => $mentionned_username]);
                 if ($mentionned_user && $mentionned_user->getIsNotifMention()) {
-                    if (!isset($spool[$mentionned_user->getEmail()])) {
-                        $spool[$mentionned_user->getEmail()] = 'Emails/newfellowshipcomment_mentionned.html.twig';
-                    }
+                    $spool[$mentionned_user->getEmail()] ??= 'Emails/newfellowshipcomment_mentionned.html.twig';
                 }
             }
             unset($spool[$user->getEmail()]);

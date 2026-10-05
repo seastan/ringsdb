@@ -47,7 +47,7 @@ class DeckCompareTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $connection = $this->db($this->client);
+        $connection = $this->db();
         $this->maxDeckId = (int) $connection->fetchColumn('SELECT MAX(id) FROM deck');
         $this->deckA = $this->insertDeck(
             'PHPUnit Deck A',
@@ -63,7 +63,7 @@ class DeckCompareTest extends WebTestCase
 
     protected function tearDown(): void
     {
-        $connection = $this->db($this->client);
+        $connection = $this->db();
         foreach (['deckslot', 'decksideslot'] as $table) {
             $connection->exec("DELETE FROM $table WHERE deck_id > {$this->maxDeckId}");
         }
@@ -97,7 +97,7 @@ class DeckCompareTest extends WebTestCase
      */
     private function insertDeck($name, array $main, array $side): int
     {
-        $connection = $this->db($this->client);
+        $connection = $this->db();
         $row = $connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
         $this->assertNotFalse($row);
         unset($row['id']);
@@ -115,7 +115,7 @@ class DeckCompareTest extends WebTestCase
 
     private function slots(KernelBrowser $client, $table, $deckId)
     {
-        return $this->db($client)->fetchAll("SELECT card_id, quantity FROM $table WHERE deck_id = ? ORDER BY card_id", [$deckId]);
+        return $this->db()->fetchAll("SELECT card_id, quantity FROM $table WHERE deck_id = ? ORDER BY card_id", [$deckId]);
     }
 
     /**
@@ -178,7 +178,7 @@ class DeckCompareTest extends WebTestCase
         $client->request('GET', "/deck/compare/{$this->deckA}/{$this->deckB}");
         $this->assertSame(403, $client->getResponse()->getStatusCode());
 
-        $this->db($client)->update('user', ['is_share_decks' => 1], ['username' => 'test']);
+        $this->db()->update('user', ['is_share_decks' => 1], ['username' => 'test']);
         $client->request('GET', "/deck/compare/{$this->deckA}/{$this->deckB}");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
     }

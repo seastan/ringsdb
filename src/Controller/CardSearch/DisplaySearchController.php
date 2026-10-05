@@ -132,9 +132,7 @@ class DisplaySearchController extends AbstractController
                     if ('name' == $sort) {
                         $val = substr($val, 0, 1);
                     }
-                    if (!isset($brokenlist[$val])) {
-                        $brokenlist[$val] = [];
-                    }
+                    $brokenlist[$val] ??= [];
                     array_push($brokenlist[$val], $cards[$i]);
                 }
                 $cards = $brokenlist;
@@ -206,9 +204,15 @@ class DisplaySearchController extends AbstractController
         ]);
     }
 
-    public function paginationItem(?string $q = null, string $v, string $s, int $ps, int $pi, int $total): string
+    public function paginationItem(?string $q = null, string $v = '', string $s = '', int $ps = 0, int $pi = 0, int $total = 0): string
     {
-        return $this->renderView('Search/paginationitem.html.twig', ['href' => null == $q ? '' : $this->generateUrl('cards_find', ['q' => $q, 'view' => $v, 'sort' => $s, 'page' => $pi]), 'ps' => $ps, 'pi' => $pi, 's' => $ps * ($pi - 1) + 1, 'e' => min($ps * $pi, $total)]);
+        return $this->renderView('Search/paginationitem.html.twig', [
+            'href' => null == $q ? '' : $this->generateUrl('cards_find', ['q' => $q, 'view' => $v, 'sort' => $s, 'page' => $pi]),
+            'ps' => $ps,
+            'pi' => $pi,
+            's' => $ps * ($pi - 1) + 1,
+            'e' => min($ps * $pi, $total),
+        ]);
     }
 
     public function pagination(int $pagesize, int $total, int $current, string $q, string $view, string $sort): string

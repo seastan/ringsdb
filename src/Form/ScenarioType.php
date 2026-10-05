@@ -32,7 +32,7 @@ class ScenarioType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => 'App\Entity\Scenario',
+            'data_class' => Scenario::class,
         ]);
     }
 

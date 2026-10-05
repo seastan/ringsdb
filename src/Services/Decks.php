@@ -135,19 +135,17 @@ class Decks
         foreach ($rows as $row) {
             $deckId = $row['deck_id'];
 
-            if (!isset($decks[$deckId])) {
-                $decks[$deckId] = [
-                    'id' => (int) $deckId,
-                    'name' => $row['name'],
-                    'version' => $row['major_version'].'.'.$row['minor_version'],
-                    'problem' => $row['problem'],
-                    'tags' => $row['tags'],
-                    'date_creation' => $row['date_creation'] ? new \DateTime($row['date_creation']) : null,
-                    'last_pack' => null !== $row['last_pack_name'] ? ['name' => $row['last_pack_name']] : null,
-                    'slots' => [],
-                    'heroes' => [],
-                ];
-            }
+            $decks[$deckId] ??= [
+                'id' => (int) $deckId,
+                'name' => $row['name'],
+                'version' => $row['major_version'].'.'.$row['minor_version'],
+                'problem' => $row['problem'],
+                'tags' => $row['tags'],
+                'date_creation' => $row['date_creation'] ? new \DateTime($row['date_creation']) : null,
+                'last_pack' => null !== $row['last_pack_name'] ? ['name' => $row['last_pack_name']] : null,
+                'slots' => [],
+                'heroes' => [],
+            ];
 
             if (null !== $row['card_code']) {
                 $decks[$deckId]['slots'][$row['card_code']] = (int) $row['qty'];

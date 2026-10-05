@@ -53,10 +53,11 @@ class ApiPrivateController extends AbstractController
         }
         $decklists = array_merge($decklists, $decks);
 
-        $dateUpdates = array_map(function ($deck) {
+        $dateUpdates = array_map(
             /* @var $deck \App\Entity\Deck */
-            return $deck->getDateUpdate();
-        }, $decklists);
+            fn ($deck) => $deck->getDateUpdate(),
+            $decklists
+        );
 
         $response = new JsonResponse();
 
@@ -97,10 +98,11 @@ class ApiPrivateController extends AbstractController
             }
             $decklists = array_merge($decklists, $decks);
         }
-        $dateUpdates = array_map(function ($deck) {
+        $dateUpdates = array_map(
             /* @var $deck \App\Entity\Deck */
-            return $deck->getDateUpdate();
-        }, $decklists);
+            fn ($deck) => $deck->getDateUpdate(),
+            $decklists
+        );
 
         $response = new JsonResponse();
 

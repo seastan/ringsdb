@@ -27,7 +27,7 @@ class CollectionTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $connection = $this->db($this->client);
+        $connection = $this->db();
         $this->fixtureUsers = $connection->fetchAll('SELECT id, owned_packs, art_preferences FROM user ORDER BY id');
         $this->fixturePack = [
             $connection->fetchAssoc('SELECT * FROM user_custom_pack WHERE id = 1'),
@@ -40,7 +40,7 @@ class CollectionTest extends WebTestCase
 
     protected function tearDown(): void
     {
-        $connection = $this->db($this->client);
+        $connection = $this->db();
         $connection->exec("DELETE FROM user_custom_pack_card WHERE custom_pack_id > {$this->maxIds['user_custom_pack']} OR id > {$this->maxIds['user_custom_pack_card']}");
         $connection->exec("DELETE FROM user_custom_pack WHERE id > {$this->maxIds['user_custom_pack']}");
         [$pack, $cards] = $this->fixturePack;
@@ -84,14 +84,14 @@ class CollectionTest extends WebTestCase
      */
     private function packCards(KernelBrowser $client, $packId): array
     {
-        $rows = $this->db($client)->fetchAll('SELECT c.code, e.quantity FROM user_custom_pack_card e JOIN card c ON c.id = e.card_id WHERE e.custom_pack_id = ? ORDER BY e.id', [$packId]);
+        $rows = $this->db()->fetchAll('SELECT c.code, e.quantity FROM user_custom_pack_card e JOIN card c ON c.id = e.card_id WHERE e.custom_pack_id = ? ORDER BY e.id', [$packId]);
 
         return array_map('intval', array_column($rows, 'quantity', 'code'));
     }
 
     private function fetchPack(KernelBrowser $client, $id)
     {
-        return $this->db($client)->fetchAssoc('SELECT p.name, p.code, p.is_enabled, p.is_published, u.username FROM user_custom_pack p JOIN user u ON u.id = p.user_id WHERE p.id = ?', [$id]);
+        return $this->db()->fetchAssoc('SELECT p.name, p.code, p.is_enabled, p.is_published, u.username FROM user_custom_pack p JOIN user u ON u.id = p.user_id WHERE p.id = ?', [$id]);
     }
 
     /**
@@ -120,7 +120,7 @@ class CollectionTest extends WebTestCase
         // the collection page is rendered directly (forward), with a flash message
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertContains('Collection saved.', $crawler->filter('body')->text());
-        $this->assertSame('1:2,2,3', $this->db($client)->fetchColumn('SELECT owned_packs FROM user WHERE id = 1'));
+        $this->assertSame('1:2,2,3', $this->db()->fetchColumn('SELECT owned_packs FROM user WHERE id = 1'));
 
         $client->request('GET', '/api/private/user/info');
         $this->assertSame('1:2,2,3', json_decode($client->getResponse()->getContent(), true)['owned_packs']);
@@ -133,7 +133,7 @@ class CollectionTest extends WebTestCase
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertSame('Invalid pack selection.', $client->getResponse()->getContent());
-        $this->assertNull($this->db($client)->fetchColumn('SELECT owned_packs FROM user WHERE id = 1'));
+        $this->assertNull($this->db()->fetchColumn('SELECT owned_packs FROM user WHERE id = 1'));
     }
 
     /* ---------------------------------------------------- art preferences */
@@ -146,7 +146,7 @@ class CollectionTest extends WebTestCase
             $this->assertSame(200, $client->getResponse()->getStatusCode());
             $this->assertSame('{"success":true}', $client->getResponse()->getContent());
 
-            return $this->db($client)->fetchColumn('SELECT art_preferences FROM user WHERE id = 1');
+            return $this->db()->fetchColumn('SELECT art_preferences FROM user WHERE id = 1');
         };
 
         $this->assertSame('{"01001":"RevCore"}', $save('01001', 'RevCore'));
@@ -183,7 +183,7 @@ class CollectionTest extends WebTestCase
         ]);
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame('/collection/packs', $response->headers->get('Location'));
-        $id = (int) $this->db($client)->fetchColumn('SELECT MAX(id) FROM user_custom_pack');
+        $id = (int) $this->db()->fetchColumn('SELECT MAX(id) FROM user_custom_pack');
         $this->assertGreaterThan($this->maxIds['user_custom_pack'], $id);
         $pack = $this->fetchPack($client, $id);
         $this->assertRegExp("/^custom_{$id}_[0-9a-f]{6}$/", $pack['code']);
@@ -223,7 +223,7 @@ class CollectionTest extends WebTestCase
 
         $response = $this->submitPackForm($client, '/collection/custom-pack/new', '  ', [['card_code' => '01001', 'quantity' => 1]]);
         $this->assertSame('/collection/custom-pack/new', $response->headers->get('Location'));
-        $this->assertSame((string) $this->maxIds['user_custom_pack'], $this->db($client)->fetchColumn('SELECT MAX(id) FROM user_custom_pack'));
+        $this->assertSame((string) $this->maxIds['user_custom_pack'], $this->db()->fetchColumn('SELECT MAX(id) FROM user_custom_pack'));
 
         $response = $this->submitPackForm($client, '/collection/custom-pack/1/edit', '', []);
         $this->assertSame('/collection/custom-pack/1/edit', $response->headers->get('Location'));
@@ -263,7 +263,7 @@ class CollectionTest extends WebTestCase
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertSame(['success' => true, 'name' => 'Test Custom Pack'], json_decode($client->getResponse()->getContent(), true));
-        $id = (int) $this->db($client)->fetchColumn('SELECT MAX(id) FROM user_custom_pack');
+        $id = (int) $this->db()->fetchColumn('SELECT MAX(id) FROM user_custom_pack');
         $copy = $this->fetchPack($client, $id);
         $this->assertSame(['Test Custom Pack', '1', '0', 'admin'], [$copy['name'], $copy['is_enabled'], $copy['is_published'], $copy['username']]);
         $this->assertNotSame($this->fixturePack[0]['code'], $copy['code']);
@@ -273,12 +273,12 @@ class CollectionTest extends WebTestCase
     public function testCopyAnUnpublishedPack(): void
     {
         $client = $this->createAuthenticatedClient('admin');
-        $this->db($client)->update('user_custom_pack', ['is_published' => 0], ['id' => 1]);
+        $this->db()->update('user_custom_pack', ['is_published' => 0], ['id' => 1]);
         $client->request('POST', '/collection/custom-pack/1/copy');
 
         $this->assertSame(404, $client->getResponse()->getStatusCode());
         $this->assertSame('{"error":"Pack not found"}', $client->getResponse()->getContent());
-        $this->assertSame((string) $this->maxIds['user_custom_pack'], $this->db($client)->fetchColumn('SELECT MAX(id) FROM user_custom_pack'));
+        $this->assertSame((string) $this->maxIds['user_custom_pack'], $this->db()->fetchColumn('SELECT MAX(id) FROM user_custom_pack'));
     }
 
     /**

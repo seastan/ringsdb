@@ -75,7 +75,7 @@ class DefaultController extends AbstractController
         // Curent time in seconds
         $timebiday = intdiv($timesec, 24 * 60 * 60);
         // This value will increase by 1 every day
-        srand($timebiday);
+        mt_srand($timebiday);
         $quests = $scenarioRepository->findBy([], ['position' => 'ASC']);
         $numquests = count($quests);
         $randquest = $quests[array_rand($quests)];

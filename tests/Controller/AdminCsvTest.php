@@ -50,7 +50,7 @@ class AdminCsvTest extends WebTestCase
 
     protected function tearDown(): void
     {
-        $connection = $this->db($this->client);
+        $connection = $this->db();
         foreach (['card_printing', 'card', 'pack'] as $table) {
             $connection->exec("DELETE FROM $table WHERE id > {$this->maxIds[$table]}");
         }
@@ -142,7 +142,7 @@ class AdminCsvTest extends WebTestCase
      */
     private function fetchPrinting(KernelBrowser $client, string $packCode, string $name): array
     {
-        $row = $this->db($client)->fetchAssoc('SELECT c.id, c.code, c.name, c.position, c.health, c.text, t.name AS type, s.name AS sphere,
+        $row = $this->db()->fetchAssoc('SELECT c.id, c.code, c.name, c.position, c.health, c.text, t.name AS type, s.name AS sphere,
                 cp.quantity, cp.illustrator, cp.octgnid
             FROM card_printing cp JOIN pack p ON p.id = cp.pack_id JOIN card c ON c.id = cp.card_id
             JOIN type t ON t.id = c.type_id JOIN sphere s ON s.id = c.sphere_id
@@ -159,7 +159,7 @@ class AdminCsvTest extends WebTestCase
 
     private function rowCount(KernelBrowser $client, string $table): int
     {
-        return (int) $this->db($client)->fetchColumn("SELECT COUNT(*) FROM $table");
+        return (int) $this->db()->fetchColumn("SELECT COUNT(*) FROM $table");
     }
 
     /* -------------------------------------------------------------- tests */
@@ -239,8 +239,8 @@ class AdminCsvTest extends WebTestCase
             [$counts[0] + 21, $counts[1] + 21, $counts[2] + 1],
             [$this->rowCount($client, 'card'), $this->rowCount($client, 'card_printing'), $this->rowCount($client, 'pack')]
         );
-        $pack = $this->db($client)->fetchAssoc('SELECT p.name, p.position, p.size, p.date_release, y.code AS cycle FROM pack p JOIN cycle y ON y.id = p.cycle_id WHERE p.code = ?', ['PHPU']);
-        $lastCycle = $this->db($client)->fetchColumn('SELECT code FROM cycle ORDER BY id DESC LIMIT 1');
+        $pack = $this->db()->fetchAssoc('SELECT p.name, p.position, p.size, p.date_release, y.code AS cycle FROM pack p JOIN cycle y ON y.id = p.cycle_id WHERE p.code = ?', ['PHPU']);
+        $lastCycle = $this->db()->fetchColumn('SELECT code FROM cycle ORDER BY id DESC LIMIT 1');
         $this->assertSame(['name' => 'PHPUnit Pack', 'position' => '1', 'size' => '1', 'date_release' => '2030-02-01', 'cycle' => $lastCycle], $pack);
 
         $beorn = $this->fetchPrinting($client, 'PHPU', 'Beorn');
@@ -280,7 +280,7 @@ class AdminCsvTest extends WebTestCase
         $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, self::SAMPLE, 'THo2', 'ALeP - The Hobbit (renamed)', 'THo'));
 
         $this->assertSame($packs, $this->rowCount($client, 'pack'));
-        $this->assertSame('ALeP - The Hobbit (renamed)', $this->db($client)->fetchColumn("SELECT name FROM pack WHERE code = 'THo2'"));
+        $this->assertSame('ALeP - The Hobbit (renamed)', $this->db()->fetchColumn("SELECT name FROM pack WHERE code = 'THo2'"));
         $this->assertSame('Bilbo Baggins', $this->fetchPrinting($client, 'THo2', 'Bilbo Baggins')['name']);
     }
 
