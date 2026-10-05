@@ -29,13 +29,12 @@ class FellowshipFixtures extends Fixture implements DependentFixtureInterface
         /** @var User $user */
         $user = $this->getReference('test-user');
 
-        $fellowship = new Fellowship();
+        $fellowship = new Fellowship($user);
         $fellowship->setIsPublic(true);
         $fellowship->setNbVotes(0);
         $fellowship->setNbComments(0);
         $fellowship->setNbFavorites(0);
         $fellowship->setNbDecks(4);
-        $fellowship->setUser($user);
         $fellowship->setName('Heirs to Numeror Cycle');
         $fellowship->setNameCanonical('heirs-to-numeror-cycle');
         $fellowship->setDateCreation(new \DateTime('2015-08-16'));

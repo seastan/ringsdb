@@ -76,12 +76,7 @@ class SaveFellowshipController extends AbstractController
                 throw new AccessDeniedHttpException('Access denied to this object.');
             }
         } else {
-            $fellowship = new Fellowship();
-            $fellowship->setIsPublic(false);
-            $fellowship->setNbVotes(0);
-            $fellowship->setNbComments(0);
-            $fellowship->setNbFavorites(0);
-            $fellowship->setNbDecks(0);
+            $fellowship = new Fellowship($user);
         }
 
         $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
@@ -93,7 +88,6 @@ class SaveFellowshipController extends AbstractController
         $auto_publish = boolval(filter_var($request->request->get('auto_publish'), FILTER_SANITIZE_NUMBER_INT));
         $descriptionMd = trim((string) $request->request->get('descriptionMd'));
         $descriptionHtml = $this->texts->markdown($descriptionMd);
-        $fellowship->setUser($user);
         $fellowship->setName($name);
         $fellowship->setNameCanonical($this->texts->slugify($name));
         $fellowship->setDescriptionMd($descriptionMd);

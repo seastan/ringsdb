@@ -40,32 +40,31 @@ class Fellowship
     /**
      * @var bool
      */
-    private $isPublic;
+    private $isPublic = false;
 
     /**
      * @var int
      */
-    private $nbVotes;
+    private $nbVotes = 0;
 
     /**
      * @var int
      */
-    private $nbFavorites;
+    private $nbFavorites = 0;
 
     /**
      * @var int
      */
-    private $nbComments;
+    private $nbComments = 0;
 
     /**
-     * @var \DateTime
+     * @var int
      */
-    private $dateCreation;
+    private $nbDecks = 0;
 
-    /**
-     * @var \DateTime
-     */
-    private $dateUpdate;
+    private \DateTime $dateCreation;
+
+    private \DateTime $dateUpdate;
 
     /**
      * @var \DateTime|null
@@ -87,10 +86,7 @@ class Fellowship
      */
     private $comments;
 
-    /**
-     * @var User
-     */
-    private $user;
+    private \App\Entity\User $user;
 
     /**
      * @var Collection<int, User>
@@ -105,13 +101,16 @@ class Fellowship
     /**
      * Constructor.
      */
-    public function __construct()
+    public function __construct(User $user)
     {
+        $this->user = $user;
         $this->decks = new ArrayCollection();
         $this->decklists = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->favorites = new ArrayCollection();
         $this->votes = new ArrayCollection();
+        $this->dateCreation = new \DateTime();
+        $this->dateUpdate = new \DateTime();
     }
 
     /**
@@ -499,11 +498,6 @@ class Fellowship
     {
         return $this->votes;
     }
-
-    /**
-     * @var int
-     */
-    private $nbDecks;
 
     /**
      * Set nbDecks.
