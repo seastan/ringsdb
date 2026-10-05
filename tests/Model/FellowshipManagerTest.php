@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class FellowshipManagerTest extends KernelTestCase
 {
-    private \Doctrine\DBAL\Connection $connection;
+    private Connection $connection;
 
     /** @var int[] */
     private array $maxIds = [];
@@ -192,7 +192,7 @@ class FellowshipManagerTest extends KernelTestCase
     /**
      * @dataProvider searchProvider
      */
-    public function testComplexSearch(array $query, array $expected, string $username = null): void
+    public function testComplexSearch(array $query, array $expected, ?string $username = null): void
     {
         $this->assertSame($expected, $this->names($this->manager($query, $username)->findFellowshipsWithComplexSearch()));
     }

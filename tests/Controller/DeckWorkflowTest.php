@@ -442,7 +442,7 @@ class DeckWorkflowTest extends WebTestCase
      *
      * @dataProvider fileImportProvider
      */
-    public function testFileImport(string $filename, string $fileContent, array $expectedSlots, string $expectedProblem = null): void
+    public function testFileImport(string $filename, string $fileContent, array $expectedSlots, ?string $expectedProblem = null): void
     {
         $client = $this->createAuthenticatedClient();
         $maxId = $this->maxDeckId();

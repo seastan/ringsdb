@@ -34,7 +34,7 @@ class DeckFixtures extends Fixture implements ContainerAwareInterface, Dependent
 
     public function load(ObjectManager $manager): void
     {
-        if (!$this->container instanceof \Symfony\Component\DependencyInjection\ContainerInterface) {
+        if (!$this->container instanceof ContainerInterface) {
             throw new \LogicException('The container is not set.');
         }
 

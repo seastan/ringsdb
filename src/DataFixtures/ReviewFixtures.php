@@ -37,7 +37,7 @@ class ReviewFixtures extends Fixture implements ContainerAwareInterface, Depende
         /** @var User $user */
         $user = $this->getReference('test-user');
         $card = $manager->getRepository(Card::class)->findOneBy(['code' => '01001']);
-        if (!$card instanceof Card || !$this->container instanceof \Symfony\Component\DependencyInjection\ContainerInterface) {
+        if (!$card instanceof Card || !$this->container instanceof ContainerInterface) {
             throw new \LogicException('Card 01001 or the container is missing.');
         }
 

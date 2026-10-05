@@ -18,7 +18,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class PatronCommandTest extends KernelTestCase
 {
-    private \Doctrine\DBAL\Connection $connection;
+    private Connection $connection;
 
     private array $fixtureUsers;
 

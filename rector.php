@@ -18,6 +18,8 @@ return RectorConfig::configure()
         SetList::CODE_QUALITY,
         SetList::CODING_STYLE,
         SetList::TYPE_DECLARATION,
+        SetList::PRIVATIZATION,
+        SetList::TYPE_DECLARATION_DOCBLOCKS,
     ])
     ->withSkip([
         Rector\CodeQuality\Rector\For_\ForRepeatedCountToOwnVariableRector::class,

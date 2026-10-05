@@ -27,7 +27,7 @@ class SuggestionsCommandTest extends KernelTestCase
 
     public const GIMLI = 4;
 
-    private \Doctrine\DBAL\Connection $connection;
+    private Connection $connection;
 
     private string $file;
 

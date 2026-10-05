@@ -30,9 +30,9 @@ class CardStatsCalculatorTest extends KernelTestCase
 
     public const WAR_OF_DALE = 68;
 
-    private \Doctrine\DBAL\Connection $connection;
+    private Connection $connection;
 
-    private \App\Stats\CardStatsCalculator $calculator;
+    private CardStatsCalculator $calculator;
 
     /** @var int[] */
     private array $maxIds = [];
