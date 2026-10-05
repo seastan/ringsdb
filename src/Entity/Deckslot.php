@@ -19,7 +19,7 @@ class Deckslot implements SlotInterface
 
     private Card $card;
 
-    public function __construct(Card $card, Deck $deck, int $quantity)
+    public function __construct(Deck $deck, Card $card, int $quantity)
     {
         $this->card = $card;
         $this->deck = $deck;

@@ -77,11 +77,11 @@ class SaveQuestlogController extends AbstractController
                 throw new NotFoundHttpException('This questlog does not exist.');
             }
 
-            if ($questlog->getUser() && !$questlog->getUser()->isEqualTo($user)) {
+            if (!$questlog->getUser()->isEqualTo($user)) {
                 throw new AccessDeniedHttpException('Access denied to this object.');
             }
         } else {
-            $questlog = new Questlog();
+            $questlog = new Questlog($user);
             $questlog->setNbVotes(0);
             $questlog->setNbComments(0);
             $questlog->setNbFavorites(0);
@@ -111,7 +111,6 @@ class SaveQuestlogController extends AbstractController
         }
 
         $date = new \DateTime($date);
-        $questlog->setUser($user);
         $questlog->setName($name);
         $questlog->setNameCanonical($this->texts->slugify($name));
         $questlog->setDescriptionMd($descriptionMd);

@@ -28,14 +28,12 @@ class NewDeckController extends AbstractController
      */
     public function __invoke(): RedirectResponse
     {
-        /* @var $deck \App\Entity\Deck */
-        $deck = new Deck();
+        $deck = new Deck($this->currentUser());
         $deck->setName('New Deck');
         $deck->setDescriptionMd('');
         $deck->setLastPack();
         $deck->setProblem('too_few_heroes');
         $deck->setTags('');
-        $deck->setUser($this->currentUser());
 
         $this->entityManager->persist($deck);
         $this->entityManager->flush();

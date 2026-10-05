@@ -50,7 +50,7 @@ class EditQuestlogController extends AbstractController
             throw new NotFoundHttpException('This questlog does not exists.');
         }
 
-        if ($questlog->getUser() && !$questlog->getUser()->isEqualTo($user)) {
+        if (!$questlog->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException('Access denied to this object.');
         }
 

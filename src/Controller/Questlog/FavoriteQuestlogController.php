@@ -54,14 +54,14 @@ class FavoriteQuestlogController extends AbstractController
             $questlog->setNbfavorites($questlog->getNbFavorites() - 1);
             $questlog->removeFavorite($user);
             $questlog->setDateUpdate(new \DateTime());
-            if ($author && !$author->isEqualTo($user)) {
+            if (!$author->isEqualTo($user)) {
                 $author->setReputation($author->getReputation() - 5);
             }
         } else {
             $questlog->setNbfavorites($questlog->getNbFavorites() + 1);
             $questlog->addFavorite($user);
             $questlog->setDateUpdate(new \DateTime());
-            if ($author && !$author->isEqualTo($user)) {
+            if (!$author->isEqualTo($user)) {
                 $author->setReputation($author->getReputation() + 5);
             }
         }

@@ -15,9 +15,9 @@ class Decksideslot implements SlotInterface
 
     private int $quantity;
 
-    private \App\Entity\Deck $deck;
+    private Deck $deck;
 
-    private \App\Entity\Card $card;
+    private Card $card;
 
     public function __construct(Deck $deck, Card $card, int $quantity)
     {

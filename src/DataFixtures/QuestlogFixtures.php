@@ -31,7 +31,7 @@ class QuestlogFixtures extends Fixture implements DependentFixtureInterface
         /** @var User $user */
         $user = $this->getReference('test-user');
 
-        $questlog = new Questlog();
+        $questlog = new Questlog($user);
         $questlog->setSuccess(true);
         $questlog->setNbVotes(0);
         $questlog->setNbComments(0);
@@ -45,7 +45,6 @@ class QuestlogFixtures extends Fixture implements DependentFixtureInterface
             throw new \LogicException('Scenario 1 is missing.');
         }
 
-        $questlog->setUser($user);
         $questlog->setName('Untitled Questlog');
         $questlog->setNameCanonical('untitled-questlog');
         $questlog->setDescriptionMd('Hello world');

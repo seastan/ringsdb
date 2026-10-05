@@ -180,7 +180,7 @@ class DeckFixtures extends Fixture implements ContainerAwareInterface, Dependent
         ];
 
         foreach ($deckData as $i => $data) {
-            $deck = new Deck();
+            $deck = new Deck($user);
             $deckService->saveDeck(
                 $user,
                 $deck,

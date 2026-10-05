@@ -59,7 +59,7 @@ class AjaxSaveController extends AbstractController
 
             $source_deck = $deck;
         } else {
-            $deck = new Deck();
+            $deck = new Deck($user);
         }
 
         $content = json_decode($request->get('content'), true);

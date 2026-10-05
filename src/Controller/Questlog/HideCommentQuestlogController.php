@@ -49,7 +49,7 @@ class HideCommentQuestlogController extends AbstractController
             throw new BadRequestHttpException('Unable to find comment');
         }
 
-        if ($comment->getQuestlog()->getUser() && !$comment->getQuestlog()->getUser()->isEqualTo($user)) {
+        if (!$comment->getQuestlog()->getUser()->isEqualTo($user)) {
             return new JsonResponse("You don't have permission to edit this comment.");
         }
 

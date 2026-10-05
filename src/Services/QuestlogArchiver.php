@@ -46,8 +46,7 @@ class QuestlogArchiver
 
         $questlog_user = $questlog->getUser();
         $is_public = $questlog->getIsPublic();
-        if ($questlog_user instanceof User
-            && !$questlog_user->isEqualTo($user)
+        if (!$questlog_user->isEqualTo($user)
             && !$questlog_user->getIsShareDecks()
             && !$is_public) {
             throw new AccessDeniedHttpException("You don't have access to this questlog.");

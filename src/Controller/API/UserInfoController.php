@@ -80,7 +80,7 @@ class UserInfoController extends AbstractController
                     $questlog_id = $questlog->getId();
                     $content['is_liked'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM questlog d\n        \t\t\t\tJOIN questlog_vote v ON v.questlog_id = d.id\n        \t\t\t\tWHERE v.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $questlog_id])->fetch(\PDO::FETCH_NUM)[0];
                     $content['is_favorite'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM questlog d\n        \t\t\t\tJOIN questlog_favorite f ON f.questlog_id = d.id\n        \t\t\t\tWHERE f.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $questlog_id])->fetch(\PDO::FETCH_NUM)[0];
-                    $content['is_author'] = $questlog->getUser() && $questlog->getUser()->isEqualTo($user);
+                    $content['is_author'] = $questlog->getUser()->isEqualTo($user);
                     $content['can_delete'] = 0 == $questlog->getNbcomments() && 0 == $questlog->getNbfavorites() && 0 == $questlog->getNbVotes();
                 }
             }

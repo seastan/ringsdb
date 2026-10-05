@@ -23,7 +23,7 @@ class SnapshotManager
         foreach ($questlog_decks as $questlog_deck) {
             $deck = $questlog_deck->getDeck();
             if (!$deck) {
-                $deck = new Deck();
+                $deck = new Deck($questlog->getUser());
                 $deck->setName('[deleted]');
                 $questlog_deck->setDeck($deck);
             }

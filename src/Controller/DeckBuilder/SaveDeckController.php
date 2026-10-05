@@ -6,7 +6,6 @@ namespace App\Controller\DeckBuilder;
 
 use App\Controller\CurrentUserTrait;
 use App\Entity\Deck;
-use App\Entity\User;
 use App\Repository\DeckRepository;
 use App\Services\Decks;
 use Doctrine\ORM\EntityManagerInterface;
@@ -43,8 +42,8 @@ class SaveDeckController extends AbstractController
      */
     public function __invoke(Request $request): Response
     {
-        /* @var $user User */
         $user = $this->currentUser();
+
         if (count($user->getDecks()) > $user->getMaxNbDecks()) {
             throw new UnprocessableEntityHttpException('You have reached the maximum number of decks allowed. Delete some decks or increase your reputation.');
         }
@@ -74,7 +73,7 @@ class SaveDeckController extends AbstractController
         $is_copy = (bool) filter_var($request->get('copy'), FILTER_SANITIZE_NUMBER_INT);
         if ($is_copy || !$id) {
             /* @var $deck \App\Entity\Deck */
-            $deck = new Deck();
+            $deck = new Deck($user);
         }
 
         $content = json_decode($request->get('content'), true);

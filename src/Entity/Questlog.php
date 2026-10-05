@@ -96,7 +96,7 @@ class Questlog
      */
     private $comments;
 
-    private ?User $user = null;
+    private User $user;
 
     private ?Scenario $scenario = null;
 
@@ -113,8 +113,9 @@ class Questlog
     /**
      * Constructor.
      */
-    public function __construct()
+    public function __construct(User $user)
     {
+        $this->user = $user;
         $this->decks = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->favorites = new ArrayCollection();
@@ -500,7 +501,7 @@ class Questlog
     /**
      * Get user.
      */
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }

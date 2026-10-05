@@ -38,9 +38,9 @@ class ViewQuestlogController extends AbstractController
             throw new NotFoundHttpException('This questlog does not exists.');
         }
 
-        $is_owner = $this->getUser() && $questlog->getUser() && $this->getUser()->getId() == $questlog->getUser()->getId();
+        $is_owner = $this->getUser() && $this->getUser()->getId() == $questlog->getUser()->getId();
         $is_public = $questlog->getIsPublic();
-        if ($questlog->getUser() && !$questlog->getUser()->getIsShareDecks() && !$is_owner && !$is_public) {
+        if (!$questlog->getUser()->getIsShareDecks() && !$is_owner && !$is_public) {
             throw new AccessDeniedHttpException('You are not allowed to view this questlog. To get access, you can ask it\'s owner to enable "Share my decks" on their account.');
         }
 
@@ -50,9 +50,7 @@ class ViewQuestlogController extends AbstractController
                 fn ($comment) => $comment->getUser()->getUsername(),
                 $questlog->getComments()->getValues()
             );
-            if ($questlog->getUser()) {
-                $commenters[] = $questlog->getUser()->getUsername();
-            }
+            $commenters[] = $questlog->getUser()->getUsername();
         } else {
             $commenters = [];
         }

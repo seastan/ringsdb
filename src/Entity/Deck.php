@@ -219,15 +219,9 @@ class Deck extends ExportableDeck implements \JsonSerializable
      */
     private $tags;
 
-    /**
-     * @var int
-     */
-    private $majorVersion;
+    private int $majorVersion;
 
-    /**
-     * @var int
-     */
-    private $minorVersion;
+    private int $minorVersion;
 
     /**
      * @var Collection<int, Deckslot>
@@ -249,31 +243,34 @@ class Deck extends ExportableDeck implements \JsonSerializable
      */
     private $changes;
 
-    /**
-     * @var User
-     */
-    private $user;
+    private User $user;
+
+    private ?Pack $lastPack = null;
+
+    private ?Decklist $parent = null;
 
     /**
-     * @var Pack|null
+     * @var Collection<int, QuestlogDeck>
      */
-    private $lastPack;
+    private $questlogs;
 
     /**
-     * @var Decklist|null
+     * @var Collection<int, FellowshipDeck>
      */
-    private $parent;
+    private $fellowships;
 
     /**
      * Constructor.
      */
-    public function __construct()
+    public function __construct(User $user)
     {
+        $this->user = $user;
         $this->slots = new ArrayCollection();
         $this->sideslots = new ArrayCollection();
         $this->children = new ArrayCollection();
         $this->changes = new ArrayCollection();
         $this->fellowships = new ArrayCollection();
+        $this->questlogs = new ArrayCollection();
         $this->minorVersion = 0;
         $this->majorVersion = 0;
     }
@@ -618,11 +615,6 @@ class Deck extends ExportableDeck implements \JsonSerializable
     }
 
     /**
-     * @var Collection<int, FellowshipDeck>
-     */
-    private $fellowships;
-
-    /**
      * Add fellowship.
      */
     public function addFellowship(FellowshipDeck $fellowship): Deck
@@ -665,11 +657,6 @@ class Deck extends ExportableDeck implements \JsonSerializable
 
         return $childrenFellowships;
     }
-
-    /**
-     * @var Collection<int, QuestlogDeck>
-     */
-    private $questlogs;
 
     /**
      * Add questlog.

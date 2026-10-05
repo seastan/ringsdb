@@ -45,7 +45,7 @@ class DeleteQuestlogController extends AbstractController
             return $this->redirect($this->generateUrl('myquestlogs_list'));
         }
 
-        if ($questlog->getUser() && !$questlog->getUser()->isEqualTo($user)) {
+        if (!$questlog->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException("You don't have access to this quest log.");
         }
 

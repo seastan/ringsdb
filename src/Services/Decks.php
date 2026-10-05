@@ -227,8 +227,7 @@ class Decks
             $name = 'Untitled Deck';
         }
 
-        /* @var $deck \App\Entity\Deck */
-        $deck = new Deck();
+        $deck = new Deck($user);
         $this->saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, null);
         $this->doctrine->flush();
 
@@ -378,7 +377,7 @@ class Decks
                 continue;
             }
             $card = $cards[$card_code];
-            $slot = new Deckslot($card, $deck, $qty);
+            $slot = new Deckslot($deck, $card, $qty);
             $deck->addSlot($slot);
         }
 
@@ -387,7 +386,7 @@ class Decks
                 continue;
             }
             $card = $cards[$card_code];
-            $slot = new Decksideslot($card, $deck, $qty);
+            $slot = new Decksideslot($deck, $card, $qty);
             $deck->addSideslot($slot);
         }
 
@@ -466,7 +465,7 @@ class Decks
             }
 
             $card = $cards[$card_code];
-            $slot = new Deckslot($card, $deck, $qty);
+            $slot = new Deckslot($deck, $card, $qty);
             $deck->addSlot($slot);
         }
 

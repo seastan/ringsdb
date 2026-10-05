@@ -40,6 +40,8 @@ class ImportAllController extends AbstractController
      */
     public function __invoke(Request $request): RedirectResponse
     {
+        $user = $this->currentUser();
+
         // time-consuming task
         ini_set('max_execution_time', '300');
         $uploadedFile = $request->files->get('uparchive');
@@ -76,10 +78,9 @@ class ImportAllController extends AbstractController
 
                 $deckname = pathinfo($name, PATHINFO_FILENAME);
                 // one deck per file, even without any card (an empty deck)
-                /* @var $deck \App\Entity\Deck */
-                $deck = new Deck();
+                $deck = new Deck($user);
                 $this->entityManager->persist($deck);
-                $this->decks->saveDeck($this->currentUser(), $deck, null, $deckname, '', '', $parse['content'], null);
+                $this->decks->saveDeck($user, $deck, null, $deckname, '', '', $parse['content'], null);
             }
         }
 

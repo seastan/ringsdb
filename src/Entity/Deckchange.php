@@ -31,7 +31,7 @@ class Deckchange
      */
     private $version;
 
-    private \App\Entity\Deck $deck;
+    private Deck $deck;
 
     public function __construct(Deck $deck)
     {

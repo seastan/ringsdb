@@ -73,7 +73,7 @@ class NewQuestlogController extends AbstractController
             }
         }
 
-        $questlog = new Questlog();
+        $questlog = new Questlog($this->currentUser());
         $questlog->setSuccess(true);
 
         return $this->render('QuestLog/edit.html.twig', ['quests' => $quests, 'pagetitle' => 'Log a Quest', 'deck1' => $decks[0], 'deck2' => $decks[1], 'deck3' => $decks[2], 'deck4' => $decks[3], 'questlogdeck1_content' => null, 'questlogdeck2_content' => null, 'questlogdeck3_content' => null, 'questlogdeck4_content' => null, 'questlogdeck1_player_name' => $author_names[0], 'questlogdeck2_player_name' => $author_names[1], 'questlogdeck3_player_name' => $author_names[2], 'questlogdeck4_player_name' => $author_names[3], 'questlog' => $questlog, 'is_locked_as_public' => false, 'nbDecks' => 0], $response);

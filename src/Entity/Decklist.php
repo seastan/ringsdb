@@ -101,13 +101,13 @@ class Decklist extends ExportableDeck implements \JsonSerializable
      */
     private $children;
 
-    private \App\Entity\User $user;
+    private User $user;
 
-    private ?\App\Entity\Pack $lastPack = null;
+    private ?Pack $lastPack = null;
 
-    private ?\App\Entity\Deck $parent = null;
+    private ?Deck $parent = null;
 
-    private ?\App\Entity\Decklist $precedent = null;
+    private ?Decklist $precedent = null;
 
     /**
      * @var Collection<int, User>
@@ -134,7 +134,7 @@ class Decklist extends ExportableDeck implements \JsonSerializable
      */
     private $fellowships;
 
-    private ?\App\Entity\Sphere $predominantSphere = null;
+    private ?Sphere $predominantSphere = null;
 
     /**
      * @var Collection<int, Sphere>
@@ -782,7 +782,7 @@ class Decklist extends ExportableDeck implements \JsonSerializable
     {
         $allFellowships = $this->getFellowships()->toArray();
 
-        return array_filter($allFellowships, fn (\App\Entity\FellowshipDecklist $k): bool => $k->getFellowship()->getIsPublic());
+        return array_filter($allFellowships, fn (FellowshipDecklist $k): bool => $k->getFellowship()->getIsPublic());
     }
 
     /**
@@ -848,7 +848,7 @@ class Decklist extends ExportableDeck implements \JsonSerializable
 
         $allQuestlogs = array_unique(array_merge($theseLogs, $parentLogs), SORT_REGULAR);
 
-        return array_filter($allQuestlogs, fn (\App\Entity\QuestlogDeck $k): bool => $k->getQuestlog()->getIsPublic());
+        return array_filter($allQuestlogs, fn (QuestlogDeck $k): bool => $k->getQuestlog()->getIsPublic());
     }
 
     public function jsonSerialize()
