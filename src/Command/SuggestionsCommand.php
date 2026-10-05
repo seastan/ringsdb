@@ -11,15 +11,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SuggestionsCommand extends Command
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
-    /**
-     * @var string
-     */
-    private $publicDir;
+    private string $publicDir;
 
     public function __construct(Connection $connection, string $publicDir)
     {

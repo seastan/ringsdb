@@ -18,20 +18,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DefaultController extends AbstractController
 {
-    /**
-     * @var int
-     */
-    private $cacheExpiration;
+    private int $cacheExpiration;
 
-    /**
-     * @var string|null
-     */
-    private $gameName;
+    private ?string $gameName;
 
-    /**
-     * @var string|null
-     */
-    private $publisherName;
+    private ?string $publisherName;
 
     private EntityManagerInterface $entityManager;
 

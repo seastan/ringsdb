@@ -20,15 +20,9 @@ class TagController extends AbstractController
 {
     use CurrentUserTrait;
 
-    /**
-     * @var Decks
-     */
-    private $decks;
+    private Decks $decks;
 
-    /**
-     * @var DeckRepository
-     */
-    private $deckRepository;
+    private DeckRepository $deckRepository;
 
     private EntityManagerInterface $entityManager;
 

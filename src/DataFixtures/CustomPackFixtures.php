@@ -41,6 +41,7 @@ class CustomPackFixtures extends Fixture implements DependentFixtureInterface
             if (!$card instanceof Card) {
                 throw new \LogicException("Card $code is missing.");
             }
+
             $entry = new UserCustomPackCard($pack, $card, $quantity);
             $pack->addCard($entry);
         }

@@ -20,15 +20,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class CardPrintingController extends AbstractController
 {
-    /**
-     * @var CardPrintingRepository
-     */
-    private $cardPrintingRepository;
+    private CardPrintingRepository $cardPrintingRepository;
 
-    /**
-     * @var PackRepository
-     */
-    private $packRepository;
+    private PackRepository $packRepository;
 
     private EntityManagerInterface $entityManager;
 

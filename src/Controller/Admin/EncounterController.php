@@ -21,10 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class EncounterController extends AbstractController
 {
-    /**
-     * @var EncounterRepository
-     */
-    private $encounterRepository;
+    private EncounterRepository $encounterRepository;
 
     private EntityManagerInterface $entityManager;
 

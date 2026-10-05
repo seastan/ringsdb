@@ -13,10 +13,7 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
  */
 class ContentHashVersionStrategy implements VersionStrategyInterface
 {
-    /**
-     * @var string
-     */
-    private $webDir;
+    private string $webDir;
 
     /**
      * @var array<string, string>

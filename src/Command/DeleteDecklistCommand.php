@@ -16,20 +16,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DeleteDecklistCommand extends Command
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
-    /**
-     * @var DeckRepository
-     */
-    private $deckRepository;
+    private DeckRepository $deckRepository;
 
-    /**
-     * @var DecklistRepository
-     */
-    private $decklistRepository;
+    private DecklistRepository $decklistRepository;
 
     public function __construct(EntityManagerInterface $entityManager, DeckRepository $deckRepository, DecklistRepository $decklistRepository)
     {

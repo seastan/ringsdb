@@ -13,15 +13,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PublicProfileController extends AbstractController
 {
-    /**
-     * @var int
-     */
-    private $cacheExpiration;
+    private int $cacheExpiration;
 
-    /**
-     * @var UserRepository
-     */
-    private $userRepository;
+    private UserRepository $userRepository;
 
     public function __construct(int $cacheExpiration, UserRepository $userRepository)
     {

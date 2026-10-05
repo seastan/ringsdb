@@ -16,20 +16,11 @@ use App\Services\Texts;
 
 class DecklistFactory
 {
-    /**
-     * @var DeckValidationHelper
-     */
-    private $deckValidationHelper;
+    private DeckValidationHelper $deckValidationHelper;
 
-    /**
-     * @var Texts
-     */
-    private $texts;
+    private Texts $texts;
 
-    /**
-     * @var SphereRepository
-     */
-    private $sphereRepository;
+    private SphereRepository $sphereRepository;
 
     public function __construct(DeckValidationHelper $deckValidationHelper, Texts $texts, SphereRepository $sphereRepository)
     {

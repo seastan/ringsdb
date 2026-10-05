@@ -21,10 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class PackController extends AbstractController
 {
-    /**
-     * @var PackRepository
-     */
-    private $packRepository;
+    private PackRepository $packRepository;
 
     private EntityManagerInterface $entityManager;
 

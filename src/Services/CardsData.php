@@ -19,45 +19,21 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CardsData
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
-    /**
-     * @var UrlGeneratorInterface
-     */
-    private $router;
+    private UrlGeneratorInterface $router;
 
-    /**
-     * @var Packages
-     */
-    private $assets_packages;
+    private Packages $assets_packages;
 
-    /**
-     * @var string
-     */
-    private $publicDir;
+    private string $publicDir;
 
-    /**
-     * @var CardRepository
-     */
-    private $cardRepository;
+    private CardRepository $cardRepository;
 
-    /**
-     * @var CycleRepository
-     */
-    private $cycleRepository;
+    private CycleRepository $cycleRepository;
 
-    /**
-     * @var ReviewRepository
-     */
-    private $reviewRepository;
+    private ReviewRepository $reviewRepository;
 
-    /**
-     * @var SphereRepository
-     */
-    private $sphereRepository;
+    private SphereRepository $sphereRepository;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -206,6 +182,7 @@ class CardsData
                     } else {
                         $qb->andWhere("(c.$searchName = 0)");
                     }
+
                     ++$i;
 
                     break;
@@ -230,6 +207,7 @@ class CardsData
 
                         $qb->setParameter($i++, $arg);
                     }
+
                     $qb->andWhere(implode('!' == $operator ? ' and ' : ' or ', $or));
 
                     break;

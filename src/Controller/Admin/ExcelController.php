@@ -25,15 +25,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ExcelController extends AbstractController
 {
-    /**
-     * @var CardRepository
-     */
-    private $cardRepository;
+    private CardRepository $cardRepository;
 
-    /**
-     * @var PackRepository
-     */
-    private $packRepository;
+    private PackRepository $packRepository;
 
     private EntityManagerInterface $entityManager;
 

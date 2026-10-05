@@ -41,6 +41,7 @@ class DeckValidationHelper
         if ($cardsCount < 30) {
             return 'too_few_cards';
         }
+
         if ($cardsCount < 50 && !$casualPlay) {
             return 'invalid_for_tournament_play';
         }

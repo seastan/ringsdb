@@ -21,10 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class TypeController extends AbstractController
 {
-    /**
-     * @var TypeRepository
-     */
-    private $typeRepository;
+    private TypeRepository $typeRepository;
 
     private EntityManagerInterface $entityManager;
 

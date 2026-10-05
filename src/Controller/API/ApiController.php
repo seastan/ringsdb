@@ -27,30 +27,15 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ApiController extends AbstractController
 {
-    /**
-     * @var CardsData
-     */
-    private $cardsData;
+    private CardsData $cardsData;
 
-    /**
-     * @var int
-     */
-    private $cacheExpiration;
+    private int $cacheExpiration;
 
-    /**
-     * @var CardRepository
-     */
-    private $cardRepository;
+    private CardRepository $cardRepository;
 
-    /**
-     * @var DecklistRepository
-     */
-    private $decklistRepository;
+    private DecklistRepository $decklistRepository;
 
-    /**
-     * @var PackRepository
-     */
-    private $packRepository;
+    private PackRepository $packRepository;
 
     private EntityManagerInterface $entityManager;
 

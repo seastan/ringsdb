@@ -21,10 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ScenarioController extends AbstractController
 {
-    /**
-     * @var ScenarioRepository
-     */
-    private $scenarioRepository;
+    private ScenarioRepository $scenarioRepository;
 
     private EntityManagerInterface $entityManager;
 

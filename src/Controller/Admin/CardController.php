@@ -24,15 +24,9 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CardController extends AbstractController
 {
-    /**
-     * @var string
-     */
-    private $publicDir;
+    private string $publicDir;
 
-    /**
-     * @var CardRepository
-     */
-    private $cardRepository;
+    private CardRepository $cardRepository;
 
     private EntityManagerInterface $entityManager;
 

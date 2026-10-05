@@ -21,10 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CycleController extends AbstractController
 {
-    /**
-     * @var CycleRepository
-     */
-    private $cycleRepository;
+    private CycleRepository $cycleRepository;
 
     private EntityManagerInterface $entityManager;
 

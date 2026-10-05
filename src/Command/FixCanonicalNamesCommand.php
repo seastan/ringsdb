@@ -13,20 +13,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class FixCanonicalNamesCommand extends Command
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
-    /**
-     * @var Texts
-     */
-    private $texts;
+    private Texts $texts;
 
-    /**
-     * @var ScenarioRepository
-     */
-    private $scenarioRepository;
+    private ScenarioRepository $scenarioRepository;
 
     public function __construct(EntityManagerInterface $entityManager, Texts $texts, ScenarioRepository $scenarioRepository)
     {

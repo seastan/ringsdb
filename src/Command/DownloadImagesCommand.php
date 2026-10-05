@@ -12,20 +12,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DownloadImagesCommand extends Command
 {
-    /**
-     * @var Packages
-     */
-    private $packages;
+    private Packages $packages;
 
-    /**
-     * @var string
-     */
-    private $publicDir;
+    private string $publicDir;
 
-    /**
-     * @var CardRepository
-     */
-    private $cardRepository;
+    private CardRepository $cardRepository;
 
     public function __construct(Packages $packages, string $publicDir, CardRepository $cardRepository)
     {

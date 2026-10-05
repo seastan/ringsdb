@@ -51,25 +51,13 @@ class FellowshipManager
      */
     protected $user;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $doctrine;
+    private EntityManagerInterface $doctrine;
 
-    /**
-     * @var RequestStack
-     */
-    private $request_stack;
+    private RequestStack $request_stack;
 
-    /**
-     * @var UrlGeneratorInterface
-     */
-    private $router;
+    private UrlGeneratorInterface $router;
 
-    /**
-     * @var CardRepository
-     */
-    private $cardRepository;
+    private CardRepository $cardRepository;
 
     public function __construct(EntityManagerInterface $doctrine, RequestStack $request_stack, UrlGeneratorInterface $router, CardRepository $cardRepository)
     {

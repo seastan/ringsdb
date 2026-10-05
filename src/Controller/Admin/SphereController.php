@@ -21,10 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class SphereController extends AbstractController
 {
-    /**
-     * @var SphereRepository
-     */
-    private $sphereRepository;
+    private SphereRepository $sphereRepository;
 
     private EntityManagerInterface $entityManager;
 

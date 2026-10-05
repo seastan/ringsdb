@@ -17,10 +17,7 @@ class SaveProfileController extends AbstractController
 {
     use CurrentUserTrait;
 
-    /**
-     * @var UserRepository
-     */
-    private $userRepository;
+    private UserRepository $userRepository;
 
     private EntityManagerInterface $entityManager;
 
