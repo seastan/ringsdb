@@ -82,15 +82,9 @@ class Questlog
      */
     private $isPublic = false;
 
-    /**
-     * @var \DateTime
-     */
-    private $dateCreation;
+    private \DateTime $dateCreation;
 
-    /**
-     * @var \DateTime
-     */
-    private $dateUpdate;
+    private \DateTime $dateUpdate;
 
     /**
      * @var Collection<int, QuestlogDeck>
@@ -102,15 +96,9 @@ class Questlog
      */
     private $comments;
 
-    /**
-     * @var User|null
-     */
-    private $user;
+    private ?\App\Entity\User $user = null;
 
-    /**
-     * @var Scenario|null
-     */
-    private $scenario;
+    private ?\App\Entity\Scenario $scenario = null;
 
     /**
      * @var Collection<int, User>

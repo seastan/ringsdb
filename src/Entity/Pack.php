@@ -59,10 +59,7 @@ class Pack
      */
     private $printings;
 
-    /**
-     * @var Cycle|null
-     */
-    private $cycle;
+    private ?\App\Entity\Cycle $cycle = null;
 
     /**
      * Constructor.
@@ -314,7 +311,7 @@ class Pack
             return $latestPack->getCycle()->getPosition() < $this->getCycle()->getPosition();
         }
 
-        if ($latestPack->getDateRelease() && $this->getDateRelease()) {
+        if ($latestPack->getDateRelease() instanceof \DateTime && $this->getDateRelease() instanceof \DateTime) {
             return $latestPack->getDateRelease() < $this->getDateRelease();
         }
 

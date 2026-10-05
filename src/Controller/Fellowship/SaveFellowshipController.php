@@ -146,10 +146,8 @@ class SaveFellowshipController extends AbstractController
                             throw new NotFoundHttpException('One of the selected decks does not exists.');
                         }
 
-                        $fellowship_decklist = new FellowshipDecklist();
-                        $fellowship_decklist->setDecklist($decklist);
+                        $fellowship_decklist = new FellowshipDecklist($decklist, $fellowship);
                         $fellowship_decklist->setDeckNumber($i - $skip);
-                        $fellowship_decklist->setFellowship($fellowship);
                         $fellowship->addDecklist($fellowship_decklist);
                     }
 

@@ -102,10 +102,8 @@ class PublishFellowshipController extends AbstractController
                 $this->entityManager->persist($decklist);
             }
 
-            $fellowship_decklist = new FellowshipDecklist();
-            $fellowship_decklist->setDecklist($decklist);
+            $fellowship_decklist = new FellowshipDecklist($decklist, $fellowship);
             $fellowship_decklist->setDeckNumber($fellowship_deck->getDeckNumber());
-            $fellowship_decklist->setFellowship($fellowship);
             $this->entityManager->remove($fellowship_deck);
             $fellowship->removeDeck($fellowship_deck);
             $fellowship->addDecklist($fellowship_decklist);

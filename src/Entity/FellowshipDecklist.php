@@ -30,6 +30,16 @@ class FellowshipDecklist
     private $decklist;
 
     /**
+     * @param Decklist $decklist
+     * @param Fellowship $fellowship
+     */
+    public function __construct(Decklist $decklist, Fellowship $fellowship)
+    {
+        $this->decklist = $decklist;
+        $this->fellowship = $fellowship;
+    }
+
+    /**
      * Get id.
      */
     public function getId(): ?int
