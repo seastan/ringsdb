@@ -95,8 +95,9 @@ class AdminWriteTest extends WebTestCase
     }
 
     /**
-     * @return array<string, mixed>
      * @param array<string, string> $values
+     *
+     * @return array<string, mixed>
      */
     private function prefixed(string $prefix, array $values): array
     {
@@ -111,6 +112,7 @@ class AdminWriteTest extends WebTestCase
     /* -------------------------------------------------------------- CRUD */
     /**
      * [route slug, form name, table, created values, expected columns, updated values, expected columns].
+     *
      * @return array<string, string[]|array<string, bool|string>[]|array<string, string>[]>
      */
     public function crudProvider(): array

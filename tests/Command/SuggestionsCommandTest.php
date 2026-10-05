@@ -90,6 +90,7 @@ class SuggestionsCommandTest extends KernelTestCase
 
     /**
      * The value of the matrix for two card codes.
+     *
      * @param array<string, mixed> $suggestions
      */
     private function value(array $suggestions, string $code1, string $code2)

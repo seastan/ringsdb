@@ -84,7 +84,7 @@ class FellowshipManagerTest extends KernelTestCase
 
     /* ------------------------------------------------------------ helpers */
     /**
-     * @param int[] $decklistIds
+     * @param int[]                                    $decklistIds
      * @param array<string, int>|array<string, string> $values
      */
     private function insertFellowship(string $name, int $userId, array $decklistIds, array $values): int
@@ -104,6 +104,7 @@ class FellowshipManagerTest extends KernelTestCase
 
     /**
      * A copy of fixture decklist 2 with the given cards ([card id => quantity]).
+     *
      * @param int[] $slots
      */
     private function insertDecklist(array $slots): int

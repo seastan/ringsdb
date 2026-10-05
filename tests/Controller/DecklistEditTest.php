@@ -91,6 +91,7 @@ class DecklistEditTest extends WebTestCase
 
     /**
      * A copy of fixture decklist 2 (with its cards), returns its id.
+     *
      * @param array<string, int> $values
      */
     private function insertDecklist(string $name, array $values = []): int

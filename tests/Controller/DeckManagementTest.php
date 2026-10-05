@@ -90,6 +90,7 @@ class DeckManagementTest extends WebTestCase
 
     /**
      * A copy of fixture deck 2 (cards included), plus 2 Feint in the sideboard, returns its id.
+     *
      * @param array<string, int> $values
      */
     private function insertDeck(string $name, array $values = []): int
@@ -406,6 +407,7 @@ class DeckManagementTest extends WebTestCase
     /**
      * Posts a zip archive of [name => content] to POST /deck/import/all ("Import from an archive"
      * modal of My Decks).
+     *
      * @param array<string, string> $entries
      */
     private function uploadArchive(KernelBrowser $client, array $entries): \Symfony\Component\HttpFoundation\Response

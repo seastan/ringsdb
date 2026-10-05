@@ -98,6 +98,7 @@ class DeckCompareTest extends WebTestCase
 
     /**
      * A copy of fixture deck 2 with the given cards ([card id => quantity]).
+     *
      * @param int[] $main
      * @param int[] $side
      */

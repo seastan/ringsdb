@@ -236,17 +236,13 @@ class DefaultController extends AbstractController
         for ($i = 0; $i < min($num_comments, count($reviews_recent)); ++$i) {
             $review = $reviews_recent[$i];
             $comment = [];
-            if ($review) {
-                $comment['type'] = 'review';
-                $comment['review'] = $review;
-                $comment['user'] = $review->getUser();
-                $comment['dateCreation'] = $review->getDateCreation();
-                $comment['text'] = $review->getTextHtml();
-            }
+            $comment['type'] = 'review';
+            $comment['review'] = $review;
+            $comment['user'] = $review->getUser();
+            $comment['dateCreation'] = $review->getDateCreation();
+            $comment['text'] = $review->getTextHtml();
 
-            if ([] !== $comment) {
-                $all_comments[] = $comment;
-            }
+            $all_comments[] = $comment;
         }
 
         // Recent review comments
@@ -257,22 +253,18 @@ class DefaultController extends AbstractController
         for ($i = 0; $i < min($num_comments, count($reviews_recent_discussion)); ++$i) {
             $review = $reviews_recent_discussion[$i];
             $comment = [];
-            if ($review) {
-                $lastcomment = $review->getComments()->last();
-                if ($lastcomment) {
-                    $comment['type'] = 'reviewcomment';
-                    $comment['review'] = $review;
-                    $comment['user'] = $lastcomment->getUser();
-                    $comment['dateCreation'] = $lastcomment->getDateCreation();
-                    $comment['text'] = $lastcomment->getText();
-                } else {
-                    continue;
-                }
+            $lastcomment = $review->getComments()->last();
+            if ($lastcomment) {
+                $comment['type'] = 'reviewcomment';
+                $comment['review'] = $review;
+                $comment['user'] = $lastcomment->getUser();
+                $comment['dateCreation'] = $lastcomment->getDateCreation();
+                $comment['text'] = $lastcomment->getText();
+            } else {
+                continue;
             }
 
-            if ([] !== $comment) {
-                $all_comments[] = $comment;
-            }
+            $all_comments[] = $comment;
         }
 
         // Sort all comments by date
@@ -284,7 +276,7 @@ class DefaultController extends AbstractController
         for ($i = 0; $i < count($all_comments); ++$i) {
             $comment = $all_comments[$i];
             $text = $comment['text'];
-            if (strlen($text) > 300) {
+            if (is_string($text) && strlen($text) > 300) {
                 $text = (string) preg_replace('/\\s+?(\\S+)?$/', '', substr($text.' ', 0, 301));
                 if (strrpos($text, '<') > strrpos($text, '>')) {
                     $text = substr($text.' ', 0, strrpos($text, '<'));

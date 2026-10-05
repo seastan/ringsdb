@@ -84,7 +84,7 @@ class QuestLogManagerTest extends KernelTestCase
 
     /* ------------------------------------------------------------ helpers */
     /**
-     * @param int[] $deckIds
+     * @param int[]                                    $deckIds
      * @param array<string, int>|array<string, string> $values
      */
     private function insertQuestlog(string $name, int $userId, array $deckIds, array $values): int
@@ -106,6 +106,7 @@ class QuestLogManagerTest extends KernelTestCase
 
     /**
      * A copy of fixture deck 2 with the given cards ([card id => quantity]).
+     *
      * @param int[] $slots
      */
     private function insertDeck(array $slots): int

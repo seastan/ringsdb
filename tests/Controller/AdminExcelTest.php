@@ -95,8 +95,9 @@ class AdminExcelTest extends WebTestCase
     }
 
     /**
-     * @return array<int, string|bool> [response content, echoed report]
      * @param array<string, string> $parameters
+     *
+     * @return array<int, string|bool> [response content, echoed report]
      */
     private function upload(KernelBrowser $client, string $file, array $parameters = []): array
     {

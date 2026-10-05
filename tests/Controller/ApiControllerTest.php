@@ -51,6 +51,7 @@ class ApiControllerTest extends WebTestCase
     /* ------------------------------------------------------- JSON bodies */
     /**
      * [snapshot name, uri, expected Last-Modified header (null if none)].
+     *
      * @return array<string, string[]|string[]|null[]>
      */
     public function jsonEndpointProvider(): array

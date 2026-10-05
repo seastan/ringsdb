@@ -17,7 +17,7 @@ class TwigExtension extends AbstractExtension
     }
 
     /**
-     * @return \Twig\TwigTest[]
+     * @return TwigTest[]
      */
     public function getTests()
     {

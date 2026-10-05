@@ -119,6 +119,7 @@ class FellowshipWorkflowTest extends WebTestCase
 
     /**
      * Fills the deck picker's hidden fields: [slot => [id, is_decklist]].
+     *
      * @param array<int, mixed> $decks
      */
     private function selectDecks(Form $form, array $decks): void

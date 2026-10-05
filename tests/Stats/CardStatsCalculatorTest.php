@@ -68,8 +68,8 @@ class CardStatsCalculatorTest extends KernelTestCase
     /**
      * Inserts a private deck (a copy of fixture deck 2 with other values), returns its id.
      *
-     * @param int[] $main [card id => quantity]
-     * @param int[] $side [card id => quantity]
+     * @param int[]                                    $main   [card id => quantity]
+     * @param int[]                                    $side   [card id => quantity]
      * @param array<string, string>|array<string, int> $values
      */
     private function insertDeck(array $values, array $main, array $side = []): int
@@ -92,8 +92,9 @@ class CardStatsCalculatorTest extends KernelTestCase
 
     /**
      * Inserts a decklist (a copy of fixture decklist 2 with other values), returns its id.
+     *
      * @param array<string, string> $values
-     * @param int[] $main
+     * @param int[]                 $main
      */
     private function insertDecklist(array $values, array $main): int
     {
@@ -110,9 +111,10 @@ class CardStatsCalculatorTest extends KernelTestCase
     }
 
     /**
-     * @return array [code => [columns...]] for the given codes
      * @param string[] $codes
      * @param string[] $columns
+     *
+     * @return array [code => [columns...]] for the given codes
      */
     private function byCode(array $cards, array $codes, array $columns): array
     {
@@ -261,8 +263,9 @@ class CardStatsCalculatorTest extends KernelTestCase
 
     /* ----------------------------------------------------------- command */
     /**
-     * @return array{int, string}
      * @param array<string, string> $input
+     *
+     * @return array{int, string}
      */
     private function runCommand(array $input): array
     {

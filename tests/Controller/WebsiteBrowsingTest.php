@@ -56,6 +56,7 @@ class WebsiteBrowsingTest extends WebTestCase
     /* ------------------------------------------------------ public pages */
     /**
      * [uri, snapshot name, <title>].
+     *
      * @return array<string, string[]>
      */
     public function publicPageProvider(): array
@@ -113,6 +114,7 @@ class WebsiteBrowsingTest extends WebTestCase
     /* ---------------------------------------------------- members' pages */
     /**
      * [uri, snapshot name, <title>].
+     *
      * @return array<string, string[]>
      */
     public function memberPageProvider(): array
@@ -156,6 +158,7 @@ class WebsiteBrowsingTest extends WebTestCase
     /* ----------------------------------------------------- access control */
     /**
      * Pages anonymous visitors cannot see: [uri, expected status, expected Location or error title].
+     *
      * @return array<string, string[]|int[]>
      */
     public function anonymousAccessProvider(): array
@@ -214,6 +217,7 @@ class WebsiteBrowsingTest extends WebTestCase
     /* ---------------------------------------------------- redirects & 404 */
     /**
      * [uri, expected Location].
+     *
      * @return array<string, string[]>
      */
     public function redirectProvider(): array
@@ -241,6 +245,7 @@ class WebsiteBrowsingTest extends WebTestCase
 
     /**
      * [uri, error title].
+     *
      * @return array<string, string[]>
      */
     public function notFoundProvider(): array
@@ -269,6 +274,7 @@ class WebsiteBrowsingTest extends WebTestCase
     /* ---------------------------------------------------------- downloads */
     /**
      * [uri, snapshot file, Content-Type, Content-Disposition, authenticated].
+     *
      * @return array<string, string[]|bool[]>
      */
     public function downloadProvider(): array
@@ -301,6 +307,7 @@ class WebsiteBrowsingTest extends WebTestCase
      * Zip archives: the content is checked entry by entry (zip metadata contains timestamps).
      *
      * [uri, expected entries => snapshot file]
+     *
      * @return array<string, string[]|array<string, string>[]>
      */
     public function zipDownloadProvider(): array

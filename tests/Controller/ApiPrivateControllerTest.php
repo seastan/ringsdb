@@ -87,6 +87,7 @@ class ApiPrivateControllerTest extends WebTestCase
     /* ------------------------------------------------------- JSON bodies */
     /**
      * [user, uri, snapshot name].
+     *
      * @return array<string, string[]>
      */
     public function cacheableEndpointProvider(): array
@@ -114,6 +115,7 @@ class ApiPrivateControllerTest extends WebTestCase
 
     /**
      * [user, uri, expected JSON].
+     *
      * @return array<string, string[]|never[][]|array<string, bool|string>[]>
      */
     public function uncachedEndpointProvider(): array
