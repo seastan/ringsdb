@@ -106,7 +106,7 @@ class DisplaySearchController extends AbstractController
                 if ($pack instanceof Pack) {
                     if (empty($availability[$pack->getCode()])) {
                         $availability[$pack->getCode()] = false;
-                        if ($pack->getDateRelease() && $pack->getDateRelease() <= new \DateTime()) {
+                        if ($pack->getDateRelease() instanceof \DateTime && $pack->getDateRelease() <= new \DateTime()) {
                             $availability[$pack->getCode()] = true;
                         }
                     }
@@ -199,7 +199,7 @@ class DisplaySearchController extends AbstractController
         } else {
             $primaryPrinting = $card->getPrimaryPrinting();
             $selectedPack = $primaryPrinting instanceof \App\Entity\CardPrinting ? $primaryPrinting->getPack() : null;
-            if ($primaryPrinting && $selectedPack) {
+            if ($primaryPrinting instanceof \App\Entity\CardPrinting && $selectedPack instanceof Pack) {
                 $pos = $primaryPrinting->getPosition();
                 $prevP = $this->cardPrintingRepository->findOneBy(['pack' => $selectedPack, 'position' => $pos - 1]);
                 $nextP = $this->cardPrintingRepository->findOneBy(['pack' => $selectedPack, 'position' => $pos + 1]);

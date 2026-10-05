@@ -73,7 +73,7 @@ class SearchFormController extends AbstractController
         $traits = array_filter(array_keys($traits));
         sort($traits);
         $list_illustrators = $this->connection->executeQuery("SELECT DISTINCT illustrator FROM card_printing WHERE illustrator IS NOT NULL AND illustrator != '' ORDER BY illustrator")->fetchAll();
-        $illustrators = array_map(fn ($card) => $card['illustrator'], $list_illustrators);
+        $illustrators = array_map(fn (array $card) => $card['illustrator'], $list_illustrators);
 
         return $this->render('Search/searchform.html.twig', ['pagetitle' => 'Card Search', 'pagedescription' => 'Find all the cards of the game, easily searchable.', 'packs' => $packs, 'cycles' => $cycles, 'types' => $types, 'spheres' => $spheres, 'traits' => $traits, 'illustrators' => $illustrators, 'allsets' => $this->renderView('Default/allsets.html.twig', ['data' => $this->cardsData->allSetsData()])], $response);
     }

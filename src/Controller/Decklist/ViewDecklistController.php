@@ -53,7 +53,7 @@ class ViewDecklistController extends AbstractController
 
         $commenters = array_map(
             /* @var $comment \App\Entity\Comment */
-            fn ($comment) => $comment->getUser()->getUsername(),
+            fn (\App\Entity\Comment $comment) => $comment->getUser()->getUsername(),
             $decklist->getComments()->getValues()
         );
         $commenters[] = $decklist->getUser()->getUsername();

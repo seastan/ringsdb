@@ -44,7 +44,7 @@ class DefaultController extends AbstractController
      * @param array<string, mixed> $a
      * @param array<string, mixed> $b
      */
-    public function orderNew($a, $b): int
+    public function orderNew(array $a, array $b): int
     {
         return $b['dateCreation'] <=> $a['dateCreation'];
     }

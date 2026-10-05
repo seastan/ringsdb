@@ -54,7 +54,7 @@ class GetPacksController extends AbstractController
             }
         }
 
-        $countOf = function ($pack) use ($hasCollection, $countById) {
+        $countOf = function ($pack) use ($hasCollection, $countById): int {
             if ($hasCollection) {
                 return $countById[$pack->getId()] ?? 0;
             }

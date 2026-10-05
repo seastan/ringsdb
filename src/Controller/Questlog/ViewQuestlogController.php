@@ -47,7 +47,7 @@ class ViewQuestlogController extends AbstractController
         if ($is_public) {
             $commenters = array_map(
                 /* @var $comment \App\Entity\QuestlogComment */
-                fn ($comment) => $comment->getUser()->getUsername(),
+                fn (\App\Entity\QuestlogComment $comment) => $comment->getUser()->getUsername(),
                 $questlog->getComments()->getValues()
             );
             $commenters[] = $questlog->getUser()->getUsername();

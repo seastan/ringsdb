@@ -12,10 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class UserFixtures extends Fixture implements ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface|null
-     */
-    private $container;
+    private ?ContainerInterface $container = null;
 
     public function setContainer(?ContainerInterface $container = null): void
     {

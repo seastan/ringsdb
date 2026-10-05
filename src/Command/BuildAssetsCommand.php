@@ -87,7 +87,7 @@ class BuildAssetsCommand extends Command
      */
     public static function rewriteUrls(string $css, string $source, string $target): string
     {
-        return (string) preg_replace_callback('/url\(\s*([\'"]?)([^\'")]+)\1\s*\)/', function (array $m) use ($source, $target) {
+        return (string) preg_replace_callback('/url\(\s*([\'"]?)([^\'")]+)\1\s*\)/', function (array $m) use ($source, $target): string {
             $url = $m[2];
             if (preg_match('#^([a-z][a-z0-9+.-]*:|//|/|\#)#i', $url)) {
                 return $m[0];

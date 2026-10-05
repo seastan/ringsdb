@@ -47,7 +47,7 @@ class ViewFellowshipController extends AbstractController
         if ($is_public) {
             $commenters = array_map(
                 /* @var $comment \App\Entity\FellowshipComment */
-                fn ($comment) => $comment->getUser()->getUsername(),
+                fn (\App\Entity\FellowshipComment $comment) => $comment->getUser()->getUsername(),
                 $fellowship->getComments()->getValues()
             );
             $commenters[] = $fellowship->getUser()->getUsername();

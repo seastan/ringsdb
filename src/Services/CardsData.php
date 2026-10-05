@@ -87,7 +87,7 @@ class CardsData
             return '';
         }
 
-        return implode('', array_map(fn ($l): string => "<p>$l</p>", preg_split('/[\r?\n]+/', $text) ?: []));
+        return implode('', array_map(fn (string $l): string => "<p>$l</p>", preg_split('/[\r?\n]+/', $text) ?: []));
     }
 
     /**
@@ -548,7 +548,7 @@ class CardsData
             ];
         }
 
-        usort($cardinfo['packs'], function ($a, $b) {
+        usort($cardinfo['packs'], function (array $a, array $b): int {
             if (null === $a['date_release'] && null === $b['date_release']) {
                 return 0;
             }
@@ -689,11 +689,11 @@ class CardsData
         return implode(
             ' ',
             array_map(
-                fn ($l): string => ($l[0] ? $l[0].$l[1] : '')
+                fn (array $l): string => ($l[0] ? $l[0].$l[1] : '')
                     .implode(
                         '|',
                         array_map(
-                            fn ($s) => preg_match("/^[\p{L}\p{N}\-\&]+$/u", $s)
+                            fn (string $s): string => preg_match("/^[\p{L}\p{N}\-\&]+$/u", $s)
                                 ? $s
                                 : "\"$s\"",
                             array_slice($l, 2)

@@ -14,10 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DecklistFixtures extends Fixture implements ContainerAwareInterface, DependentFixtureInterface
 {
-    /**
-     * @var ContainerInterface|null
-     */
-    private $container;
+    private ?ContainerInterface $container = null;
 
     public function setContainer(?ContainerInterface $container = null): void
     {
