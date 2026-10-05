@@ -60,7 +60,7 @@ class GetPacksController extends AbstractController
             // no collection set => default to owning one of each released pack
             return null !== $pack->getDateRelease() ? 1 : 0;
         };
-        $entryOf = fn ($pack) => ['code' => $pack->getCode(), 'id' => $pack->getId(), 'label' => $pack->getName(), 'count' => $countOf($pack), 'future' => null === $pack->getDateRelease()];
+        $entryOf = fn ($pack): array => ['code' => $pack->getCode(), 'id' => $pack->getId(), 'label' => $pack->getName(), 'count' => $countOf($pack), 'future' => null === $pack->getDateRelease()];
         foreach ($list_cycles as $cycle) {
             $size = count($cycle->getPacks());
             $first_pack = $cycle->getPacks()->first();

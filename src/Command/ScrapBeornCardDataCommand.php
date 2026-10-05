@@ -380,7 +380,7 @@ class ScrapBeornCardDataCommand extends Command
                     $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', '\'', '\''], $text);
                     $text = (string) preg_replace('/<a title="Search:.*?>(.*?)<\/a>/', '\\1', $text);
                     $text = (string) preg_replace('/<a title="Keyword:.*?>(.*?)<\/a>/', '\\1', $text);
-                    $text = (string) preg_replace_callback('/<img .*?src="\/Images\/(.*?)\..*?>/', fn ($m) => strtolower("[$m[1]]"), $text);
+                    $text = (string) preg_replace_callback('/<img .*?src="\/Images\/(.*?)\..*?>/', fn ($m): string => strtolower("[$m[1]]"), $text);
                     $text = str_replace(['<br />', '<br>'], ["\n", "\n"], $text);
                     $text = str_replace('</b><b>', ' ', $text);
                     $text = str_replace('</b>: ', ':</b> ', $text);

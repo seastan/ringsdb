@@ -123,7 +123,7 @@ class DeckCompareTest extends WebTestCase
      */
     private static function columns(Crawler $row): array
     {
-        return $row->filter('.col-xs-6')->each(fn (Crawler $column) => $column->children()->each(fn (Crawler $line) => trim((string) preg_replace('/\s+/u', ' ', $line->text()))));
+        return $row->filter('.col-xs-6')->each(fn (Crawler $column) => $column->children()->each(fn (Crawler $line): string => trim((string) preg_replace('/\s+/u', ' ', $line->text()))));
     }
 
     /* -------------------------------------------------------------- tests */
@@ -137,7 +137,7 @@ class DeckCompareTest extends WebTestCase
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $rows = $crawler->filter('.main > .row');
-        $this->assertSame([["Deck #{$this->deckA}", 'PHPUnit Deck A'], ["Deck #{$this->deckB}", 'PHPUnit Deck B']], $rows->eq(0)->filter('.col-xs-6')->each(fn (Crawler $column) => [trim($column->filter('h1')->text()), trim($column->filter('h3')->text())]));
+        $this->assertSame([["Deck #{$this->deckA}", 'PHPUnit Deck A'], ["Deck #{$this->deckB}", 'PHPUnit Deck B']], $rows->eq(0)->filter('.col-xs-6')->each(fn (Crawler $column): array => [trim($column->filter('h1')->text()), trim($column->filter('h3')->text())]));
 
         // heroes: in common, then left in each deck
         $this->assertSame('Heroes', trim($rows->eq(1)->text()));

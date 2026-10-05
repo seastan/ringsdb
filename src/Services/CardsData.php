@@ -111,7 +111,7 @@ class CardsData
             return '';
         }
 
-        return implode('', array_map(fn ($l) => "<p>$l</p>", preg_split('/[\r?\n]+/', $text) ?: []));
+        return implode('', array_map(fn ($l): string => "<p>$l</p>", preg_split('/[\r?\n]+/', $text) ?: []));
     }
 
     /**
@@ -575,7 +575,7 @@ class CardsData
 
         if ($api) {
             unset($cardinfo['id']);
-            $cardinfo = array_filter($cardinfo, fn ($var) => isset($var));
+            $cardinfo = array_filter($cardinfo, fn ($var): bool => isset($var));
         } else {
             $cardinfo['text'] = $this->replaceSymbols($cardinfo['text']);
             $cardinfo['text'] = $this->splitInParagraphs($cardinfo['text']);
@@ -695,7 +695,7 @@ class CardsData
         return implode(
             ' ',
             array_map(
-                fn ($l) => ($l[0] ? $l[0].$l[1] : '')
+                fn ($l): string => ($l[0] ? $l[0].$l[1] : '')
                     .implode(
                         '|',
                         array_map(

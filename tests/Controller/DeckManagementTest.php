@@ -129,7 +129,7 @@ class DeckManagementTest extends WebTestCase
     {
         preg_match_all("/insert_alert_message\\('(\\w+)', (\"[^\"]*\")\\)/", $client->getResponse()->getContent(), $matches, PREG_SET_ORDER);
 
-        return array_map(fn ($match) => [$match[1], json_decode($match[2])], $matches);
+        return array_map(fn ($match): array => [$match[1], json_decode($match[2])], $matches);
     }
 
     /* -------------------------------------------------------------- clone */

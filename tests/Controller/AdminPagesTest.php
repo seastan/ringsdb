@@ -138,7 +138,7 @@ class AdminPagesTest extends WebTestCase
      */
     public function snapshotPageProvider()
     {
-        return array_filter($this->adminPageProvider(), fn (array $page) => null !== $page[1]);
+        return array_filter($this->adminPageProvider(), fn (array $page): bool => null !== $page[1]);
     }
 
     /**

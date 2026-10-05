@@ -236,7 +236,7 @@ class Pack
     public function getCards(): Collection
     {
         /* @phpstan-ignore-next-line return.type */
-        return $this->printings->filter(fn ($p) => $p->getCard() instanceof Card)->map(fn ($p) => $p->getCard());
+        return $this->printings->filter(fn ($p): bool => $p->getCard() instanceof Card)->map(fn ($p) => $p->getCard());
     }
 
     /**

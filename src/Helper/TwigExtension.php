@@ -19,8 +19,8 @@ class TwigExtension extends AbstractExtension
     public function getTests()
     {
         return [
-            new TwigTest('decklist', fn ($event) => $event instanceof Decklist),
-            new TwigTest('deck', fn ($event) => $event instanceof Deck),
+            new TwigTest('decklist', fn ($event): bool => $event instanceof Decklist),
+            new TwigTest('deck', fn ($event): bool => $event instanceof Deck),
         ];
     }
 }

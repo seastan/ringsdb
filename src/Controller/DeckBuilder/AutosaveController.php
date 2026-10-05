@@ -58,7 +58,7 @@ class AutosaveController extends AbstractController
             throw new UnprocessableEntityHttpException('Wrong content '.json_encode($diff));
         }
         // [main added, main removed, side added, side removed], the side parts may be missing
-        $parts = array_map(fn ($part) => is_array($part) ? count($part) : 0, $diff);
+        $parts = array_map(fn ($part): int => is_array($part) ? count($part) : 0, $diff);
         if (array_sum($parts) > 0) {
             /* @var $change \App\Entity\Deckchange */
             $change = new Deckchange();
