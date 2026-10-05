@@ -68,4 +68,7 @@ clear-cache:
 cs:
 	docker compose exec -it -u www-data symfony php vendor/bin/php-cs-fixer fix
 
-all: install lint-twig cs phpstan phpunit
+rector:
+	docker compose exec -it -u www-data symfony php vendor/bin/rector
+
+all: install lint-twig rector cs phpstan phpunit
