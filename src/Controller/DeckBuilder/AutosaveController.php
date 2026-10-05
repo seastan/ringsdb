@@ -48,7 +48,7 @@ class AutosaveController extends AbstractController
         if (!$deck) {
             throw new UnprocessableEntityHttpException('Cannot find deck '.$deck_id);
         }
-        if ($user->getId() != $deck->getUser()->getId()) {
+        if (!$deck->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException("You don't have access to this deck.");
         }
         // decoded as arrays: count() of an object is a warning since PHP 7.2

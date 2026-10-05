@@ -70,7 +70,7 @@ class SaveQuestlogController extends AbstractController
             if (!$questlog) {
                 throw new NotFoundHttpException('This questlog does not exist.');
             }
-            if ($user->getId() !== $questlog->getUser()->getId()) {
+            if ($questlog->getUser() && !$questlog->getUser()->isEqualTo($user)) {
                 throw new AccessDeniedHttpException('Access denied to this object.');
             }
         } else {
@@ -137,9 +137,8 @@ class SaveQuestlogController extends AbstractController
                         if (!$deck) {
                             throw new NotFoundHttpException('One of the selected decks does not exist.');
                         }
-                        $deck_user = $deck->getUser();
-                        $is_owner = $user->getId() == $deck_user->getId();
-                        if (!$is_owner && !$deck_user->getIsShareDecks()) {
+                        $is_owner = $deck->getUser()->isEqualTo($user);
+                        if (!$is_owner && !$deck->getUser()->getIsShareDecks()) {
                             throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
                         }
                         if (!$is_owner) {

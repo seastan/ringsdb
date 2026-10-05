@@ -63,7 +63,7 @@ class NewQuestlogController extends AbstractController
                 if ($decks[$i]) {
                     $user = $decks[$i]->getUser();
                     $author_names[$i] = $user->getUsername();
-                    if (!$public && !$user->getIsShareDecks() && $user->getId() != $this->currentUser()->getId()) {
+                    if (!$public && !$user->getIsShareDecks() && !$this->currentUser()->isEqualTo($user)) {
                         $decks[$i] = null;
                     }
                 }

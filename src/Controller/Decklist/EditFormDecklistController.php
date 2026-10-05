@@ -36,7 +36,7 @@ class EditFormDecklistController extends AbstractController
         if (!$decklist) {
             throw $this->createNotFoundException('Decklist not found');
         }
-        if (!$this->isGranted('ROLE_SUPER_ADMIN') && $user->getId() !== $decklist->getUser()->getId()) {
+        if (!$this->isGranted('ROLE_SUPER_ADMIN') && !$decklist->getUser()->isEqualTo($user)) {
             throw $this->createAccessDeniedException('Access denied');
         }
 

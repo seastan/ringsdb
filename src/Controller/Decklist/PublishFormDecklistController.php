@@ -46,7 +46,7 @@ class PublishFormDecklistController extends AbstractController
             throw $this->createAccessDeniedException('You must be logged in for this operation.');
         }
         $deck = $this->deckRepository->find($deck_id);
-        if (!$deck || $deck->getUser()->getId() != $user->getId()) {
+        if (!$deck || !$deck->getUser()->isEqualTo($user)) {
             throw $this->createAccessDeniedException("You don't have access to this decklist.");
         }
 

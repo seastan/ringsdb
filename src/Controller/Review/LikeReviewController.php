@@ -39,7 +39,7 @@ class LikeReviewController extends AbstractController
             throw new \Exception('Unable to find review.');
         }
         // a user cannot vote on her own review
-        if ($review->getUser()->getId() != $user->getId()) {
+        if (!$review->getUser()->isEqualTo($user)) {
             // checking if the user didn't already vote on that review
             $query = $this->reviewRepository->createQueryBuilder('r')->innerJoin('r.votes', 'u')->where('r.id = :review_id')->andWhere('u.id = :user_id')->setParameter('review_id', $review_id)->setParameter('user_id', $user->getId())->getQuery();
             $result = $query->getResult();

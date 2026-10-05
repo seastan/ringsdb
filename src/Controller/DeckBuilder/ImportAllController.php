@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\DeckBuilder;
 
+use App\Controller\CurrentUserTrait;
 use App\Entity\Deck;
 use App\Services\DeckImporter;
 use App\Services\Decks;
@@ -16,6 +17,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ImportAllController extends AbstractController
 {
+    use CurrentUserTrait;
+
     private EntityManagerInterface $entityManager;
     private DeckImporter $deckImporter;
     private Decks $decks;
@@ -70,7 +73,7 @@ class ImportAllController extends AbstractController
                 /* @var $deck \App\Entity\Deck */
                 $deck = new Deck();
                 $this->entityManager->persist($deck);
-                $this->decks->saveDeck($this->getUser(), $deck, null, $deckname, '', '', $parse['content'], null);
+                $this->decks->saveDeck($this->currentUser(), $deck, null, $deckname, '', '', $parse['content'], null);
             }
         }
         $zip->close();

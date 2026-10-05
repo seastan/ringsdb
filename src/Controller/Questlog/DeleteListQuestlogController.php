@@ -44,7 +44,7 @@ class DeleteListQuestlogController extends AbstractController
             if (!$questlog) {
                 continue;
             }
-            if ($user->getId() != $questlog->getUser()->getId()) {
+            if ($questlog->getUser() && !$questlog->getUser()->isEqualTo($user)) {
                 continue;
             }
             if ($questlog->getNbVotes() || $questlog->getNbfavorites() || $questlog->getNbcomments()) {

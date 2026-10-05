@@ -12,17 +12,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class GetCycleController extends AbstractController
 {
     private CycleRepository $cycleRepository;
-    private string $gameName;
-    private string $publisherName;
 
     public function __construct(
-        CycleRepository $cycleRepository,
-        string $gameName,
-        string $publisherName
+        CycleRepository $cycleRepository
     ) {
         $this->cycleRepository = $cycleRepository;
-        $this->gameName = $gameName;
-        $this->publisherName = $publisherName;
     }
 
     /**
@@ -38,11 +32,16 @@ class GetCycleController extends AbstractController
         if (!$cycle) {
             throw $this->createNotFoundException('This cycle does not exist');
         }
-        $game_name = $this->gameName;
-        $publisher_name = $this->publisherName;
-        $meta = $cycle->getName().", a cycle of adventure packs for {$game_name} published by {$publisher_name}.";
         $key = array_search('cycle', SearchKeys::$searchKeys);
 
-        return $this->forward(DisplaySearchController::class, ['_route' => $request->attributes->get('_route'), '_route_params' => $request->attributes->get('_route_params'), 'q' => $key.':'.$cycle_code, 'view' => $view, 'sort' => $sort, 'page' => $page, 'pagetitle' => $cycle->getName(), 'meta' => $meta]);
+        return $this->forward(DisplaySearchController::class, [
+            '_route' => $request->attributes->get('_route'),
+            '_route_params' => $request->attributes->get('_route_params'),
+            'q' => $key.':'.$cycle_code,
+            'view' => $view,
+            'sort' => $sort,
+            'page' => $page,
+            'pagetitle' => $cycle->getName(),
+        ]);
     }
 }

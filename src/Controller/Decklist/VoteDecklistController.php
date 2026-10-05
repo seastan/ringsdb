@@ -44,7 +44,7 @@ class VoteDecklistController extends AbstractController
         if (!$decklist instanceof Decklist) {
             throw new BadRequestHttpException('Unable to find deck');
         }
-        if ($decklist->getUser()->getId() != $user->getId()) {
+        if (!$decklist->getUser()->isEqualTo($user)) {
             $query = $this->decklistRepository->createQueryBuilder('d')->innerJoin('d.votes', 'u')->where('d.id = :decklist_id')->andWhere('u.id = :user_id')->setParameter('decklist_id', $decklist_id)->setParameter('user_id', $user->getId())->getQuery();
             $result = $query->getResult();
             if (empty($result)) {

@@ -47,7 +47,7 @@ class HideCommentFellowshipController extends AbstractController
         if (!$comment) {
             throw new BadRequestHttpException('Unable to find comment');
         }
-        if ($comment->getFellowship()->getUser()->getId() !== $user->getId()) {
+        if (!$comment->getFellowship()->getUser()->isEqualTo($user)) {
             return new JsonResponse("You don't have permission to edit this comment.");
         }
         $comment->setIsHidden((bool) $hidden);

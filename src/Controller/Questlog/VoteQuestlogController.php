@@ -44,11 +44,10 @@ class VoteQuestlogController extends AbstractController
         if (!$questlog) {
             throw new BadRequestHttpException('Unable to find quest log');
         }
-        if ($questlog->getUser()->getId() != $user->getId()) {
+        if ($questlog->getUser() instanceof User && !$questlog->getUser()->isEqualTo($user)) {
             $query = $this->questlogRepository->createQueryBuilder('d')->innerJoin('d.votes', 'u')->where('d.id = :questlog_id')->andWhere('u.id = :user_id')->setParameter('questlog_id', $questlog_id)->setParameter('user_id', $user->getId())->getQuery();
             $result = $query->getResult();
             if (empty($result)) {
-                /* @var $author User */
                 $author = $questlog->getUser();
                 $author->setReputation($author->getReputation() + 1);
                 $questlog->addVote($user);

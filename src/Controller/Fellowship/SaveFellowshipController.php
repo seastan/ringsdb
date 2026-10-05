@@ -66,7 +66,7 @@ class SaveFellowshipController extends AbstractController
             if (!$fellowship) {
                 throw new NotFoundHttpException('This fellowship does not exists.');
             }
-            if ($user->getId() !== $fellowship->getUser()->getId()) {
+            if (!$fellowship->getUser()->isEqualTo($user)) {
                 throw new AccessDeniedHttpException('Access denied to this object.');
             }
         } else {
@@ -113,9 +113,8 @@ class SaveFellowshipController extends AbstractController
                         if (!$deck) {
                             throw new NotFoundHttpException('One of the selected decks does not exists.');
                         }
-                        $deck_user = $deck->getUser();
-                        $is_owner = $user->getId() == $deck_user->getId();
-                        if (!$is_owner && !$deck_user->getIsShareDecks()) {
+                        $is_owner = $deck->getUser()->isEqualTo($user);
+                        if (!$is_owner && !$deck->getUser()->getIsShareDecks()) {
                             throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
                         }
                         if (!$is_owner) {

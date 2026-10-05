@@ -105,7 +105,19 @@ class ApiController extends AbstractController
         foreach ($list_packs as $pack) {
             $real = count($pack->getCards());
             $max = $pack->getSize();
-            $packs[] = ['name' => $pack->getName(), 'code' => $pack->getCode(), 'position' => $pack->getPosition(), 'cycle_position' => $pack->getCycle()->getPosition(), 'available' => $pack->getDateRelease() ? $pack->getDateRelease()->format('Y-m-d') : '', 'known' => intval($real), 'total' => $max, 'url' => $this->generateUrl('cards_list', ['pack_code' => $pack->getCode()], UrlGeneratorInterface::ABSOLUTE_URL), 'id' => $pack->getId()];
+            $packs[] = [
+                'name' => $pack->getName(),
+                'code' => $pack->getCode(),
+                'position' => $pack->getPosition(),
+                'cycle_position' => $pack->getCycle() ? $pack->getCycle()->getPosition() : null,
+                'available' => $pack->getDateRelease()
+                    ? $pack->getDateRelease()->format('Y-m-d')
+                    : '',
+                'known' => intval($real),
+                'total' => $max,
+                'url' => $this->generateUrl('cards_list', ['pack_code' => $pack->getCode()], UrlGeneratorInterface::ABSOLUTE_URL),
+                'id' => $pack->getId(),
+            ];
         }
         $content = json_encode($packs);
         $this->setJsonContent($response, (string) $content, $jsonp);
@@ -442,7 +454,11 @@ class ApiController extends AbstractController
                 if (!$card) {
                     continue;
                 }
-                $decklist['heroes_details'][] = ['name' => $card->getName(), 'sphere' => $card->getSphere()->getName(), 'pack' => $card->getPack()->getName()];
+                $decklist['heroes_details'][] = [
+                    'name' => $card->getName(),
+                    'sphere' => $card->getSphere() ? $card->getSphere()->getName() : null,
+                    'pack' => $card->getPack() ? $card->getPack()->getName() : null,
+                ];
             }
         }
         $content = json_encode($decklists);

@@ -33,7 +33,7 @@ class SaveCustomPackController extends AbstractController
      */
     public function __invoke(Request $request): RedirectResponse
     {
-        $user = $this->getUser();
+        $user = $this->currentUser();
         $name = trim($request->get('name', ''));
         if ('' === $name) {
             $this->get('session')->getFlashBag()->set('error', 'Pack name is required.');

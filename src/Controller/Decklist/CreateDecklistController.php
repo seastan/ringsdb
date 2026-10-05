@@ -54,7 +54,7 @@ class CreateDecklistController extends AbstractController
         if (!$deck) {
             throw new BadRequestHttpException('Invalid deck_id.');
         }
-        if ($user->getId() !== $deck->getUser()->getId()) {
+        if (!$deck->getUser()->isEqualTo($user)) {
             throw $this->createAccessDeniedException('Access denied to this object.');
         }
         $name = filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES) ?: '';

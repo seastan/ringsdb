@@ -36,9 +36,20 @@ class ListPublishedCustomPacksController extends AbstractController
                 $card = $entry->getCard();
                 $sphere = $card->getSphere();
                 $type = $card->getType();
-                $cards[] = ['card_code' => $card->getCode(), 'card_name' => $card->getName(), 'sphere_code' => $sphere->getCode(), 'type_name' => $type->getName(), 'quantity' => $entry->getQuantity()];
+                $cards[] = [
+                    'card_code' => $card->getCode(),
+                    'card_name' => $card->getName(),
+                    'sphere_code' => $sphere ? $sphere->getCode() : null,
+                    'type_name' => $type ? $type->getName() : null,
+                    'quantity' => $entry->getQuantity(),
+                ];
             }
-            $result[] = ['id' => $pack->getId(), 'name' => $pack->getName(), 'owner_name' => $pack->getUser()->getUsername(), 'cards' => $cards];
+            $result[] = [
+                'id' => $pack->getId(),
+                'name' => $pack->getName(),
+                'owner_name' => $pack->getUser()->getUsername(),
+                'cards' => $cards,
+            ];
         }
 
         return new JsonResponse($result);

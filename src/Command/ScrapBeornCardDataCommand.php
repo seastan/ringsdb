@@ -200,6 +200,9 @@ class ScrapBeornCardDataCommand extends Command
                 $output->writeln('<error>Cannot find pack ['.$set.']</error>');
                 exit;
             }
+            if (!$pack->getCycle()) {
+                throw new \RuntimeException('Pack must be part of a cycle');
+            }
 
             $beornset = str_replace([' '], ['%20'], $set);
             $html = file_get_contents("http://hallofbeorn.com/LotR?Sort=Set_Number&CardSet=$beornset");

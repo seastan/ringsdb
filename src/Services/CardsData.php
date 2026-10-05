@@ -539,6 +539,9 @@ class CardsData
         $cardinfo['packs'] = [];
         foreach ($card->getPrintings() as $printing) {
             $pack = $printing->getPack();
+            if (!$pack) {
+                continue;
+            }
 
             $prImageUrl = $this->assets_packages->getUrl('bundles/cards/'.$printing->getImageCode().'.png');
             $prImagePath = $this->publicDir.preg_replace('/\?.*/', '', $prImageUrl);

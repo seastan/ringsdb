@@ -50,7 +50,7 @@ class AjaxSaveController extends AbstractController
         if ($id) {
             /* @var $deck \App\Entity\Deck */
             $deck = $this->deckRepository->find($id);
-            if (!$deck || $user->getId() != $deck->getUser()->getId()) {
+            if (!$deck || !$deck->getUser()->isEqualTo($user)) {
                 return new JsonResponse(['success' => false, 'error' => "You don't have access to this deck."], 403);
             }
             $source_deck = $deck;

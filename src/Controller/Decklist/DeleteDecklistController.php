@@ -43,7 +43,7 @@ class DeleteDecklistController extends AbstractController
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
         $decklist = $this->decklistRepository->find($decklist_id);
-        if (!$decklist || $decklist->getUser()->getId() != $user->getId()) {
+        if (!$decklist || !$decklist->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException("You don't have access to this decklist.");
         }
         if ($decklist->getNbVotes() || $decklist->getNbfavorites() || $decklist->getNbcomments()) {

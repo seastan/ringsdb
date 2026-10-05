@@ -50,14 +50,14 @@ class FavoriteDecklistController extends AbstractController
         if ($is_favorite) {
             $decklist->setNbfavorites($decklist->getNbFavorites() - 1);
             $user->removeFavorite($decklist);
-            if ($author->getId() != $user->getId()) {
+            if (!$author->isEqualTo($user)) {
                 $author->setReputation($author->getReputation() - 5);
             }
         } else {
             $decklist->setNbfavorites($decklist->getNbFavorites() + 1);
             $user->addFavorite($decklist);
             $decklist->setDateUpdate(new \DateTime());
-            if ($author->getId() != $user->getId()) {
+            if (!$author->isEqualTo($user)) {
                 $author->setReputation($author->getReputation() + 5);
             }
         }

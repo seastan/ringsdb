@@ -51,7 +51,7 @@ class ScrapBeornScenarioDataCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $name = $input->getOption('name');
+        $name = (string) $input->getOption('name');
         $skip = (int) $input->getOption('skip');
         $customjson = $input->getOption('customjson');
 
@@ -70,7 +70,11 @@ class ScrapBeornScenarioDataCommand extends Command
 
         if ($name) {
             /* @var $allScenarios \App\Entity\Scenario[] */
-            $allScenarios = [$em->getRepository(Scenario::class)->findOneBy(['name' => $name])];
+            $scenario = $em->getRepository(Scenario::class)->findOneBy(['name' => $name]);
+            if (null === $scenario) {
+                throw new \RuntimeException(sprintf('Scenario with name "%s" not found.', $name));
+            }
+            $allScenarios = [$scenario];
         } else {
             /* @var $allScenarios \App\Entity\Scenario[] */
             $allScenarios = $em->getRepository(Scenario::class)->findAll();

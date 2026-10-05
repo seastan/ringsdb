@@ -49,7 +49,7 @@ class SaveDecklistController extends AbstractController
         if (!$decklist) {
             throw $this->createNotFoundException('Decklist not found');
         }
-        if (!$this->isGranted('ROLE_SUPER_ADMIN') && $user->getId() !== $decklist->getUser()->getId()) {
+        if (!$this->isGranted('ROLE_SUPER_ADMIN') && !$decklist->getUser()->isEqualTo($user)) {
             throw $this->createAccessDeniedException('Access denied');
         }
         $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));

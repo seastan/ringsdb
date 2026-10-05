@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Entity\Card;
+use App\Entity\Sphere;
+use App\Entity\Type;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
@@ -123,7 +125,8 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         $slotsByType = ['hero' => [], 'ally' => [], 'attachment' => [], 'event' => [], 'player-side-quest' => [], 'player-objective' => [], 'contract' => [], 'treasure' => []];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if (array_key_exists($card->getType()->getCode(), $slotsByType)) {
+            if ($card->getType() instanceof Type
+                && array_key_exists($card->getType()->getCode(), $slotsByType)) {
                 $slotsByType[$card->getType()->getCode()][] = $slot;
             }
         }
@@ -136,7 +139,8 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         $countByType = ['hero' => 0, 'ally' => 0, 'attachment' => 0, 'event' => 0, 'player-side-quest' => 0, 'player-objective' => 0, 'contract' => 0, 'treasure' => 0];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if (array_key_exists($card->getType()->getCode(), $countByType)) {
+            if ($card->getType() instanceof Type
+                && array_key_exists($card->getType()->getCode(), $countByType)) {
                 $countByType[$card->getType()->getCode()] += $slot->getQuantity();
             }
         }
@@ -149,7 +153,8 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         $countBySphere = ['spirit' => 0, 'tactics' => 0, 'leadership' => 0, 'lore' => 0];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if (array_key_exists($card->getSphere()->getCode(), $countBySphere)) {
+            if ($card->getSphere() instanceof Sphere
+                && array_key_exists($card->getSphere()->getCode(), $countBySphere)) {
                 $countBySphere[$card->getSphere()->getCode()] += $slot->getQuantity();
             }
         }
@@ -162,7 +167,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         $heroDeck = [];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if ('hero' === $card->getType()->getCode()) {
+            if ($card->getType() instanceof Type && 'hero' === $card->getType()->getCode()) {
                 $heroDeck[] = $slot;
             }
         }
@@ -175,7 +180,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         $drawDeck = [];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if (in_array($card->getType()->getCode(), ['ally', 'attachment', 'event', 'player-side-quest', 'player-objective', 'contract', 'treasure'])) {
+            if ($card->getType() instanceof Type && in_array($card->getType()->getCode(), ['ally', 'attachment', 'event', 'player-side-quest', 'player-objective', 'contract', 'treasure'])) {
                 $drawDeck[] = $slot;
             }
         }
@@ -207,7 +212,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
             foreach ($heroDeck->getSlots() as $slot) {
                 $card = $slot->getCard();
 
-                if ('lore' == $card->getSphere()->getCode()) {
+                if ($card->getSphere() instanceof Sphere && 'lore' == $card->getSphere()->getCode()) {
                     --$threat;
                 }
             }
@@ -233,9 +238,9 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         $copiesAndDeckLimit = [];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            $cardName = $card->getName();
+            $cardName = $card->getName() ?? '';
 
-            if ('hero' === $card->getType()->getCode()) {
+            if ($card->getType() instanceof Type && 'hero' === $card->getType()->getCode()) {
                 $cardName = $cardName.'Hero';
             }
 

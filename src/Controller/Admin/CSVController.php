@@ -131,9 +131,10 @@ class CSVController extends AbstractController
         // pack are never touched.
         foreach ($pack->getPrintings() as $printing) {
             $existingCard = $printing->getCard();
-            if (!array_key_exists($existingCard->getCode(), $newCodes)
+            if ($existingCard
+                && !array_key_exists((string) $existingCard->getCode(), $newCodes)
                 && !array_key_exists((string) $printing->getOctgnid(), $newOctgnids)
-                && false === strpos($existingCard->getName(), '[deleted]')) {
+                && false === strpos($existingCard->getName() ?? '', '[deleted]')) {
                 $deletedCards[] = $existingCard->getCode();
                 ++$summary['deleted'];
                 $existingCard->setName('[deleted] '.$existingCard->getName());
@@ -298,9 +299,6 @@ class CSVController extends AbstractController
             if (!$cardIsNew && !$printingIsNew && $changed) {
                 ++$summary['updated'];
             }
-
-            $this->entityManager->persist($cardEntity);
-            $this->entityManager->persist($printingEntity);
         }
 
         $this->entityManager->flush();

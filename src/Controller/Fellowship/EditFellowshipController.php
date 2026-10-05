@@ -43,7 +43,7 @@ class EditFellowshipController extends AbstractController
         if (!$fellowship) {
             throw new NotFoundHttpException('This fellowship does not exists.');
         }
-        if ($user->getId() !== $fellowship->getUser()->getId()) {
+        if (!$fellowship->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException('Access denied to this object.');
         }
         $data = ['pagetitle' => 'Edit Fellowship', 'deck1' => null, 'deck2' => null, 'deck3' => null, 'deck4' => null, 'fellowship' => $fellowship, 'is_public' => $fellowship->getIsPublic()];

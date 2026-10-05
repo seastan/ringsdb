@@ -45,7 +45,7 @@ class VoteFellowshipController extends AbstractController
         if (!$fellowship) {
             throw new BadRequestHttpException('Unable to find fellowship');
         }
-        if ($fellowship->getUser()->getId() != $user->getId()) {
+        if (!$fellowship->getUser()->isEqualTo($user)) {
             $query = $this->fellowshipRepository->createQueryBuilder('d')->innerJoin('d.votes', 'u')->where('d.id = :fellowship_id')->andWhere('u.id = :user_id')->setParameter('fellowship_id', $fellowship_id)->setParameter('user_id', $user->getId())->getQuery();
             $result = $query->getResult();
             if (empty($result)) {

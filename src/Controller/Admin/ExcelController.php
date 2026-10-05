@@ -70,8 +70,7 @@ class ExcelController extends AbstractController
             if (!$pack) {
                 throw $this->createNotFoundException('Pack not found.');
             }
-            $printings = $cardPrintingRepository->findBy(['pack' => $pack], ['position' => 'ASC']);
-            $cards = array_values(array_unique(array_map(fn ($p) => $p->getCard(), $printings), SORT_REGULAR));
+            $cards = $pack->getCards()->toArray();
             $pack_name = $pack->getName();
         }
         $fieldNames = $this->entityManager->getClassMetadata(Card::class)->getFieldNames();

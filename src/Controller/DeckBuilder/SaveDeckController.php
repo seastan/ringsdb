@@ -52,7 +52,7 @@ class SaveDeckController extends AbstractController
         if ($id) {
             /* @var $deck \App\Entity\Deck */
             $deck = $this->deckRepository->find($id);
-            if (!$deck || $user->getId() != $deck->getUser()->getId()) {
+            if (!$deck || !$deck->getUser()->isEqualTo($user)) {
                 throw new AccessDeniedHttpException("You don't have access to this deck.");
             }
             $source_deck = $deck;

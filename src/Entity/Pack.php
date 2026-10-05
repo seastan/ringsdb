@@ -235,7 +235,8 @@ class Pack
      */
     public function getCards(): Collection
     {
-        return $this->printings->map(fn ($p) => $p->getCard());
+        /* @phpstan-ignore-next-line return.type */
+        return $this->printings->filter(fn ($p) => $p->getCard() instanceof Card)->map(fn ($p) => $p->getCard());
     }
 
     /**
@@ -282,5 +283,31 @@ class Pack
     public function getCycle(): ?Cycle
     {
         return $this->cycle;
+    }
+
+    /**
+     * Returns true is self is later than the argument.
+     */
+    public function isLaterThan(Pack $latestPack): bool
+    {
+        if (!$latestPack->getCycle() instanceof Cycle
+            || !$this->getCycle() instanceof Cycle) {
+            throw new \LogicException('Pack should be an instance of Cycle to be sorted');
+        }
+
+        if (!$latestPack->getDateRelease()
+            && !$this->getDateRelease()) {
+            if ($latestPack->getCycle()->getPosition() === $this->getCycle()->getPosition()) {
+                return $latestPack->getCycle()->getPosition() < $this->getCycle()->getPosition();
+            }
+
+            return $latestPack->getCycle()->getPosition() < $this->getCycle()->getPosition();
+        }
+
+        if ($latestPack->getDateRelease() && $this->getDateRelease()) {
+            return $latestPack->getDateRelease() < $this->getDateRelease();
+        }
+
+        return !$this->getDateRelease();
     }
 }

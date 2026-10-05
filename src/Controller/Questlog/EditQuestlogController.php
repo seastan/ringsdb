@@ -48,7 +48,7 @@ class EditQuestlogController extends AbstractController
         if (!$questlog) {
             throw new NotFoundHttpException('This questlog does not exists.');
         }
-        if ($user->getId() !== $questlog->getUser()->getId()) {
+        if ($questlog->getUser() && !$questlog->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException('Access denied to this object.');
         }
         /* @var $quests Scenario[] */

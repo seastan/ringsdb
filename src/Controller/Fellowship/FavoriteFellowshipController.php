@@ -54,14 +54,14 @@ class FavoriteFellowshipController extends AbstractController
             $fellowship->setNbfavorites($fellowship->getNbFavorites() - 1);
             $fellowship->removeFavorite($user);
             $fellowship->setDateUpdate(new \DateTime());
-            if ($author->getId() != $user->getId()) {
+            if (!$author->isEqualTo($user)) {
                 $author->setReputation($author->getReputation() - 5);
             }
         } else {
             $fellowship->setNbfavorites($fellowship->getNbFavorites() + 1);
             $fellowship->addFavorite($user);
             $fellowship->setDateUpdate(new \DateTime());
-            if ($author->getId() != $user->getId()) {
+            if (!$author->isEqualTo($user)) {
                 $author->setReputation($author->getReputation() + 5);
             }
         }

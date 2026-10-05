@@ -74,7 +74,7 @@ class CommentQuestlogController extends AbstractController
             $this->entityManager->flush();
             // send emails
             $spool = [];
-            if ($questlog->getUser()->getIsNotifAuthor()) {
+            if ($questlog->getUser() && $questlog->getUser()->getIsNotifAuthor()) {
                 $spool[$questlog->getUser()->getEmail()] = 'Emails/newquestlogcomment_author.html.twig';
             }
             foreach ($questlog->getComments() as $comment) {

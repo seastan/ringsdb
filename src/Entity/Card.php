@@ -147,8 +147,9 @@ class Card
             }
 
             // a printing always has a pack (card_printing.pack_id is NOT NULL)
-            $pDate = $p->getPack()->getDateRelease();
-            $primaryDate = $primary->getPack()->getDateRelease();
+            // except for a Card that has not been persisted yet
+            $pDate = $p->getPack() ? $p->getPack()->getDateRelease() : null;
+            $primaryDate = $primary->getPack() ? $primary->getPack()->getDateRelease() : null;
 
             // Prefer the earliest-released pack so the canonical printing is the
             // original one (e.g. Core Set over a later reprint or starter). A
@@ -244,7 +245,12 @@ class Card
 
     public function getAdminLabel(): string
     {
-        return $this->name.' ('.$this->sphere->getName().', '.$this->type->getName().')';
+        return sprintf(
+            '%s (%s, %s)',
+            $this->getName() ?? '<name>',
+            $this->getSphere() ? $this->getSphere()->getName() : '<sphere>',
+            $this->getType() ? $this->getType()->getName() : '<type>',
+        );
     }
 
     /**

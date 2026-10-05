@@ -38,7 +38,7 @@ class DisplaySearchController extends AbstractController
     /**
      * No route for this controller, it's called internally only.
      */
-    public function __invoke(string $q, string $view = 'card', string $sort = 'set', int $page = 1, string $pagetitle = '', string $meta = '', ?string $selected_pack_code = null): Response
+    public function __invoke(string $q, string $view = 'card', string $sort = 'set', int $page = 1, string $pagetitle = '', ?string $selected_pack_code = null): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -93,13 +93,15 @@ class DisplaySearchController extends AbstractController
                 $pack = $card->getPack();
                 /** @var array<string, mixed> $cardinfo */
                 $cardinfo = $this->cardsData->getCardInfo($card, false);
-                if (empty($availability[$pack->getCode()])) {
-                    $availability[$pack->getCode()] = false;
-                    if ($pack->getDateRelease() && $pack->getDateRelease() <= new \DateTime()) {
-                        $availability[$pack->getCode()] = true;
+                if ($pack instanceof Pack) {
+                    if (empty($availability[$pack->getCode()])) {
+                        $availability[$pack->getCode()] = false;
+                        if ($pack->getDateRelease() && $pack->getDateRelease() <= new \DateTime()) {
+                            $availability[$pack->getCode()] = true;
+                        }
                     }
+                    $cardinfo['available'] = $availability[$pack->getCode()];
                 }
-                $cardinfo['available'] = $availability[$pack->getCode()];
                 $cardinfo['selected_pack_code'] = $selected_pack_code;
                 if ($selected_pack_code) {
                     foreach ($cardinfo['packs'] as $p) {
@@ -144,12 +146,21 @@ class DisplaySearchController extends AbstractController
         }
 
         // attention si $s="short", $cards est un tableau à 2 niveaux au lieu de 1 seul
-        return $this->render('Search/display-'.$view.'.html.twig', ['view' => $view, 'sort' => $sort, 'cards' => $cards, 'first' => $first, 'last' => $last, 'searchbar' => $searchbar, 'pagination' => $pagination, 'pagetitle' => $pagetitle, 'metadescription' => $meta, 'includeReviews' => $includeReviews], $response);
+        return $this->render('Search/display-'.$view.'.html.twig', [
+            'view' => $view,
+            'sort' => $sort,
+            'cards' => $cards,
+            'first' => $first,
+            'last' => $last,
+            'searchbar' => $searchbar,
+            'pagination' => $pagination,
+            'pagetitle' => $pagetitle,
+            'includeReviews' => $includeReviews,
+        ], $response);
     }
 
     public function setNavigation(Card $card, ?string $selectedPackCode = null): string
     {
-        $em = $this->getDoctrine();
         $selectedPack = null;
         if ($selectedPackCode) {
             $selectedPack = $this->packRepository->findOneBy(['code' => $selectedPackCode]);
@@ -183,7 +194,16 @@ class DisplaySearchController extends AbstractController
         }
         $packParam = $selectedPackCode ? ['pack' => $selectedPackCode] : [];
 
-        return $this->renderView('Search/setnavigation.html.twig', ['prevtitle' => $prev ? $prev->getName() : '', 'prevhref' => $prev ? $this->generateUrl('cards_zoom', array_merge(['card_code' => $prev->getCode()], $packParam)) : '', 'nexttitle' => $next ? $next->getName() : '', 'nexthref' => $next ? $this->generateUrl('cards_zoom', array_merge(['card_code' => $next->getCode()], $packParam)) : '', 'settitle' => $selectedPack->getName(), 'sethref' => $this->generateUrl('cards_list', ['pack_code' => $selectedPack->getCode()])]);
+        return $this->renderView('Search/setnavigation.html.twig', [
+            'prevtitle' => $prev ? $prev->getName() : '',
+            'prevhref' => $prev ? $this->generateUrl('cards_zoom', array_merge(['card_code' => $prev->getCode()], $packParam)) : '',
+            'nexttitle' => $next ? $next->getName() : '',
+            'nexthref' => $next ? $this->generateUrl('cards_zoom', array_merge(['card_code' => $next->getCode()], $packParam)) : '',
+            'settitle' => $selectedPack ? $selectedPack->getName() : '',
+            'sethref' => $selectedPack ? $this->generateUrl('cards_list', [
+                'pack_code' => $selectedPack->getCode(),
+            ]) : '',
+        ]);
     }
 
     public function paginationItem(?string $q = null, string $v, string $s, int $ps, int $pi, int $total): string

@@ -46,7 +46,7 @@ class NewFellowshipController extends AbstractController
                 if ($decks[$i]) {
                     /* @var $user User */
                     $user = $decks[$i]->getUser();
-                    if (!$user->getIsShareDecks() && $user->getId() != $this->currentUser()->getId()) {
+                    if (!$user->getIsShareDecks() && !$this->currentUser()->isEqualTo($user)) {
                         $decks[$i] = null;
                     }
                 }

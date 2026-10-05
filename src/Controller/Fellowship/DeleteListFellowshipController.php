@@ -44,7 +44,7 @@ class DeleteListFellowshipController extends AbstractController
             if (!$fellowship) {
                 continue;
             }
-            if ($user->getId() != $fellowship->getUser()->getId()) {
+            if (!$fellowship->getUser()->isEqualTo($user)) {
                 continue;
             }
             if ($fellowship->getNbVotes() || $fellowship->getNbfavorites() || $fellowship->getNbcomments()) {

@@ -298,7 +298,16 @@ class DefaultController extends AbstractController
         $game_name = $this->gameName;
         $publisher_name = $this->publisherName;
 
-        return $this->render('Default/index.html.twig', ['pagetitle' => "{$game_name} Deckbuilder", 'pagedescription' => "Build your deck for {$game_name} by {$publisher_name}. Browse the cards and the thousand of decklists submitted by the community. Publish your own decks and get feedback.", 'decklists_trending' => $decklists_trending, 'fellowships_trending' => $fellowships_trending, 'decklists_new' => $decklists_new, 'fellowships_new' => $fellowships_new, 'all_comments' => $all_comments, 'daily_challenge' => $daily_challenge], $response);
+        return $this->render('Default/index.html.twig', [
+            'pagetitle' => "{$game_name} Deckbuilder",
+            'pagedescription' => "Build your deck for {$game_name} by {$publisher_name}. Browse the cards and the thousand of decklists submitted by the community. Publish your own decks and get feedback.",
+            'decklists_trending' => $decklists_trending,
+            'fellowships_trending' => $fellowships_trending,
+            'decklists_new' => $decklists_new,
+            'fellowships_new' => $fellowships_new,
+            'all_comments' => $all_comments,
+            'daily_challenge' => $daily_challenge,
+        ], $response);
     }
 
     public function rulesAction(CardsData $cardsData): Response
@@ -306,7 +315,10 @@ class DefaultController extends AbstractController
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
-        $render = $this->renderView('Default/rules.html.twig', ['pagetitle' => 'Rules', 'pagedescription' => 'Refer to the official rules of the game.']);
+        $render = $this->renderView('Default/rules.html.twig', [
+            'pagetitle' => 'Rules',
+            'pagedescription' => 'Refer to the official rules of the game.',
+        ]);
         $page = $cardsData->replaceSymbols($render);
         $response->setContent($page);
 
@@ -322,7 +334,10 @@ class DefaultController extends AbstractController
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
 
-        return $this->render('Default/about.html.twig', ['pagetitle' => 'About', 'game_name' => $this->gameName], $response);
+        return $this->render('Default/about.html.twig', [
+            'pagetitle' => 'About',
+            'game_name' => $this->gameName,
+        ], $response);
     }
 
     /**
@@ -334,6 +349,10 @@ class DefaultController extends AbstractController
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
 
-        return $this->render('Default/apiIntro.html.twig', ['pagetitle' => 'API', 'game_name' => $this->gameName, 'publisher_name' => $this->publisherName], $response);
+        return $this->render('Default/apiIntro.html.twig', [
+            'pagetitle' => 'API',
+            'game_name' => $this->gameName,
+            'publisher_name' => $this->publisherName,
+        ], $response);
     }
 }

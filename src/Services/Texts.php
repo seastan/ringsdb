@@ -66,7 +66,12 @@ class Texts
      */
     public function img_responsive(string $string): string
     {
-        return preg_replace('/<img/', '<img class="img-responsive"', $string);
+        $replace = preg_replace('/<img/', '<img class="img-responsive"', $string);
+        if (null === $replace) {
+            throw new \RuntimeException('Unable to parse image string '.$string);
+        }
+
+        return $replace;
     }
 
     /**

@@ -83,7 +83,7 @@ class ApiPrivateController extends AbstractController
         if (!$user) {
             return new JsonResponse(['success' => false, 'error' => 'This user does not exist.']);
         }
-        $show_private_decks = $user->getId() == $this->currentUser()->getId();
+        $show_private_decks = $this->currentUser()->isEqualTo($user);
         /* @var $decklists Decklist[] */
         $decklists = $this->decklistRepository->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
         foreach ($decklists as &$decklist) {

@@ -47,7 +47,7 @@ class PublishFormFellowshipController extends AbstractController
         }
         /* @var $fellowship \App\Entity\Fellowship */
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
-        if (!$fellowship || $fellowship->getUser()->getId() != $user->getId()) {
+        if (!$fellowship || !$fellowship->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
         $problem = $this->fellowshipValidationHelper->findProblem($fellowship);

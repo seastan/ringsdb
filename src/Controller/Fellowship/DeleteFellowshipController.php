@@ -42,7 +42,7 @@ class DeleteFellowshipController extends AbstractController
         if (!$fellowship) {
             return $this->redirect($this->generateUrl('myfellowships_list'));
         }
-        if ($fellowship->getUser()->getId() != $user->getId()) {
+        if (!$fellowship->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
         if ($fellowship->getNbVotes() || $fellowship->getNbfavorites() || $fellowship->getNbcomments()) {

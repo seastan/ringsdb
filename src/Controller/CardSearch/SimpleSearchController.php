@@ -29,7 +29,7 @@ class SimpleSearchController extends AbstractController
      */
     public function findAction(Request $request)
     {
-        $q = $request->query->get('q');
+        $q = (string) $request->query->get('q');
         $q = str_replace('t:campaign', 't:treasure', $q);
         $page = $request->query->get('page') ?: 1;
         $view = $request->query->get('view') ?: 'list';
@@ -49,6 +49,12 @@ class SimpleSearchController extends AbstractController
             }
         }
 
-        return $this->forward(DisplaySearchController::class, ['q' => $q, 'view' => $view, 'sort' => $sort, 'page' => $page, '_route' => $request->get('_route')]);
+        return $this->forward(DisplaySearchController::class, [
+            'q' => $q,
+            'view' => $view,
+            'sort' => $sort,
+            'page' => $page,
+            '_route' => $request->get('_route'),
+        ]);
     }
 }

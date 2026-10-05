@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Entity\Deck;
 use App\Entity\User;
 use App\Repository\QuestlogRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,7 +41,10 @@ class QuestlogArchiver
         }
         $questlog_user = $questlog->getUser();
         $is_public = $questlog->getIsPublic();
-        if ($questlog_user->getId() != $user->getId() && !$questlog_user->getIsShareDecks() && !$is_public) {
+        if ($questlog_user instanceof User
+            && !$questlog_user->isEqualTo($user)
+            && !$questlog_user->getIsShareDecks()
+            && !$is_public) {
             throw new AccessDeniedHttpException("You don't have access to this questlog.");
         }
         $tmpDir = $this->cacheDir;
@@ -56,14 +60,12 @@ class QuestlogArchiver
             $questlog_decks = $questlog->getDecks();
             foreach ($questlog_decks as $questlog_deck) {
                 $deck = $questlog_deck->getDeck();
-                $this->decks->setSlots($deck, json_decode($questlog_deck->getContent(), true));
-                $decks[] = $deck;
+                if ($deck instanceof Deck) {
+                    $this->decks->setSlots($deck, json_decode($questlog_deck->getContent(), true));
+                    $decks[] = $deck;
+                }
             }
             foreach ($decks as $deck) {
-                /* @var $deck \App\Entity\Deck */
-                if (!$deck) {
-                    continue;
-                }
                 if ($octgn) {
                     $extension = 'o8d';
                     $content = $this->twig->render('Export/octgn.xml.twig', ['deck' => $deck->getTextExport()]);

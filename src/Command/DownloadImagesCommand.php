@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Entity\ReviewRepository;
 use App\Repository\CardRepository;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Console\Command\Command;
@@ -48,7 +47,6 @@ class DownloadImagesCommand extends Command
     {
         $assets_helper = $this->packages;
 
-        /* @var $repo ReviewRepository */
         $repo = $this->cardRepository;
 
         $publicDir = $this->publicDir;
@@ -56,6 +54,9 @@ class DownloadImagesCommand extends Command
 
         $cards = $repo->findBy([], ['code' => 'ASC']);
         foreach ($cards as $card) {
+            if (!$card->getPack()) {
+                continue;
+            }
             $card_code = $card->getCode();
             $imageurl = $assets_helper->getUrl('bundles/cards/'.$card_code.'.png');
             $imagepath = $publicDir.preg_replace('/\?.*/', '', $imageurl);

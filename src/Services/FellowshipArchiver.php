@@ -38,7 +38,7 @@ class FellowshipArchiver
         }
         $fellowship_user = $fellowship->getUser();
         $is_public = $fellowship->getIsPublic();
-        if ($fellowship_user->getId() != $user->getId() && !$fellowship_user->getIsShareDecks() && !$is_public) {
+        if (!$fellowship_user->isEqualTo($user) && !$fellowship_user->getIsShareDecks() && !$is_public) {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
         $tmpDir = $this->cacheDir;

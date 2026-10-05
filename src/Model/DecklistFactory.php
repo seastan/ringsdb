@@ -9,6 +9,7 @@ use App\Entity\Decklist;
 use App\Entity\Decklistsideslot;
 use App\Entity\Decklistslot;
 use App\Entity\Pack;
+use App\Entity\Sphere;
 use App\Helper\DeckValidationHelper;
 use App\Repository\SphereRepository;
 use App\Services\Texts;
@@ -64,7 +65,7 @@ class DecklistFactory
         if (empty($descriptionMd)) {
             $descriptionMd = $deck->getDescriptionMd();
         }
-        $description = $this->texts->markdown($descriptionMd);
+        $description = $this->texts->markdown($descriptionMd ?? '');
 
         $countBySphere = $deck->getSlots()->getCountBySphere();
         $predominantSphere = array_keys($countBySphere, max($countBySphere))[0];
@@ -114,7 +115,9 @@ class DecklistFactory
         $decklist->setStartingThreat($decklist->getSlots()->getStartingThreat());
 
         foreach ($heroes as $hero) {
-            $decklist->addSphere($hero->getCard()->getSphere());
+            if ($hero->getCard()->getSphere() instanceof Sphere) {
+                $decklist->addSphere($hero->getCard()->getSphere());
+            }
         }
 
         if (count($deck->getChildren())) {

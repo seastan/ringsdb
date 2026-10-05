@@ -37,9 +37,9 @@ class ViewQuestlogController extends AbstractController
         if (!$questlog) {
             throw new NotFoundHttpException('This questlog does not exists.');
         }
-        $is_owner = $this->getUser() && $this->getUser()->getId() == $questlog->getUser()->getId();
+        $is_owner = $this->getUser() && $questlog->getUser() && $this->getUser()->getId() == $questlog->getUser()->getId();
         $is_public = $questlog->getIsPublic();
-        if (!$questlog->getUser()->getIsShareDecks() && !$is_owner && !$is_public) {
+        if ($questlog->getUser() && !$questlog->getUser()->getIsShareDecks() && !$is_owner && !$is_public) {
             throw new AccessDeniedHttpException('You are not allowed to view this questlog. To get access, you can ask it\'s owner to enable "Share my decks" on their account.');
         }
         if ($is_public) {
@@ -47,11 +47,33 @@ class ViewQuestlogController extends AbstractController
                 /* @var $comment \App\Entity\QuestlogComment */
                 return $comment->getUser()->getUsername();
             }, $questlog->getComments()->getValues());
-            $commenters[] = $questlog->getUser()->getUsername();
+            if ($questlog->getUser()) {
+                $commenters[] = $questlog->getUser()->getUsername();
+            }
         } else {
             $commenters = [];
         }
-        $data = ['pagetitle' => $questlog->getScenario()->getName().' - Quest Log', 'deck1' => null, 'deck2' => null, 'deck3' => null, 'deck4' => null, 'questlogdeck1_content' => null, 'questlogdeck2_content' => null, 'questlogdeck3_content' => null, 'questlogdeck4_content' => null, 'questlogdeck1_player_name' => null, 'questlogdeck2_player_name' => null, 'questlogdeck3_player_name' => null, 'questlogdeck4_player_name' => null, 'questlog' => $questlog, 'is_owner' => $is_owner, 'is_public' => $is_public, 'commenters' => $commenters, 'nbDecks' => $questlog->getNbDecks()];
+
+        $data = [
+            'pagetitle' => ($questlog->getScenario() ? $questlog->getScenario()->getName() : 'Unknown Scenario').' - Quest Log',
+            'deck1' => null,
+            'deck2' => null,
+            'deck3' => null,
+            'deck4' => null,
+            'questlogdeck1_content' => null,
+            'questlogdeck2_content' => null,
+            'questlogdeck3_content' => null,
+            'questlogdeck4_content' => null,
+            'questlogdeck1_player_name' => null,
+            'questlogdeck2_player_name' => null,
+            'questlogdeck3_player_name' => null,
+            'questlogdeck4_player_name' => null,
+            'questlog' => $questlog,
+            'is_owner' => $is_owner,
+            'is_public' => $is_public,
+            'commenters' => $commenters,
+            'nbDecks' => $questlog->getNbDecks(),
+        ];
         /* @var $questlog_decks \App\Entity\QuestlogDeck[] */
         $questlog_decks = $questlog->getDecks();
         foreach ($questlog_decks as $questlog_deck) {

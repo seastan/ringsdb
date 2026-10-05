@@ -34,9 +34,20 @@ class GetCustomPacksController extends AbstractController
             $cards = [];
             foreach ($pack->getCards() as $entry) {
                 $card = $entry->getCard();
-                $cards[] = ['card_code' => $card->getCode(), 'card_name' => $card->getName(), 'type_code' => $card->getType()->getCode(), 'quantity' => $entry->getQuantity()];
+                $cards[] = [
+                    'card_code' => $card->getCode(),
+                    'card_name' => $card->getName(),
+                    'type_code' => $card->getType() ? $card->getType()->getCode() : null,
+                    'quantity' => $entry->getQuantity(),
+                ];
             }
-            $result[] = ['id' => $pack->getId(), 'code' => $pack->getCode(), 'name' => $pack->getName(), 'is_enabled' => $pack->getIsEnabled(), 'cards' => $cards];
+            $result[] = [
+                'id' => $pack->getId(),
+                'code' => $pack->getCode(),
+                'name' => $pack->getName(),
+                'is_enabled' => $pack->getIsEnabled(),
+                'cards' => $cards,
+            ];
         }
 
         return new JsonResponse($result);

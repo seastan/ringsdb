@@ -46,7 +46,7 @@ class EditReviewController extends AbstractController
         if (!$review) {
             throw new BadRequestHttpException('Unable to find review.');
         }
-        if ($review->getUser()->getId() !== $user->getId()) {
+        if (!$review->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException('You cannot edit this review.');
         }
         $review_raw = trim($request->get('review'));

@@ -83,7 +83,12 @@ class CardPrintingController extends AbstractController
         $entity = new CardPrinting();
         $form = $this->createForm(CardPrintingType::class, $entity, ['filter_pack' => $filterPack]);
 
-        return $this->render('CardPrinting/new.html.twig', ['entity' => $entity, 'form' => $form->createView(), 'packs' => $this->packRepository->findBy([], ['name' => 'ASC']), 'filter_pack' => $filterPack ? $filterPack->getId() : null]);
+        return $this->render('CardPrinting/new.html.twig', [
+            'entity' => $entity,
+            'form' => $form->createView(),
+            'packs' => $this->packRepository->findBy([], ['name' => 'ASC']),
+            'filter_pack' => $filterPack ? $filterPack->getId() : null,
+        ]);
     }
 
     /**
@@ -102,7 +107,12 @@ class CardPrintingController extends AbstractController
             return $this->redirect($this->generateUrl('admin_card_printing_show', ['id' => $entity->getId()]));
         }
 
-        return $this->render('CardPrinting/new.html.twig', ['entity' => $entity, 'form' => $form->createView(), 'packs' => $this->packRepository->findBy([], ['name' => 'ASC']), 'filter_pack' => $filterPack ? $filterPack->getId() : null]);
+        return $this->render('CardPrinting/new.html.twig', [
+            'entity' => $entity,
+            'form' => $form->createView(),
+            'packs' => $this->packRepository->findBy([], ['name' => 'ASC']),
+            'filter_pack' => $filterPack ? $filterPack->getId() : null,
+        ]);
     }
 
     /**

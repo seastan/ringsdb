@@ -53,7 +53,7 @@ class DeckArchiver
                 if (!$deck) {
                     continue;
                 }
-                if ($user->getId() != $deck->getUser()->getId()) {
+                if (!$deck->getUser()->isEqualTo($user)) {
                     continue;
                 }
                 if ($octgn) {

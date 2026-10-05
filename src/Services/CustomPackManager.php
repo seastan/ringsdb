@@ -55,7 +55,7 @@ class CustomPackManager
     public function loadOwnedPack(User $user, int $id): ?UserCustomPack
     {
         $pack = $this->userCustomPackRepository->find($id);
-        if (!$pack || $pack->getUser()->getId() !== $user->getId()) {
+        if (!$pack || !$pack->getUser()->isEqualTo($user)) {
             return null;
         }
 

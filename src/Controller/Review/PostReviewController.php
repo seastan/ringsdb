@@ -49,7 +49,7 @@ class PostReviewController extends AbstractController
         if (!$card) {
             throw new \Exception('This card does not exist.');
         }
-        if (!$card->getPack()->getDateRelease()) {
+        if (!$card->getPack() || !$card->getPack()->getDateRelease()) {
             throw new \Exception('You may not write a review for an unreleased card.');
         }
         // checking the user didn't already write a review for that card
