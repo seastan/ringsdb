@@ -98,6 +98,8 @@ class DeckCompareTest extends WebTestCase
 
     /**
      * A copy of fixture deck 2 with the given cards ([card id => quantity]).
+     * @param int[] $main
+     * @param int[] $side
      */
     private function insertDeck(string $name, array $main, array $side): int
     {
@@ -118,7 +120,7 @@ class DeckCompareTest extends WebTestCase
         return $id;
     }
 
-    private function slots(string $table, $deckId)
+    private function slots(string $table, int $deckId)
     {
         return $this->db()->fetchAll("SELECT card_id, quantity FROM $table WHERE deck_id = ? ORDER BY card_id", [$deckId]);
     }

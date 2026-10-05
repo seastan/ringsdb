@@ -58,9 +58,8 @@ class SuggestionsCommandTest extends KernelTestCase
     }
 
     /* ------------------------------------------------------------ helpers */
-
     /**
-     * @return array the decoded suggestions.json
+     * @return array<string, mixed> the decoded suggestions.json
      */
     private function runCommand(): array
     {
@@ -74,6 +73,9 @@ class SuggestionsCommandTest extends KernelTestCase
         return json_decode((string) file_get_contents($this->file), true);
     }
 
+    /**
+     * @param int[] $cardIds
+     */
     private function insertDeck(array $cardIds): void
     {
         $row = $this->connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
@@ -88,6 +90,7 @@ class SuggestionsCommandTest extends KernelTestCase
 
     /**
      * The value of the matrix for two card codes.
+     * @param array<string, mixed> $suggestions
      */
     private function value(array $suggestions, string $code1, string $code2)
     {

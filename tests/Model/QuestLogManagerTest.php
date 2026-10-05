@@ -83,7 +83,10 @@ class QuestLogManagerTest extends KernelTestCase
     }
 
     /* ------------------------------------------------------------ helpers */
-
+    /**
+     * @param int[] $deckIds
+     * @param array<string, int>|array<string, string> $values
+     */
     private function insertQuestlog(string $name, int $userId, array $deckIds, array $values): int
     {
         $this->connection->insert('questlog', $values + [
@@ -103,6 +106,7 @@ class QuestLogManagerTest extends KernelTestCase
 
     /**
      * A copy of fixture deck 2 with the given cards ([card id => quantity]).
+     * @param int[] $slots
      */
     private function insertDeck(array $slots): int
     {
@@ -118,6 +122,9 @@ class QuestLogManagerTest extends KernelTestCase
         return $id;
     }
 
+    /**
+     * @param array<string, string> $query
+     */
     private function manager(array $query = [], ?string $username = null): QuestLogManager
     {
         $container = static::$kernel->getContainer();
@@ -198,6 +205,9 @@ class QuestLogManagerTest extends KernelTestCase
         $this->assertSame($expected, $this->names($this->manager($query, $username)->findQuestLogsWithComplexSearch()));
     }
 
+    /**
+     * @return array<string, mixed[]>
+     */
     public function searchProvider(): array
     {
         return [

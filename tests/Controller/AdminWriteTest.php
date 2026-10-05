@@ -82,6 +82,9 @@ class AdminWriteTest extends WebTestCase
         return $client;
     }
 
+    /**
+     * @param array<string, mixed> $values
+     */
     private function submitForm(KernelBrowser $client, string $pageUri, string $action, array $values): \Symfony\Component\HttpFoundation\Response
     {
         $crawler = $client->request('GET', $pageUri);
@@ -93,6 +96,7 @@ class AdminWriteTest extends WebTestCase
 
     /**
      * @return array<string, mixed>
+     * @param array<string, string> $values
      */
     private function prefixed(string $prefix, array $values): array
     {
@@ -105,9 +109,9 @@ class AdminWriteTest extends WebTestCase
     }
 
     /* -------------------------------------------------------------- CRUD */
-
     /**
      * [route slug, form name, table, created values, expected columns, updated values, expected columns].
+     * @return array<string, string[]|array<string, bool|string>[]|array<string, string>[]>
      */
     public function crudProvider(): array
     {
@@ -293,6 +297,9 @@ class AdminWriteTest extends WebTestCase
         $this->assertSame($location, $client->getResponse()->headers->get('Location'));
     }
 
+    /**
+     * @return array<string, string[]|array<string, string>[]>
+     */
     public function findUserProvider(): array
     {
         return [

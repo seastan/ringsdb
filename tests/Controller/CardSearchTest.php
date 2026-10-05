@@ -46,6 +46,9 @@ class CardSearchTest extends WebTestCase
         $this->assertSame($expected, $names);
     }
 
+    /**
+     * @return array<string, string[]|string[][]>
+     */
     public function acronymProvider(): array
     {
         return [

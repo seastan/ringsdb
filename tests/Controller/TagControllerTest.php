@@ -55,7 +55,7 @@ class TagControllerTest extends WebTestCase
     }
 
     /**
-     * @return array the decoded JSON answer
+     * @return array<string, mixed> the decoded JSON answer
      */
     private function post(KernelBrowser $client, string $action, array $parameters): array
     {
@@ -159,6 +159,9 @@ class TagControllerTest extends WebTestCase
         $this->assertSame(array_column($this->fixtureDecks, 'tags', 'id'), $this->tags());
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function actionProvider(): array
     {
         return ['add' => ['add'], 'remove' => ['remove'], 'clear' => ['clear']];

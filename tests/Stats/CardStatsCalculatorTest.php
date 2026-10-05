@@ -65,12 +65,12 @@ class CardStatsCalculatorTest extends KernelTestCase
     }
 
     /* ------------------------------------------------------------ helpers */
-
     /**
      * Inserts a private deck (a copy of fixture deck 2 with other values), returns its id.
      *
-     * @param array $main [card id => quantity]
-     * @param array $side [card id => quantity]
+     * @param int[] $main [card id => quantity]
+     * @param int[] $side [card id => quantity]
+     * @param array<string, string>|array<string, int> $values
      */
     private function insertDeck(array $values, array $main, array $side = []): int
     {
@@ -92,6 +92,8 @@ class CardStatsCalculatorTest extends KernelTestCase
 
     /**
      * Inserts a decklist (a copy of fixture decklist 2 with other values), returns its id.
+     * @param array<string, string> $values
+     * @param int[] $main
      */
     private function insertDecklist(array $values, array $main): int
     {
@@ -109,6 +111,8 @@ class CardStatsCalculatorTest extends KernelTestCase
 
     /**
      * @return array [code => [columns...]] for the given codes
+     * @param string[] $codes
+     * @param string[] $columns
      */
     private function byCode(array $cards, array $codes, array $columns): array
     {
@@ -145,6 +149,9 @@ class CardStatsCalculatorTest extends KernelTestCase
         $this->assertMatchesJsonSnapshot("stats/cards_2015-08_step$step", json_encode($this->calculator->computeCards('2015-08', $step)));
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function stepProvider(): array
     {
         return ['full decks' => ['1'], 'limited decks' => ['2'], 'sideboards and totals' => ['3']];
@@ -236,6 +243,9 @@ class CardStatsCalculatorTest extends KernelTestCase
         $this->assertSame(['01001' => ['full_decks' => $counted ? '1' : '0']], $this->byCode($cards, ['01001'], ['full_decks']));
     }
 
+    /**
+     * @return array<string, string[]|bool[]>
+     */
     public function monthRuleProvider(): array
     {
         return [
@@ -250,9 +260,9 @@ class CardStatsCalculatorTest extends KernelTestCase
     }
 
     /* ----------------------------------------------------------- command */
-
     /**
      * @return array{int, string}
+     * @param array<string, string> $input
      */
     private function runCommand(array $input): array
     {

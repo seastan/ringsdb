@@ -84,6 +84,9 @@ class ReviewTest extends WebTestCase
         return $client;
     }
 
+    /**
+     * @param array<string, string>|array<string, int> $parameters
+     */
     private function ajax(KernelBrowser $client, string $uri, array $parameters, string $method = 'POST'): Response
     {
         $client->request($method, $uri, $parameters, [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
@@ -91,6 +94,9 @@ class ReviewTest extends WebTestCase
         return $client->getResponse();
     }
 
+    /**
+     * @param array<string, bool>|array<string, string>|array<string, int> $expected
+     */
     private function assertJsonAnswer(Response $response, int $status, array $expected): void
     {
         $this->assertSame($status, $response->getStatusCode());
@@ -151,6 +157,9 @@ class ReviewTest extends WebTestCase
         $this->assertSame([], $this->newReviews());
     }
 
+    /**
+     * @return array<string, string[]|int[]|array<string, int|string>[]>
+     */
     public function refusedReviewProvider(): array
     {
         $text = $this->reviewText();
@@ -232,6 +241,9 @@ class ReviewTest extends WebTestCase
         $this->assertSame($this->fixtureReview['text_md'], $this->db()->fetchColumn('SELECT text_md FROM review WHERE id = 1'));
     }
 
+    /**
+     * @return array<string, string[]|int[]>
+     */
     public function refusedEditProvider(): array
     {
         return [
@@ -309,6 +321,9 @@ class ReviewTest extends WebTestCase
         $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM reviewcomment'));
     }
 
+    /**
+     * @return array<string, string[]|array<string, int|string>[]>
+     */
     public function refusedCommentProvider(): array
     {
         return [

@@ -134,6 +134,9 @@ class AdminCsvTest extends WebTestCase
         return $file;
     }
 
+    /**
+     * @param mixed[]|string[]|null[]|bool[] $values
+     */
     private function csvLine(array $values): string
     {
         $stream = fopen('php://memory', 'r+');

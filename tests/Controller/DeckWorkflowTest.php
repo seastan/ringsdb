@@ -102,6 +102,9 @@ class DeckWorkflowTest extends WebTestCase
         return array_map('intval', array_column($rows, 'quantity', 'code'));
     }
 
+    /**
+     * @param array<string, int> $main
+     */
     private function saveDeck(KernelBrowser $client, int $deckId, string $name, string $description, string $tags, array $main): void
     {
         $crawler = $client->request('GET', "/deck/edit/$deckId");
@@ -324,6 +327,9 @@ class DeckWorkflowTest extends WebTestCase
         $this->assertSame(['New Deck', '0'], [$deck['name'], $deck['minor_version']]);
     }
 
+    /**
+     * @return array<string, string[]|string[]|bool[]>
+     */
     public function refusedContentProvider(): array
     {
         return [
@@ -424,6 +430,9 @@ class DeckWorkflowTest extends WebTestCase
         $this->assertSame($expectedSlots, $this->fetchSlots('deckslot', 'deck_id', $ids[0]));
     }
 
+    /**
+     * @return array<string, string[]|bool[]|array<string, int>[]|null[]>
+     */
     public function importProvider(): array
     {
         $main = $this->coreLeadershipDeck();
@@ -462,6 +471,9 @@ class DeckWorkflowTest extends WebTestCase
         $this->assertSame($expectedSlots, $this->fetchSlots('deckslot', 'deck_id', $ids[0]));
     }
 
+    /**
+     * @return array<string, string[]|array<string, int>[]|never[][]>
+     */
     public function fileImportProvider(): array
     {
         return [
@@ -530,6 +542,9 @@ class DeckWorkflowTest extends WebTestCase
         );
     }
 
+    /**
+     * @return array<string, int[]>
+     */
     public function fixtureDeckProvider(): array
     {
         return [
@@ -672,6 +687,9 @@ class DeckWorkflowTest extends WebTestCase
         $this->assertSame($expected, $this->fetchDeck($deckId)['tags']);
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function tagsProvider(): array
     {
         return [
@@ -712,6 +730,9 @@ class DeckWorkflowTest extends WebTestCase
         $this->assertSame('0', $this->db()->fetchColumn("SELECT COUNT(*) FROM decklist WHERE name = 'PHPUnit Unknown'"));
     }
 
+    /**
+     * @return array<string, array<int, array<string, int>>|array<int, never[]>>
+     */
     public function invalidDeckIdProvider(): array
     {
         return [

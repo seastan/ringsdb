@@ -204,6 +204,9 @@ class DecklistCommentTest extends WebTestCase
         $this->assertSame($expectedHtml, $comments[0]['text']);
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function markdownProvider(): array
     {
         return [

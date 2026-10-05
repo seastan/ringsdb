@@ -51,6 +51,9 @@ class ApiPrivateControllerTest extends WebTestCase
         return $client;
     }
 
+    /**
+     * @param array<string, string> $headers
+     */
     private function ajax(KernelBrowser $client, string $uri, array $headers = []): Response
     {
         $client->request('GET', $uri, [], [], $headers + ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
@@ -82,9 +85,9 @@ class ApiPrivateControllerTest extends WebTestCase
     }
 
     /* ------------------------------------------------------- JSON bodies */
-
     /**
      * [user, uri, snapshot name].
+     * @return array<string, string[]>
      */
     public function cacheableEndpointProvider(): array
     {
@@ -111,6 +114,7 @@ class ApiPrivateControllerTest extends WebTestCase
 
     /**
      * [user, uri, expected JSON].
+     * @return array<string, string[]|never[][]|array<string, bool|string>[]>
      */
     public function uncachedEndpointProvider(): array
     {
@@ -181,7 +185,9 @@ class ApiPrivateControllerTest extends WebTestCase
     }
 
     /* ----------------------------------------------------------- security */
-
+    /**
+     * @return array<string, string[]>
+     */
     public function privateUriProvider(): array
     {
         return [

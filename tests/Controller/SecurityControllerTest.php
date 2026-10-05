@@ -198,6 +198,9 @@ class SecurityControllerTest extends WebTestCase
         }
     }
 
+    /**
+     * @return array<string, string[]|string[]|null[]>
+     */
     public function invalidRegistrationProvider(): array
     {
         return [
@@ -282,6 +285,9 @@ class SecurityControllerTest extends WebTestCase
         $this->assertAnonymous($client);
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function invalidCredentialsProvider(): array
     {
         return [

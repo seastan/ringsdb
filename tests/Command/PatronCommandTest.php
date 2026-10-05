@@ -39,9 +39,9 @@ class PatronCommandTest extends KernelTestCase
     }
 
     /* ------------------------------------------------------------ helpers */
-
     /**
      * @return string the output, without the leading dates
+     * @param array<string, string> $arguments
      */
     private function runCommand(array $arguments): string
     {

@@ -116,6 +116,9 @@ class AdminPagesTest extends WebTestCase
         $this->assertSame($before, $this->db()->fetchAll('SELECT id, name FROM cycle ORDER BY id'));
     }
 
+    /**
+     * @return array<string, mixed[]>
+     */
     public function writeRouteProvider(): array
     {
         return [
@@ -162,6 +165,9 @@ class AdminPagesTest extends WebTestCase
         $this->assertCount((int) $this->db()->fetchColumn("SELECT COUNT(*) FROM $table"), $crawler->filter('table tbody tr'));
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function bigListProvider(): array
     {
         return [
@@ -185,6 +191,9 @@ class AdminPagesTest extends WebTestCase
         $this->assertMatchesJsonSnapshot("admin/$snapshot", $client->getResponse()->getContent());
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function statisticsProvider(): array
     {
         return [

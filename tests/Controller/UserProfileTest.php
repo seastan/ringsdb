@@ -257,6 +257,9 @@ class UserProfileTest extends WebTestCase
         $this->assertSame($this->fixtureUsers[0]['password'], $this->fetchUser()['password']);
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function invalidPasswordChangeProvider(): array
     {
         return [

@@ -91,6 +91,7 @@ class DecklistEditTest extends WebTestCase
 
     /**
      * A copy of fixture decklist 2 (with its cards), returns its id.
+     * @param array<string, int> $values
      */
     private function insertDecklist(string $name, array $values = []): int
     {
@@ -105,6 +106,9 @@ class DecklistEditTest extends WebTestCase
         return $id;
     }
 
+    /**
+     * @param array<string, string> $values
+     */
     private function saveForm(KernelBrowser $client, int $decklistId, array $values): \Symfony\Component\HttpFoundation\Response
     {
         $crawler = $client->request('GET', "/decklist/edit/$decklistId");
@@ -162,6 +166,9 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame($expected, $this->fetchDecklist(1)['name']);
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function nameProvider(): array
     {
         return [
@@ -184,6 +191,9 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame($expected, $this->fetchDecklist(1)['precedent_decklist_id']);
     }
 
+    /**
+     * @return array<string, string[]|string[]|null[]>
+     */
     public function precedentProvider(): array
     {
         return [
@@ -210,6 +220,9 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame('Dwarf Lore/Leadership/Tactics', $this->fetchDecklist(1)['name']);
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function editRouteProvider(): array
     {
         return [
@@ -295,6 +308,9 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame('4', $this->db()->fetchColumn('SELECT COUNT(*) FROM decklist'));
     }
 
+    /**
+     * @return array<string, string[]|int[]|null[]>
+     */
     public function refusedDeleteProvider(): array
     {
         return [

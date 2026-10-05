@@ -246,6 +246,9 @@ class CollectionTest extends WebTestCase
         $this->assertSame(['01001' => 1, '01016' => 3], $this->packCards(1));
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function foreignPackRouteProvider(): array
     {
         return [
@@ -294,6 +297,9 @@ class CollectionTest extends WebTestCase
         $this->assertSame('http://localhost/login', $client->getResponse()->headers->get('Location'));
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function anonymousRouteProvider(): array
     {
         return [

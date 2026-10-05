@@ -30,7 +30,9 @@ class ApiControllerTest extends WebTestCase
     }
 
     /* ------------------------------------------------------------ helpers */
-
+    /**
+     * @param array<string, string> $headers
+     */
     private function get(KernelBrowser $client, string $uri, array $headers = []): Response
     {
         $client->request('GET', $uri, [], [], $headers);
@@ -47,9 +49,9 @@ class ApiControllerTest extends WebTestCase
     }
 
     /* ------------------------------------------------------- JSON bodies */
-
     /**
      * [snapshot name, uri, expected Last-Modified header (null if none)].
+     * @return array<string, string[]|string[]|null[]>
      */
     public function jsonEndpointProvider(): array
     {
@@ -171,6 +173,9 @@ class ApiControllerTest extends WebTestCase
         $this->assertStringStartsWith('{', (string) $response->getContent());
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function jsonpEndpointProvider(): array
     {
         return [
@@ -203,6 +208,9 @@ class ApiControllerTest extends WebTestCase
         $this->assertNotEmpty($response->getContent());
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function cachedEndpointProvider(): array
     {
         return [
@@ -230,6 +238,9 @@ class ApiControllerTest extends WebTestCase
         $this->assertSame($expectedStatus, $response->getStatusCode());
     }
 
+    /**
+     * @return array<string, array<int, string|int>>
+     */
     public function errorProvider(): array
     {
         return [
@@ -256,6 +267,9 @@ class ApiControllerTest extends WebTestCase
         $this->assertSame("$format format not supported. Only json is supported.", $response->getContent());
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function unsupportedFormatProvider(): array
     {
         return [

@@ -90,6 +90,7 @@ class DeckManagementTest extends WebTestCase
 
     /**
      * A copy of fixture deck 2 (cards included), plus 2 Feint in the sideboard, returns its id.
+     * @param array<string, int> $values
      */
     private function insertDeck(string $name, array $values = []): int
     {
@@ -339,6 +340,9 @@ class DeckManagementTest extends WebTestCase
         $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function emptyDiffProvider(): array
     {
         return [
@@ -374,6 +378,9 @@ class DeckManagementTest extends WebTestCase
         $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
     }
 
+    /**
+     * @return array<string, string[]|int[]|null[]>
+     */
     public function invalidAutosaveProvider(): array
     {
         return [
@@ -399,6 +406,7 @@ class DeckManagementTest extends WebTestCase
     /**
      * Posts a zip archive of [name => content] to POST /deck/import/all ("Import from an archive"
      * modal of My Decks).
+     * @param array<string, string> $entries
      */
     private function uploadArchive(KernelBrowser $client, array $entries): \Symfony\Component\HttpFoundation\Response
     {
@@ -494,6 +502,9 @@ class DeckManagementTest extends WebTestCase
         $this->assertTrue($this->deckExists(1));
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function anonymousRouteProvider(): array
     {
         return [

@@ -185,6 +185,9 @@ class DecklistSocialTest extends WebTestCase
         $this->assertSame(['nb_favorites' => '0', 'nb_votes' => '0', 'favorites' => '0', 'votes' => '0', 'author_reputation' => '1'], $this->state());
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function actionProvider(): array
     {
         return ['favorite' => ['favorite'], 'vote' => ['like']];
