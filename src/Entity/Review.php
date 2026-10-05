@@ -32,35 +32,20 @@ class Review
      */
     private $dateLastComment;
 
-    /**
-     * @var string
-     */
-    private $textMd;
+    private string $textMd;
 
-    /**
-     * @var string
-     */
-    private $textHtml;
+    private string $textHtml;
 
-    /**
-     * @var int
-     */
-    private $nbVotes;
+    private int $nbVotes;
 
     /**
      * @var Collection<int, Reviewcomment>
      */
     private $comments;
 
-    /**
-     * @var Card
-     */
-    private $card;
+    private \App\Entity\Card $card;
 
-    /**
-     * @var User
-     */
-    private $user;
+    private \App\Entity\User $user;
 
     /**
      * @var Collection<int, User>
@@ -70,8 +55,13 @@ class Review
     /**
      * Constructor.
      */
-    public function __construct()
+    public function __construct(User $user, Card $card, string $textMd, string $textHtml)
     {
+        $this->user = $user;
+        $this->card = $card;
+        $this->textMd = $textMd;
+        $this->textHtml = $textHtml;
+        $this->nbVotes = 0;
         $this->comments = new ArrayCollection();
         $this->votes = new ArrayCollection();
     }

@@ -45,13 +45,9 @@ class ReviewFixtures extends Fixture implements ContainerAwareInterface, Depende
         }
 
         $textMd = "Aragorn is a **great** leader.\n\nHe readies after committing to the quest.";
+        $textHtml = $this->container->get('texts')->markdown($textMd);
 
-        $review = new Review();
-        $review->setCard($card);
-        $review->setUser($user);
-        $review->setTextMd($textMd);
-        $review->setTextHtml($this->container->get('texts')->markdown($textMd));
-        $review->setNbVotes(0);
+        $review = new Review($user, $card, $textMd, $textHtml);
         $review->setDateCreation(new \DateTime('2015-08-16'));
         $review->setDateUpdate(new \DateTime('2015-08-16'));
         $review->setDateLastComment(new \DateTime('2015-08-16'));

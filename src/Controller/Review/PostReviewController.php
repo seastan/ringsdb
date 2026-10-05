@@ -72,12 +72,7 @@ class PostReviewController extends AbstractController
             throw new \Exception('Your review is empty.');
         }
 
-        $review = new Review();
-        $review->setCard($card);
-        $review->setUser($user);
-        $review->setTextMd($review_raw);
-        $review->setTextHtml($review_html);
-        $review->setNbVotes(0);
+        $review = new Review($user, $card, $review_raw, $review_html);
 
         $this->entityManager->persist($review);
         $this->entityManager->flush();
