@@ -16,9 +16,9 @@ class FellowshipDeck
 
     private int $deckNumber;
 
-    private \App\Entity\Fellowship $fellowship;
+    private Fellowship $fellowship;
 
-    private \App\Entity\Deck $deck;
+    private Deck $deck;
 
     public function __construct(Fellowship $fellowship, Deck $deck, int $deckNumber)
     {

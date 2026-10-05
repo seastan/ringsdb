@@ -103,9 +103,9 @@ class Card
      */
     private $printings;
 
-    private ?\App\Entity\Type $type = null;
+    private ?Type $type = null;
 
-    private ?\App\Entity\Sphere $sphere = null;
+    private ?Sphere $sphere = null;
 
     /**
      * Constructor.

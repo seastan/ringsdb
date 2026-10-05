@@ -23,9 +23,9 @@ class Comment
      */
     private $isHidden = false;
 
-    private \App\Entity\User $user;
+    private User $user;
 
-    private \App\Entity\Decklist $decklist;
+    private Decklist $decklist;
 
     public function __construct(User $user, Decklist $decklist, string $text)
     {
