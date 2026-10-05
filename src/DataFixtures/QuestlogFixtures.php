@@ -62,12 +62,11 @@ class QuestlogFixtures extends Fixture implements DependentFixtureInterface
             /** @var Decklist $decklist */
             $decklist = $this->getReference('test-decklist-'.$i);
 
-            $questlog_decklist = new QuestlogDeck();
+            $questlog_decklist = new QuestlogDeck($questlog);
             $questlog_decklist->setDecklist($decklist);
             $questlog_decklist->setDeck($decklist->getParent());
             $questlog_decklist->setContent((string) json_encode($decklist->getContent()));
             $questlog_decklist->setDeckNumber($i);
-            $questlog_decklist->setQuestlog($questlog);
             $questlog_decklist->setPlayer('Player '.$i);
 
             $questlog->addDeck($questlog_decklist);

@@ -165,11 +165,10 @@ class SaveQuestlogController extends AbstractController
                             return new Response('Cannot save a questlog with an empty deck');
                         }
 
-                        $questlog_deck = new QuestlogDeck();
+                        $questlog_deck = new QuestlogDeck($questlog);
                         $questlog_deck->setDeck($deck);
                         $questlog_deck->setContent((string) json_encode($content));
                         $questlog_deck->setDeckNumber($i - $skip);
-                        $questlog_deck->setQuestlog($questlog);
                         $questlog_deck->setPlayer($player);
                         $questlog->addDeck($questlog_deck);
                     } else {
@@ -184,12 +183,11 @@ class SaveQuestlogController extends AbstractController
                             return new Response('Cannot save a questlog with an empty deck');
                         }
 
-                        $questlog_decklist = new QuestlogDeck();
+                        $questlog_decklist = new QuestlogDeck($questlog);
                         $questlog_decklist->setDecklist($decklist);
                         $questlog_decklist->setDeck($decklist->getParent());
                         $questlog_decklist->setContent((string) json_encode($content));
                         $questlog_decklist->setDeckNumber($i - $skip);
-                        $questlog_decklist->setQuestlog($questlog);
                         $questlog_decklist->setPlayer($player);
                         $questlog->addDeck($questlog_decklist);
                     }
@@ -207,10 +205,9 @@ class SaveQuestlogController extends AbstractController
                     }
 
                     // Reference deck was deleted
-                    $questlog_deck = new QuestlogDeck();
+                    $questlog_deck = new QuestlogDeck($questlog);
                     $questlog_deck->setContent((string) json_encode($content));
                     $questlog_deck->setDeckNumber($i - $skip);
-                    $questlog_deck->setQuestlog($questlog);
                     $questlog_deck->setPlayer($player);
                     $questlog->addDeck($questlog_deck);
                     ++$nb_decks;

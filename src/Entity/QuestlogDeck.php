@@ -24,20 +24,16 @@ class QuestlogDeck
      */
     private $content;
 
-    /**
-     * @var Questlog
-     */
-    private $questlog;
+    private \App\Entity\Questlog $questlog;
 
-    /**
-     * @var Deck|null
-     */
-    private $deck;
+    private ?\App\Entity\Deck $deck = null;
 
-    /**
-     * @var Decklist|null
-     */
-    private $decklist;
+    private ?\App\Entity\Decklist $decklist = null;
+
+    public function __construct(Questlog $questlog)
+    {
+        $this->questlog = $questlog;
+    }
 
     /**
      * Get id.
