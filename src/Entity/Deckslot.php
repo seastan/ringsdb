@@ -13,20 +13,18 @@ class Deckslot implements SlotInterface
      */
     private $id;
 
-    /**
-     * @var int
-     */
-    private $quantity;
+    private int $quantity;
 
-    /**
-     * @var Deck
-     */
-    private $deck;
+    private Deck $deck;
 
-    /**
-     * @var Card
-     */
-    private $card;
+    private Card $card;
+
+    public function __construct(Card $card, Deck $deck, int $quantity)
+    {
+        $this->card = $card;
+        $this->deck = $deck;
+        $this->quantity = $quantity;
+    }
 
     /**
      * Get id.

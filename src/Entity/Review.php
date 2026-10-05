@@ -43,9 +43,9 @@ class Review
      */
     private $comments;
 
-    private \App\Entity\Card $card;
+    private Card $card;
 
-    private \App\Entity\User $user;
+    private User $user;
 
     /**
      * @var Collection<int, User>

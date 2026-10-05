@@ -24,11 +24,11 @@ class QuestlogDeck
      */
     private $content;
 
-    private \App\Entity\Questlog $questlog;
+    private Questlog $questlog;
 
-    private ?\App\Entity\Deck $deck = null;
+    private ?Deck $deck = null;
 
-    private ?\App\Entity\Decklist $decklist = null;
+    private ?Decklist $decklist = null;
 
     public function __construct(Questlog $questlog)
     {

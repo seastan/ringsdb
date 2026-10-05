@@ -59,7 +59,7 @@ class Pack
      */
     private $printings;
 
-    private ?\App\Entity\Cycle $cycle = null;
+    private ?Cycle $cycle = null;
 
     /**
      * Constructor.

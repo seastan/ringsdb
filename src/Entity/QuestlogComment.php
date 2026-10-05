@@ -23,9 +23,9 @@ class QuestlogComment
      */
     private $isHidden = false;
 
-    private \App\Entity\User $user;
+    private User $user;
 
-    private \App\Entity\Questlog $questlog;
+    private Questlog $questlog;
 
     public function __construct(User $user, Questlog $questlog, string $text)
     {

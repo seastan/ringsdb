@@ -43,10 +43,7 @@ class Encounter implements \JsonSerializable
      */
     private $dateUpdate;
 
-    /**
-     * @var Pack|null
-     */
-    private $pack;
+    private ?Pack $pack = null;
 
     public function __toString()
     {

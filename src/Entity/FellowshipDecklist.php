@@ -29,10 +29,6 @@ class FellowshipDecklist
      */
     private $decklist;
 
-    /**
-     * @param Decklist $decklist
-     * @param Fellowship $fellowship
-     */
     public function __construct(Decklist $decklist, Fellowship $fellowship)
     {
         $this->decklist = $decklist;

@@ -28,9 +28,9 @@ class FellowshipComment
      */
     private $isHidden = false;
 
-    private \App\Entity\User $user;
+    private User $user;
 
-    private \App\Entity\Fellowship $fellowship;
+    private Fellowship $fellowship;
 
     public function __construct(User $user, Fellowship $fellowship, string $text)
     {

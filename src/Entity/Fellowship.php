@@ -86,7 +86,7 @@ class Fellowship
      */
     private $comments;
 
-    private \App\Entity\User $user;
+    private User $user;
 
     /**
      * @var Collection<int, User>

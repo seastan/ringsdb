@@ -96,9 +96,9 @@ class Questlog
      */
     private $comments;
 
-    private ?\App\Entity\User $user = null;
+    private ?User $user = null;
 
-    private ?\App\Entity\Scenario $scenario = null;
+    private ?Scenario $scenario = null;
 
     /**
      * @var Collection<int, User>

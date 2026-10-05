@@ -37,7 +37,7 @@ class Scenario implements \JsonSerializable
      */
     private $dateUpdate;
 
-    private ?\App\Entity\Pack $pack = null;
+    private ?Pack $pack = null;
 
     /**
      * @var Collection<int, Encounter>

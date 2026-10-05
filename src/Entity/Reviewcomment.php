@@ -26,9 +26,9 @@ class Reviewcomment
 
     private string $text;
 
-    private \App\Entity\User $user;
+    private User $user;
 
-    private \App\Entity\Review $review;
+    private Review $review;
 
     public function __construct(User $user, Review $review, string $text)
     {
