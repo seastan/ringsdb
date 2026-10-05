@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class LikeReviewController extends AbstractController
 {
     private ReviewRepository $reviewRepository;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -32,12 +33,14 @@ class LikeReviewController extends AbstractController
         if (!$user) {
             throw $this->createAccessDeniedException('You are not logged in.');
         }
+
         $review_id = filter_var($request->request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $review Review */
         $review = $this->reviewRepository->find($review_id);
         if (!$review) {
             throw new \Exception('Unable to find review.');
         }
+
         // a user cannot vote on her own review
         if (!$review->getUser()->isEqualTo($user)) {
             // checking if the user didn't already vote on that review

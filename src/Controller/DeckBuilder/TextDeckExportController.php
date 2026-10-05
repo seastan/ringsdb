@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class TextDeckExportController extends AbstractController
 {
     private DeckRepository $deckRepository;
+
     private Texts $texts;
 
     public function __construct(
@@ -41,12 +42,15 @@ class TextDeckExportController extends AbstractController
         if (!$deck) {
             throw new NotFoundHttpException("This deck doesn't exist.");
         }
+
         $is_owner = $this->getUser() && $this->getUser()->getId() == $deck->getUser()->getId();
         if (!$deck->getUser()->getIsShareDecks() && !$is_owner) {
             throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
         }
+
         $content = $this->renderView('Export/plain.txt.twig', ['deck' => $deck->getTextExport()]);
         $content = str_replace("\n", "\r\n", $content);
+
         $response = new Response();
         $response->headers->set('Content-Type', 'text/plain');
         $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->texts->slugify($deck->getName()).'.txt'));

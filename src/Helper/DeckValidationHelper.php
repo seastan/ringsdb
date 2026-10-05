@@ -9,10 +9,6 @@ use App\Entity\Deck;
 
 class DeckValidationHelper
 {
-    public function __construct()
-    {
-    }
-
     public function canIncludeCard(Deck $deck, Card $card): bool
     {
         return true;
@@ -44,7 +40,8 @@ class DeckValidationHelper
         $cardsCount = $deck->getSlots()->getDrawDeck()->countCards();
         if ($cardsCount < 30) {
             return 'too_few_cards';
-        } elseif ($cardsCount < 50 && !$casualPlay) {
+        }
+        if ($cardsCount < 50 && !$casualPlay) {
             return 'invalid_for_tournament_play';
         }
 
@@ -62,6 +59,7 @@ class DeckValidationHelper
         if (!$problem) {
             return '';
         }
+
         $labels = [
             'too_many_heroes' => 'Contains too many heroes',
             'too_few_heroes' => 'Contains too few heroes',

@@ -28,98 +28,122 @@ class Decklist extends ExportableDeck implements \JsonSerializable
      * @var int|null
      */
     private $id;
+
     /**
      * @var string
      */
     private $name;
+
     /**
      * @var string
      */
     private $nameCanonical;
+
     /**
      * @var \DateTime
      */
     private $dateCreation;
+
     /**
      * @var \DateTime
      */
     private $dateUpdate;
+
     /**
      * @var \DateTime|null
      */
     private $dateLastComment;
+
     /**
      * @var string|null
      */
     private $descriptionMd;
+
     /**
      * @var string|null
      */
     private $descriptionHtml;
+
     /**
      * @var string
      */
     private $signature;
+
     /**
      * @var int
      */
     private $nbVotes;
+
     /**
      * @var int
      */
     private $nbFavorites;
+
     /**
      * @var int
      */
     private $nbComments;
+
     /**
      * @var bool|null
      */
     private $freezeComments;
+
     /**
      * @var string
      */
     private $version;
+
     /**
      * @var Collection<int, Decklistslot>
      */
     private $slots;
+
     /**
      * @var Collection<int, Decklistsideslot>
      */
     private $sideslots;
+
     /**
      * @var Collection<int, Comment>
      */
     private $comments;
+
     /**
      * @var Collection<int, Decklist>
      */
     private $successors;
+
     /**
      * @var Collection<int, Deck>
      */
     private $children;
+
     /**
      * @var User
      */
     private $user;
+
     /**
      * @var Pack|null
      */
     private $lastPack;
+
     /**
      * @var Deck|null
      */
     private $parent;
+
     /**
      * @var Decklist|null
      */
     private $precedent;
+
     /**
      * @var Collection<int, User>
      */
     private $favorites;
+
     /**
      * @var Collection<int, User>
      */
@@ -804,6 +828,7 @@ class Decklist extends ExportableDeck implements \JsonSerializable
     {
         return $this->startingThreat;
     }
+
     /**
      * @var Collection<int, QuestlogDeck>
      */
@@ -846,9 +871,10 @@ class Decklist extends ExportableDeck implements \JsonSerializable
     {
         $theseLogs = $this->getQuestlogs()->toArray();
         $parentLogs = [];
-        if ($this->getParent()) {
+        if ($this->getParent() instanceof Deck) {
             $parentLogs = $this->getParent()->getQuestlogs()->toArray();
         }
+
         $allQuestlogs = array_unique(array_merge($theseLogs, $parentLogs), SORT_REGULAR);
 
         return array_filter($allQuestlogs, fn ($k) => $k->getQuestlog()->getIsPublic());

@@ -17,10 +17,13 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class CollectionTest extends WebTestCase
 {
     private KernelBrowser $client;
+
     /** @var array */
     private $fixtureUsers;
+
     /** @var array */
     private $fixturePack;
+
     /** @var int[] */
     private $maxIds = [];
 
@@ -49,13 +52,16 @@ class CollectionTest extends WebTestCase
         } else {
             $connection->update('user_custom_pack', $pack, ['id' => 1]);
         }
+
         $connection->exec('DELETE FROM user_custom_pack_card WHERE custom_pack_id = 1');
         foreach ($cards as $card) {
             $connection->insert('user_custom_pack_card', $card);
         }
+
         foreach ($this->fixtureUsers as $user) {
             $connection->update('user', $user, ['id' => $user['id']]);
         }
+
         parent::tearDown();
     }
 
@@ -82,14 +88,14 @@ class CollectionTest extends WebTestCase
     /**
      * @return array<int|string, int>
      */
-    private function packCards(KernelBrowser $client, $packId): array
+    private function packCards($packId): array
     {
         $rows = $this->db()->fetchAll('SELECT c.code, e.quantity FROM user_custom_pack_card e JOIN card c ON c.id = e.card_id WHERE e.custom_pack_id = ? ORDER BY e.id', [$packId]);
 
         return array_map('intval', array_column($rows, 'quantity', 'code'));
     }
 
-    private function fetchPack(KernelBrowser $client, $id)
+    private function fetchPack($id)
     {
         return $this->db()->fetchAssoc('SELECT p.name, p.code, p.is_enabled, p.is_published, u.username FROM user_custom_pack p JOIN user u ON u.id = p.user_id WHERE p.id = ?', [$id]);
     }
@@ -185,10 +191,10 @@ class CollectionTest extends WebTestCase
         $this->assertSame('/collection/packs', $response->headers->get('Location'));
         $id = (int) $this->db()->fetchColumn('SELECT MAX(id) FROM user_custom_pack');
         $this->assertGreaterThan($this->maxIds['user_custom_pack'], $id);
-        $pack = $this->fetchPack($client, $id);
+        $pack = $this->fetchPack($id);
         $this->assertRegExp("/^custom_{$id}_[0-9a-f]{6}$/", $pack['code']);
         $this->assertSame(['PHPUnit Pack', '1', '0', 'test'], [$pack['name'], $pack['is_enabled'], $pack['is_published'], $pack['username']]);
-        $this->assertSame(['01001' => 2, '01013' => 3, '01016' => 1], $this->packCards($client, $id));
+        $this->assertSame(['01001' => 2, '01013' => 3, '01016' => 1], $this->packCards($id));
         // flash messages are displayed by JavaScript: app.ui.insert_alert_message('success', <JSON>)
         $client->followRedirect();
         $this->assertContains("insert_alert_message('success', ".json_encode('Custom pack "PHPUnit Pack" created.').')', $client->getResponse()->getContent());
@@ -200,21 +206,21 @@ class CollectionTest extends WebTestCase
             ['card_code' => '01002', 'quantity' => 1],
         ]);
         $this->assertSame('/collection/packs', $response->headers->get('Location'));
-        $this->assertSame('PHPUnit Pack Edited', $this->fetchPack($client, $id)['name']);
-        $this->assertSame(['01002' => 1], $this->packCards($client, $id));
+        $this->assertSame('PHPUnit Pack Edited', $this->fetchPack($id)['name']);
+        $this->assertSame(['01002' => 1], $this->packCards($id));
 
         // 3. toggle enabled and published (buttons of the collection page)
         $client->request('POST', "/collection/custom-pack/$id/toggle");
         $client->request('POST', "/collection/custom-pack/$id/publish");
         $this->assertSame('/collection/packs', $client->getResponse()->headers->get('Location'));
-        $pack = $this->fetchPack($client, $id);
+        $pack = $this->fetchPack($id);
         $this->assertSame(['0', '1'], [$pack['is_enabled'], $pack['is_published']]);
 
         // 4. delete, with its cards
         $client->request('POST', "/collection/custom-pack/$id/delete");
         $this->assertSame('/collection/packs', $client->getResponse()->headers->get('Location'));
-        $this->assertFalse($this->fetchPack($client, $id));
-        $this->assertSame([], $this->packCards($client, $id));
+        $this->assertFalse($this->fetchPack($id));
+        $this->assertSame([], $this->packCards($id));
     }
 
     public function testCustomPackNameIsRequired(): void
@@ -229,7 +235,7 @@ class CollectionTest extends WebTestCase
         $this->assertSame('/collection/custom-pack/1/edit', $response->headers->get('Location'));
         $crawler = $client->followRedirect();
         $this->assertContains('Pack name is required.', $crawler->filter('body')->text());
-        $this->assertSame('Test Custom Pack', $this->fetchPack($client, 1)['name']);
+        $this->assertSame('Test Custom Pack', $this->fetchPack(1)['name']);
     }
 
     /**
@@ -241,8 +247,8 @@ class CollectionTest extends WebTestCase
         $client->request($method, $uri, ['name' => 'Hacked', 'cards_json' => '[]']);
 
         $this->assertSame(404, $client->getResponse()->getStatusCode());
-        $this->assertSame(['Test Custom Pack', '1', '1', 'test'], array_values(array_diff_key($this->fetchPack($client, 1), ['code' => 0])));
-        $this->assertSame(['01001' => 1, '01016' => 3], $this->packCards($client, 1));
+        $this->assertSame(['Test Custom Pack', '1', '1', 'test'], array_values(array_diff_key($this->fetchPack(1), ['code' => 0])));
+        $this->assertSame(['01001' => 1, '01016' => 3], $this->packCards(1));
     }
 
     public function foreignPackRouteProvider(): array
@@ -264,10 +270,10 @@ class CollectionTest extends WebTestCase
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertSame(['success' => true, 'name' => 'Test Custom Pack'], json_decode($client->getResponse()->getContent(), true));
         $id = (int) $this->db()->fetchColumn('SELECT MAX(id) FROM user_custom_pack');
-        $copy = $this->fetchPack($client, $id);
+        $copy = $this->fetchPack($id);
         $this->assertSame(['Test Custom Pack', '1', '0', 'admin'], [$copy['name'], $copy['is_enabled'], $copy['is_published'], $copy['username']]);
         $this->assertNotSame($this->fixturePack[0]['code'], $copy['code']);
-        $this->assertSame(['01001' => 1, '01016' => 3], $this->packCards($client, $id));
+        $this->assertSame(['01001' => 1, '01016' => 3], $this->packCards($id));
     }
 
     public function testCopyAnUnpublishedPack(): void

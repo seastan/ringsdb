@@ -33,8 +33,10 @@ class SavePacksController extends AbstractController
         if (preg_match('/[^0-9:,\\-]/', $selectedPacks)) {
             return new Response('Invalid pack selection.');
         }
+
         $user = $this->currentUser();
         $user->setOwnedPacks($selectedPacks);
+
         $this->entityManager->persist($user);
         $this->entityManager->flush();
         $this->get('session')->getFlashBag()->set('notice', 'Collection saved.');

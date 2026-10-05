@@ -27,20 +27,29 @@ class DeckCompareTest extends WebTestCase
 {
     /** card ids (the Core Set cards have the id of their number) */
     public const ARAGORN = 1;
+
     public const GIMLI = 4;
+
     public const LEGOLAS = 5;
+
     public const GUARD_OF_THE_CITADEL = 13;
+
     public const VETERAN_AXEHAND = 28;
+
     public const GONDORIAN_SPEARMAN = 29;
+
     public const FEINT = 34;
+
     public const QUICK_STRIKE = 35;
 
     private KernelBrowser $client;
 
     /** @var int */
     private $maxDeckId;
+
     /** @var int */
     private $deckA;
+
     /** @var int */
     private $deckB;
 
@@ -67,6 +76,7 @@ class DeckCompareTest extends WebTestCase
         foreach (['deckslot', 'decksideslot'] as $table) {
             $connection->exec("DELETE FROM $table WHERE deck_id > {$this->maxDeckId}");
         }
+
         $connection->exec("DELETE FROM deck WHERE id > {$this->maxDeckId}");
         $connection->update('user', ['is_share_decks' => 0], ['username' => 'test']);
         parent::tearDown();
@@ -106,6 +116,7 @@ class DeckCompareTest extends WebTestCase
         foreach ($main as $cardId => $quantity) {
             $connection->insert('deckslot', ['deck_id' => $id, 'card_id' => $cardId, 'quantity' => $quantity]);
         }
+
         foreach ($side as $cardId => $quantity) {
             $connection->insert('decksideslot', ['deck_id' => $id, 'card_id' => $cardId, 'quantity' => $quantity]);
         }
@@ -113,7 +124,7 @@ class DeckCompareTest extends WebTestCase
         return $id;
     }
 
-    private function slots(KernelBrowser $client, $table, $deckId)
+    private function slots($table, $deckId)
     {
         return $this->db()->fetchAll("SELECT card_id, quantity FROM $table WHERE deck_id = ? ORDER BY card_id", [$deckId]);
     }
@@ -121,7 +132,7 @@ class DeckCompareTest extends WebTestCase
     /**
      * @return array the text of each line of the two columns of a row of the page
      */
-    private static function columns(Crawler $row): array
+    private function columns(Crawler $row): array
     {
         return $row->filter('.col-xs-6')->each(fn (Crawler $column) => $column->children()->each(fn (Crawler $line): string => trim((string) preg_replace('/\s+/u', ' ', $line->text()))));
     }
@@ -131,7 +142,7 @@ class DeckCompareTest extends WebTestCase
     public function testCompareTwoDecks(): void
     {
         $client = $this->createAuthenticatedClient();
-        $before = [$this->slots($client, 'deckslot', $this->deckA), $this->slots($client, 'decksideslot', $this->deckB)];
+        $before = [$this->slots('deckslot', $this->deckA), $this->slots('decksideslot', $this->deckB)];
 
         $crawler = $client->request('GET', "/deck/compare/{$this->deckA}/{$this->deckB}");
 
@@ -141,21 +152,21 @@ class DeckCompareTest extends WebTestCase
 
         // heroes: in common, then left in each deck
         $this->assertSame('Heroes', trim($rows->eq(1)->text()));
-        $this->assertSame([['1x Gimli'], ['1x Gimli']], self::columns($rows->eq(2)));
-        $this->assertSame([['1x Legolas'], ['1x Aragorn']], self::columns($rows->eq(3)));
+        $this->assertSame([['1x Gimli'], ['1x Gimli']], $this->columns($rows->eq(2)));
+        $this->assertSame([['1x Legolas'], ['1x Aragorn']], $this->columns($rows->eq(3)));
 
         // draw decks: the common quantity is the minimum, the rest stays in the deck
         $this->assertSame('Draw Decks', trim($rows->eq(4)->text()));
-        $this->assertSame([['1x Veteran Axehand'], ['1x Veteran Axehand']], self::columns($rows->eq(5)));
-        $this->assertSame([['2x Veteran Axehand', '2x Gondorian Spearman'], ['3x Guard of the Citadel']], self::columns($rows->eq(6)));
+        $this->assertSame([['1x Veteran Axehand'], ['1x Veteran Axehand']], $this->columns($rows->eq(5)));
+        $this->assertSame([['2x Veteran Axehand', '2x Gondorian Spearman'], ['3x Guard of the Citadel']], $this->columns($rows->eq(6)));
 
         // sideboards
         $this->assertSame('Sideboard', trim($rows->eq(7)->text()));
-        $this->assertSame([['1x Feint'], ['1x Feint']], self::columns($rows->eq(8)));
-        $this->assertSame([['1x Feint'], ['1x Quick Strike']], self::columns($rows->eq(9)));
+        $this->assertSame([['1x Feint'], ['1x Feint']], $this->columns($rows->eq(8)));
+        $this->assertSame([['1x Feint'], ['1x Quick Strike']], $this->columns($rows->eq(9)));
 
         // the slots are detached before being changed: the decks are not modified
-        $this->assertSame($before, [$this->slots($client, 'deckslot', $this->deckA), $this->slots($client, 'decksideslot', $this->deckB)]);
+        $this->assertSame($before, [$this->slots('deckslot', $this->deckA), $this->slots('decksideslot', $this->deckB)]);
     }
 
     public function testCompareADeckWithItself(): void
@@ -164,11 +175,11 @@ class DeckCompareTest extends WebTestCase
         $crawler = $client->request('GET', "/deck/compare/{$this->deckA}/{$this->deckA}");
 
         $rows = $crawler->filter('.main > .row');
-        $this->assertSame([['1x Gimli', '1x Legolas'], ['1x Gimli', '1x Legolas']], self::columns($rows->eq(2)));
+        $this->assertSame([['1x Gimli', '1x Legolas'], ['1x Gimli', '1x Legolas']], $this->columns($rows->eq(2)));
         // nothing is left
-        $this->assertSame([[], []], self::columns($rows->eq(3)));
-        $this->assertSame([[], []], self::columns($rows->eq(6)));
-        $this->assertSame([[], []], self::columns($rows->eq(9)));
+        $this->assertSame([[], []], $this->columns($rows->eq(3)));
+        $this->assertSame([[], []], $this->columns($rows->eq(6)));
+        $this->assertSame([[], []], $this->columns($rows->eq(9)));
     }
 
     public function testAnotherUsersDecksRequireSharing(): void

@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class OctgnExportDecklistController extends AbstractController
 {
     private int $cacheExpiration;
+
     private DecklistRepository $decklistRepository;
 
     public function __construct(
@@ -45,6 +46,7 @@ class OctgnExportDecklistController extends AbstractController
         if (!$decklist) {
             throw new NotFoundHttpException('Unable to find decklist.');
         }
+
         $content = $this->renderView('Export/octgn.xml.twig', ['deck' => $decklist->getTextExport()]);
         $response = new Response();
         $response->headers->set('Content-Type', 'application/octgn');

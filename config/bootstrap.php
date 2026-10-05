@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 use Symfony\Component\Dotenv\Dotenv;
 
-require dirname(__DIR__).'/vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 $projectDir = dirname(__DIR__);
 $dotenv = new Dotenv(false);
@@ -20,6 +20,7 @@ $dotenv = new Dotenv(false);
 if (is_file("$projectDir/.env")) {
     $dotenv->load("$projectDir/.env");
 }
+
 // APP_ENV decides which files come next: the real environment, else .env, else .env.local
 // (where a server sets APP_ENV=prod)
 $env = $_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? 'dev';
@@ -27,6 +28,7 @@ if ('test' !== $env && is_file("$projectDir/.env.local")) {
     $dotenv->load("$projectDir/.env.local");
     $env = $_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? $env;
 }
+
 foreach ([".env.$env", ".env.$env.local"] as $file) {
     if (is_file("$projectDir/$file")) {
         $dotenv->load("$projectDir/$file");

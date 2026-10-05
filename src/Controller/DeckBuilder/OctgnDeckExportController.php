@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class OctgnDeckExportController extends AbstractController
 {
     private DeckRepository $deckRepository;
+
     private Texts $texts;
 
     public function __construct(DeckRepository $deckRepository, Texts $texts)
@@ -39,10 +40,12 @@ class OctgnDeckExportController extends AbstractController
         if (!$deck) {
             throw new NotFoundHttpException("This deck doesn't exist.");
         }
+
         $is_owner = $this->getUser() && $this->getUser()->getId() == $deck->getUser()->getId();
         if (!$deck->getUser()->getIsShareDecks() && !$is_owner) {
             throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
         }
+
         $content = $this->renderView('Export/octgn.xml.twig', ['deck' => $deck->getTextExport()]);
         $response = new Response();
         $response->headers->set('Content-Type', 'application/octgn');

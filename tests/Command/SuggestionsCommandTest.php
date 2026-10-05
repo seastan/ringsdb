@@ -24,14 +24,18 @@ use Symfony\Component\Console\Tester\CommandTester;
 class SuggestionsCommandTest extends KernelTestCase
 {
     public const ARAGORN = 1;
+
     public const GIMLI = 4;
 
     /** @var Connection */
     private $connection;
+
     /** @var string */
     private $file;
+
     /** @var string|null */
     private $backup;
+
     /** @var int */
     private $maxDeckId;
 
@@ -51,6 +55,7 @@ class SuggestionsCommandTest extends KernelTestCase
         } else {
             file_put_contents($this->file, $this->backup);
         }
+
         $this->connection->exec("DELETE FROM deckslot WHERE deck_id > {$this->maxDeckId}");
         $this->connection->exec("DELETE FROM deck WHERE id > {$this->maxDeckId}");
         parent::tearDown();
@@ -88,7 +93,7 @@ class SuggestionsCommandTest extends KernelTestCase
     /**
      * The value of the matrix for two card codes.
      */
-    private static function value(array $suggestions, $code1, $code2)
+    private function value(array $suggestions, $code1, $code2)
     {
         $i = array_search($code1, $suggestions['index'], true);
         $j = array_search($code2, $suggestions['index'], true);
@@ -117,8 +122,8 @@ class SuggestionsCommandTest extends KernelTestCase
         }
 
         // the fixture decks share no card: 1 for two cards of the same deck, 0 otherwise
-        $this->assertSame(1, self::value($suggestions, '01004', '01028'), 'Gimli and Veteran Axehand, deck 1');
-        $this->assertSame(0, self::value($suggestions, '01004', '01001'), 'Gimli (deck 1) and Aragorn (deck 2)');
+        $this->assertSame(1, $this->value($suggestions, '01004', '01028'), 'Gimli and Veteran Axehand, deck 1');
+        $this->assertSame(0, $this->value($suggestions, '01004', '01001'), 'Gimli (deck 1) and Aragorn (deck 2)');
         $total = array_sum(array_map('array_sum', $suggestions['matrix']));
         $pairs = (int) $this->connection->fetchColumn('SELECT SUM(n * (n - 1) / 2) FROM (SELECT COUNT(*) n FROM deckslot GROUP BY deck_id) t');
         $this->assertSame($pairs, $total);
@@ -132,9 +137,9 @@ class SuggestionsCommandTest extends KernelTestCase
 
         $suggestions = $this->runCommand();
 
-        $this->assertSame(2, self::value($suggestions, '01001', '01004'));
+        $this->assertSame(2, $this->value($suggestions, '01001', '01004'));
         // their pairs with the other cards of their fixture decks do not change
-        $this->assertSame(1, self::value($suggestions, '01004', '01028'));
+        $this->assertSame(1, $this->value($suggestions, '01004', '01028'));
     }
 
     /**
@@ -150,8 +155,8 @@ class SuggestionsCommandTest extends KernelTestCase
         $suggestions = $this->runCommand();
 
         // Aragorn: 151 decks, Gimli: 151 decks, together in 150: round(150 / 151 * 100)
-        $this->assertSame(99, self::value($suggestions, '01001', '01004'));
+        $this->assertSame(99, $this->value($suggestions, '01001', '01004'));
         // Guard of the Citadel: 50 decks (+ fixture deck 2), with Aragorn in 51 of them: 51 / max(100, 51)
-        $this->assertSame(51, self::value($suggestions, '01001', '01013'));
+        $this->assertSame(51, $this->value($suggestions, '01001', '01013'));
     }
 }

@@ -16,7 +16,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class ListFellowshipController extends AbstractController
 {
     private int $cacheExpiration;
+
     private FellowshipManager $fellowshipManager;
+
     private CycleRepository $cycleRepository;
 
     public function __construct(
@@ -43,8 +45,10 @@ class ListFellowshipController extends AbstractController
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
+
         $this->fellowshipManager->setLimit(30);
         $this->fellowshipManager->setPage($page);
+
         $header = '';
         switch ($type) {
             case 'find':
@@ -61,6 +65,7 @@ class ListFellowshipController extends AbstractController
                 } else {
                     $paginator = $this->fellowshipManager->getEmptyList();
                 }
+
                 $pagetitle = 'Favorite Fellowships';
                 break;
             case 'mine':
@@ -71,6 +76,7 @@ class ListFellowshipController extends AbstractController
                 } else {
                     $paginator = $this->fellowshipManager->getEmptyList();
                 }
+
                 $pagetitle = 'My Public Fellowships';
                 break;
             case 'recent':
@@ -109,6 +115,7 @@ class ListFellowshipController extends AbstractController
         if (0 === count($packs)) {
             $packs = $dbh->executeQuery('SELECT id FROM pack')->fetchAll(\PDO::FETCH_COLUMN);
         }
+
         $categories = [];
         $on = 0;
         $off = 0;
@@ -121,6 +128,7 @@ class ListFellowshipController extends AbstractController
             if (0 == $cycle->getPosition() || false === $first_pack) {
                 continue;
             }
+
             if (1 === $size && $first_pack->getName() == $cycle->getName()) {
                 $checked = count($packs) ? in_array($first_pack->getId(), $packs) : true;
                 if ($checked) {
@@ -128,6 +136,7 @@ class ListFellowshipController extends AbstractController
                 } else {
                     ++$off;
                 }
+
                 $categories[0]['packs'][] = ['id' => $first_pack->getId(), 'label' => $first_pack->getName(), 'checked' => $checked, 'future' => null === $first_pack->getDateRelease()];
             } else {
                 $category = ['label' => $cycle->getName(), 'packs' => []];
@@ -138,11 +147,14 @@ class ListFellowshipController extends AbstractController
                     } else {
                         ++$off;
                     }
+
                     $category['packs'][] = ['id' => $pack->getId(), 'label' => $pack->getName(), 'checked' => $checked, 'future' => null === $pack->getDateRelease()];
                 }
+
                 $categories[] = $category;
             }
         }
+
         $params = ['allowed' => $categories, 'on' => $on, 'off' => $off, 'author' => $author_name, 'name' => $fellowship_name, 'numcores' => $numcores, 'numplaysets' => $numplaysets];
         $params['sort_'.$sort] = ' selected="selected"';
         $params['nb_decks_selected'] = $nb_decks;

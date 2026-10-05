@@ -13,22 +13,27 @@ class QuestlogComment
      * @var int|null
      */
     private $id;
+
     /**
      * @var string
      */
     private $text;
+
     /**
      * @var \DateTime
      */
     private $dateCreation;
+
     /**
      * @var bool
      */
     private $isHidden;
+
     /**
      * @var User
      */
     private $user;
+
     /**
      * @var Questlog
      */

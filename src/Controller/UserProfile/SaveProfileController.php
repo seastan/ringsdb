@@ -21,6 +21,7 @@ class SaveProfileController extends AbstractController
      * @var UserRepository
      */
     private $userRepository;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -46,19 +47,22 @@ class SaveProfileController extends AbstractController
 
                 return $this->redirect($this->generateUrl('user_profile_edit'));
             }
+
             $user->setUsername($username);
         }
+
         $email = (string) filter_var($request->get('email'), FILTER_SANITIZE_STRING);
         if ($email !== $user->getEmail()) {
             $user->setEmail($email);
         }
+
         $resume = (string) filter_var($request->get('resume'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
         $sphere_code = (string) filter_var($request->get('user_sphere_code'), FILTER_SANITIZE_STRING);
-        $notifAuthor = $request->get('notif_author') ? true : false;
-        $notifCommenter = $request->get('notif_commenter') ? true : false;
-        $notifMention = $request->get('notif_mention') ? true : false;
-        $shareDecks = $request->get('share_decks') ? true : false;
-        $darkMode = $request->get('dark_mode') ? true : false;
+        $notifAuthor = (bool) $request->get('notif_author');
+        $notifCommenter = (bool) $request->get('notif_commenter');
+        $notifMention = (bool) $request->get('notif_mention');
+        $shareDecks = (bool) $request->get('share_decks');
+        $darkMode = (bool) $request->get('dark_mode');
         $user->setColor($sphere_code);
         $user->setResume($resume);
         $user->setIsNotifAuthor($notifAuthor);
@@ -66,6 +70,7 @@ class SaveProfileController extends AbstractController
         $user->setIsNotifMention($notifMention);
         $user->setIsShareDecks($shareDecks);
         $user->setDarkMode($darkMode);
+
         $this->entityManager->flush();
         $this->get('session')->getFlashBag()->set('notice', 'Successfully saved your profile.');
         $response = $this->redirect($this->generateUrl('user_profile_edit'));

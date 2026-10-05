@@ -12,14 +12,17 @@ class Deckslot implements SlotInterface
      * @var int|null
      */
     private $id;
+
     /**
      * @var int
      */
     private $quantity;
+
     /**
      * @var Deck
      */
     private $deck;
+
     /**
      * @var Card
      */

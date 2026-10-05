@@ -16,6 +16,7 @@ class GetPacksController extends AbstractController
     use CurrentUserTrait;
 
     private CycleRepository $cycleRepository;
+
     private UserCustomPackRepository $userCustomPackRepository;
 
     public function __construct(
@@ -52,6 +53,7 @@ class GetPacksController extends AbstractController
                 }
             }
         }
+
         $countOf = function ($pack) use ($hasCollection, $countById) {
             if ($hasCollection) {
                 return $countById[$pack->getId()] ?? 0;
@@ -67,6 +69,7 @@ class GetPacksController extends AbstractController
             if (0 == $cycle->getPosition() || false === $first_pack) {
                 continue;
             }
+
             if (1 === $size && $first_pack->getName() == $cycle->getName()) {
                 if ($first_pack->getIsRepackaged()) {
                     $repackaged['packs'][] = $entryOf($first_pack);
@@ -82,15 +85,18 @@ class GetPacksController extends AbstractController
                         $category['packs'][] = $entryOf($pack);
                     }
                 }
+
                 if (count($category['packs'])) {
                     $categories[] = $category;
                 }
             }
         }
+
         // Repackaged products go in their own section at the end.
         if (count($repackaged['packs'])) {
             $categories[] = $repackaged;
         }
+
         $customPacks = $this->userCustomPackRepository->findBy(['user' => $this->getUser()], ['createdAt' => 'ASC', 'id' => 'ASC']);
 
         return $this->render('Collection/packs.html.twig', ['pagetitle' => 'My Collection', 'categories' => $categories, 'reloaduser' => $reloaduser, 'customPacks' => $customPacks]);

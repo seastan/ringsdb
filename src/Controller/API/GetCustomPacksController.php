@@ -28,6 +28,7 @@ class GetCustomPacksController extends AbstractController
         if (!$user) {
             return new JsonResponse([], 401);
         }
+
         $packs = $this->userCustomPackRepository->findBy(['user' => $user], ['createdAt' => 'ASC', 'id' => 'ASC']);
         $result = [];
         foreach ($packs as $pack) {
@@ -41,6 +42,7 @@ class GetCustomPacksController extends AbstractController
                     'quantity' => $entry->getQuantity(),
                 ];
             }
+
             $result[] = [
                 'id' => $pack->getId(),
                 'code' => $pack->getCode(),

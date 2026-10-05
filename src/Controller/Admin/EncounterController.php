@@ -25,6 +25,7 @@ class EncounterController extends AbstractController
      * @var EncounterRepository
      */
     private $encounterRepository;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -91,6 +92,7 @@ class EncounterController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Encounter entity.');
         }
+
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('Encounter/show.html.twig', ['entity' => $entity, 'delete_form' => $deleteForm->createView()]);
@@ -107,6 +109,7 @@ class EncounterController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Encounter entity.');
         }
+
         $editForm = $this->createForm(EncounterType::class, $entity, ['method' => 'PUT']);
         $deleteForm = $this->createDeleteForm($id);
 
@@ -124,6 +127,7 @@ class EncounterController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Encounter entity.');
         }
+
         $deleteForm = $this->createDeleteForm($id);
         $editForm = $this->createForm(EncounterType::class, $entity, ['method' => 'PUT']);
         $editForm->handleRequest($request);
@@ -151,6 +155,7 @@ class EncounterController extends AbstractController
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Encounter entity.');
             }
+
             $this->entityManager->remove($entity);
             $this->entityManager->flush();
         }

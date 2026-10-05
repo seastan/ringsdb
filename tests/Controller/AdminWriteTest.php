@@ -47,16 +47,19 @@ class AdminWriteTest extends WebTestCase
         foreach (['decklist_spheres', 'decklistslot', 'decklistsideslot'] as $table) {
             $connection->exec("DELETE FROM $table WHERE decklist_id > {$max['decklist']}");
         }
+
         $connection->exec("DELETE FROM decklist WHERE id > {$max['decklist']}");
         foreach (['deckslot', 'decksideslot'] as $table) {
             $connection->exec("DELETE FROM $table WHERE deck_id > {$max['deck']} OR card_id > {$max['card']}");
         }
+
         $connection->exec("DELETE FROM deck WHERE id > {$max['deck']}");
         foreach (self::TABLES as $table) {
             if ('scenario_encounter' !== $table) {
                 $connection->exec("DELETE FROM $table WHERE id > {$max[$table]}");
             }
         }
+
         $connection->exec("DELETE FROM comment WHERE id > {$max['comment']}");
         $connection->update('comment', ['is_hidden' => 0], ['id' => 1]);
         parent::tearDown();
@@ -91,7 +94,7 @@ class AdminWriteTest extends WebTestCase
     /**
      * @return array<string, mixed>
      */
-    private static function prefixed($prefix, array $values): array
+    private function prefixed($prefix, array $values): array
     {
         $fields = [];
         foreach ($values as $name => $value) {
@@ -169,7 +172,7 @@ class AdminWriteTest extends WebTestCase
         $columns = implode(', ', array_keys($expectedCreated));
 
         // create: redirect to the show page
-        $response = $this->submitForm($client, "/admin/$slug/new", "/admin/$slug/create", self::prefixed($formName, $created));
+        $response = $this->submitForm($client, "/admin/$slug/new", "/admin/$slug/create", $this->prefixed($formName, $created));
         $this->assertSame(302, $response->getStatusCode());
         $this->assertRegExp("#^/admin/$slug/\\d+/show$#", self::location($response));
         $id = (int) explode('/', self::location($response))[3];
@@ -180,7 +183,7 @@ class AdminWriteTest extends WebTestCase
         $this->assertSame(200, $client->getResponse()->getStatusCode());
 
         // edit: redirect to the edit page
-        $response = $this->submitForm($client, "/admin/$slug/$id/edit", "/admin/$slug/$id/update", self::prefixed($formName, $updated));
+        $response = $this->submitForm($client, "/admin/$slug/$id/edit", "/admin/$slug/$id/update", $this->prefixed($formName, $updated));
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame("/admin/$slug/$id/edit", $response->headers->get('Location'));
         $this->assertEquals($expectedUpdated, $this->db()->fetchAssoc("SELECT $columns FROM $table WHERE id = ?", [$id]));
@@ -196,7 +199,7 @@ class AdminWriteTest extends WebTestCase
     {
         $client = $this->createAdminClient();
         $crawler = $client->request('GET', '/admin/scenario/new');
-        $form = $crawler->filter('form[action="/admin/scenario/create"]')->form(self::prefixed('appbundle_scenario', [
+        $form = $crawler->filter('form[action="/admin/scenario/create"]')->form($this->prefixed('appbundle_scenario', [
             'code' => 'PHPUnit Scenario', 'name' => 'PHPUnit Scenario', 'position' => '999', 'pack' => '1',
         ]));
         /** @var \Symfony\Component\DomCrawler\Field\ChoiceFormField[] $encounters */
@@ -242,7 +245,7 @@ class AdminWriteTest extends WebTestCase
     public function testForceDeleteACard(): void
     {
         $client = $this->createAdminClient();
-        $response = $this->submitForm($client, '/admin/card/new', '/admin/card/create', self::prefixed('appbundle_cardtype', [
+        $response = $this->submitForm($client, '/admin/card/new', '/admin/card/create', $this->prefixed('appbundle_cardtype', [
             'position' => '1', 'deck_limit' => '3', 'code' => '99901', 'type' => '2', 'sphere' => '1', 'name' => 'PHPUnit Card',
         ]));
         $cardId = (int) explode('/', self::location($response))[3];

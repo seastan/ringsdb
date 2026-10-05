@@ -19,7 +19,9 @@ class NewQuestlogController extends AbstractController
     use CurrentUserTrait;
 
     private ScenarioRepository $scenarioRepository;
+
     private DecklistRepository $decklistRepository;
+
     private DeckRepository $deckRepository;
 
     public function __construct(
@@ -60,6 +62,7 @@ class NewQuestlogController extends AbstractController
                 } else {
                     $decks[$i] = $this->deckRepository->find($deck_ids[$i]);
                 }
+
                 if ($decks[$i]) {
                     $user = $decks[$i]->getUser();
                     $author_names[$i] = $user->getUsername();
@@ -69,6 +72,7 @@ class NewQuestlogController extends AbstractController
                 }
             }
         }
+
         $questlog = new Questlog();
         $questlog->setSuccess(true);
 

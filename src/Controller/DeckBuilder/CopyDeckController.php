@@ -31,10 +31,12 @@ class CopyDeckController extends AbstractController
         if (!$decklist) {
             throw new NotFoundHttpException("This deck doesn't exist.");
         }
+
         $content = ['main' => [], 'side' => []];
         foreach ($decklist->getSlots() as $slot) {
             $content['main'][$slot->getCard()->getCode()] = $slot->getQuantity();
         }
+
         foreach ($decklist->getSideslots() as $slot) {
             $content['side'][$slot->getCard()->getCode()] = $slot->getQuantity();
         }

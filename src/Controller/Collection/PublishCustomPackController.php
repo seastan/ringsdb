@@ -16,6 +16,7 @@ class PublishCustomPackController extends AbstractController
     use CurrentUserTrait;
 
     private CustomPackManager $customPackManager;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -37,11 +38,13 @@ class PublishCustomPackController extends AbstractController
     public function __invoke(int $id): RedirectResponse
     {
         $pack = $this->customPackManager->loadOwnedPack($this->currentUser(), $id);
-        if (!$pack) {
+        if (!$pack instanceof \App\Entity\UserCustomPack) {
             throw $this->createNotFoundException();
         }
+
         $pack->setIsPublished(!$pack->getIsPublished());
         $pack->setUpdatedAt(new \DateTime());
+
         $this->entityManager->persist($pack);
         $this->entityManager->flush();
 

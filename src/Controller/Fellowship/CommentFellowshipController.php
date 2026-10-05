@@ -24,9 +24,13 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class CommentFellowshipController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+
     private Texts $texts;
+
     private MailerInterface $mailer;
+
     private FellowshipRepository $fellowshipRepository;
+
     private UserRepository $userRepository;
 
     public function __construct(
@@ -55,11 +59,13 @@ class CommentFellowshipController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
+
         $fellowship_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
         if (!$fellowship) {
             throw new BadRequestHttpException('Wrong fellowship id');
         }
+
         $comment_text = trim($request->get('comment'));
         if (!empty($comment_text)) {
             $comment_text = (string) preg_replace('%(?<!\\()\\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\\d\\x{00a1}-\\x{ffff}]+-?)*[a-z\\d\\x{00a1}-\\x{ffff}]+)(?:\\.(?:[a-z\\d\\x{00a1}-\\x{ffff}]+-?)*[a-z\\d\\x{00a1}-\\x{ffff}]+)*(?:\\.[a-z\\x{00a1}-\\x{ffff}]{2,6}))(?::\\d+)?)(?:[^\\s]*)?%iu', '[$1]($0)', $comment_text);
@@ -68,6 +74,7 @@ class CommentFellowshipController extends AbstractController
             if (preg_match_all('/`@([\\w_]+)`/', $comment_text, $matches, PREG_PATTERN_ORDER)) {
                 $mentionned_usernames = array_unique($matches[1]);
             }
+
             $comment_html = $this->texts->markdown($comment_text);
             $now = new \DateTime();
             $comment = new FellowshipComment();
@@ -86,6 +93,7 @@ class CommentFellowshipController extends AbstractController
             if ($fellowship->getUser()->getIsNotifAuthor()) {
                 $spool[$fellowship->getUser()->getEmail()] = 'Emails/newfellowshipcomment_author.html.twig';
             }
+
             foreach ($fellowship->getComments() as $comment) {
                 /* @var $comment \App\Entity\FellowshipComment */
                 $commenter = $comment->getUser();
@@ -93,6 +101,7 @@ class CommentFellowshipController extends AbstractController
                     $spool[$commenter->getEmail()] ??= 'Emails/newfellowshipcomment_commenter.html.twig';
                 }
             }
+
             foreach ($mentionned_usernames as $mentionned_username) {
                 /* @var $mentionned_user User */
                 $mentionned_user = $this->userRepository->findOneBy(['username' => $mentionned_username]);
@@ -100,6 +109,7 @@ class CommentFellowshipController extends AbstractController
                     $spool[$mentionned_user->getEmail()] ??= 'Emails/newfellowshipcomment_mentionned.html.twig';
                 }
             }
+
             unset($spool[$user->getEmail()]);
             $email_data = ['username' => $user->getUsername(), 'fellowship_name' => $fellowship->getName(), 'url' => $this->generateUrl('fellowship_view', ['fellowship_id' => $fellowship->getId(), 'fellowship_name' => $fellowship->getNameCanonical()], UrlGeneratorInterface::ABSOLUTE_URL).'#'.$comment->getId(), 'comment' => $comment_html, 'profile' => $this->generateUrl('user_profile_edit', [], UrlGeneratorInterface::ABSOLUTE_URL)];
             foreach ($spool as $email => $view) {

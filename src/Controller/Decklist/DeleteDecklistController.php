@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class DeleteDecklistController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+
     private DecklistRepository $decklistRepository;
 
     public function __construct(
@@ -42,24 +43,29 @@ class DeleteDecklistController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
+
         $decklist = $this->decklistRepository->find($decklist_id);
         if (!$decklist || !$decklist->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException("You don't have access to this decklist.");
         }
+
         if ($decklist->getNbVotes() || $decklist->getNbfavorites() || $decklist->getNbcomments()) {
             throw new AccessDeniedHttpException('Cannot delete this decklist.');
         }
+
         $precedent = $decklist->getPrecedent();
         $children_decks = $decklist->getChildren();
         /* @var $children_deck Deck */
         foreach ($children_decks as $children_deck) {
             $children_deck->setParent($precedent);
         }
+
         $successor_decklists = $decklist->getSuccessors();
         /* @var $successor_decklist Decklist */
         foreach ($successor_decklists as $successor_decklist) {
             $successor_decklist->setPrecedent($precedent);
         }
+
         $this->entityManager->remove($decklist);
         $this->entityManager->flush();
 

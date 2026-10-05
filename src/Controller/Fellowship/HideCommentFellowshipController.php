@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class HideCommentFellowshipController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+
     private FellowshipCommentRepository $fellowshipCommentRepository;
 
     public function __construct(
@@ -43,13 +44,16 @@ class HideCommentFellowshipController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
+
         $comment = $this->fellowshipCommentRepository->find($comment_id);
         if (!$comment) {
             throw new BadRequestHttpException('Unable to find comment');
         }
+
         if (!$comment->getFellowship()->getUser()->isEqualTo($user)) {
             return new JsonResponse("You don't have permission to edit this comment.");
         }
+
         $comment->setIsHidden((bool) $hidden);
         $this->entityManager->flush();
 

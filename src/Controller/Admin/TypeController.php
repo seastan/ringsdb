@@ -25,6 +25,7 @@ class TypeController extends AbstractController
      * @var TypeRepository
      */
     private $typeRepository;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -76,9 +77,7 @@ class TypeController extends AbstractController
      */
     private function createCreateForm(Type $entity): FormInterface
     {
-        $form = $this->createForm(TypeType::class, $entity, ['action' => $this->generateUrl('admin_type_create'), 'method' => 'POST']);
-
-        return $form;
+        return $this->createForm(TypeType::class, $entity, ['action' => $this->generateUrl('admin_type_create'), 'method' => 'POST']);
     }
 
     /**
@@ -105,6 +104,7 @@ class TypeController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Type entity.');
         }
+
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('Type/show.html.twig', ['entity' => $entity, 'delete_form' => $deleteForm->createView()]);
@@ -121,6 +121,7 @@ class TypeController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Type entity.');
         }
+
         $editForm = $this->createEditForm($entity);
         $deleteForm = $this->createDeleteForm($id);
 
@@ -153,6 +154,7 @@ class TypeController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Type entity.');
         }
+
         $deleteForm = $this->createDeleteForm($id);
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
@@ -179,6 +181,7 @@ class TypeController extends AbstractController
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Type entity.');
             }
+
             $this->entityManager->remove($entity);
             $this->entityManager->flush();
         }

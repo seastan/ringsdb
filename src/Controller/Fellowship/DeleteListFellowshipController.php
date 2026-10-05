@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class DeleteListFellowshipController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+
     private FellowshipRepository $fellowshipRepository;
 
     public function __construct(
@@ -36,6 +37,7 @@ class DeleteListFellowshipController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
+
         $list_id = explode('-', $request->get('ids'));
         $message = null;
         foreach ($list_id as $id) {
@@ -44,9 +46,11 @@ class DeleteListFellowshipController extends AbstractController
             if (!$fellowship) {
                 continue;
             }
+
             if (!$fellowship->getUser()->isEqualTo($user)) {
                 continue;
             }
+
             if ($fellowship->getNbVotes() || $fellowship->getNbfavorites() || $fellowship->getNbcomments()) {
                 $message = "You can't delete a published fellowship. Unpublished selected fellowships were deleted.";
             } else {
@@ -55,14 +59,17 @@ class DeleteListFellowshipController extends AbstractController
                 foreach ($decks as $deck) {
                     $this->entityManager->remove($deck);
                 }
+
                 /* @var $decks \App\Entity\FellowshipDecklist[] */
                 $decklists = $fellowship->getDecklists();
                 foreach ($decklists as $decklist) {
                     $this->entityManager->remove($decklist);
                 }
+
                 $this->entityManager->remove($fellowship);
             }
         }
+
         $this->entityManager->flush();
         $this->get('session')->getFlashBag()->set('notice', $message ?: 'Fellowships deleted.');
 

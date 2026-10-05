@@ -27,6 +27,7 @@ class SnapshotManager
                 $deck->setName('[deleted]');
                 $questlog_deck->setDeck($deck);
             }
+
             $questlogdeck_content = json_decode($questlog_deck->getContent(), true);
             $decks_service->setSlots($deck, $questlogdeck_content);
         }

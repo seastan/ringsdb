@@ -13,14 +13,17 @@ class Type
      * @var int|null
      */
     private $id;
+
     /**
      * @var string
      */
     private $code;
+
     /**
      * @var string
      */
     private $name;
+
     /**
      * @var Collection<int, Card>
      */

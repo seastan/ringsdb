@@ -17,12 +17,12 @@ class Scenario implements \JsonSerializable
         $encounters = $this->getEncounters()->toArray();
         $pack = $this->getPack();
 
-        $array = [
+        return [
             'id' => $this->getId(),
             'code' => $this->getCode(),
             'name' => $this->getName(),
             'nameCanonical' => $this->getNameCanonical(),
-            'pack' => $pack ? $pack->getName() : '',
+            'pack' => $pack instanceof Pack ? $pack->getName() : '',
             'date_creation' => $this->getDateCreation()->format('c'),
             'date_update' => $this->getDateUpdate()->format('c'),
             'encounters' => $encounters,
@@ -61,34 +61,38 @@ class Scenario implements \JsonSerializable
             'nightmare_surges' => $this->getNightmareSurges(),
             'nightmare_encounter_side_quests' => $this->getNightmareEncounterSideQuests(),
         ];
-
-        return $array;
     }
 
     /**
      * @var int|null
      */
     private $id;
+
     /**
      * @var string
      */
     private $code;
+
     /**
      * @var string
      */
     private $name;
+
     /**
      * @var \DateTime
      */
     private $dateCreation;
+
     /**
      * @var \DateTime
      */
     private $dateUpdate;
+
     /**
      * @var Pack|null
      */
     private $pack;
+
     /**
      * @var Collection<int, Encounter>
      */
@@ -265,114 +269,142 @@ class Scenario implements \JsonSerializable
      * @var bool
      */
     private $hasEasy;
+
     /**
      * @var bool
      */
     private $hasNightmare;
+
     /**
      * @var int
      */
     private $easyCards;
+
     /**
      * @var int
      */
     private $easyEnemies;
+
     /**
      * @var int
      */
     private $easyLocations;
+
     /**
      * @var int
      */
     private $easyTreacheries;
+
     /**
      * @var int
      */
     private $easyObjectiveAllies;
+
     /**
      * @var int
      */
     private $easyObjectiveLocations;
+
     /**
      * @var int
      */
     private $easySurges;
+
     /**
      * @var int
      */
     private $easyShadows;
+
     /**
      * @var int
      */
     private $easyEncounterSideQuests;
+
     /**
      * @var int
      */
     private $normalCards;
+
     /**
      * @var int
      */
     private $normalEnemies;
+
     /**
      * @var int
      */
     private $normalLocations;
+
     /**
      * @var int
      */
     private $normalTreacheries;
+
     /**
      * @var int
      */
     private $normalObjectiveAllies;
+
     /**
      * @var int
      */
     private $normalObjectiveLocations;
+
     /**
      * @var int
      */
     private $normalSurges;
+
     /**
      * @var int
      */
     private $normalShadows;
+
     /**
      * @var int
      */
     private $normalEncounterSideQuests;
+
     /**
      * @var int
      */
     private $nightmareCards;
+
     /**
      * @var int
      */
     private $nightmareEnemies;
+
     /**
      * @var int
      */
     private $nightmareLocations;
+
     /**
      * @var int
      */
     private $nightmareTreacheries;
+
     /**
      * @var int
      */
     private $nightmareObjectiveAllies;
+
     /**
      * @var int
      */
     private $nightmareObjectiveLocations;
+
     /**
      * @var int
      */
     private $nightmareSurges;
+
     /**
      * @var int
      */
     private $nightmareShadows;
+
     /**
      * @var int
      */
@@ -962,10 +994,12 @@ class Scenario implements \JsonSerializable
      * @var int
      */
     private $easyObjectives;
+
     /**
      * @var int
      */
     private $normalObjectives;
+
     /**
      * @var int
      */

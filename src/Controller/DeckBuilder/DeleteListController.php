@@ -17,6 +17,7 @@ class DeleteListController extends AbstractController
     use CurrentUserTrait;
 
     private EntityManagerInterface $entityManager;
+
     private DeckRepository $deckRepository;
 
     public function __construct(
@@ -39,14 +40,18 @@ class DeleteListController extends AbstractController
             if (!$deck) {
                 continue;
             }
+
             if ($this->currentUser()->getId() != $deck->getUser()->getId()) {
                 continue;
             }
+
             foreach ($deck->getChildren() as $decklist) {
-                $decklist->setParent(null);
+                $decklist->setParent();
             }
+
             $this->entityManager->remove($deck);
         }
+
         $this->entityManager->flush();
         $this->get('session')->getFlashBag()->set('notice', 'Decks deleted.');
 

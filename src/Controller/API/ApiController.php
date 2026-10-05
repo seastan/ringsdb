@@ -31,22 +31,27 @@ class ApiController extends AbstractController
      * @var CardsData
      */
     private $cardsData;
+
     /**
      * @var int
      */
     private $cacheExpiration;
+
     /**
      * @var CardRepository
      */
     private $cardRepository;
+
     /**
      * @var DecklistRepository
      */
     private $decklistRepository;
+
     /**
      * @var PackRepository
      */
     private $packRepository;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -85,6 +90,7 @@ class ApiController extends AbstractController
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
+
         $jsonp = $request->query->get('jsonp');
         /* @var $em EntityManager */
         /* @var $list_packs \App\Entity\Pack[] */
@@ -96,10 +102,12 @@ class ApiController extends AbstractController
                 $lastModified = $pack->getDateUpdate();
             }
         }
+
         $response->setLastModified($lastModified);
         if ($response->isNotModified($request)) {
             return $response;
         }
+
         $packs = [];
         /* @var $pack \App\Entity\Pack */
         foreach ($list_packs as $pack) {
@@ -119,6 +127,7 @@ class ApiController extends AbstractController
                 'id' => $pack->getId(),
             ];
         }
+
         $content = json_encode($packs);
         $this->setJsonContent($response, (string) $content, $jsonp);
 
@@ -164,6 +173,7 @@ class ApiController extends AbstractController
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
+
         $jsonp = $request->query->get('jsonp');
         /* @var $em EntityManager */
         /* @var $card \App\Entity\Card */
@@ -171,12 +181,14 @@ class ApiController extends AbstractController
         if (!$card instanceof Card) {
             throw $this->createNotFoundException('Card not found');
         }
+
         // check the last-modified-since header
         $lastModified = $card->getDateUpdate();
         $response->setLastModified($lastModified);
         if ($response->isNotModified($request)) {
             return $response;
         }
+
         // build the response
         /* @var $card \App\Entity\Card */
         $card = $this->cardsData->getCardInfo($card, true);
@@ -206,6 +218,7 @@ class ApiController extends AbstractController
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
+
         $jsonp = $request->query->get('jsonp');
         /* @var $em EntityManager */
         /* @var $list_cards \App\Entity\Card[] */
@@ -221,6 +234,7 @@ class ApiController extends AbstractController
                 $lastModified = $card->getDateUpdate();
             }
         }
+
         $printingMax = $this->entityManager->createQuery('SELECT MAX(cp.dateUpdate) FROM App:CardPrinting cp')->getSingleScalarResult();
         if ($printingMax) {
             $printingMax = new \DateTime((string) $printingMax);
@@ -228,16 +242,19 @@ class ApiController extends AbstractController
                 $lastModified = $printingMax;
             }
         }
+
         $response->setLastModified($lastModified);
         if ($response->isNotModified($request)) {
             return $response;
         }
+
         // build the response
         $cards = [];
         /* @var $card \App\Entity\Card */
         foreach ($list_cards as $card) {
             $cards[] = $this->cardsData->getCardInfo($card, true);
         }
+
         $content = json_encode($cards);
         $this->setJsonContent($response, (string) $content, $jsonp);
 
@@ -283,6 +300,7 @@ class ApiController extends AbstractController
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
+
         $jsonp = $request->query->get('jsonp');
         $format = $request->getRequestFormat();
         if ('json' !== $format) {
@@ -290,12 +308,14 @@ class ApiController extends AbstractController
 
             return $response;
         }
+
         /* @var $em EntityManager */
         /* @var $pack \App\Entity\Pack */
         $pack = $this->packRepository->findOneBy(['code' => $pack_code]);
         if (!$pack) {
             throw $this->createNotFoundException('Pack not found');
         }
+
         $conditions = $this->cardsData->syntax("e:{$pack_code}");
         $this->cardsData->validateConditions($conditions);
         $query = $this->cardsData->buildQueryFromConditions($conditions);
@@ -308,15 +328,18 @@ class ApiController extends AbstractController
                     $last_modified = $rows[$rowindex]->getDateUpdate();
                 }
             }
+
             $response->setLastModified($last_modified);
             if ($response->isNotModified($request)) {
                 return $response;
             }
+
             for ($rowindex = 0; $rowindex < count($rows); ++$rowindex) {
                 $card = $this->cardsData->getCardInfo($rows[$rowindex], true);
                 $cards[] = $card;
             }
         }
+
         $content = json_encode($cards);
         $this->setJsonContent($response, (string) $content, $jsonp);
 
@@ -363,6 +386,7 @@ class ApiController extends AbstractController
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
+
         $jsonp = $request->query->get('jsonp');
         $format = $request->getRequestFormat();
         if ('json' !== $format) {
@@ -370,16 +394,19 @@ class ApiController extends AbstractController
 
             return $response;
         }
+
         /* @var $em EntityManager */
         /* @var $decklist \App\Entity\Decklist */
         $decklist = $this->decklistRepository->find($decklist_id);
         if (!$decklist) {
             throw $this->createNotFoundException('Decklist not found');
         }
+
         $response->setLastModified($decklist->getDateUpdate());
         if ($response->isNotModified($request)) {
             return $response;
         }
+
         $content = json_encode($decklist);
         $this->setJsonContent($response, (string) $content, $jsonp);
 
@@ -426,6 +453,7 @@ class ApiController extends AbstractController
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
+
         $jsonp = $request->query->get('jsonp');
         $format = $request->getRequestFormat();
         if ('json' !== $format) {
@@ -433,9 +461,11 @@ class ApiController extends AbstractController
 
             return $response;
         }
+
         /* @var $em EntityManager */
         $qb = $this->decklistRepository->createQueryBuilder('d');
         $qb->andWhere("d.dateCreation LIKE '{$date}%'");
+
         $decklists = $qb->getQuery()->getResult();
         $cardRepo = $this->cardRepository;
         $userRepo = $userRepository;
@@ -447,6 +477,7 @@ class ApiController extends AbstractController
             if ($user) {
                 $username = $user->getUsername();
             }
+
             $decklist['username'] = $username;
             $codes = array_keys($decklist['heroes']);
             foreach ($codes as $code) {
@@ -454,6 +485,7 @@ class ApiController extends AbstractController
                 if (!$card) {
                     continue;
                 }
+
                 $decklist['heroes_details'][] = [
                     'name' => $card->getName(),
                     'sphere' => $card->getSphere() ? $card->getSphere()->getName() : null,
@@ -461,6 +493,7 @@ class ApiController extends AbstractController
                 ];
             }
         }
+
         $content = json_encode($decklists);
         $this->setJsonContent($response, (string) $content, $jsonp);
 
@@ -506,6 +539,7 @@ class ApiController extends AbstractController
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
+
         $jsonp = $request->query->get('jsonp');
         $format = $request->getRequestFormat();
         if ('json' !== $format) {
@@ -513,6 +547,7 @@ class ApiController extends AbstractController
 
             return $response;
         }
+
         /* @var $em EntityManager */
         $card = $this->cardRepository->findOneBy(['code' => $card_code]);
         if (!$card) {
@@ -520,6 +555,7 @@ class ApiController extends AbstractController
 
             return $response;
         }
+
         $qb = $this->entityManager->createQueryBuilder();
         // Select decklists
         $qb->select('d.id, d.name, d.nameCanonical, d.dateCreation, d.dateUpdate');
@@ -534,6 +570,7 @@ class ApiController extends AbstractController
         $qb->setParameter('card', $card);
         // limit 10
         $qb->setMaxResults(10);
+
         $query = $qb->getQuery();
         /* @var $decklists ArrayCollection */
         $decklists = $query->getArrayResult();
@@ -543,10 +580,12 @@ class ApiController extends AbstractController
                 $lastModified = $decklist['dateUpdate'];
             }
         }
+
         $response->setLastModified($lastModified);
         if ($response->isNotModified($request)) {
             return $response;
         }
+
         foreach ($decklists as &$decklist) {
             $decklist['url'] = $this->generateUrl('decklist_detail', ['decklist_id' => $decklist['id'], 'decklist_name' => $decklist['nameCanonical']]);
             unset($decklist['descriptionMd']);
@@ -554,6 +593,7 @@ class ApiController extends AbstractController
             $decklist['dateCreation'] = $decklist['dateCreation']->format('c');
             $decklist['dateUpdate'] = $decklist['dateUpdate']->format('c');
         }
+
         $content = json_encode($decklists);
         $this->setJsonContent($response, (string) $content, $jsonp);
 
@@ -599,6 +639,7 @@ class ApiController extends AbstractController
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
+
         $jsonp = $request->query->get('jsonp');
         /* @var $em EntityManager */
         /* @var $scenario \App\Entity\Scenario */
@@ -606,12 +647,14 @@ class ApiController extends AbstractController
         if (!$scenario instanceof Scenario) {
             throw $this->createNotFoundException('Scenario not found.');
         }
+
         // check the last-modified-since header
         $lastModified = $scenario->getDateUpdate();
         $response->setLastModified($lastModified);
         if ($response->isNotModified($request)) {
             return $response;
         }
+
         $content = json_encode($scenario);
         $this->setJsonContent($response, (string) $content, $jsonp);
 
@@ -627,10 +670,12 @@ class ApiController extends AbstractController
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
+
         $jsonp = $request->query->get('jsonp');
         $cards = [];
         $conditions = $this->cardsData->syntax(urldecode($q));
         $conditions = $this->cardsData->validateConditions($conditions);
+
         $last_modified = null;
         $query = $this->cardsData->buildQueryFromConditions($conditions);
         if ($query && ($rows = $this->cardsData->get_search_rows($conditions, 'set'))) {
@@ -639,15 +684,18 @@ class ApiController extends AbstractController
                     $last_modified = $rows[$rowindex]->getDateUpdate();
                 }
             }
+
             $response->setLastModified($last_modified);
             if ($response->isNotModified($request)) {
                 return $response;
             }
+
             for ($rowindex = 0; $rowindex < count($rows); ++$rowindex) {
                 $card = $this->cardsData->getCardInfo($rows[$rowindex], true);
                 $cards[] = $card;
             }
         }
+
         $content = json_encode($cards);
         $this->setJsonContent($response, (string) $content, $jsonp);
 
@@ -670,13 +718,15 @@ class ApiController extends AbstractController
 
             return;
         }
+
         $jsonp = new JsonResponse();
         $jsonp->setJson($json);
         try {
             $jsonp->setCallback($callback);
-        } catch (\InvalidArgumentException $e) {
-            throw new BadRequestHttpException('Invalid JSONP callback.');
+        } catch (\InvalidArgumentException $invalidArgumentException) {
+            throw new BadRequestHttpException('Invalid JSONP callback.', $invalidArgumentException);
         }
+
         $response->headers->set('Content-Type', 'application/javascript');
         $response->setContent((string) $jsonp->getContent());
     }

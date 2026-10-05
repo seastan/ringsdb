@@ -66,6 +66,7 @@ class PrecomputeCardStatsCommand extends Command
 
             return 1;
         }
+
         $count = max(1, (int) $input->getOption('months'));
 
         for ($i = 0; $i < $count; ++$i) {
@@ -83,6 +84,7 @@ class PrecomputeCardStatsCommand extends Command
                 $output->writeln(sprintf('  step %d: %d bytes in %.1fs', $step, strlen($payload), microtime(true) - $t));
             }
         }
+
         $output->writeln('done');
 
         return 0;

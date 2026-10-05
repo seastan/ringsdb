@@ -22,7 +22,9 @@ class AutosaveController extends AbstractController
     use CurrentUserTrait;
 
     private DeckRepository $deckRepository;
+
     private EntityManagerInterface $entityManager;
+
     private LoggerInterface $logger;
 
     public function __construct(
@@ -48,15 +50,18 @@ class AutosaveController extends AbstractController
         if (!$deck) {
             throw new UnprocessableEntityHttpException('Cannot find deck '.$deck_id);
         }
+
         if (!$deck->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException("You don't have access to this deck.");
         }
+
         // decoded as arrays: count() of an object is a warning since PHP 7.2
         $diff = json_decode((string) $request->get('diff'), true);
-        if (!is_array($diff) || 4 != count($diff) && 2 != count($diff)) {
+        if (!is_array($diff) || 4 !== count($diff) && 2 !== count($diff)) {
             $this->logger->error('cannot use diff', (array) $diff);
             throw new UnprocessableEntityHttpException('Wrong content '.json_encode($diff));
         }
+
         // [main added, main removed, side added, side removed], the side parts may be missing
         $parts = array_map(fn ($part): int => is_array($part) ? count($part) : 0, $diff);
         if (array_sum($parts) > 0) {

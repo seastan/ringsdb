@@ -14,6 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class OctgnListExportController extends AbstractController
 {
     use CurrentUserTrait;
+
     private DeckArchiver $deckArchiver;
 
     public function __construct(

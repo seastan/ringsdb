@@ -17,8 +17,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class ListQuestlogController extends AbstractController
 {
     private int $cacheExpiration;
+
     private QuestLogManager $questlogManager;
+
     private SnapshotManager $snapshotManager;
+
     private CycleRepository $cycleRepository;
 
     public function __construct(
@@ -50,6 +53,7 @@ class ListQuestlogController extends AbstractController
 
         $this->questlogManager->setLimit(30);
         $this->questlogManager->setPage($page);
+
         $header = '';
         switch ($type) {
             case 'find':
@@ -66,6 +70,7 @@ class ListQuestlogController extends AbstractController
                 } else {
                     $paginator = $this->questlogManager->getEmptyList();
                 }
+
                 $pagetitle = 'Favorite Quest Logs';
                 break;
             case 'mine':
@@ -76,6 +81,7 @@ class ListQuestlogController extends AbstractController
                 } else {
                     $paginator = $this->questlogManager->getEmptyList();
                 }
+
                 $pagetitle = 'My Public Quest Logs';
                 break;
             case 'recent':
@@ -96,6 +102,7 @@ class ListQuestlogController extends AbstractController
                 $pagetitle = 'Popular Quest Logs';
                 break;
         }
+
         $this->snapshotManager->setSnapshots($paginator);
 
         return $this->render('QuestLog/public-questlogs.html.twig', ['pagetitle' => $pagetitle, 'pagedescription' => 'Browse the collection of thousands of premade decks.', 'questlogs' => $paginator, 'url' => $request->getRequestUri(), 'header' => $header, 'type' => $type, 'pages' => $this->questlogManager->getClosePages(), 'prevurl' => $this->questlogManager->getPreviousUrl(), 'nexturl' => $this->questlogManager->getNextUrl()], $response);
@@ -114,6 +121,7 @@ class ListQuestlogController extends AbstractController
         if (0 === count($packs)) {
             $packs = $dbh->executeQuery('SELECT id FROM pack')->fetchAll(\PDO::FETCH_COLUMN);
         }
+
         $categories = [];
         $on = 0;
         $off = 0;
@@ -126,6 +134,7 @@ class ListQuestlogController extends AbstractController
             if (0 == $cycle->getPosition() || false === $first_pack) {
                 continue;
             }
+
             if (1 === $size && $first_pack->getName() == $cycle->getName()) {
                 $checked = count($packs) ? in_array($first_pack->getId(), $packs) : true;
                 if ($checked) {
@@ -133,6 +142,7 @@ class ListQuestlogController extends AbstractController
                 } else {
                     ++$off;
                 }
+
                 $categories[0]['packs'][] = ['id' => $first_pack->getId(), 'label' => $first_pack->getName(), 'checked' => $checked, 'future' => null === $first_pack->getDateRelease()];
             } else {
                 $category = ['label' => $cycle->getName(), 'packs' => []];
@@ -143,11 +153,14 @@ class ListQuestlogController extends AbstractController
                     } else {
                         ++$off;
                     }
+
                     $category['packs'][] = ['id' => $pack->getId(), 'label' => $pack->getName(), 'checked' => $checked, 'future' => null === $pack->getDateRelease()];
                 }
+
                 $categories[] = $category;
             }
         }
+
         $params = ['name' => $questlog_name, 'allowed' => $categories, 'on' => $on, 'off' => $off, 'author' => $author_name, 'scenario' => $scenario];
         $params['sort_'.$sort] = ' selected="selected"';
         $params['nb_decks_selected'] = $nb_decks;

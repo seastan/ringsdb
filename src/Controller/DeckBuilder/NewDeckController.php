@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\DeckBuilder;
 
 use App\Controller\CurrentUserTrait;
@@ -30,10 +32,11 @@ class NewDeckController extends AbstractController
         $deck = new Deck();
         $deck->setName('New Deck');
         $deck->setDescriptionMd('');
-        $deck->setLastPack(null);
+        $deck->setLastPack();
         $deck->setProblem('too_few_heroes');
         $deck->setTags('');
         $deck->setUser($this->currentUser());
+
         $this->entityManager->persist($deck);
         $this->entityManager->flush();
 

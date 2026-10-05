@@ -33,7 +33,7 @@ class EditCustomPackController extends AbstractController
     public function __invoke(int $id): Response
     {
         $pack = $this->customPackManager->loadOwnedPack($this->currentUser(), $id);
-        if (!$pack) {
+        if (!$pack instanceof \App\Entity\UserCustomPack) {
             throw $this->createNotFoundException();
         }
 

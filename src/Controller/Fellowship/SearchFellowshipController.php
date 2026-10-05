@@ -15,7 +15,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class SearchFellowshipController extends AbstractController
 {
     private int $cacheExpiration;
+
     private Connection $connection;
+
     private CycleRepository $cycleRepository;
 
     public function __construct(
@@ -36,11 +38,13 @@ class SearchFellowshipController extends AbstractController
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
+
         $spheres = $this->connection->executeQuery('SELECT s.name, s.code FROM sphere s ORDER BY s.name ASC')->fetchAll();
         $owned_packs = '';
         if ($this->getUser()) {
             $owned_packs = $this->getUser()->getOwnedPacks();
         }
+
         if ($owned_packs) {
             // owned_packs is a per-pack count map ("id" / "id:count", legacy "id-2");
             // keep the ids whose count is > 0.
@@ -55,6 +59,7 @@ class SearchFellowshipController extends AbstractController
         } else {
             $packs = $this->connection->executeQuery('SELECT id FROM pack WHERE date_release IS NOT NULL')->fetchAll(\PDO::FETCH_COLUMN);
         }
+
         $categories = [];
         $on = 0;
         $off = 0;
@@ -67,6 +72,7 @@ class SearchFellowshipController extends AbstractController
             if (0 == $cycle->getPosition() || false === $first_pack) {
                 continue;
             }
+
             if (1 === $size && $first_pack->getName() == $cycle->getName()) {
                 $checked = count($packs) ? in_array($first_pack->getId(), $packs) : true;
                 if ($checked) {
@@ -74,6 +80,7 @@ class SearchFellowshipController extends AbstractController
                 } else {
                     ++$off;
                 }
+
                 $categories[0]['packs'][] = ['id' => $first_pack->getId(), 'label' => $first_pack->getName(), 'checked' => $checked, 'future' => null === $first_pack->getDateRelease()];
             } else {
                 $category = ['label' => $cycle->getName(), 'packs' => []];
@@ -84,11 +91,14 @@ class SearchFellowshipController extends AbstractController
                     } else {
                         ++$off;
                     }
+
                     $category['packs'][] = ['id' => $pack->getId(), 'label' => $pack->getName(), 'checked' => $checked, 'future' => null === $pack->getDateRelease()];
                 }
+
                 $categories[] = $category;
             }
         }
+
         $searchForm = $this->renderView('Fellowship/form.html.twig', ['spheres' => $spheres, 'allowed' => $categories, 'on' => $on, 'off' => $off, 'author' => '', 'name' => '', 'numcores' => '12', 'numplaysets' => '4']);
 
         return $this->render('Fellowship/public-fellowships.html.twig', ['pagetitle' => 'Fellowship Search', 'fellowships' => null, 'url' => $request->getRequestUri(), 'header' => $searchForm, 'type' => 'find', 'pages' => null, 'prevurl' => null, 'nexturl' => null], $response);

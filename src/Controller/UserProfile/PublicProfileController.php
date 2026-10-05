@@ -17,6 +17,7 @@ class PublicProfileController extends AbstractController
      * @var int
      */
     private $cacheExpiration;
+
     /**
      * @var UserRepository
      */

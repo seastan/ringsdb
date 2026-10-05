@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ViewDecklistController extends AbstractController
 {
     private int $cacheExpiration;
+
     private DecklistRepository $decklistRepository;
 
     public function __construct(
@@ -39,14 +40,17 @@ class ViewDecklistController extends AbstractController
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
+
         $decklist = $this->decklistRepository->find($decklist_id);
         if (!$decklist) {
             throw $this->createNotFoundException('Decklist not found.');
         }
+
         $duplicate = $this->decklistRepository->findOneBy(['signature' => $decklist->getSignature()]);
         if (!$duplicate || $duplicate->getDateCreation() >= $decklist->getDateCreation() || $duplicate->getId() === $decklist->getId()) {
             $duplicate = null;
         }
+
         $commenters = array_map(
             /* @var $comment \App\Entity\Comment */
             fn ($comment) => $comment->getUser()->getUsername(),

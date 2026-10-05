@@ -13,22 +13,27 @@ class QuestlogDeck
      * @var int|null
      */
     private $id;
+
     /**
      * @var int
      */
     private $deckNumber;
+
     /**
      * @var string
      */
     private $content;
+
     /**
      * @var Questlog
      */
     private $questlog;
+
     /**
      * @var Deck|null
      */
     private $deck;
+
     /**
      * @var Decklist|null
      */

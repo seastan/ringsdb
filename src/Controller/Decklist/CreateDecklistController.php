@@ -22,8 +22,11 @@ class CreateDecklistController extends AbstractController
     use CurrentUserTrait;
 
     private DeckRepository $deckRepository;
+
     private DecklistRepository $decklistRepository;
+
     private DecklistFactory $decklistFactory;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -54,9 +57,11 @@ class CreateDecklistController extends AbstractController
         if (!$deck) {
             throw new BadRequestHttpException('Invalid deck_id.');
         }
+
         if (!$deck->getUser()->isEqualTo($user)) {
             throw $this->createAccessDeniedException('Access denied to this object.');
         }
+
         $name = filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES) ?: '';
         $descriptionMd = trim((string) $request->request->get('descriptionMd'));
         $precedent_id = trim((string) $request->request->get('precedent'));
@@ -68,13 +73,15 @@ class CreateDecklistController extends AbstractController
                 $precedent_id = null;
             }
         }
+
         $precedent = $precedent_id ? $this->decklistRepository->find($precedent_id) : null;
         try {
             /* @var $decklist \App\Entity\Decklist */
             $decklist = $this->decklistFactory->createDecklistFromDeck($deck, $name, $descriptionMd);
-        } catch (\Exception $e) {
-            return $this->render('Default/error.html.twig', ['pagetitle' => 'Error', 'error' => $e]);
+        } catch (\Exception $exception) {
+            return $this->render('Default/error.html.twig', ['pagetitle' => 'Error', 'error' => $exception]);
         }
+
         $decklist->setPrecedent($precedent);
         $this->entityManager->persist($decklist);
         $this->entityManager->flush();

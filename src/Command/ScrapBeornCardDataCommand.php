@@ -128,7 +128,7 @@ class ScrapBeornCardDataCommand extends Command
         $forceData = $input->getOption('force-data');
         $forceImage = $input->getOption('force-image');
         $showTexts = $input->getOption('show-texts');
-        $skipData = $input->getOption('skip-data');
+        $input->getOption('skip-data');
 
         $sets = [];
         if ($setname) {
@@ -145,7 +145,7 @@ class ScrapBeornCardDataCommand extends Command
                 'Foundations of Stone',
                 'Shadow and Flame',
                 'Heirs of Númenor',
-                'The Steward\'s Fear',
+                "The Steward's Fear",
                 'The Drúadan Forest',
                 'Encounter at Amon Dîn',
                 'Assault on Osgiliath',
@@ -156,7 +156,7 @@ class ScrapBeornCardDataCommand extends Command
                 'The Three Trials',
                 'Trouble in Tharbad',
                 'The Nîn-in-Eilph',
-                'Celebrimbor\'s Secret',
+                "Celebrimbor's Secret",
                 'The Antlered Crown',
                 'The Lost Realm',
                 'The Wastes of Eriador',
@@ -200,6 +200,7 @@ class ScrapBeornCardDataCommand extends Command
                 $output->writeln('<error>Cannot find pack ['.$set.']</error>');
                 exit;
             }
+
             if (!$pack->getCycle()) {
                 throw new \RuntimeException('Pack must be part of a cycle');
             }
@@ -242,6 +243,7 @@ class ScrapBeornCardDataCommand extends Command
                 } else {
                     $sphere = 'Neutral';
                 }
+
                 $output->writeln('3');
 
                 // Name and Uniqueness
@@ -270,8 +272,8 @@ class ScrapBeornCardDataCommand extends Command
                 // Threat, Willpower, Attack, Defense, Hit Points
                 $c = $cardCrawler->filter('div.statValueBox')->first();
                 $output->writeln('9');
-
-                $cost = $threat = $c->filter('span')->eq(1)->text();
+                $cost = $c->filter('span')->eq(1)->text();
+                $threat = $cost;
                 $output->writeln('9a');
                 $limit = ('Hero' == $type) ? 1 : 3;
                 $output->writeln('9b');
@@ -304,6 +306,7 @@ class ScrapBeornCardDataCommand extends Command
                     $quest = $c->filter('span')->eq(4)->text();
                     $output->writeln('9o');
                 }
+
                 $output->writeln('10');
 
                 // Traits, text and flavor
@@ -341,11 +344,13 @@ class ScrapBeornCardDataCommand extends Command
                     $output->writeln('Card not found in RingsDB database.');
                     continue;
                 }
+
                 $output->writeln('15b');
                 if (!$forceData && !$forceImage) {
                     // shortcut: we already know this card
                     continue;
                 }
+
                 $output->writeln('16');
 
                 if ($forceData) {
@@ -355,12 +360,14 @@ class ScrapBeornCardDataCommand extends Command
                             $objSphere = $oneSphere;
                         }
                     }
+
                     $output->writeln('17');
 
                     if (!$objSphere) {
                         $output->writeln("<error>Cannot find sphere [$sphere] for this card</error>");
                         exit;
                     }
+
                     $output->writeln('18');
 
                     $objType = null;
@@ -369,15 +376,17 @@ class ScrapBeornCardDataCommand extends Command
                             $objType = $oneType;
                         }
                     }
+
                     $output->writeln('19');
 
                     if (!$objType) {
                         $output->writeln("<error>Cannot find type [$type] for this card</error>");
                         exit;
                     }
+
                     $output->writeln('20');
 
-                    $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', '\'', '\''], $text);
+                    $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', "'", "'"], $text);
                     $text = (string) preg_replace('/<a title="Search:.*?>(.*?)<\/a>/', '\\1', $text);
                     $text = (string) preg_replace('/<a title="Keyword:.*?>(.*?)<\/a>/', '\\1', $text);
                     $text = (string) preg_replace_callback('/<img .*?src="\/Images\/(.*?)\..*?>/', fn ($m): string => strtolower("[$m[1]]"), $text);
@@ -393,6 +402,7 @@ class ScrapBeornCardDataCommand extends Command
                         $output->writeln('Card text:');
                         VarDumper::dump($text);
                     }
+
                     $output->writeln('22');
 
                     $flavor = str_replace(['<br />', '<br>'], ["\n", "\n"], $flavor);
@@ -406,12 +416,14 @@ class ScrapBeornCardDataCommand extends Command
                         $output->writeln('Card flavor:');
                         VarDumper::dump($flavor);
                     }
+
                     $output->writeln('24');
 
                     $question = new ConfirmationQuestion('Shall I import this card?');
                     if (!$questionHelper->ask($input, $output, $question)) {
                         continue;
                     }
+
                     $output->writeln('25');
 
                     $output->writeln('26');
@@ -422,6 +434,7 @@ class ScrapBeornCardDataCommand extends Command
                     } else {
                         $card->setCode(sprintf('%02d%03d', $pack->getCycle()->getPosition(), $position));
                     }
+
                     $output->writeln('27');
 
                     $card->setType($objType);
@@ -483,11 +496,13 @@ class ScrapBeornCardDataCommand extends Command
                         $output->writeln('<error>Cannot download image for this card</error>');
                         exit;
                     }
+
                     $output->writeln('36');
 
                     file_put_contents($outputfile, $image);
                     $output->writeln('37');
                 }
+
                 $output->writeln('38');
                 $this->entityManager->flush();
                 $output->writeln('39');

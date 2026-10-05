@@ -17,6 +17,7 @@ class DeleteCustomPackController extends AbstractController
     use CurrentUserTrait;
 
     private CustomPackManager $customPackManager;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -38,9 +39,10 @@ class DeleteCustomPackController extends AbstractController
     public function __invoke(Request $request, int $id): RedirectResponse
     {
         $pack = $this->customPackManager->loadOwnedPack($this->currentUser(), $id);
-        if (!$pack) {
+        if (!$pack instanceof \App\Entity\UserCustomPack) {
             throw $this->createNotFoundException();
         }
+
         $this->entityManager->remove($pack);
         $this->entityManager->flush();
         $this->get('session')->getFlashBag()->set('notice', 'Custom pack deleted.');

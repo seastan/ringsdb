@@ -30,6 +30,7 @@ class FileImportDeckController extends AbstractController
         if (!isset($uploadedFile)) {
             throw new UnprocessableEntityHttpException('No file uploaded');
         }
+
         $origname = $uploadedFile->getClientOriginalName();
         $origext = $uploadedFile->getClientOriginalExtension();
         $filename = $uploadedFile->getPathname();
@@ -43,10 +44,12 @@ class FileImportDeckController extends AbstractController
                 throw new UnprocessableEntityHttpException('Bad file');
             }
         }
+
         $contents = file_get_contents($filename);
         if (false === $contents) {
             throw new \RuntimeException('Cannot read from uploaded file '.$filename);
         }
+
         if ('octgn' == $filetype || 'auto' == $filetype && 'o8d' == $origext) {
             $parse = $this->deckImporter->parseOctgnImport($contents);
         } else {

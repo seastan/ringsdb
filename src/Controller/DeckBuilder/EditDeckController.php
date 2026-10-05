@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class EditDeckController extends AbstractController
 {
     use CurrentUserTrait;
+
     private DeckRepository $deckRepository;
 
     public function __construct(
@@ -33,6 +34,7 @@ class EditDeckController extends AbstractController
         if (!$deck) {
             throw new NotFoundHttpException("This deck doesn't exist.");
         }
+
         if ($this->currentUser()->getId() != $deck->getUser()->getId()) {
             throw new AccessDeniedHttpException('You are not allowed to view this deck.');
         }

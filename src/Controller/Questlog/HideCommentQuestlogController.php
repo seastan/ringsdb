@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class HideCommentQuestlogController extends AbstractController
 {
     private QuestlogCommentRepository $questlogCommentRepository;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -42,13 +43,16 @@ class HideCommentQuestlogController extends AbstractController
         if (!$user) {
             throw $this->createAccessDeniedException('You are not logged in.');
         }
+
         $comment = $this->questlogCommentRepository->find($comment_id);
         if (!$comment) {
             throw new BadRequestHttpException('Unable to find comment');
         }
+
         if ($comment->getQuestlog()->getUser() && !$comment->getQuestlog()->getUser()->isEqualTo($user)) {
             return new JsonResponse("You don't have permission to edit this comment.");
         }
+
         $comment->setIsHidden((bool) $hidden);
         $this->entityManager->flush();
 

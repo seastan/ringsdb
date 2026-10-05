@@ -17,6 +17,7 @@ class UpdateCustomPackController extends AbstractController
     use CurrentUserTrait;
 
     private CustomPackManager $customPackManager;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -38,24 +39,28 @@ class UpdateCustomPackController extends AbstractController
     public function __invoke(Request $request, int $id): RedirectResponse
     {
         $pack = $this->customPackManager->loadOwnedPack($this->currentUser(), $id);
-        if (!$pack) {
+        if (!$pack instanceof \App\Entity\UserCustomPack) {
             throw $this->createNotFoundException();
         }
+
         $name = trim($request->get('name', ''));
         if ('' === $name) {
             $this->get('session')->getFlashBag()->set('error', 'Pack name is required.');
 
             return $this->redirectToRoute('collection_custom_pack_edit', ['id' => $id]);
         }
+
         $cardsJson = $request->get('cards_json', '[]');
         $cardEntries = json_decode($cardsJson, true);
         if (!is_array($cardEntries)) {
             $cardEntries = [];
         }
+
         $this->entityManager = $this->getDoctrine()->getManager();
         $pack->setName($name);
         $pack->setUpdatedAt(new \DateTime());
         $pack->clearCards();
+
         $this->entityManager->flush();
         // delete old cards before inserting new ones
         $this->customPackManager->attachCards($pack, $cardEntries);

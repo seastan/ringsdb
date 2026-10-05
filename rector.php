@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\Set\ValueObject\SetList;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -11,8 +12,10 @@ return RectorConfig::configure()
         __DIR__.'/src',
         __DIR__.'/tests',
     ])
-    // uncomment to reach your current PHP version
     ->withPhpSets()
-    ->withTypeCoverageLevel(10)
-    ->withDeadCodeLevel(10)
-    ->withCodeQualityLevel(7);
+    ->withSets([
+        SetList::DEAD_CODE,
+        SetList::CODE_QUALITY,
+        SetList::CODING_STYLE,
+    ])
+;

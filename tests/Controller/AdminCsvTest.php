@@ -28,8 +28,10 @@ class AdminCsvTest extends WebTestCase
 
     /** @var int[] */
     private $maxIds = [];
+
     /** @var array[] rows to restore, by table */
     private $backup = [];
+
     /** @var string[] */
     private $files = [];
 
@@ -40,6 +42,7 @@ class AdminCsvTest extends WebTestCase
         foreach (['card', 'card_printing', 'pack'] as $table) {
             $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
         }
+
         $packs = "SELECT id FROM pack WHERE code IN ('THo', 'ALePMotKA')";
         $this->backup = [
             'pack' => $connection->fetchAll("SELECT * FROM pack WHERE id IN ($packs)"),
@@ -54,14 +57,17 @@ class AdminCsvTest extends WebTestCase
         foreach (['card_printing', 'card', 'pack'] as $table) {
             $connection->exec("DELETE FROM $table WHERE id > {$this->maxIds[$table]}");
         }
+
         foreach ($this->backup as $table => $rows) {
             foreach ($rows as $row) {
                 $connection->update($table, $row, ['id' => $row['id']]);
             }
         }
+
         foreach ($this->files as $file) {
             @unlink($file);
         }
+
         parent::tearDown();
     }
 
@@ -116,18 +122,19 @@ class AdminCsvTest extends WebTestCase
         while (is_array($row = fgetcsv($in))) {
             $row = $change(array_combine($header, $row));
             if (null !== $row) {
-                $lines[] = self::csvLine(array_values($row));
+                $lines[] = $this->csvLine(array_values($row));
             }
         }
+
         fclose($in);
         $file = self::temporaryFile('csv');
         $this->files[] = $file;
-        file_put_contents($file, "\xEF\xBB\xBF".self::csvLine($header).implode('', $lines));
+        file_put_contents($file, "\xEF\xBB\xBF".$this->csvLine($header).implode('', $lines));
 
         return $file;
     }
 
-    private static function csvLine(array $values): string
+    private function csvLine(array $values): string
     {
         $stream = fopen('php://memory', 'r+');
         self::assertNotFalse($stream);
@@ -140,7 +147,7 @@ class AdminCsvTest extends WebTestCase
     /**
      * @return array the card and its printing in the pack, by the card name
      */
-    private function fetchPrinting(KernelBrowser $client, string $packCode, string $name): array
+    private function fetchPrinting(string $packCode, string $name): array
     {
         $row = $this->db()->fetchAssoc('SELECT c.id, c.code, c.name, c.position, c.health, c.text, t.name AS type, s.name AS sphere,
                 cp.quantity, cp.illustrator, cp.octgnid
@@ -152,12 +159,13 @@ class AdminCsvTest extends WebTestCase
         return $row;
     }
 
-    private function printingPosition(KernelBrowser $client, string $packCode, string $name): string {
-        return (string) $this->db($client)->fetchColumn('SELECT cp.position FROM card_printing cp JOIN pack p ON p.id = cp.pack_id
+    private function printingPosition(string $packCode, string $name): string
+    {
+        return (string) $this->db()->fetchColumn('SELECT cp.position FROM card_printing cp JOIN pack p ON p.id = cp.pack_id
             JOIN card c ON c.id = cp.card_id WHERE p.code = ? AND c.name = ?', [$packCode, $name]);
     }
 
-    private function rowCount(KernelBrowser $client, string $table): int
+    private function rowCount(string $table): int
     {
         return (int) $this->db()->fetchColumn("SELECT COUNT(*) FROM $table");
     }
@@ -174,32 +182,33 @@ class AdminCsvTest extends WebTestCase
     public function testUploadAnUnchangedPack(): void
     {
         $client = $this->createAdminClient();
-        $counts = [$this->rowCount($client, 'card'), $this->rowCount($client, 'card_printing'), $this->rowCount($client, 'pack')];
-        $bilbo = $this->fetchPrinting($client, 'THo', 'Bilbo Baggins');
-        $beorn = $this->fetchPrinting($client, 'THo', 'Beorn');
+        $counts = [$this->rowCount('card'), $this->rowCount('card_printing'), $this->rowCount('pack')];
+        $bilbo = $this->fetchPrinting('THo', 'Bilbo Baggins');
+        $beorn = $this->fetchPrinting('THo', 'Beorn');
         $this->assertSame(['131005', '5'], [$beorn['code'], $beorn['position']]);
-        $beornCore = $this->fetchPrinting($client, 'OHaUH', 'Beorn');
+        $beornCore = $this->fetchPrinting('OHaUH', 'Beorn');
 
         $response = $this->upload($client, self::SAMPLE, 'THo', 'ALeP - The Hobbit');
         $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $response);
         $this->assertNotContains('marked deleted', $response);
 
-        $this->assertSame($counts, [$this->rowCount($client, 'card'), $this->rowCount($client, 'card_printing'), $this->rowCount($client, 'pack')]);
-        $this->assertSame($bilbo, $this->fetchPrinting($client, 'THo', 'Bilbo Baggins'));
-        $this->assertSame($beorn, $this->fetchPrinting($client, 'THo', 'Beorn'));
-        $this->assertSame($beornCore, $this->fetchPrinting($client, 'OHaUH', 'Beorn'));
-        $this->assertSame('991', $this->printingPosition($client, 'THo', 'Beorn'));
+        $this->assertSame($counts, [$this->rowCount('card'), $this->rowCount('card_printing'), $this->rowCount('pack')]);
+        $this->assertSame($bilbo, $this->fetchPrinting('THo', 'Bilbo Baggins'));
+        $this->assertSame($beorn, $this->fetchPrinting('THo', 'Beorn'));
+        $this->assertSame($beornCore, $this->fetchPrinting('OHaUH', 'Beorn'));
+        $this->assertSame('991', $this->printingPosition('THo', 'Beorn'));
     }
 
     /**
      * A reprint row updates the fields of its printing (illustrator, position), not those of the
      * canonical card (text).
      */
-    public function testAReprintOnlyUpdatesItsPrinting(): void {
+    public function testAReprintOnlyUpdatesItsPrinting(): void
+    {
         $client = $this->createAdminClient();
-        $beorn = $this->fetchPrinting($client, 'THo', 'Beorn');
+        $beorn = $this->fetchPrinting('THo', 'Beorn');
         $file = $this->sampleVariant(function (array $row) {
-            if ($row['name'] === 'Beorn') {
+            if ('Beorn' === $row['name']) {
                 $row['illustrator'] = 'PHPUnit Artist';
                 $row['position'] = '992';
                 $row['text'] = 'PHPUnit text.';
@@ -210,9 +219,9 @@ class AdminCsvTest extends WebTestCase
 
         $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, $file, 'THo', 'ALeP - The Hobbit'));
 
-        $beornAfter = $this->fetchPrinting($client, 'THo', 'Beorn');
+        $beornAfter = $this->fetchPrinting('THo', 'Beorn');
         $this->assertSame('PHPUnit Artist', $beornAfter['illustrator']);
-        $this->assertSame('992', $this->printingPosition($client, 'THo', 'Beorn'));
+        $this->assertSame('992', $this->printingPosition('THo', 'Beorn'));
         $this->assertSame(['131005', $beorn['text']], [$beornAfter['code'], $beornAfter['text']]);
     }
 
@@ -224,7 +233,7 @@ class AdminCsvTest extends WebTestCase
     public function testUploadANewPack(): void
     {
         $client = $this->createAdminClient();
-        $counts = [$this->rowCount($client, 'card'), $this->rowCount($client, 'card_printing'), $this->rowCount($client, 'pack')];
+        $counts = [$this->rowCount('card'), $this->rowCount('card_printing'), $this->rowCount('pack')];
         $file = $this->sampleVariant(function (array $row) {
             $row['pack'] = 'PHPUnit Pack';
             $row['code'] = '99'.substr($row['code'], 2);
@@ -237,13 +246,13 @@ class AdminCsvTest extends WebTestCase
 
         $this->assertSame(
             [$counts[0] + 21, $counts[1] + 21, $counts[2] + 1],
-            [$this->rowCount($client, 'card'), $this->rowCount($client, 'card_printing'), $this->rowCount($client, 'pack')]
+            [$this->rowCount('card'), $this->rowCount('card_printing'), $this->rowCount('pack')]
         );
         $pack = $this->db()->fetchAssoc('SELECT p.name, p.position, p.size, p.date_release, y.code AS cycle FROM pack p JOIN cycle y ON y.id = p.cycle_id WHERE p.code = ?', ['PHPU']);
         $lastCycle = $this->db()->fetchColumn('SELECT code FROM cycle ORDER BY id DESC LIMIT 1');
         $this->assertSame(['name' => 'PHPUnit Pack', 'position' => '1', 'size' => '1', 'date_release' => '2030-02-01', 'cycle' => $lastCycle], $pack);
 
-        $beorn = $this->fetchPrinting($client, 'PHPU', 'Beorn');
+        $beorn = $this->fetchPrinting('PHPU', 'Beorn');
         $this->assertSame(
             ['993991', 'Hero', 'Tactics', '10', '1', 'Steven Shan', 'phpunit-2570109c-b9ed-4af5-9f26-4cb8712605c9'],
             [$beorn['code'], $beorn['type'], $beorn['sphere'], $beorn['health'], $beorn['quantity'], $beorn['illustrator'], $beorn['octgnid']]
@@ -263,10 +272,10 @@ class AdminCsvTest extends WebTestCase
 
         $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, $file, 'THo', 'ALeP - The Hobbit'));
 
-        $bilbo = $this->fetchPrinting($client, 'THo', 'Bilbo Baggins');
+        $bilbo = $this->fetchPrinting('THo', 'Bilbo Baggins');
         $this->assertSame('[deleted] Bilbo Baggins', $bilbo['name']);
         $this->assertRegExp('/^503007_\w+$/', $bilbo['code']);
-        $this->assertSame('Lucky Number', $this->fetchPrinting($client, 'THo', 'Lucky Number')['name']);
+        $this->assertSame('Lucky Number', $this->fetchPrinting('THo', 'Lucky Number')['name']);
     }
 
     /**
@@ -275,13 +284,13 @@ class AdminCsvTest extends WebTestCase
     public function testRenameAPackWithItsOldCode(): void
     {
         $client = $this->createAdminClient();
-        $packs = $this->rowCount($client, 'pack');
+        $packs = $this->rowCount('pack');
 
         $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, self::SAMPLE, 'THo2', 'ALeP - The Hobbit (renamed)', 'THo'));
 
-        $this->assertSame($packs, $this->rowCount($client, 'pack'));
+        $this->assertSame($packs, $this->rowCount('pack'));
         $this->assertSame('ALeP - The Hobbit (renamed)', $this->db()->fetchColumn("SELECT name FROM pack WHERE code = 'THo2'"));
-        $this->assertSame('Bilbo Baggins', $this->fetchPrinting($client, 'THo2', 'Bilbo Baggins')['name']);
+        $this->assertSame('Bilbo Baggins', $this->fetchPrinting('THo2', 'Bilbo Baggins')['name']);
     }
 
     /**

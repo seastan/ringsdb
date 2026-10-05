@@ -36,22 +36,26 @@ class SaveArtController extends AbstractController
         if (!$user) {
             return new JsonResponse(['success' => false, 'error' => 'not logged in'], 403);
         }
+
         $cardCode = (string) preg_replace('/[^0-9]/', '', $request->get('card_code'));
         $packCode = (string) preg_replace('/[^A-Za-z0-9_-]/', '', $request->get('pack_code'));
         if (!$cardCode) {
             return new JsonResponse(['success' => false, 'error' => 'missing card_code'], 400);
         }
+
         $prefs = json_decode($user->getArtPreferences() ?: '{}', true);
         if (!is_array($prefs)) {
             $prefs = [];
         }
+
         if ('' === $packCode || 'default' === $packCode) {
             unset($prefs[$cardCode]);
         } else {
             $prefs[$cardCode] = $packCode;
         }
+
         $this->entityManager = $this->getDoctrine()->getManager();
-        $user->setArtPreferences(empty($prefs) ? null : (string) json_encode($prefs));
+        $user->setArtPreferences([] === $prefs ? null : (string) json_encode($prefs));
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 

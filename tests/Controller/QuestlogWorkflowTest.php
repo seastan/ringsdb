@@ -27,6 +27,7 @@ class QuestlogWorkflowTest extends WebTestCase
 
     /** @var int[] max ids before the test, by table */
     private $maxIds = [];
+
     /** @var array */
     private $fixtureQuestlog;
 
@@ -37,6 +38,7 @@ class QuestlogWorkflowTest extends WebTestCase
         foreach (['questlog', 'questlog_deck', 'deck'] as $table) {
             $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
         }
+
         $this->fixtureQuestlog = $this->questlogOneState($connection);
     }
 
@@ -65,6 +67,7 @@ class QuestlogWorkflowTest extends WebTestCase
         ] as $sql) {
             $connection->exec($sql);
         }
+
         if ($this->questlogOneState($connection) != $this->fixtureQuestlog) {
             [$questlog, $decks] = $this->fixtureQuestlog;
             $connection->update('questlog', $questlog, ['id' => 1]);
@@ -73,6 +76,7 @@ class QuestlogWorkflowTest extends WebTestCase
                 $connection->insert('questlog_deck', $row);
             }
         }
+
         $connection->update('user', ['is_share_decks' => 0], ['username' => 'test']);
         parent::tearDown();
     }
@@ -102,7 +106,7 @@ class QuestlogWorkflowTest extends WebTestCase
      *
      * @return bool|string
      */
-    private function deckContent(KernelBrowser $client, $deckId)
+    private function deckContent($deckId)
     {
         $rows = $this->db()->fetchAll('SELECT c.code, s.quantity FROM deckslot s JOIN card c ON c.id = s.card_id WHERE s.deck_id = ? ORDER BY c.code', [$deckId]);
 
@@ -112,7 +116,7 @@ class QuestlogWorkflowTest extends WebTestCase
     /**
      * Fills the deck picker's hidden fields: [slot => [id, is_decklist, content]].
      */
-    private static function selectDecks(Form $form, array $decks): void
+    private function selectDecks(Form $form, array $decks): void
     {
         for ($i = 1; $i <= 4; ++$i) {
             $form["deck{$i}_id"] = isset($decks[$i]) ? $decks[$i][0] : '';
@@ -143,7 +147,7 @@ class QuestlogWorkflowTest extends WebTestCase
         return (int) explode('/', $location)[3];
     }
 
-    private function fetchQuestlog(KernelBrowser $client, $id)
+    private function fetchQuestlog($id)
     {
         return $this->db()->fetchAssoc(
             'SELECT q.name, q.name_canonical, q.description_md, q.description_html, s.name AS scenario, q.date_played, q.quest_mode,
@@ -153,7 +157,7 @@ class QuestlogWorkflowTest extends WebTestCase
         );
     }
 
-    private function fetchQuestlogDecks(KernelBrowser $client, $id)
+    private function fetchQuestlogDecks($id)
     {
         return $this->db()->fetchAll('SELECT deck_number, deck_id, decklist_id, player, content FROM questlog_deck WHERE questlog_id = ? ORDER BY deck_number', [$id]);
     }
@@ -163,8 +167,8 @@ class QuestlogWorkflowTest extends WebTestCase
     public function testLogEditAndPublishAQuest(): void
     {
         $client = $this->createAuthenticatedClient();
-        $deck1 = $this->deckContent($client, 1);
-        $deck2 = $this->deckContent($client, 2);
+        $deck1 = $this->deckContent(1);
+        $deck2 = $this->deckContent(2);
 
         // 1. the form opened from 2 decks is prefilled with the player names
         [$crawler, $form] = $this->newForm($client, '/questlog/new/0/1/2/0/0');
@@ -185,7 +189,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $form['descriptionMd'] = 'We *lost*';
         $form['questlogdeck1_player_name'] = 'Alice';
         $form['questlogdeck2_player_name'] = 'Bob';
-        self::selectDecks($form, [1 => [1, false, $deck1], 2 => [2, false, $deck2]]);
+        $this->selectDecks($form, [1 => [1, false, $deck1], 2 => [2, false, $deck2]]);
         $client->submit($form);
 
         $id = $this->questlogIdFromRedirect($client);
@@ -204,11 +208,11 @@ class QuestlogWorkflowTest extends WebTestCase
             'is_public' => '0',
             'published' => '0',
             'username' => 'test',
-        ], $this->fetchQuestlog($client, $id));
+        ], $this->fetchQuestlog($id));
         $this->assertSame([
             ['deck_number' => '1', 'deck_id' => '1', 'decklist_id' => null, 'player' => 'Alice', 'content' => $deck1],
             ['deck_number' => '2', 'deck_id' => '2', 'decklist_id' => null, 'player' => 'Bob', 'content' => $deck2],
-        ], $this->fetchQuestlogDecks($client, $id));
+        ], $this->fetchQuestlogDecks($id));
 
         $crawler = $client->request('GET', "/questlog/view/$id/phpunitquest");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -229,23 +233,23 @@ class QuestlogWorkflowTest extends WebTestCase
         $this->assertSame($deck1, self::field($form, 'questlogdeck1_content')->getValue());
         $this->assertSame($deck2, self::field($form, 'questlogdeck2_content')->getValue());
 
-        $deck3 = $this->deckContent($client, 3);
+        $deck3 = $this->deckContent(3);
         $form['victory'] = 'yes';
         /** @var \Symfony\Component\DomCrawler\Field\ChoiceFormField $public */
         $public = $form['public'];
         $public->tick();
         $form['questlogdeck3_player_name'] = 'Carol';
-        self::selectDecks($form, [1 => [1, false, $deck1], 3 => [3, true, $deck3]]);
+        $this->selectDecks($form, [1 => [1, false, $deck1], 3 => [3, true, $deck3]]);
         $client->submit($form);
 
         $this->assertSame($id, $this->questlogIdFromRedirect($client));
-        $questlog = $this->fetchQuestlog($client, $id);
+        $questlog = $this->fetchQuestlog($id);
         $this->assertSame(['1', '2', '1', '1'], [$questlog['success'], $questlog['nb_decks'], $questlog['is_public'], $questlog['published']]);
         // a decklist is logged with its parent deck; slots are compacted
         $this->assertSame([
             ['deck_number' => '1', 'deck_id' => '1', 'decklist_id' => null, 'player' => 'Alice', 'content' => $deck1],
             ['deck_number' => '2', 'deck_id' => '3', 'decklist_id' => '3', 'player' => 'Carol', 'content' => $deck3],
-        ], $this->fetchQuestlogDecks($client, $id));
+        ], $this->fetchQuestlogDecks($id));
 
         // 3. public quest logs are listed, and visible to other users
         $crawler = $client->request('GET', '/questlogs/recent');
@@ -284,12 +288,12 @@ class QuestlogWorkflowTest extends WebTestCase
         [, $form] = $this->newForm($client);
         $form['quest'] = '1';
         $played = json_encode(['main' => ['01001' => 1, '01013' => 3], 'side' => []]);
-        self::selectDecks($form, [1 => [1, false, $played]]);
+        $this->selectDecks($form, [1 => [1, false, $played]]);
         $client->submit($form);
 
         $id = $this->questlogIdFromRedirect($client);
-        $this->assertSame($played, $this->fetchQuestlogDecks($client, $id)[0]['content']);
-        $this->assertSame('Untitled Questlog', $this->fetchQuestlog($client, $id)['name']);
+        $this->assertSame($played, $this->fetchQuestlogDecks($id)[0]['content']);
+        $this->assertSame('Untitled Questlog', $this->fetchQuestlog($id)['name']);
     }
 
     /**
@@ -303,9 +307,9 @@ class QuestlogWorkflowTest extends WebTestCase
         [, $form] = $this->newForm($client);
         $form['quest'] = '1';
         $played = json_encode(['main' => ['01001' => 1, '99999' => 2], 'side' => ['99998' => 1]]);
-        self::selectDecks($form, [1 => [1, false, $played]]);
+        $this->selectDecks($form, [1 => [1, false, $played]]);
         $client->submit($form);
-        $id = $this->questlogIdFromRedirect($client);
+        $this->questlogIdFromRedirect($client);
 
         $client->request('GET', '/myquestlogs');
 
@@ -323,10 +327,10 @@ class QuestlogWorkflowTest extends WebTestCase
         $values['score'] = 'lots';
         $values['deck1_id'] = '1';
         $values['deck1_is_decklist'] = 'false';
-        $values['questlogdeck1_content'] = $this->deckContent($client, 1);
+        $values['questlogdeck1_content'] = $this->deckContent(1);
         $client->request('POST', '/questlog/save', $values);
 
-        $questlog = $this->fetchQuestlog($client, $this->questlogIdFromRedirect($client));
+        $questlog = $this->fetchQuestlog($this->questlogIdFromRedirect($client));
         $this->assertSame(['normal', '1', '0'], [$questlog['quest_mode'], $questlog['success'], $questlog['score']]);
     }
 
@@ -337,7 +341,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $client = $this->createAuthenticatedClient();
         [, $form] = $this->newForm($client);
         $form['quest'] = '1';
-        self::selectDecks($form, []);
+        $this->selectDecks($form, []);
         $client->submit($form);
 
         $this->assertSame(422, $client->getResponse()->getStatusCode());
@@ -349,7 +353,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $client = $this->createAuthenticatedClient();
         [, $form] = $this->newForm($client);
         $form['quest'] = '1';
-        self::selectDecks($form, [1 => [1, false, '']]);
+        $this->selectDecks($form, [1 => [1, false, '']]);
         $client->submit($form);
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -364,7 +368,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $values = $form->getValues();
         $values['quest'] = '9999';
         $values['deck1_id'] = '1';
-        $values['questlogdeck1_content'] = $this->deckContent($client, 1);
+        $values['questlogdeck1_content'] = $this->deckContent(1);
         $client->request('POST', '/questlog/save', $values);
 
         $this->assertSame(404, $client->getResponse()->getStatusCode());
@@ -379,12 +383,12 @@ class QuestlogWorkflowTest extends WebTestCase
         $client = $this->createAuthenticatedClient();
         [, $form] = $this->newForm($client);
         $form['quest'] = '1';
-        self::selectDecks($form, [1 => [1, false, $this->deckContent($client, 1)], 2 => [0, false, $this->deckContent($client, 2)]]);
+        $this->selectDecks($form, [1 => [1, false, $this->deckContent(1)], 2 => [0, false, $this->deckContent(2)]]);
         $client->submit($form);
 
         $id = $this->questlogIdFromRedirect($client);
-        $this->assertCount(1, $this->fetchQuestlogDecks($client, $id));
-        $this->assertSame('1', $this->fetchQuestlog($client, $id)['nb_decks']);
+        $this->assertCount(1, $this->fetchQuestlogDecks($id));
+        $this->assertSame('1', $this->fetchQuestlog($id)['nb_decks']);
     }
 
     /* --------------------------------------------------- locked quest logs */
@@ -393,18 +397,18 @@ class QuestlogWorkflowTest extends WebTestCase
     {
         $client = $this->createAuthenticatedClient();
         $this->db()->update('questlog', ['nb_favorites' => 1], ['id' => 1]);
-        $decks = $this->fetchQuestlogDecks($client, 1);
+        $decks = $this->fetchQuestlogDecks(1);
 
         [$crawler, $form] = $this->newForm($client, '/questlog/edit/1');
         $this->assertTrue(self::field($form, 'public')->isDisabled());
         $form['name'] = 'PHPUnit Renamed';
-        self::selectDecks($form, [1 => [4, false, $this->deckContent($client, 4)]]);
+        $this->selectDecks($form, [1 => [4, false, $this->deckContent(4)]]);
         $client->submit($form);
 
         $this->assertSame(1, $this->questlogIdFromRedirect($client));
-        $questlog = $this->fetchQuestlog($client, 1);
+        $questlog = $this->fetchQuestlog(1);
         $this->assertSame(['PHPUnit Renamed', '1', '4'], [$questlog['name'], $questlog['is_public'], $questlog['nb_decks']]);
-        $this->assertSame($decks, $this->fetchQuestlogDecks($client, 1));
+        $this->assertSame($decks, $this->fetchQuestlogDecks(1));
     }
 
     /* ---------------------------------------------------- other users */
@@ -414,17 +418,17 @@ class QuestlogWorkflowTest extends WebTestCase
         $client = $this->createAuthenticatedClient('admin');
         [, $form] = $this->newForm($client);
         $form['quest'] = '1';
-        self::selectDecks($form, [1 => [1, false, $this->deckContent($client, 1)]]);
+        $this->selectDecks($form, [1 => [1, false, $this->deckContent(1)]]);
 
         $client->submit($form);
         $this->assertSame(403, $client->getResponse()->getStatusCode());
 
         // once shared, the deck is cloned for the admin; a published decklist needs no sharing
         $this->db()->update('user', ['is_share_decks' => 1], ['username' => 'test']);
-        self::selectDecks($form, [1 => [1, false, $this->deckContent($client, 1)], 2 => [2, true, $this->deckContent($client, 2)]]);
+        $this->selectDecks($form, [1 => [1, false, $this->deckContent(1)], 2 => [2, true, $this->deckContent(2)]]);
         $client->submit($form);
         $id = $this->questlogIdFromRedirect($client);
-        $decks = $this->fetchQuestlogDecks($client, $id);
+        $decks = $this->fetchQuestlogDecks($id);
         $this->assertGreaterThan($this->maxIds['deck'], (int) $decks[0]['deck_id']);
         $this->assertSame('admin', $this->db()->fetchColumn('SELECT u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$decks[0]['deck_id']]));
         $this->assertSame(['2', '2'], [$decks[1]['deck_id'], $decks[1]['decklist_id']]);
@@ -436,7 +440,7 @@ class QuestlogWorkflowTest extends WebTestCase
         [, $form] = $this->newForm($client);
         $form['quest'] = '1';
         $form['name'] = 'PHPUnit Private';
-        self::selectDecks($form, [1 => [1, false, $this->deckContent($client, 1)]]);
+        $this->selectDecks($form, [1 => [1, false, $this->deckContent(1)]]);
         $client->submit($form);
         $id = $this->questlogIdFromRedirect($client);
 
@@ -463,7 +467,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $client->request('POST', '/questlog/delete', ['questlog_id' => 1]);
         $this->assertSame(403, $client->getResponse()->getStatusCode());
 
-        $this->assertSame('Untitled Questlog', $this->fetchQuestlog($client, 1)['name']);
+        $this->assertSame('Untitled Questlog', $this->fetchQuestlog(1)['name']);
     }
 
     /* ------------------------------------------------------------- delete */
@@ -473,7 +477,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $client = $this->createAuthenticatedClient();
         [, $form] = $this->newForm($client);
         $form['quest'] = '1';
-        self::selectDecks($form, [1 => [1, false, $this->deckContent($client, 1)]]);
+        $this->selectDecks($form, [1 => [1, false, $this->deckContent(1)]]);
         $client->submit($form);
         $id = $this->questlogIdFromRedirect($client);
 
@@ -481,8 +485,8 @@ class QuestlogWorkflowTest extends WebTestCase
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/myquestlogs', $client->getResponse()->headers->get('Location'));
-        $this->assertFalse($this->fetchQuestlog($client, $id));
-        $this->assertSame([], $this->fetchQuestlogDecks($client, $id));
+        $this->assertFalse($this->fetchQuestlog($id));
+        $this->assertSame([], $this->fetchQuestlogDecks($id));
         $this->assertSame('1', $this->db()->fetchColumn('SELECT COUNT(*) FROM deck WHERE id = 1'));
     }
 
@@ -496,7 +500,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $this->assertSame('/myquestlogs', $client->getResponse()->headers->get('Location'));
         $crawler = $client->followRedirect();
         $this->assertContains("You can't delete a published quest log.", $crawler->filter('body')->text());
-        $this->assertSame('Untitled Questlog', $this->fetchQuestlog($client, 1)['name']);
+        $this->assertSame('Untitled Questlog', $this->fetchQuestlog(1)['name']);
     }
 
     public function testDeleteList(): void
@@ -506,17 +510,18 @@ class QuestlogWorkflowTest extends WebTestCase
         foreach ([1, 2] as $deckId) {
             [, $form] = $this->newForm($client);
             $form['quest'] = '1';
-            self::selectDecks($form, [1 => [$deckId, false, $this->deckContent($client, $deckId)]]);
+            $this->selectDecks($form, [1 => [$deckId, false, $this->deckContent($deckId)]]);
             $client->submit($form);
             $ids[] = $this->questlogIdFromRedirect($client);
         }
+
         $this->db()->update('questlog', ['nb_comments' => 1], ['id' => $ids[1]]);
 
         $client->request('POST', '/questlog/delete_list', ['ids' => "{$ids[0]}-{$ids[1]}-999"]);
 
         $this->assertSame('/myquestlogs', $client->getResponse()->headers->get('Location'));
-        $this->assertFalse($this->fetchQuestlog($client, $ids[0]));
-        $this->assertNotFalse($this->fetchQuestlog($client, $ids[1]));
+        $this->assertFalse($this->fetchQuestlog($ids[0]));
+        $this->assertNotFalse($this->fetchQuestlog($ids[1]));
         $crawler = $client->followRedirect();
         $this->assertContains("You can't delete a published quest log. Unpublished selected quest logs were deleted.", $crawler->filter('body')->text());
     }

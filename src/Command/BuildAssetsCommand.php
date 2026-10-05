@@ -43,6 +43,7 @@ class BuildAssetsCommand extends Command
         foreach (AssetBundles::JAVASCRIPTS as $target => $sources) {
             $bundles[$target] = fn (string $source, string $content): string => $content;
         }
+
         foreach (AssetBundles::STYLESHEETS as $target => $sources) {
             $bundles[$target] = function (string $source, string $content) use ($sourceDir, $target): string {
                 if ('.scss' === substr($source, -5)) {
@@ -67,12 +68,15 @@ class BuildAssetsCommand extends Command
 
                     return 1;
                 }
+
                 $content .= $process($source, $file)."\n";
             }
+
             $path = $this->publicDir.'/'.$target;
             if (!is_dir(dirname($path))) {
                 mkdir(dirname($path), 0777, true);
             }
+
             file_put_contents($path, $content);
             $output->writeln(sprintf('%s: %d files, %d bytes', $target, count($sources[$target]), strlen($content)));
         }
@@ -91,6 +95,7 @@ class BuildAssetsCommand extends Command
             if (preg_match('#^([a-z][a-z0-9+.-]*:|//|/|\#)#i', $url)) {
                 return $m[0];
             }
+
             // the path, then the query / fragment
             $cut = strcspn($url, '?#');
             $segments = [];
@@ -101,11 +106,13 @@ class BuildAssetsCommand extends Command
                     $segments[] = $segment;
                 }
             }
+
             $from = '.' === dirname($target) ? [] : explode('/', dirname($target));
             $common = 0;
             while ($common < count($from) && $common < count($segments) - 1 && $from[$common] === $segments[$common]) {
                 ++$common;
             }
+
             $relative = str_repeat('../', count($from) - $common).implode('/', array_slice($segments, $common));
 
             return 'url('.$m[1].$relative.substr($url, $cut).$m[1].')';

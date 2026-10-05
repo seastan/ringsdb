@@ -13,8 +13,11 @@ use Twig\Environment;
 class FellowshipArchiver
 {
     private string $cacheDir;
+
     private Environment $twig;
+
     private Texts $texts;
+
     private FellowshipRepository $fellowshipRepository;
 
     public function __construct(
@@ -36,16 +39,19 @@ class FellowshipArchiver
         if (!$fellowship) {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
+
         $fellowship_user = $fellowship->getUser();
         $is_public = $fellowship->getIsPublic();
         if (!$fellowship_user->isEqualTo($user) && !$fellowship_user->getIsShareDecks() && !$is_public) {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
+
         $tmpDir = $this->cacheDir;
         $file = tempnam($tmpDir, 'zip');
         if (false === $file) {
             throw new \RuntimeException("Cannot create a temporary file in {$tmpDir}");
         }
+
         $zip = new \ZipArchive();
         $res = $zip->open($file, \ZipArchive::OVERWRITE);
         if (true === $res) {
@@ -55,11 +61,13 @@ class FellowshipArchiver
             foreach ($fellowship_decks as $fellowship_deck) {
                 $decks[] = $fellowship_deck->getDeck();
             }
+
             /* @var $fellowship_decks \App\Entity\FellowshipDecklist[] */
             $fellowship_decklists = $fellowship->getDecklists();
             foreach ($fellowship_decklists as $fellowship_decklist) {
                 $decks[] = $fellowship_decklist->getDecklist();
             }
+
             foreach ($decks as $deck) {
                 /* @var $deck Deck */
                 if ($octgn) {
@@ -69,19 +77,24 @@ class FellowshipArchiver
                     $extension = 'txt';
                     $content = $this->twig->render('Export/plain.txt.twig', ['deck' => $deck->getTextExport()]);
                 }
+
                 $filename = $this->texts->slugify($deck->getName()).' '.$deck->getVersion().'.'.$extension;
                 $zip->addFromString($filename, $content);
             }
+
             $zip->close();
         }
+
         $response = new Response();
         $response->headers->set('Content-Type', 'application/zip');
         $response->headers->set('Content-Length', (string) filesize($file));
         $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->texts->slugify('RingsDB - Fellowship '.$fellowship_id).'.zip'));
+
         $contents = file_get_contents($file);
         if (false === $contents) {
             throw new \RuntimeException('Cannot read tmp file '.$file);
         }
+
         $response->setContent($contents);
         unlink($file);
 

@@ -16,7 +16,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class ListDecklistController extends AbstractController
 {
     private DecklistManager $decklistManager;
+
     private int $cacheExpiration;
+
     private CycleRepository $cycleRepository;
 
     public function __construct(
@@ -45,8 +47,10 @@ class ListDecklistController extends AbstractController
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
+
         $this->decklistManager->setLimit(30);
         $this->decklistManager->setPage($page);
+
         $header = '';
         switch ($type) {
             case 'find':
@@ -63,6 +67,7 @@ class ListDecklistController extends AbstractController
                 } else {
                     $paginator = $this->decklistManager->getEmptyList();
                 }
+
                 $pagetitle = 'Favorite Decklists';
                 break;
             case 'mine':
@@ -73,6 +78,7 @@ class ListDecklistController extends AbstractController
                 } else {
                     $paginator = $this->decklistManager->getEmptyList();
                 }
+
                 $pagetitle = 'My Decklists';
                 break;
             case 'recent':
@@ -116,6 +122,7 @@ class ListDecklistController extends AbstractController
         if (0 === count($packs)) {
             $packs = $dbh->executeQuery('SELECT id FROM pack')->fetchAll(\PDO::FETCH_COLUMN);
         }
+
         $categories = [];
         $on = 0;
         $off = 0;
@@ -128,6 +135,7 @@ class ListDecklistController extends AbstractController
             if (0 == $cycle->getPosition() || false === $first_pack) {
                 continue;
             }
+
             if (1 === $size && $first_pack->getName() == $cycle->getName()) {
                 $checked = count($packs) ? in_array($first_pack->getId(), $packs) : true;
                 if ($checked) {
@@ -135,6 +143,7 @@ class ListDecklistController extends AbstractController
                 } else {
                     ++$off;
                 }
+
                 $categories[0]['packs'][] = ['id' => $first_pack->getId(), 'label' => $first_pack->getName(), 'checked' => $checked, 'future' => null === $first_pack->getDateRelease()];
             } else {
                 $category = ['label' => $cycle->getName(), 'packs' => []];
@@ -145,11 +154,14 @@ class ListDecklistController extends AbstractController
                     } else {
                         ++$off;
                     }
+
                     $category['packs'][] = ['id' => $pack->getId(), 'label' => $pack->getName(), 'checked' => $checked, 'future' => null === $pack->getDateRelease()];
                 }
+
                 $categories[] = $category;
             }
         }
+
         $params = ['allowed' => $categories, 'on' => $on, 'off' => $off, 'author' => $author_name, 'name' => $decklist_name, 'threat' => $starting_threat, 'threato' => $starting_threat_o, 'reputation' => $author_reputation, 'reputationo' => $author_reputation_o, 'numcores' => $numcores, 'require_description' => $require_description];
         $params['sort_'.$sort] = ' selected="selected"';
         $params['spheres'] = $dbh->executeQuery("SELECT\n                s.name,\n                s.code\n                FROM sphere s\n                ORDER BY s.name ASC")->fetchAll();
@@ -161,6 +173,7 @@ class ListDecklistController extends AbstractController
                 $params['cards'] .= $this->renderView('Search/card.html.twig', $card);
             }
         }
+
         if (count($cards_to_exclude) > 0) {
             $cards_to_exclude = $dbh->executeQuery("SELECT\n    \t\t\t\tk.name,\n    \t\t\t\tk.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card k\n                    INNER JOIN sphere s ON s.id = k.sphere_id\n                    INNER JOIN type t ON t.id = k.type_id\n                    INNER JOIN card_printing kpr ON kpr.id = (SELECT cp2.id FROM card_printing cp2 JOIN pack pp ON pp.id = cp2.pack_id WHERE cp2.card_id = k.id ORDER BY (pp.date_release IS NULL), pp.date_release, cp2.position, cp2.id LIMIT 1)\n                    INNER JOIN pack p ON p.id = kpr.pack_id\n                    WHERE k.code IN (?)\n    \t\t\t\tORDER BY k.code DESC", [$cards_to_exclude], [Connection::PARAM_INT_ARRAY])->fetchAll();
             $params['cards_to_exclude'] = '';

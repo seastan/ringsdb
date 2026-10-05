@@ -44,6 +44,7 @@ class ListPublishedCustomPacksController extends AbstractController
                     'quantity' => $entry->getQuantity(),
                 ];
             }
+
             $result[] = [
                 'id' => $pack->getId(),
                 'name' => $pack->getName(),

@@ -13,14 +13,17 @@ class FellowshipDecklist
      * @var int|null
      */
     private $id;
+
     /**
      * @var int
      */
     private $deckNumber;
+
     /**
      * @var Fellowship
      */
     private $fellowship;
+
     /**
      * @var Decklist
      */

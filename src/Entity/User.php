@@ -22,78 +22,97 @@ class User extends BaseUser
      * @var \DateTime
      */
     private $dateCreation;
+
     /**
      * @var \DateTime
      */
     private $dateUpdate;
+
     /**
      * @var int
      */
     private $reputation;
+
     /**
      * @var string|null
      */
     private $resume;
+
     /**
      * @var string|null
      */
     private $color;
+
     /**
      * @var int
      */
     private $donation;
+
     /**
      * @var bool
      */
     private $isNotifAuthor = true;
+
     /**
      * @var bool
      */
     private $isNotifCommenter = true;
+
     /**
      * @var bool
      */
     private $isNotifMention = true;
+
     /**
      * @var bool
      */
     private $isNotifFollow = true;
+
     /**
      * @var bool
      */
     private $isNotifSuccessor = true;
+
     /**
      * @var bool
      */
     private $isShareDecks = false;
+
     /**
      * @var bool
      */
     private $darkMode = false;
+
     /**
      * @var Collection<int, Deck>
      */
     private $decks;
+
     /**
      * @var Collection<int, Decklist>
      */
     private $decklists;
+
     /**
      * @var Collection<int, Comment>
      */
     private $comments;
+
     /**
      * @var Collection<int, Review>
      */
     private $reviews;
+
     /**
      * @var Collection<int, Decklist>
      */
     private $favorites;
+
     /**
      * @var Collection<int, Decklist>
      */
     private $votes;
+
     /**
      * @var Collection<int, Review>
      */
@@ -571,6 +590,7 @@ class User extends BaseUser
      * @var Collection<int, User>
      */
     private $following;
+
     /**
      * @var Collection<int, User>
      */
@@ -631,6 +651,7 @@ class User extends BaseUser
     {
         return $this->followers;
     }
+
     /**
      * @var string|null
      */
@@ -735,10 +756,12 @@ class User extends BaseUser
      * @var Collection<int, FellowshipComment>
      */
     private $fellowship_comments;
+
     /**
      * @var Collection<int, Fellowship>
      */
     private $fellowship_favorites;
+
     /**
      * @var Collection<int, Fellowship>
      */
@@ -832,6 +855,7 @@ class User extends BaseUser
      * @var Collection<int, Questlog>
      */
     private $questlogs;
+
     /**
      * @var Collection<int, QuestlogComment>
      */
@@ -897,6 +921,7 @@ class User extends BaseUser
      * @var Collection<int, Questlog>
      */
     private $questlog_favorites;
+
     /**
      * @var Collection<int, Questlog>
      */

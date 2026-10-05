@@ -13,34 +13,42 @@ class Cycle
      * @var int|null
      */
     private $id;
+
     /**
      * @var string
      */
     private $code;
+
     /**
      * @var string
      */
     private $name;
+
     /**
      * @var int
      */
     private $position;
+
     /**
      * @var bool
      */
     private $isBox;
+
     /**
      * @var bool
      */
     private $isSaga;
+
     /**
      * @var \DateTime
      */
     private $dateCreation;
+
     /**
      * @var \DateTime
      */
     private $dateUpdate;
+
     /**
      * @var Collection<int, Pack>
      */

@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class FavoriteDecklistController extends AbstractController
 {
     private DecklistRepository $decklistRepository;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -38,12 +39,14 @@ class FavoriteDecklistController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
+
         $decklist_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $decklist \App\Entity\Decklist */
         $decklist = $this->decklistRepository->find($decklist_id);
         if (!$decklist) {
             throw new NotFoundHttpException('Wrong id');
         }
+
         $author = $decklist->getUser();
         $dbh = $this->getDoctrine()->getConnection();
         $is_favorite = $dbh->executeQuery("SELECT\n\t\t\t\tcount(*)\n\t\t\t\tFROM decklist d\n\t\t\t\tJOIN favorite f ON f.decklist_id = d.id\n\t\t\t\tWHERE f.user_id = ?\n\t\t\t\tAND d.id = ?", [$user->getId(), $decklist_id])->fetch(\PDO::FETCH_NUM)[0];
@@ -61,6 +64,7 @@ class FavoriteDecklistController extends AbstractController
                 $author->setReputation($author->getReputation() + 5);
             }
         }
+
         $this->entityManager->flush();
 
         return new Response((string) $decklist->getNbFavorites());

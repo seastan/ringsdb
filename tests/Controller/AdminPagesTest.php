@@ -65,7 +65,7 @@ class AdminPagesTest extends WebTestCase
             'user comments' => ['/admin/user/comments/1', 'user_comments_1'],
         ];
         foreach (['cycle', 'pack', 'type', 'sphere', 'card', 'card-printing', 'scenario', 'encounter'] as $entity) {
-            $big = in_array($entity, ['card', 'card-printing']);
+            $big = in_array($entity, ['card', 'card-printing'], true);
             $pages["$entity list"] = ["/admin/$entity/", $big ? null : "{$entity}_list"];
             $pages["$entity show"] = ["/admin/$entity/1/show", "{$entity}_show_1"];
             $pages["$entity new form"] = ["/admin/$entity/new", "{$entity}_new"];

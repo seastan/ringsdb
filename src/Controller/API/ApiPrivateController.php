@@ -21,10 +21,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class ApiPrivateController extends AbstractController
 {
     use CurrentUserTrait;
+
     /**
      * @var DeckRepository
      */
     private $deckRepository;
+
     /**
      * @var DecklistRepository
      */
@@ -46,11 +48,13 @@ class ApiPrivateController extends AbstractController
         foreach ($decklists as &$decklist) {
             $decklist->setDescriptionMd('');
         }
+
         /* @var $decks \App\Entity\Deck[] */
         $decks = $this->deckRepository->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC', 'id' => 'DESC']);
         foreach ($decks as &$deck) {
             $deck->setDescriptionMd('');
         }
+
         $decklists = array_merge($decklists, $decks);
 
         $dateUpdates = array_map(
@@ -84,20 +88,24 @@ class ApiPrivateController extends AbstractController
         if (!$user) {
             return new JsonResponse(['success' => false, 'error' => 'This user does not exist.']);
         }
+
         $show_private_decks = $this->currentUser()->isEqualTo($user);
         /* @var $decklists Decklist[] */
         $decklists = $this->decklistRepository->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
         foreach ($decklists as &$decklist) {
             $decklist->setDescriptionMd('');
         }
+
         if ($show_private_decks) {
             /* @var $decks \App\Entity\Deck[] */
             $decks = $this->deckRepository->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
             foreach ($decks as &$deck) {
                 $deck->setDescriptionMd('');
             }
+
             $decklists = array_merge($decklists, $decks);
         }
+
         $dateUpdates = array_map(
             /* @var $deck \App\Entity\Deck */
             fn ($deck) => $deck->getDateUpdate(),
@@ -112,6 +120,7 @@ class ApiPrivateController extends AbstractController
                 return $response;
             }
         }
+
         $response->setData($decklists);
 
         return $response;

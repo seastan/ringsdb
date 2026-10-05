@@ -31,11 +31,17 @@ class SaveQuestlogController extends AbstractController
     use CurrentUserTrait;
 
     private EntityManagerInterface $entityManager;
+
     private QuestlogRepository $questlogRepository;
+
     private Texts $texts;
+
     private ScenarioRepository $scenarioRepository;
+
     private DeckRepository $deckRepository;
+
     private Decks $decks;
+
     private DecklistRepository $decklistRepository;
 
     public function __construct(
@@ -70,6 +76,7 @@ class SaveQuestlogController extends AbstractController
             if (!$questlog) {
                 throw new NotFoundHttpException('This questlog does not exist.');
             }
+
             if ($questlog->getUser() && !$questlog->getUser()->isEqualTo($user)) {
                 throw new AccessDeniedHttpException('Access denied to this object.');
             }
@@ -80,11 +87,13 @@ class SaveQuestlogController extends AbstractController
             $questlog->setNbFavorites(0);
             $questlog->setNbDecks(0);
         }
+
         $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
         $name = substr($name, 0, 250);
         if (empty($name)) {
             $name = 'Untitled Questlog';
         }
+
         $descriptionMd = trim((string) $request->request->get('descriptionMd'));
         $descriptionHtml = $this->texts->markdown($descriptionMd);
         $quest = intval(filter_var($request->request->get('quest'), FILTER_SANITIZE_NUMBER_INT));
@@ -93,13 +102,14 @@ class SaveQuestlogController extends AbstractController
         $victory = trim((string) filter_var($request->request->get('victory'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
         $score = intval(filter_var($request->request->get('score'), FILTER_SANITIZE_NUMBER_INT));
         $public = boolval(filter_var($request->request->get('public'), FILTER_SANITIZE_NUMBER_INT));
-        $victory = 'no' == $victory ? false : true;
-        $difficulty = in_array($difficulty, ['normal', 'easy', 'nightmare']) ? $difficulty : 'normal';
+        $victory = 'no' !== $victory;
+        $difficulty = in_array($difficulty, ['normal', 'easy', 'nightmare'], true) ? $difficulty : 'normal';
         /* @var $scenario Scenario */
         $scenario = $this->scenarioRepository->find($quest);
         if (!$scenario) {
             throw new NotFoundHttpException('This scenario does not exists.');
         }
+
         $date = new \DateTime($date);
         $questlog->setUser($user);
         $questlog->setName($name);
@@ -111,18 +121,21 @@ class SaveQuestlogController extends AbstractController
         $questlog->setQuestMode($difficulty);
         $questlog->setSuccess($victory);
         $questlog->setScore($score);
+
         $is_locked_as_public = $questlog->getNbVotes() > 0 || $questlog->getNbFavorites() > 0 || $questlog->getNbComments() > 0;
         if (!$is_locked_as_public) {
             // Allow deck changing
-            $questlog->setIsPublic($public ? true : false);
+            $questlog->setIsPublic($public);
             if ($public) {
                 $questlog->setDatePublish(new \DateTime());
             }
+
             $questlogdecks = $questlog->getDecks();
             foreach ($questlog->getDecks() as $deck) {
                 $questlog->removeDeck($deck);
                 $this->entityManager->remove($deck);
             }
+
             $nb_decks = 0;
             $skip = 0;
             for ($i = 1; $i <= 4; ++$i) {
@@ -137,17 +150,21 @@ class SaveQuestlogController extends AbstractController
                         if (!$deck) {
                             throw new NotFoundHttpException('One of the selected decks does not exist.');
                         }
+
                         $is_owner = $deck->getUser()->isEqualTo($user);
                         if (!$is_owner && !$deck->getUser()->getIsShareDecks()) {
                             throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
                         }
+
                         if (!$is_owner) {
                             $deck = $this->decks->cloneDeck($deck, $user);
                         }
+
                         // $content = (array) json_decode($request->get("deck".$i."_content"));
                         if (!isset($content['main']) || empty($content['main'])) {
                             return new Response('Cannot save a questlog with an empty deck');
                         }
+
                         $questlog_deck = new QuestlogDeck();
                         $questlog_deck->setDeck($deck);
                         $questlog_deck->setContent((string) json_encode($content));
@@ -161,10 +178,12 @@ class SaveQuestlogController extends AbstractController
                         if (!$decklist) {
                             throw new NotFoundHttpException('One of the selected decks does not exist.');
                         }
+
                         // $content = (array) json_decode($request->get("deck".$i."_content"));
                         if (!isset($content['main']) || empty($content['main'])) {
                             return new Response('Cannot save a questlog with an empty deck');
                         }
+
                         $questlog_decklist = new QuestlogDeck();
                         $questlog_decklist->setDecklist($decklist);
                         $questlog_decklist->setDeck($decklist->getParent());
@@ -174,6 +193,7 @@ class SaveQuestlogController extends AbstractController
                         $questlog_decklist->setPlayer($player);
                         $questlog->addDeck($questlog_decklist);
                     }
+
                     ++$nb_decks;
                 } else {
                     // deck_id == 0 occurs if:
@@ -185,6 +205,7 @@ class SaveQuestlogController extends AbstractController
                         ++$skip;
                         continue;
                     }
+
                     // Reference deck was deleted
                     $questlog_deck = new QuestlogDeck();
                     $questlog_deck->setContent((string) json_encode($content));
@@ -195,11 +216,14 @@ class SaveQuestlogController extends AbstractController
                     ++$nb_decks;
                 }
             }
-            if (0 == $nb_decks) {
+
+            if (0 === $nb_decks) {
                 throw new UnprocessableEntityHttpException("You can't save an empty quest log.");
             }
+
             $questlog->setNbDecks($nb_decks);
         }
+
         $this->entityManager->persist($questlog);
         $this->entityManager->flush();
 

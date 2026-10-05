@@ -39,6 +39,7 @@ class DecklistFixtures extends Fixture implements ContainerAwareInterface, Depen
         if (null === $this->container) {
             throw new \LogicException('The container is not set.');
         }
+
         /** @var DecklistFactory $decklistFactory */
         $decklistFactory = $this->container->get('decklist_factory');
 

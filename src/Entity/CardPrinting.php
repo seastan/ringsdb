@@ -10,78 +10,97 @@ class CardPrinting
      * @var int|null
      */
     private $id;
+
     /**
      * @var int
      */
     private $position;
+
     /**
      * @var int
      */
     private $quantity;
+
     /**
      * @var string|null
      */
     private $illustrator;
+
     /**
      * @var string|null
      */
     private $octgnid;
+
     /**
      * @var string
      */
     private $imageCode;
+
     /**
      * @var string|null
      */
     private $traits;
+
     /**
      * @var string|null
      */
     private $text;
+
     /**
      * @var string|null
      */
     private $cost;
+
     /**
      * @var int|null
      */
     private $threat;
+
     /**
      * @var int|null
      */
     private $willpower;
+
     /**
      * @var int|null
      */
     private $attack;
+
     /**
      * @var int|null
      */
     private $defense;
+
     /**
      * @var int|null
      */
     private $health;
+
     /**
      * @var int|null
      */
     private $victory;
+
     /**
      * @var int|null
      */
     private $quest;
+
     /**
      * @var \DateTime
      */
     private $dateCreation;
+
     /**
      * @var \DateTime
      */
     private $dateUpdate;
+
     /**
      * @var Card|null
      */
     private $card;
+
     /**
      * @var Pack|null
      */

@@ -24,8 +24,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class CommentDecklistController extends AbstractController
 {
     private MailerInterface $mailer;
+
     private UserRepository $userRepository;
+
     private DecklistRepository $decklistRepository;
+
     private Texts $texts;
 
     public function __construct(
@@ -52,11 +55,13 @@ class CommentDecklistController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
+
         $decklist_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         $decklist = $this->decklistRepository->find($decklist_id);
         if (!$decklist instanceof Decklist) {
             throw new BadRequestHttpException('Wrong decklist id');
         }
+
         $comment_text = trim($request->get('comment'));
         if (!empty($comment_text)) {
             $comment_text = (string) preg_replace('%(?<!\\()\\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\\d\\x{00a1}-\\x{ffff}]+-?)*[a-z\\d\\x{00a1}-\\x{ffff}]+)(?:\\.(?:[a-z\\d\\x{00a1}-\\x{ffff}]+-?)*[a-z\\d\\x{00a1}-\\x{ffff}]+)*(?:\\.[a-z\\x{00a1}-\\x{ffff}]{2,6}))(?::\\d+)?)(?:[^\\s]*)?%iu', '[$1]($0)', $comment_text);
@@ -65,6 +70,7 @@ class CommentDecklistController extends AbstractController
             if (preg_match_all('/`@([\\w_]+)`/', $comment_text, $matches, PREG_PATTERN_ORDER)) {
                 $mentionned_usernames = array_unique($matches[1]);
             }
+
             $comment_html = $this->texts->markdown($comment_text);
             $now = new \DateTime();
             $comment = new Comment();
@@ -83,6 +89,7 @@ class CommentDecklistController extends AbstractController
             if ($decklist->getUser()->getIsNotifAuthor()) {
                 $spool[$decklist->getUser()->getEmail()] = 'Emails/newcomment_author.html.twig';
             }
+
             foreach ($decklist->getComments() as $comment) {
                 /* @var $comment Comment */
                 $commenter = $comment->getUser();
@@ -90,6 +97,7 @@ class CommentDecklistController extends AbstractController
                     $spool[$commenter->getEmail()] ??= 'Emails/newcomment_commenter.html.twig';
                 }
             }
+
             foreach ($mentionned_usernames as $mentionned_username) {
                 /* @var $mentionned_user User */
                 $mentionned_user = $this->userRepository->findOneBy(['username' => $mentionned_username]);
@@ -97,6 +105,7 @@ class CommentDecklistController extends AbstractController
                     $spool[$mentionned_user->getEmail()] ??= 'Emails/newcomment_mentionned.html.twig';
                 }
             }
+
             unset($spool[$user->getEmail()]);
             $email_data = ['username' => $user->getUsername(), 'decklist_name' => $decklist->getName(), 'url' => $this->generateUrl('decklist_detail', ['decklist_id' => $decklist->getId(), 'decklist_name' => $decklist->getNameCanonical()], UrlGeneratorInterface::ABSOLUTE_URL).'#'.$comment->getId(), 'comment' => $comment_html, 'profile' => $this->generateUrl('user_profile_edit', [], UrlGeneratorInterface::ABSOLUTE_URL)];
             foreach ($spool as $email => $view) {

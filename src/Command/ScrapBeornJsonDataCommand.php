@@ -8,10 +8,7 @@ use App\Entity\Card;
 use App\Entity\Pack;
 use App\Repository\CardPrintingRepository;
 use App\Repository\PackRepository;
-use App\Repository\SphereRepository;
-use App\Repository\TypeRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Asset\Packages;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -27,16 +24,6 @@ class ScrapBeornJsonDataCommand extends Command
     private $entityManager;
 
     /**
-     * @var Packages
-     */
-    private $packages;
-
-    /**
-     * @var string
-     */
-    private $publicDir;
-
-    /**
      * @var CardPrintingRepository
      */
     private $cardPrintingRepository;
@@ -46,33 +33,15 @@ class ScrapBeornJsonDataCommand extends Command
      */
     private $packRepository;
 
-    /**
-     * @var SphereRepository
-     */
-    private $sphereRepository;
-
-    /**
-     * @var TypeRepository
-     */
-    private $typeRepository;
-
     public function __construct(
         EntityManagerInterface $entityManager,
-        Packages $packages,
-        string $publicDir,
         CardPrintingRepository $cardPrintingRepository,
-        PackRepository $packRepository,
-        SphereRepository $sphereRepository,
-        TypeRepository $typeRepository
+        PackRepository $packRepository
     ) {
         parent::__construct();
         $this->entityManager = $entityManager;
-        $this->packages = $packages;
-        $this->publicDir = $publicDir;
         $this->cardPrintingRepository = $cardPrintingRepository;
         $this->packRepository = $packRepository;
-        $this->sphereRepository = $sphereRepository;
-        $this->typeRepository = $typeRepository;
     }
 
     protected function configure(): void
@@ -84,24 +53,6 @@ class ScrapBeornJsonDataCommand extends Command
                  null,
                  InputOption::VALUE_REQUIRED,
                  'Number of cards to skip'
-             )
-             ->addOption(
-                 'force-data',
-                 null,
-                 InputOption::VALUE_NONE,
-                 'Redefine card data'
-             )
-             ->addOption(
-                 'force-image',
-                 null,
-                 InputOption::VALUE_NONE,
-                 'Redownload card image'
-             )
-             ->addOption(
-                 'show-texts',
-                 null,
-                 InputOption::VALUE_NONE,
-                 'Show card text and flavor'
              );
     }
 
@@ -109,16 +60,7 @@ class ScrapBeornJsonDataCommand extends Command
     {
         $questionHelper = $this->getHelper('question');
 
-        $assets_helper = $this->packages;
-        $publicDir = $this->publicDir;
-
-        $allSpheres = $this->sphereRepository->findAll();
-        $allTypes = $this->typeRepository->findAll();
-
         $skip = (int) $input->getOption('skip');
-        $forceData = $input->getOption('force-data');
-        $forceImage = $input->getOption('force-image');
-        $showTexts = $input->getOption('show-texts');
 
         if (file_exists('beorn.json')) {
             VarDumper::dump('Loading Local Beorn JSON');
@@ -128,6 +70,7 @@ class ScrapBeornJsonDataCommand extends Command
             $json = file_get_contents('http://hallofbeorn.com/Export/Cards');
             file_put_contents('beorn.json', $json);
         }
+
         $beorn = json_decode((string) $json);
 
         $i = 0;
@@ -161,6 +104,7 @@ class ScrapBeornJsonDataCommand extends Command
                     $question = new ConfirmationQuestion('Continue?');
                     $questionHelper->ask($input, $output, $question);
                 }
+
                 continue;
             }
 
@@ -218,7 +162,7 @@ class ScrapBeornJsonDataCommand extends Command
                 $questionHelper->ask($input, $output, $question);
             }
 
-            $card->setIllustrator($data->Artist);
+            // $card->setIllustrator($data->Artist);
         }
 
         $this->entityManager->flush();

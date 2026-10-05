@@ -24,10 +24,12 @@ class TagController extends AbstractController
      * @var Decks
      */
     private $decks;
+
     /**
      * @var DeckRepository
      */
     private $deckRepository;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -55,13 +57,16 @@ class TagController extends AbstractController
             if (!$deck) {
                 continue;
             }
+
             if ($this->currentUser()->getId() != $deck->getUser()->getId()) {
                 continue;
             }
+
             $tags = $this->decks->normalizeTags(array_merge($this->decks->normalizeTags($deck->getTags()), $list_tag));
             $response['tags'][$deck->getId()] = $tags;
             $deck->setTags(implode(' ', $tags));
         }
+
         $this->entityManager->flush();
 
         return new JsonResponse($response);
@@ -82,13 +87,16 @@ class TagController extends AbstractController
             if (!$deck) {
                 continue;
             }
+
             if ($this->currentUser()->getId() != $deck->getUser()->getId()) {
                 continue;
             }
+
             $tags = array_values(array_diff($this->decks->normalizeTags($deck->getTags()), $list_tag));
             $response['tags'][$deck->getId()] = $tags;
             $deck->setTags(implode(' ', $tags));
         }
+
         $this->entityManager->flush();
 
         return new JsonResponse($response);
@@ -108,12 +116,15 @@ class TagController extends AbstractController
             if (!$deck) {
                 continue;
             }
+
             if ($this->currentUser()->getId() != $deck->getUser()->getId()) {
                 continue;
             }
+
             $response['tags'][$deck->getId()] = [];
             $deck->setTags('');
         }
+
         $this->entityManager->flush();
 
         return new JsonResponse($response);

@@ -57,6 +57,7 @@ class DownloadImagesCommand extends Command
             if (!$card->getPack()) {
                 continue;
             }
+
             $card_code = $card->getCode();
             $imageurl = $assets_helper->getUrl('bundles/cards/'.$card_code.'.png');
             $imagepath = $publicDir.preg_replace('/\?.*/', '', $imageurl);

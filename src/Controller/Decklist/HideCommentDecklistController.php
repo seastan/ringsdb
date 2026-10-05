@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class HideCommentDecklistController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+
     private CommentRepository $commentRepository;
 
     public function __construct(
@@ -39,13 +40,16 @@ class HideCommentDecklistController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
+
         $comment = $this->commentRepository->find($comment_id);
         if (!$comment) {
             throw new BadRequestHttpException('Unable to find comment');
         }
+
         if (!$comment->getDecklist()->getUser()->isEqualTo($user)) {
             return new JsonResponse("You don't have permission to edit this comment.");
         }
+
         $comment->setIsHidden((bool) $hidden);
         $this->entityManager->flush();
 

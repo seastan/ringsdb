@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class VoteDecklistController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+
     private DecklistRepository $decklistRepository;
 
     public function __construct(
@@ -38,12 +39,14 @@ class VoteDecklistController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
+
         $decklist_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $decklist \App\Entity\Decklist */
         $decklist = $this->decklistRepository->find($decklist_id);
         if (!$decklist instanceof Decklist) {
             throw new BadRequestHttpException('Unable to find deck');
         }
+
         if (!$decklist->getUser()->isEqualTo($user)) {
             $query = $this->decklistRepository->createQueryBuilder('d')->innerJoin('d.votes', 'u')->where('d.id = :decklist_id')->andWhere('u.id = :user_id')->setParameter('decklist_id', $decklist_id)->setParameter('user_id', $user->getId())->getQuery();
             $result = $query->getResult();

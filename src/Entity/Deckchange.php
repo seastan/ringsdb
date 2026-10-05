@@ -13,22 +13,27 @@ class Deckchange
      * @var int|null
      */
     private $id;
+
     /**
      * @var \DateTime
      */
     private $dateCreation;
+
     /**
      * @var string
      */
     private $variation;
+
     /**
      * @var bool
      */
     private $isSaved;
+
     /**
      * @var string|null
      */
     private $version;
+
     /**
      * @var Deck
      */

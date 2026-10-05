@@ -13,42 +13,52 @@ class Pack
      * @var int|null
      */
     private $id;
+
     /**
      * @var string
      */
     private $code;
+
     /**
      * @var string
      */
     private $name;
+
     /**
      * @var int
      */
     private $position;
+
     /**
      * @var int
      */
     private $size;
+
     /**
      * @var \DateTime
      */
     private $dateCreation;
+
     /**
      * @var \DateTime
      */
     private $dateUpdate;
+
     /**
      * @var \DateTime|null
      */
     private $dateRelease;
+
     /**
      * @var bool
      */
     private $isRepackaged = false;
+
     /**
      * @var Collection<int, CardPrinting>
      */
     private $printings;
+
     /**
      * @var Cycle|null
      */

@@ -39,6 +39,7 @@ class UserProfileTest extends WebTestCase
         foreach ($this->fixtureUsers as $user) {
             $connection->update('user', $user, ['id' => $user['id']]);
         }
+
         parent::tearDown();
     }
 
@@ -71,12 +72,12 @@ class UserProfileTest extends WebTestCase
     /**
      * @param int $id
      */
-    private function fetchUser(KernelBrowser $client, $id = 1)
+    private function fetchUser($id = 1)
     {
         return $this->db()->fetchAssoc('SELECT * FROM user WHERE id = ?', [$id]);
     }
 
-    private static function checkbox(Form $form, string $name): ChoiceFormField
+    private function checkbox(Form $form, string $name): ChoiceFormField
     {
         $field = $form[$name];
         if (!$field instanceof ChoiceFormField) {
@@ -118,10 +119,10 @@ class UserProfileTest extends WebTestCase
         $form = $this->profileForm($client);
         $form['resume'] = 'I play <b>Dwarves</b>.';
         $form['user_sphere_code'] = 'lore';
-        self::checkbox($form, 'notif_author')->untick();
-        self::checkbox($form, 'notif_mention')->untick();
-        self::checkbox($form, 'share_decks')->tick();
-        self::checkbox($form, 'dark_mode')->tick();
+        $this->checkbox($form, 'notif_author')->untick();
+        $this->checkbox($form, 'notif_mention')->untick();
+        $this->checkbox($form, 'share_decks')->tick();
+        $this->checkbox($form, 'dark_mode')->tick();
         $client->submit($form);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
@@ -131,7 +132,7 @@ class UserProfileTest extends WebTestCase
         $this->assertSame('1', $cookie->getValue());
         $this->assertFalse($cookie->isHttpOnly());
 
-        $user = $this->fetchUser($client);
+        $user = $this->fetchUser();
         $this->assertSame([
             'username' => 'test', 'email' => 'test@example.com',
             // FILTER_SANITIZE_STRING strips the tags
@@ -148,9 +149,9 @@ class UserProfileTest extends WebTestCase
 
         // unticked checkboxes are not posted: they become false
         $form = $this->profileForm($client);
-        self::checkbox($form, 'dark_mode')->untick();
+        $this->checkbox($form, 'dark_mode')->untick();
         $client->submit($form);
-        $this->assertSame('0', $this->fetchUser($client)['dark_mode']);
+        $this->assertSame('0', $this->fetchUser()['dark_mode']);
         $cookie = $client->getCookieJar()->get('dark_mode');
         $this->assertNotNull($cookie);
         $this->assertSame('0', $cookie->getValue());
@@ -163,7 +164,7 @@ class UserProfileTest extends WebTestCase
         $form['username'] = 'phpunit_renamed';
         $client->submit($form);
 
-        $user = $this->fetchUser($client);
+        $user = $this->fetchUser();
         $this->assertSame(['phpunit_renamed', 'phpunit_renamed'], [$user['username'], $user['username_canonical']]);
         $this->assertFalse($this->login($this->client, 'test', 'test'));
         $this->assertTrue($this->login($this->client, 'phpunit_renamed', 'test'));
@@ -180,7 +181,7 @@ class UserProfileTest extends WebTestCase
         $this->assertSame('/user/profile_edit', $client->getResponse()->headers->get('Location'));
         $crawler = $client->followRedirect();
         $this->assertContains('Username admin is already taken.', $crawler->filter('body')->text());
-        $user = $this->fetchUser($client);
+        $user = $this->fetchUser();
         $this->assertSame(['test', null], [$user['username'], $user['resume']]);
     }
 
@@ -195,7 +196,7 @@ class UserProfileTest extends WebTestCase
         $client->submit($form);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
-        $user = $this->fetchUser($client);
+        $user = $this->fetchUser();
         $this->assertSame(['not-an-email', 'not-an-email'], [$user['email'], $user['email_canonical']]);
     }
 
@@ -210,7 +211,7 @@ class UserProfileTest extends WebTestCase
         $client->submit($form);
 
         $this->assertSame(500, $client->getResponse()->getStatusCode());
-        $this->assertSame('test@example.com', $this->fetchUser($client)['email']);
+        $this->assertSame('test@example.com', $this->fetchUser()['email']);
     }
 
     /* ------------------------------------------------ FOSUser: account */
@@ -227,13 +228,13 @@ class UserProfileTest extends WebTestCase
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertContains('The entered password is invalid.', $crawler->filter('body')->text());
-        $this->assertSame('test@example.com', $this->fetchUser($client)['email']);
+        $this->assertSame('test@example.com', $this->fetchUser()['email']);
 
         $form['fos_user_profile_form[current_password]'] = 'test';
         $client->submit($form);
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/profile/', $client->getResponse()->headers->get('Location'));
-        $user = $this->fetchUser($client);
+        $user = $this->fetchUser();
         $this->assertSame(['phpunit_new@example.com', 'phpunit_new@example.com'], [$user['email'], $user['email_canonical']]);
     }
 
@@ -254,14 +255,14 @@ class UserProfileTest extends WebTestCase
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertContains($error, $crawler->filter('body')->text());
-        $this->assertSame($this->fixtureUsers[0]['password'], $this->fetchUser($client)['password']);
+        $this->assertSame($this->fixtureUsers[0]['password'], $this->fetchUser()['password']);
     }
 
     public function invalidPasswordChangeProvider(): array
     {
         return [
             'wrong current password' => ['wrong', 'secret123', 'secret123', 'The entered password is invalid.'],
-            'confirmation mismatch' => ['test', 'secret123', 'other123', 'The entered passwords don\'t match'],
+            'confirmation mismatch' => ['test', 'secret123', 'other123', "The entered passwords don't match"],
         ];
     }
 
@@ -298,7 +299,7 @@ class UserProfileTest extends WebTestCase
         $messages = $this->sentMessages($client);
         $this->assertCount(1, $messages);
         $this->assertEquals('test@example.com', $messages[0]->getTo()[0]->getAddress());
-        $token = $this->fetchUser($client)['confirmation_token'];
+        $token = $this->fetchUser()['confirmation_token'];
         $this->assertNotEmpty($token);
         $this->assertContains("/resetting/reset/$token", str_replace("=\r\n", '', $messages[0]->getBody()->toString()));
 
@@ -306,7 +307,7 @@ class UserProfileTest extends WebTestCase
         $client->enableProfiler();
         $client->submit($form);
         $this->assertCount(0, $this->sentMessages($client));
-        $this->assertSame($token, $this->fetchUser($client)['confirmation_token']);
+        $this->assertSame($token, $this->fetchUser()['confirmation_token']);
 
         // 3. the link opens the reset form; the new password logs the user in
         $crawler = $client->request('GET', "/resetting/reset/$token");
@@ -321,7 +322,7 @@ class UserProfileTest extends WebTestCase
         $this->assertSame(200, $client->getResponse()->getStatusCode());
 
         // 4. the token is consumed, and the new password works
-        $this->assertNull($this->fetchUser($client)['confirmation_token']);
+        $this->assertNull($this->fetchUser()['confirmation_token']);
         $client->request('GET', "/resetting/reset/$token");
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/login', $client->getResponse()->headers->get('Location'));

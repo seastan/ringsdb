@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ListReviewsController extends AbstractController
 {
     private int $cacheExpiration;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -36,10 +37,12 @@ class ListReviewsController extends AbstractController
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
+
         $limit = 5;
         if ($page < 1) {
             $page = 1;
         }
+
         $start = ($page - 1) * $limit;
         $pagetitle = 'Card Reviews';
         /* @var $em EntityManager */
@@ -51,6 +54,7 @@ class ListReviewsController extends AbstractController
         foreach ($paginator as $review) {
             $reviews[] = $review;
         }
+
         // pagination : calcul de nbpages // currpage // prevpage // nextpage
         // à partir de $start, $limit, $count, $maxcount, $page
         $currpage = $page;
@@ -61,9 +65,9 @@ class ListReviewsController extends AbstractController
         $params = $request->query->all();
         $pages = [];
         for ($page = 1; $page <= $nbpages; ++$page) {
-            $pages[] = ['numero' => $page, 'url' => $this->generateUrl($route, $params + ['page' => $page]), 'current' => $page == $currpage];
+            $pages[] = ['numero' => $page, 'url' => $this->generateUrl($route, $params + ['page' => $page]), 'current' => $page === $currpage];
         }
 
-        return $this->render('Reviews/reviews.html.twig', ['pagetitle' => $pagetitle, 'pagedescription' => 'Read the latest user-submitted reviews on the cards.', 'reviews' => $reviews, 'url' => $request->getRequestUri(), 'route' => $route, 'pages' => $pages, 'prevurl' => 1 == $currpage ? null : $this->generateUrl($route, $params + ['page' => $prevpage]), 'nexturl' => $currpage == $nbpages ? null : $this->generateUrl($route, $params + ['page' => $nextpage])], $response);
+        return $this->render('Reviews/reviews.html.twig', ['pagetitle' => $pagetitle, 'pagedescription' => 'Read the latest user-submitted reviews on the cards.', 'reviews' => $reviews, 'url' => $request->getRequestUri(), 'route' => $route, 'pages' => $pages, 'prevurl' => 1 === $currpage ? null : $this->generateUrl($route, $params + ['page' => $prevpage]), 'nexturl' => $currpage == $nbpages ? null : $this->generateUrl($route, $params + ['page' => $nextpage])], $response);
     }
 }

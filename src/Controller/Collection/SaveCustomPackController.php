@@ -18,6 +18,7 @@ class SaveCustomPackController extends AbstractController
     use CurrentUserTrait;
 
     private EntityManagerInterface $entityManager;
+
     private CustomPackManager $customPackManager;
 
     public function __construct(
@@ -40,17 +41,21 @@ class SaveCustomPackController extends AbstractController
 
             return $this->redirectToRoute('collection_custom_pack_new');
         }
+
         $cardsJson = $request->get('cards_json', '[]');
         $cardEntries = json_decode($cardsJson, true);
         if (!is_array($cardEntries)) {
             $cardEntries = [];
         }
+
         $pack = new UserCustomPack();
         $pack->setUser($user);
         $pack->setName($name);
         $pack->setCode('tmp');
+
         $this->entityManager->persist($pack);
         $this->entityManager->flush();
+
         $pack->setCode('custom_'.$pack->getId().'_'.substr(md5(uniqid('', true)), 0, 6));
         $this->customPackManager->attachCards($pack, $cardEntries);
         $this->entityManager->persist($pack);

@@ -37,6 +37,7 @@ class Diff
                 $cards[$card->getCode()] = $card;
                 $collection[$card->getCode()] = ($collection[$card->getCode()] ?? 0) + $slot->getQuantity();
             }
+
             $quantities[] = $collection;
         }
 
@@ -45,6 +46,7 @@ class Diff
             foreach ($quantities as $collection) {
                 $minimum = min($minimum, $collection[$code] ?? 0);
             }
+
             if ($minimum > 0) {
                 $common[] = ['card' => $cards[$code], 'quantity' => $minimum];
                 foreach (array_keys($quantities) as $i) {
@@ -61,6 +63,7 @@ class Diff
                     $left[] = ['card' => $cards[$code], 'quantity' => $quantity];
                 }
             }
+
             $differences[] = $left;
         }
 
@@ -83,6 +86,7 @@ class Diff
                     $cards[] = $code;
                 }
             }
+
             $ensembles[] = $cards;
         }
 
@@ -92,13 +96,14 @@ class Diff
             $code = $ensembles[0][$i];
             $indexes = [$i];
             for ($j = 1; $j < count($ensembles); ++$j) {
-                $index = array_search($code, $ensembles[$j]);
+                $index = array_search($code, $ensembles[$j], true);
                 if (false !== $index) {
                     $indexes[] = $index;
                 } else {
                     break;
                 }
             }
+
             if (count($indexes) === count($ensembles)) {
                 $conjunction[] = $code;
                 for ($j = 0; $j < count($indexes); ++$j) {
@@ -106,6 +111,7 @@ class Diff
                     array_splice($list, $indexes[$j], 1);
                     $ensembles[$j] = $list;
                 }
+
                 --$i;
             }
         }
@@ -114,6 +120,7 @@ class Diff
         for ($i = 0; $i < count($ensembles); ++$i) {
             $listings[$i] = array_count_values($ensembles[$i]);
         }
+
         $intersect = array_count_values($conjunction);
 
         return [$listings, $intersect];

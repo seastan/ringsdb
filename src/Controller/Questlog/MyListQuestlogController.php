@@ -22,8 +22,11 @@ class MyListQuestlogController extends AbstractController
     use CurrentUserTrait;
 
     private ScenarioRepository $scenarioRepository;
+
     private Connection $connection;
+
     private QuestlogRepository $questlogRepository;
+
     private SnapshotManager $snapshotManager;
 
     public function __construct(
@@ -56,6 +59,7 @@ class MyListQuestlogController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
+
         // Count played scenarios
         $playedEasy = [];
         $playedNormal = [];
@@ -70,9 +74,11 @@ class MyListQuestlogController extends AbstractController
                 $playedNightmare[$c['scenario_id']] = $c['victory'];
             }
         }
-        if (0 == count($played)) {
+
+        if (0 === count($played)) {
             return $this->render('QuestLog/no-questlogs.html.twig', ['pagetitle' => 'My Quest Logs', 'pagedescription' => 'Log a new quest.']);
         }
+
         $show_all = false;
         $scenario = null;
         if (null == $scenario_name_canonical) {
@@ -84,15 +90,18 @@ class MyListQuestlogController extends AbstractController
                 throw new NotFoundHttpException('This quest does not exist.');
             }
         }
+
         if ('easy' != $quest_mode && 'nightmare' != $quest_mode) {
             $quest_mode = 'normal';
         }
+
         /* @var $questlogs \App\Entity\Questlog[] */
         if ($show_all) {
             $questlogs = $this->questlogRepository->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
         } else {
             $questlogs = $this->questlogRepository->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => 'DESC', 'id' => 'DESC']);
         }
+
         $this->snapshotManager->setSnapshots($questlogs);
         $victories = 0;
         $defeats = 0;

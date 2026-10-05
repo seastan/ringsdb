@@ -16,9 +16,13 @@ use Symfony\Component\HttpFoundation\Response;
 class DisplaySearchController extends AbstractController
 {
     private int $cacheExpiration;
+
     private CardsData $cardsData;
+
     private PackRepository $packRepository;
+
     private CycleRepository $cycleRepository;
+
     private CardPrintingRepository $cardPrintingRepository;
 
     public function __construct(
@@ -53,22 +57,26 @@ class DisplaySearchController extends AbstractController
         if (!array_key_exists($view, $pagesizes)) {
             $view = 'list';
         }
+
         $conditions = $this->cardsData->syntax($q);
         $conditions = $this->cardsData->validateConditions($conditions);
+
         $q = $this->cardsData->buildQueryFromConditions($conditions);
         if ($q && ($rows = $this->cardsData->get_search_rows($conditions, $sort))) {
-            if (1 == count($rows)) {
+            if (1 === count($rows)) {
                 $view = 'card';
                 $includeReviews = true;
             }
-            if ('' == $pagetitle) {
-                if (1 == count($conditions) && 3 == count($conditions[0]) && ':' == $conditions[0][1]) {
+
+            if ('' === $pagetitle) {
+                if (1 === count($conditions) && 3 === count($conditions[0]) && ':' == $conditions[0][1]) {
                     if ('e' == $conditions[0][0]) {
                         $pack = $this->packRepository->findOneBy(['code' => $conditions[0][2]]);
                         if ($pack) {
                             $pagetitle = $pack->getName();
                         }
                     }
+
                     if ('c' == $conditions[0][0]) {
                         $cycle = $this->cycleRepository->findOneBy(['code' => $conditions[0][2]]);
                         if ($cycle) {
@@ -77,6 +85,7 @@ class DisplaySearchController extends AbstractController
                     }
                 }
             }
+
             // pagination
             $nb_per_page = $pagesizes[$view];
             $first = $nb_per_page * ($page - 1);
@@ -84,6 +93,7 @@ class DisplaySearchController extends AbstractController
                 $page = 1;
                 $first = 0;
             }
+
             $last = $first + $nb_per_page;
             // data à passer à la view
             for ($rowindex = $first; $rowindex < $last && $rowindex < count($rows); ++$rowindex) {
@@ -100,8 +110,10 @@ class DisplaySearchController extends AbstractController
                             $availability[$pack->getCode()] = true;
                         }
                     }
+
                     $cardinfo['available'] = $availability[$pack->getCode()];
                 }
+
                 $cardinfo['selected_pack_code'] = $selected_pack_code;
                 if ($selected_pack_code) {
                     foreach ($cardinfo['packs'] as $p) {
@@ -111,33 +123,40 @@ class DisplaySearchController extends AbstractController
                         }
                     }
                 }
+
                 if ($includeReviews) {
                     $cardinfo['reviews'] = $this->cardsData->getReviews($card);
                 }
+
                 $cards[] = $cardinfo;
             }
+
             ++$first;
             // si on a des cartes on affiche une bande de navigation/pagination
-            if (1 == count($rows)) {
+            if (1 === count($rows)) {
                 $pagination = $this->setNavigation($rows[0], $selected_pack_code);
             } else {
                 $pagination = $this->pagination($nb_per_page, count($rows), $first, $q, $view, $sort);
             }
+
             // si on est en vue "short" on casse la liste par tri
-            if (count($cards) && 'short' == $view) {
+            if (count($cards) && 'short' === $view) {
                 $sortfields = ['set' => 'pack_name', 'name' => 'name', 'sphere' => 'sphere_name', 'type' => 'type_name', 'cost' => 'cost'];
                 $brokenlist = [];
                 for ($i = 0; $i < count($cards); ++$i) {
                     $val = $cards[$i][$sortfields[$sort]];
-                    if ('name' == $sort) {
+                    if ('name' === $sort) {
                         $val = substr($val, 0, 1);
                     }
+
                     $brokenlist[$val] ??= [];
-                    array_push($brokenlist[$val], $cards[$i]);
+                    $brokenlist[$val][] = $cards[$i];
                 }
+
                 $cards = $brokenlist;
             }
         }
+
         $searchbar = $this->renderView('Search/searchbar.html.twig', ['q' => $q, 'view' => $view, 'sort' => $sort]);
         if (empty($pagetitle)) {
             $pagetitle = $q;
@@ -163,6 +182,7 @@ class DisplaySearchController extends AbstractController
         if ($selectedPackCode) {
             $selectedPack = $this->packRepository->findOneBy(['code' => $selectedPackCode]);
         }
+
         if ($selectedPack) {
             // Navigate within the selected printing's pack via CardPrinting positions.
             $printing = $this->cardPrintingRepository->findOneBy(['card' => $card, 'pack' => $selectedPack]);
@@ -178,7 +198,7 @@ class DisplaySearchController extends AbstractController
             }
         } else {
             $primaryPrinting = $card->getPrimaryPrinting();
-            $selectedPack = $primaryPrinting ? $primaryPrinting->getPack() : null;
+            $selectedPack = $primaryPrinting instanceof \App\Entity\CardPrinting ? $primaryPrinting->getPack() : null;
             if ($primaryPrinting && $selectedPack) {
                 $pos = $primaryPrinting->getPosition();
                 $prevP = $this->cardPrintingRepository->findOneBy(['pack' => $selectedPack, 'position' => $pos - 1]);
@@ -190,6 +210,7 @@ class DisplaySearchController extends AbstractController
                 $next = null;
             }
         }
+
         $packParam = $selectedPackCode ? ['pack' => $selectedPackCode] : [];
 
         return $this->renderView('Search/setnavigation.html.twig', [
@@ -220,6 +241,7 @@ class DisplaySearchController extends AbstractController
         if ($total < $pagesize) {
             $pagesize = $total;
         }
+
         $pagecount = (int) ceil($total / $pagesize);
         $pageindex = (int) ceil($current / $pagesize);
         // 1-based
@@ -227,15 +249,18 @@ class DisplaySearchController extends AbstractController
         if ($pageindex > 2) {
             $first = $this->paginationItem($q, $view, $sort, $pagesize, 1, $total);
         }
+
         $prev = '';
         if ($pageindex > 1) {
             $prev = $this->paginationItem($q, $view, $sort, $pagesize, $pageindex - 1, $total);
         }
+
         $current = $this->paginationItem(null, $view, $sort, $pagesize, $pageindex, $total);
         $next = '';
         if ($pageindex < $pagecount) {
             $next = $this->paginationItem($q, $view, $sort, $pagesize, $pageindex + 1, $total);
         }
+
         $last = '';
         if ($pageindex < $pagecount - 1) {
             $last = $this->paginationItem($q, $view, $sort, $pagesize, $pagecount, $total);

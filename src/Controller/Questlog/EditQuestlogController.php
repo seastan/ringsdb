@@ -20,6 +20,7 @@ class EditQuestlogController extends AbstractController
     use CurrentUserTrait;
 
     private QuestlogRepository $questlogRepository;
+
     private ScenarioRepository $scenarioRepository;
 
     public function __construct(
@@ -48,9 +49,11 @@ class EditQuestlogController extends AbstractController
         if (!$questlog) {
             throw new NotFoundHttpException('This questlog does not exists.');
         }
+
         if ($questlog->getUser() && !$questlog->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException('Access denied to this object.');
         }
+
         /* @var $quests Scenario[] */
         $quests = $this->scenarioRepository->findBy([], ['position' => 'ASC']);
         $is_locked_as_public = $questlog->getNbVotes() > 0 || $questlog->getNbFavorites() > 0 || $questlog->getNbComments() > 0;

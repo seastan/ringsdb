@@ -23,7 +23,9 @@ class SaveDeckController extends AbstractController
     use CurrentUserTrait;
 
     private DeckRepository $deckRepository;
+
     private EntityManagerInterface $entityManager;
+
     private Decks $decks;
 
     public function __construct(
@@ -46,6 +48,7 @@ class SaveDeckController extends AbstractController
         if (count($user->getDecks()) > $user->getMaxNbDecks()) {
             throw new UnprocessableEntityHttpException('You have reached the maximum number of decks allowed. Delete some decks or increase your reputation.');
         }
+
         $id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         $deck = null;
         $source_deck = null;
@@ -55,8 +58,10 @@ class SaveDeckController extends AbstractController
             if (!$deck || !$deck->getUser()->isEqualTo($user)) {
                 throw new AccessDeniedHttpException("You don't have access to this deck.");
             }
+
             $source_deck = $deck;
         }
+
         $cancel_edits = (bool) filter_var($request->get('cancel_edits'), FILTER_SANITIZE_NUMBER_INT);
         if ($cancel_edits) {
             if ($deck) {
@@ -65,23 +70,28 @@ class SaveDeckController extends AbstractController
 
             return $this->redirect($this->generateUrl('decks_list'));
         }
+
         $is_copy = (bool) filter_var($request->get('copy'), FILTER_SANITIZE_NUMBER_INT);
         if ($is_copy || !$id) {
             /* @var $deck \App\Entity\Deck */
             $deck = new Deck();
         }
+
         $content = json_decode($request->get('content'), true);
         if (!isset($content['main']) || !is_array($content['main'])) {
             return new Response('Cannot import an empty deck');
         }
+
         $name = filter_var($request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
         if (empty($name)) {
             $name = 'Untitled Deck';
         }
+
         $decklist_id = filter_var($request->get('decklist_id'), FILTER_SANITIZE_NUMBER_INT);
         if (false === $decklist_id) {
             throw new BadRequestHttpException('Wrong decklist_id');
         }
+
         $description = trim($request->get('description') ?? '');
         $tags = filter_var($request->get('tags'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES) ?: '';
         $this->decks->saveDeck($user, $deck, (int) $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);

@@ -14,6 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class TextListExportController extends AbstractController
 {
     use CurrentUserTrait;
+
     private DeckArchiver $deckArchiver;
 
     public function __construct(

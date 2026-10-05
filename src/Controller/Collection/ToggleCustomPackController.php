@@ -17,6 +17,7 @@ class ToggleCustomPackController extends AbstractController
     use CurrentUserTrait;
 
     private CustomPackManager $customPackManager;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -38,11 +39,13 @@ class ToggleCustomPackController extends AbstractController
     public function __invoke(Request $request, int $id): RedirectResponse
     {
         $pack = $this->customPackManager->loadOwnedPack($this->currentUser(), $id);
-        if (!$pack) {
+        if (!$pack instanceof \App\Entity\UserCustomPack) {
             throw $this->createNotFoundException();
         }
+
         $pack->setIsEnabled(!$pack->getIsEnabled());
         $pack->setUpdatedAt(new \DateTime());
+
         $this->entityManager->persist($pack);
         $this->entityManager->flush();
 

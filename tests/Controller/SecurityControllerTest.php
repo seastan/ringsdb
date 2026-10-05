@@ -81,6 +81,7 @@ class SecurityControllerTest extends WebTestCase
         if ($rememberMe) {
             $values['_remember_me'] = 'on';
         }
+
         $form = $crawler->selectButton('_submit')->form($values);
 
         return $client->submit($form);

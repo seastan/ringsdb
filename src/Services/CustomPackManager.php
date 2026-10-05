@@ -12,7 +12,9 @@ use Doctrine\ORM\EntityManagerInterface;
 class CustomPackManager
 {
     private EntityManagerInterface $entityManager;
+
     private CardRepository $cardRepository;
+
     private UserCustomPackRepository $userCustomPackRepository;
 
     public function __construct(
@@ -38,10 +40,12 @@ class CustomPackManager
             if ('' === $code || $qty < 1 || $qty > 9 || isset($seen[$code])) {
                 continue;
             }
+
             $card = $cardRepo->findOneBy(['code' => $code]);
             if (!$card) {
                 continue;
             }
+
             $seen[$code] = true;
             $packCard = new UserCustomPackCard();
             $packCard->setCustomPack($pack);

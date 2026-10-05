@@ -43,7 +43,7 @@ class NewFellowshipController extends AbstractController
             if ($deck_ids[$i]) {
                 /* @var $decks Deck[] */
                 $decks[$i] = $this->deckRepository->find($deck_ids[$i]);
-                if ($decks[$i]) {
+                if ($decks[$i] instanceof Deck) {
                     /* @var $user User */
                     $user = $decks[$i]->getUser();
                     if (!$user->getIsShareDecks() && !$this->currentUser()->isEqualTo($user)) {

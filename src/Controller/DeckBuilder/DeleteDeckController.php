@@ -18,6 +18,7 @@ class DeleteDeckController extends AbstractController
     use CurrentUserTrait;
 
     private EntityManagerInterface $entityManager;
+
     private DeckRepository $deckRepository;
 
     public function __construct(
@@ -39,15 +40,18 @@ class DeleteDeckController extends AbstractController
         if (!$deck) {
             return $this->redirect($this->generateUrl('decks_list'));
         }
+
         if ($this->currentUser()->getId() != $deck->getUser()->getId()) {
             throw new AccessDeniedHttpException("You don't have access to this deck.");
         }
+
         if (count($deck->getFellowships())) {
             $this->get('session')->getFlashBag()->set('error', "You can't delete a deck that is member of a fellowship.");
         } else {
             foreach ($deck->getChildren() as $decklist) {
-                $decklist->setParent(null);
+                $decklist->setParent();
             }
+
             $this->entityManager->remove($deck);
             $this->entityManager->flush();
             $this->get('session')->getFlashBag()->set('notice', 'Deck deleted.');

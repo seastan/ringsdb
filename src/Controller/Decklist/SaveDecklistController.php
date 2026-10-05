@@ -16,7 +16,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class SaveDecklistController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+
     private DecklistRepository $decklistRepository;
+
     private Texts $texts;
 
     public function __construct(
@@ -45,18 +47,22 @@ class SaveDecklistController extends AbstractController
         if (!$user) {
             throw $this->createAccessDeniedException('Anonymous access denied');
         }
+
         $decklist = $this->decklistRepository->find($decklist_id);
         if (!$decklist) {
             throw $this->createNotFoundException('Decklist not found');
         }
+
         if (!$this->isGranted('ROLE_SUPER_ADMIN') && !$decklist->getUser()->isEqualTo($user)) {
             throw $this->createAccessDeniedException('Access denied');
         }
+
         $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = 'Untitled';
         }
+
         $descriptionMd = trim((string) $request->request->get('descriptionMd'));
         $descriptionHtml = $this->texts->markdown($descriptionMd);
         $precedent_id = trim((string) $request->request->get('precedent'));
@@ -68,6 +74,7 @@ class SaveDecklistController extends AbstractController
                 $precedent_id = null;
             }
         }
+
         $precedent = $precedent_id && $precedent_id != $decklist_id ? $this->decklistRepository->find($precedent_id) : null;
         $decklist->setName($name);
         $decklist->setNameCanonical($this->texts->slugify($name).'-'.$decklist->getVersion());
@@ -75,6 +82,7 @@ class SaveDecklistController extends AbstractController
         $decklist->setDescriptionHtml($descriptionHtml);
         $decklist->setPrecedent($precedent);
         $decklist->setDateUpdate(new \DateTime());
+
         $this->entityManager->flush();
 
         return $this->redirect($this->generateUrl('decklist_detail', ['decklist_id' => $decklist_id, 'decklist_name' => $decklist->getNameCanonical()]));

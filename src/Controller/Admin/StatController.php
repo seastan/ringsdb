@@ -22,6 +22,7 @@ class StatController extends AbstractController
         if (!$month) {
             $month = date('Y-m', strtotime('first day of last month'));
         }
+
         $packs = $this->getPacks();
         $pack_rules = $this->getPackRuless();
         /* @var $dbh Connection */
@@ -50,16 +51,19 @@ class StatController extends AbstractController
         if (!$month) {
             $month = date('Y-m', strtotime('first day of last month'));
         }
+
         $step = $request->query->get('step');
         if (!$step) {
             $step = '1';
         }
+
         /* @var $dbh Connection */
         $dbh = $this->getDoctrine()->getConnection();
         $payload = $dbh->executeQuery('SELECT payload FROM stat_cards_cache WHERE month = ? AND step = ?', [$month, (int) $step])->fetchColumn();
         if (false === $payload) {
             return new Response("Per-card stats for {$month} have not been precomputed yet. Run `php bin/console app:stats:precompute-cards {$month}` (scheduled via cron).", 503);
         }
+
         $response = new Response($payload);
         $response->headers->set('Content-Type', 'application/json');
 
@@ -87,9 +91,8 @@ class StatController extends AbstractController
     {
         $dbh = $this->getDoctrine()->getConnection();
         $query = "SELECT name, date_release\nFROM pack\nWHERE date_release IS NOT NULL\nORDER BY date_release";
-        $packs = $dbh->executeQuery($query, [])->fetchAll(\PDO::FETCH_ASSOC);
 
-        return $packs;
+        return $dbh->executeQuery($query, [])->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
@@ -97,9 +100,7 @@ class StatController extends AbstractController
      */
     public function getPackRuless(): array
     {
-        $pack_rules = ['Core Set' => ['2000-01-01', '2011-07-21'], 'Shadows of Mirkwood' => ['2011-07-21', '2012-01-06'], 'Dwarrowdelf' => ['2012-01-06', '2012-08-17'], 'Against the Shadow' => ['2012-08-17', '2014-02-21'], 'The Ring-maker' => ['2014-02-21', '2015-04-03'], 'Angmar Awakened' => ['2015-04-03', '2016-02-11'], 'Dream-chaser' => ['2016-02-11', '2016-11-23'], 'Haradrim' => ['2016-11-23', '2018-06-14'], 'Ered Mithrin' => ['2018-06-14', '2019-08-02'], 'Vengeance of Mordor' => ['2019-08-02', '2021-03-21'], 'ALeP - Oaths of the Rohirrim' => ['2021-03-21', '2099-12-31']];
-
-        return $pack_rules;
+        return ['Core Set' => ['2000-01-01', '2011-07-21'], 'Shadows of Mirkwood' => ['2011-07-21', '2012-01-06'], 'Dwarrowdelf' => ['2012-01-06', '2012-08-17'], 'Against the Shadow' => ['2012-08-17', '2014-02-21'], 'The Ring-maker' => ['2014-02-21', '2015-04-03'], 'Angmar Awakened' => ['2015-04-03', '2016-02-11'], 'Dream-chaser' => ['2016-02-11', '2016-11-23'], 'Haradrim' => ['2016-11-23', '2018-06-14'], 'Ered Mithrin' => ['2018-06-14', '2019-08-02'], 'Vengeance of Mordor' => ['2019-08-02', '2021-03-21'], 'ALeP - Oaths of the Rohirrim' => ['2021-03-21', '2099-12-31']];
     }
 
     /**

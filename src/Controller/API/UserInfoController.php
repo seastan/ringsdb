@@ -60,6 +60,7 @@ class UserInfoController extends AbstractController
                     $content['can_delete'] = 0 == $decklist->getNbcomments() && 0 == $decklist->getNbfavorites() && 0 == $decklist->getNbVotes();
                 }
             }
+
             if (isset($fellowship_id)) {
                 /* @var $fellowship Fellowship */
                 $fellowship = $fellowshipRepository->find($fellowship_id);
@@ -71,6 +72,7 @@ class UserInfoController extends AbstractController
                     $content['can_delete'] = 0 == $fellowship->getNbcomments() && 0 == $fellowship->getNbfavorites() && 0 == $fellowship->getNbVotes();
                 }
             }
+
             if (isset($questlog_id)) {
                 /* @var $questlog Questlog */
                 $questlog = $questlogRepository->find($questlog_id);
@@ -82,6 +84,7 @@ class UserInfoController extends AbstractController
                     $content['can_delete'] = 0 == $questlog->getNbcomments() && 0 == $questlog->getNbfavorites() && 0 == $questlog->getNbVotes();
                 }
             }
+
             if (isset($card_id)) {
                 /* @var $card Card */
                 $card = $cardRepository->find($card_id);

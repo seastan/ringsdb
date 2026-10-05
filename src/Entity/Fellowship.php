@@ -16,70 +16,87 @@ class Fellowship
      * @var int|null
      */
     private $id;
+
     /**
      * @var string
      */
     private $name;
+
     /**
      * @var string
      */
     private $nameCanonical;
+
     /**
      * @var string|null
      */
     private $descriptionMd;
+
     /**
      * @var string|null
      */
     private $descriptionHtml;
+
     /**
      * @var bool
      */
     private $isPublic;
+
     /**
      * @var int
      */
     private $nbVotes;
+
     /**
      * @var int
      */
     private $nbFavorites;
+
     /**
      * @var int
      */
     private $nbComments;
+
     /**
      * @var \DateTime
      */
     private $dateCreation;
+
     /**
      * @var \DateTime
      */
     private $dateUpdate;
+
     /**
      * @var \DateTime|null
      */
     private $dateLastComment;
+
     /**
      * @var Collection<int, FellowshipDeck>
      */
     private $decks;
+
     /**
      * @var Collection<int, FellowshipDecklist>
      */
     private $decklists;
+
     /**
      * @var Collection<int, FellowshipComment>
      */
     private $comments;
+
     /**
      * @var User
      */
     private $user;
+
     /**
      * @var Collection<int, User>
      */
     private $favorites;
+
     /**
      * @var Collection<int, User>
      */

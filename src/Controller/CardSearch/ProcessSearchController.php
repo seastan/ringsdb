@@ -34,12 +34,14 @@ class ProcessSearchController extends AbstractController
         if ('' != $request->query->get('q')) {
             $params[] = $request->query->get('q');
         }
+
         foreach (SearchKeys::$searchKeys as $key => $searchName) {
             if ('sphere' === $searchName) {
                 $val = $request->query->all($key);
                 if (count($val) > 0 && count($val) < count($spheres)) {
                     $params[] = $key.':'.implode('|', array_map(fn ($s) => false !== strstr($s, ' ') ? "\"{$s}\"" : $s, $val));
                 }
+
                 continue;
             }
 
@@ -51,18 +53,22 @@ class ProcessSearchController extends AbstractController
                     if (!preg_match('/^[\\p{L}\\p{N}\\_\\-\\&]+$/u', $val, $match)) {
                         $val = "\"{$val}\"";
                     }
+
                     $op = $request->query->get($key.'o');
                     if (!in_array($op, $operators)) {
                         $op = ':';
                     }
                 }
+
                 $params[] = "{$key}{$op}{$val}";
             }
         }
+
         $find = ['q' => implode(' ', $params)];
         if ('name' != $sort) {
             $find['sort'] = $sort;
         }
+
         if ('list' != $view) {
             $find['view'] = $view;
         }

@@ -249,7 +249,7 @@ class WebsiteBrowsingTest extends WebTestCase
             'unknown cycle' => ['/cycle/nope', 'This cycle does not exist (404 Not Found)'],
             'unknown card' => ['/card/99999', 'Sorry, this card is not in the database (yet?) (404 Not Found)'],
             'unknown decklist' => ['/decklist/view/999/nope', 'Decklist not found. (404 Not Found)'],
-            'unknown deck' => ['/deck/view/999', 'This deck doesn\'t exist. (404 Not Found)'],
+            'unknown deck' => ['/deck/view/999', "This deck doesn't exist. (404 Not Found)"],
         ];
     }
 
@@ -287,6 +287,7 @@ class WebsiteBrowsingTest extends WebTestCase
     {
         $client = $authenticated ? $this->createAuthenticatedClient() : $this->client;
         $client->request('GET', $uri);
+
         $response = $client->getResponse();
 
         $this->assertSame(200, $response->getStatusCode(), "GET $uri");
@@ -341,6 +342,7 @@ class WebsiteBrowsingTest extends WebTestCase
     {
         $client = $this->createAuthenticatedClient();
         $client->request('GET', $uri);
+
         $response = $client->getResponse();
 
         $this->assertSame(200, $response->getStatusCode(), "GET $uri");
@@ -355,6 +357,7 @@ class WebsiteBrowsingTest extends WebTestCase
         for ($i = 0; $i < $zip->numFiles; ++$i) {
             $actual[$zip->getNameIndex($i)] = $zip->getFromIndex($i);
         }
+
         $zip->close();
         unlink($file);
 

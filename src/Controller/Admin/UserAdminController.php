@@ -25,10 +25,12 @@ class UserAdminController extends AbstractController
      * @var CommentRepository
      */
     private $commentRepository;
+
     /**
      * @var UserRepository
      */
     private $userRepository;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -62,6 +64,7 @@ class UserAdminController extends AbstractController
                 $user = $this->userRepository->find($request->request->get('id'));
             }
         }
+
         if (!$user) {
             $this->addFlash('warning', 'Cannot find user');
 
@@ -95,6 +98,7 @@ class UserAdminController extends AbstractController
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
+
         $user->setLocked(!$user->isLocked());
         $this->entityManager->flush();
 
@@ -125,17 +129,20 @@ class UserAdminController extends AbstractController
         if (!$decklist) {
             throw $this->createNotFoundException('Decklist not found');
         }
+
         // first we remove the foreign keys in Decklist and Deck pointing to this decklist
         $successors = $decklistRepository->findBy(['precedent' => $decklist]);
         foreach ($successors as $successor) {
             /* @var $successor Decklist */
-            $successor->setPrecedent(null);
+            $successor->setPrecedent();
         }
+
         $children = $deckRepository->findBy(['parent' => $decklist]);
         foreach ($children as $child) {
             /* @var $child Deck */
-            $child->setParent(null);
+            $child->setParent();
         }
+
         $this->entityManager->flush();
         // then we remove the decklist itself
         $this->entityManager->remove($decklist);
@@ -172,6 +179,7 @@ class UserAdminController extends AbstractController
         if (!$comment) {
             throw $this->createNotFoundException('Comment not found');
         }
+
         $comment->setIsHidden(!$comment->getIsHidden());
         $this->entityManager->flush();
 
@@ -188,6 +196,7 @@ class UserAdminController extends AbstractController
         if (!$comment) {
             throw $this->createNotFoundException('Comment not found');
         }
+
         $this->entityManager->remove($comment);
         $this->entityManager->flush();
 

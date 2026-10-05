@@ -12,7 +12,9 @@ use Symfony\Component\DomCrawler\Crawler;
 class DeckImporter
 {
     private EntityManagerInterface $entityManager;
+
     private CardRepository $cardRepository;
+
     private PackRepository $packRepository;
 
     public function __construct(EntityManagerInterface $entityManager, CardRepository $cardRepository, PackRepository $packRepository)
@@ -29,27 +31,29 @@ class DeckImporter
     {
         $content = ['main' => [], 'side' => []];
         $addToSideboard = false;
-        $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', '\'', '\''], $text);
+        $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', "'", "'"], $text);
         $lines = explode("\n", $text);
-        $identity = null;
         foreach ($lines as $line) {
             $matches = [];
             $pack_name = null;
             $name = null;
             $quantity = 1;
-            if ('Sideboard' == trim($line)) {
+            if ('Sideboard' === trim($line)) {
                 $addToSideboard = true;
                 continue;
             }
+
             if (preg_match('/(x\\d+|\\d+x)/u', $line, $matches)) {
                 $quantity = intval(str_replace('x', '', $matches[1]));
                 $line = str_replace($matches[1], '', $line);
             }
+
             if (preg_match('/^\\s*([\\pLl\\pLu\\pN\\-\\.\'\\!\\: ]+)\\(?([^\\)]*)\\)?/u', $line, $matches)) {
                 $name = trim($matches[1]);
                 // the pack name, empty when absent
                 $pack_name = trim($matches[2]);
             }
+
             $card = null;
             $pack = null;
             if ($pack_name) {
@@ -59,6 +63,7 @@ class DeckImporter
                     $pack = $this->packRepository->findOneBy(['code' => $pack_name]);
                 }
             }
+
             if ($pack) {
                 // a card belongs to its packs through its printings
                 /* @var $card \App\Entity\Card */
@@ -67,6 +72,7 @@ class DeckImporter
                 /* @var $pack \App\Entity\Card */
                 $card = $this->cardRepository->findOneBy(['name' => $name]);
             }
+
             if ($card) {
                 if ($addToSideboard) {
                     $content['side'][$card->getCode()] = $quantity;
@@ -94,11 +100,13 @@ class DeckImporter
         foreach ($cardcrawler as $domElement) {
             $octgnids[$domElement->getAttribute('id')] = intval($domElement->getAttribute('qty'));
         }
+
         $cardcrawler = $crawler->filter('deck > section[name="Sideboard"] > card');
         /** @var \DOMElement $domElement */
         foreach ($cardcrawler as $domElement) {
             $sideoctgnids[$domElement->getAttribute('id')] = intval($domElement->getAttribute('qty'));
         }
+
         // read desc
         $desccrawler = $crawler->filter('deck > notes');
         $descriptions = [];
@@ -106,21 +114,24 @@ class DeckImporter
         foreach ($desccrawler as $domElement) {
             $descriptions[] = $domElement->nodeValue;
         }
+
         $content = [];
         foreach ($octgnids as $octgnid => $qty) {
             $card = $this->findCardByOctgnid($octgnid);
-            if ($card) {
+            if ($card instanceof Card) {
                 // several printings of a card can have their own octgnid
                 $content[$card->getCode()] = ($content[$card->getCode()] ?? 0) + $qty;
             }
         }
+
         $sidecontent = [];
         foreach ($sideoctgnids as $octgnid => $qty) {
             $card = $this->findCardByOctgnid($octgnid);
-            if ($card) {
+            if ($card instanceof Card) {
                 $sidecontent[$card->getCode()] = ($sidecontent[$card->getCode()] ?? 0) + $qty;
             }
         }
+
         $description = implode("\n", $descriptions);
 
         return ['content' => ['main' => $content, 'side' => $sidecontent], 'description' => $description];

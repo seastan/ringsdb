@@ -41,7 +41,7 @@ class DecklistFactory
     public function createDecklistFromDeck(Deck $deck, ?string $name = null, ?string $descriptionMd = null): Decklist
     {
         /* @var $lastPack Pack */
-        $lastPack = $deck->getLastPack();
+        $deck->getLastPack();
         $problem = $this->deckValidationHelper->findProblem($deck, true);
         if ($problem) {
             throw new \Exception('This deck cannot be published  because it is invalid: "'.$this->deckValidationHelper->getProblemLabel($problem).'".');
@@ -60,15 +60,17 @@ class DecklistFactory
                 $name = 'Untitled Deck';
             }
         }
+
         $name = substr($name, 0, 60);
 
         if (empty($descriptionMd)) {
             $descriptionMd = $deck->getDescriptionMd();
         }
+
         $description = $this->texts->markdown($descriptionMd ?? '');
 
         $countBySphere = $deck->getSlots()->getCountBySphere();
-        $predominantSphere = array_keys($countBySphere, max($countBySphere))[0];
+        $predominantSphere = array_keys($countBySphere, max(...array_values($countBySphere)))[0];
         $predominantSphere = $this->sphereRepository->findOneBy(['code' => $predominantSphere]);
 
         $heroes = $deck->getSlots()->getHeroDeck();
@@ -122,9 +124,10 @@ class DecklistFactory
 
         if (count($deck->getChildren())) {
             $decklist->setPrecedent($deck->getChildren()[0]);
-        } elseif ($deck->getParent()) {
+        } elseif ($deck->getParent() instanceof Decklist) {
             $decklist->setPrecedent($deck->getParent());
         }
+
         $decklist->setParent($deck);
 
         $deck->setMinorVersion(1);

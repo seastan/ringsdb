@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class VoteQuestlogController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+
     private QuestlogRepository $questlogRepository;
 
     public function __construct(
@@ -38,12 +39,14 @@ class VoteQuestlogController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
+
         $questlog_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $questlog \App\Entity\QuestLog */
         $questlog = $this->questlogRepository->find($questlog_id);
         if (!$questlog) {
             throw new BadRequestHttpException('Unable to find quest log');
         }
+
         if ($questlog->getUser() instanceof User && !$questlog->getUser()->isEqualTo($user)) {
             $query = $this->questlogRepository->createQueryBuilder('d')->innerJoin('d.votes', 'u')->where('d.id = :questlog_id')->andWhere('u.id = :user_id')->setParameter('questlog_id', $questlog_id)->setParameter('user_id', $user->getId())->getQuery();
             $result = $query->getResult();

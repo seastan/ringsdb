@@ -35,6 +35,7 @@ trait JsonSnapshotTrait
             if (!is_dir(dirname($file))) {
                 mkdir(dirname($file), 0755, true);
             }
+
             file_put_contents($file, $actual);
         }
 

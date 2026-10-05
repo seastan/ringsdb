@@ -28,10 +28,12 @@ class CardController extends AbstractController
      * @var string
      */
     private $publicDir;
+
     /**
      * @var CardRepository
      */
     private $cardRepository;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -100,6 +102,7 @@ class CardController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Card entity.');
         }
+
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('Card/show.html.twig', ['entity' => $entity, 'delete_form' => $deleteForm->createView()]);
@@ -116,6 +119,7 @@ class CardController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Card entity.');
         }
+
         $editForm = $this->createForm(CardType::class, $entity, ['method' => 'PUT']);
         $deleteForm = $this->createDeleteForm($id);
         $forceDeleteForm = $this->createForceDeleteForm($id);
@@ -134,6 +138,7 @@ class CardController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Card entity.');
         }
+
         $deleteForm = $this->createDeleteForm($id);
         $forceDeleteForm = $this->createForceDeleteForm($id);
         $editForm = $this->createForm(CardType::class, $entity, ['method' => 'PUT']);
@@ -170,6 +175,7 @@ class CardController extends AbstractController
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Card entity.');
             }
+
             $this->entityManager->remove($entity);
             $this->entityManager->flush();
         }
@@ -191,6 +197,7 @@ class CardController extends AbstractController
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Card entity.');
             }
+
             /* @var $dbh Connection */
             $dbh = $this->getDoctrine()->getConnection();
             $query = 'DELETE FROM deckslot WHERE card_id = '.$id;

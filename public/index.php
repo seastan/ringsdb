@@ -17,7 +17,7 @@ if (file_exists(__DIR__.'/../maintenance.flag')) {
     exit;
 }
 
-require dirname(__DIR__).'/config/bootstrap.php';
+require __DIR__.'/../config/bootstrap.php';
 
 if ($_SERVER['APP_DEBUG']) {
     umask(0000);

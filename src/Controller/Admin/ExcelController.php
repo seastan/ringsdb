@@ -29,10 +29,12 @@ class ExcelController extends AbstractController
      * @var CardRepository
      */
     private $cardRepository;
+
     /**
      * @var PackRepository
      */
     private $packRepository;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -70,9 +72,11 @@ class ExcelController extends AbstractController
             if (!$pack) {
                 throw $this->createNotFoundException('Pack not found.');
             }
+
             $cards = $pack->getCards()->toArray();
             $pack_name = $pack->getName();
         }
+
         $fieldNames = $this->entityManager->getClassMetadata(Card::class)->getFieldNames();
         $associationMappings = $this->entityManager->getClassMetadata(Card::class)->getAssociationMappings();
         $lastModified = null;
@@ -82,6 +86,7 @@ class ExcelController extends AbstractController
                 $lastModified = $card->getDateUpdate();
             }
         }
+
         $spreadsheet = new Spreadsheet();
         $spreadsheet->getProperties()->setCreator('Sydtrack')->setLastModifiedBy($lastModified ? $lastModified->format('Y-m-d') : '')->setTitle($pack_name);
         $phpActiveSheet = $spreadsheet->setActiveSheetIndex(0);
@@ -94,13 +99,16 @@ class ExcelController extends AbstractController
                 $phpCell->setValue($fieldName);
             }
         }
+
         foreach ($fieldNames as $fieldName) {
             if (in_array($fieldName, $ignoredFields)) {
                 continue;
             }
+
             $phpCell = $phpActiveSheet->getCell([$col_index++, 1]);
             $phpCell->setValue($fieldName);
         }
+
         foreach ($cards as $row_index => $card) {
             $col_index = 1;
             foreach ($associationMappings as $fieldName => $associationMapping) {
@@ -111,10 +119,12 @@ class ExcelController extends AbstractController
                     $phpCell->setValue($value);
                 }
             }
+
             foreach ($fieldNames as $fieldName) {
                 if (in_array($fieldName, $ignoredFields)) {
                     continue;
                 }
+
                 $getter = str_replace(' ', '', ucwords(str_replace('_', ' ', "get_{$fieldName}")));
                 $value = $card->{$getter}();
                 $value ??= '';
@@ -131,6 +141,7 @@ class ExcelController extends AbstractController
                 }
             }
         }
+
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $response = new StreamedResponse(function () use ($writer): void {
             $writer->save('php://output');
@@ -160,6 +171,7 @@ class ExcelController extends AbstractController
         $inputFileName = $uploadedFile->getPathname();
         $objReader = IOFactory::createReaderForFile($inputFileName);
         $objReader->setReadDataOnly(true);
+
         $spreadsheet = $objReader->load($inputFileName);
         $objWorksheet = $spreadsheet->getActiveSheet();
         $enableCardCreation = $request->request->has('create');
@@ -176,8 +188,10 @@ class ExcelController extends AbstractController
                 foreach ($cellIterator as $cell) {
                     $colNames[$cell->getColumn()] = $cell->getValue();
                 }
+
                 continue;
             }
+
             $card = [];
             $cellIterator = $row->getCellIterator();
             foreach ($cellIterator as $cell) {
@@ -186,10 +200,12 @@ class ExcelController extends AbstractController
                 // $setter = str_replace(' ', '', ucwords(str_replace('_', ' ', "set_$fieldName")));
                 $card[$colName] = $cell->getValue();
             }
+
             if (count($card) && !empty($card['code'])) {
                 $cards[] = $card;
             }
         }
+
         $repo = $this->cardRepository;
         $metaData = $this->entityManager->getClassMetadata(Card::class);
         $fieldNames = $metaData->getFieldNames();
@@ -208,6 +224,7 @@ class ExcelController extends AbstractController
                     continue;
                 }
             }
+
             $changed = false;
             $output = ['<h4>'.$card['name'].'</h4>'];
             foreach ($card as $colName => $value) {
@@ -223,6 +240,7 @@ class ExcelController extends AbstractController
                     if (!$associationEntity) {
                         throw new \Exception("cannot find entity [{$colName}] of name [{$value}]");
                     }
+
                     if (!$entity->{$getter}() || $entity->{$getter}()->getId() !== $associationEntity->getId()) {
                         $changed = true;
                         $output[] = "<p>association [{$colName}] changed</p>";
@@ -234,6 +252,7 @@ class ExcelController extends AbstractController
                         if ('boolean' === $type) {
                             $value = (bool) $value;
                         }
+
                         if ($entity->{$getter}() != $value || $entity->{$getter}() === null && $entity->{$getter}() !== $value) {
                             $changed = true;
                             $output[] = "<p>field [{$colName}] changed</p>";
@@ -242,12 +261,14 @@ class ExcelController extends AbstractController
                     }
                 }
             }
+
             if ($changed) {
                 $this->entityManager->persist($entity);
                 ++$counter;
                 echo implode('', $output);
             }
         }
+
         $this->entityManager->flush();
 
         return new Response($counter.' cards changed or added');

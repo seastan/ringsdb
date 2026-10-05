@@ -17,7 +17,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class EditReviewController extends AbstractController
 {
     private ReviewRepository $reviewRepository;
+
     private Texts $texts;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -40,23 +42,29 @@ class EditReviewController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You are not logged in.');
         }
+
         $review_id = filter_var($request->get('review_id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $review Review */
         $review = $this->reviewRepository->find($review_id);
         if (!$review) {
             throw new BadRequestHttpException('Unable to find review.');
         }
+
         if (!$review->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException('You cannot edit this review.');
         }
+
         $review_raw = trim($request->get('review'));
         $review_raw = (string) preg_replace('%(?<!\\()\\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\\d\\x{00a1}-\\x{ffff}]+-?)*[a-z\\d\\x{00a1}-\\x{ffff}]+)(?:\\.(?:[a-z\\d\\x{00a1}-\\x{ffff}]+-?)*[a-z\\d\\x{00a1}-\\x{ffff}]+)*(?:\\.[a-z\\x{00a1}-\\x{ffff}]{2,6}))(?::\\d+)?)(?:[^\\s]*)?%iu', '[$1]($0)', $review_raw);
+
         $review_html = $this->texts->markdown($review_raw);
         if (!$review_html) {
             return new Response('Your review is empty.');
         }
+
         $review->setTextMd($review_raw);
         $review->setTextHtml($review_html);
+
         $this->entityManager->flush();
 
         return new JsonResponse(['success' => true]);

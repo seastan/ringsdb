@@ -28,10 +28,13 @@ class QuestLogManagerTest extends KernelTestCase
 {
     /** @var Connection */
     private $connection;
+
     /** @var int[] */
     private $maxIds = [];
+
     /** @var int[] name => id */
     private $ids = [];
+
     /** @var array */
     private $fixtureUsers;
 
@@ -42,6 +45,7 @@ class QuestLogManagerTest extends KernelTestCase
         foreach (['questlog', 'questlog_comment', 'deck'] as $table) {
             $this->maxIds[$table] = (int) $this->connection->fetchColumn("SELECT MAX(id) FROM $table");
         }
+
         $this->fixtureUsers = $this->connection->fetchAll('SELECT id, reputation FROM user');
 
         $admin = (int) $this->connection->fetchColumn("SELECT id FROM user WHERE username = 'admin'");
@@ -72,9 +76,11 @@ class QuestLogManagerTest extends KernelTestCase
         ] as $sql) {
             $this->connection->exec($sql);
         }
+
         foreach ($this->fixtureUsers as $user) {
             $this->connection->update('user', $user, ['id' => $user['id']]);
         }
+
         parent::tearDown();
     }
 
@@ -169,6 +175,7 @@ class QuestLogManagerTest extends KernelTestCase
         $manager = $this->manager();
         $manager->setLimit(2);
         $manager->setPage(2);
+
         $list = $manager->findQuestLogsByAge();
 
         $this->assertSame(['Q5', 'Q1'], $this->names($list));

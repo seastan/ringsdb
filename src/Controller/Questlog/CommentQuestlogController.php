@@ -24,7 +24,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class CommentQuestlogController extends AbstractController
 {
     private QuestlogRepository $questlogRepository;
+
     private Texts $texts;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -47,11 +49,13 @@ class CommentQuestlogController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
+
         $questlog_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         $questlog = $this->questlogRepository->find($questlog_id);
         if (!$questlog) {
             throw new BadRequestHttpException('Wrong quest log id');
         }
+
         $comment_text = trim($request->get('comment'));
         if (!empty($comment_text)) {
             $comment_text = (string) preg_replace('%(?<!\\()\\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\\d\\x{00a1}-\\x{ffff}]+-?)*[a-z\\d\\x{00a1}-\\x{ffff}]+)(?:\\.(?:[a-z\\d\\x{00a1}-\\x{ffff}]+-?)*[a-z\\d\\x{00a1}-\\x{ffff}]+)*(?:\\.[a-z\\x{00a1}-\\x{ffff}]{2,6}))(?::\\d+)?)(?:[^\\s]*)?%iu', '[$1]($0)', $comment_text);
@@ -60,6 +64,7 @@ class CommentQuestlogController extends AbstractController
             if (preg_match_all('/`@([\\w_]+)`/', $comment_text, $matches, PREG_PATTERN_ORDER)) {
                 $mentionned_usernames = array_unique($matches[1]);
             }
+
             $comment_html = $this->texts->markdown($comment_text);
             $now = new \DateTime();
             $comment = new QuestlogComment();
@@ -77,6 +82,7 @@ class CommentQuestlogController extends AbstractController
             if ($questlog->getUser() && $questlog->getUser()->getIsNotifAuthor()) {
                 $spool[$questlog->getUser()->getEmail()] = 'Emails/newquestlogcomment_author.html.twig';
             }
+
             foreach ($questlog->getComments() as $comment) {
                 /* @var $comment \App\Entity\QuestlogComment */
                 $commenter = $comment->getUser();
@@ -84,6 +90,7 @@ class CommentQuestlogController extends AbstractController
                     $spool[$commenter->getEmail()] ??= 'Emails/newquestlogcomment_commenter.html.twig';
                 }
             }
+
             foreach ($mentionned_usernames as $mentionned_username) {
                 /* @var $mentionned_user User */
                 $mentionned_user = $userRepository->findOneBy(['username' => $mentionned_username]);
@@ -91,6 +98,7 @@ class CommentQuestlogController extends AbstractController
                     $spool[$mentionned_user->getEmail()] ??= 'Emails/newquestlogcomment_mentionned.html.twig';
                 }
             }
+
             unset($spool[$user->getEmail()]);
             $email_data = ['username' => $user->getUsername(), 'questlog_name' => $questlog->getName(), 'url' => $this->generateUrl('questlog_view', ['questlog_id' => $questlog->getId(), 'questlog_name' => $questlog->getNameCanonical()], UrlGeneratorInterface::ABSOLUTE_URL).'#'.$comment->getId(), 'comment' => $comment_html, 'profile' => $this->generateUrl('user_profile_edit', [], UrlGeneratorInterface::ABSOLUTE_URL)];
             foreach ($spool as $email => $view) {

@@ -29,11 +29,12 @@ class Deck extends ExportableDeck implements \JsonSerializable
 
         foreach ($changes as $change) {
             if ($change->getIsSaved()) {
-                array_push($savedChanges, $change);
+                $savedChanges[] = $change;
             } else {
                 array_unshift($unsavedChanges, $change);
             }
         }
+
         $array['unsaved'] = count($unsavedChanges);
 
         // recreating the versions with the variation info, starting from $preversion
@@ -152,7 +153,7 @@ class Deck extends ExportableDeck implements \JsonSerializable
                 'main' => $postversion,
                 'side' => $sidepostversion,
             ];
-            array_push($snapshots, $row);
+            $snapshots[] = $row;
         }
 
         return $snapshots;
@@ -187,62 +188,77 @@ class Deck extends ExportableDeck implements \JsonSerializable
      * @var int|null
      */
     private $id;
+
     /**
      * @var string
      */
     private $name;
+
     /**
      * @var \DateTime
      */
     private $dateCreation;
+
     /**
      * @var \DateTime
      */
     private $dateUpdate;
+
     /**
      * @var string|null
      */
     private $descriptionMd;
+
     /**
      * @var string|null
      */
     private $problem;
+
     /**
      * @var string|null
      */
     private $tags;
+
     /**
      * @var int
      */
     private $majorVersion;
+
     /**
      * @var int
      */
     private $minorVersion;
+
     /**
      * @var Collection<int, Deckslot>
      */
     private $slots;
+
     /**
      * @var Collection<int, Decksideslot>
      */
     private $sideslots;
+
     /**
      * @var Collection<int, Decklist>
      */
     private $children;
+
     /**
      * @var Collection<int, Deckchange>
      */
     private $changes;
+
     /**
      * @var User
      */
     private $user;
+
     /**
      * @var Pack|null
      */
     private $lastPack;
+
     /**
      * @var Decklist|null
      */
@@ -690,9 +706,7 @@ class Deck extends ExportableDeck implements \JsonSerializable
      */
     public function getAllQuestlogs(): array
     {
-        $allQuestlogs = $this->getQuestlogs()->toArray();
-
-        return $allQuestlogs;
+        return $this->getQuestlogs()->toArray();
         /*
             return array_filter($allQuestlogs, function($k) {
                 return $k->getQuestlog()->getIsPublic();

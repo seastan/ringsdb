@@ -32,22 +32,27 @@ class DecklistManager
      * @var Sphere|null
      */
     protected $predominantSphere;
+
     /**
      * @var int
      */
     protected $page = 1;
+
     /**
      * @var int
      */
     protected $start = 0;
+
     /**
      * @var int
      */
     protected $limit = 30;
+
     /**
      * @var int
      */
     protected $maxcount = 0;
+
     /**
      * @var User|null
      */
@@ -139,6 +144,7 @@ class DecklistManager
             $qb->where('d.predominantSphere = :predominantSphere');
             $qb->setParameter('predominantSphere', $this->predominantSphere);
         }
+
         $qb->setFirstResult($this->start);
         $qb->setMaxResults($this->limit);
         $qb->distinct();
@@ -346,6 +352,7 @@ class DecklistManager
             } else {
                 $qb->andWhere('d.startingThreat = :threat');
             }
+
             $qb->setParameter('threat', $threat);
         }
 
@@ -358,6 +365,7 @@ class DecklistManager
             } else {
                 $qb->andWhere('u.reputation = :reputation');
             }
+
             $qb->setParameter('reputation', $reputation);
         }
 
@@ -365,7 +373,7 @@ class DecklistManager
             $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'), 0));
         }
 
-        $useCustomPacks = !empty($customPackCodes) && $this->user;
+        $useCustomPacks = [] !== $customPackCodes && $this->user;
 
         if (count($cards_code) > 0 || count($packs) > 0 || $useCustomPacks) {
             if (count($cards_code) > 0) {
@@ -375,6 +383,7 @@ class DecklistManager
                     if (!$card) {
                         continue;
                     }
+
                     $qb->innerJoin('d.slots', "s$i");
                     $qb->andWhere("s$i.card = :card$i");
                     $qb->setParameter("card$i", $card);
@@ -382,6 +391,7 @@ class DecklistManager
                     // $packs[] = $card->getPack()->getId();
                 }
             }
+
             if (count($packs) > 0 || $useCustomPacks) {
                 // A decklist matches iff every slot's card can be supplied in sufficient
                 // quantity by the allowed official packs OR by the user's custom packs.
@@ -483,6 +493,7 @@ class DecklistManager
                     );
                 }
             }
+
             if (count($cards_to_exclude) > 0) {
                 $sub = $this->doctrine->createQueryBuilder();
                 $sub->select('k');
@@ -492,6 +503,7 @@ class DecklistManager
                 $sub->andWhere($sub->expr()->in('k.code', $cards_to_exclude));
                 $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
             }
+
             // (the former Core-only "num cores" quantity check is now subsumed by the
             //  quantity-aware allowed-packs filter above.)
         }
@@ -510,9 +522,10 @@ class DecklistManager
                 break;
 
             case 'reputation':
-                if (!in_array('d.user', $joinTables)) {
+                if (!in_array('d.user', $joinTables, true)) {
                     $qb->innerJoin('d.user', 'u');
                 }
+
                 // with DISTINCT, MySQL 5.7+ only sorts on selected columns
                 $qb->addSelect('u.reputation AS HIDDEN reputation');
                 $qb->orderBy('reputation', 'DESC');

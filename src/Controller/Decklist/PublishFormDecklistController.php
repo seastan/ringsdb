@@ -16,8 +16,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class PublishFormDecklistController extends AbstractController
 {
     private DeckRepository $deckRepository;
+
     private DecklistRepository $decklistRepository;
+
     private DecklistFactory $decklistFactory;
+
     private DeckValidationHelper $deckValidationHelper;
 
     public function __construct(
@@ -45,6 +48,7 @@ class PublishFormDecklistController extends AbstractController
         if (!$user) {
             throw $this->createAccessDeniedException('You must be logged in for this operation.');
         }
+
         $deck = $this->deckRepository->find($deck_id);
         if (!$deck || !$deck->getUser()->isEqualTo($user)) {
             throw $this->createAccessDeniedException("You don't have access to this decklist.");
@@ -56,6 +60,7 @@ class PublishFormDecklistController extends AbstractController
 
             return $this->redirect($this->generateUrl('deck_view', ['deck_id' => $deck->getId()]));
         }
+
         $content = ['main' => $deck->getSlots()->getContent(), 'side' => $deck->getSideslots()->getContent()];
         $new_content = (string) json_encode($content);
         $new_signature = md5($new_content);
@@ -68,6 +73,7 @@ class PublishFormDecklistController extends AbstractController
                 $this->get('session')->getFlashBag()->set('warning', "This deck <a href=\"{$url}\">has already been published</a> before. You are going to create a duplicate.");
             }
         }
+
         // decklist for the form ; won't be persisted
         $decklist = $this->decklistFactory->createDecklistFromDeck($deck, $deck->getName(), $deck->getDescriptionMd());
 

@@ -20,6 +20,7 @@ class PatronCommandTest extends KernelTestCase
 {
     /** @var Connection */
     private $connection;
+
     /** @var array */
     private $fixtureUsers;
 
@@ -35,6 +36,7 @@ class PatronCommandTest extends KernelTestCase
         foreach ($this->fixtureUsers as $user) {
             $this->connection->update('user', $user, ['id' => $user['id']]);
         }
+
         parent::tearDown();
     }
 

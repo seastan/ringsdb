@@ -47,7 +47,7 @@ class CardStatsCalculator
             $dbh->executeQuery("DROP TEMPORARY TABLE IF EXISTS $tmp");
         }
 
-        if ('1' == $step) {
+        if ('1' === $step) {
             $query = "CREATE TEMPORARY TABLE decklist_filtered
 SELECT CASE WHEN CAST(c.code AS UNSIGNED) > 1000000 THEN SUBSTRING(c.code, 3) ELSE source_code(c.code, cp.name) END AS code,
   dls.quantity,
@@ -179,12 +179,10 @@ GROUP BY c.code, cprim.octgnid, c.name, t.name, s.name, p.name, p.date_release, 
 ORDER BY encounter, full_decks DESC, CAST(c.code AS UNSIGNED) DESC";
             $cards = $dbh->executeQuery($query1, [])->fetchAll(\PDO::FETCH_ASSOC);
 
-            $res = ['cards' => $cards];
-
-            return $res;
+            return ['cards' => $cards];
         }
 
-        if ('2' == $step) {
+        if ('2' === $step) {
             $query = "CREATE TEMPORARY TABLE decklist_filtered2
 SELECT CASE WHEN CAST(c.code AS UNSIGNED) > 1000000 THEN SUBSTRING(c.code, 3) ELSE source_code(c.code, cp.name) END AS code,
   dls.quantity,
@@ -309,12 +307,10 @@ GROUP BY c.code
 ORDER BY c.code";
             $cards = $dbh->executeQuery($query2, [])->fetchAll(\PDO::FETCH_ASSOC);
 
-            $res = ['cards' => $cards];
-
-            return $res;
+            return ['cards' => $cards];
         }
 
-        if ('3' == $step) {
+        if ('3' === $step) {
             $query3 = "SELECT c.code,
     COUNT(sl.new_code) AS sides,
     ROUND(COALESCE(AVG(sl.quantity), 0), 2) AS side_copies
@@ -480,13 +476,11 @@ FROM (
             $pack_rules = $this->getPackRuless();
             $mapping = $this->getOctgnIdMapping();
 
-            $res = ['cards' => $cards,
+            return ['cards' => $cards,
                 'total' => $total[0],
                 'packs' => $packs,
                 'pack_rules' => $pack_rules,
                 'mapping' => $mapping];
-
-            return $res;
         }
 
         return null;
@@ -503,9 +497,8 @@ FROM (
 FROM pack
 WHERE date_release IS NOT NULL
 ORDER BY date_release';
-        $packs = $dbh->executeQuery($query, [])->fetchAll(\PDO::FETCH_ASSOC);
 
-        return $packs;
+        return $dbh->executeQuery($query, [])->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
@@ -513,7 +506,7 @@ ORDER BY date_release';
      */
     private function getPackRuless(): array
     {
-        $pack_rules = ['Core Set' => ['2000-01-01', '2011-07-21'],
+        return ['Core Set' => ['2000-01-01', '2011-07-21'],
             'Shadows of Mirkwood' => ['2011-07-21', '2012-01-06'],
             'Dwarrowdelf' => ['2012-01-06', '2012-08-17'],
             'Against the Shadow' => ['2012-08-17', '2014-02-21'],
@@ -524,8 +517,6 @@ ORDER BY date_release';
             'Ered Mithrin' => ['2018-06-14', '2019-08-02'],
             'Vengeance of Mordor' => ['2019-08-02', '2021-03-21'],
             'ALeP - Oaths of the Rohirrim' => ['2021-03-21', '2099-12-31']];
-
-        return $pack_rules;
     }
 
     /**

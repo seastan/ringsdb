@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class TextExportDecklistController extends AbstractController
 {
     private int $cacheExpiration;
+
     private DecklistRepository $decklistRepository;
 
     public function __construct(
@@ -46,8 +47,10 @@ class TextExportDecklistController extends AbstractController
         if (!$decklist) {
             throw new NotFoundHttpException('Unable to find decklist.');
         }
+
         $content = $this->renderView('Export/plain.txt.twig', ['deck' => $decklist->getTextExport()]);
         $content = str_replace("\n", "\r\n", $content);
+
         $response = new Response();
         $response->headers->set('Content-Type', 'text/plain');
         $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $decklist->getNameCanonical().'.txt'));

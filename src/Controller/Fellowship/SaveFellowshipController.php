@@ -30,10 +30,15 @@ class SaveFellowshipController extends AbstractController
     use CurrentUserTrait;
 
     private EntityManagerInterface $entityManager;
+
     private Texts $texts;
+
     private Decks $decks;
+
     private DeckRepository $deckRepository;
+
     private DecklistRepository $decklistRepository;
+
     private FellowshipRepository $fellowshipRepository;
 
     public function __construct(
@@ -66,6 +71,7 @@ class SaveFellowshipController extends AbstractController
             if (!$fellowship) {
                 throw new NotFoundHttpException('This fellowship does not exists.');
             }
+
             if (!$fellowship->getUser()->isEqualTo($user)) {
                 throw new AccessDeniedHttpException('Access denied to this object.');
             }
@@ -77,11 +83,13 @@ class SaveFellowshipController extends AbstractController
             $fellowship->setNbFavorites(0);
             $fellowship->setNbDecks(0);
         }
+
         $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = 'Untitled Fellowship';
         }
+
         $auto_publish = boolval(filter_var($request->request->get('auto_publish'), FILTER_SANITIZE_NUMBER_INT));
         $descriptionMd = trim((string) $request->request->get('descriptionMd'));
         $descriptionHtml = $this->texts->markdown($descriptionMd);
@@ -90,6 +98,7 @@ class SaveFellowshipController extends AbstractController
         $fellowship->setNameCanonical($this->texts->slugify($name));
         $fellowship->setDescriptionMd($descriptionMd);
         $fellowship->setDescriptionHtml($descriptionHtml);
+
         $is_public = $fellowship->getIsPublic();
         if (!$is_public) {
             // Allow deck changing
@@ -97,10 +106,12 @@ class SaveFellowshipController extends AbstractController
                 $fellowship->removeDeck($deck);
                 $this->entityManager->remove($deck);
             }
+
             foreach ($fellowship->getDecklists() as $deck) {
                 $fellowship->removeDecklist($deck);
                 $this->entityManager->remove($deck);
             }
+
             $nb_decks = 0;
             $skip = 0;
             for ($i = 1; $i <= 4; ++$i) {
@@ -113,13 +124,16 @@ class SaveFellowshipController extends AbstractController
                         if (!$deck) {
                             throw new NotFoundHttpException('One of the selected decks does not exists.');
                         }
+
                         $is_owner = $deck->getUser()->isEqualTo($user);
                         if (!$is_owner && !$deck->getUser()->getIsShareDecks()) {
                             throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
                         }
+
                         if (!$is_owner) {
                             $deck = $this->decks->cloneDeck($deck, $user);
                         }
+
                         $fellowship_deck = new FellowshipDeck();
                         $fellowship_deck->setDeck($deck);
                         $fellowship_deck->setDeckNumber($i - $skip);
@@ -131,26 +145,32 @@ class SaveFellowshipController extends AbstractController
                         if (!$decklist) {
                             throw new NotFoundHttpException('One of the selected decks does not exists.');
                         }
+
                         $fellowship_decklist = new FellowshipDecklist();
                         $fellowship_decklist->setDecklist($decklist);
                         $fellowship_decklist->setDeckNumber($i - $skip);
                         $fellowship_decklist->setFellowship($fellowship);
                         $fellowship->addDecklist($fellowship_decklist);
                     }
+
                     ++$nb_decks;
                 } else {
                     ++$skip;
                 }
             }
-            if (0 == $nb_decks) {
+
+            if (0 === $nb_decks) {
                 throw new UnprocessableEntityHttpException("You can't save an empty fellowship.");
             }
+
             $fellowship->setNbDecks($nb_decks);
         }
+
         if ($auto_publish && $fellowship->getDecks()->isEmpty()) {
             $fellowship->setIsPublic(true);
             $fellowship->setDatePublish(new \DateTime());
         }
+
         $this->entityManager->persist($fellowship);
         $this->entityManager->flush();
 

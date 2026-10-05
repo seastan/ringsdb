@@ -25,6 +25,7 @@ class ScenarioController extends AbstractController
      * @var ScenarioRepository
      */
     private $scenarioRepository;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -127,6 +128,7 @@ class ScenarioController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Scenario entity.');
         }
+
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('Scenario/show.html.twig', ['entity' => $entity, 'delete_form' => $deleteForm->createView()]);
@@ -143,6 +145,7 @@ class ScenarioController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Scenario entity.');
         }
+
         $editForm = $this->createForm(ScenarioType::class, $entity, ['method' => 'PUT']);
         $deleteForm = $this->createDeleteForm($id);
 
@@ -160,6 +163,7 @@ class ScenarioController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Scenario entity.');
         }
+
         $deleteForm = $this->createDeleteForm($id);
         $editForm = $this->createForm(ScenarioType::class, $entity, ['method' => 'PUT']);
         $editForm->handleRequest($request);
@@ -189,6 +193,7 @@ class ScenarioController extends AbstractController
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Scenario entity.');
             }
+
             $this->entityManager->remove($entity);
             $this->entityManager->flush();
         }

@@ -147,7 +147,7 @@ class CardsData
                 ];
             }
 
-            if (1 == count($packs) && $packs[0]['label'] == $cycle->getName()) {
+            if (1 === count($packs) && $packs[0]['label'] == $cycle->getName()) {
                 $cycles[] = $packs[0];
             } else {
                 $cycles[] = [
@@ -170,9 +170,7 @@ class CardsData
      */
     public function getPrimarySpheres(): array
     {
-        $spheres = $this->sphereRepository->findBy(['is_primary' => true], ['code' => 'ASC']);
-
-        return $spheres;
+        return $this->sphereRepository->findBy(['is_primary' => true], ['code' => 'ASC']);
     }
 
     /**
@@ -186,8 +184,6 @@ class CardsData
 
         $qb = $this->cardRepository->createQueryBuilder('c');
         $qb->leftJoin('c.type', 't')->leftJoin('c.sphere', 's');
-        $qb2 = null;
-        $qb3 = null;
 
         foreach ($conditions as $condition) {
             $searchCode = array_shift($condition);
@@ -205,42 +201,37 @@ class CardsData
 
             switch ($searchType) {
                 case 'boolean':
-                    switch ($searchCode) {
-                        default:
-                            if ((':' == $operator && $condition[0]) || ('!' == $operator && !$condition[0])) {
-                                $qb->andWhere("(c.$searchName = 1)");
-                            } else {
-                                $qb->andWhere("(c.$searchName = 0)");
-                            }
-                            ++$i;
-                            break;
+                    if ((':' == $operator && $condition[0]) || ('!' == $operator && !$condition[0])) {
+                        $qb->andWhere("(c.$searchName = 1)");
+                    } else {
+                        $qb->andWhere("(c.$searchName = 0)");
                     }
+                    ++$i;
+
                     break;
 
                 case 'integer':
-                    switch ($searchCode) {
-                        default:
-                            $or = [];
-                            foreach ($condition as $arg) {
-                                switch ($operator) {
-                                    case ':':
-                                        $or[] = "(c.$searchName = ?$i)";
-                                        break;
-                                    case '!':
-                                        $or[] = "(c.$searchName != ?$i)";
-                                        break;
-                                    case '<':
-                                        $or[] = "(c.$searchName < ?$i)";
-                                        break;
-                                    case '>':
-                                        $or[] = "(c.$searchName > ?$i)";
-                                        break;
-                                }
-                                $qb->setParameter($i++, $arg);
-                            }
-                            $qb->andWhere(implode('!' == $operator ? ' and ' : ' or ', $or));
-                            break;
+                    $or = [];
+                    foreach ($condition as $arg) {
+                        switch ($operator) {
+                            case ':':
+                                $or[] = "(c.$searchName = ?$i)";
+                                break;
+                            case '!':
+                                $or[] = "(c.$searchName != ?$i)";
+                                break;
+                            case '<':
+                                $or[] = "(c.$searchName < ?$i)";
+                                break;
+                            case '>':
+                                $or[] = "(c.$searchName > ?$i)";
+                                break;
+                        }
+
+                        $qb->setParameter($i++, $arg);
                     }
+                    $qb->andWhere(implode('!' == $operator ? ' and ' : ' or ', $or));
+
                     break;
 
                 case 'code':
@@ -258,8 +249,10 @@ class CardsData
                                         $or[] = "NOT EXISTS ($sub)";
                                         break;
                                 }
+
                                 $qb->setParameter($i++, $arg);
                             }
+
                             $qb->andWhere(implode('!' == $operator ? ' and ' : ' or ', $or));
                             break;
 
@@ -282,8 +275,10 @@ class CardsData
                                         $or[] = "EXISTS ($base AND ppe{$i}.dateRelease > (SELECT p3{$i}.dateRelease FROM App:Pack p3{$i} WHERE p3{$i}.code = ?$i))";
                                         break;
                                 }
+
                                 $qb->setParameter($i++, $arg);
                             }
+
                             $qb->andWhere(implode('!' == $operator ? ' and ' : ' or ', $or));
                             break;
 
@@ -299,11 +294,14 @@ class CardsData
                                         $or[] = "($searchCode.code != ?$i)";
                                         break;
                                 }
+
                                 $qb->setParameter($i++, $arg);
                             }
+
                             $qb->andWhere(implode('!' == $operator ? ' and ' : ' or ', $or));
                             break;
                     }
+
                     break;
 
                 case 'date':
@@ -329,6 +327,7 @@ class CardsData
                                     }
                                 }
                             }
+
                             $qb->andWhere(implode(' or ', $or));
                             break;
 
@@ -344,8 +343,10 @@ class CardsData
                                         $or[] = "(c.text not like ?$i)";
                                         break;
                                 }
+
                                 $qb->setParameter($i++, "%$arg%");
                             }
+
                             $qb->andWhere(implode('!' == $operator ? ' and ' : ' or ', $or));
                             break;
 
@@ -361,8 +362,10 @@ class CardsData
                                         $or[] = "(c.flavor not like ?$i)";
                                         break;
                                 }
+
                                 $qb->setParameter($i++, "%$arg%");
                             }
+
                             $qb->andWhere(implode('!' == $operator ? ' and ' : ' or ', $or));
                             break;
 
@@ -387,6 +390,7 @@ class CardsData
                                         break;
                                 }
                             }
+
                             $qb->andWhere(implode('!' == $operator ? ' and ' : ' or ', $or));
                             break;
 
@@ -403,8 +407,10 @@ class CardsData
                                         $or[] = "NOT EXISTS ($sub)";
                                         break;
                                 }
+
                                 $qb->setParameter($i++, $arg);
                             }
+
                             $qb->andWhere(implode('!' == $operator ? ' and ' : ' or ', $or));
                             break;
 
@@ -428,9 +434,11 @@ class CardsData
                                     $qb->setParameter($i++, new \DateTime($arg));
                                 }
                             }
+
                             $qb->andWhere(implode(' or ', $or));
                             break;
                     }
+
                     break;
             }
         }
@@ -465,12 +473,13 @@ class CardsData
                 $qb->orderBy('c.health', 'DESC');
                 break;
         }
+
         $qb->addOrderBy('c.name');
         $qb->addOrderBy('c.code');
-        $query = $qb->getQuery();
-        $rows = $query->getResult();
 
-        return $rows;
+        $query = $qb->getQuery();
+
+        return $query->getResult();
     }
 
     /**
@@ -511,6 +520,7 @@ class CardsData
                     $value = (bool) $value;
                     break;
             }
+
             $fieldName = ltrim(strtolower((string) preg_replace('/[A-Z]/', '_$0', $fieldName)), '_');
             $cardinfo[$fieldName] = $value;
         }
@@ -559,13 +569,16 @@ class CardsData
                 'date_release' => $dateRelease ? $dateRelease->format('Y-m-d') : null,
             ];
         }
+
         usort($cardinfo['packs'], function ($a, $b) {
             if (null === $a['date_release'] && null === $b['date_release']) {
                 return 0;
             }
+
             if (null === $a['date_release']) {
                 return 1;
             }
+
             if (null === $b['date_release']) {
                 return -1;
             }
@@ -608,10 +621,11 @@ class CardsData
         // s'il tombe sur un argument alors qu'il est en recherche de type, alors le type est vide
         $etat = 1;
         while ('' != $query) {
-            if (1 == $etat) {
+            if (1 === $etat) {
                 if (count($cond) > 2) {
                     $list[] = $cond;
                 }
+
                 // on commence par rechercher un type de condition
                 $match = [];
                 if (preg_match('/^(\p{L})([:<>!])(.*)/u', $query, $match)) { // jeton "condition:"
@@ -620,12 +634,13 @@ class CardsData
                 } else {
                     $cond = ['', ':'];
                 }
+
                 $etat = 2;
             } else {
                 if (preg_match('/^"([^"]*)"(.*)/u', $query, $match) // jeton "texte libre entre guillements"
                     || preg_match('/^([\p{L}\p{N}\-\&]+)(.*)/u', $query, $match) // jeton "texte autorisé sans guillements"
                 ) {
-                    if ((2 == $etat && 2 == count($cond)) || 3 == $etat) {
+                    if ((2 === $etat && 2 === count($cond)) || 3 === $etat) {
                         $cond[] = $match[1];
                         $query = $match[2];
                         $etat = 2;
@@ -636,7 +651,7 @@ class CardsData
                     }
                 } else {
                     if (preg_match('/^\|(.*)/u', $query, $match)) { // jeton "|"
-                        if ((':' == $cond[1] || '!' == $cond[1]) && ((2 == $etat && count($cond) > 2) || 3 == $etat)) {
+                        if ((':' == $cond[1] || '!' == $cond[1]) && ((2 === $etat && count($cond) > 2) || 3 === $etat)) {
                             $query = $match[1];
                             $etat = 3;
                         } else {
@@ -657,7 +672,8 @@ class CardsData
                 }
             }
         }
-        if (4 != $etat && count($cond) > 2) {
+
+        if (4 !== $etat && count($cond) > 2) {
             $list[] = $cond;
         }
 
@@ -727,6 +743,7 @@ class CardsData
         $qb->from('App:Card', 'c');
         $qb->select('c.traits');
         $qb->distinct();
+
         $result = $qb->getQuery()->getResult();
 
         $traits = [];

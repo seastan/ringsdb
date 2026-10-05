@@ -20,7 +20,9 @@ class ImportAllController extends AbstractController
     use CurrentUserTrait;
 
     private EntityManagerInterface $entityManager;
+
     private DeckImporter $deckImporter;
+
     private Decks $decks;
 
     public function __construct(
@@ -44,6 +46,7 @@ class ImportAllController extends AbstractController
         if (!isset($uploadedFile)) {
             throw new UnprocessableEntityHttpException('No file uploaded');
         }
+
         $filename = $uploadedFile->getPathname();
         if (function_exists('finfo_open')) {
             // return mime type ala mimetype extension
@@ -54,6 +57,7 @@ class ImportAllController extends AbstractController
                 throw new UnprocessableEntityHttpException('Bad file');
             }
         }
+
         $zip = new \ZipArchive();
         $res = $zip->open($filename);
         if (true === $res) {
@@ -63,11 +67,13 @@ class ImportAllController extends AbstractController
                 if (false === $data) {
                     throw new \RuntimeException('Cannot read from zip file '.$filename);
                 }
-                if ('o8d' == pathinfo($name, PATHINFO_EXTENSION)) {
+
+                if ('o8d' === pathinfo($name, PATHINFO_EXTENSION)) {
                     $parse = $this->deckImporter->parseOctgnImport($data);
                 } else {
                     $parse = $this->deckImporter->parseTextImport($data);
                 }
+
                 $deckname = pathinfo($name, PATHINFO_FILENAME);
                 // one deck per file, even without any card (an empty deck)
                 /* @var $deck \App\Entity\Deck */
@@ -76,6 +82,7 @@ class ImportAllController extends AbstractController
                 $this->decks->saveDeck($this->currentUser(), $deck, null, $deckname, '', '', $parse['content'], null);
             }
         }
+
         $zip->close();
         $this->entityManager->flush();
         $this->get('session')->getFlashBag()->set('notice', 'Decks imported.');

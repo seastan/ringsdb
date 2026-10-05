@@ -125,7 +125,7 @@ class SuggestionsCommand extends Command
             foreach ($pairs as $pair) {
                 $index1 = $cardIndexById[$pair[0]];
                 $index2 = $cardIndexById[$pair[1]];
-                $matrix[$index1][$index2] += 1;
+                ++$matrix[$index1][$index2];
             }
         }
 

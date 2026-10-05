@@ -13,9 +13,13 @@ use Twig\Environment;
 class QuestlogArchiver
 {
     private QuestlogRepository $questlogRepository;
+
     private string $cacheDir;
+
     private Decks $decks;
+
     private Environment $twig;
+
     private Texts $texts;
 
     public function __construct(
@@ -39,6 +43,7 @@ class QuestlogArchiver
         if (!$questlog) {
             throw new AccessDeniedHttpException("You don't have access to this questlog.");
         }
+
         $questlog_user = $questlog->getUser();
         $is_public = $questlog->getIsPublic();
         if ($questlog_user instanceof User
@@ -47,11 +52,13 @@ class QuestlogArchiver
             && !$is_public) {
             throw new AccessDeniedHttpException("You don't have access to this questlog.");
         }
+
         $tmpDir = $this->cacheDir;
         $file = tempnam($tmpDir, 'zip');
         if (false === $file) {
             throw new \RuntimeException("Cannot create a temporary file in {$tmpDir}");
         }
+
         $zip = new \ZipArchive();
         $res = $zip->open($file, \ZipArchive::OVERWRITE);
         if (true === $res) {
@@ -65,6 +72,7 @@ class QuestlogArchiver
                     $decks[] = $deck;
                 }
             }
+
             foreach ($decks as $deck) {
                 if ($octgn) {
                     $extension = 'o8d';
@@ -73,19 +81,24 @@ class QuestlogArchiver
                     $extension = 'txt';
                     $content = $this->twig->render('Export/plain.txt.twig', ['deck' => $deck->getTextExport()]);
                 }
+
                 $filename = $this->texts->slugify($deck->getName()).' '.$deck->getVersion().'.'.$extension;
                 $zip->addFromString($filename, $content);
             }
+
             $zip->close();
         }
+
         $response = new Response();
         $response->headers->set('Content-Type', 'application/zip');
         $response->headers->set('Content-Length', (string) filesize($file));
         $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->texts->slugify('RingsDB - Quest Log '.$questlog_id).'.zip'));
+
         $contents = file_get_contents($file);
         if (false === $contents) {
             throw new \RuntimeException('Cannot read tmp file '.$file);
         }
+
         $response->setContent($contents);
         unlink($file);
 

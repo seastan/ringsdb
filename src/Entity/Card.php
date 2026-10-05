@@ -13,86 +13,107 @@ class Card
      * @var int|null
      */
     private $id;
+
     /**
      * @var int|null
      */
     private $position;
+
     /**
      * @var string|null
      */
     private $code;
+
     /**
      * @var string|null
      */
     private $name;
+
     /**
      * @var string|null
      */
     private $traits;
+
     /**
      * @var string|null
      */
     private $text;
+
     /**
      * @var string|null
      */
     private $flavor;
+
     /**
      * @var bool
      */
     private $isUnique = false;
+
     /**
      * @var string|null
      */
     private $cost;
+
     /**
      * @var int|null
      */
     private $threat;
+
     /**
      * @var int|null
      */
     private $willpower;
+
     /**
      * @var int|null
      */
     private $attack;
+
     /**
      * @var int|null
      */
     private $defense;
+
     /**
      * @var int|null
      */
     private $health;
+
     /**
      * @var int|null
      */
     private $victory;
+
     /**
      * @var int
      */
     private $deckLimit = 3;
+
     /**
      * @var \DateTime
      */
     private $dateCreation;
+
     /**
      * @var \DateTime
      */
     private $dateUpdate;
+
     /**
      * @var Collection<int, Review>
      */
     private $reviews;
+
     /**
      * @var Collection<int, CardPrinting>
      */
     private $printings;
+
     /**
      * @var Type|null
      */
     private $type;
+
     /**
      * @var Sphere|null
      */
@@ -248,8 +269,8 @@ class Card
         return sprintf(
             '%s (%s, %s)',
             $this->getName() ?? '<name>',
-            $this->getSphere() ? $this->getSphere()->getName() : '<sphere>',
-            $this->getType() ? $this->getType()->getName() : '<type>',
+            $this->getSphere() instanceof Sphere ? $this->getSphere()->getName() : '<sphere>',
+            $this->getType() instanceof Type ? $this->getType()->getName() : '<type>',
         );
     }
 
@@ -477,7 +498,7 @@ class Card
     {
         $p = $this->getPrimaryPrinting();
 
-        return $p ? $p->getQuantity() : null;
+        return $p instanceof CardPrinting ? $p->getQuantity() : null;
     }
 
     /**
@@ -505,14 +526,14 @@ class Card
     {
         $p = $this->getPrimaryPrinting();
 
-        return $p ? $p->getIllustrator() : null;
+        return $p instanceof CardPrinting ? $p->getIllustrator() : null;
     }
 
     public function getOctgnid(): ?string
     {
         $p = $this->getPrimaryPrinting();
 
-        return $p ? $p->getOctgnid() : null;
+        return $p instanceof CardPrinting ? $p->getOctgnid() : null;
     }
 
     /**
@@ -587,7 +608,7 @@ class Card
     {
         $p = $this->getPrimaryPrinting();
 
-        return $p ? $p->getPack() : null;
+        return $p instanceof CardPrinting ? $p->getPack() : null;
     }
 
     /**
@@ -650,6 +671,7 @@ class Card
     {
         return $this->quest;
     }
+
     /**
      * @var bool
      */

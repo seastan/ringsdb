@@ -32,7 +32,8 @@ class GetCycleController extends AbstractController
         if (!$cycle) {
             throw $this->createNotFoundException('This cycle does not exist');
         }
-        $key = array_search('cycle', SearchKeys::$searchKeys);
+
+        $key = array_search('cycle', SearchKeys::$searchKeys, true);
 
         return $this->forward(DisplaySearchController::class, [
             '_route' => $request->attributes->get('_route'),

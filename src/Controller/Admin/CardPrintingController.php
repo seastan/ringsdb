@@ -24,10 +24,12 @@ class CardPrintingController extends AbstractController
      * @var CardPrintingRepository
      */
     private $cardPrintingRepository;
+
     /**
      * @var PackRepository
      */
     private $packRepository;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -51,9 +53,11 @@ class CardPrintingController extends AbstractController
         if ($packId) {
             $qb->andWhere('p.id = :pack')->setParameter('pack', $packId);
         }
+
         if ($cardName) {
             $qb->andWhere('c.name LIKE :card')->setParameter('card', '%'.$cardName.'%');
         }
+
         $entities = $qb->getQuery()->getResult();
         $packs = $this->packRepository->findBy([], ['name' => 'ASC']);
 
@@ -69,6 +73,7 @@ class CardPrintingController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find CardPrinting entity.');
         }
+
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('CardPrinting/show.html.twig', ['entity' => $entity, 'delete_form' => $deleteForm->createView()]);
@@ -87,7 +92,7 @@ class CardPrintingController extends AbstractController
             'entity' => $entity,
             'form' => $form->createView(),
             'packs' => $this->packRepository->findBy([], ['name' => 'ASC']),
-            'filter_pack' => $filterPack ? $filterPack->getId() : null,
+            'filter_pack' => $filterPack instanceof Pack ? $filterPack->getId() : null,
         ]);
     }
 
@@ -111,7 +116,7 @@ class CardPrintingController extends AbstractController
             'entity' => $entity,
             'form' => $form->createView(),
             'packs' => $this->packRepository->findBy([], ['name' => 'ASC']),
-            'filter_pack' => $filterPack ? $filterPack->getId() : null,
+            'filter_pack' => $filterPack instanceof Pack ? $filterPack->getId() : null,
         ]);
     }
 
@@ -124,11 +129,12 @@ class CardPrintingController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find CardPrinting entity.');
         }
+
         $filterPack = $this->resolveFilterPack($request);
         $editForm = $this->createForm(CardPrintingType::class, $entity, ['filter_pack' => $filterPack, 'method' => 'PUT']);
         $deleteForm = $this->createDeleteForm($id);
 
-        return $this->render('CardPrinting/edit.html.twig', ['entity' => $entity, 'edit_form' => $editForm->createView(), 'delete_form' => $deleteForm->createView(), 'packs' => $this->packRepository->findBy([], ['name' => 'ASC']), 'filter_pack' => $filterPack ? $filterPack->getId() : null]);
+        return $this->render('CardPrinting/edit.html.twig', ['entity' => $entity, 'edit_form' => $editForm->createView(), 'delete_form' => $deleteForm->createView(), 'packs' => $this->packRepository->findBy([], ['name' => 'ASC']), 'filter_pack' => $filterPack instanceof Pack ? $filterPack->getId() : null]);
     }
 
     /**
@@ -144,6 +150,7 @@ class CardPrintingController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find CardPrinting entity.');
         }
+
         $filterPack = $this->resolveFilterPack($request);
         $deleteForm = $this->createDeleteForm($id);
         $editForm = $this->createForm(CardPrintingType::class, $entity, ['filter_pack' => $filterPack, 'method' => 'PUT']);
@@ -155,7 +162,7 @@ class CardPrintingController extends AbstractController
             return $this->redirect($this->generateUrl('admin_card_printing_edit', ['id' => $id]));
         }
 
-        return $this->render('CardPrinting/edit.html.twig', ['entity' => $entity, 'edit_form' => $editForm->createView(), 'delete_form' => $deleteForm->createView(), 'packs' => $this->packRepository->findBy([], ['name' => 'ASC']), 'filter_pack' => $filterPack ? $filterPack->getId() : null]);
+        return $this->render('CardPrinting/edit.html.twig', ['entity' => $entity, 'edit_form' => $editForm->createView(), 'delete_form' => $deleteForm->createView(), 'packs' => $this->packRepository->findBy([], ['name' => 'ASC']), 'filter_pack' => $filterPack instanceof Pack ? $filterPack->getId() : null]);
     }
 
     /**
@@ -174,6 +181,7 @@ class CardPrintingController extends AbstractController
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find CardPrinting entity.');
             }
+
             $this->entityManager->remove($entity);
             $this->entityManager->flush();
         }

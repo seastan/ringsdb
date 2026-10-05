@@ -18,7 +18,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class FavoriteFellowshipController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+
     private Connection $connection;
+
     private FellowshipRepository $fellowshipRepository;
 
     public function __construct(
@@ -41,12 +43,14 @@ class FavoriteFellowshipController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
+
         $fellowship_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $fellowship \App\Entity\Fellowship */
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
         if (!$fellowship) {
             throw new NotFoundHttpException('Wrong id');
         }
+
         /* @var $author User */
         $author = $fellowship->getUser();
         $is_favorite = $this->connection->executeQuery("SELECT\n\t\t\t\tcount(*)\n\t\t\t\tFROM fellowship d\n\t\t\t\tJOIN fellowship_favorite f ON f.fellowship_id = d.id\n\t\t\t\tWHERE f.user_id = ?\n\t\t\t\tAND d.id = ?", [$user->getId(), $fellowship_id])->fetch(\PDO::FETCH_NUM)[0];
@@ -65,6 +69,7 @@ class FavoriteFellowshipController extends AbstractController
                 $author->setReputation($author->getReputation() + 5);
             }
         }
+
         $this->entityManager->flush();
 
         return new Response((string) $fellowship->getNbFavorites());

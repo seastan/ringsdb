@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ListDecksController extends AbstractController
 {
     use CurrentUserTrait;
+
     private Decks $decks;
 
     public function __construct(
@@ -37,6 +38,7 @@ class ListDecksController extends AbstractController
         if (0 === $totalDecks) {
             return $this->render('Builder/no-decks.html.twig', ['pagetitle' => 'My Decks', 'pagedescription' => 'Create custom decks with the help of a powerful deckbuilder.', 'nbmax' => $user->getMaxNbDecks()]);
         }
+
         // The service returns lightweight per-deck arrays (id/name/version/problem/tags/
         // last_pack/slots/heroes) already shaped for the template — no entity hydration.
         $decks = $decksService->getDecksWithSlotsForUser($user, $limit);
@@ -44,6 +46,7 @@ class ListDecksController extends AbstractController
         foreach ($decks as $deck) {
             $tags[] = $deck['tags'];
         }
+
         $tags = array_unique($tags);
 
         return $this->render('Builder/decks.html.twig', ['pagetitle' => 'My Decks', 'pagedescription' => 'Create custom decks with the help of a powerful deckbuilder.', 'decks' => $decks, 'tags' => $tags, 'nbmax' => $user->getMaxNbDecks(), 'nbdecks' => $totalDecks, 'nbloaded' => count($decks), 'cannotcreate' => $user->getMaxNbDecks() <= $totalDecks, 'show_all' => $showAll]);

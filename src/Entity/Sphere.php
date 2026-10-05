@@ -13,18 +13,22 @@ class Sphere
      * @var int|null
      */
     private $id;
+
     /**
      * @var string
      */
     private $code;
+
     /**
      * @var string
      */
     private $name;
+
     /**
      * @var bool
      */
     private $is_primary;
+
     /**
      * @var Collection<int, Card>
      */

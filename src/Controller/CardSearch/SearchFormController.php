@@ -17,10 +17,15 @@ use Symfony\Component\Routing\Annotation\Route;
 class SearchFormController extends AbstractController
 {
     private int $cacheExpiration;
+
     private PackRepository $packRepository;
+
     private CycleRepository $cycleRepository;
+
     private SphereRepository $sphereRepository;
+
     private CardsData $cardsData;
+
     private Connection $connection;
 
     public function __construct(
@@ -47,18 +52,21 @@ class SearchFormController extends AbstractController
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
+
         $list_packs = $this->packRepository->findBy([], ['dateRelease' => 'ASC', 'position' => 'ASC']);
         $packs = [];
         foreach ($list_packs as $pack) {
             /* @var $pack Pack */
             $packs[] = ['name' => $pack->getName(), 'code' => $pack->getCode()];
         }
+
         $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
         $cycles = [];
         foreach ($list_cycles as $cycle) {
             /* @var $cycle Cycle */
             $cycles[] = ['name' => $cycle->getName(), 'code' => $cycle->getCode()];
         }
+
         $types = $typeRepository->findBy([], ['name' => 'ASC']);
         $spheres = $this->sphereRepository->findBy([], ['id' => 'ASC']);
         $traits = $this->cardsData->getDistinctTraits();

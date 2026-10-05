@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class DeleteFellowshipController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+
     private FellowshipRepository $fellowshipRepository;
 
     public function __construct(
@@ -36,15 +37,18 @@ class DeleteFellowshipController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
+
         $fellowship_id = filter_var($request->get('fellowship_id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $fellowship \App\Entity\Fellowship */
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
         if (!$fellowship) {
             return $this->redirect($this->generateUrl('myfellowships_list'));
         }
+
         if (!$fellowship->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
+
         if ($fellowship->getNbVotes() || $fellowship->getNbfavorites() || $fellowship->getNbcomments()) {
             $this->get('session')->getFlashBag()->set('error', "You can't delete a published fellowship.");
         } else {
@@ -53,11 +57,13 @@ class DeleteFellowshipController extends AbstractController
             foreach ($decks as $deck) {
                 $this->entityManager->remove($deck);
             }
+
             /* @var $decks \App\Entity\FellowshipDecklist[] */
             $decklists = $fellowship->getDecklists();
             foreach ($decklists as $decklist) {
                 $this->entityManager->remove($decklist);
             }
+
             $this->entityManager->remove($fellowship);
             $this->entityManager->flush();
         }

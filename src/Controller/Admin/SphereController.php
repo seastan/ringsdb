@@ -25,6 +25,7 @@ class SphereController extends AbstractController
      * @var SphereRepository
      */
     private $sphereRepository;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -76,9 +77,7 @@ class SphereController extends AbstractController
      */
     private function createCreateForm(Sphere $entity): FormInterface
     {
-        $form = $this->createForm(SphereType::class, $entity, ['action' => $this->generateUrl('admin_sphere_create'), 'method' => 'POST']);
-
-        return $form;
+        return $this->createForm(SphereType::class, $entity, ['action' => $this->generateUrl('admin_sphere_create'), 'method' => 'POST']);
     }
 
     /**
@@ -105,6 +104,7 @@ class SphereController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Sphere entity.');
         }
+
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('Sphere/show.html.twig', ['entity' => $entity, 'delete_form' => $deleteForm->createView()]);
@@ -121,6 +121,7 @@ class SphereController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Sphere entity.');
         }
+
         $editForm = $this->createEditForm($entity);
         $deleteForm = $this->createDeleteForm($id);
 
@@ -153,6 +154,7 @@ class SphereController extends AbstractController
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Sphere entity.');
         }
+
         $deleteForm = $this->createDeleteForm($id);
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
@@ -179,6 +181,7 @@ class SphereController extends AbstractController
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Sphere entity.');
             }
+
             $this->entityManager->remove($entity);
             $this->entityManager->flush();
         }

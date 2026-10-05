@@ -16,7 +16,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class CopyCustomPackController extends AbstractController
 {
     private UserCustomPackRepository $userCustomPackRepository;
+
     private EntityManagerInterface $entityManager;
+
     private CustomPackManager $customPackManager;
 
     public function __construct(
@@ -43,21 +45,26 @@ class CopyCustomPackController extends AbstractController
         if (!$user) {
             return new JsonResponse(['error' => 'Not authenticated'], 401);
         }
+
         $source = $this->userCustomPackRepository->findOneBy(['id' => $id, 'isPublished' => true]);
         if (!$source) {
             return new JsonResponse(['error' => 'Pack not found'], 404);
         }
+
         $copy = new UserCustomPack();
         $copy->setUser($user);
         $copy->setName($source->getName());
         $copy->setCode('tmp');
+
         $this->entityManager->persist($copy);
         $this->entityManager->flush();
+
         $copy->setCode('custom_'.$copy->getId().'_'.substr(md5(uniqid('', true)), 0, 6));
         $cardEntries = [];
         foreach ($source->getCards() as $entry) {
             $cardEntries[] = ['card_code' => $entry->getCard()->getCode(), 'quantity' => $entry->getQuantity()];
         }
+
         $this->customPackManager->attachCards($copy, $cardEntries);
         $this->entityManager->persist($copy);
         $this->entityManager->flush();

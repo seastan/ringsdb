@@ -106,7 +106,7 @@ class Decks
 
         $ids = array_column($idQuery->getScalarResult(), 'id');
 
-        if (empty($ids)) {
+        if ([] === $ids) {
             return [];
         }
 
@@ -160,7 +160,7 @@ class Decks
         // Load the (small, bounded) set of distinct hero cards as real entities so the
         // template's hero.sphere.code / hero.pack.code accessors keep working unchanged.
         $heroCards = [];
-        if (!empty($heroCodes)) {
+        if ([] !== $heroCodes) {
             $heroEntities = $this->doctrine->createQuery(
                 'SELECT c, p, pk FROM App\Entity\Card c
                  LEFT JOIN c.printings p
@@ -182,8 +182,10 @@ class Decks
                     $heroes[] = $heroCards[$code];
                 }
             }
+
             $deck['heroes'] = $heroes;
         }
+
         unset($deck);
 
         return array_values($decks);
@@ -199,7 +201,7 @@ class Decks
     public function cloneDeck(?Deck $deck, User $user): Deck
     {
         /* @var $deck \App\Entity\Deck */
-        if (!$deck) {
+        if (!$deck instanceof Deck) {
             throw new NotFoundHttpException("This deck doesn't exist.");
         }
 
@@ -218,7 +220,7 @@ class Decks
 
         $name = $deck->getName();
         $description = $deck->getDescriptionMd();
-        $decklist_id = $deck->getParent() ? $deck->getParent()->getId() : null;
+        $decklist_id = $deck->getParent() instanceof Decklist ? $deck->getParent()->getId() : null;
         $tags = '';
 
         if (empty($name)) {
@@ -280,7 +282,7 @@ class Decks
 
             $pack = $card->getPack();
             if ($pack instanceof Pack) {
-                if (!$latestPack) {
+                if (!$latestPack instanceof Pack) {
                     $latestPack = $pack;
                 } elseif ($pack->isLaterThan($latestPack)) {
                     $latestPack = $pack;
@@ -290,7 +292,7 @@ class Decks
             $cards[$card_code] = $card;
             if ($card->getType() instanceof Type
                 && $card->getSphere() instanceof Sphere
-                && 'hero' == $card->getType()->getCode()) {
+                && 'hero' === $card->getType()->getCode()) {
                 $spheres[] = $card->getSphere()->getCode();
             }
 
@@ -315,7 +317,7 @@ class Decks
 
         $deck->setLastPack($latestPack);
         $tags = $this->normalizeTags($tags);
-        if (empty($tags)) {
+        if ([] === $tags) {
             // tags can never be empty. if it is we put spheres in
             $tags = $this->normalizeTags($spheres);
         }
@@ -324,7 +326,7 @@ class Decks
         $this->doctrine->persist($deck);
 
         // on the deck content
-        if ($source_deck) {
+        if ($source_deck instanceof Deck) {
             // compute diff between current content and saved content
             [$listings] = $this->diff->diffContents([
                 $content['main'],
@@ -426,7 +428,6 @@ class Decks
         /* @var $latestPack Pack */
 
         $cards = [];
-        $latestPack = null;
 
         foreach ($content['main'] as $card_code => $qty) {
             $card = $this->findCardByCode((string) $card_code);
@@ -470,6 +471,7 @@ class Decks
             if (!isset($cards[$card_code])) {
                 continue;
             }
+
             $card = $cards[$card_code];
             $slot = new Deckslot();
             $slot->setQuantity($qty);
@@ -482,6 +484,7 @@ class Decks
             if (!isset($cards[$card_code])) {
                 continue;
             }
+
             $card = $cards[$card_code];
             $slot = new Decksideslot();
             $slot->setQuantity($qty);
@@ -503,6 +506,7 @@ class Decks
         if (0 === $deck->getSlots()->getDrawDeck()->countCards()) {
             $this->doctrine->remove($deck);
         }
+
         $this->doctrine->flush();
     }
 

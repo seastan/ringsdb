@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class SendConfirmationEmailController extends AbstractController
 {
     private MailerInterface $mailer;
+
     private UserManagerInterface $userManager;
 
     public function __construct(
@@ -35,9 +36,11 @@ class SendConfirmationEmailController extends AbstractController
         if (!$user) {
             throw new NotFoundHttpException("Cannot find user from username [{$username}]");
         }
+
         if (!$user->getConfirmationToken()) {
             return $this->render('User/remind-no-token.html.twig');
         }
+
         $this->mailer->sendConfirmationEmailMessage($user);
         $this->get('session')->set('fos_user_send_confirmation_email/email', $user->getEmail());
         $url = $this->generateUrl('fos_user_registration_check_email');

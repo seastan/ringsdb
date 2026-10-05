@@ -48,6 +48,7 @@ class CSVController extends AbstractController
         $inputFileName = $request->files->get('upfile')->getPathname();
         $content = str_replace("\xEF\xBB\xBF", '', trim((string) file_get_contents($inputFileName)));
         $content = str_replace("\r", "\n", str_replace("\n", '<br/>', str_replace("\r\n", "\r", $content)));
+
         $content_array = explode("\n", $content);
 
         if (count($content_array) < 2) {
@@ -74,8 +75,9 @@ class CSVController extends AbstractController
 
             $newCodes[$card['code']] = 1;
             $newOctgnids[$card['octgnid']] = 1;
-            array_push($cards, $card);
+            $cards[] = $card;
         }
+
         $packRepo = $packRepository;
         $pack = $packRepo->findOneBy(['code' => $inputCode]);
         $oldPack = $packRepo->findOneBy(['code' => $inputOldCode]);
@@ -182,6 +184,7 @@ class CSVController extends AbstractController
                     $isReprint = true;
                 }
             }
+
             if (!$cardEntity) {
                 $cardEntity = new Card();
                 $now = new \DateTime();
@@ -228,8 +231,8 @@ class CSVController extends AbstractController
                     continue;
                 }
 
-                $getter = str_replace(' ', '', ucwords(str_replace('_', ' ', "get_$colName")));
-                $setter = str_replace(' ', '', ucwords(str_replace('_', ' ', "set_$colName")));
+                $getter = str_replace(' ', '', ucwords(str_replace('_', ' ', "get_{$colName}")));
+                $setter = str_replace(' ', '', ucwords(str_replace('_', ' ', "set_{$colName}")));
 
                 if (array_key_exists($colName, $cardAssocMappings)) {
                     // Association field on Card (type, sphere).
@@ -241,7 +244,8 @@ class CSVController extends AbstractController
                     $associationEntity = $associationRepository->findOneBy(['name' => $value]);
 
                     if (!$associationEntity) {
-                        if (('type' == $colName) && ('Other' == $value)) { // legacy code
+                        if ('type' === $colName && 'Other' == $value) {
+                            // legacy code
                             $value = 'Contract';
                             /** @var Type|null $associationEntity */
                             $associationEntity = $associationRepository->findOneBy(['name' => $value]);
@@ -253,9 +257,9 @@ class CSVController extends AbstractController
                         }
                     }
 
-                    if (!$cardEntity->$getter() || $cardEntity->$getter()->getId() !== $associationEntity->getId()) {
+                    if (!$cardEntity->{$getter}() || $cardEntity->{$getter}()->getId() !== $associationEntity->getId()) {
                         $changed = true;
-                        $cardEntity->$setter($associationEntity);
+                        $cardEntity->{$setter}($associationEntity);
                     }
                 } elseif (in_array($colName, $cardFieldNames) && !$isReprint) {
                     // Scalar field on Card.
@@ -263,17 +267,17 @@ class CSVController extends AbstractController
 
                     if ('boolean' === $type) {
                         $value = (bool) $value;
-                    } elseif (('smallint' === $type) && ('' == $value)) {
+                    } elseif ('smallint' === $type && '' == $value) {
                         $value = null;
-                    } elseif (('smallint' === $type) && ('X' == $value)) {
+                    } elseif ('smallint' === $type && 'X' == $value) {
                         $value = null;
-                    } elseif (('cost' == $colName) && ('' == $value)) {
+                    } elseif ('cost' === $colName && '' == $value) {
                         $value = null;
                     }
 
-                    if ($cardEntity->$getter() !== $value) {
+                    if ($cardEntity->{$getter}() !== $value) {
                         $changed = true;
-                        $cardEntity->$setter($value);
+                        $cardEntity->{$setter}($value);
                     }
                 } elseif (in_array($colName, $printingFieldNames)) {
                     // Scalar field on CardPrinting (quantity, illustrator, imageCode, …).
@@ -281,17 +285,17 @@ class CSVController extends AbstractController
 
                     if ('boolean' === $type) {
                         $value = (bool) $value;
-                    } elseif (('smallint' === $type) && ('' == $value)) {
+                    } elseif ('smallint' === $type && '' == $value) {
                         $value = null;
-                    } elseif (('smallint' === $type) && ('X' == $value)) {
+                    } elseif ('smallint' === $type && 'X' == $value) {
                         $value = null;
-                    } elseif (('cost' == $colName) && ('' == $value)) {
+                    } elseif ('cost' === $colName && '' == $value) {
                         $value = null;
                     }
 
-                    if ($printingEntity->$getter() !== $value) {
+                    if ($printingEntity->{$getter}() !== $value) {
                         $changed = true;
-                        $printingEntity->$setter($value);
+                        $printingEntity->{$setter}($value);
                     }
                 }
             }

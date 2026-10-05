@@ -27,11 +27,13 @@ class Texts
         if (!is_dir($cache_dir)) {
             mkdir($cache_dir, 0775, true);
         }
+
         $config = \HTMLPurifier_Config::create(['Cache.SerializerPath' => $cache_dir]);
         // raw definition: never null
         /** @var \HTMLPurifier_HTMLDefinition $def */
         $def = $config->getHTMLDefinition(true);
         $def->addAttribute('a', 'data-code', 'Text');
+
         $this->purifier_service = new \HTMLPurifier($config);
 
         $this->markdown_service = new \Parsedown();
@@ -86,8 +88,7 @@ class Texts
         $filename = (string) preg_replace('/[^\w\-]/', '', $filename);
         $filename = (string) preg_replace('/\-+/', '-', $filename);
         $filename = trim($filename, '-');
-        $filename = strtolower($filename);
 
-        return $filename;
+        return strtolower($filename);
     }
 }

@@ -13,22 +13,27 @@ class FellowshipComment
      * @var int|null
      */
     private $id;
+
     /**
      * @var \DateTime
      */
     private $dateCreation;
+
     /**
      * @var \DateTime
      */
     private $dateUpdate;
+
     /**
      * @var string
      */
     private $text;
+
     /**
      * @var User
      */
     private $user;
+
     /**
      * @var Fellowship
      */

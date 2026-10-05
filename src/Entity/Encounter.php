@@ -11,46 +11,42 @@ class Encounter implements \JsonSerializable
 {
     public function jsonSerialize()
     {
-        $array = [
+        return [
             'id' => $this->getId(),
             'code' => $this->getCode(),
             'name' => $this->getName(),
         ];
-
-        return $array;
     }
 
     /**
      * @var int|null
      */
     private $id;
+
     /**
      * @var string
      */
     private $code;
+
     /**
      * @var string
      */
     private $name;
+
     /**
      * @var \DateTime
      */
     private $dateCreation;
+
     /**
      * @var \DateTime
      */
     private $dateUpdate;
+
     /**
      * @var Pack|null
      */
     private $pack;
-
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-    }
 
     public function __toString()
     {

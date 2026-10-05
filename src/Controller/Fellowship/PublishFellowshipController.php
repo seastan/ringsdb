@@ -22,10 +22,15 @@ use Symfony\Component\Routing\Annotation\Route;
 class PublishFellowshipController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+
     private FellowshipValidationHelper $fellowshipValidationHelper;
+
     private Texts $texts;
+
     private DecklistFactory $decklistFactory;
+
     private DecklistRepository $decklistRepository;
+
     private FellowshipRepository $fellowshipRepository;
 
     public function __construct(
@@ -54,22 +59,26 @@ class PublishFellowshipController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
+
         $fellowship_id = intval(filter_var($request->request->get('fellowship_id'), FILTER_SANITIZE_NUMBER_INT));
         /* @var $fellowship \App\Entity\Fellowship */
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
         if (!$fellowship || !$fellowship->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
+
         if ($fellowship->getIsPublic()) {
             $this->get('session')->getFlashBag()->set('error', 'This fellowship is already published.');
 
             return $this->redirect($this->generateUrl('fellowship_view', ['fellowship_id' => $fellowship->getId()]));
         }
+
         $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = 'Untitled Fellowship';
         }
+
         $descriptionMd = trim((string) $request->request->get('descriptionMd'));
         $descriptionHtml = $this->texts->markdown($descriptionMd);
         $fellowship->setName($name);
@@ -92,6 +101,7 @@ class PublishFellowshipController extends AbstractController
                 $decklist = $this->decklistFactory->createDecklistFromDeck($deck, $deck->getName(), $deck->getDescriptionMd());
                 $this->entityManager->persist($decklist);
             }
+
             $fellowship_decklist = new FellowshipDecklist();
             $fellowship_decklist->setDecklist($decklist);
             $fellowship_decklist->setDeckNumber($fellowship_deck->getDeckNumber());
@@ -100,6 +110,7 @@ class PublishFellowshipController extends AbstractController
             $fellowship->removeDeck($fellowship_deck);
             $fellowship->addDecklist($fellowship_decklist);
         }
+
         // Validate fellowship
         $problem = $this->fellowshipValidationHelper->findProblem($fellowship);
         if ($problem) {
@@ -107,6 +118,7 @@ class PublishFellowshipController extends AbstractController
 
             return $this->redirect($this->generateUrl('fellowship_view', ['fellowship_id' => $fellowship->getId()]));
         }
+
         $this->entityManager->persist($fellowship);
         $this->entityManager->flush();
 

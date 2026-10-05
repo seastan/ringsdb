@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class VoteFellowshipController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+
     private FellowshipRepository $fellowshipRepository;
 
     public function __construct(
@@ -39,12 +40,14 @@ class VoteFellowshipController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
+
         $fellowship_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $fellowship \App\Entity\Fellowship */
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
         if (!$fellowship) {
             throw new BadRequestHttpException('Unable to find fellowship');
         }
+
         if (!$fellowship->getUser()->isEqualTo($user)) {
             $query = $this->fellowshipRepository->createQueryBuilder('d')->innerJoin('d.votes', 'u')->where('d.id = :fellowship_id')->andWhere('u.id = :user_id')->setParameter('fellowship_id', $fellowship_id)->setParameter('user_id', $user->getId())->getQuery();
             $result = $query->getResult();

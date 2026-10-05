@@ -32,7 +32,8 @@ class ListCardsController extends AbstractController
         if (!$pack) {
             throw $this->createNotFoundException('This pack does not exist');
         }
-        $key = array_search('pack', SearchKeys::$searchKeys);
+
+        $key = array_search('pack', SearchKeys::$searchKeys, true);
 
         return $this->forward(DisplaySearchController::class, [
             '_route' => $request->attributes->get('_route'),

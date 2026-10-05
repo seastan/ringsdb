@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\CardSearch;
 
 use App\Repository\CardRepository;
@@ -27,7 +29,8 @@ class ZoomController extends AbstractController
         if (!$card) {
             throw $this->createNotFoundException('Sorry, this card is not in the database (yet?)');
         }
-        $selectedPackCode = $request->query->get('pack', null);
+
+        $selectedPackCode = $request->query->get('pack');
 
         return $this->forward(DisplaySearchController::class, [
             '_route' => $request->attributes->get('_route'),

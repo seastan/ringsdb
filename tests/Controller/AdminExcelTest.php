@@ -32,8 +32,10 @@ class AdminExcelTest extends WebTestCase
 
     /** @var int */
     private $maxCardId;
+
     /** @var array */
     private $coreCards;
+
     /** @var string[] */
     private $files = [];
 
@@ -52,9 +54,11 @@ class AdminExcelTest extends WebTestCase
         foreach ($this->coreCards as $card) {
             $connection->update('card', $card, ['id' => $card['id']]);
         }
+
         foreach ($this->files as $file) {
             @unlink($file);
         }
+
         parent::tearDown();
     }
 
@@ -104,7 +108,7 @@ class AdminExcelTest extends WebTestCase
         return [$client->getResponse()->getContent(), strip_tags(str_replace(['</h4>', '</p>'], [': ', '; '], $report))];
     }
 
-    private static function rows($file): array
+    private function rows($file): array
     {
         return IOFactory::load($file)->getActiveSheet()->toArray(null, false, false, false);
     }
@@ -112,7 +116,7 @@ class AdminExcelTest extends WebTestCase
     /**
      * Changes the file with PhpSpreadsheet: [row (1 = header) => [column name => value]].
      */
-    private static function edit($file, array $changes): void
+    private function edit($file, array $changes): void
     {
         $spreadsheet = IOFactory::load($file);
         $sheet = $spreadsheet->getActiveSheet();
@@ -120,16 +124,17 @@ class AdminExcelTest extends WebTestCase
             foreach ($values as $column => $value) {
                 // PhpSpreadsheet columns start at 1
                 $sheet->setCellValueExplicit(
-                    [(int) array_search($column, self::HEADER) + 1, $row],
+                    [(int) array_search($column, self::HEADER, true) + 1, $row],
                     $value,
                     is_int($value) ? DataType::TYPE_NUMERIC : DataType::TYPE_STRING
                 );
             }
         }
+
         IOFactory::createWriter($spreadsheet, 'Xlsx')->save($file);
     }
 
-    private function fetchCard(KernelBrowser $client, $code)
+    private function fetchCard($code)
     {
         return $this->db()->fetchAssoc('SELECT c.name, c.cost, c.text, t.name AS type, s.name AS sphere FROM card c JOIN type t ON t.id = c.type_id JOIN sphere s ON s.id = c.sphere_id WHERE c.code = ?', [$code]);
     }
@@ -143,7 +148,7 @@ class AdminExcelTest extends WebTestCase
 
         $this->assertSame('text/vnd.ms-excel; charset=utf-8', $client->getResponse()->headers->get('Content-Type'));
         $this->assertSame('attachment; filename=coreset.xlsx', $client->getResponse()->headers->get('Content-Disposition'));
-        $rows = self::rows($file);
+        $rows = $this->rows($file);
         // the associations (by name) then the fields of Card, except id and dates; one row per card
         $this->assertSame(self::HEADER, $rows[0]);
         $this->assertCount(1 + count($this->coreCards), $rows);
@@ -161,7 +166,7 @@ class AdminExcelTest extends WebTestCase
         $file = $this->download($client, 0);
 
         $this->assertSame('attachment; filename=lotrlcgcards.xlsx', $client->getResponse()->headers->get('Content-Disposition'));
-        $this->assertCount(1 + (int) $this->db()->fetchColumn('SELECT COUNT(*) FROM card'), self::rows($file));
+        $this->assertCount(1 + (int) $this->db()->fetchColumn('SELECT COUNT(*) FROM card'), $this->rows($file));
     }
 
     /* ------------------------------------------------------------- upload */
@@ -196,7 +201,7 @@ class AdminExcelTest extends WebTestCase
         $file = self::temporaryFile('excel').'.xlsx';
         $this->files[] = $file;
         copy(__DIR__.'/../Resources/fixtures/import/core-set.xlsx', $file);
-        $this->assertSame(self::HEADER, self::rows($file)[0]);
+        $this->assertSame(self::HEADER, $this->rows($file)[0]);
 
         [$response, $report] = $this->upload($client, $file);
         $this->assertSame('7 cards changed or added', $response);
@@ -213,14 +218,14 @@ class AdminExcelTest extends WebTestCase
         $this->upload($client, $file);
 
         // Aragorn (row 2): new name, cost and sphere
-        self::edit($file, [2 => ['name' => 'PHPUnit Aragorn', 'cost' => 4, 'sphere' => 'Tactics']]);
+        $this->edit($file, [2 => ['name' => 'PHPUnit Aragorn', 'cost' => 4, 'sphere' => 'Tactics']]);
         [$response, $report] = $this->upload($client, $file);
 
         $this->assertSame('1 cards changed or added', $response);
         $this->assertSame('PHPUnit Aragorn: association [sphere] changed; field [name] changed; field [cost] changed; ', $report);
         $this->assertSame(
             ['name' => 'PHPUnit Aragorn', 'cost' => '4', 'type' => 'Hero', 'sphere' => 'Tactics'],
-            array_diff_key($this->fetchCard($client, '01001'), ['text' => 0])
+            array_diff_key($this->fetchCard('01001'), ['text' => 0])
         );
     }
 
@@ -229,17 +234,17 @@ class AdminExcelTest extends WebTestCase
         $client = $this->createAdminClient();
         $file = $this->download($client, 1);
         $this->upload($client, $file);
-        $row = count(self::rows($file)) + 1;
-        self::edit($file, [$row => ['type' => 'Ally', 'sphere' => 'Lore', 'position' => 999, 'code' => '99901', 'name' => 'PHPUnit Ally',
+        $row = count($this->rows($file)) + 1;
+        $this->edit($file, [$row => ['type' => 'Ally', 'sphere' => 'Lore', 'position' => 999, 'code' => '99901', 'name' => 'PHPUnit Ally',
             'traits' => 'Test.', 'text' => 'Does nothing.', 'cost' => 2, 'willpower' => 1, 'attack' => 1, 'defense' => 1, 'health' => 2, 'deckLimit' => 3]]);
 
         [$response] = $this->upload($client, $file);
         $this->assertSame('0 cards changed or added', $response);
-        $this->assertFalse($this->fetchCard($client, '99901'));
+        $this->assertFalse($this->fetchCard('99901'));
 
         [$response] = $this->upload($client, $file, ['create' => '1']);
         $this->assertSame('1 cards changed or added', $response);
-        $this->assertSame(['name' => 'PHPUnit Ally', 'cost' => '2', 'text' => 'Does nothing.', 'type' => 'Ally', 'sphere' => 'Lore'], $this->fetchCard($client, '99901'));
+        $this->assertSame(['name' => 'PHPUnit Ally', 'cost' => '2', 'text' => 'Does nothing.', 'type' => 'Ally', 'sphere' => 'Lore'], $this->fetchCard('99901'));
     }
 
     /**
@@ -251,12 +256,12 @@ class AdminExcelTest extends WebTestCase
         $client = $this->createAdminClient();
         $file = $this->download($client, 1);
         $this->upload($client, $file);
-        self::edit($file, [2 => ['name' => 'PHPUnit Aragorn'], 3 => ['sphere' => 'Nonexistent']]);
+        $this->edit($file, [2 => ['name' => 'PHPUnit Aragorn'], 3 => ['sphere' => 'Nonexistent']]);
 
         $this->upload($client, $file);
 
         $this->assertSame(500, $client->getResponse()->getStatusCode());
         $this->assertContains('cannot find entity [sphere] of name [Nonexistent]', $client->getResponse()->getContent());
-        $this->assertSame('Aragorn', $this->fetchCard($client, '01001')['name']);
+        $this->assertSame('Aragorn', $this->fetchCard('01001')['name']);
     }
 }

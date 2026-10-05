@@ -90,6 +90,7 @@ class ApiControllerTest extends WebTestCase
             $this->assertSame(self::CACHE_CONTROL, $response->headers->get('Cache-Control'));
             $this->assertSame('*', $response->headers->get('Access-Control-Allow-Origin'));
         }
+
         $this->assertMatchesJsonSnapshot($snapshot, $response->getContent());
     }
 

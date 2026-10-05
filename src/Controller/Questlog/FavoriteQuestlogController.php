@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class FavoriteQuestlogController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+
     private QuestlogRepository $questlogRepository;
 
     public function __construct(
@@ -37,12 +38,14 @@ class FavoriteQuestlogController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
+
         $questlog_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $questlog \App\Entity\QuestLog */
         $questlog = $this->questlogRepository->find($questlog_id);
         if (!$questlog) {
             throw new NotFoundHttpException('Wrong id');
         }
+
         /* @var $author User */
         $author = $questlog->getUser();
         $dbh = $this->getDoctrine()->getConnection();
@@ -62,6 +65,7 @@ class FavoriteQuestlogController extends AbstractController
                 $author->setReputation($author->getReputation() + 5);
             }
         }
+
         $this->entityManager->flush();
 
         return new Response((string) $questlog->getNbFavorites());

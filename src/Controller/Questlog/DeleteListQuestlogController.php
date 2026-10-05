@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class DeleteListQuestlogController extends AbstractController
 {
     private QuestlogRepository $questlogRepository;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(
@@ -36,6 +37,7 @@ class DeleteListQuestlogController extends AbstractController
         if (!$user) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
+
         $list_id = explode('-', $request->get('ids'));
         $message = null;
         foreach ($list_id as $id) {
@@ -44,9 +46,11 @@ class DeleteListQuestlogController extends AbstractController
             if (!$questlog) {
                 continue;
             }
+
             if ($questlog->getUser() && !$questlog->getUser()->isEqualTo($user)) {
                 continue;
             }
+
             if ($questlog->getNbVotes() || $questlog->getNbfavorites() || $questlog->getNbcomments()) {
                 $message = "You can't delete a published quest log. Unpublished selected quest logs were deleted.";
             } else {
@@ -55,9 +59,11 @@ class DeleteListQuestlogController extends AbstractController
                 foreach ($decks as $deck) {
                     $this->entityManager->remove($deck);
                 }
+
                 $this->entityManager->remove($questlog);
             }
         }
+
         $this->entityManager->flush();
         $this->get('session')->getFlashBag()->set('notice', $message ?: 'Quest Logs deleted.');
 

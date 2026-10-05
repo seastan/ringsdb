@@ -16,86 +16,107 @@ class Questlog
      * @var int|null
      */
     private $id;
+
     /**
      * @var string|null
      */
     private $name;
+
     /**
      * @var string|null
      */
     private $nameCanonical;
+
     /**
      * @var string|null
      */
     private $descriptionMd;
+
     /**
      * @var string|null
      */
     private $descriptionHtml;
+
     /**
      * @var \DateTime|null
      */
     private $datePlayed;
+
     /**
      * @var string|null
      */
     private $questMode;
+
     /**
      * @var bool
      */
     private $success = false;
+
     /**
      * @var int|null
      */
     private $score;
+
     /**
      * @var int
      */
     private $nbDecks = 0;
+
     /**
      * @var int
      */
     private $nbVotes = 0;
+
     /**
      * @var int
      */
     private $nbFavorites = 0;
+
     /**
      * @var int
      */
     private $nbComments = 0;
+
     /**
      * @var bool
      */
     private $isPublic = false;
+
     /**
      * @var \DateTime
      */
     private $dateCreation;
+
     /**
      * @var \DateTime
      */
     private $dateUpdate;
+
     /**
      * @var Collection<int, QuestlogDeck>
      */
     private $decks;
+
     /**
      * @var Collection<int, QuestlogComment>
      */
     private $comments;
+
     /**
      * @var User|null
      */
     private $user;
+
     /**
      * @var Scenario|null
      */
     private $scenario;
+
     /**
      * @var Collection<int, User>
      */
     private $favorites;
+
     /**
      * @var Collection<int, User>
      */

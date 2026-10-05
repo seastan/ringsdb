@@ -10,14 +10,17 @@ class UserCustomPackCard
      * @var int|null
      */
     private $id;
+
     /**
      * @var UserCustomPack
      */
     private $customPack;
+
     /**
      * @var Card
      */
     private $card;
+
     /**
      * @var int
      */

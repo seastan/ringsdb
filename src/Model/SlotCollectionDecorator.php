@@ -113,6 +113,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
                 }
             }
         }
+
         ksort($packs);
 
         return array_values($packs);
@@ -184,7 +185,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         $drawDeck = [];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if ($card->getType() instanceof Type && in_array($card->getType()->getCode(), ['ally', 'attachment', 'event', 'player-side-quest', 'player-objective', 'contract', 'treasure'])) {
+            if ($card->getType() instanceof Type && in_array($card->getType()->getCode(), ['ally', 'attachment', 'event', 'player-side-quest', 'player-objective', 'contract', 'treasure'], true)) {
                 $drawDeck[] = $slot;
             }
         }
@@ -207,6 +208,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
             if ('Mirlonde' == $card->getName() && $card->getPack() && 'TDF' == $card->getPack()->getCode()) {
                 $mirlonde = true;
             }
+
             if ('Folco Boffin' == $card->getName() && $card->getPack() && 'DoCG' == $card->getPack()->getCode()) {
                 $folco = true;
             }
@@ -216,11 +218,12 @@ class SlotCollectionDecorator implements SlotCollectionInterface
             foreach ($heroDeck->getSlots() as $slot) {
                 $card = $slot->getCard();
 
-                if ($card->getSphere() instanceof Sphere && 'lore' == $card->getSphere()->getCode()) {
+                if ($card->getSphere() instanceof Sphere && 'lore' === $card->getSphere()->getCode()) {
                     --$threat;
                 }
             }
         }
+
         if ($folco) {
             foreach ($heroDeck->getSlots() as $slot) {
                 $card = $slot->getCard();
@@ -276,6 +279,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         foreach ($this->slots as $slot) {
             $arr[$slot->getCard()->getCode()] = $slot->getQuantity();
         }
+
         ksort($arr);
 
         return $arr;

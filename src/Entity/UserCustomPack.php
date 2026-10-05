@@ -13,34 +13,42 @@ class UserCustomPack
      * @var int|null
      */
     private $id;
+
     /**
      * @var User
      */
     private $user;
+
     /**
      * @var string
      */
     private $name;
+
     /**
      * @var string
      */
     private $code;
+
     /**
      * @var bool
      */
     private $isEnabled = true;
+
     /**
      * @var bool
      */
     private $isPublished = false;
+
     /**
      * @var \DateTime
      */
     private $createdAt;
+
     /**
      * @var \DateTime
      */
     private $updatedAt;
+
     /**
      * @var Collection<int, UserCustomPackCard>
      */

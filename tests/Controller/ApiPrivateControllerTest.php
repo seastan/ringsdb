@@ -92,7 +92,7 @@ class ApiPrivateControllerTest extends WebTestCase
             'my decks: decklists then decks' => ['test', '/api/private/decks', 'private/decks_test'],
             'my decks by username' => ['test', '/api/private/decks_by_user/test', 'private/decks_test'],
             // private decks are only listed for their owner, even when they are shared
-            'another user\'s decklists only' => ['admin', '/api/private/decks_by_user/test', 'private/decklists_test'],
+            "another user's decklists only" => ['admin', '/api/private/decks_by_user/test', 'private/decklists_test'],
             'own deck' => ['test', '/api/private/deck/load/1', 'private/deck_1'],
         ];
     }

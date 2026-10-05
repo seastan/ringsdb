@@ -12,6 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class PatronsController extends AbstractController
 {
     private int $cacheExpiration;
+
     private Connection $connection;
 
     public function __construct(
@@ -30,6 +31,7 @@ class PatronsController extends AbstractController
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
+
         $users = $this->connection->executeQuery('SELECT * FROM user WHERE donation > 0 ORDER BY donation DESC, username', [])->fetchAll(\PDO::FETCH_ASSOC);
 
         return $this->render('Default/patrons.html.twig', ['pagetitle' => 'The Gracious Patrons', 'patrons' => $users], $response);

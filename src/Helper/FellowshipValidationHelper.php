@@ -12,10 +12,6 @@ use App\Model\SlotInterface;
 
 class FellowshipValidationHelper
 {
-    public function __construct()
-    {
-    }
-
     public function findProblem(Fellowship $fellowship): ?string
     {
         $heroes = [];
@@ -53,7 +49,7 @@ class FellowshipValidationHelper
             }
         }
 
-        if (0 == $count) {
+        if (0 === $count) {
             return 'too_few_decks';
         }
 
@@ -65,6 +61,7 @@ class FellowshipValidationHelper
         if (!$problem) {
             return '';
         }
+
         $labels = [
             'too_few_decks' => 'Too few decks selectsd',
             'hero_conflicts' => 'MHero conflicts between selected decks',

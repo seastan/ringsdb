@@ -74,6 +74,7 @@ class ScrapBeornScenarioDataCommand extends Command
             if (null === $scenario) {
                 throw new \RuntimeException(sprintf('Scenario with name "%s" not found.', $name));
             }
+
             $allScenarios = [$scenario];
         } else {
             /* @var $allScenarios \App\Entity\Scenario[] */
@@ -97,12 +98,13 @@ class ScrapBeornScenarioDataCommand extends Command
                 $json = file_get_contents($url.$beornscenario);
             }
 
-            if (!$json || '{}' == $json) {
+            if (!$json || '{}' === $json) {
                 $output_line = 'Could not find scenario '.$scenario->getName();
                 VarDumper::dump($output_line);
                 $res .= $output_line."\n<br>";
                 continue;
             }
+
             $beorn = json_decode($json);
 
             $scenario->setHasEasy($beorn->HasEasy);

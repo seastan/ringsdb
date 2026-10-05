@@ -67,7 +67,7 @@ class DeleteDecklistCommand extends Command
 
         foreach ($successors as $successor) {
             /* @var $successor Decklist */
-            $successor->setPrecedent(null);
+            $successor->setPrecedent();
         }
 
         $children = $this->deckRepository->findBy([
@@ -76,7 +76,7 @@ class DeleteDecklistCommand extends Command
 
         foreach ($children as $child) {
             /* @var $child Deck */
-            $child->setParent(null);
+            $child->setParent();
         }
 
         $this->entityManager->flush();

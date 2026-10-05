@@ -40,6 +40,7 @@ class DeleteInactiveCommand extends Command
     {
         $limit = new \DateTime();
         $limit->sub(new \DateInterval('PT48H'));
+
         $count = 0;
 
         $users = $this->userRepository->findBy(['enabled' => false]);
@@ -50,6 +51,7 @@ class DeleteInactiveCommand extends Command
                 $this->entityManager->remove($user);
             }
         }
+
         $this->entityManager->flush();
         $output->writeln(date('c')." Delete $count inactive users.");
 

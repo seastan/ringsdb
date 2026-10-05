@@ -40,6 +40,7 @@ class ViewDeckController extends AbstractController
         if (!$deck) {
             throw new NotFoundHttpException("This deck doesn't exist.");
         }
+
         $is_owner = $this->getUser() && $this->getUser()->getId() == $deck->getUser()->getId();
         if (!$deck->getUser()->getIsShareDecks() && !$is_owner) {
             throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');

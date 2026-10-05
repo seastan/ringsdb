@@ -16,42 +16,52 @@ class Review
      * @var int|null
      */
     private $id;
+
     /**
      * @var \DateTime
      */
     private $dateCreation;
+
     /**
      * @var \DateTime
      */
     private $dateUpdate;
+
     /**
      * @var \DateTime|null
      */
     private $dateLastComment;
+
     /**
      * @var string
      */
     private $textMd;
+
     /**
      * @var string
      */
     private $textHtml;
+
     /**
      * @var int
      */
     private $nbVotes;
+
     /**
      * @var Collection<int, Reviewcomment>
      */
     private $comments;
+
     /**
      * @var Card
      */
     private $card;
+
     /**
      * @var User
      */
     private $user;
+
     /**
      * @var Collection<int, User>
      */

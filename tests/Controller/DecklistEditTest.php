@@ -23,8 +23,10 @@ class DecklistEditTest extends WebTestCase
 
     /** @var array */
     private $fixtureDecklists;
+
     /** @var array */
     private $fixtureUsers;
+
     /** @var int[] */
     private $maxIds = [];
 
@@ -55,12 +57,15 @@ class DecklistEditTest extends WebTestCase
         ] as $sql) {
             $connection->exec($sql);
         }
+
         foreach ($this->fixtureDecklists as $decklist) {
             $connection->update('decklist', $decklist, ['id' => $decklist['id']]);
         }
+
         foreach ($this->fixtureUsers as $user) {
             $connection->update('user', $user, ['id' => $user['id']]);
         }
+
         parent::tearDown();
     }
 
@@ -84,7 +89,7 @@ class DecklistEditTest extends WebTestCase
         return $client;
     }
 
-    private function fetchDecklist(KernelBrowser $client, $id)
+    private function fetchDecklist($id)
     {
         return $this->db()->fetchAssoc('SELECT name, name_canonical, description_md, description_html, precedent_decklist_id, date_update FROM decklist WHERE id = ?', [$id]);
     }
@@ -92,7 +97,7 @@ class DecklistEditTest extends WebTestCase
     /**
      * A copy of fixture decklist 2 (with its cards), returns its id.
      */
-    private function insertDecklist(KernelBrowser $client, $name, array $values = []): int
+    private function insertDecklist($name, array $values = []): int
     {
         $connection = $this->db();
         $row = $connection->fetchAssoc('SELECT * FROM decklist WHERE id = 2');
@@ -140,7 +145,7 @@ class DecklistEditTest extends WebTestCase
         // the canonical name keeps the version
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame('/decklist/view/1/phpunitrenamed-1.0', $response->headers->get('Location'));
-        $decklist = $this->fetchDecklist($client, 1);
+        $decklist = $this->fetchDecklist(1);
         $this->assertSame(
             ['PHPUnit Renamed', 'phpunitrenamed-1.0', 'Now **bold**', '<p>Now <strong>bold</strong></p>', '2'],
             [$decklist['name'], $decklist['name_canonical'], $decklist['description_md'], $decklist['description_html'], $decklist['precedent_decklist_id']]
@@ -159,7 +164,7 @@ class DecklistEditTest extends WebTestCase
         $client = $this->createAuthenticatedClient();
         $this->saveForm($client, 1, ['name' => $name]);
 
-        $this->assertSame($expected, $this->fetchDecklist($client, 1)['name']);
+        $this->assertSame($expected, $this->fetchDecklist(1)['name']);
     }
 
     public function nameProvider(): array
@@ -181,7 +186,7 @@ class DecklistEditTest extends WebTestCase
         $client = $this->createAuthenticatedClient();
         $this->saveForm($client, 1, ['precedent' => $precedent]);
 
-        $this->assertSame($expected, $this->fetchDecklist($client, 1)['precedent_decklist_id']);
+        $this->assertSame($expected, $this->fetchDecklist(1)['precedent_decklist_id']);
     }
 
     public function precedentProvider(): array
@@ -207,7 +212,7 @@ class DecklistEditTest extends WebTestCase
         $client->request($method, $uri, ['name' => 'Hacked']);
 
         $this->assertSame(403, $client->getResponse()->getStatusCode());
-        $this->assertSame('Dwarf Lore/Leadership/Tactics', $this->fetchDecklist($client, 1)['name']);
+        $this->assertSame('Dwarf Lore/Leadership/Tactics', $this->fetchDecklist(1)['name']);
     }
 
     public function editRouteProvider(): array
@@ -230,7 +235,7 @@ class DecklistEditTest extends WebTestCase
         $response = $this->saveForm($client, 1, ['name' => 'Moderated']);
 
         $this->assertSame('/decklist/view/1/moderated-1.0', $response->headers->get('Location'));
-        $this->assertSame('Moderated', $this->fetchDecklist($client, 1)['name']);
+        $this->assertSame('Moderated', $this->fetchDecklist(1)['name']);
     }
 
     /**
@@ -243,7 +248,7 @@ class DecklistEditTest extends WebTestCase
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('http://localhost/login', $client->getResponse()->headers->get('Location'));
-        $this->assertSame('Dwarf Lore/Leadership/Tactics', $this->fetchDecklist($client, 1)['name']);
+        $this->assertSame('Dwarf Lore/Leadership/Tactics', $this->fetchDecklist(1)['name']);
     }
 
     public function testEditAnUnknownDecklist(): void
@@ -262,8 +267,8 @@ class DecklistEditTest extends WebTestCase
     public function testDelete(): void
     {
         $client = $this->createAuthenticatedClient();
-        $id = $this->insertDecklist($client, 'PHPUnit To Delete', ['precedent_decklist_id' => 1]);
-        $successor = $this->insertDecklist($client, 'PHPUnit Successor', ['precedent_decklist_id' => $id]);
+        $id = $this->insertDecklist('PHPUnit To Delete', ['precedent_decklist_id' => 1]);
+        $successor = $this->insertDecklist('PHPUnit Successor', ['precedent_decklist_id' => $id]);
         $deck = $this->db()->fetchAssoc('SELECT * FROM deck WHERE id = 3');
         $this->assertNotFalse($deck);
         unset($deck['id']);
@@ -274,9 +279,9 @@ class DecklistEditTest extends WebTestCase
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/decklists/mine', $client->getResponse()->headers->get('Location'));
-        $this->assertFalse($this->fetchDecklist($client, $id));
+        $this->assertFalse($this->fetchDecklist($id));
         $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM decklistslot WHERE decklist_id = ?', [$id]));
-        $this->assertSame('1', $this->fetchDecklist($client, $successor)['precedent_decklist_id']);
+        $this->assertSame('1', $this->fetchDecklist($successor)['precedent_decklist_id']);
         $this->assertSame('1', $this->db()->fetchColumn('SELECT parent_decklist_id FROM deck WHERE id = ?', [$child]));
     }
 
@@ -313,7 +318,7 @@ class DecklistEditTest extends WebTestCase
     public function testDecklistUsedInAFellowship(): void
     {
         $client = $this->createAuthenticatedClient();
-        $id = $this->insertDecklist($client, 'PHPUnit In A Fellowship');
+        $id = $this->insertDecklist('PHPUnit In A Fellowship');
         $connection = $this->db();
         $connection->insert('fellowship', ['user_id' => 1, 'name' => 'PHPUnit', 'name_canonical' => 'phpunit', 'is_public' => 1,
             'nb_decks' => 1, 'nb_votes' => 0, 'nb_favorites' => 0, 'nb_comments' => 0,
@@ -324,7 +329,7 @@ class DecklistEditTest extends WebTestCase
         $client->request('POST', "/decklist/delete/$id");
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
-        $this->assertFalse($this->fetchDecklist($client, $id));
+        $this->assertFalse($this->fetchDecklist($id));
         $this->assertSame(['1', '1'], [
             $connection->fetchColumn('SELECT is_public FROM fellowship WHERE id = ?', [$fellowshipId]),
             $connection->fetchColumn('SELECT nb_decks FROM fellowship WHERE id = ?', [$fellowshipId]),

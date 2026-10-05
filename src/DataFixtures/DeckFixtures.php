@@ -40,6 +40,7 @@ class DeckFixtures extends Fixture implements ContainerAwareInterface, Dependent
         if (null === $this->container) {
             throw new \LogicException('The container is not set.');
         }
+
         /** @var Decks $deckService */
         $deckService = $this->container->get('decks');
 

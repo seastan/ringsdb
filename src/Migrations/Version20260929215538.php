@@ -43,7 +43,7 @@ final class Version20260929215538 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->abortIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
+        $this->abortIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), "Migration can only be executed safely on 'mysql'.");
 
         $this->addSql('ALTER TABLE fellowshipcomment CHANGE user_id user_id INT NOT NULL, CHANGE fellowship_id fellowship_id INT NOT NULL');
         $this->addSql('ALTER TABLE decksideslot CHANGE deck_id deck_id INT NOT NULL, CHANGE card_id card_id INT NOT NULL');
@@ -68,7 +68,7 @@ final class Version20260929215538 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->abortIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
+        $this->abortIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), "Migration can only be executed safely on 'mysql'.");
 
         $this->addSql('ALTER TABLE card CHANGE type_id type_id INT DEFAULT NULL, CHANGE sphere_id sphere_id INT DEFAULT NULL');
         $this->addSql('ALTER TABLE comment CHANGE user_id user_id INT DEFAULT NULL, CHANGE decklist_id decklist_id INT DEFAULT NULL');

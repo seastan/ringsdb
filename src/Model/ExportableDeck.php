@@ -50,7 +50,7 @@ abstract class ExportableDeck
         $slots = $this->getSlots();
         $sideslots = $this->getSideslots();
         $last_pack = '';
-        if ($this->getLastPack()) {
+        if ($this->getLastPack() instanceof Pack) {
             $last_pack = $this->getLastPack()->getName();
         }
 

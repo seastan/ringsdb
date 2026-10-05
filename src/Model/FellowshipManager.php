@@ -30,18 +30,22 @@ class FellowshipManager
      * @var int
      */
     protected $page = 1;
+
     /**
      * @var int
      */
     protected $start = 0;
+
     /**
      * @var int
      */
     protected $limit = 30;
+
     /**
      * @var int
      */
     protected $maxcount = 0;
+
     /**
      * @var User|null
      */
@@ -304,7 +308,7 @@ class FellowshipManager
             $qb->setParameter('nbdecks', $nb_decks);
         }
 
-        $useCustomPacks = !empty($customPackCodes) && $this->user;
+        $useCustomPacks = [] !== $customPackCodes && $this->user;
 
         if (count($cards_code) > 0 || count($packs) > 0 || $useCustomPacks) {
             $qb->innerJoin('d.decklists', 'l');
@@ -325,6 +329,7 @@ class FellowshipManager
                     // $packs[] = $card->getPack()->getId();
                 }
             }
+
             if (count($packs) > 0 || $useCustomPacks) {
                 // A card is "not covered" if it has no printing in the official allowed
                 // packs AND is not present in any selected custom pack.
@@ -393,9 +398,10 @@ class FellowshipManager
                 break;
 
             case 'reputation':
-                if (!in_array('d.user', $joinTables)) {
+                if (!in_array('d.user', $joinTables, true)) {
                     $qb->innerJoin('d.user', 'u');
                 }
+
                 // with DISTINCT, MySQL 5.7+ only sorts on selected columns
                 $qb->addSelect('u.reputation AS HIDDEN reputation');
                 $qb->orderBy('reputation', 'DESC');

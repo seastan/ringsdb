@@ -34,6 +34,7 @@ class TagControllerTest extends WebTestCase
         foreach ($this->fixtureDecks as $deck) {
             $connection->update('deck', $deck, ['id' => $deck['id']]);
         }
+
         parent::tearDown();
     }
 
@@ -71,7 +72,7 @@ class TagControllerTest extends WebTestCase
     /**
      * @return array<int|string, mixed>
      */
-    private function tags(KernelBrowser $client): array
+    private function tags(): array
     {
         return array_column($this->db()->fetchAll('SELECT id, tags FROM deck ORDER BY id'), 'tags', 'id');
     }
@@ -89,7 +90,7 @@ class TagControllerTest extends WebTestCase
             1 => ['tactics', 'leadership', 'lore', 'dwarf'],
             4 => ['tactics', 'dwarf'],
         ]], $answer);
-        $this->assertSame(['1' => 'tactics leadership lore dwarf', '2' => 'leadership spirit', '3' => 'spirit lore', '4' => 'tactics dwarf'], $this->tags($client));
+        $this->assertSame(['1' => 'tactics leadership lore dwarf', '2' => 'leadership spirit', '3' => 'spirit lore', '4' => 'tactics dwarf'], $this->tags());
         $this->assertSame('application/json', $client->getResponse()->headers->get('Content-Type'));
     }
 
@@ -101,7 +102,7 @@ class TagControllerTest extends WebTestCase
         $answer = $this->post($client, 'add', ['ids' => ['2'], 'tags' => ['gondor']]);
 
         $this->assertSame([2 => ['gondor']], $answer['tags']);
-        $this->assertSame('gondor', $this->tags($client)['2']);
+        $this->assertSame('gondor', $this->tags()['2']);
     }
 
     /**
@@ -115,12 +116,12 @@ class TagControllerTest extends WebTestCase
 
         $answer = $this->post($client, 'add', ['ids' => ['4'], 'tags' => ['', 'dwarf', '', ' two  words ']]);
         $this->assertSame([4 => ['tactics', 'lore', 'dwarf', 'two', 'words']], $answer['tags']);
-        $this->assertSame('tactics lore dwarf two words', $this->tags($client)['4']);
+        $this->assertSame('tactics lore dwarf two words', $this->tags()['4']);
 
         $this->db()->update('deck', ['tags' => ' tactics  lore '], ['id' => 4]);
         $answer = $this->post($client, 'remove', ['ids' => ['4'], 'tags' => ['', 'lore']]);
         $this->assertSame([4 => ['tactics']], $answer['tags']);
-        $this->assertSame('tactics', $this->tags($client)['4']);
+        $this->assertSame('tactics', $this->tags()['4']);
     }
 
     public function testRemoveTags(): void
@@ -134,7 +135,7 @@ class TagControllerTest extends WebTestCase
             2 => ['leadership', 'spirit'],
             3 => ['spirit'],
         ]], $answer);
-        $this->assertSame(['1' => 'tactics leadership', '2' => 'leadership spirit', '3' => 'spirit', '4' => 'tactics'], $this->tags($client));
+        $this->assertSame(['1' => 'tactics leadership', '2' => 'leadership spirit', '3' => 'spirit', '4' => 'tactics'], $this->tags());
     }
 
     public function testClearTags(): void
@@ -144,7 +145,7 @@ class TagControllerTest extends WebTestCase
         $answer = $this->post($client, 'clear', ['ids' => ['1', '3']]);
 
         $this->assertSame(['success' => true, 'tags' => [1 => [], 3 => []]], $answer);
-        $this->assertSame(['1' => '', '2' => 'leadership spirit', '3' => '', '4' => 'tactics'], $this->tags($client));
+        $this->assertSame(['1' => '', '2' => 'leadership spirit', '3' => '', '4' => 'tactics'], $this->tags());
     }
 
     /**
@@ -159,7 +160,7 @@ class TagControllerTest extends WebTestCase
         $answer = $this->post($client, $action, ['ids' => ['1', '999'], 'tags' => ['hacked']]);
 
         $this->assertSame(['success' => true], $answer);
-        $this->assertSame(array_column($this->fixtureDecks, 'tags', 'id'), $this->tags($client));
+        $this->assertSame(array_column($this->fixtureDecks, 'tags', 'id'), $this->tags());
     }
 
     public function actionProvider(): array
@@ -180,7 +181,7 @@ class TagControllerTest extends WebTestCase
 
         $this->assertSame(403, $client->getResponse()->getStatusCode());
         $this->assertSame(['success' => false, 'message' => 'Access Denied.'], json_decode($client->getResponse()->getContent(), true));
-        $this->assertSame(array_column($this->fixtureDecks, 'tags', 'id'), $this->tags($client));
+        $this->assertSame(array_column($this->fixtureDecks, 'tags', 'id'), $this->tags());
     }
 
     /**
@@ -193,7 +194,7 @@ class TagControllerTest extends WebTestCase
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('http://localhost/login', $client->getResponse()->headers->get('Location'));
-        $this->assertSame(array_column($this->fixtureDecks, 'tags', 'id'), $this->tags($client));
+        $this->assertSame(array_column($this->fixtureDecks, 'tags', 'id'), $this->tags());
     }
 
     public function testGetIsNotAllowed(): void

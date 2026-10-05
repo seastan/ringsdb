@@ -28,6 +28,7 @@ class DecklistCommentTest extends WebTestCase
 
     /** @var int */
     private $maxCommentId;
+
     /** @var array */
     private $decklists;
 
@@ -47,6 +48,7 @@ class DecklistCommentTest extends WebTestCase
         foreach ($this->decklists as $decklist) {
             $connection->update('decklist', $decklist, ['id' => $decklist['id']]);
         }
+
         parent::tearDown();
     }
 
@@ -79,7 +81,7 @@ class DecklistCommentTest extends WebTestCase
         return $client->getResponse();
     }
 
-    private function newComments(KernelBrowser $client)
+    private function newComments()
     {
         return $this->db()->fetchAll(
             'SELECT c.decklist_id, u.username, c.text, c.is_hidden FROM comment c JOIN user u ON u.id = c.user_id WHERE c.id > ? ORDER BY c.id',
@@ -118,7 +120,7 @@ class DecklistCommentTest extends WebTestCase
             'username' => 'admin',
             'text' => '<p>Nice <strong>deck</strong>!</p>',
             'is_hidden' => '0',
-        ]], $this->newComments($client));
+        ]], $this->newComments());
 
         $decklist = $this->db()->fetchAssoc('SELECT nb_comments, date_update, date_last_comment FROM decklist WHERE id = 1');
         $this->assertNotFalse($decklist);
@@ -157,7 +159,7 @@ class DecklistCommentTest extends WebTestCase
             'username' => 'test',
             'text' => '<p>What do you think, <code>@admin</code>?</p>',
             'is_hidden' => '0',
-        ]], $this->newComments($client));
+        ]], $this->newComments());
         $this->assertSame(['admin@example.com' => '[ringsdb] New comment'], $this->sentEmails($client));
     }
 
@@ -199,7 +201,7 @@ class DecklistCommentTest extends WebTestCase
         $client = $this->createAuthenticatedClient('test');
         $this->postComment($client, 1, $text);
 
-        $comments = $this->newComments($client);
+        $comments = $this->newComments();
         $this->assertCount(1, $comments);
         $this->assertSame($expectedHtml, $comments[0]['text']);
     }
@@ -222,7 +224,7 @@ class DecklistCommentTest extends WebTestCase
 
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame(self::DECKLIST_1_URL, $response->headers->get('Location'));
-        $this->assertSame([], $this->newComments($client));
+        $this->assertSame([], $this->newComments());
         $this->assertSame('1', $this->db()->fetchColumn('SELECT nb_comments FROM decklist WHERE id = 1'));
         $this->assertSame([], $this->sentEmails($client));
     }
@@ -234,7 +236,7 @@ class DecklistCommentTest extends WebTestCase
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('http://localhost/login', $client->getResponse()->headers->get('Location'));
-        $this->assertSame([], $this->newComments($client));
+        $this->assertSame([], $this->newComments());
     }
 
     public function testCommentOnUnknownDecklist(): void
@@ -243,7 +245,7 @@ class DecklistCommentTest extends WebTestCase
         $client->request('POST', '/user/comment', ['id' => 999, 'comment' => 'Lost']);
 
         $this->assertSame(400, $client->getResponse()->getStatusCode());
-        $this->assertSame([], $this->newComments($client));
+        $this->assertSame([], $this->newComments());
     }
 
     /**
@@ -258,7 +260,7 @@ class DecklistCommentTest extends WebTestCase
         $this->assertSame(500, $client->getResponse()->getStatusCode());
         $this->assertSame('application/json', $client->getResponse()->headers->get('Content-Type'));
         $this->assertSame(['success' => false, 'message' => 'Wrong decklist id'], json_decode($client->getResponse()->getContent(), true));
-        $this->assertSame([], $this->newComments($client));
+        $this->assertSame([], $this->newComments());
     }
 
     /* --------------------------------------------------------- hot topics */

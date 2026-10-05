@@ -82,7 +82,7 @@ class RemoveUserCommand extends Command
             ]);
 
             foreach ($children as $child) {
-                $child->setParent(null);
+                $child->setParent();
             }
 
             $this->entityManager->remove($deck);
@@ -101,7 +101,7 @@ class RemoveUserCommand extends Command
                 'precedent' => $decklist,
             ]);
             foreach ($successors as $successor) {
-                $successor->setPrecedent(null);
+                $successor->setPrecedent();
             }
 
             $children = $this->deckRepository->findBy([
@@ -109,7 +109,7 @@ class RemoveUserCommand extends Command
             ]);
             foreach ($children as $child) {
                 /* @var $child Deck */
-                $child->setParent(null);
+                $child->setParent();
             }
 
             $this->entityManager->remove($decklist);

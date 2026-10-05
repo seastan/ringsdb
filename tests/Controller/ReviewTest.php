@@ -29,8 +29,10 @@ class ReviewTest extends WebTestCase
 
     /** @var int[] */
     private $maxIds = [];
+
     /** @var array */
     private $fixtureReview;
+
     /** @var array */
     private $fixtureUsers;
 
@@ -41,6 +43,7 @@ class ReviewTest extends WebTestCase
         foreach (['review', 'reviewcomment'] as $table) {
             $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
         }
+
         $review = $connection->fetchAssoc('SELECT * FROM review WHERE id = 1');
         $this->assertNotFalse($review);
         $this->fixtureReview = $review;
@@ -58,9 +61,11 @@ class ReviewTest extends WebTestCase
         } else {
             $connection->update('review', $this->fixtureReview, ['id' => 1]);
         }
+
         foreach ($this->fixtureUsers as $user) {
             $connection->update('user', $user, ['id' => $user['id']]);
         }
+
         parent::tearDown();
     }
 
@@ -98,7 +103,7 @@ class ReviewTest extends WebTestCase
         $this->assertSame($expected, json_decode($response->getContent(), true));
     }
 
-    private function newReviews(KernelBrowser $client)
+    private function newReviews()
     {
         return $this->db()->fetchAll(
             'SELECT c.code, u.username, r.text_md, r.text_html, r.nb_votes FROM review r JOIN card c ON c.id = r.card_id JOIN user u ON u.id = r.user_id WHERE r.id > ? ORDER BY r.id',
@@ -106,7 +111,7 @@ class ReviewTest extends WebTestCase
         );
     }
 
-    private static function reviewText(): string
+    private function reviewText(): string
     {
         return "Théodred is a **cheap** hero: he gives a resource to a questing hero.\n\nSee http://example.com/theodred";
     }
@@ -117,7 +122,7 @@ class ReviewTest extends WebTestCase
     {
         $client = $this->createAuthenticatedClient('admin');
 
-        $response = $this->ajax($client, '/review/post', ['card_id' => 2, 'review_id' => '', 'review' => self::reviewText()]);
+        $response = $this->ajax($client, '/review/post', ['card_id' => 2, 'review_id' => '', 'review' => $this->reviewText()]);
 
         $this->assertJsonAnswer($response, 200, ['success' => true]);
         $this->assertSame([[
@@ -126,7 +131,7 @@ class ReviewTest extends WebTestCase
             'text_md' => "Théodred is a **cheap** hero: he gives a resource to a questing hero.\n\nSee [example.com](http://example.com/theodred)",
             'text_html' => "<p>Théodred is a <strong>cheap</strong> hero: he gives a resource to a questing hero.</p>\n<p>See <a href=\"http://example.com/theodred\">example.com</a></p>",
             'nb_votes' => '0',
-        ]], $this->newReviews($client));
+        ]], $this->newReviews());
 
         $crawler = $client->request('GET', '/card/01002');
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -148,12 +153,12 @@ class ReviewTest extends WebTestCase
         $response = $this->ajax($client, '/review/post', $parameters + ['review_id' => '']);
 
         $this->assertJsonAnswer($response, 500, ['success' => false, 'message' => $message]);
-        $this->assertSame([], $this->newReviews($client));
+        $this->assertSame([], $this->newReviews());
     }
 
     public function refusedReviewProvider(): array
     {
-        $text = self::reviewText();
+        $text = $this->reviewText();
 
         return [
             // "test" already wrote 1 review, with a reputation of 1
@@ -175,21 +180,22 @@ class ReviewTest extends WebTestCase
         $releaseDate = $connection->fetchColumn("SELECT date_release FROM pack WHERE code = 'HfG'");
         try {
             $connection->update('pack', ['date_release' => null], ['code' => 'HfG']);
-            $response = $this->ajax($client, '/review/post', ['card_id' => 74, 'review_id' => '', 'review' => self::reviewText()]);
+            $response = $this->ajax($client, '/review/post', ['card_id' => 74, 'review_id' => '', 'review' => $this->reviewText()]);
             $this->assertJsonAnswer($response, 500, ['success' => false, 'message' => 'You may not write a review for an unreleased card.']);
         } finally {
             $connection->update('pack', ['date_release' => $releaseDate], ['code' => 'HfG']);
         }
-        $this->assertSame([], $this->newReviews($client));
+
+        $this->assertSame([], $this->newReviews());
     }
 
     public function testAnonymousCannotWriteAReview(): void
     {
         $client = $this->client;
-        $response = $this->ajax($client, '/review/post', ['card_id' => 2, 'review' => self::reviewText()]);
+        $response = $this->ajax($client, '/review/post', ['card_id' => 2, 'review' => $this->reviewText()]);
 
         $this->assertJsonAnswer($response, 403, ['success' => false, 'message' => 'You are not logged in.']);
-        $this->assertSame([], $this->newReviews($client));
+        $this->assertSame([], $this->newReviews());
     }
 
     /* -------------------------------------------------------------- edit */
@@ -234,7 +240,7 @@ class ReviewTest extends WebTestCase
     public function refusedEditProvider(): array
     {
         return [
-            'another user\'s review' => ['admin', 1, 'You cannot edit this review.'],
+            "another user's review" => ['admin', 1, 'You cannot edit this review.'],
             'unknown review' => ['test', 999, 'Unable to find review.'],
         ];
     }
