@@ -1,7 +1,8 @@
 <?php
 
-namespace AppBundle\Controller;
+namespace App\Controller;
 
+use App\Repository\DeckRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,6 +15,15 @@ use Symfony\Component\HttpFoundation\Response;
 class Oauth2Controller extends AbstractController {
 
 	/**
+	 * @var DeckRepository
+	 */
+	private $deckRepository;
+
+	public function __construct(DeckRepository $deckRepository) {
+		$this->deckRepository = $deckRepository;
+	}
+
+	/**
 	 * Return one Deck as JSON, if the owner shares their decks.
 	 *
 	 * @param mixed $id
@@ -24,8 +34,8 @@ class Oauth2Controller extends AbstractController {
 		$response->headers->set('Content-Type', 'application/json');
 		$response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-		/* @var $deck \AppBundle\Entity\Deck */
-		$deck = $this->getDoctrine()->getRepository('AppBundle:Deck')->find($id);
+		/* @var $deck \App\Entity\Deck */
+		$deck = $this->deckRepository->find($id);
 
 		if (!$deck) {
 			$response->setContent(json_encode([

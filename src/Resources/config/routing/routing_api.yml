@@ -8,6 +8,13 @@ app_api_private:
     resource: "api/routing_api_private.yml"
     prefix: /private
 
+# anonymous, CORS-open deck endpoint for external integrations (DragnCards); gated
+# per-deck by the owner's "Share my decks" setting. Legacy /oauth2 path kept for
+# compatibility — it uses no OAuth (see Oauth2Controller).
+app_api_oauth2:
+    resource: "api/routing_api_oauth2.yml"
+    prefix: /oauth2
+
 api_intro:
     path: /
     defaults:
