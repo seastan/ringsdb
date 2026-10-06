@@ -101,7 +101,7 @@ class SecurityControllerTest extends WebTestCase
 
         $client->request('GET', '/api/private/user/info');
         $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertInternalType('array', $data);
+        $this->assertIsArray($data);
         $this->assertEquals($username, $data['name']);
     }
 
@@ -144,17 +144,17 @@ class SecurityControllerTest extends WebTestCase
         $this->assertNotEmpty($user->getConfirmationToken());
         $this->assertNotSame('secret123', $user->getPassword(), 'Password must be encoded');
         $token = $user->getConfirmationToken();
-        $this->assertContains('/register/confirm/'.$token, str_replace("=\r\n", '', $message->getBody()->toString()));
+        $this->assertStringContainsString('/register/confirm/'.$token, str_replace("=\r\n", '', $message->getBody()->toString()));
 
         $client->followRedirect();
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertContains($email, $client->getResponse()->getContent());
+        $this->assertStringContainsString($email, $client->getResponse()->getContent());
 
         // 3. login is refused until the account is confirmed
         $this->login($client, $username, 'secret123');
         $this->assertRedirectsTo($client, '#/login$#');
         $crawler = $client->followRedirect();
-        $this->assertContains('Invalid credentials', $crawler->filter('.alert-danger')->text());
+        $this->assertStringContainsString('Invalid credentials', $crawler->filter('.alert-danger')->text());
         $this->assertAnonymous($client);
 
         // 4. confirmation link enables the account and logs the user in
@@ -192,7 +192,7 @@ class SecurityControllerTest extends WebTestCase
         // form is displayed again, with errors, and no user is created
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertCount(1, $crawler->filter('form.fos_user_registration_register'));
-        $this->assertContains($expectedError, $client->getResponse()->getContent());
+        $this->assertStringContainsString($expectedError, $client->getResponse()->getContent());
         if ('test' !== $username) {
             $this->assertNull($this->findUser($client, $username));
         }
@@ -223,7 +223,7 @@ class SecurityControllerTest extends WebTestCase
         ]]);
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertContains('The CSRF token is invalid', $client->getResponse()->getContent());
+        $this->assertStringContainsString('The CSRF token is invalid', $client->getResponse()->getContent());
         $this->assertNull($this->findUser($client, self::PREFIX.'csrf'));
     }
 
@@ -280,7 +280,7 @@ class SecurityControllerTest extends WebTestCase
 
         $this->assertRedirectsTo($client, '#/login$#');
         $crawler = $client->followRedirect();
-        $this->assertContains('Invalid credentials.', $crawler->filter('.alert-danger')->text());
+        $this->assertStringContainsString('Invalid credentials.', $crawler->filter('.alert-danger')->text());
         $this->assertEquals($username, $crawler->filter('#username')->attr('value'));
         $this->assertAnonymous($client);
     }
@@ -304,7 +304,7 @@ class SecurityControllerTest extends WebTestCase
 
         $this->assertRedirectsTo($client, '#/login$#');
         $crawler = $client->followRedirect();
-        $this->assertContains('Invalid CSRF token.', $crawler->filter('.alert-danger')->text());
+        $this->assertStringContainsString('Invalid CSRF token.', $crawler->filter('.alert-danger')->text());
         $this->assertAnonymous($client);
     }
 

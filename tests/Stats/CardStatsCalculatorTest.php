@@ -281,8 +281,8 @@ class CardStatsCalculatorTest extends KernelTestCase
         [$status, $display] = $this->runCommand(['month' => '2015-08', '--months' => '2']);
 
         $this->assertSame(0, $status);
-        $this->assertContains("Computing 2015-08 ...\n", $display);
-        $this->assertContains("Computing 2015-07 ...\n", $display);
+        $this->assertStringContainsString("Computing 2015-08 ...\n", $display);
+        $this->assertStringContainsString("Computing 2015-07 ...\n", $display);
         $this->assertStringEndsWith("done\n", $display);
         $rows = $this->connection->fetchAll("SELECT month, step, payload FROM stat_cards_cache WHERE month IN ('2015-07', '2015-08') ORDER BY month, step");
         $this->assertSame([['2015-07', '1'], ['2015-07', '2'], ['2015-07', '3'], ['2015-08', '1'], ['2015-08', '2'], ['2015-08', '3']], array_map(fn (array $row): array => [$row['month'], $row['step']], $rows));
@@ -299,7 +299,7 @@ class CardStatsCalculatorTest extends KernelTestCase
         [$status, $display] = $this->runCommand(['month' => "2015-08' OR '1"]);
 
         $this->assertSame(1, $status);
-        $this->assertContains("month must be YYYY-MM, got '2015-08' OR '1'", $display);
+        $this->assertStringContainsString("month must be YYYY-MM, got '2015-08' OR '1'", $display);
         $this->assertSame('0', $this->connection->fetchColumn('SELECT COUNT(*) FROM stat_cards_cache'));
     }
 }

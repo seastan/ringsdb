@@ -136,9 +136,9 @@ class ReviewTest extends WebTestCase
 
         $crawler = $client->request('GET', '/card/01002');
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertContains('is a cheap hero', $crawler->filter('.review-text')->text());
+        $this->assertStringContainsString('is a cheap hero', $crawler->filter('.review-text')->text());
         $crawler = $client->request('GET', '/reviews');
-        $this->assertContains('is a cheap hero', $crawler->filter('body')->text());
+        $this->assertStringContainsString('is a cheap hero', $crawler->filter('body')->text());
     }
 
     /**

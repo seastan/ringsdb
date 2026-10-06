@@ -104,7 +104,7 @@ class DecklistSocialTest extends WebTestCase
 
         // the decklist is listed in the user's favorites
         $crawler = $client->request('GET', '/decklists/favorites');
-        $this->assertContains('Gondor/Dunedain Leadership/Spirit', $crawler->filter('body')->text());
+        $this->assertStringContainsString('Gondor/Dunedain Leadership/Spirit', $crawler->filter('body')->text());
 
         $response = $this->post($client, 'favorite', 2);
         $this->assertSame('0', $response->getContent());

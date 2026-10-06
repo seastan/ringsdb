@@ -67,7 +67,7 @@ class CardSearchTest extends WebTestCase
         $names = $this->search('los');
         $this->assertNotContains('Longbeard Orc Slayer', $names);
         foreach ($names as $name) {
-            $this->assertContains('los', strtolower($name));
+            $this->assertStringContainsString('los', strtolower($name));
         }
     }
 
@@ -77,6 +77,6 @@ class CardSearchTest extends WebTestCase
         $crawler = $client->request('GET', '/find?q=LOS');
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertContains('Longbeard Orc Slayer', $crawler->filter('body')->text());
+        $this->assertStringContainsString('Longbeard Orc Slayer', $crawler->filter('body')->text());
     }
 }

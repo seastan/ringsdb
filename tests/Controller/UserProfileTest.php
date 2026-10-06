@@ -141,7 +141,7 @@ class UserProfileTest extends WebTestCase
         ], array_intersect_key($user, array_flip(['username', 'email', 'resume', 'color', 'is_notif_author', 'is_notif_commenter', 'is_notif_mention', 'is_share_decks', 'dark_mode'])));
 
         $crawler = $client->followRedirect();
-        $this->assertContains('Successfully saved your profile.', $crawler->filter('body')->text());
+        $this->assertStringContainsString('Successfully saved your profile.', $crawler->filter('body')->text());
         $client->request('GET', '/api/private/user/info');
         $info = json_decode($client->getResponse()->getContent(), true);
         $this->assertSame(['lore', true], [$info['sphere'], $info['dark_mode']]);
@@ -179,7 +179,7 @@ class UserProfileTest extends WebTestCase
 
         $this->assertSame('/user/profile_edit', $client->getResponse()->headers->get('Location'));
         $crawler = $client->followRedirect();
-        $this->assertContains('Username admin is already taken.', $crawler->filter('body')->text());
+        $this->assertStringContainsString('Username admin is already taken.', $crawler->filter('body')->text());
         $user = $this->fetchUser();
         $this->assertSame(['test', null], [$user['username'], $user['resume']]);
     }
@@ -226,7 +226,7 @@ class UserProfileTest extends WebTestCase
         $crawler = $client->submit($form);
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertContains('The entered password is invalid.', $crawler->filter('body')->text());
+        $this->assertStringContainsString('The entered password is invalid.', $crawler->filter('body')->text());
         $this->assertSame('test@example.com', $this->fetchUser()['email']);
 
         $form['fos_user_profile_form[current_password]'] = 'test';
@@ -253,7 +253,7 @@ class UserProfileTest extends WebTestCase
         ]));
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertContains($error, $crawler->filter('body')->text());
+        $this->assertStringContainsString($error, $crawler->filter('body')->text());
         $this->assertSame($this->fixtureUsers[0]['password'], $this->fetchUser()['password']);
     }
 
@@ -303,7 +303,7 @@ class UserProfileTest extends WebTestCase
         $this->assertEquals('test@example.com', $messages[0]->getTo()[0]->getAddress());
         $token = $this->fetchUser()['confirmation_token'];
         $this->assertNotEmpty($token);
-        $this->assertContains("/resetting/reset/$token", str_replace("=\r\n", '', $messages[0]->getBody()->toString()));
+        $this->assertStringContainsString("/resetting/reset/$token", str_replace("=\r\n", '', $messages[0]->getBody()->toString()));
 
         // 2. a second request is ignored while the first one is recent (no second email)
         $client->enableProfiler();

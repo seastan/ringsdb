@@ -249,7 +249,7 @@ class QuestlogWorkflowTest extends WebTestCase
 
         // 3. public quest logs are listed, and visible to other users
         $crawler = $client->request('GET', '/questlogs/recent');
-        $this->assertContains('PHPUnit Quest', $crawler->filter('body')->text());
+        $this->assertStringContainsString('PHPUnit Quest', $crawler->filter('body')->text());
         $client = $this->createAuthenticatedClient('admin');
         $client->request('GET', "/questlog/view/$id/phpunitquest");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -495,7 +495,7 @@ class QuestlogWorkflowTest extends WebTestCase
 
         $this->assertSame('/myquestlogs', $client->getResponse()->headers->get('Location'));
         $crawler = $client->followRedirect();
-        $this->assertContains("You can't delete a published quest log.", $crawler->filter('body')->text());
+        $this->assertStringContainsString("You can't delete a published quest log.", $crawler->filter('body')->text());
         $this->assertSame('Untitled Questlog', $this->fetchQuestlog(1)['name']);
     }
 
@@ -519,7 +519,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $this->assertFalse($this->fetchQuestlog($ids[0]));
         $this->assertNotFalse($this->fetchQuestlog($ids[1]));
         $crawler = $client->followRedirect();
-        $this->assertContains("You can't delete a published quest log. Unpublished selected quest logs were deleted.", $crawler->filter('body')->text());
+        $this->assertStringContainsString("You can't delete a published quest log. Unpublished selected quest logs were deleted.", $crawler->filter('body')->text());
     }
 
     /**

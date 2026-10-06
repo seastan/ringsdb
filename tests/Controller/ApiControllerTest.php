@@ -137,7 +137,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertSame(400, $response->getStatusCode());
         // not a script: the callback is not echoed as code
         $this->assertNotSame('application/javascript', $response->headers->get('Content-Type'));
-        $this->assertNotContains('/**/', (string) $response->getContent());
+        $this->assertStringNotContainsString('/**/', (string) $response->getContent());
     }
 
     /**

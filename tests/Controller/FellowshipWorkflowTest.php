@@ -199,7 +199,7 @@ class FellowshipWorkflowTest extends WebTestCase
 
         $crawler = $client->request('GET', "/fellowship/view/$id");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertContains('PHPUnit Fellowship', $crawler->filter('h1')->text());
+        $this->assertStringContainsString('PHPUnit Fellowship', $crawler->filter('h1')->text());
 
         // 2. edit: the form is prefilled; rename, replace deck 2 by decklist 3 in slot 3 (slots are compacted)
         $crawler = $client->request('GET', "/fellowship/edit/$id");
@@ -255,7 +255,7 @@ class FellowshipWorkflowTest extends WebTestCase
         $client->request('GET', "/fellowship/publish/$id");
         $this->assertSame("/fellowship/view/$id", $client->getResponse()->headers->get('Location'));
         $crawler = $client->followRedirect();
-        $this->assertContains('This fellowship is already published.', $crawler->filter('body')->text());
+        $this->assertStringContainsString('This fellowship is already published.', $crawler->filter('body')->text());
 
         $crawler = $client->request('GET', "/fellowship/edit/$id");
         $form = $crawler->filter('form[action="/fellowship/save"]')->form();
@@ -269,7 +269,7 @@ class FellowshipWorkflowTest extends WebTestCase
         $client->request('GET', '/logout');
         $crawler = $client->request('GET', "/fellowship/view/$id/phpunitpublishedfellowship");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertContains('PHPUnit Renamed', $crawler->filter('h1')->text());
+        $this->assertStringContainsString('PHPUnit Renamed', $crawler->filter('h1')->text());
     }
 
     public function testPublishKeepsTheMatchingDecklistsByDefault(): void
@@ -310,7 +310,7 @@ class FellowshipWorkflowTest extends WebTestCase
         $client->request('GET', "/fellowship/publish/$id");
         $this->assertSame("/fellowship/view/$id", $client->getResponse()->headers->get('Location'));
         $crawler = $client->followRedirect();
-        $this->assertContains('This fellowship cannot be published because it is invalid.', $crawler->filter('body')->text());
+        $this->assertStringContainsString('This fellowship cannot be published because it is invalid.', $crawler->filter('body')->text());
 
         $client->request('POST', '/fellowship/publish', ['fellowship_id' => $id, 'name' => 'PHPUnit Conflict']);
         $this->assertSame("/fellowship/view/$id", $client->getResponse()->headers->get('Location'));
@@ -336,8 +336,8 @@ class FellowshipWorkflowTest extends WebTestCase
         $crawler = $client->request('GET', '/fellowship/new/1/2/0/0');
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertContains('Decks[1] = {"id":1,', $client->getResponse()->getContent());
-        $this->assertContains('Decks[2] = {"id":2,', $client->getResponse()->getContent());
+        $this->assertStringContainsString('Decks[1] = {"id":1,', $client->getResponse()->getContent());
+        $this->assertStringContainsString('Decks[2] = {"id":2,', $client->getResponse()->getContent());
         $this->assertCount(1, $crawler->filter('form[action="/fellowship/save"]'));
     }
 
@@ -417,7 +417,7 @@ class FellowshipWorkflowTest extends WebTestCase
 
         $this->assertSame('/myfellowships', $client->getResponse()->headers->get('Location'));
         $crawler = $client->followRedirect();
-        $this->assertContains("You can't delete a published fellowship.", $crawler->filter('body')->text());
+        $this->assertStringContainsString("You can't delete a published fellowship.", $crawler->filter('body')->text());
         $this->assertSame('Heirs to Numeror Cycle', $this->fetchFellowship(1)['name']);
     }
 

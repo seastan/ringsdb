@@ -190,7 +190,7 @@ class DeckWorkflowTest extends WebTestCase
         $crawler = $client->request('GET', '/decks');
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertSame('My private decks (5/500 slots)', trim((string) preg_replace('/\s+/', ' ', $crawler->filter('h1')->text())));
-        $this->assertContains('PHPUnit Leadership', $client->getResponse()->getContent());
+        $this->assertStringContainsString('PHPUnit Leadership', $client->getResponse()->getContent());
 
         // 3. edit: rename, swap a hero (Glóin -> Gimli) and an ally (Gondorian Spearman -> Horseback Archer)
         $edited = $main;
@@ -279,7 +279,7 @@ class DeckWorkflowTest extends WebTestCase
         $crawler = $client->request('GET', $location);
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertSame('PHPUnit Published · RingsDB', trim($crawler->filter('title')->text()));
-        $this->assertContains('Published deck', $crawler->filter('body')->text());
+        $this->assertStringContainsString('Published deck', $crawler->filter('body')->text());
     }
 
     /**
@@ -626,9 +626,9 @@ class DeckWorkflowTest extends WebTestCase
 
         // 4. both decklist pages show the link
         $crawler = $client->request('GET', $location);
-        $this->assertContains('Dwarf Lore/Leadership/Tactics', $crawler->filter('#table-predecessor')->text());
+        $this->assertStringContainsString('Dwarf Lore/Leadership/Tactics', $crawler->filter('#table-predecessor')->text());
         $crawler = $client->request('GET', '/decklist/view/1/dwarfloreleadershiptactics-1.0');
-        $this->assertContains('PHPUnit Dwarves Remix', $crawler->filter('#table-successor')->text());
+        $this->assertStringContainsString('PHPUnit Dwarves Remix', $crawler->filter('#table-successor')->text());
     }
 
     public function testAnotherUserCanCopyADecklist(): void
@@ -714,7 +714,7 @@ class DeckWorkflowTest extends WebTestCase
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame("/deck/view/$deckId", $client->getResponse()->headers->get('Location'));
         $crawler = $client->followRedirect();
-        $this->assertContains('This deck cannot be published because it is invalid.', $crawler->filter('body')->text());
+        $this->assertStringContainsString('This deck cannot be published because it is invalid.', $crawler->filter('body')->text());
         $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM decklist WHERE parent_deck_id = ?', [$deckId]));
     }
 

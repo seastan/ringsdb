@@ -120,7 +120,7 @@ class CollectionTest extends WebTestCase
 
         // the collection page is rendered directly (forward), with a flash message
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertContains('Collection saved.', $crawler->filter('body')->text());
+        $this->assertStringContainsString('Collection saved.', $crawler->filter('body')->text());
         $this->assertSame('1:2,2,3', $this->db()->fetchColumn('SELECT owned_packs FROM user WHERE id = 1'));
 
         $client->request('GET', '/api/private/user/info');
@@ -192,7 +192,7 @@ class CollectionTest extends WebTestCase
         $this->assertSame(['01001' => 2, '01013' => 3, '01016' => 1], $this->packCards($id));
         // flash messages are displayed by JavaScript: app.ui.insert_alert_message('success', <JSON>)
         $client->followRedirect();
-        $this->assertContains("insert_alert_message('success', ".json_encode('Custom pack "PHPUnit Pack" created.').')', $client->getResponse()->getContent());
+        $this->assertStringContainsString("insert_alert_message('success', ".json_encode('Custom pack "PHPUnit Pack" created.').')', $client->getResponse()->getContent());
 
         // 2. edit: the cards are replaced
         $crawler = $client->request('GET', "/collection/custom-pack/$id/edit");
@@ -229,7 +229,7 @@ class CollectionTest extends WebTestCase
         $response = $this->submitPackForm($client, '/collection/custom-pack/1/edit', '', []);
         $this->assertSame('/collection/custom-pack/1/edit', $response->headers->get('Location'));
         $crawler = $client->followRedirect();
-        $this->assertContains('Pack name is required.', $crawler->filter('body')->text());
+        $this->assertStringContainsString('Pack name is required.', $crawler->filter('body')->text());
         $this->assertSame('Test Custom Pack', $this->fetchPack(1)['name']);
     }
 

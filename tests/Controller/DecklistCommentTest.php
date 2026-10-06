@@ -130,7 +130,7 @@ class DecklistCommentTest extends WebTestCase
         $message = $this->sentMessages($client)[0];
         $this->assertSame(['test@example.com' => '[ringsdb] New comment'], $this->sentEmails($client));
         $this->assertEquals('seastan@ringsdb.com', $message->getFrom()[0]->getAddress());
-        $this->assertContains('<p>Nice <strong>deck</strong>!</p>', $message->getBody()->toString());
+        $this->assertStringContainsString('<p>Nice <strong>deck</strong>!</p>', $message->getBody()->toString());
 
         // the comment is displayed on the decklist page
         $crawler = $client->request('GET', self::DECKLIST_1_URL);

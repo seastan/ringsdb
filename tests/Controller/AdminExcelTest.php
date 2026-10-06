@@ -184,8 +184,8 @@ class AdminExcelTest extends WebTestCase
 
         [$response, $report] = $this->upload($client, $file);
         $this->assertSame('7 cards changed or added', $response);
-        $this->assertContains('Legolas: field [text] changed; field [flavor] changed;', $report);
-        $this->assertNotContains("\r", $this->db()->fetchColumn("SELECT text FROM card WHERE code = '01005'"));
+        $this->assertStringContainsString('Legolas: field [text] changed; field [flavor] changed;', $report);
+        $this->assertStringNotContainsString("\r", $this->db()->fetchColumn("SELECT text FROM card WHERE code = '01005'"));
 
         [$response] = $this->upload($client, $file);
         $this->assertSame('0 cards changed or added', $response);
@@ -205,7 +205,7 @@ class AdminExcelTest extends WebTestCase
 
         [$response, $report] = $this->upload($client, $file);
         $this->assertSame('7 cards changed or added', $response);
-        $this->assertContains('Legolas: field [text] changed; field [flavor] changed;', $report);
+        $this->assertStringContainsString('Legolas: field [text] changed; field [flavor] changed;', $report);
 
         [$response] = $this->upload($client, $file);
         $this->assertSame('0 cards changed or added', $response);
@@ -261,7 +261,7 @@ class AdminExcelTest extends WebTestCase
         $this->upload($client, $file);
 
         $this->assertSame(500, $client->getResponse()->getStatusCode());
-        $this->assertContains('cannot find entity [sphere] of name [Nonexistent]', $client->getResponse()->getContent());
+        $this->assertStringContainsString('cannot find entity [sphere] of name [Nonexistent]', $client->getResponse()->getContent());
         $this->assertSame('Aragorn', $this->fetchCard('01001')['name']);
     }
 }
