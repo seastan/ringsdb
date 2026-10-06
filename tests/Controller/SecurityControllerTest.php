@@ -138,11 +138,11 @@ class SecurityControllerTest extends WebTestCase
 
         // 2. user is created, disabled, with a confirmation token
         $user = $this->findUser($client, $username);
-        $this->assertNotNull($user);
+        $this->assertInstanceOf(User::class, $user);
         $this->assertEquals($email, $user->getEmail());
         $this->assertFalse($user->isEnabled());
         $this->assertNotEmpty($user->getConfirmationToken());
-        $this->assertNotEquals('secret123', $user->getPassword(), 'Password must be encoded');
+        $this->assertNotSame('secret123', $user->getPassword(), 'Password must be encoded');
         $token = $user->getConfirmationToken();
         $this->assertContains('/register/confirm/'.$token, str_replace("=\r\n", '', $message->getBody()->toString()));
 
@@ -164,7 +164,7 @@ class SecurityControllerTest extends WebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
         $user = $this->findUser($client, $username);
-        $this->assertNotNull($user);
+        $this->assertInstanceOf(User::class, $user);
         $this->assertTrue($user->isEnabled());
         $this->assertNull($user->getConfirmationToken());
         $this->assertAuthenticatedAs($client, $username);
@@ -315,7 +315,7 @@ class SecurityControllerTest extends WebTestCase
         $this->assertTrue($client->getResponse()->isRedirect());
 
         $cookie = $client->getCookieJar()->get('REMEMBERME');
-        $this->assertNotNull($cookie, 'REMEMBERME cookie must be set');
+        $this->assertInstanceOf(\Symfony\Component\BrowserKit\Cookie::class, $cookie, 'REMEMBERME cookie must be set');
 
         // drop the session: the remember-me cookie alone must authenticate the user
         $client->getCookieJar()->clear();

@@ -115,7 +115,7 @@ class AdminCsvTest extends WebTestCase
     private function sampleVariant(callable $change): string
     {
         $in = fopen(self::SAMPLE, 'r');
-        $this->assertNotFalse($in);
+        self::assertNotFalse($in);
         fseek($in, 3); // UTF-8 BOM
         $header = (array) fgetcsv($in);
         $lines = [];
@@ -157,7 +157,7 @@ class AdminCsvTest extends WebTestCase
             FROM card_printing cp JOIN pack p ON p.id = cp.pack_id JOIN card c ON c.id = cp.card_id
             JOIN type t ON t.id = c.type_id JOIN sphere s ON s.id = c.sphere_id
             WHERE p.code = ? AND c.name LIKE ?', [$packCode, "%$name"]);
-        $this->assertNotFalse($row, "$name in $packCode");
+        self::assertNotFalse($row, "$name in $packCode");
 
         return $row;
     }

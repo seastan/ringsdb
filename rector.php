@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\SetList;
 
 return RectorConfig::configure()
@@ -20,6 +21,7 @@ return RectorConfig::configure()
         SetList::TYPE_DECLARATION,
         SetList::PRIVATIZATION,
         SetList::TYPE_DECLARATION_DOCBLOCKS,
+        PHPUnitSetList::PHPUNIT_NARROW_ASSERTS,
     ])
     ->withSkip([
         Rector\CodeQuality\Rector\For_\ForRepeatedCountToOwnVariableRector::class,

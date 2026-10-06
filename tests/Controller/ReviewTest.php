@@ -304,8 +304,8 @@ class ReviewTest extends WebTestCase
         // BUG: escaped once more by Twig when displayed, the entities are shown as is
         $crawler = $client->request('GET', self::CARD_URL);
         $node = $crawler->filter('#review-1 .review-comment')->first()->getNode(0);
-        $this->assertNotNull($node);
-        $this->assertNotNull($node->firstChild);
+        $this->assertInstanceOf(\DOMNode::class, $node);
+        $this->assertInstanceOf(\DOMNode::class, $node->firstChild);
         $text = (string) $node->firstChild->nodeValue;
         $this->assertSame('Agreed &lt;b&gt;100%&lt;/b&gt; —', trim((string) preg_replace('/\s+/u', ' ', $text)));
     }

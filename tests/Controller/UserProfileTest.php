@@ -127,7 +127,7 @@ class UserProfileTest extends WebTestCase
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/user/profile_edit', $client->getResponse()->headers->get('Location'));
         $cookie = $client->getCookieJar()->get('dark_mode');
-        $this->assertNotNull($cookie);
+        $this->assertInstanceOf(\Symfony\Component\BrowserKit\Cookie::class, $cookie);
         $this->assertSame('1', $cookie->getValue());
         $this->assertFalse($cookie->isHttpOnly());
 
@@ -152,7 +152,7 @@ class UserProfileTest extends WebTestCase
         $client->submit($form);
         $this->assertSame('0', $this->fetchUser()['dark_mode']);
         $cookie = $client->getCookieJar()->get('dark_mode');
-        $this->assertNotNull($cookie);
+        $this->assertInstanceOf(\Symfony\Component\BrowserKit\Cookie::class, $cookie);
         $this->assertSame('0', $cookie->getValue());
     }
 

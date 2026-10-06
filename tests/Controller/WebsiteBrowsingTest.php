@@ -361,7 +361,7 @@ class WebsiteBrowsingTest extends WebTestCase
         file_put_contents($file, $response->getContent());
         $zip = new \ZipArchive();
         // true, or an error code
-        $this->assertSame(true, $zip->open($file));
+        $this->assertTrue($zip->open($file));
         $actual = [];
         for ($i = 0; $i < $zip->numFiles; ++$i) {
             $actual[$zip->getNameIndex($i)] = $zip->getFromIndex($i);
