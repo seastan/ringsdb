@@ -19,14 +19,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CardsData
 {
-    public function __construct(private EntityManagerInterface $entityManager, private UrlGeneratorInterface $router, private Packages $assets_packages, private string $publicDir, private CardRepository $cardRepository, private CycleRepository $cycleRepository, private ReviewRepository $reviewRepository, private SphereRepository $sphereRepository)
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly UrlGeneratorInterface $router, private readonly Packages $assets_packages, private readonly string $publicDir, private readonly CardRepository $cardRepository, private readonly CycleRepository $cycleRepository, private readonly ReviewRepository $reviewRepository, private readonly SphereRepository $sphereRepository)
     {
     }
 
     /**
      * Searches for and replaces symbol tokens with markup in a given text.
-     *
-     * @param string $text
      */
     public function replaceSymbols(?string $text): string
     {

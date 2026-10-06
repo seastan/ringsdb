@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class FixCanonicalNamesCommand extends Command
 {
-    public function __construct(private EntityManagerInterface $entityManager, private Texts $texts, private ScenarioRepository $scenarioRepository)
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly Texts $texts, private readonly ScenarioRepository $scenarioRepository)
     {
         parent::__construct();
     }

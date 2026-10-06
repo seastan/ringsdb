@@ -171,7 +171,27 @@ class Deck extends ExportableDeck implements \JsonSerializable
         return $snapshots;
     }
 
-    public function jsonSerialize()
+    /**
+     * @return array{
+     *     id: int|null,
+     *     name: string,
+     *     date_creation: string,
+     *     date_update: string,
+     *     description_md: string|null,
+     *     user_id: int|null,
+     *     heroes: array<int|string, int>,
+     *     slots: array<int|string, int>,
+     *     sideslots: array<int|string, int>,
+     *     version: string,
+     *     last_pack: Pack|null,
+     *     freeze_comments?: bool|null,
+     *     is_published: false,
+     *     problem: string|null,
+     *     tags: string|null,
+     *     history: list<array<string, mixed>>,
+     * }
+     */
+    public function jsonSerialize(): array
     {
         $array = parent::getArrayExport();
         $array['is_published'] = false;

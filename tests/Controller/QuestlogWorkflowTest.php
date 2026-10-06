@@ -104,7 +104,7 @@ class QuestlogWorkflowTest extends WebTestCase
     {
         $rows = $this->db()->fetchAll('SELECT c.code, s.quantity FROM deckslot s JOIN card c ON c.id = s.card_id WHERE s.deck_id = ? ORDER BY c.code', [$deckId]);
 
-        return json_encode(['main' => array_map('intval', array_column($rows, 'quantity', 'code')), 'side' => []]);
+        return json_encode(['main' => array_map(intval(...), array_column($rows, 'quantity', 'code')), 'side' => []]);
     }
 
     /**
@@ -196,16 +196,16 @@ class QuestlogWorkflowTest extends WebTestCase
             'scenario' => 'Journey Along the Anduin',
             'date_played' => '2020-05-17 00:00:00',
             'quest_mode' => 'nightmare',
-            'success' => '0',
-            'score' => '142',
-            'nb_decks' => '2',
-            'is_public' => '0',
-            'published' => '0',
+            'success' => 0,
+            'score' => 142,
+            'nb_decks' => 2,
+            'is_public' => 0,
+            'published' => 0,
             'username' => 'test',
         ], $this->fetchQuestlog($id));
         $this->assertSame([
-            ['deck_number' => '1', 'deck_id' => '1', 'decklist_id' => null, 'player' => 'Alice', 'content' => $deck1],
-            ['deck_number' => '2', 'deck_id' => '2', 'decklist_id' => null, 'player' => 'Bob', 'content' => $deck2],
+            ['deck_number' => 1, 'deck_id' => 1, 'decklist_id' => null, 'player' => 'Alice', 'content' => $deck1],
+            ['deck_number' => 2, 'deck_id' => 2, 'decklist_id' => null, 'player' => 'Bob', 'content' => $deck2],
         ], $this->fetchQuestlogDecks($id));
 
         $crawler = $client->request('GET', "/questlog/view/$id/phpunitquest");
@@ -238,11 +238,11 @@ class QuestlogWorkflowTest extends WebTestCase
 
         $this->assertSame($id, $this->questlogIdFromRedirect($client));
         $questlog = $this->fetchQuestlog($id);
-        $this->assertSame(['1', '2', '1', '1'], [$questlog['success'], $questlog['nb_decks'], $questlog['is_public'], $questlog['published']]);
+        $this->assertSame([1, 2, 1, 1], [$questlog['success'], $questlog['nb_decks'], $questlog['is_public'], $questlog['published']]);
         // a decklist is logged with its parent deck; slots are compacted
         $this->assertSame([
-            ['deck_number' => '1', 'deck_id' => '1', 'decklist_id' => null, 'player' => 'Alice', 'content' => $deck1],
-            ['deck_number' => '2', 'deck_id' => '3', 'decklist_id' => '3', 'player' => 'Carol', 'content' => $deck3],
+            ['deck_number' => 1, 'deck_id' => 1, 'decklist_id' => null, 'player' => 'Alice', 'content' => $deck1],
+            ['deck_number' => 2, 'deck_id' => 3, 'decklist_id' => 3, 'player' => 'Carol', 'content' => $deck3],
         ], $this->fetchQuestlogDecks($id));
 
         // 3. public quest logs are listed, and visible to other users
@@ -326,7 +326,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $client->request('POST', '/questlog/save', $values);
 
         $questlog = $this->fetchQuestlog($this->questlogIdFromRedirect($client));
-        $this->assertSame(['normal', '1', '0'], [$questlog['quest_mode'], $questlog['success'], $questlog['score']]);
+        $this->assertSame(['normal', 1, 0], [$questlog['quest_mode'], $questlog['success'], $questlog['score']]);
     }
 
     /* ------------------------------------------------------------ refused */
@@ -340,7 +340,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $client->submit($form);
 
         $this->assertSame(422, $client->getResponse()->getStatusCode());
-        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM questlog WHERE id > ?', [$this->maxIds['questlog']]));
+        $this->assertSame(0, $this->db()->fetchColumn('SELECT COUNT(*) FROM questlog WHERE id > ?', [$this->maxIds['questlog']]));
     }
 
     public function testDeckWithoutContentIsRefused(): void
@@ -353,7 +353,7 @@ class QuestlogWorkflowTest extends WebTestCase
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertSame('Cannot save a questlog with an empty deck', $client->getResponse()->getContent());
-        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM questlog WHERE id > ?', [$this->maxIds['questlog']]));
+        $this->assertSame(0, $this->db()->fetchColumn('SELECT COUNT(*) FROM questlog WHERE id > ?', [$this->maxIds['questlog']]));
     }
 
     public function testUnknownScenarioIsRefused(): void
@@ -383,7 +383,7 @@ class QuestlogWorkflowTest extends WebTestCase
 
         $id = $this->questlogIdFromRedirect($client);
         $this->assertCount(1, $this->fetchQuestlogDecks($id));
-        $this->assertSame('1', $this->fetchQuestlog($id)['nb_decks']);
+        $this->assertSame(1, $this->fetchQuestlog($id)['nb_decks']);
     }
 
     /* --------------------------------------------------- locked quest logs */
@@ -402,7 +402,7 @@ class QuestlogWorkflowTest extends WebTestCase
 
         $this->assertSame(1, $this->questlogIdFromRedirect($client));
         $questlog = $this->fetchQuestlog(1);
-        $this->assertSame(['PHPUnit Renamed', '1', '4'], [$questlog['name'], $questlog['is_public'], $questlog['nb_decks']]);
+        $this->assertSame(['PHPUnit Renamed', 1, 4], [$questlog['name'], $questlog['is_public'], $questlog['nb_decks']]);
         $this->assertSame($decks, $this->fetchQuestlogDecks(1));
     }
 
@@ -426,7 +426,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $decks = $this->fetchQuestlogDecks($id);
         $this->assertGreaterThan($this->maxIds['deck'], (int) $decks[0]['deck_id']);
         $this->assertSame('admin', $this->db()->fetchColumn('SELECT u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$decks[0]['deck_id']]));
-        $this->assertSame(['2', '2'], [$decks[1]['deck_id'], $decks[1]['decklist_id']]);
+        $this->assertSame([2, 2], [$decks[1]['deck_id'], $decks[1]['decklist_id']]);
     }
 
     public function testPrivateQuestlogVisibility(): void
@@ -482,7 +482,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $this->assertSame('/myquestlogs', $client->getResponse()->headers->get('Location'));
         $this->assertFalse($this->fetchQuestlog($id));
         $this->assertSame([], $this->fetchQuestlogDecks($id));
-        $this->assertSame('1', $this->db()->fetchColumn('SELECT COUNT(*) FROM deck WHERE id = 1'));
+        $this->assertSame(1, $this->db()->fetchColumn('SELECT COUNT(*) FROM deck WHERE id = 1'));
     }
 
     public function testQuestlogWithSocialActivityCannotBeDeleted(): void

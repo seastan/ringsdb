@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class LikeReviewController extends AbstractController
 {
-    public function __construct(private EntityManagerInterface $entityManager, private ReviewRepository $reviewRepository)
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly ReviewRepository $reviewRepository)
     {
     }
 

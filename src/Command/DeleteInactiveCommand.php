@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DeleteInactiveCommand extends Command
 {
-    public function __construct(private EntityManagerInterface $entityManager, private UserRepository $userRepository)
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly UserRepository $userRepository)
     {
         parent::__construct();
     }

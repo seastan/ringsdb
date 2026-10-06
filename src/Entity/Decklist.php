@@ -949,7 +949,28 @@ class Decklist extends ExportableDeck implements \JsonSerializable
         return array_filter($allQuestlogs, fn (QuestlogDeck $k): bool => $k->getQuestlog()->getIsPublic());
     }
 
-    public function jsonSerialize()
+    /**
+     * @return array{
+     *     id: int|null,
+     *     name: string,
+     *     date_creation: string,
+     *     date_update: string,
+     *     description_md: string|null,
+     *     user_id: int|null,
+     *     heroes: array<int|string, int>,
+     *     slots: array<int|string, int>,
+     *     sideslots: array<int|string, int>,
+     *     version: string,
+     *     last_pack: string,
+     *     freeze_comments?: bool|null,
+     *     is_published: true,
+     *     nb_votes: int,
+     *     nb_favorites: int,
+     *     nb_comments: int,
+     *     starting_threat: int,
+     * }
+     */
+    public function jsonSerialize(): array
     {
         $array = parent::getArrayExport();
         $array['is_published'] = true;

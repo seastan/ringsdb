@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CommentDecklistController extends AbstractController
 {
-    public function __construct(private MailerInterface $mailer, private UserRepository $userRepository, private DecklistRepository $decklistRepository, private Texts $texts)
+    public function __construct(private readonly MailerInterface $mailer, private readonly UserRepository $userRepository, private readonly DecklistRepository $decklistRepository, private readonly Texts $texts)
     {
     }
 

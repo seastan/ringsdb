@@ -11,6 +11,7 @@ use App\Entity\Fellowship;
 use App\Entity\FellowshipDeck;
 use App\Entity\FellowshipDecklist;
 use App\Entity\User;
+use App\Helper\StringSanitizer;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use App\Repository\FellowshipRepository;
@@ -55,7 +56,7 @@ class SaveFellowshipController extends AbstractController
             $fellowship = new Fellowship($user);
         }
 
-        $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $name = trim(StringSanitizer::sanitize($request->request->get('name'), false));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = 'Untitled Fellowship';
@@ -86,7 +87,7 @@ class SaveFellowshipController extends AbstractController
             $skip = 0;
             for ($i = 1; $i <= 4; ++$i) {
                 $deck_id = intval(filter_var($request->request->get('deck'.$i.'_id'), FILTER_SANITIZE_NUMBER_INT));
-                $is_decklist = 'true' == filter_var($request->get('deck'.$i.'_is_decklist'), FILTER_SANITIZE_STRING);
+                $is_decklist = 'true' === StringSanitizer::sanitize($request->get('deck'.$i.'_is_decklist'));
                 if ($deck_id) {
                     if (!$is_decklist) {
                         /* @var $deck Deck */

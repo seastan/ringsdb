@@ -188,7 +188,7 @@ class AdminCsvTest extends WebTestCase
         $counts = [$this->rowCount('card'), $this->rowCount('card_printing'), $this->rowCount('pack')];
         $bilbo = $this->fetchPrinting('THo', 'Bilbo Baggins');
         $beorn = $this->fetchPrinting('THo', 'Beorn');
-        $this->assertSame(['131005', '5'], [$beorn['code'], $beorn['position']]);
+        $this->assertSame(['131005', 5], [$beorn['code'], $beorn['position']]);
         $beornCore = $this->fetchPrinting('OHaUH', 'Beorn');
 
         $response = $this->upload($client, self::SAMPLE, 'THo', 'ALeP - The Hobbit');
@@ -253,11 +253,11 @@ class AdminCsvTest extends WebTestCase
         );
         $pack = $this->db()->fetchAssoc('SELECT p.name, p.position, p.size, p.date_release, y.code AS cycle FROM pack p JOIN cycle y ON y.id = p.cycle_id WHERE p.code = ?', ['PHPU']);
         $lastCycle = $this->db()->fetchColumn('SELECT code FROM cycle ORDER BY id DESC LIMIT 1');
-        $this->assertSame(['name' => 'PHPUnit Pack', 'position' => '1', 'size' => '1', 'date_release' => '2030-02-01', 'cycle' => $lastCycle], $pack);
+        $this->assertSame(['name' => 'PHPUnit Pack', 'position' => 1, 'size' => 1, 'date_release' => '2030-02-01', 'cycle' => $lastCycle], $pack);
 
         $beorn = $this->fetchPrinting('PHPU', 'Beorn');
         $this->assertSame(
-            ['993991', 'Hero', 'Tactics', '10', '1', 'Steven Shan', 'phpunit-2570109c-b9ed-4af5-9f26-4cb8712605c9'],
+            ['993991', 'Hero', 'Tactics', 10, 1, 'Steven Shan', 'phpunit-2570109c-b9ed-4af5-9f26-4cb8712605c9'],
             [$beorn['code'], $beorn['type'], $beorn['sphere'], $beorn['health'], $beorn['quantity'], $beorn['illustrator'], $beorn['octgnid']]
         );
         // the line break of the text is kept, the lines of the file are not mixed up

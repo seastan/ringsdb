@@ -24,7 +24,7 @@ class LoginManager
      */
     private const FIREWALL = 'main';
 
-    public function __construct(private TokenStorageInterface $tokenStorage, private UserCheckerInterface $userChecker, private SessionAuthenticationStrategyInterface $sessionStrategy, private RequestStack $requestStack, private EntityManagerInterface $entityManager)
+    public function __construct(private readonly TokenStorageInterface $tokenStorage, private readonly UserCheckerInterface $userChecker, private readonly SessionAuthenticationStrategyInterface $sessionStrategy, private readonly RequestStack $requestStack, private readonly EntityManagerInterface $entityManager)
     {
     }
 

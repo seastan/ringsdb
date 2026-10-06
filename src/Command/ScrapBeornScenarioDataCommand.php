@@ -14,7 +14,7 @@ use Symfony\Component\VarDumper\VarDumper;
 
 class ScrapBeornScenarioDataCommand extends Command
 {
-    public function __construct(private EntityManagerInterface $entityManager)
+    public function __construct(private readonly EntityManagerInterface $entityManager)
     {
         parent::__construct();
     }

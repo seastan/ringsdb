@@ -147,7 +147,7 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame('/decklist/view/1/phpunitrenamed-1.0', $response->headers->get('Location'));
         $decklist = $this->fetchDecklist(1);
         $this->assertSame(
-            ['PHPUnit Renamed', 'phpunitrenamed-1.0', 'Now **bold**', '<p>Now <strong>bold</strong></p>', '2'],
+            ['PHPUnit Renamed', 'phpunitrenamed-1.0', 'Now **bold**', '<p>Now <strong>bold</strong></p>', 2],
             [$decklist['name'], $decklist['name_canonical'], $decklist['description_md'], $decklist['description_html'], $decklist['precedent_decklist_id']]
         );
         $this->assertGreaterThan('2015-08-16 00:00:00', $decklist['date_update']);
@@ -184,7 +184,7 @@ class DecklistEditTest extends WebTestCase
      *
      * @dataProvider precedentProvider
      */
-    public function testPrecedent(string $precedent, ?string $expected): void
+    public function testPrecedent(string $precedent, ?int $expected): void
     {
         $client = $this->createAuthenticatedClient();
         $this->saveForm($client, 1, ['precedent' => $precedent]);
@@ -198,8 +198,8 @@ class DecklistEditTest extends WebTestCase
     public function precedentProvider(): array
     {
         return [
-            'id' => ['3', '3'],
-            'decklist URL' => ['https://ringsdb.com/decklist/view/4/gondorrohansilvantactics-1.0', '4'],
+            'id' => ['3', 3],
+            'decklist URL' => ['https://ringsdb.com/decklist/view/4/gondorrohansilvantactics-1.0', 4],
             'empty' => ['', null],
             'itself' => ['1', null],
             'unknown decklist' => ['999', null],
@@ -289,9 +289,9 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/decklists/mine', $client->getResponse()->headers->get('Location'));
         $this->assertFalse($this->fetchDecklist($id));
-        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM decklistslot WHERE decklist_id = ?', [$id]));
-        $this->assertSame('1', $this->fetchDecklist($successor)['precedent_decklist_id']);
-        $this->assertSame('1', $this->db()->fetchColumn('SELECT parent_decklist_id FROM deck WHERE id = ?', [$child]));
+        $this->assertSame(0, $this->db()->fetchColumn('SELECT COUNT(*) FROM decklistslot WHERE decklist_id = ?', [$id]));
+        $this->assertSame(1, $this->fetchDecklist($successor)['precedent_decklist_id']);
+        $this->assertSame(1, $this->db()->fetchColumn('SELECT parent_decklist_id FROM deck WHERE id = ?', [$child]));
     }
 
     /**
@@ -306,7 +306,7 @@ class DecklistEditTest extends WebTestCase
         $client->request('POST', "/decklist/delete/$decklist");
 
         $this->assertSame(403, $client->getResponse()->getStatusCode());
-        $this->assertSame('4', $this->db()->fetchColumn('SELECT COUNT(*) FROM decklist'));
+        $this->assertSame(4, $this->db()->fetchColumn('SELECT COUNT(*) FROM decklist'));
     }
 
     /**
@@ -342,10 +342,10 @@ class DecklistEditTest extends WebTestCase
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertFalse($this->fetchDecklist($id));
-        $this->assertSame(['1', '1'], [
+        $this->assertSame([1, 1], [
             $connection->fetchColumn('SELECT is_public FROM fellowship WHERE id = ?', [$fellowshipId]),
             $connection->fetchColumn('SELECT nb_decks FROM fellowship WHERE id = ?', [$fellowshipId]),
         ]);
-        $this->assertSame('0', $connection->fetchColumn('SELECT COUNT(*) FROM fellowship_decklist WHERE fellowship_id = ?', [$fellowshipId]));
+        $this->assertSame(0, $connection->fetchColumn('SELECT COUNT(*) FROM fellowship_decklist WHERE fellowship_id = ?', [$fellowshipId]));
     }
 }

@@ -124,7 +124,7 @@ class SuggestionsCommandTest extends KernelTestCase
         // the fixture decks share no card: 1 for two cards of the same deck, 0 otherwise
         $this->assertSame(1, $this->value($suggestions, '01004', '01028'), 'Gimli and Veteran Axehand, deck 1');
         $this->assertSame(0, $this->value($suggestions, '01004', '01001'), 'Gimli (deck 1) and Aragorn (deck 2)');
-        $total = array_sum(array_map('array_sum', $suggestions['matrix']));
+        $total = array_sum(array_map(array_sum(...), $suggestions['matrix']));
         $pairs = (int) $this->connection->fetchColumn('SELECT SUM(n * (n - 1) / 2) FROM (SELECT COUNT(*) n FROM deckslot GROUP BY deck_id) t');
         $this->assertSame($pairs, $total);
     }

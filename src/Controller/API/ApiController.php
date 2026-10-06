@@ -27,7 +27,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ApiController extends AbstractController
 {
-    public function __construct(private CardsData $cardsData, private int $cacheExpiration, private CardRepository $cardRepository, private DecklistRepository $decklistRepository, private PackRepository $packRepository, private EntityManagerInterface $entityManager)
+    public function __construct(private readonly CardsData $cardsData, private readonly int $cacheExpiration, private readonly CardRepository $cardRepository, private readonly DecklistRepository $decklistRepository, private readonly PackRepository $packRepository, private readonly EntityManagerInterface $entityManager)
     {
     }
 

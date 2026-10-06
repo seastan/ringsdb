@@ -1177,7 +1177,51 @@ class Scenario implements \JsonSerializable
         return $this->nameCanonical;
     }
 
-    public function jsonSerialize()
+    /**
+     * @return array{
+     *     id: int|null,
+     *     code: string,
+     *     name: string,
+     *     nameCanonical: string,
+     *     pack: string,
+     *     date_creation: string,
+     *     date_update: string,
+     *     encounters: array<int, Encounter>,
+     *     has_easy: bool,
+     *     has_nightmare: bool,
+     *     easy_cards: int,
+     *     easy_enemies: int,
+     *     easy_locations: int,
+     *     easy_treacheries: int,
+     *     easy_shadows: int,
+     *     easy_objectives: int,
+     *     easy_objective_allies: int,
+     *     easy_objective_locations: int,
+     *     easy_surges: int,
+     *     easy_encounter_side_quests: int,
+     *     normal_cards: int,
+     *     normal_enemies: int,
+     *     normal_locations: int,
+     *     normal_treacheries: int,
+     *     normal_shadows: int,
+     *     normal_objectives: int,
+     *     normal_objective_allies: int,
+     *     normal_objective_locations: int,
+     *     normal_surges: int,
+     *     normal_encounter_side_quests: int,
+     *     nightmare_cards: int,
+     *     nightmare_enemies: int,
+     *     nightmare_locations: int,
+     *     nightmare_treacheries: int,
+     *     nightmare_shadows: int,
+     *     nightmare_objectives: int,
+     *     nightmare_objective_allies: int,
+     *     nightmare_objective_locations: int,
+     *     nightmare_surges: int,
+     *     nightmare_encounter_side_quests: int,
+     * }
+     */
+    public function jsonSerialize(): array
     {
         $encounters = $this->getEncounters()->toArray();
         $pack = $this->getPack();

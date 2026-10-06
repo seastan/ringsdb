@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ViewQuestlogController extends AbstractController
 {
-    public function __construct(private QuestlogRepository $questlogRepository)
+    public function __construct(private readonly QuestlogRepository $questlogRepository)
     {
     }
 

@@ -11,7 +11,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class DeckImporter
 {
-    public function __construct(private EntityManagerInterface $entityManager, private CardRepository $cardRepository, private PackRepository $packRepository)
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly CardRepository $cardRepository, private readonly PackRepository $packRepository)
     {
     }
 

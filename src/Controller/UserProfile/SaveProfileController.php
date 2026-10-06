@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\UserProfile;
 
 use App\Controller\CurrentUserTrait;
+use App\Helper\StringSanitizer;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,7 +29,7 @@ class SaveProfileController extends AbstractController
     {
         /* @var $user \App\Entity\User */
         $user = $this->currentUser();
-        $username = (string) filter_var($request->get('username'), FILTER_SANITIZE_STRING);
+        $username = StringSanitizer::sanitize($request->get('username'));
         if ($username !== $user->getUsername()) {
             $user_existing = $this->userRepository->findOneBy(['username' => $username]);
             if ($user_existing) {
@@ -40,13 +41,13 @@ class SaveProfileController extends AbstractController
             $user->setUsername($username);
         }
 
-        $email = (string) filter_var($request->get('email'), FILTER_SANITIZE_STRING);
+        $email = StringSanitizer::sanitize($request->get('email'));
         if ($email !== $user->getEmail()) {
             $user->setEmail($email);
         }
 
-        $resume = (string) filter_var($request->get('resume'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
-        $sphere_code = (string) filter_var($request->get('user_sphere_code'), FILTER_SANITIZE_STRING);
+        $resume = StringSanitizer::sanitize($request->get('resume'), false);
+        $sphere_code = StringSanitizer::sanitize($request->get('user_sphere_code'));
         $notifAuthor = (bool) $request->get('notif_author');
         $notifCommenter = (bool) $request->get('notif_commenter');
         $notifMention = (bool) $request->get('notif_mention');

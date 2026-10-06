@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class GetCycleController extends AbstractController
 {
-    public function __construct(private CycleRepository $cycleRepository)
+    public function __construct(private readonly CycleRepository $cycleRepository)
     {
     }
 

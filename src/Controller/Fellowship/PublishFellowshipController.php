@@ -7,6 +7,7 @@ namespace App\Controller\Fellowship;
 use App\Entity\FellowshipDecklist;
 use App\Entity\User;
 use App\Helper\FellowshipValidationHelper;
+use App\Helper\StringSanitizer;
 use App\Model\DecklistFactory;
 use App\Repository\DecklistRepository;
 use App\Repository\FellowshipRepository;
@@ -21,7 +22,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PublishFellowshipController extends AbstractController
 {
-    public function __construct(private EntityManagerInterface $entityManager, private FellowshipValidationHelper $fellowshipValidationHelper, private Texts $texts, private DecklistFactory $decklistFactory, private DecklistRepository $decklistRepository, private FellowshipRepository $fellowshipRepository)
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly FellowshipValidationHelper $fellowshipValidationHelper, private readonly Texts $texts, private readonly DecklistFactory $decklistFactory, private readonly DecklistRepository $decklistRepository, private readonly FellowshipRepository $fellowshipRepository)
     {
     }
 
@@ -49,7 +50,7 @@ class PublishFellowshipController extends AbstractController
             return $this->redirect($this->generateUrl('fellowship_view', ['fellowship_id' => $fellowship->getId()]));
         }
 
-        $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $name = trim(StringSanitizer::sanitize($request->request->get('name'), false));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = 'Untitled Fellowship';

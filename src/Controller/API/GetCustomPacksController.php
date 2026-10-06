@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class GetCustomPacksController extends AbstractController
 {
-    public function __construct(private UserCustomPackRepository $userCustomPackRepository)
+    public function __construct(private readonly UserCustomPackRepository $userCustomPackRepository)
     {
     }
 

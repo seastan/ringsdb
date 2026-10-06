@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\DeckBuilder;
 
+use App\Helper\StringSanitizer;
 use App\Services\DeckImporter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FileImportDeckController extends AbstractController
 {
-    public function __construct(private DeckImporter $deckImporter)
+    public function __construct(private readonly DeckImporter $deckImporter)
     {
     }
 
@@ -22,7 +23,7 @@ class FileImportDeckController extends AbstractController
      */
     public function __invoke(Request $request): Response
     {
-        $filetype = filter_var($request->get('type'), FILTER_SANITIZE_STRING);
+        $filetype = StringSanitizer::sanitize($request->get('type'));
         $uploadedFile = $request->files->get('upfile');
         if (!isset($uploadedFile)) {
             throw new UnprocessableEntityHttpException('No file uploaded');
@@ -47,7 +48,7 @@ class FileImportDeckController extends AbstractController
             throw new \RuntimeException('Cannot read from uploaded file '.$filename);
         }
 
-        if ('octgn' == $filetype || 'auto' == $filetype && 'o8d' == $origext) {
+        if ('octgn' === $filetype || 'auto' === $filetype && 'o8d' == $origext) {
             $parse = $this->deckImporter->parseOctgnImport($contents);
         } else {
             $parse = $this->deckImporter->parseTextImport($contents);

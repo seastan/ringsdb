@@ -25,7 +25,7 @@ class ResettingResetController extends AbstractController
      */
     private const TOKEN_TTL = 86400;
 
-    public function __construct(private UserRepository $userRepository, private UserPasswordUpdater $passwordUpdater, private EntityManagerInterface $entityManager, private LoginManager $loginManager)
+    public function __construct(private readonly UserRepository $userRepository, private readonly UserPasswordUpdater $passwordUpdater, private readonly EntityManagerInterface $entityManager, private readonly LoginManager $loginManager)
     {
     }
 

@@ -13,7 +13,7 @@ use Symfony\Component\PasswordHasher\LegacyPasswordHasherInterface;
  */
 class UserPasswordUpdater
 {
-    public function __construct(private PasswordHasherFactoryInterface $passwordHasherFactory)
+    public function __construct(private readonly PasswordHasherFactoryInterface $passwordHasherFactory)
     {
     }
 

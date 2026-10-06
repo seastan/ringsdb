@@ -131,7 +131,7 @@ class ReviewTest extends WebTestCase
             'username' => 'admin',
             'text_md' => "Théodred is a **cheap** hero: he gives a resource to a questing hero.\n\nSee [example.com](http://example.com/theodred)",
             'text_html' => "<p>Théodred is a <strong>cheap</strong> hero: he gives a resource to a questing hero.</p>\n<p>See <a href=\"http://example.com/theodred\">example.com</a></p>",
-            'nb_votes' => '0',
+            'nb_votes' => 0,
         ]], $this->newReviews());
 
         $crawler = $client->request('GET', '/card/01002');
@@ -260,14 +260,14 @@ class ReviewTest extends WebTestCase
 
         $this->assertJsonAnswer($this->ajax($client, '/review/like', ['id' => 1]), 200, ['success' => true, 'nbVotes' => 1]);
 
-        $this->assertSame('1', $this->db()->fetchColumn('SELECT nb_votes FROM review WHERE id = 1'));
-        $this->assertSame('1', $this->db()->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
+        $this->assertSame(1, $this->db()->fetchColumn('SELECT nb_votes FROM review WHERE id = 1'));
+        $this->assertSame(1, $this->db()->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
         // the author earns 1 reputation point
-        $this->assertSame('2', $this->db()->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
+        $this->assertSame(2, $this->db()->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
 
         // liking twice does nothing
         $this->assertJsonAnswer($this->ajax($client, '/review/like', ['id' => 1]), 200, ['success' => true, 'nbVotes' => 1]);
-        $this->assertSame('2', $this->db()->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
+        $this->assertSame(2, $this->db()->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
     }
 
     public function testCannotLikeOwnReview(): void
@@ -276,8 +276,8 @@ class ReviewTest extends WebTestCase
 
         $this->assertJsonAnswer($this->ajax($client, '/review/like', ['id' => 1]), 200, ['success' => true, 'nbVotes' => 0]);
 
-        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
-        $this->assertSame('1', $this->db()->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
+        $this->assertSame(0, $this->db()->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
+        $this->assertSame(1, $this->db()->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
     }
 
     public function testLikeAnUnknownReview(): void
@@ -318,7 +318,7 @@ class ReviewTest extends WebTestCase
         $client = $this->createAuthenticatedClient('admin');
 
         $this->assertJsonAnswer($this->ajax($client, '/review/comment', $parameters), 500, ['success' => false, 'message' => $message]);
-        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM reviewcomment'));
+        $this->assertSame(0, $this->db()->fetchColumn('SELECT COUNT(*) FROM reviewcomment'));
     }
 
     /**
@@ -341,7 +341,7 @@ class ReviewTest extends WebTestCase
     {
         $client = $this->createAuthenticatedClient('admin');
         $this->assertJsonAnswer($this->ajax($client, '/review/remove/1', []), 403, ['success' => false, 'message' => 'No user or not admin']);
-        $this->assertSame('1', $this->db()->fetchColumn('SELECT COUNT(*) FROM review WHERE id = 1'));
+        $this->assertSame(1, $this->db()->fetchColumn('SELECT COUNT(*) FROM review WHERE id = 1'));
 
         $this->db()->update('user', ['roles' => serialize(['ROLE_SUPER_ADMIN'])], ['username' => 'admin']);
         $client = $this->createAuthenticatedClient('admin');
@@ -349,7 +349,7 @@ class ReviewTest extends WebTestCase
 
         // the route accepts any method, GET included
         $this->assertJsonAnswer($this->ajax($client, '/review/remove/1', [], 'GET'), 200, ['success' => true]);
-        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM review WHERE id = 1'));
-        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
+        $this->assertSame(0, $this->db()->fetchColumn('SELECT COUNT(*) FROM review WHERE id = 1'));
+        $this->assertSame(0, $this->db()->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
     }
 }

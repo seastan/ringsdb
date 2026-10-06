@@ -12,7 +12,7 @@ use Twig\Environment;
 
 class FellowshipArchiver
 {
-    public function __construct(private string $cacheDir, private FellowshipRepository $fellowshipRepository, private Environment $twig, private Texts $texts)
+    public function __construct(private readonly string $cacheDir, private readonly FellowshipRepository $fellowshipRepository, private readonly Environment $twig, private readonly Texts $texts)
     {
     }
 
