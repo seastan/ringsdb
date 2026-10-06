@@ -1,4 +1,4 @@
-FROM php:8.1-alpine
+FROM php:8.2-alpine
 
 RUN apk update && apk add --no-cache \
     libzip-dev \
