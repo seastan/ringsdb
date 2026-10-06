@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Entity\CardPrinting;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckchangeRepository;
 use App\Repository\CardRepository;
@@ -430,12 +431,12 @@ class Decks {
      * merged by the card-printings migration.
      */
     private function findCardByCode(string $code): ?Card {
-        $card = $this->doctrine->getRepository('AppBundle:Card')->findOneBy(['code' => $code]);
+        $card = $this->doctrine->getRepository(Card::class)->findOneBy(['code' => $code]);
         if ($card) {
             return $card;
         }
 
-        $printing = $this->doctrine->getRepository('AppBundle:CardPrinting')->findOneBy(['imageCode' => $code]);
+        $printing = $this->doctrine->getRepository(CardPrinting::class)->findOneBy(['imageCode' => $code]);
 
         return $printing ? $printing->getCard() : null;
     }
