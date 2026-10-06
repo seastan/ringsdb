@@ -15,20 +15,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ListFellowshipController extends AbstractController
 {
-    private int $cacheExpiration;
-
-    private FellowshipManager $fellowshipManager;
-
-    private CycleRepository $cycleRepository;
-
-    public function __construct(
-        int $cacheExpiration,
-        FellowshipManager $fellowshipManager,
-        CycleRepository $cycleRepository
-    ) {
-        $this->cacheExpiration = $cacheExpiration;
-        $this->fellowshipManager = $fellowshipManager;
-        $this->cycleRepository = $cycleRepository;
+    public function __construct(private int $cacheExpiration, private FellowshipManager $fellowshipManager, private CycleRepository $cycleRepository)
+    {
     }
 
     /**

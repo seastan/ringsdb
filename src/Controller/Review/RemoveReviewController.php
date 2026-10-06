@@ -12,16 +12,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RemoveReviewController extends AbstractController
 {
-    private ReviewRepository $reviewRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        ReviewRepository $reviewRepository,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->reviewRepository = $reviewRepository;
-        $this->entityManager = $entityManager;
+    public function __construct(private ReviewRepository $reviewRepository, private EntityManagerInterface $entityManager)
+    {
     }
 
     /**

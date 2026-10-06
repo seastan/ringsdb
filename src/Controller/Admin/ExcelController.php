@@ -25,20 +25,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ExcelController extends AbstractController
 {
-    private CardRepository $cardRepository;
-
-    private PackRepository $packRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        CardRepository $cardRepository,
-        PackRepository $packRepository,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->cardRepository = $cardRepository;
-        $this->packRepository = $packRepository;
-        $this->entityManager = $entityManager;
+    public function __construct(private CardRepository $cardRepository, private PackRepository $packRepository, private EntityManagerInterface $entityManager)
+    {
     }
 
     /**

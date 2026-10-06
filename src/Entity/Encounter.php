@@ -19,7 +19,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * )
  * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="entity_region")
  */
-class Encounter implements \JsonSerializable
+class Encounter implements \JsonSerializable, \Stringable
 {
     public function jsonSerialize()
     {
@@ -75,7 +75,7 @@ class Encounter implements \JsonSerializable
      */
     private ?Pack $pack = null;
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getName();
     }

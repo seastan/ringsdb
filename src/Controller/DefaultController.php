@@ -18,24 +18,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DefaultController extends AbstractController
 {
-    private int $cacheExpiration;
-
-    private ?string $gameName;
-
-    private ?string $publisherName;
-
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        int $cacheExpiration,
-        ?string $gameName,
-        ?string $publisherName,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->cacheExpiration = $cacheExpiration;
-        $this->gameName = $gameName;
-        $this->publisherName = $publisherName;
-        $this->entityManager = $entityManager;
+    public function __construct(private int $cacheExpiration, private ?string $gameName, private ?string $publisherName, private EntityManagerInterface $entityManager)
+    {
     }
 
     /**
@@ -278,8 +262,9 @@ class DefaultController extends AbstractController
             $text = $comment['text'];
             if (is_string($text) && strlen($text) > 300) {
                 $text = (string) preg_replace('/\\s+?(\\S+)?$/', '', substr($text.' ', 0, 301));
-                if (strrpos($text, '<') > strrpos($text, '>')) {
-                    $text = substr($text.' ', 0, strrpos($text, '<'));
+                $strrpos = strrpos($text, '<');
+                if (false !== $strrpos && $strrpos > strrpos($text, '>')) {
+                    $text = substr($text.' ', 0, $strrpos);
                 }
 
                 $text = (string) preg_replace('/\\s+?(\\S+)?$/', '', $text);

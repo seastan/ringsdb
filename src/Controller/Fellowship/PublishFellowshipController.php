@@ -21,32 +21,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PublishFellowshipController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private FellowshipValidationHelper $fellowshipValidationHelper;
-
-    private Texts $texts;
-
-    private DecklistFactory $decklistFactory;
-
-    private DecklistRepository $decklistRepository;
-
-    private FellowshipRepository $fellowshipRepository;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        FellowshipValidationHelper $fellowshipValidationHelper,
-        Texts $texts,
-        DecklistFactory $decklistFactory,
-        DecklistRepository $decklistRepository,
-        FellowshipRepository $fellowshipRepository
-    ) {
-        $this->entityManager = $entityManager;
-        $this->fellowshipValidationHelper = $fellowshipValidationHelper;
-        $this->texts = $texts;
-        $this->decklistFactory = $decklistFactory;
-        $this->decklistRepository = $decklistRepository;
-        $this->fellowshipRepository = $fellowshipRepository;
+    public function __construct(private EntityManagerInterface $entityManager, private FellowshipValidationHelper $fellowshipValidationHelper, private Texts $texts, private DecklistFactory $decklistFactory, private DecklistRepository $decklistRepository, private FellowshipRepository $fellowshipRepository)
+    {
     }
 
     /**

@@ -29,32 +29,8 @@ class SaveFellowshipController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private EntityManagerInterface $entityManager;
-
-    private Texts $texts;
-
-    private Decks $decks;
-
-    private DeckRepository $deckRepository;
-
-    private DecklistRepository $decklistRepository;
-
-    private FellowshipRepository $fellowshipRepository;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        Texts $texts,
-        Decks $decks,
-        DeckRepository $deckRepository,
-        DecklistRepository $decklistRepository,
-        FellowshipRepository $fellowshipRepository
-    ) {
-        $this->entityManager = $entityManager;
-        $this->texts = $texts;
-        $this->decks = $decks;
-        $this->deckRepository = $deckRepository;
-        $this->decklistRepository = $decklistRepository;
-        $this->fellowshipRepository = $fellowshipRepository;
+    public function __construct(private EntityManagerInterface $entityManager, private Texts $texts, private Decks $decks, private DeckRepository $deckRepository, private DecklistRepository $decklistRepository, private FellowshipRepository $fellowshipRepository)
+    {
     }
 
     /**

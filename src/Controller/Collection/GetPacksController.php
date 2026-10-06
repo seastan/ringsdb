@@ -15,16 +15,8 @@ class GetPacksController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private CycleRepository $cycleRepository;
-
-    private UserCustomPackRepository $userCustomPackRepository;
-
-    public function __construct(
-        CycleRepository $cycleRepository,
-        UserCustomPackRepository $userCustomPackRepository
-    ) {
-        $this->cycleRepository = $cycleRepository;
-        $this->userCustomPackRepository = $userCustomPackRepository;
+    public function __construct(private CycleRepository $cycleRepository, private UserCustomPackRepository $userCustomPackRepository)
+    {
     }
 
     /**

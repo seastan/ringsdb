@@ -16,24 +16,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ListQuestlogController extends AbstractController
 {
-    private int $cacheExpiration;
-
-    private QuestLogManager $questlogManager;
-
-    private SnapshotManager $snapshotManager;
-
-    private CycleRepository $cycleRepository;
-
-    public function __construct(
-        int $cacheExpiration,
-        QuestLogManager $questLogManager,
-        SnapshotManager $snapshotManager,
-        CycleRepository $cycleRepository
-    ) {
-        $this->cacheExpiration = $cacheExpiration;
-        $this->questlogManager = $questLogManager;
-        $this->snapshotManager = $snapshotManager;
-        $this->cycleRepository = $cycleRepository;
+    public function __construct(private int $cacheExpiration, private QuestLogManager $questlogManager, private SnapshotManager $snapshotManager, private CycleRepository $cycleRepository)
+    {
     }
 
     /**

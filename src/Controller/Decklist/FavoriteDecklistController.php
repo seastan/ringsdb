@@ -16,16 +16,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FavoriteDecklistController extends AbstractController
 {
-    private DecklistRepository $decklistRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        DecklistRepository $decklistRepository
-    ) {
-        $this->decklistRepository = $decklistRepository;
-        $this->entityManager = $entityManager;
+    public function __construct(private EntityManagerInterface $entityManager, private DecklistRepository $decklistRepository)
+    {
     }
 
     /**

@@ -13,12 +13,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class CopyDeckController extends AbstractController
 {
-    private DecklistRepository $decklistRepository;
-
-    public function __construct(
-        DecklistRepository $decklistRepository
-    ) {
-        $this->decklistRepository = $decklistRepository;
+    public function __construct(private DecklistRepository $decklistRepository)
+    {
     }
 
     /**

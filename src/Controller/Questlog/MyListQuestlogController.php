@@ -21,24 +21,8 @@ class MyListQuestlogController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private ScenarioRepository $scenarioRepository;
-
-    private Connection $connection;
-
-    private QuestlogRepository $questlogRepository;
-
-    private SnapshotManager $snapshotManager;
-
-    public function __construct(
-        Connection $connection,
-        ScenarioRepository $scenarioRepository,
-        QuestlogRepository $questlogRepository,
-        SnapshotManager $snapshotManager
-    ) {
-        $this->scenarioRepository = $scenarioRepository;
-        $this->connection = $connection;
-        $this->questlogRepository = $questlogRepository;
-        $this->snapshotManager = $snapshotManager;
+    public function __construct(private Connection $connection, private ScenarioRepository $scenarioRepository, private QuestlogRepository $questlogRepository, private SnapshotManager $snapshotManager)
+    {
     }
 
     /**

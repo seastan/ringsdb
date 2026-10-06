@@ -17,20 +17,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FavoriteFellowshipController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private Connection $connection;
-
-    private FellowshipRepository $fellowshipRepository;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        Connection $connection,
-        FellowshipRepository $fellowshipRepository
-    ) {
-        $this->entityManager = $entityManager;
-        $this->connection = $connection;
-        $this->fellowshipRepository = $fellowshipRepository;
+    public function __construct(private EntityManagerInterface $entityManager, private Connection $connection, private FellowshipRepository $fellowshipRepository)
+    {
     }
 
     /**

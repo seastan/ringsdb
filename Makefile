@@ -51,7 +51,7 @@ phpunit-update-snapshots: test-fixtures
 
 # Code coverage report in var/cache/coverage/index.html (uses Xdebug)
 coverage: test-fixtures
-	$(EXEC_SYMFONY) php vendor/bin/simple-phpunit --coverage-html var/cache/coverage --coverage-text=php://stdout --colors=never
+	$(EXEC) -it -u www-data -e XDEBUG_MODE=coverage symfony php vendor/bin/simple-phpunit --coverage-html var/cache/coverage --coverage-text=php://stdout --colors=never
 	@echo "Code coverage report: \033[36mfile://${PWD}/var/cache/coverage/index.html\033[0m"
 
 # cache:warmup: the service types are read from the dumped container (see phpstan.neon.dist)
@@ -76,3 +76,6 @@ rector:
 	$(EXEC_SYMFONY) php vendor/bin/rector
 
 all: install lint-twig rector cs phpstan phpunit
+
+reset:
+	rm -rf var/ vendor/

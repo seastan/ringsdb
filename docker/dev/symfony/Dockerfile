@@ -1,15 +1,15 @@
-FROM php:7.4-alpine
+FROM php:8.0-alpine
 
 RUN apk update && apk add --no-cache \
     libzip-dev \
-    libpng-dev
+    libpng-dev \
+    linux-headers
 
 RUN docker-php-ext-install pdo_mysql gd zip
 
-# Xdebug (dev stack), used for code coverage (make coverage). Xdebug 2.9.8 is the last version
-# supporting PHP 7.1 (Xdebug 3 requires PHP 7.2+).
+# Xdebug (dev stack), used for code coverage (make coverage).
 RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
-    && pecl install xdebug-2.9.8 \
+    && pecl install xdebug-3.4.5 \
     && docker-php-ext-enable xdebug \
     && apk del .build-deps
 

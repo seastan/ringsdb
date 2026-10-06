@@ -16,21 +16,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class RemoveUserCommand extends Command
 {
-    private EntityManagerInterface $entityManager;
-
-    private DeckRepository $deckRepository;
-
-    private DecklistRepository $decklistRepository;
-
-    private UserRepository $userRepository;
-
-    public function __construct(EntityManagerInterface $entityManager, DeckRepository $deckRepository, DecklistRepository $decklistRepository, UserRepository $userRepository)
+    public function __construct(private EntityManagerInterface $entityManager, private DeckRepository $deckRepository, private DecklistRepository $decklistRepository, private UserRepository $userRepository)
     {
         parent::__construct();
-        $this->entityManager = $entityManager;
-        $this->deckRepository = $deckRepository;
-        $this->decklistRepository = $decklistRepository;
-        $this->userRepository = $userRepository;
     }
 
     protected function configure(): void

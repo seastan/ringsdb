@@ -16,12 +16,8 @@ class SaveArtController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        EntityManagerInterface $entityManager
-    ) {
-        $this->entityManager = $entityManager;
+    public function __construct(private EntityManagerInterface $entityManager)
+    {
     }
 
     /**
@@ -37,8 +33,8 @@ class SaveArtController extends AbstractController
             return new JsonResponse(['success' => false, 'error' => 'not logged in'], 403);
         }
 
-        $cardCode = (string) preg_replace('/[^0-9]/', '', $request->get('card_code'));
-        $packCode = (string) preg_replace('/[^A-Za-z0-9_-]/', '', $request->get('pack_code'));
+        $cardCode = (string) preg_replace('/[^0-9]/', '', $request->get('card_code') ?? '');
+        $packCode = (string) preg_replace('/[^A-Za-z0-9_-]/', '', $request->get('pack_code') ?? '');
         if (!$cardCode) {
             return new JsonResponse(['success' => false, 'error' => 'missing card_code'], 400);
         }

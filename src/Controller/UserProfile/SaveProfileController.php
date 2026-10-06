@@ -17,16 +17,8 @@ class SaveProfileController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private UserRepository $userRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        UserRepository $userRepository
-    ) {
-        $this->userRepository = $userRepository;
-        $this->entityManager = $entityManager;
+    public function __construct(private EntityManagerInterface $entityManager, private UserRepository $userRepository)
+    {
     }
 
     /**

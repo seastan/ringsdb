@@ -22,14 +22,8 @@ class ApiPrivateController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private DeckRepository $deckRepository;
-
-    private DecklistRepository $decklistRepository;
-
-    public function __construct(DeckRepository $deckRepository, DecklistRepository $decklistRepository)
+    public function __construct(private DeckRepository $deckRepository, private DecklistRepository $decklistRepository)
     {
-        $this->deckRepository = $deckRepository;
-        $this->decklistRepository = $decklistRepository;
     }
 
     /**
@@ -53,7 +47,7 @@ class ApiPrivateController extends AbstractController
 
         $dateUpdates = array_map(
             /* @var $deck \App\Entity\Deck */
-            fn ($deck) => $deck->getDateUpdate(),
+            fn (\App\Entity\Decklist|Deck $deck): \DateTime => $deck->getDateUpdate(),
             $decklists
         );
 
@@ -102,7 +96,7 @@ class ApiPrivateController extends AbstractController
 
         $dateUpdates = array_map(
             /* @var $deck \App\Entity\Deck */
-            fn ($deck) => $deck->getDateUpdate(),
+            fn (\App\Entity\Decklist|Deck $deck): \DateTime => $deck->getDateUpdate(),
             $decklists
         );
 

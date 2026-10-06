@@ -19,40 +19,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CardsData
 {
-    private EntityManagerInterface $entityManager;
-
-    private UrlGeneratorInterface $router;
-
-    private Packages $assets_packages;
-
-    private string $publicDir;
-
-    private CardRepository $cardRepository;
-
-    private CycleRepository $cycleRepository;
-
-    private ReviewRepository $reviewRepository;
-
-    private SphereRepository $sphereRepository;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        UrlGeneratorInterface $router,
-        Packages $assets_packages,
-        string $publicDir,
-        CardRepository $cardRepository,
-        CycleRepository $cycleRepository,
-        ReviewRepository $reviewRepository,
-        SphereRepository $sphereRepository
-    ) {
-        $this->entityManager = $entityManager;
-        $this->router = $router;
-        $this->assets_packages = $assets_packages;
-        $this->publicDir = $publicDir;
-        $this->cardRepository = $cardRepository;
-        $this->cycleRepository = $cycleRepository;
-        $this->reviewRepository = $reviewRepository;
-        $this->sphereRepository = $sphereRepository;
+    public function __construct(private EntityManagerInterface $entityManager, private UrlGeneratorInterface $router, private Packages $assets_packages, private string $publicDir, private CardRepository $cardRepository, private CycleRepository $cycleRepository, private ReviewRepository $reviewRepository, private SphereRepository $sphereRepository)
+    {
     }
 
     /**
@@ -60,7 +28,7 @@ class CardsData
      *
      * @param string $text
      */
-    public function replaceSymbols($text): string
+    public function replaceSymbols(?string $text): string
     {
         /** @var array<string, string> $displayTextReplacements */
         static $displayTextReplacements = [
@@ -78,7 +46,7 @@ class CardsData
             '[unique]' => '<span class="icon-unique"></span>',
         ];
 
-        return str_replace(array_keys($displayTextReplacements), array_values($displayTextReplacements), $text);
+        return str_replace(array_keys($displayTextReplacements), array_values($displayTextReplacements), $text ?? '');
     }
 
     public function splitInParagraphs(string $text): string

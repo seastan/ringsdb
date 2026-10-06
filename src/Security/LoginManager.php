@@ -24,28 +24,8 @@ class LoginManager
      */
     private const FIREWALL = 'main';
 
-    private TokenStorageInterface $tokenStorage;
-
-    private UserCheckerInterface $userChecker;
-
-    private SessionAuthenticationStrategyInterface $sessionStrategy;
-
-    private RequestStack $requestStack;
-
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        TokenStorageInterface $tokenStorage,
-        UserCheckerInterface $userChecker,
-        SessionAuthenticationStrategyInterface $sessionStrategy,
-        RequestStack $requestStack,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->tokenStorage = $tokenStorage;
-        $this->userChecker = $userChecker;
-        $this->sessionStrategy = $sessionStrategy;
-        $this->requestStack = $requestStack;
-        $this->entityManager = $entityManager;
+    public function __construct(private TokenStorageInterface $tokenStorage, private UserCheckerInterface $userChecker, private SessionAuthenticationStrategyInterface $sessionStrategy, private RequestStack $requestStack, private EntityManagerInterface $entityManager)
+    {
     }
 
     /**
@@ -55,7 +35,7 @@ class LoginManager
     {
         try {
             $this->userChecker->checkPreAuth($user);
-        } catch (AccountStatusException $accountStatusException) {
+        } catch (AccountStatusException) {
             return;
         }
 

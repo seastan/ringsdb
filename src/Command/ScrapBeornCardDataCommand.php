@@ -25,30 +25,9 @@ class ScrapBeornCardDataCommand extends Command
 {
     use StringInputTrait;
 
-    private EntityManagerInterface $entityManager;
-
-    private Packages $packages;
-
-    private string $publicDir;
-
-    private CardPrintingRepository $cardPrintingRepository;
-
-    private PackRepository $packRepository;
-
-    private SphereRepository $sphereRepository;
-
-    private TypeRepository $typeRepository;
-
-    public function __construct(EntityManagerInterface $entityManager, Packages $packages, string $publicDir, CardPrintingRepository $cardPrintingRepository, PackRepository $packRepository, SphereRepository $sphereRepository, TypeRepository $typeRepository)
+    public function __construct(private EntityManagerInterface $entityManager, private Packages $packages, private string $publicDir, private CardPrintingRepository $cardPrintingRepository, private PackRepository $packRepository, private SphereRepository $sphereRepository, private TypeRepository $typeRepository)
     {
         parent::__construct();
-        $this->entityManager = $entityManager;
-        $this->packages = $packages;
-        $this->publicDir = $publicDir;
-        $this->cardPrintingRepository = $cardPrintingRepository;
-        $this->packRepository = $packRepository;
-        $this->sphereRepository = $sphereRepository;
-        $this->typeRepository = $typeRepository;
     }
 
     protected function configure(): void

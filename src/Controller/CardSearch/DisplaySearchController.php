@@ -15,28 +15,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DisplaySearchController extends AbstractController
 {
-    private int $cacheExpiration;
-
-    private CardsData $cardsData;
-
-    private PackRepository $packRepository;
-
-    private CycleRepository $cycleRepository;
-
-    private CardPrintingRepository $cardPrintingRepository;
-
-    public function __construct(
-        int $cacheExpiration,
-        CardsData $cardsData,
-        PackRepository $packRepository,
-        CycleRepository $cycleRepository,
-        CardPrintingRepository $cardPrintingRepository
-    ) {
-        $this->cacheExpiration = $cacheExpiration;
-        $this->cardsData = $cardsData;
-        $this->packRepository = $packRepository;
-        $this->cycleRepository = $cycleRepository;
-        $this->cardPrintingRepository = $cardPrintingRepository;
+    public function __construct(private int $cacheExpiration, private CardsData $cardsData, private PackRepository $packRepository, private CycleRepository $cycleRepository, private CardPrintingRepository $cardPrintingRepository)
+    {
     }
 
     /**

@@ -21,16 +21,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class SphereController extends AbstractController
 {
-    private SphereRepository $sphereRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        SphereRepository $sphereRepository,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->sphereRepository = $sphereRepository;
-        $this->entityManager = $entityManager;
+    public function __construct(private SphereRepository $sphereRepository, private EntityManagerInterface $entityManager)
+    {
     }
 
     /**

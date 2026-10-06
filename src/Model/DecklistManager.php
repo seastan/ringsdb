@@ -58,23 +58,8 @@ class DecklistManager
      */
     protected $user;
 
-    private EntityManagerInterface $doctrine;
-
-    private RequestStack $request_stack;
-
-    private UrlGeneratorInterface $router;
-
-    private CardRepository $cardRepository;
-
-    private SphereRepository $sphereRepository;
-
-    public function __construct(EntityManagerInterface $doctrine, RequestStack $request_stack, UrlGeneratorInterface $router, CardRepository $cardRepository, SphereRepository $sphereRepository)
+    public function __construct(private EntityManagerInterface $doctrine, private RequestStack $request_stack, private UrlGeneratorInterface $router, private CardRepository $cardRepository, private SphereRepository $sphereRepository)
     {
-        $this->doctrine = $doctrine;
-        $this->request_stack = $request_stack;
-        $this->router = $router;
-        $this->cardRepository = $cardRepository;
-        $this->sphereRepository = $sphereRepository;
     }
 
     /**

@@ -51,20 +51,8 @@ class QuestLogManager
      */
     protected $user;
 
-    private EntityManagerInterface $doctrine;
-
-    private RequestStack $request_stack;
-
-    private UrlGeneratorInterface $router;
-
-    private CardRepository $cardRepository;
-
-    public function __construct(EntityManagerInterface $doctrine, RequestStack $request_stack, UrlGeneratorInterface $router, CardRepository $cardRepository)
+    public function __construct(private EntityManagerInterface $doctrine, private RequestStack $request_stack, private UrlGeneratorInterface $router, private CardRepository $cardRepository)
     {
-        $this->doctrine = $doctrine;
-        $this->request_stack = $request_stack;
-        $this->router = $router;
-        $this->cardRepository = $cardRepository;
     }
 
     /**

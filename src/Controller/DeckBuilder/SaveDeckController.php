@@ -21,20 +21,8 @@ class SaveDeckController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private DeckRepository $deckRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    private Decks $decks;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        DeckRepository $deckRepository,
-        Decks $decks
-    ) {
-        $this->deckRepository = $deckRepository;
-        $this->entityManager = $entityManager;
-        $this->decks = $decks;
+    public function __construct(private EntityManagerInterface $entityManager, private DeckRepository $deckRepository, private Decks $decks)
+    {
     }
 
     /**

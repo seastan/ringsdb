@@ -38,12 +38,6 @@ class QuestlogDeck
     private $content;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Questlog", inversedBy="decks")
-     * @ORM\JoinColumn(name="questlog_id", referencedColumnName="id", nullable=false)
-     */
-    private Questlog $questlog;
-
-    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Deck", inversedBy="questlogs")
      * @ORM\JoinColumn(name="deck_id", referencedColumnName="id", onDelete="SET NULL")
      */
@@ -55,9 +49,13 @@ class QuestlogDeck
      */
     private ?Decklist $decklist = null;
 
-    public function __construct(Questlog $questlog)
-    {
-        $this->questlog = $questlog;
+    public function __construct(
+        /**
+         * @ORM\ManyToOne(targetEntity="App\Entity\Questlog", inversedBy="decks")
+         * @ORM\JoinColumn(name="questlog_id", referencedColumnName="id", nullable=false)
+         */
+        private Questlog $questlog
+    ) {
     }
 
     /**

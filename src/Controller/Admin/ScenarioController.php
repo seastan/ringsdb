@@ -21,16 +21,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ScenarioController extends AbstractController
 {
-    private ScenarioRepository $scenarioRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        ScenarioRepository $scenarioRepository,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->scenarioRepository = $scenarioRepository;
-        $this->entityManager = $entityManager;
+    public function __construct(private ScenarioRepository $scenarioRepository, private EntityManagerInterface $entityManager)
+    {
     }
 
     /**

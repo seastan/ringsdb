@@ -23,28 +23,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CommentFellowshipController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private Texts $texts;
-
-    private MailerInterface $mailer;
-
-    private FellowshipRepository $fellowshipRepository;
-
-    private UserRepository $userRepository;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        Texts $texts,
-        MailerInterface $mailer,
-        FellowshipRepository $fellowshipRepository,
-        UserRepository $userRepository
-    ) {
-        $this->entityManager = $entityManager;
-        $this->texts = $texts;
-        $this->mailer = $mailer;
-        $this->fellowshipRepository = $fellowshipRepository;
-        $this->userRepository = $userRepository;
+    public function __construct(private EntityManagerInterface $entityManager, private Texts $texts, private MailerInterface $mailer, private FellowshipRepository $fellowshipRepository, private UserRepository $userRepository)
+    {
     }
 
     /**

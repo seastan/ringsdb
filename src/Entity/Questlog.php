@@ -145,12 +145,6 @@ class Questlog
     private $comments;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="questlogs")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
-     */
-    private User $user;
-
-    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Scenario", inversedBy="questlogs")
      * @ORM\JoinColumn(name="scenario_id", referencedColumnName="id", nullable=false)
      */
@@ -183,9 +177,12 @@ class Questlog
     /**
      * Constructor.
      */
-    public function __construct(User $user)
-    {
-        $this->user = $user;
+    public function __construct(/**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="questlogs")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     */
+        private User $user
+    ) {
         $this->decks = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->favorites = new ArrayCollection();

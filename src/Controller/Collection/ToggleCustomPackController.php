@@ -16,16 +16,8 @@ class ToggleCustomPackController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private CustomPackManager $customPackManager;
-
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        CustomPackManager $customPackManager
-    ) {
-        $this->customPackManager = $customPackManager;
-        $this->entityManager = $entityManager;
+    public function __construct(private EntityManagerInterface $entityManager, private CustomPackManager $customPackManager)
+    {
     }
 
     /**

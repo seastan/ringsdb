@@ -11,20 +11,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class CustomPackManager
 {
-    private EntityManagerInterface $entityManager;
-
-    private CardRepository $cardRepository;
-
-    private UserCustomPackRepository $userCustomPackRepository;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        CardRepository $cardRepository,
-        UserCustomPackRepository $userCustomPackRepository
-    ) {
-        $this->entityManager = $entityManager;
-        $this->cardRepository = $cardRepository;
-        $this->userCustomPackRepository = $userCustomPackRepository;
+    public function __construct(private EntityManagerInterface $entityManager, private CardRepository $cardRepository, private UserCustomPackRepository $userCustomPackRepository)
+    {
     }
 
     /**

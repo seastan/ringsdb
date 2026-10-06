@@ -12,16 +12,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ListReviewsController extends AbstractController
 {
-    private int $cacheExpiration;
-
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        int $cacheExpiration,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->cacheExpiration = $cacheExpiration;
-        $this->entityManager = $entityManager;
+    public function __construct(private int $cacheExpiration, private EntityManagerInterface $entityManager)
+    {
     }
 
     /**

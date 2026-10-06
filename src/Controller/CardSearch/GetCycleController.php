@@ -11,12 +11,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class GetCycleController extends AbstractController
 {
-    private CycleRepository $cycleRepository;
-
-    public function __construct(
-        CycleRepository $cycleRepository
-    ) {
-        $this->cycleRepository = $cycleRepository;
+    public function __construct(private CycleRepository $cycleRepository)
+    {
     }
 
     /**

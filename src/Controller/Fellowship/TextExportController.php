@@ -14,12 +14,8 @@ class TextExportController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private FellowshipArchiver $fellowshipArchiver;
-
-    public function __construct(
-        FellowshipArchiver $fellowshipArchiver
-    ) {
-        $this->fellowshipArchiver = $fellowshipArchiver;
+    public function __construct(private FellowshipArchiver $fellowshipArchiver)
+    {
     }
 
     /**

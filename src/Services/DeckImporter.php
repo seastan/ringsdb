@@ -11,17 +11,8 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class DeckImporter
 {
-    private EntityManagerInterface $entityManager;
-
-    private CardRepository $cardRepository;
-
-    private PackRepository $packRepository;
-
-    public function __construct(EntityManagerInterface $entityManager, CardRepository $cardRepository, PackRepository $packRepository)
+    public function __construct(private EntityManagerInterface $entityManager, private CardRepository $cardRepository, private PackRepository $packRepository)
     {
-        $this->entityManager = $entityManager;
-        $this->packRepository = $packRepository;
-        $this->cardRepository = $cardRepository;
     }
 
     /**
@@ -144,7 +135,7 @@ class DeckImporter
      *
      * @param string $octgnid
      */
-    private function findCardByOctgnid($octgnid): ?Card
+    private function findCardByOctgnid(int|string $octgnid): ?Card
     {
         $printing = $this->entityManager->createQueryBuilder()->select('cp')->from('App:CardPrinting', 'cp')->join('cp.card', 'c')->where('cp.octgnid = :octgnid')->setParameter('octgnid', $octgnid)->orderBy('c.id', 'ASC')->setMaxResults(1)->getQuery()->getOneOrNullResult();
 

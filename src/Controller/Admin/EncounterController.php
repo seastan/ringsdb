@@ -21,16 +21,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class EncounterController extends AbstractController
 {
-    private EncounterRepository $encounterRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        EncounterRepository $encounterRepository,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->encounterRepository = $encounterRepository;
-        $this->entityManager = $entityManager;
+    public function __construct(private EncounterRepository $encounterRepository, private EntityManagerInterface $entityManager)
+    {
     }
 
     /**

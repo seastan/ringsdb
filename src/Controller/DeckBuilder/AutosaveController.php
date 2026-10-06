@@ -21,20 +21,8 @@ class AutosaveController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private DeckRepository $deckRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    private LoggerInterface $logger;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        DeckRepository $deckRepository,
-        LoggerInterface $logger
-    ) {
-        $this->entityManager = $entityManager;
-        $this->deckRepository = $deckRepository;
-        $this->logger = $logger;
+    public function __construct(private EntityManagerInterface $entityManager, private DeckRepository $deckRepository, private LoggerInterface $logger)
+    {
     }
 
     /**

@@ -12,20 +12,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ByAuthorController extends AbstractController
 {
-    private int $cacheExpiration;
-
-    private UserRepository $userRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        int $cacheExpiration,
-        UserRepository $userRepository,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->cacheExpiration = $cacheExpiration;
-        $this->userRepository = $userRepository;
-        $this->entityManager = $entityManager;
+    public function __construct(private int $cacheExpiration, private UserRepository $userRepository, private EntityManagerInterface $entityManager)
+    {
     }
 
     /**

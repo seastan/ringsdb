@@ -15,16 +15,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SendConfirmationEmailController extends AbstractController
 {
-    private UserMailer $mailer;
-
-    private UserRepository $userRepository;
-
-    public function __construct(
-        UserMailer $mailer,
-        UserRepository $userRepository
-    ) {
-        $this->mailer = $mailer;
-        $this->userRepository = $userRepository;
+    public function __construct(private UserMailer $mailer, private UserRepository $userRepository)
+    {
     }
 
     /**

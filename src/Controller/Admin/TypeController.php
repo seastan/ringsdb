@@ -21,16 +21,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class TypeController extends AbstractController
 {
-    private TypeRepository $typeRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        TypeRepository $typeRepository,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->typeRepository = $typeRepository;
-        $this->entityManager = $entityManager;
+    public function __construct(private TypeRepository $typeRepository, private EntityManagerInterface $entityManager)
+    {
     }
 
     /**

@@ -25,11 +25,6 @@ class Comment
     private $id;
 
     /**
-     * @ORM\Column(type="text")
-     */
-    private string $text;
-
-    /**
      * @ORM\Column(name="date_creation", type="datetime", nullable=false)
      * @Gedmo\Timestampable(on="create")
      */
@@ -42,23 +37,19 @@ class Comment
      */
     private $isHidden = false;
 
-    /**
+    public function __construct(/**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="comments")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */
-    private User $user;
-
-    /**
+        private User $user, /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Decklist", inversedBy="comments")
      * @ORM\JoinColumn(name="decklist_id", referencedColumnName="id", nullable=false)
      */
-    private Decklist $decklist;
-
-    public function __construct(User $user, Decklist $decklist, string $text)
-    {
-        $this->user = $user;
-        $this->decklist = $decklist;
-        $this->text = $text;
+        private Decklist $decklist, /**
+     * @ORM\Column(type="text")
+     */
+        private string $text
+    ) {
         $this->dateCreation = new \DateTime();
     }
 

@@ -25,11 +25,6 @@ class QuestlogComment
     private $id;
 
     /**
-     * @ORM\Column(type="text")
-     */
-    private string $text;
-
-    /**
      * @ORM\Column(name="date_creation", type="datetime", nullable=false)
      * @Gedmo\Timestampable(on="create")
      */
@@ -42,23 +37,19 @@ class QuestlogComment
      */
     private $isHidden = false;
 
-    /**
+    public function __construct(/**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="questlog_comments")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */
-    private User $user;
-
-    /**
+        private User $user, /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Questlog", inversedBy="comments")
      * @ORM\JoinColumn(name="questlog_id", referencedColumnName="id", nullable=false)
      */
-    private Questlog $questlog;
-
-    public function __construct(User $user, Questlog $questlog, string $text)
-    {
-        $this->user = $user;
-        $this->questlog = $questlog;
-        $this->text = $text;
+        private Questlog $questlog, /**
+     * @ORM\Column(type="text")
+     */
+        private string $text
+    ) {
         $this->dateCreation = new \DateTime();
     }
 

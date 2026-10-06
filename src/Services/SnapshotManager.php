@@ -7,13 +7,8 @@ use App\Entity\Questlog;
 
 class SnapshotManager
 {
-    // Set the deck content to the QuestlogDeck snapshot
-    private Decks $decks;
-
-    public function __construct(
-        Decks $decks
-    ) {
-        $this->decks = $decks;
+    public function __construct(private Decks $decks)
+    {
     }
 
     public function setSnapshot(Questlog $questlog): void

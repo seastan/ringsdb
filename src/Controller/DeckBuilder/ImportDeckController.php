@@ -10,12 +10,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ImportDeckController extends AbstractController
 {
-    private int $cacheExpiration;
-
-    public function __construct(
-        int $cacheExpiration
-    ) {
-        $this->cacheExpiration = $cacheExpiration;
+    public function __construct(private int $cacheExpiration)
+    {
     }
 
     /**

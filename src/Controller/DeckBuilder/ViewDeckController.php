@@ -16,12 +16,8 @@ class ViewDeckController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private DeckRepository $deckRepository;
-
-    public function __construct(
-        DeckRepository $deckRepository
-    ) {
-        $this->deckRepository = $deckRepository;
+    public function __construct(private DeckRepository $deckRepository)
+    {
     }
 
     /**

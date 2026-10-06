@@ -29,28 +29,22 @@ class UserCustomPackCard
      */
     private $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\UserCustomPack", inversedBy="cards")
-     * @ORM\JoinColumn(name="custom_pack_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     */
-    private UserCustomPack $customPack;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Card")
-     * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     */
-    private Card $card;
-
-    /**
-     * @ORM\Column(type="smallint", nullable=false, options={"default": 1, "unsigned": true})
-     */
-    public int $quantity;
-
-    public function __construct(UserCustomPack $customPack, Card $card, int $quantity)
-    {
-        $this->customPack = $customPack;
-        $this->card = $card;
-        $this->quantity = $quantity;
+    public function __construct(
+        /**
+         * @ORM\ManyToOne(targetEntity="App\Entity\UserCustomPack", inversedBy="cards")
+         * @ORM\JoinColumn(name="custom_pack_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+         */
+        private UserCustomPack $customPack,
+        /**
+         * @ORM\ManyToOne(targetEntity="App\Entity\Card")
+         * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+         */
+        private Card $card,
+        /**
+         * @ORM\Column(type="smallint", nullable=false, options={"default": 1, "unsigned": true})
+         */
+        public int $quantity
+    ) {
     }
 
     public function getId(): ?int

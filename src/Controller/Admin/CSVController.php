@@ -136,7 +136,7 @@ class CSVController extends AbstractController
             if ($existingCard
                 && !array_key_exists((string) $existingCard->getCode(), $newCodes)
                 && !array_key_exists((string) $printing->getOctgnid(), $newOctgnids)
-                && false === strpos($existingCard->getName() ?? '', '[deleted]')) {
+                && !str_contains($existingCard->getName() ?? '', '[deleted]')) {
                 $deletedCards[] = $existingCard->getCode();
                 ++$summary['deleted'];
                 $existingCard->setName('[deleted] '.$existingCard->getName());

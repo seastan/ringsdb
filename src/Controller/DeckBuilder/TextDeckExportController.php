@@ -15,16 +15,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class TextDeckExportController extends AbstractController
 {
-    private DeckRepository $deckRepository;
-
-    private Texts $texts;
-
-    public function __construct(
-        DeckRepository $deckRepository,
-        Texts $texts
-    ) {
-        $this->deckRepository = $deckRepository;
-        $this->texts = $texts;
+    public function __construct(private DeckRepository $deckRepository, private Texts $texts)
+    {
     }
 
     /**

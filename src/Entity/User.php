@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @UniqueEntity(fields="usernameCanonical", errorPath="username", message="The username is already used.", groups={"Registration", "Profile"})
  * @UniqueEntity(fields="emailCanonical", errorPath="email", message="The email is already used.", groups={"Registration", "Profile"})
  */
-class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, EquatableInterface
+class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, EquatableInterface, \Stringable
 {
     public const ROLE_DEFAULT = 'ROLE_USER';
 

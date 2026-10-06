@@ -17,16 +17,8 @@ class DeleteDeckController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private EntityManagerInterface $entityManager;
-
-    private DeckRepository $deckRepository;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        DeckRepository $deckRepository
-    ) {
-        $this->entityManager = $entityManager;
-        $this->deckRepository = $deckRepository;
+    public function __construct(private EntityManagerInterface $entityManager, private DeckRepository $deckRepository)
+    {
     }
 
     /**
