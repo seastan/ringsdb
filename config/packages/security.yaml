@@ -1,16 +1,22 @@
 security:
     hide_user_not_found: true
 
-    encoders:
-        FOS\UserBundle\Model\UserInterface: sha512
+    # the hashes of FOSUserBundle: MessageDigestPasswordHasher, salted per user (User::$salt)
+    password_hashers:
+        App\Entity\User:
+            algorithm: sha512
+            encode_as_base64: true
+            iterations: 5000
 
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER
         ROLE_SUPER_ADMIN: ROLE_ADMIN
 
     providers:
-        fos_userbundle:
-            id: fos_user.user_provider.username_email
+        # login by username or email (UserRepository::loadUserByIdentifier())
+        app_user_provider:
+            entity:
+                class: App\Entity\User
 
     firewalls:
         dev:
@@ -24,9 +30,9 @@ security:
 
         main:
             pattern:    ^/
-            user_checker: fos_user.user_checker
+            user_checker: App\Security\UserChecker
             form_login:
-                provider: fos_userbundle
+                provider: app_user_provider
                 csrf_token_generator: security.csrf.token_manager
                 always_use_default_target_path: false
                 default_target_path: index

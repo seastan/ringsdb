@@ -15,7 +15,7 @@ use PHPStan\Type\TypeCombinator;
 
 /**
  * Controller::getUser() returns the logged in user, an App\Entity\User (the only user
- * class, FOSUserBundle's user provider), or null for an anonymous visitor.
+ * class, the entity user provider of security.yaml), or null for an anonymous visitor.
  */
 class ControllerGetUserReturnTypeExtension implements DynamicMethodReturnTypeExtension
 {

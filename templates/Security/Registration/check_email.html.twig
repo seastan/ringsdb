@@ -1,0 +1,5 @@
+{% extends "Security/layout.html.twig" %}
+
+{% block security_content %}
+    <p>An email has been sent to {{ user.email }}. It contains an activation link you must click to activate your account.</p>
+{% endblock security_content %}

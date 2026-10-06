@@ -5,43 +5,34 @@ declare(strict_types=1);
 namespace App\DataFixtures;
 
 use App\Entity\User;
+use App\Security\UserPasswordUpdater;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class UserFixtures extends Fixture implements ContainerAwareInterface
+class UserFixtures extends Fixture
 {
-    private ?ContainerInterface $container = null;
+    private UserPasswordUpdater $passwordUpdater;
 
-    public function setContainer(?ContainerInterface $container = null): void
+    public function __construct(UserPasswordUpdater $passwordUpdater)
     {
-        $this->container = $container;
+        $this->passwordUpdater = $passwordUpdater;
     }
 
     public function load(ObjectManager $manager): void
     {
-        if (!$this->container instanceof ContainerInterface) {
-            throw new \LogicException('The container is not set.');
-        }
-
-        $userManager = $this->container->get('fos_user.user_manager');
-
-        /** @var User $user */
-        $user = $userManager->createUser();
+        $user = new User();
         $user->setUsername('test');
         $user->setEmail('test@example.com');
         $user->setPlainPassword('test');
         $user->setEnabled(true);
         $user->setDateCreation(new \DateTime('2015-08-16'));
         $user->setDateUpdate(new \DateTime('2015-08-16'));
-
-        $userManager->updateUser($user);
+        $this->passwordUpdater->hashPassword($user);
+        $manager->persist($user);
 
         $this->addReference('test-user', $user);
 
-        /** @var User $admin */
-        $admin = $userManager->createUser();
+        $admin = new User();
         $admin->setUsername('admin');
         $admin->setEmail('admin@example.com');
         $admin->setPlainPassword('admin');
@@ -49,8 +40,10 @@ class UserFixtures extends Fixture implements ContainerAwareInterface
         $admin->addRole('ROLE_ADMIN');
         $admin->setDateCreation(new \DateTime('2015-08-16'));
         $admin->setDateUpdate(new \DateTime('2015-08-16'));
+        $this->passwordUpdater->hashPassword($admin);
+        $manager->persist($admin);
 
-        $userManager->updateUser($admin);
+        $manager->flush();
 
         $this->addReference('admin-user', $admin);
     }

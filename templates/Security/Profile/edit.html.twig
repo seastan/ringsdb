@@ -1,8 +1,10 @@
-{% trans_default_domain 'FOSUserBundle' %}
+{% extends "Security/layout.html.twig" %}
 
+{% block security_content %}
 {{ form_start(form, {'action': path('fos_user_profile_edit'), 'attr': {'class': 'fos_user_profile_edit'}}) }}
     {{ form_widget(form) }}
     <div>
-        <input type="submit" value="{{ 'profile.edit.submit'|trans }}"/>
+        <input type="submit" value="Update"/>
     </div>
 {{ form_end(form) }}
+{% endblock security_content %}

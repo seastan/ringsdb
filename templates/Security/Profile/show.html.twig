@@ -1,0 +1,8 @@
+{% extends "Security/layout.html.twig" %}
+
+{% block security_content %}
+    <div class="fos_user_user_show">
+        <p>Username: {{ user.username }}</p>
+        <p>Email: {{ user.email }}</p>
+    </div>
+{% endblock security_content %}

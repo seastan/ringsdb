@@ -32,7 +32,6 @@
         "erusev/parsedown": "^1.6",
         "ezyang/htmlpurifier": "^4.6",
         "friendsofsymfony/jsrouting-bundle": "^2.2",
-        "friendsofsymfony/user-bundle": "^3.0.0",
         "gedmo/doctrine-extensions": "^3.3",
         "nelmio/api-doc-bundle": "^4.38",
         "ocramius/proxy-manager": "~2.2.0",

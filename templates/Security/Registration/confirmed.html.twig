@@ -1,0 +1,7 @@
+{% extends "Security/layout.html.twig" %}
+
+{% block security_content %}
+    <p class="lead">Congrats {{ user.username }}, your account is now activated.</p>
+    {# targetUrl: the page requested before the registration #}
+    {% if targetUrl is not empty %}<p><a href="{{ targetUrl }}">Back to the originating page.</a></p>{% endif %}
+{% endblock security_content %}

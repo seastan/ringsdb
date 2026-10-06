@@ -46,8 +46,15 @@ services:
     App\Model\QuestLogManager:
         shared: false
 
-    fos_user.doctrine_registry:
-        alias: doctrine
+    App\Security\LoginManager:
+        arguments:
+            $userChecker: '@App\Security\UserChecker'
+            $sessionStrategy: '@security.authentication.session_strategy'
+
+    App\Security\UserMailer:
+        arguments:
+            $senderAddress: '%env(EMAIL_SENDER_ADDRESS)%'
+            $senderName: '%env(EMAIL_SENDER_NAME)%'
 
     # the historical ids, still fetched with get() by the fixtures and the tests
     decks: { alias: App\Services\Decks, public: true }

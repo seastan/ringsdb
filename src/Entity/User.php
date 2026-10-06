@@ -7,17 +7,30 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use FOS\UserBundle\Model\User as BaseUser;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\EquatableInterface;
+use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * User.
  *
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\Table(name="user")
+ *
+ * The validation groups are those of the account forms (src/Form/Security).
+ *
+ * @UniqueEntity(fields="usernameCanonical", errorPath="username", message="The username is already used.", groups={"Registration", "Profile"})
+ * @UniqueEntity(fields="emailCanonical", errorPath="email", message="The email is already used.", groups={"Registration", "Profile"})
  */
-class User extends BaseUser
+class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, EquatableInterface
 {
+    public const ROLE_DEFAULT = 'ROLE_USER';
+
+    public const ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
+
     /**
      * @var int|null
      *
@@ -25,7 +38,91 @@ class User extends BaseUser
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    private $id;
+
+    /**
+     * @ORM\Column(type="string", length=180)
+     *
+     * @Assert\NotBlank(message="Please enter a username.", groups={"Registration", "Profile"})
+     *
+     * @Assert\Length(min=2, max=180, minMessage="The username is too short.", maxMessage="The username is too long.", groups={"Registration", "Profile"})
+     */
+    private ?string $username = null;
+
+    /**
+     * Lowercased username, for the case-insensitive lookups (login, registration uniqueness).
+     *
+     * @ORM\Column(name="username_canonical", type="string", length=180, unique=true)
+     */
+    private ?string $usernameCanonical = null;
+
+    /**
+     * @ORM\Column(type="string", length=180)
+     *
+     * @Assert\NotBlank(message="Please enter an email.", groups={"Registration", "Profile"})
+     *
+     * @Assert\Length(min=2, max=180, minMessage="The email is too short.", maxMessage="The email is too long.", groups={"Registration", "Profile"})
+     *
+     * @Assert\Email(message="The email is not valid.", groups={"Registration", "Profile"})
+     */
+    private ?string $email = null;
+
+    /**
+     * @ORM\Column(name="email_canonical", type="string", length=180, unique=true)
+     */
+    private ?string $emailCanonical = null;
+
+    /**
+     * False until the registration is confirmed by email.
+     *
+     * @ORM\Column(type="boolean")
+     */
+    private bool $enabled = false;
+
+    /**
+     * The per-user salt of the legacy sha512 hashes (see security.yaml).
+     *
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private ?string $salt = null;
+
+    /**
+     * @ORM\Column(type="string")
+     */
+    private ?string $password = null;
+
+    /**
+     * Not persisted: hashed into $password by UserPasswordUpdater.
+     *
+     * @Assert\NotBlank(message="Please enter a password.", groups={"Registration", "ResetPassword", "ChangePassword"})
+     *
+     * @Assert\Length(min=2, max=4096, minMessage="The password is too short.", groups={"Registration", "Profile", "ResetPassword", "ChangePassword"})
+     */
+    private ?string $plainPassword = null;
+
+    /**
+     * @ORM\Column(name="last_login", type="datetime", nullable=true)
+     */
+    private ?\DateTime $lastLogin = null;
+
+    /**
+     * The token of the registration confirmation link, then of the password reset link.
+     *
+     * @ORM\Column(name="confirmation_token", type="string", length=180, unique=true, nullable=true)
+     */
+    private ?string $confirmationToken = null;
+
+    /**
+     * @ORM\Column(name="password_requested_at", type="datetime", nullable=true)
+     */
+    private ?\DateTime $passwordRequestedAt = null;
+
+    /**
+     * @var string[]
+     *
+     * @ORM\Column(type="array")
+     */
+    private array $roles = [];
 
     public function getMaxNbDecks(): float
     {
@@ -175,8 +272,6 @@ class User extends BaseUser
 
     public function __construct()
     {
-        parent::__construct();
-
         $this->reputation = 1;
         $this->donation = 0;
         $this->decks = new ArrayCollection();
@@ -196,6 +291,253 @@ class User extends BaseUser
         $this->questlog_comments = new ArrayCollection();
         $this->questlog_favorites = new ArrayCollection();
         $this->questlog_votes = new ArrayCollection();
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->getUsername();
+    }
+
+    /**
+     * What the session stores (the user is reloaded by id on each request): the format of
+     * FOSUserBundle's base class, so that the sessions opened before its removal stay valid.
+     *
+     * @return mixed[]
+     */
+    public function __serialize(): array
+    {
+        return [
+            $this->password,
+            $this->salt,
+            $this->usernameCanonical,
+            $this->username,
+            $this->enabled,
+            $this->id,
+            $this->email,
+            $this->emailCanonical,
+        ];
+    }
+
+    /**
+     * @param mixed[] $data
+     */
+    public function __unserialize(array $data): void
+    {
+        [
+            $this->password,
+            $this->salt,
+            $this->usernameCanonical,
+            $this->username,
+            $this->enabled,
+            $this->id,
+            $this->email,
+            $this->emailCanonical
+        ] = $data;
+    }
+
+    /**
+     * Lowercases a username or an email, for the *Canonical columns.
+     */
+    public static function canonicalize(string $string): string
+    {
+        return mb_strtolower($string);
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->username;
+    }
+
+    public function getUsername(): string
+    {
+        return (string) $this->username;
+    }
+
+    /**
+     * Also sets the canonical username.
+     */
+    public function setUsername(?string $username): User
+    {
+        $this->username = $username;
+        $this->usernameCanonical = null === $username ? null : self::canonicalize($username);
+
+        return $this;
+    }
+
+    public function getUsernameCanonical(): ?string
+    {
+        return $this->usernameCanonical;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    /**
+     * Also sets the canonical email.
+     */
+    public function setEmail(?string $email): User
+    {
+        $this->email = $email;
+        $this->emailCanonical = null === $email ? null : self::canonicalize($email);
+
+        return $this;
+    }
+
+    public function getEmailCanonical(): ?string
+    {
+        return $this->emailCanonical;
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
+    public function setEnabled(bool $enabled): User
+    {
+        $this->enabled = $enabled;
+
+        return $this;
+    }
+
+    public function getSalt(): ?string
+    {
+        return $this->salt;
+    }
+
+    public function setSalt(?string $salt): User
+    {
+        $this->salt = $salt;
+
+        return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): User
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(?string $plainPassword): User
+    {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    public function eraseCredentials(): void
+    {
+        $this->plainPassword = null;
+    }
+
+    public function getLastLogin(): ?\DateTime
+    {
+        return $this->lastLogin;
+    }
+
+    public function setLastLogin(?\DateTime $lastLogin): User
+    {
+        $this->lastLogin = $lastLogin;
+
+        return $this;
+    }
+
+    public function getConfirmationToken(): ?string
+    {
+        return $this->confirmationToken;
+    }
+
+    public function setConfirmationToken(?string $confirmationToken): User
+    {
+        $this->confirmationToken = $confirmationToken;
+
+        return $this;
+    }
+
+    public function getPasswordRequestedAt(): ?\DateTime
+    {
+        return $this->passwordRequestedAt;
+    }
+
+    public function setPasswordRequestedAt(?\DateTime $passwordRequestedAt): User
+    {
+        $this->passwordRequestedAt = $passwordRequestedAt;
+
+        return $this;
+    }
+
+    /**
+     * Whether a password reset was requested less than $ttl seconds ago.
+     */
+    public function isPasswordRequestNonExpired(int $ttl): bool
+    {
+        return $this->passwordRequestedAt instanceof \DateTime
+            && $this->passwordRequestedAt->getTimestamp() + $ttl > time();
+    }
+
+    /**
+     * The stored roles, plus ROLE_USER.
+     *
+     * @return string[]
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        $roles[] = self::ROLE_DEFAULT;
+
+        return array_values(array_unique($roles));
+    }
+
+    /**
+     * @param string[] $roles
+     */
+    public function setRoles(array $roles): User
+    {
+        $this->roles = [];
+        foreach ($roles as $role) {
+            $this->addRole($role);
+        }
+
+        return $this;
+    }
+
+    public function addRole(string $role): User
+    {
+        $role = strtoupper($role);
+        if (self::ROLE_DEFAULT !== $role && !in_array($role, $this->roles, true)) {
+            $this->roles[] = $role;
+        }
+
+        return $this;
+    }
+
+    /**
+     * A user whose password (or username) changed in the database is logged out.
+     */
+    public function isEqualTo(UserInterface $user): bool
+    {
+        return $user instanceof self
+            && $this->password === $user->password
+            && $this->salt === $user->salt
+            && $this->username === $user->username;
     }
 
     /**

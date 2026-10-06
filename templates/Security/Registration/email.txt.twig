@@ -1,0 +1,17 @@
+{% block subject %}
+{% autoescape false %}
+Welcome {{ user.username }}!
+{% endautoescape %}
+{% endblock %}
+{% block body_text %}
+{% autoescape false %}
+Hello {{ user.username }}!
+
+To finish activating your account - please visit {{ confirmationUrl }}
+
+This link can only be used once to validate your account.
+
+Regards,
+the Team.
+{% endautoescape %}
+{% endblock %}

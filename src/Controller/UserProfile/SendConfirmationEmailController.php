@@ -4,35 +4,35 @@ declare(strict_types=1);
 
 namespace App\Controller\UserProfile;
 
-use App\Entity\User;
-use FOS\UserBundle\Mailer\MailerInterface;
-use FOS\UserBundle\Model\UserManagerInterface;
+use App\Controller\Security\RegistrationCheckEmailController;
+use App\Repository\UserRepository;
+use App\Security\UserMailer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 class SendConfirmationEmailController extends AbstractController
 {
-    private MailerInterface $mailer;
+    private UserMailer $mailer;
 
-    private UserManagerInterface $userManager;
+    private UserRepository $userRepository;
 
     public function __construct(
-        MailerInterface $mailer,
-        UserManagerInterface $userManager
+        UserMailer $mailer,
+        UserRepository $userRepository
     ) {
         $this->mailer = $mailer;
-        $this->userManager = $userManager;
+        $this->userRepository = $userRepository;
     }
 
     /**
      * @Route("/user/remind/{username}", name="remind_email")
      */
-    public function __invoke(string $username): Response
+    public function __invoke(Request $request, string $username): Response
     {
-        /** @var User|null $user */
-        $user = $this->userManager->findUserByUsername($username);
+        $user = $this->userRepository->findOneByUsername($username);
         if (!$user) {
             throw new NotFoundHttpException("Cannot find user from username [{$username}]");
         }
@@ -42,7 +42,7 @@ class SendConfirmationEmailController extends AbstractController
         }
 
         $this->mailer->sendConfirmationEmailMessage($user);
-        $this->get('session')->set('fos_user_send_confirmation_email/email', $user->getEmail());
+        $request->getSession()->set(RegistrationCheckEmailController::SESSION_EMAIL, $user->getEmail());
         $url = $this->generateUrl('fos_user_registration_check_email');
 
         return $this->redirect($url);

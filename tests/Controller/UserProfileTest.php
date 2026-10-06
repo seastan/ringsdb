@@ -12,7 +12,7 @@ use Symfony\Component\DomCrawler\Form;
 /**
  * Profile forms:
  * - the site's own profile form (GET /user/profile_edit, POST /user/profile_save);
- * - the FOSUserBundle forms: account (/profile/edit), password change
+ * - the account forms (formerly FOSUserBundle's): account (/profile/edit), password change
  *   (/profile/change-password), password reset (/resetting/*).
  *
  * The users' rows are restored in tearDown() (passwords included).
@@ -213,7 +213,7 @@ class UserProfileTest extends WebTestCase
         $this->assertSame('test@example.com', $this->fetchUser()['email']);
     }
 
-    /* ------------------------------------------------ FOSUser: account */
+    /* ---------------------------------------------------------- account */
 
     public function testFosProfileEditRequiresTheCurrentPassword(): void
     {
@@ -237,7 +237,7 @@ class UserProfileTest extends WebTestCase
         $this->assertSame(['phpunit_new@example.com', 'phpunit_new@example.com'], [$user['email'], $user['email_canonical']]);
     }
 
-    /* ------------------------------------------- FOSUser: change password */
+    /* -------------------------------------------------- change password */
 
     /**
      * @dataProvider invalidPasswordChangeProvider
@@ -284,7 +284,7 @@ class UserProfileTest extends WebTestCase
         $this->assertTrue($this->login($this->client, 'test', 'secret123'));
     }
 
-    /* -------------------------------------------- FOSUser: reset password */
+    /* --------------------------------------------------- reset password */
 
     public function testResetPassword(): void
     {

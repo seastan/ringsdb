@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
- * Registration / login / logout workflow (FOSUserBundle + security firewall "default").
+ * Registration / login / logout workflow (src/Controller/Security + security firewall "main").
  *
  * Relies on the "test" / "test" user loaded by LoadUserData.
  * Users created by these tests are prefixed with "phpunit_" and removed in tearDown().
