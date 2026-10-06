@@ -1,0 +1,10 @@
+# This file is the entry point to configure your own HTTP routes.
+# Files in the routes/ subdirectory configure the routes for your dependencies.
+
+#index:
+#    path: /
+#    defaults: { _controller: 'App\Controller\DefaultController::index' }
+
+app:
+    resource: "../../src/Resources/config/routing.yml"
+    prefix:   /

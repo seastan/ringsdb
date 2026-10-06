@@ -1,0 +1,42 @@
+{% extends 'Search/display.html.twig' %}
+{% import "macros.html.twig" as macros %}
+
+{% block main %}
+
+    <table class="rwd-table table table-striped table-condensed">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Sphere</th>
+            <th>Type</th>
+            <th class="hidden-xs cost" title="Cost/Threat" data-toggle="tooltip" data-container="body">Cost</th>
+            <th class="hidden-xs willpower"><span class="icon-willpower"></span></th>
+            <th class="hidden-xs attack"><span class="icon-attack"></span></th>
+            <th class="hidden-xs defense"><span class="icon-defense"></span></th>
+            <th class="hidden-xs health"><span class="icon-health"></span></th>
+            <th>Traits</th>
+            <th>Sets</th>
+        </tr>
+        </thead>
+
+        {% for i in 0..cards | length - 1 %}
+
+            <tr class="{% if i % 2==0 %}even{% else %}odd{% endif %}">
+                {% set card = cards[i] %}
+                <td>
+                    <a href="{{ card.url }}" class="card-tip{% if card.available == false %} card-preview{% endif %}" data-code="{{ card.code }}">{{ card.name }}</a>
+                </td>
+                <td><span class="icon icon-{{ card.sphere_code }} fg-{{ card.sphere_code }}"></span> <span class="hidden-xs">{{ card.sphere_name }}</span></td>
+                <td><span class="icon icon-{{ card.type_code }} fg-{{ card.sphere_code }}"></span> <span class="hidden-xs">{{ card.type_name }}</span></td>
+                <td class="hidden-xs cost">{% if card.type_name == 'Hero' %}{{ macros.integer_or_x(card.threat) }}{% else %}{% if card.type_code == 'ally' or card.type_code == 'attachment' or card.type_code == 'event' or card.type_code == 'player-side-quest' or (card.type_code == 'contract' and card.cost != null ) or (card.type_code == 'treasure' and card.cost != null ) %}{{ macros.integer_or_x(card.cost) }}{% endif %}{% endif %}</td>
+                <td class="hidden-xs willpower">{% if card.type_code == 'hero' or card.type_code == 'ally' or (card.type_code == 'treasure' and card.health != null) %}{{ macros.integer_or_x(card.willpower) }}{% endif %}</td>
+                <td class="hidden-xs attack">{% if card.type_code == 'hero' or card.type_code == 'ally' or (card.type_code == 'treasure' and card.health != null) %}{{ macros.integer_or_x(card.attack) }}{% endif %}</td>
+                <td class="hidden-xs defense">{% if card.type_code == 'hero' or card.type_code == 'ally' or (card.type_code == 'treasure' and card.health != null) %}{{ macros.integer_or_x(card.defense) }}{% endif %}</td>
+                <td class="hidden-xs health">{% if card.type_code == 'hero' or card.type_code == 'ally' or (card.type_code == 'treasure' and card.health != null) %}{{ macros.integer_or_x(card.health) }}{% endif %}</td>
+                <td>{{ card.traits }}</td>
+                <td style="white-space:nowrap">{% for printing in card.packs %}<a href="{{ path('cards_list', {'pack_code': printing.pack_code}) }}" title="{{ printing.pack_name }}">{{ printing.pack_code }}</a>{% if not loop.last %}&nbsp;·&nbsp;{% endif %}{% endfor %}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

@@ -1,76 +1,119 @@
 {
-  "name": "sydtrack/ringsdb",
-  "description": "The Lord of the Rings LCG deckbuilder",
-  "license": "proprietary",
-  "type": "project",
-  "autoload": {
-    "psr-4": {
-      "": "src/",
-      "SymfonyStandard\\": "app/"
+    "name": "sydtrack/ringsdb",
+    "description": "The Lord of the Rings LCG deckbuilder",
+    "license": "proprietary",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": ">=7.1.33",
+        "ext-dom": "*",
+        "ext-fileinfo": "*",
+        "ext-iconv": "*",
+        "ext-json": "*",
+        "ext-libxml": "*",
+        "ext-pdo": "*",
+        "ext-zip": "*",
+        "doctrine/dbal": "^2.5",
+        "doctrine/doctrine-bundle": "^1.12",
+        "doctrine/doctrine-migrations-bundle": "~2.2.0",
+        "doctrine/migrations": "~2.2.0",
+        "doctrine/orm": "^2.5",
+        "erusev/parsedown": "^1.6",
+        "ezyang/htmlpurifier": "^4.6",
+        "friendsofsymfony/jsrouting-bundle": "^2.2",
+        "friendsofsymfony/user-bundle": "^2.1.0",
+        "gedmo/doctrine-extensions": "^2.4",
+        "nelmio/api-doc-bundle": "^2.9",
+        "ocramius/proxy-manager": "~2.2.0",
+        "phpoffice/phpspreadsheet": "^1.30.7",
+        "scssphp/scssphp": "^1.13",
+        "symfony/asset": "*",
+        "symfony/cache": "*",
+        "symfony/config": "*",
+        "symfony/console": "*",
+        "symfony/css-selector": "*",
+        "symfony/debug": "*",
+        "symfony/dependency-injection": "*",
+        "symfony/doctrine-bridge": "*",
+        "symfony/dom-crawler": "*",
+        "symfony/dotenv": "*",
+        "symfony/event-dispatcher": "*",
+        "symfony/filesystem": "*",
+        "symfony/finder": "*",
+        "symfony/flex": "^1.22",
+        "symfony/form": "*",
+        "symfony/framework-bundle": "*",
+        "symfony/http-foundation": "*",
+        "symfony/http-kernel": "*",
+        "symfony/inflector": "*",
+        "symfony/intl": "*",
+        "symfony/monolog-bridge": "*",
+        "symfony/monolog-bundle": "^3.6",
+        "symfony/options-resolver": "*",
+        "symfony/property-access": "*",
+        "symfony/routing": "*",
+        "symfony/security-bundle": "*",
+        "symfony/serializer": "*",
+        "symfony/swiftmailer-bundle": "^3.1",
+        "symfony/templating": "*",
+        "symfony/translation": "*",
+        "symfony/twig-bridge": "*",
+        "symfony/twig-bundle": "*",
+        "symfony/validator": "*",
+        "symfony/var-dumper": "*",
+        "symfony/yaml": "*",
+        "twig/twig": "^2.10"
+    },
+    "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^3.0.0",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.2",
+        "phpstan/phpstan-doctrine": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
+        "symfony/browser-kit": "*",
+        "symfony/debug-bundle": "*",
+        "symfony/phpunit-bridge": "4.4",
+        "symfony/process": "*",
+        "symfony/stopwatch": "*",
+        "symfony/web-profiler-bundle": "*",
+        "symfony/web-server-bundle": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear --no-warmup": "symfony-cmd",
+            "assets:install public --symlink --relative": "symfony-cmd",
+            "ln -sfn ../../src/Resources/public public/bundles/app": "script",
+            "app:assets": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ]
+    },
+    "config": {
+        "platform": {
+            "php": "7.4.33"
+        },
+        "sort-packages": true,
+        "allow-plugins": {
+            "phpstan/extension-installer": true,
+            "symfony/flex": true
+        }
+    },
+    "extra": {
+        "symfony": {
+            "require": "4.4.*"
+        }
     }
-  },
-  "require": {
-    "php": ">=7.1.33",
-    "ext-dom": "*",
-    "ext-fileinfo": "*",
-    "ext-iconv": "*",
-    "ext-libxml": "*",
-    "ext-json": "*",
-    "ext-pdo": "*",
-    "ext-zip": "*",
-    "symfony/symfony": "^3.4",
-    "symfony/assetic-bundle": "^2.8",
-    "symfony/swiftmailer-bundle": "~2.3",
-    "symfony/monolog-bundle": "^3.6",
-    "sensio/framework-extra-bundle": "~3.0,>=3.0.2",
-    "incenteev/composer-parameter-handler": "~2.0",
-    "friendsofsymfony/user-bundle": "^2.1.0",
-    "gedmo/doctrine-extensions": "^2.4",
-    "doctrine/dbal": "^2.5",
-    "doctrine/orm": "^2.5",
-    "doctrine/doctrine-bundle": "^1.12",
-    "friendsofsymfony/jsrouting-bundle": "^1.5",
-    "ezyang/htmlpurifier": "^4.6",
-    "leafo/scssphp": "^0.2.0",
-    "patchwork/jsqueeze": "~1.0",
-    "nelmio/api-doc-bundle": "^2.9",
-    "erusev/parsedown": "^1.6",
-    "symfony/twig-bundle": "^3.4",
-    "symfony/asset": "^3.4",
-    "phpoffice/phpspreadsheet": "^1.30.7",
-    "doctrine/doctrine-migrations-bundle": "~2.2.0",
-    "doctrine/migrations": "~2.2.0",
-    "ocramius/proxy-manager": "~2.2.0"
-  },
-  "require-dev": {
-    "sensio/generator-bundle": "~3.0",
-    "symfony/phpunit-bridge": "4.4",
-    "doctrine/doctrine-fixtures-bundle": "^2.4.1",
-    "phpstan/phpstan": "^2.2"
-  },
-  "scripts": {
-    "symfony-scripts": [
-      "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
-      "php app/console cache:clear --no-warmup",
-      "php app/console assets:install web --symlink --relative",
-      "php app/console assetic:dump"
-    ],
-    "post-install-cmd": [
-      "@symfony-scripts"
-    ],
-    "post-update-cmd": [
-      "@symfony-scripts"
-    ]
-  },
-  "config": {
-    "bin-dir": "bin"
-  },
-  "extra": {
-    "symfony-app-dir": "app",
-    "symfony-web-dir": "web",
-    "symfony-assets-install": "relative",
-    "incenteev-parameters": {
-      "file": "app/config/parameters.yml"
-    }
-  }
 }

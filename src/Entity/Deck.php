@@ -1,0 +1,767 @@
+<?php
+
+namespace App\Entity;
+
+use App\Entity\Decksideslot;
+use App\Entity\Deckslot;
+use App\Entity\FellowshipDeck;
+use App\Entity\FellowshipDecklist;
+use App\Entity\Pack;
+use App\Entity\QuestlogDeck;
+
+class Deck extends \App\Model\ExportableDeck implements \JsonSerializable {
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function getHistory() {
+        $slots = $this->getSlots();
+        $cards = $slots->getContent();
+        $sideslots = $this->getSideslots();
+        $sidecards = $sideslots->getContent();
+
+        $snapshots = [];
+        $changes = $this->getChanges();
+        $savedChanges = [];
+        $unsavedChanges = [];
+
+        foreach ($changes as $change) {
+            if ($change->getIsSaved()) {
+                array_push($savedChanges, $change);
+            } else {
+                array_unshift($unsavedChanges, $change);
+            }
+        }
+        $array['unsaved'] = count($unsavedChanges);
+
+        // recreating the versions with the variation info, starting from $preversion
+        $preversion = $cards;
+        $sidepreversion = $sidecards;
+        foreach ($savedChanges as $change) {
+            $variation = json_decode($change->getVariation(), true);
+            $row = [
+                'variation' => $variation,
+                'is_saved' => $change->getIsSaved(),
+                'version' => $change->getVersion(),
+                'content' => [
+                    'main' => $preversion,
+                    'side' => $sidepreversion
+                ],
+                'date_creation' => $change->getDateCreation()->format('c'),
+            ];
+            array_unshift($snapshots, $row);
+
+            // applying variation to create 'next' (older) preversion
+            foreach ($variation[0] as $code => $qty) {
+                if (isset($preversion[$code])) {
+                    $preversion[$code] = $preversion[$code] - $qty;
+                    if ($preversion[$code] == 0) {
+                        unset ($preversion[$code]);
+                    }
+                }
+            }
+
+            foreach ($variation[1] as $code => $qty) {
+                if (!isset($preversion[$code])) {
+                    $preversion[$code] = 0;
+                }
+                $preversion[$code] = $preversion[$code] + $qty;
+            }
+
+            if (!isset($variation[2])) {
+                $variation[2] = [];
+            }
+
+            foreach ($variation[2] as $code => $qty) {
+                if (isset($sidepreversion[$code])) {
+                    $sidepreversion[$code] = $sidepreversion[$code] - $qty;
+                    if ($sidepreversion[$code] == 0) {
+                        unset ($sidepreversion[$code]);
+                    }
+                }
+            }
+
+            if (!isset($variation[3])) {
+                $variation[3] = [];
+            }
+
+            foreach ($variation[3] as $code => $qty) {
+                if (!isset($sidepreversion[$code])) {
+                    $sidepreversion[$code] = 0;
+                }
+                $sidepreversion[$code] = $sidepreversion[$code] + $qty;
+            }
+
+            ksort($preversion);
+            ksort($sidepreversion);
+        }
+
+        // add last know version with empty diff
+        $row = [
+            'variation' => null,
+            'is_saved' => true,
+            'version' => "0.0",
+            'content' => [
+                'main' => $preversion,
+                'side' => $sidepreversion,
+            ],
+            'date_creation' => $this->getDateCreation()->format('c')
+        ];
+        array_unshift($snapshots, $row);
+
+        // recreating the snapshots with the variation info, starting from $postversion
+        $postversion = $cards;
+        $sidepostversion = $sidecards;
+        foreach ($unsavedChanges as $change) {
+            $variation = json_decode($change->getVariation(), true);
+            $row = [
+                'variation' => $variation,
+                'is_saved' => $change->getIsSaved(),
+                'version' => $change->getVersion(),
+                'date_creation' => $change->getDateCreation()->format('c'),
+            ];
+
+            // applying variation to postversion
+            foreach ($variation[0] as $code => $qty) {
+                if (!isset ($postversion[$code])) {
+                    $postversion[$code] = 0;
+                }
+                $postversion[$code] = $postversion[$code] + $qty;
+            }
+
+            foreach ($variation[1] as $code => $qty) {
+                $postversion[$code] = $postversion[$code] - $qty;
+                if ($postversion[$code] == 0) {
+                    unset ($postversion[$code]);
+                }
+            }
+
+            if (!isset($variation[2])) {
+                $variation[2] = [];
+            }
+
+            foreach ($variation[2] as $code => $qty) {
+                if (!isset ($sidepostversion[$code])) {
+                    $sidepostversion[$code] = 0;
+                }
+                $sidepostversion[$code] = $sidepostversion[$code] + $qty;
+            }
+
+            if (!isset($variation[3])) {
+                $variation[3] = [];
+            }
+
+            foreach ($variation[3] as $code => $qty) {
+                $sidepostversion[$code] = $sidepostversion[$code] - $qty;
+                if ($sidepostversion[$code] == 0) {
+                    unset ($sidepostversion[$code]);
+                }
+            }
+
+            ksort($postversion);
+            ksort($sidepostversion);
+
+            // add postversion with variation that lead to it
+            $row['content'] = [
+                'main' => $postversion,
+                'side' => $sidepostversion
+            ];
+            array_push($snapshots, $row);
+        }
+
+        return $snapshots;
+    }
+
+    public function jsonSerialize() {
+        $array = parent::getArrayExport();
+        $array['is_published'] = false;
+        $array['problem'] = $this->getProblem();
+        $array['tags'] = $this->getTags();
+        $array['last_pack'] = $this->getLastPack();
+        $array['history'] = $this->getHistory();
+
+        return $array;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsUnsaved() {
+        $changes = $this->getChanges();
+
+        foreach ($changes as $change) {
+            if (!$change->getIsSaved()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @var integer
+     */
+    private $id;
+    /**
+     * @var string
+     */
+    private $name;
+    /**
+     * @var \DateTime
+     */
+    private $dateCreation;
+    /**
+     * @var \DateTime
+     */
+    private $dateUpdate;
+    /**
+     * @var string|null
+     */
+    private $descriptionMd;
+    /**
+     * @var string|null
+     */
+    private $problem;
+    /**
+     * @var string|null
+     */
+    private $tags;
+    /**
+     * @var integer
+     */
+    private $majorVersion;
+    /**
+     * @var integer
+     */
+    private $minorVersion;
+    /**
+     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Deckslot>
+     */
+    private $slots;
+    /**
+     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Decksideslot>
+     */
+    private $sideslots;
+    /**
+     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Decklist>
+     */
+    private $children;
+    /**
+     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Deckchange>
+     */
+    private $changes;
+    /**
+     * @var \App\Entity\User
+     */
+    private $user;
+    /**
+     * @var \App\Entity\Pack|null
+     */
+    private $lastPack;
+    /**
+     * @var \App\Entity\Decklist|null
+     */
+    private $parent;
+
+    /**
+     * Constructor
+     */
+    public function __construct() {
+        $this->slots = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->sideslots = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->children = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->changes = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->fellowships = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->minorVersion = 0;
+        $this->majorVersion = 0;
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId() {
+        return $this->id;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     *
+     * @return Deck
+     */
+    public function setName($name) {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName() {
+        return $this->name;
+    }
+
+    /**
+     * Set dateCreation
+     *
+     * @param \DateTime $dateCreation
+     *
+     * @return Deck
+     */
+    public function setDateCreation($dateCreation) {
+        $this->dateCreation = $dateCreation;
+
+        return $this;
+    }
+
+    /**
+     * Get dateCreation
+     *
+     * @return \DateTime
+     */
+    public function getDateCreation() {
+        return $this->dateCreation;
+    }
+
+    /**
+     * Set dateUpdate
+     *
+     * @param \DateTime $dateUpdate
+     *
+     * @return Deck
+     */
+    public function setDateUpdate($dateUpdate) {
+        $this->dateUpdate = $dateUpdate;
+
+        return $this;
+    }
+
+    /**
+     * Get dateUpdate
+     *
+     * @return \DateTime
+     */
+    public function getDateUpdate() {
+        return $this->dateUpdate;
+    }
+
+    /**
+     * Set descriptionMd
+     *
+     * @param string|null $descriptionMd
+     *
+     * @return Deck
+     */
+    public function setDescriptionMd($descriptionMd) {
+        $this->descriptionMd = $descriptionMd;
+
+        return $this;
+    }
+
+    /**
+     * Get descriptionMd
+     *
+     * @return string|null
+     */
+    public function getDescriptionMd() {
+        return $this->descriptionMd;
+    }
+
+    /**
+     * Set problem
+     *
+     * @param string|null $problem
+     *
+     * @return Deck
+     */
+    public function setProblem($problem) {
+        $this->problem = $problem;
+
+        return $this;
+    }
+
+    /**
+     * Get problem
+     *
+     * @return string|null
+     */
+    public function getProblem() {
+        return $this->problem;
+    }
+
+    /**
+     * Set tags
+     *
+     * @param string|null $tags
+     *
+     * @return Deck
+     */
+    public function setTags($tags) {
+        $this->tags = $tags;
+
+        return $this;
+    }
+
+    /**
+     * Get tags
+     *
+     * @return string|null
+     */
+    public function getTags() {
+        return $this->tags;
+    }
+
+    /**
+     * Add slot
+     *
+     * @param \App\Entity\Deckslot $slot
+     *
+     * @return Deck
+     */
+    public function addSlot(\App\Entity\Deckslot $slot) {
+        $this->slots[] = $slot;
+
+        return $this;
+    }
+
+    /**
+     * Remove slot
+     *
+     * @param \App\Entity\Deckslot $slot
+     * @return void
+     */
+    public function removeSlot(\App\Entity\Deckslot $slot) {
+        $this->slots->removeElement($slot);
+    }
+
+    /**
+     * Get slots
+     *
+     * @return \App\Model\SlotCollectionInterface<Deckslot>
+     */
+    public function getSlots() {
+        return new \App\Model\SlotCollectionDecorator($this->slots);
+    }
+
+    /**
+     * Add sideslot
+     *
+     * @param \App\Entity\Decksideslot $sideslot
+     *
+     * @return Deck
+     */
+    public function addSideslot(\App\Entity\Decksideslot $sideslot) {
+        $this->sideslots[] = $sideslot;
+
+        return $this;
+    }
+
+    /**
+     * Remove sideslot
+     *
+     * @param \App\Entity\Decksideslot $sideslot
+     * @return void
+     */
+    public function removeSideslot(\App\Entity\Decksideslot $sideslot) {
+        $this->sideslots->removeElement($sideslot);
+    }
+
+    /**
+     * Get sideslots
+     *
+     * @return \App\Model\SlotCollectionInterface<Decksideslot>
+     */
+    public function getSideslots() {
+        return new \App\Model\SlotCollectionDecorator($this->sideslots);
+    }
+
+    /**
+     * Add child
+     *
+     * @param \App\Entity\Decklist $child
+     *
+     * @return Deck
+     */
+    public function addChild(\App\Entity\Decklist $child) {
+        $this->children[] = $child;
+
+        return $this;
+    }
+
+    /**
+     * Remove child
+     *
+     * @param \App\Entity\Decklist $child
+     * @return void
+     */
+    public function removeChild(\App\Entity\Decklist $child) {
+        $this->children->removeElement($child);
+    }
+
+    /**
+     * Get children
+     *
+     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Decklist>
+     */
+    public function getChildren() {
+        return $this->children;
+    }
+
+    /**
+     * Add change
+     *
+     * @param \App\Entity\Deckchange $change
+     *
+     * @return Deck
+     */
+    public function addChange(\App\Entity\Deckchange $change) {
+        $this->changes[] = $change;
+
+        return $this;
+    }
+
+    /**
+     * Remove change
+     *
+     * @param \App\Entity\Deckchange $change
+     * @return void
+     */
+    public function removeChange(\App\Entity\Deckchange $change) {
+        $this->changes->removeElement($change);
+    }
+
+    /**
+     * Get changes
+     *
+     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Deckchange>
+     */
+    public function getChanges() {
+        return $this->changes;
+    }
+
+    /**
+     * Set user
+     *
+     * @param \App\Entity\User $user
+     *
+     * @return Deck
+     */
+    public function setUser(\App\Entity\User $user) {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get user
+     *
+     * @return \App\Entity\User
+     */
+    public function getUser() {
+        return $this->user;
+    }
+
+    /**
+     * Set lastPack
+     *
+     * @param \App\Entity\Pack $lastPack
+     *
+     * @return Deck
+     */
+    public function setLastPack(Pack $lastPack = null) {
+        $this->lastPack = $lastPack;
+
+        return $this;
+    }
+
+    /**
+     * Get lastPack
+     *
+     * @return \App\Entity\Pack|null
+     */
+    public function getLastPack() {
+        return $this->lastPack;
+    }
+
+    /**
+     * Set parent
+     *
+     * @param \App\Entity\Decklist $parent
+     *
+     * @return Deck
+     */
+    public function setParent(\App\Entity\Decklist $parent = null) {
+        $this->parent = $parent;
+
+        return $this;
+    }
+
+    /**
+     * Get parent
+     *
+     * @return \App\Entity\Decklist|null
+     */
+    public function getParent() {
+        return $this->parent;
+    }
+
+    /**
+     * Set majorVersion
+     *
+     * @param integer $majorVersion
+     *
+     * @return Deck
+     */
+    public function setMajorVersion($majorVersion) {
+        $this->majorVersion = $majorVersion;
+
+        return $this;
+    }
+
+    /**
+     * Get majorVersion
+     *
+     * @return integer
+     */
+    public function getMajorVersion() {
+        return $this->majorVersion;
+    }
+
+    /**
+     * Set minorVersion
+     *
+     * @param integer $minorVersion
+     *
+     * @return Deck
+     */
+    public function setMinorVersion($minorVersion) {
+        $this->minorVersion = $minorVersion;
+
+        return $this;
+    }
+
+    /**
+     * Get minorVersion
+     *
+     * @return integer
+     */
+    public function getMinorVersion() {
+        return $this->minorVersion;
+    }
+
+    /**
+     * @return string
+     */
+    public function getVersion() {
+        return $this->majorVersion . "." . $this->minorVersion;
+    }
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\FellowshipDeck>
+     */
+    private $fellowships;
+
+    /**
+     * Add fellowship
+     *
+     * @param \App\Entity\FellowshipDeck $fellowship
+     *
+     * @return Deck
+     */
+    public function addFellowship(\App\Entity\FellowshipDeck $fellowship) {
+        $this->fellowships[] = $fellowship;
+
+        return $this;
+    }
+
+    /**
+     * Remove fellowship
+     *
+     * @param \App\Entity\FellowshipDeck $fellowship
+     * @return void
+     */
+    public function removeFellowship(\App\Entity\FellowshipDeck $fellowship) {
+        $this->fellowships->removeElement($fellowship);
+    }
+
+    /**
+     * Get fellowships
+     *
+     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\FellowshipDeck>
+     */
+    public function getFellowships() {
+        return $this->fellowships;
+    }
+
+    /**
+     * Get allFellowships
+     *
+     * @return array<int, FellowshipDeck|FellowshipDecklist>
+     */
+    public function getAllFellowships() {
+        $childrenFellowships = $this->getFellowships()->toArray();
+
+        foreach ($this->getChildren() as &$child) {
+            $childrenFellowships = array_merge($childrenFellowships, $child->getFellowships()->toArray());
+        }
+
+        return $childrenFellowships;
+    }
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\QuestlogDeck>
+     */
+    private $questlogs;
+
+    /**
+     * Add questlog
+     *
+     * @param \App\Entity\QuestlogDeck $questlog
+     *
+     * @return Deck
+     */
+    public function addQuestlog(\App\Entity\QuestlogDeck $questlog) {
+        $this->questlogs[] = $questlog;
+
+        return $this;
+    }
+
+    /**
+     * Remove questlog
+     *
+     * @param \App\Entity\QuestlogDeck $questlog
+     * @return void
+     */
+    public function removeQuestlog(\App\Entity\QuestlogDeck $questlog) {
+        $this->questlogs->removeElement($questlog);
+    }
+
+    /**
+     * Get questlogs
+     *
+     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\QuestlogDeck>
+     */
+    public function getQuestlogs() {
+        return $this->questlogs;
+    }
+
+    /**
+     * Get allQuestlogs
+     *
+     * @return array<int, QuestlogDeck>
+     */
+    public function getAllQuestlogs() {
+        $allQuestlogs = $this->getQuestlogs()->toArray();
+        return $allQuestlogs;
+    /*
+        return array_filter($allQuestlogs, function($k) {
+            return $k->getQuestlog()->getIsPublic();
+        });
+    */
+    }
+}

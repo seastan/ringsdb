@@ -1,0 +1,29 @@
+card_review_post:
+    path: /post
+    methods: [POST]
+    defaults: 
+        _controller: App\Controller\ReviewController::postAction
+
+card_review_edit:
+    path: /edit
+    methods: [POST]
+    defaults: 
+        _controller: App\Controller\ReviewController::editAction
+
+card_review_like:
+    path: /like
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\ReviewController::likeAction
+
+card_review_remove:
+    path: /remove/{id}
+    defaults:
+        _controller: App\Controller\ReviewController::removeAction
+        
+card_reviewcomment_post:
+    path: /comment
+    methods: [POST]
+    defaults: 
+        _controller: App\Controller\ReviewController::commentAction
+        

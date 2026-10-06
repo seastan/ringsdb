@@ -1,0 +1,23 @@
+excel_download_form:
+    path: /download
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\ExcelController::downloadFormAction
+
+excel_download_process:
+    path: /download
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\ExcelController::downloadProcessAction
+
+excel_upload_form:
+    path: /upload
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\ExcelController::uploadFormAction
+
+excel_upload_process:
+    path: /upload
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\ExcelController::uploadProcessAction

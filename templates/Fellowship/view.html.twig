@@ -1,0 +1,123 @@
+{% extends 'layout.html.twig' %}
+{% import "macros.html.twig" as macros %}
+
+{% block javascripts %}
+    <script src="{{ asset('bundles/app/js/ui.fellowshipview.js') }}"></script>
+
+    <script type="text/javascript">
+        var Decks = {};
+        Decks[1] = {{ deck1 | json_encode | raw }};
+        Decks[2] = {{ deck2 | json_encode | raw }};
+        Decks[3] = {{ deck3 | json_encode | raw }};
+        Decks[4] = {{ deck4 | json_encode | raw }};
+
+        var Commenters = {{ commenters | json_encode | raw }};
+        var Fellowship = {
+            id: {{ fellowship.id }},
+            name: {{ fellowship.name | json_encode | raw }},
+            published: {{ fellowship.isPublic | json_encode }}
+        };
+        app.deck_selection.show_sideboard = true;
+        app.deck_selection.init(Decks);
+        app.user.params.fellowship_id = {{ fellowship.id }};
+
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="main white container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 style="border-bottom:1px solid lightgray">{{ fellowship.name }}</h1>
+            </div>
+        </div>
+
+        <div class="row selected-decks hidden">
+            <div class="col-md-3 col-sm-6 deck">
+                <div class="selected-deck-content small view">
+                    <div id="deck1-content" class="deck-loading">
+                        <i class="fa fa-spinner fa-spin fa-5x"></i>
+                    </div>
+                    <div id="deck1-side-content"></div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 deck">
+                <div class="selected-deck-content small view">
+                    <div id="deck2-content" class="deck-loading">
+                        <i class="fa fa-spinner fa-spin fa-5x"></i>
+                    </div>
+                    <div id="deck2-side-content"></div>
+                </div>
+            </div>
+            <div class="visible-sm-block" style="clear: both"></div>
+            <div class="col-md-3 col-sm-6 deck">
+                <div class="selected-deck-content small view">
+                    <div id="deck3-content" class="deck-loading">
+                        <i class="fa fa-spinner fa-spin fa-5x"></i>
+                    </div>
+                    <div id="deck3-side-content"></div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 deck">
+                <div class="selected-deck-content small view">
+                    <div id="deck4-content" class="deck-loading">
+                        <i class="fa fa-spinner fa-spin fa-5x"></i>
+                    </div>
+                    <div id="deck4-side-content"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="description">
+            <div class="row">
+                <div class="col-xs-7">
+                    <h3 class="username" style="margin-top: 10px">
+                        <span class="fa fa-user"></span>
+                        {{ macros.username(fellowship.user) }}
+                    </h3>
+                </div>
+                {% if is_public %}
+                    <div class="col-xs-5 text-right hidden-print" style="margin-bottom: 5px">
+                        <div class="social">{{ macros.fellowship_social_icons(fellowship) }}</div>
+                        <span class="hidden-xs">published: </span>
+                        <time datetime="{{ fellowship.datePublish | date('c') }}">{{ fellowship.datePublish | date('M d, Y') }}</time>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="row hidden-print">
+                <div class="col-md-12" id="btn-group-deck">
+                    {% include 'Fellowship/toolbar.html.twig' %}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default" style="margin-bottom: 0">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Description</h3>
+                        </div>
+                        <div class="panel-body" id="fellowship-description">
+                            {% if fellowship.descriptionHtml is empty  %}
+                                <i>No description.</i>
+                            {% else %}
+                                {{ fellowship.descriptionHtml | raw }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if is_public %}
+                <div class="row hidden-print">
+                    <div class="col-md-12">
+                        {% include 'Fellowship/comments.html.twig' %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% include 'Modale/delete_fellowship.html.twig' %}
+    {% include 'Modale/export.html.twig' %}
+
+{% endblock %}

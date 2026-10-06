@@ -1,0 +1,11 @@
+command_form:
+    path: /
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\CommandController::formAction
+
+command_run:
+    path: /
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\CommandController::runAction

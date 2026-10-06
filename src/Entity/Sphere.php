@@ -1,0 +1,142 @@
+<?php
+
+namespace App\Entity;
+
+class Sphere {
+    /**
+     * @var integer
+     */
+    private $id;
+    /**
+     * @var string
+     */
+    private $code;
+    /**
+     * @var string
+     */
+    private $name;
+    /**
+     * @var boolean
+     */
+    private $is_primary;
+    /**
+     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Card>
+     */
+    private $cards;
+
+    /**
+     * Constructor
+     */
+    public function __construct() {
+        $this->cards = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId() {
+        return $this->id;
+    }
+
+    /**
+     * Set code
+     *
+     * @param string $code
+     *
+     * @return Sphere
+     */
+    public function setCode($code) {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    /**
+     * Get code
+     *
+     * @return string
+     */
+    public function getCode() {
+        return $this->code;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     *
+     * @return Sphere
+     */
+    public function setName($name) {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName() {
+        return $this->name;
+    }
+
+    /**
+     * Set isPrimary
+     *
+     * @param boolean $isPrimary
+     *
+     * @return Sphere
+     */
+    public function setIsPrimary($isPrimary) {
+        $this->is_primary = $isPrimary;
+
+        return $this;
+    }
+
+    /**
+     * Get isPrimary
+     *
+     * @return boolean
+     */
+    public function getIsPrimary() {
+        return $this->is_primary;
+    }
+
+
+
+    /**
+     * Add card
+     *
+     * @param \App\Entity\Card $card
+     *
+     * @return Sphere
+     */
+    public function addCard(\App\Entity\Card $card) {
+        $this->cards[] = $card;
+
+        return $this;
+    }
+
+    /**
+     * Remove card
+     *
+     * @param \App\Entity\Card $card
+     * @return void
+     */
+    public function removeCard(\App\Entity\Card $card) {
+        $this->cards->removeElement($card);
+    }
+
+    /**
+     * Get cards
+     *
+     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Card>
+     */
+    public function getCards() {
+        return $this->cards;
+    }
+}
