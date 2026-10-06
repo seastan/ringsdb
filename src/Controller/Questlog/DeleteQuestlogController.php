@@ -15,16 +15,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DeleteQuestlogController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private QuestlogRepository $questlogRepository;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        QuestlogRepository $questlogRepository
-    ) {
-        $this->entityManager = $entityManager;
-        $this->questlogRepository = $questlogRepository;
+    public function __construct(private EntityManagerInterface $entityManager, private QuestlogRepository $questlogRepository)
+    {
     }
 
     /**

@@ -228,7 +228,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
             foreach ($heroDeck->getSlots() as $slot) {
                 $card = $slot->getCard();
 
-                if (false !== strpos((string) $card->getTraits(), 'Hobbit')) {
+                if (str_contains((string) $card->getTraits(), 'Hobbit')) {
                     --$threat;
                 }
             }

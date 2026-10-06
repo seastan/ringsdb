@@ -19,20 +19,8 @@ class ImportAllController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private EntityManagerInterface $entityManager;
-
-    private DeckImporter $deckImporter;
-
-    private Decks $decks;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        DeckImporter $deckImporter,
-        Decks $decks
-    ) {
-        $this->entityManager = $entityManager;
-        $this->deckImporter = $deckImporter;
-        $this->decks = $decks;
+    public function __construct(private EntityManagerInterface $entityManager, private DeckImporter $deckImporter, private Decks $decks)
+    {
     }
 
     /**
@@ -55,7 +43,7 @@ class ImportAllController extends AbstractController
             $finfo = finfo_open(FILEINFO_MIME);
             $mime = false !== $finfo ? (string) finfo_file($finfo, $filename) : '';
             // check to see if the mime-type is 'zip'
-            if ('application/zip' !== substr($mime, 0, 15)) {
+            if (!str_starts_with($mime, 'application/zip')) {
                 throw new UnprocessableEntityHttpException('Bad file');
             }
         }

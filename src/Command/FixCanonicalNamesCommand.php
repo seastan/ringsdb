@@ -13,18 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class FixCanonicalNamesCommand extends Command
 {
-    private EntityManagerInterface $entityManager;
-
-    private Texts $texts;
-
-    private ScenarioRepository $scenarioRepository;
-
-    public function __construct(EntityManagerInterface $entityManager, Texts $texts, ScenarioRepository $scenarioRepository)
+    public function __construct(private EntityManagerInterface $entityManager, private Texts $texts, private ScenarioRepository $scenarioRepository)
     {
         parent::__construct();
-        $this->entityManager = $entityManager;
-        $this->texts = $texts;
-        $this->scenarioRepository = $scenarioRepository;
     }
 
     protected function configure(): void

@@ -14,12 +14,8 @@ class OctgnExportController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private QuestlogArchiver $questlogArchiver;
-
-    public function __construct(
-        QuestlogArchiver $questlogArchiver
-    ) {
-        $this->questlogArchiver = $questlogArchiver;
+    public function __construct(private QuestlogArchiver $questlogArchiver)
+    {
     }
 
     /**

@@ -17,28 +17,8 @@ use Twig\Environment;
  */
 class UserMailer
 {
-    private MailerInterface $mailer;
-
-    private UrlGeneratorInterface $router;
-
-    private Environment $twig;
-
-    private string $senderAddress;
-
-    private string $senderName;
-
-    public function __construct(
-        MailerInterface $mailer,
-        UrlGeneratorInterface $router,
-        Environment $twig,
-        string $senderAddress,
-        string $senderName
-    ) {
-        $this->mailer = $mailer;
-        $this->router = $router;
-        $this->twig = $twig;
-        $this->senderAddress = $senderAddress;
-        $this->senderName = $senderName;
+    public function __construct(private MailerInterface $mailer, private UrlGeneratorInterface $router, private Environment $twig, private string $senderAddress, private string $senderName)
+    {
     }
 
     public function sendConfirmationEmailMessage(User $user): void

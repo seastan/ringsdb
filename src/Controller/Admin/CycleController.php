@@ -21,16 +21,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CycleController extends AbstractController
 {
-    private CycleRepository $cycleRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        CycleRepository $cycleRepository,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->cycleRepository = $cycleRepository;
-        $this->entityManager = $entityManager;
+    public function __construct(private CycleRepository $cycleRepository, private EntityManagerInterface $entityManager)
+    {
     }
 
     /**

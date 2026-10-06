@@ -50,7 +50,7 @@ class DeckWorkflowTest extends WebTestCase
                 "DELETE FROM deck WHERE id IN ($ids)",
             ] as $sql) {
                 // MySQL cannot use a subquery on the table being deleted from: resolve it first
-                if (false !== strpos($sql, $decklists)) {
+                if (str_contains($sql, $decklists)) {
                     $decklistIds = $connection->fetchAll($decklists);
                     $in = $decklistIds ? implode(',', array_map('intval', array_column($decklistIds, 'id'))) : 'NULL';
                     $sql = str_replace($decklists, $in, $sql);
@@ -310,7 +310,7 @@ class DeckWorkflowTest extends WebTestCase
     /**
      * @dataProvider refusedContentProvider
      */
-    public function testSavingADeckWithoutCardsIsRefused($content): void
+    public function testSavingADeckWithoutCardsIsRefused(string|bool $content): void
     {
         $client = $this->createAuthenticatedClient();
         $deckId = $this->createDeck($client);
@@ -403,7 +403,7 @@ class DeckWorkflowTest extends WebTestCase
      *
      * @dataProvider importProvider
      */
-    public function testImportPage($content, ?array $expectedSlots): void
+    public function testImportPage(string|bool $content, ?array $expectedSlots): void
     {
         $client = $this->createAuthenticatedClient();
         $maxId = $this->maxDeckId();

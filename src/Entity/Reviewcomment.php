@@ -40,28 +40,22 @@ class Reviewcomment
      */
     private $dateUpdate;
 
-    /**
-     * @ORM\Column(type="text", nullable=false)
-     */
-    private string $text;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
-     */
-    private User $user;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Review", inversedBy="comments")
-     * @ORM\JoinColumn(name="review_id", referencedColumnName="id", nullable=false)
-     */
-    private Review $review;
-
-    public function __construct(User $user, Review $review, string $text)
-    {
-        $this->user = $user;
-        $this->review = $review;
-        $this->text = $text;
+    public function __construct(
+        /**
+         * @ORM\ManyToOne(targetEntity="App\Entity\User")
+         * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+         */
+        private User $user,
+        /**
+         * @ORM\ManyToOne(targetEntity="App\Entity\Review", inversedBy="comments")
+         * @ORM\JoinColumn(name="review_id", referencedColumnName="id", nullable=false)
+         */
+        private Review $review,
+        /**
+         * @ORM\Column(type="text", nullable=false)
+         */
+        private string $text
+    ) {
     }
 
     /**

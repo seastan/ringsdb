@@ -11,12 +11,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ProcessSearchController extends AbstractController
 {
-    private SphereRepository $sphereRepository;
-
-    public function __construct(
-        SphereRepository $sphereRepository
-    ) {
-        $this->sphereRepository = $sphereRepository;
+    public function __construct(private SphereRepository $sphereRepository)
+    {
     }
 
     /**
@@ -39,7 +35,7 @@ class ProcessSearchController extends AbstractController
             if ('sphere' === $searchName) {
                 $val = $request->query->all($key);
                 if (count($val) > 0 && count($val) < count($spheres)) {
-                    $params[] = $key.':'.implode('|', array_map(fn ($s) => false !== strstr($s, ' ') ? "\"{$s}\"" : $s, $val));
+                    $params[] = $key.':'.implode('|', array_map(fn ($s) => str_contains($s, ' ') ? "\"{$s}\"" : $s, $val));
                 }
 
                 continue;

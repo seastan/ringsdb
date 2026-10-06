@@ -21,16 +21,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class PackController extends AbstractController
 {
-    private PackRepository $packRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        PackRepository $packRepository,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->packRepository = $packRepository;
-        $this->entityManager = $entityManager;
+    public function __construct(private PackRepository $packRepository, private EntityManagerInterface $entityManager)
+    {
     }
 
     /**

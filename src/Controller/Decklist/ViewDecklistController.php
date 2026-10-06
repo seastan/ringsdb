@@ -12,16 +12,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ViewDecklistController extends AbstractController
 {
-    private int $cacheExpiration;
-
-    private DecklistRepository $decklistRepository;
-
-    public function __construct(
-        int $cacheExpiration,
-        DecklistRepository $decklistRepository
-    ) {
-        $this->cacheExpiration = $cacheExpiration;
-        $this->decklistRepository = $decklistRepository;
+    public function __construct(private int $cacheExpiration, private DecklistRepository $decklistRepository)
+    {
     }
 
     /**
@@ -53,7 +45,7 @@ class ViewDecklistController extends AbstractController
 
         $commenters = array_map(
             /* @var $comment \App\Entity\Comment */
-            fn (\App\Entity\Comment $comment) => $comment->getUser()->getUsername(),
+            fn (\App\Entity\Comment $comment): string => $comment->getUser()->getUsername(),
             $decklist->getComments()->getValues()
         );
         $commenters[] = $decklist->getUser()->getUsername();

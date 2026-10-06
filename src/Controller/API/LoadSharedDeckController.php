@@ -17,11 +17,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class LoadSharedDeckController extends AbstractController
 {
-    private DeckRepository $deckRepository;
-
-    public function __construct(DeckRepository $deckRepository)
+    public function __construct(private DeckRepository $deckRepository)
     {
-        $this->deckRepository = $deckRepository;
     }
 
     /**

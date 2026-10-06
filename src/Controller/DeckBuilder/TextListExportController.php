@@ -15,12 +15,8 @@ class TextListExportController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private DeckArchiver $deckArchiver;
-
-    public function __construct(
-        DeckArchiver $deckArchiver
-    ) {
-        $this->deckArchiver = $deckArchiver;
+    public function __construct(private DeckArchiver $deckArchiver)
+    {
     }
 
     /**

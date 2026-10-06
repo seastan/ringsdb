@@ -160,12 +160,6 @@ class Decklist extends ExportableDeck implements \JsonSerializable
     private $children;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="decklists")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
-     */
-    private User $user;
-
-    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Pack")
      * @ORM\JoinColumn(name="last_pack_id", referencedColumnName="id")
      */
@@ -249,9 +243,12 @@ class Decklist extends ExportableDeck implements \JsonSerializable
     /**
      * Constructor.
      */
-    public function __construct(User $user)
-    {
-        $this->user = $user;
+    public function __construct(/**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="decklists")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     */
+        private User $user
+    ) {
         $this->slots = new ArrayCollection();
         $this->sideslots = new ArrayCollection();
         $this->comments = new ArrayCollection();

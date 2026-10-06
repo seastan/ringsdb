@@ -13,15 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class FixThreatCommand extends Command
 {
-    private EntityManagerInterface $entityManager;
-
-    private DecklistRepository $decklistRepository;
-
-    public function __construct(EntityManagerInterface $entityManager, DecklistRepository $decklistRepository)
+    public function __construct(private EntityManagerInterface $entityManager, private DecklistRepository $decklistRepository)
     {
         parent::__construct();
-        $this->entityManager = $entityManager;
-        $this->decklistRepository = $decklistRepository;
     }
 
     protected function configure(): void

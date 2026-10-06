@@ -15,16 +15,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DeleteFellowshipController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private FellowshipRepository $fellowshipRepository;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        FellowshipRepository $fellowshipRepository
-    ) {
-        $this->entityManager = $entityManager;
-        $this->fellowshipRepository = $fellowshipRepository;
+    public function __construct(private EntityManagerInterface $entityManager, private FellowshipRepository $fellowshipRepository)
+    {
     }
 
     /**

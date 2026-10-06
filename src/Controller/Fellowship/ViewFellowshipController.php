@@ -13,12 +13,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ViewFellowshipController extends AbstractController
 {
-    private FellowshipRepository $fellowshipRepository;
-
-    public function __construct(
-        FellowshipRepository $fellowshipRepository
-    ) {
-        $this->fellowshipRepository = $fellowshipRepository;
+    public function __construct(private FellowshipRepository $fellowshipRepository)
+    {
     }
 
     /**
@@ -47,7 +43,7 @@ class ViewFellowshipController extends AbstractController
         if ($is_public) {
             $commenters = array_map(
                 /* @var $comment \App\Entity\FellowshipComment */
-                fn (\App\Entity\FellowshipComment $comment) => $comment->getUser()->getUsername(),
+                fn (\App\Entity\FellowshipComment $comment): string => $comment->getUser()->getUsername(),
                 $fellowship->getComments()->getValues()
             );
             $commenters[] = $fellowship->getUser()->getUsername();

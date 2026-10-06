@@ -22,28 +22,22 @@ class Deckslot implements SlotInterface
      */
     private $id;
 
-    /**
-     * @ORM\Column(type="smallint")
-     */
-    private int $quantity;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Deck", inversedBy="slots")
-     * @ORM\JoinColumn(name="deck_id", referencedColumnName="id", nullable=false)
-     */
-    private Deck $deck;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Card")
-     * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false)
-     */
-    private Card $card;
-
-    public function __construct(Deck $deck, Card $card, int $quantity)
-    {
-        $this->card = $card;
-        $this->deck = $deck;
-        $this->quantity = $quantity;
+    public function __construct(
+        /**
+         * @ORM\ManyToOne(targetEntity="App\Entity\Deck", inversedBy="slots")
+         * @ORM\JoinColumn(name="deck_id", referencedColumnName="id", nullable=false)
+         */
+        private Deck $deck,
+        /**
+         * @ORM\ManyToOne(targetEntity="App\Entity\Card")
+         * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false)
+         */
+        private Card $card,
+        /**
+         * @ORM\Column(type="smallint")
+         */
+        private int $quantity
+    ) {
     }
 
     /**

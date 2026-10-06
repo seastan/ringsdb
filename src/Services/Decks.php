@@ -24,32 +24,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Decks
 {
-    private EntityManagerInterface $doctrine;
-
-    private DeckValidationHelper $deck_validation_helper;
-
-    private Diff $diff;
-
-    private CardRepository $cardRepository;
-
-    private DeckchangeRepository $deckchangeRepository;
-
-    private DecklistRepository $decklistRepository;
-
-    public function __construct(
-        EntityManagerInterface $doctrine,
-        DeckValidationHelper $deck_validation_helper,
-        Diff $diff,
-        CardRepository $cardRepository,
-        DeckchangeRepository $deckchangeRepository,
-        DecklistRepository $decklistRepository
-    ) {
-        $this->doctrine = $doctrine;
-        $this->deck_validation_helper = $deck_validation_helper;
-        $this->diff = $diff;
-        $this->cardRepository = $cardRepository;
-        $this->deckchangeRepository = $deckchangeRepository;
-        $this->decklistRepository = $decklistRepository;
+    public function __construct(private EntityManagerInterface $doctrine, private DeckValidationHelper $deck_validation_helper, private Diff $diff, private CardRepository $cardRepository, private DeckchangeRepository $deckchangeRepository, private DecklistRepository $decklistRepository)
+    {
     }
 
     /**

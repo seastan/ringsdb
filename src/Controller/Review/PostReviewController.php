@@ -15,20 +15,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PostReviewController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private ReviewRepository $reviewRepository;
-
-    private Texts $texts;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        ReviewRepository $reviewRepository,
-        Texts $texts
-    ) {
-        $this->entityManager = $entityManager;
-        $this->reviewRepository = $reviewRepository;
-        $this->texts = $texts;
+    public function __construct(private EntityManagerInterface $entityManager, private ReviewRepository $reviewRepository, private Texts $texts)
+    {
     }
 
     /**

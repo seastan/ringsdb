@@ -11,12 +11,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ListPublishedCustomPacksController extends AbstractController
 {
-    private UserCustomPackRepository $userCustomPackRepository;
-
-    public function __construct(
-        UserCustomPackRepository $userCustomPackRepository
-    ) {
-        $this->userCustomPackRepository = $userCustomPackRepository;
+    public function __construct(private UserCustomPackRepository $userCustomPackRepository)
+    {
     }
 
     /**

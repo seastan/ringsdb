@@ -21,24 +21,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class RegisterController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private UserPasswordUpdater $passwordUpdater;
-
-    private TokenGenerator $tokenGenerator;
-
-    private UserMailer $mailer;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        UserPasswordUpdater $passwordUpdater,
-        TokenGenerator $tokenGenerator,
-        UserMailer $mailer
-    ) {
-        $this->entityManager = $entityManager;
-        $this->passwordUpdater = $passwordUpdater;
-        $this->tokenGenerator = $tokenGenerator;
-        $this->mailer = $mailer;
+    public function __construct(private EntityManagerInterface $entityManager, private UserPasswordUpdater $passwordUpdater, private TokenGenerator $tokenGenerator, private UserMailer $mailer)
+    {
     }
 
     /**

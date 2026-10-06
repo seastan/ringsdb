@@ -12,22 +12,16 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SimpleSearchController extends AbstractController
 {
-    private CardsData $cardsData;
-
-    public function __construct(
-        CardsData $cardsData
-    ) {
-        $this->cardsData = $cardsData;
+    public function __construct(private CardsData $cardsData)
+    {
     }
 
     /**
      * Processes the action of the single card search input.
      *
-     * @return RedirectResponse|Response
-     *
      * @Route("/find", name="cards_find")
      */
-    public function findAction(Request $request)
+    public function findAction(Request $request): RedirectResponse|Response
     {
         $q = (string) $request->query->get('q');
         $q = str_replace('t:campaign', 't:treasure', $q);

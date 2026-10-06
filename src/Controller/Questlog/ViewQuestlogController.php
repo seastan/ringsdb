@@ -13,12 +13,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ViewQuestlogController extends AbstractController
 {
-    private QuestlogRepository $questlogRepository;
-
-    public function __construct(
-        QuestlogRepository $questlogRepository
-    ) {
-        $this->questlogRepository = $questlogRepository;
+    public function __construct(private QuestlogRepository $questlogRepository)
+    {
     }
 
     /**
@@ -47,7 +43,7 @@ class ViewQuestlogController extends AbstractController
         if ($is_public) {
             $commenters = array_map(
                 /* @var $comment \App\Entity\QuestlogComment */
-                fn (\App\Entity\QuestlogComment $comment) => $comment->getUser()->getUsername(),
+                fn (\App\Entity\QuestlogComment $comment): string => $comment->getUser()->getUsername(),
                 $questlog->getComments()->getValues()
             );
             $commenters[] = $questlog->getUser()->getUsername();

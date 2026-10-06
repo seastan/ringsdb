@@ -15,24 +15,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PublishFormDecklistController extends AbstractController
 {
-    private DeckRepository $deckRepository;
-
-    private DecklistRepository $decklistRepository;
-
-    private DecklistFactory $decklistFactory;
-
-    private DeckValidationHelper $deckValidationHelper;
-
-    public function __construct(
-        DeckRepository $deckRepository,
-        DecklistRepository $decklistRepository,
-        DecklistFactory $decklistFactory,
-        DeckValidationHelper $deckValidationHelper
-    ) {
-        $this->deckRepository = $deckRepository;
-        $this->decklistRepository = $decklistRepository;
-        $this->decklistFactory = $decklistFactory;
-        $this->deckValidationHelper = $deckValidationHelper;
+    public function __construct(private DeckRepository $deckRepository, private DecklistRepository $decklistRepository, private DecklistFactory $decklistFactory, private DeckValidationHelper $deckValidationHelper)
+    {
     }
 
     /**

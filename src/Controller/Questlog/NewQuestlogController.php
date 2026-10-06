@@ -18,20 +18,8 @@ class NewQuestlogController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private ScenarioRepository $scenarioRepository;
-
-    private DecklistRepository $decklistRepository;
-
-    private DeckRepository $deckRepository;
-
-    public function __construct(
-        ScenarioRepository $scenarioRepository,
-        DecklistRepository $decklistRepository,
-        DeckRepository $deckRepository
-    ) {
-        $this->scenarioRepository = $scenarioRepository;
-        $this->decklistRepository = $decklistRepository;
-        $this->deckRepository = $deckRepository;
+    public function __construct(private ScenarioRepository $scenarioRepository, private DecklistRepository $decklistRepository, private DeckRepository $deckRepository)
+    {
     }
 
     /**

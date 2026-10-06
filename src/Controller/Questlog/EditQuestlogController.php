@@ -19,16 +19,8 @@ class EditQuestlogController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private QuestlogRepository $questlogRepository;
-
-    private ScenarioRepository $scenarioRepository;
-
-    public function __construct(
-        QuestlogRepository $questlogRepository,
-        ScenarioRepository $scenarioRepository
-    ) {
-        $this->questlogRepository = $questlogRepository;
-        $this->scenarioRepository = $scenarioRepository;
+    public function __construct(private QuestlogRepository $questlogRepository, private ScenarioRepository $scenarioRepository)
+    {
     }
 
     /**

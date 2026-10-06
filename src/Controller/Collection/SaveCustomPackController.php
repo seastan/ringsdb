@@ -17,16 +17,8 @@ class SaveCustomPackController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private EntityManagerInterface $entityManager;
-
-    private CustomPackManager $customPackManager;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        CustomPackManager $customPackManager
-    ) {
-        $this->entityManager = $entityManager;
-        $this->customPackManager = $customPackManager;
+    public function __construct(private EntityManagerInterface $entityManager, private CustomPackManager $customPackManager)
+    {
     }
 
     /**

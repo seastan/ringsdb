@@ -16,32 +16,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SearchFormController extends AbstractController
 {
-    private int $cacheExpiration;
-
-    private PackRepository $packRepository;
-
-    private CycleRepository $cycleRepository;
-
-    private SphereRepository $sphereRepository;
-
-    private CardsData $cardsData;
-
-    private Connection $connection;
-
-    public function __construct(
-        int $cacheExpiration,
-        PackRepository $packRepository,
-        CycleRepository $cycleRepository,
-        SphereRepository $sphereRepository,
-        CardsData $cardsData,
-        Connection $connection
-    ) {
-        $this->cacheExpiration = $cacheExpiration;
-        $this->packRepository = $packRepository;
-        $this->cycleRepository = $cycleRepository;
-        $this->sphereRepository = $sphereRepository;
-        $this->cardsData = $cardsData;
-        $this->connection = $connection;
+    public function __construct(private int $cacheExpiration, private PackRepository $packRepository, private CycleRepository $cycleRepository, private SphereRepository $sphereRepository, private CardsData $cardsData, private Connection $connection)
+    {
     }
 
     /**

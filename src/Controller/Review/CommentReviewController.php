@@ -13,16 +13,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class CommentReviewController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private ReviewRepository $reviewRepository;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        ReviewRepository $reviewRepository
-    ) {
-        $this->entityManager = $entityManager;
-        $this->reviewRepository = $reviewRepository;
+    public function __construct(private EntityManagerInterface $entityManager, private ReviewRepository $reviewRepository)
+    {
     }
 
     /**

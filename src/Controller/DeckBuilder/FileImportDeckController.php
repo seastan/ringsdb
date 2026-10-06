@@ -13,11 +13,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FileImportDeckController extends AbstractController
 {
-    private DeckImporter $deckImporter;
-
-    public function __construct(DeckImporter $deckImporter)
+    public function __construct(private DeckImporter $deckImporter)
     {
-        $this->deckImporter = $deckImporter;
     }
 
     /**
@@ -39,7 +36,7 @@ class FileImportDeckController extends AbstractController
             $finfo = finfo_open(FILEINFO_MIME);
             $mime = false !== $finfo ? (string) finfo_file($finfo, $filename) : '';
             // check to see if the mime-type starts with 'text'
-            $is_text = 'text' == substr($mime, 0, 4) || 'application/xml' == substr($mime, 0, 15);
+            $is_text = str_starts_with($mime, 'text') || str_starts_with($mime, 'application/xml');
             if (!$is_text) {
                 throw new UnprocessableEntityHttpException('Bad file');
             }

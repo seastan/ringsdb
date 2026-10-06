@@ -14,20 +14,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SearchDecklistController extends AbstractController
 {
-    private int $cacheExpiration;
-
-    private Connection $connection;
-
-    private CycleRepository $cycleRepository;
-
-    public function __construct(
-        int $cacheExpiration,
-        Connection $connection,
-        CycleRepository $cycleRepository
-    ) {
-        $this->cacheExpiration = $cacheExpiration;
-        $this->connection = $connection;
-        $this->cycleRepository = $cycleRepository;
+    public function __construct(private int $cacheExpiration, private Connection $connection, private CycleRepository $cycleRepository)
+    {
     }
 
     /**

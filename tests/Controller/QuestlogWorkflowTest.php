@@ -99,10 +99,8 @@ class QuestlogWorkflowTest extends WebTestCase
 
     /**
      * The cards of a deck, as the deck picker serializes them.
-     *
-     * @return bool|string
      */
-    private function deckContent(int $deckId)
+    private function deckContent(int $deckId): string|false
     {
         $rows = $this->db()->fetchAll('SELECT c.code, s.quantity FROM deckslot s JOIN card c ON c.id = s.card_id WHERE s.deck_id = ? ORDER BY c.code', [$deckId]);
 

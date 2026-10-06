@@ -23,20 +23,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CommentQuestlogController extends AbstractController
 {
-    private QuestlogRepository $questlogRepository;
-
-    private Texts $texts;
-
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        QuestlogRepository $questlogRepository,
-        Texts $texts
-    ) {
-        $this->questlogRepository = $questlogRepository;
-        $this->texts = $texts;
-        $this->entityManager = $entityManager;
+    public function __construct(private EntityManagerInterface $entityManager, private QuestlogRepository $questlogRepository, private Texts $texts)
+    {
     }
 
     /**

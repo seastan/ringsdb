@@ -21,20 +21,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class UserAdminController extends AbstractController
 {
-    private CommentRepository $commentRepository;
-
-    private UserRepository $userRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        CommentRepository $commentRepository,
-        UserRepository $userRepository
-    ) {
-        $this->commentRepository = $commentRepository;
-        $this->userRepository = $userRepository;
-        $this->entityManager = $entityManager;
+    public function __construct(private EntityManagerInterface $entityManager, private CommentRepository $commentRepository, private UserRepository $userRepository)
+    {
     }
 
     /**

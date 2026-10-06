@@ -30,36 +30,8 @@ class SaveQuestlogController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private EntityManagerInterface $entityManager;
-
-    private QuestlogRepository $questlogRepository;
-
-    private Texts $texts;
-
-    private ScenarioRepository $scenarioRepository;
-
-    private DeckRepository $deckRepository;
-
-    private Decks $decks;
-
-    private DecklistRepository $decklistRepository;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        QuestlogRepository $questlogRepository,
-        Texts $texts,
-        ScenarioRepository $scenarioRepository,
-        DeckRepository $deckRepository,
-        DecklistRepository $decklistRepository,
-        Decks $decks
-    ) {
-        $this->entityManager = $entityManager;
-        $this->questlogRepository = $questlogRepository;
-        $this->texts = $texts;
-        $this->scenarioRepository = $scenarioRepository;
-        $this->deckRepository = $deckRepository;
-        $this->decks = $decks;
-        $this->decklistRepository = $decklistRepository;
+    public function __construct(private EntityManagerInterface $entityManager, private QuestlogRepository $questlogRepository, private Texts $texts, private ScenarioRepository $scenarioRepository, private DeckRepository $deckRepository, private DecklistRepository $decklistRepository, private Decks $decks)
+    {
     }
 
     /**

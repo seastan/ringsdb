@@ -13,16 +13,13 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
  */
 class ContentHashVersionStrategy implements VersionStrategyInterface
 {
-    private string $webDir;
-
     /**
      * @var array<string, string>
      */
     private array $versions = [];
 
-    public function __construct(string $publicDir)
+    public function __construct(private string $publicDir)
     {
-        $this->webDir = $publicDir;
     }
 
     /**
@@ -31,7 +28,7 @@ class ContentHashVersionStrategy implements VersionStrategyInterface
     public function getVersion($path): string
     {
         if (!isset($this->versions[$path])) {
-            $file = $this->webDir.'/'.ltrim($path, '/');
+            $file = $this->publicDir.'/'.ltrim($path, '/');
             $hash = preg_match('/\.(js|css)$/', $path) && is_file($file) ? md5_file($file) : false;
             $this->versions[$path] = false !== $hash ? substr($hash, 0, 8) : '';
         }

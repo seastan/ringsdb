@@ -15,20 +15,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ListDecklistController extends AbstractController
 {
-    private DecklistManager $decklistManager;
-
-    private int $cacheExpiration;
-
-    private CycleRepository $cycleRepository;
-
-    public function __construct(
-        int $cacheExpiration,
-        DecklistManager $decklistManager,
-        CycleRepository $cycleRepository
-    ) {
-        $this->decklistManager = $decklistManager;
-        $this->cacheExpiration = $cacheExpiration;
-        $this->cycleRepository = $cycleRepository;
+    public function __construct(private int $cacheExpiration, private DecklistManager $decklistManager, private CycleRepository $cycleRepository)
+    {
     }
 
     /**

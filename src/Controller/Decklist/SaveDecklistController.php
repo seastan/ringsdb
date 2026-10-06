@@ -15,20 +15,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SaveDecklistController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private DecklistRepository $decklistRepository;
-
-    private Texts $texts;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        DecklistRepository $decklistRepository,
-        Texts $texts
-    ) {
-        $this->entityManager = $entityManager;
-        $this->decklistRepository = $decklistRepository;
-        $this->texts = $texts;
+    public function __construct(private EntityManagerInterface $entityManager, private DecklistRepository $decklistRepository, private Texts $texts)
+    {
     }
 
     /**

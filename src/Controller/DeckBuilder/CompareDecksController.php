@@ -14,16 +14,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class CompareDecksController extends AbstractController
 {
-    private DeckRepository $deckRepository;
-
-    private Diff $diffService;
-
-    public function __construct(
-        DeckRepository $deckRepository,
-        Diff $diffService
-    ) {
-        $this->deckRepository = $deckRepository;
-        $this->diffService = $diffService;
+    public function __construct(private DeckRepository $deckRepository, private Diff $diffService)
+    {
     }
 
     /**

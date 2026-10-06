@@ -11,12 +11,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ListCardsController extends AbstractController
 {
-    private PackRepository $packRepository;
-
-    public function __construct(
-        PackRepository $packRepository
-    ) {
-        $this->packRepository = $packRepository;
+    public function __construct(private PackRepository $packRepository)
+    {
     }
 
     /**

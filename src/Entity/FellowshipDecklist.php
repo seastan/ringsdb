@@ -30,22 +30,18 @@ class FellowshipDecklist
      */
     private $deckNumber;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Fellowship", inversedBy="decklists")
-     * @ORM\JoinColumn(name="fellowship_id", referencedColumnName="id", nullable=false)
-     */
-    private Fellowship $fellowship;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Decklist", inversedBy="fellowships")
-     * @ORM\JoinColumn(name="decklist_id", referencedColumnName="id", nullable=false)
-     */
-    private Decklist $decklist;
-
-    public function __construct(Decklist $decklist, Fellowship $fellowship)
-    {
-        $this->decklist = $decklist;
-        $this->fellowship = $fellowship;
+    public function __construct(
+        /**
+         * @ORM\ManyToOne(targetEntity="App\Entity\Decklist", inversedBy="fellowships")
+         * @ORM\JoinColumn(name="decklist_id", referencedColumnName="id", nullable=false)
+         */
+        private Decklist $decklist,
+        /**
+         * @ORM\ManyToOne(targetEntity="App\Entity\Fellowship", inversedBy="decklists")
+         * @ORM\JoinColumn(name="fellowship_id", referencedColumnName="id", nullable=false)
+         */
+        private Fellowship $fellowship
+    ) {
     }
 
     /**
