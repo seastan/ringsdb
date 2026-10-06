@@ -6,30 +6,71 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @ORM\Entity(repositoryClass="App\Repository\UserCustomPackRepository")
+ * @ORM\Table(
+ *     name="user_custom_pack",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(name="ucp_code_idx", columns={"code"})
+ *     },
+ *     indexes={
+ *         @ORM\Index(name="ucp_user_idx", columns={"user_id"})
+ *     }
+ * )
+ */
 class UserCustomPack
 {
     /**
      * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     */
     private User $user;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=false)
+     */
     private string $name;
 
+    /**
+     * @ORM\Column(type="string", length=64, nullable=false)
+     */
     private string $code;
 
+    /**
+     * @ORM\Column(name="is_enabled", type="boolean", nullable=false, options={"default": true})
+     */
     private bool $isEnabled = true;
 
+    /**
+     * @ORM\Column(name="is_published", type="boolean", nullable=false, options={"default": false})
+     */
     private bool $isPublished = false;
 
+    /**
+     * @ORM\Column(name="created_at", type="datetime", nullable=false)
+     */
     private \DateTime $createdAt;
 
+    /**
+     * @ORM\Column(name="updated_at", type="datetime", nullable=false)
+     */
     private \DateTime $updatedAt;
 
     /**
      * @var Collection<int, UserCustomPackCard>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\UserCustomPackCard", mappedBy="customPack", cascade={"persist", "remove"}, orphanRemoval=true)
      */
     private Collection $cards;
 

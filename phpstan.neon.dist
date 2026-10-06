@@ -13,7 +13,7 @@ parameters:
     symfony:
         containerXmlPath: var/cache/test/srcApp_KernelTestDebugContainer.xml
         consoleApplicationLoader: src/PHPStan/console-application.php
-    # phpstan/phpstan-doctrine: the entity metadata (YAML mappings), for the repositories, the
+    # phpstan/phpstan-doctrine: the entity metadata (annotations), for the repositories, the
     # fields and the DQL
     doctrine:
         objectManagerLoader: src/PHPStan/object-manager.php

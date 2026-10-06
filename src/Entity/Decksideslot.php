@@ -5,18 +5,38 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Model\SlotInterface;
+use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="decksideslot")
+ */
 class Decksideslot implements SlotInterface
 {
     /**
      * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
+    /**
+     * @ORM\Column(type="smallint")
+     */
     private int $quantity;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Deck", inversedBy="sideslots")
+     * @ORM\JoinColumn(name="deck_id", referencedColumnName="id", nullable=false)
+     */
     private Deck $deck;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Card")
+     * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false)
+     */
     private Card $card;
 
     public function __construct(Deck $deck, Card $card, int $quantity)

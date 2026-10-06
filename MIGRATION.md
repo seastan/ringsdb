@@ -171,7 +171,9 @@ Details:
 - **Controllers in the routes**: `'App\Controller\XController::yAction'` (and in the
   `forward()` calls) instead of `AppBundle:X:y`.
 - **Doctrine**: the mappings are declared (`is_bundle: false`, `src/Resources/config/doctrine`,
-  alias `App`, so the `App:Card` aliases of DQL still work until ORM 3).
+  alias `App`, so the `App:Card` aliases of DQL still work until ORM 3). The YAML mappings were
+  later converted to docblock annotations in `src/Entity` (`type: annotation`; `User` redeclares
+  the `$id` of the FOSUserBundle base class so that it can carry its mapping).
 - **Paths**: the services that built `%kernel.root_dir%/../web` get `$publicDir`
   (`%kernel.project_dir%/public`); `kernel.root_dir` is deprecated in 4.2.
 - **Application assets**: `src/Resources/public/` is no longer installed by `assets:install` (there
@@ -285,8 +287,8 @@ are no longer analysed), with the official extensions (loaded by `phpstan/extens
 - `phpstan-symfony`: the service types, read from the container dumped in `var/cache/test`
   (hence the `cache:warmup` of `make phpstan`), and the console helpers
   (`src/PHPStan/console-application.php`);
-- `phpstan-doctrine`: the entity metadata, from the YAML mappings through the entity manager of the
-  test environment (`src/PHPStan/object-manager.php`): the repositories, the fields,
+- `phpstan-doctrine`: the entity metadata, from the entity annotations through the entity manager
+  of the test environment (`src/PHPStan/object-manager.php`): the repositories, the fields,
   the collections, the DQL. It needs the class names: `getRepository(Card::class)`, the
   `'AppBundle:Card'` aliases were replaced (they are gone in ORM 3; the aliases inside DQL strings
   remain, still valid in ORM 2.7). phpstan's result cache does not know the mappings: after

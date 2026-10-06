@@ -6,59 +6,103 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
+/**
+ * @ORM\Entity(repositoryClass="App\Repository\PackRepository")
+ * @ORM\Table(
+ *     name="pack",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(name="pack_code_idx", columns={"code"})
+ *     },
+ *     indexes={
+ *         @ORM\Index(name="idx_pack_date_release", columns={"date_release"})
+ *     }
+ * )
+ * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="entity_region")
+ */
 class Pack
 {
     /**
      * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=255, nullable=false)
      */
     private $code;
 
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=1024, nullable=false)
      */
     private $name;
 
     /**
      * @var int
+     *
+     * @ORM\Column(type="smallint", nullable=false)
      */
     private $position;
 
     /**
      * @var int
+     *
+     * @ORM\Column(type="smallint", nullable=false)
      */
     private $size;
 
     /**
      * @var \DateTime
+     *
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
      */
     private $dateCreation;
 
     /**
      * @var \DateTime
+     *
+     * @ORM\Column(name="date_update", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="update")
      */
     private $dateUpdate;
 
     /**
      * @var \DateTime|null
+     *
+     * @ORM\Column(name="date_release", type="date", nullable=true)
      */
     private $dateRelease;
 
     /**
      * @var bool
+     *
+     * @ORM\Column(name="is_repackaged", type="boolean", nullable=false, options={"default": false})
      */
     private $isRepackaged = false;
 
     /**
      * @var Collection<int, CardPrinting>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\CardPrinting", mappedBy="pack")
+     * @ORM\OrderBy({"position"="ASC"})
      */
     private $printings;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Cycle", inversedBy="packs")
+     * @ORM\JoinColumn(name="cycle_id", referencedColumnName="id", nullable=false)
+     */
     private ?Cycle $cycle = null;
 
     /**

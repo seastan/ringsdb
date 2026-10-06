@@ -6,95 +6,158 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Fellowship.
+ *
+ * @ORM\Entity(repositoryClass="App\Repository\FellowshipRepository")
+ * @ORM\Table(name="fellowship")
  */
 class Fellowship
 {
     /**
      * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=255)
      */
     private $name;
 
     /**
      * @var string
+     *
+     * @ORM\Column(name="name_canonical", type="string", length=255)
      */
     private $nameCanonical;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(name="description_md", type="text", nullable=true)
      */
     private $descriptionMd;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(name="description_html", type="text", nullable=true)
      */
     private $descriptionHtml;
 
     /**
      * @var bool
+     *
+     * @ORM\Column(name="is_public", type="boolean", nullable=false)
      */
     private $isPublic = false;
 
     /**
      * @var int
+     *
+     * @ORM\Column(name="nb_votes", type="integer")
      */
     private $nbVotes = 0;
 
     /**
      * @var int
+     *
+     * @ORM\Column(name="nb_favorites", type="integer")
      */
     private $nbFavorites = 0;
 
     /**
      * @var int
+     *
+     * @ORM\Column(name="nb_comments", type="integer")
      */
     private $nbComments = 0;
 
     /**
      * @var int
+     *
+     * @ORM\Column(name="nb_decks", type="integer")
      */
     private $nbDecks = 0;
 
+    /**
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
+     */
     private \DateTime $dateCreation;
 
+    /**
+     * @ORM\Column(name="date_update", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="update")
+     */
     private \DateTime $dateUpdate;
 
     /**
      * @var \DateTime|null
+     *
+     * @ORM\Column(name="date_last_comment", type="datetime", nullable=true)
+     * @Gedmo\Timestampable(on="update")
      */
     private $dateLastComment;
 
     /**
      * @var Collection<int, FellowshipDeck>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\FellowshipDeck", mappedBy="fellowship", cascade={"persist", "remove"})
      */
     private $decks;
 
     /**
      * @var Collection<int, FellowshipDecklist>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\FellowshipDecklist", mappedBy="fellowship", cascade={"persist", "remove"})
      */
     private $decklists;
 
     /**
      * @var Collection<int, FellowshipComment>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\FellowshipComment", mappedBy="fellowship", cascade={"persist", "remove"})
+     * @ORM\OrderBy({"dateCreation"="ASC"})
      */
     private $comments;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="fellowships")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     */
     private User $user;
 
     /**
      * @var Collection<int, User>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="fellowship_favorites")
+     * @ORM\JoinTable(
+     *     name="fellowship_favorite",
+     *     joinColumns={@ORM\JoinColumn(name="fellowship_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     * )
      */
     private $favorites;
 
     /**
      * @var Collection<int, User>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="fellowship_votes")
+     * @ORM\JoinTable(
+     *     name="fellowship_vote",
+     *     joinColumns={@ORM\JoinColumn(name="fellowship_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     * )
      */
     private $votes;
 
@@ -517,6 +580,8 @@ class Fellowship
 
     /**
      * @var \DateTime|null
+     *
+     * @ORM\Column(name="date_publish", type="datetime", nullable=true)
      */
     private $datePublish;
 

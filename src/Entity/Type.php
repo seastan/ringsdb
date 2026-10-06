@@ -6,26 +6,48 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @ORM\Entity(repositoryClass="App\Repository\TypeRepository")
+ * @ORM\Table(
+ *     name="type",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(name="type_code_idx", columns={"code"})
+ *     }
+ * )
+ * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="entity_region")
+ */
 class Type
 {
     /**
      * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=255, nullable=false)
      */
     private $code;
 
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=1024, nullable=false)
      */
     private $name;
 
     /**
      * @var Collection<int, Card>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Card", mappedBy="type")
+     * @ORM\OrderBy({"position"="ASC"})
      */
     private $cards;
 

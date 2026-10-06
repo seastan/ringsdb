@@ -6,107 +6,177 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Questlog.
+ *
+ * @ORM\Entity(repositoryClass="App\Repository\QuestlogRepository")
+ * @ORM\Table(name="questlog")
  */
 class Questlog
 {
     /**
      * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(type="string", length=255)
      */
     private $name;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(name="name_canonical", type="string", length=255)
      */
     private $nameCanonical;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(name="description_md", type="text", nullable=true)
      */
     private $descriptionMd;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(name="description_html", type="text", nullable=true)
      */
     private $descriptionHtml;
 
     /**
      * @var \DateTime|null
+     *
+     * @ORM\Column(name="date_played", type="datetime", nullable=false)
      */
     private $datePlayed;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(name="quest_mode", type="string", length=32)
      */
     private $questMode;
 
     /**
      * @var bool
+     *
+     * @ORM\Column(type="boolean", nullable=false)
      */
     private $success = false;
 
     /**
      * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
      */
     private $score;
 
     /**
      * @var int
+     *
+     * @ORM\Column(name="nb_decks", type="integer")
      */
     private $nbDecks = 0;
 
     /**
      * @var int
+     *
+     * @ORM\Column(name="nb_votes", type="integer")
      */
     private $nbVotes = 0;
 
     /**
      * @var int
+     *
+     * @ORM\Column(name="nb_favorites", type="integer")
      */
     private $nbFavorites = 0;
 
     /**
      * @var int
+     *
+     * @ORM\Column(name="nb_comments", type="integer")
      */
     private $nbComments = 0;
 
     /**
      * @var bool
+     *
+     * @ORM\Column(name="is_public", type="boolean", nullable=false)
      */
     private $isPublic = false;
 
+    /**
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
+     */
     private \DateTime $dateCreation;
 
+    /**
+     * @ORM\Column(name="date_update", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="update")
+     */
     private \DateTime $dateUpdate;
 
     /**
      * @var Collection<int, QuestlogDeck>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\QuestlogDeck", mappedBy="questlog", cascade={"persist", "remove"})
      */
     private $decks;
 
     /**
      * @var Collection<int, QuestlogComment>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\QuestlogComment", mappedBy="questlog", cascade={"persist", "remove"})
+     * @ORM\OrderBy({"dateCreation"="ASC"})
      */
     private $comments;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="questlogs")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     */
     private User $user;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Scenario", inversedBy="questlogs")
+     * @ORM\JoinColumn(name="scenario_id", referencedColumnName="id", nullable=false)
+     */
     private ?Scenario $scenario = null;
 
     /**
      * @var Collection<int, User>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="questlog_favorites")
+     * @ORM\JoinTable(
+     *     name="questlog_favorite",
+     *     joinColumns={@ORM\JoinColumn(name="questlog_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     * )
      */
     private $favorites;
 
     /**
      * @var Collection<int, User>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="questlog_votes")
+     * @ORM\JoinTable(
+     *     name="questlog_vote",
+     *     joinColumns={@ORM\JoinColumn(name="questlog_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     * )
      */
     private $votes;
 
@@ -578,6 +648,8 @@ class Questlog
 
     /**
      * @var \DateTime|null
+     *
+     * @ORM\Column(name="date_publish", type="datetime", nullable=true)
      */
     private $datePublish;
 

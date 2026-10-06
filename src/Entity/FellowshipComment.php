@@ -4,16 +4,30 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+
 /**
  * FellowshipComment.
+ *
+ * @ORM\Entity(repositoryClass="App\Repository\FellowshipCommentRepository")
+ * @ORM\Table(name="fellowshipcomment")
  */
 class FellowshipComment
 {
     /**
      * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
+    /**
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
+     */
     private \DateTime $dateCreation;
 
     /**
@@ -21,15 +35,28 @@ class FellowshipComment
      */
     private $dateUpdate;
 
+    /**
+     * @ORM\Column(type="text")
+     */
     private string $text;
 
     /**
      * @var bool
+     *
+     * @ORM\Column(name="is_hidden", type="boolean")
      */
     private $isHidden = false;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="fellowship_comments")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     */
     private User $user;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Fellowship", inversedBy="comments")
+     * @ORM\JoinColumn(name="fellowship_id", referencedColumnName="id", nullable=false)
+     */
     private Fellowship $fellowship;
 
     public function __construct(User $user, Fellowship $fellowship, string $text)

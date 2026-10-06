@@ -4,17 +4,46 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(
+ *     name="user_custom_pack_card",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(name="ucpc_pack_card_idx", columns={"custom_pack_id", "card_id"})
+ *     },
+ *     indexes={
+ *         @ORM\Index(name="fk_ucpc_card", columns={"card_id"})
+ *     }
+ * )
+ */
 class UserCustomPackCard
 {
     /**
      * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\UserCustomPack", inversedBy="cards")
+     * @ORM\JoinColumn(name="custom_pack_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     */
     private UserCustomPack $customPack;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Card")
+     * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     */
     private Card $card;
 
+    /**
+     * @ORM\Column(type="smallint", nullable=false, options={"default": 1, "unsigned": true})
+     */
     public int $quantity;
 
     public function __construct(UserCustomPack $customPack, Card $card, int $quantity)

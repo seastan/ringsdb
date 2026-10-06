@@ -4,27 +4,54 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+
 /**
  * QuestlogComment.
+ *
+ * @ORM\Entity(repositoryClass="App\Repository\QuestlogCommentRepository")
+ * @ORM\Table(name="questlog_comment")
  */
 class QuestlogComment
 {
     /**
      * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
+    /**
+     * @ORM\Column(type="text")
+     */
     private string $text;
 
+    /**
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
+     */
     private \DateTime $dateCreation;
 
     /**
      * @var bool
+     *
+     * @ORM\Column(name="is_hidden", type="boolean")
      */
     private $isHidden = false;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="questlog_comments")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     */
     private User $user;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Questlog", inversedBy="comments")
+     * @ORM\JoinColumn(name="questlog_id", referencedColumnName="id", nullable=false)
+     */
     private Questlog $questlog;
 
     public function __construct(User $user, Questlog $questlog, string $text)

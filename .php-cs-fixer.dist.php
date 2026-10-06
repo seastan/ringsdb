@@ -18,6 +18,15 @@ return (new PhpCsFixer\Config())
             'import_constants' => false,
             'import_functions' => false,
         ],
+        // the groups of @Symfony, plus the Doctrine mapping annotations kept together
+        'phpdoc_separation' => [
+            'groups' => [
+                ['Annotation', 'NamedArgumentConstructor', 'Target'],
+                ...PhpCsFixer\Fixer\Phpdoc\PhpdocSeparationFixer::OPTION_GROUPS_DEFAULT,
+                ['ORM\*', 'Gedmo\*'],
+            ],
+            'skip_unlisted_annotations' => false,
+        ],
     ])
     ->setFinder($finder)
 ;

@@ -6,31 +6,55 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @ORM\Entity(repositoryClass="App\Repository\SphereRepository")
+ * @ORM\Table(
+ *     name="sphere",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(name="sphere_code_idx", columns={"code"})
+ *     }
+ * )
+ * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="entity_region")
+ */
 class Sphere
 {
     /**
      * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=255, nullable=false)
      */
     private $code;
 
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=1024, nullable=false)
      */
     private $name;
 
     /**
      * @var bool
+     *
+     * @ORM\Column(type="boolean", nullable=false)
      */
     private $is_primary;
 
     /**
      * @var Collection<int, Card>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Card", mappedBy="sphere")
+     * @ORM\OrderBy({"position"="ASC"})
      */
     private $cards;
 

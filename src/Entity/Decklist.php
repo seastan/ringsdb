@@ -9,135 +9,240 @@ use App\Model\SlotCollectionDecorator;
 use App\Model\SlotCollectionInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
+/**
+ * @ORM\Entity(repositoryClass="App\Repository\DecklistRepository")
+ * @ORM\Table(
+ *     name="decklist",
+ *     indexes={
+ *         @ORM\Index(name="idx_decklist_date_creation", columns={"date_creation"})
+ *     }
+ * )
+ */
 class Decklist extends ExportableDeck implements \JsonSerializable
 {
     /**
      * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=255)
      */
     private $name;
 
     /**
      * @var string
+     *
+     * @ORM\Column(name="name_canonical", type="string", length=255)
      */
     private $nameCanonical;
 
+    /**
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
+     */
     private \DateTime $dateCreation;
 
+    /**
+     * @ORM\Column(name="date_update", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="update")
+     */
     private \DateTime $dateUpdate;
 
     /**
      * @var \DateTime|null
+     *
+     * @ORM\Column(name="date_last_comment", type="datetime", nullable=true)
+     * @Gedmo\Timestampable(on="update")
      */
     private $dateLastComment;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(name="description_md", type="text", nullable=true)
      */
     private $descriptionMd;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(name="description_html", type="text", nullable=true)
      */
     private $descriptionHtml;
 
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=32)
      */
     private $signature;
 
     /**
      * @var int
+     *
+     * @ORM\Column(name="nb_votes", type="integer")
      */
     private $nbVotes = 0;
 
     /**
      * @var int
+     *
+     * @ORM\Column(name="nb_favorites", type="integer")
      */
     private $nbFavorites = 0;
 
     /**
      * @var int
+     *
+     * @ORM\Column(name="nb_comments", type="integer")
      */
     private $nbComments = 0;
 
     /**
      * @var bool|null
+     *
+     * @ORM\Column(name="freeze_comments", type="boolean", nullable=true)
      */
     private $freezeComments;
 
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=8)
      */
     private $version;
 
     /**
      * @var Collection<int, Decklistslot>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Decklistslot", mappedBy="decklist", cascade={"persist", "remove"})
      */
     private $slots;
 
     /**
      * @var Collection<int, Decklistsideslot>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Decklistsideslot", mappedBy="decklist", cascade={"persist", "remove"})
      */
     private $sideslots;
 
     /**
      * @var Collection<int, Comment>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="decklist", cascade={"persist", "remove"})
+     * @ORM\OrderBy({"dateCreation"="ASC"})
      */
     private $comments;
 
     /**
      * @var Collection<int, Decklist>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Decklist", mappedBy="precedent")
+     * @ORM\OrderBy({"dateCreation"="ASC"})
      */
     private $successors;
 
     /**
      * @var Collection<int, Deck>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Deck", mappedBy="parent")
      */
     private $children;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="decklists")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     */
     private User $user;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Pack")
+     * @ORM\JoinColumn(name="last_pack_id", referencedColumnName="id")
+     */
     private ?Pack $lastPack = null;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Deck", inversedBy="children")
+     * @ORM\JoinColumn(name="parent_deck_id", referencedColumnName="id")
+     */
     private ?Deck $parent = null;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Decklist", inversedBy="successors")
+     * @ORM\JoinColumn(name="precedent_decklist_id", referencedColumnName="id")
+     */
     private ?Decklist $precedent = null;
 
     /**
      * @var Collection<int, User>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="favorites")
+     * @ORM\JoinTable(
+     *     name="favorite",
+     *     joinColumns={@ORM\JoinColumn(name="decklist_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     * )
      */
     private $favorites;
 
     /**
      * @var Collection<int, User>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="votes")
+     * @ORM\JoinTable(
+     *     name="vote",
+     *     joinColumns={@ORM\JoinColumn(name="decklist_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     * )
      */
     private $votes;
 
     /**
      * @var Collection<int, QuestlogDeck>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\QuestlogDeck", mappedBy="decklist", cascade={"persist"})
      */
     private $questlogs;
 
     /**
      * @var int
+     *
+     * @ORM\Column(name="starting_threat", type="smallint", nullable=false)
      */
     private $startingThreat;
 
     /**
      * @var Collection<int, FellowshipDecklist>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\FellowshipDecklist", mappedBy="decklist", cascade={"persist", "remove"})
      */
     private $fellowships;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Sphere")
+     * @ORM\JoinColumn(name="predominant_sphere_id", referencedColumnName="id")
+     */
     private ?Sphere $predominantSphere = null;
 
     /**
      * @var Collection<int, Sphere>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\Sphere")
+     * @ORM\JoinTable(
+     *     name="decklist_spheres",
+     *     joinColumns={@ORM\JoinColumn(name="decklist_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="sphere_id", referencedColumnName="id")}
+     * )
      */
     private $spheres;
 

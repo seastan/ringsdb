@@ -6,49 +6,93 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Review.
+ *
+ * @ORM\Entity(repositoryClass="App\Repository\ReviewRepository")
+ * @ORM\Table(name="review")
  */
 class Review
 {
     /**
      * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @var \DateTime
+     *
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
      */
     private $dateCreation;
 
     /**
      * @var \DateTime
+     *
+     * @ORM\Column(name="date_update", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="update")
      */
     private $dateUpdate;
 
     /**
      * @var \DateTime|null
+     *
+     * @ORM\Column(name="date_last_comment", type="datetime", nullable=true)
+     * @Gedmo\Timestampable(on="update")
      */
     private $dateLastComment;
 
+    /**
+     * @ORM\Column(name="text_md", type="text", nullable=false)
+     */
     private string $textMd;
 
+    /**
+     * @ORM\Column(name="text_html", type="text", nullable=false)
+     */
     private string $textHtml;
 
+    /**
+     * @ORM\Column(name="nb_votes", type="smallint", nullable=false)
+     */
     private int $nbVotes;
 
     /**
      * @var Collection<int, Reviewcomment>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Reviewcomment", mappedBy="review", cascade={"persist"})
      */
     private $comments;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Card", inversedBy="reviews")
+     * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false)
+     */
     private Card $card;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="reviews")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     */
     private User $user;
 
     /**
      * @var Collection<int, User>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="reviewvotes")
+     * @ORM\JoinTable(
+     *     name="reviewvote",
+     *     joinColumns={@ORM\JoinColumn(name="review_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     * )
      */
     private $votes;
 

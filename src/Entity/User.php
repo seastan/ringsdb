@@ -6,13 +6,27 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * User.
+ *
+ * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ORM\Table(name="user")
  */
 class User extends BaseUser
 {
+    /**
+     * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    protected $id;
+
     public function getMaxNbDecks(): float
     {
         return 5 * (100 + floor($this->reputation / 10));
@@ -20,95 +34,142 @@ class User extends BaseUser
 
     /**
      * @var \DateTime
+     *
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
      */
     private $dateCreation;
 
     /**
      * @var \DateTime
+     *
+     * @ORM\Column(name="date_update", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="update")
      */
     private $dateUpdate;
 
+    /**
+     * @ORM\Column(type="integer", nullable=false)
+     */
     private int $reputation;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(type="text", nullable=true)
      */
     private $resume;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $color;
 
+    /**
+     * @ORM\Column(type="integer", nullable=false)
+     */
     private int $donation;
 
     /**
      * @var bool
+     *
+     * @ORM\Column(name="is_notif_author", type="boolean", nullable=false, options={"default": true})
      */
     private $isNotifAuthor = true;
 
     /**
      * @var bool
+     *
+     * @ORM\Column(name="is_notif_commenter", type="boolean", nullable=false, options={"default": true})
      */
     private $isNotifCommenter = true;
 
     /**
      * @var bool
+     *
+     * @ORM\Column(name="is_notif_mention", type="boolean", nullable=false, options={"default": true})
      */
     private $isNotifMention = true;
 
     /**
      * @var bool
+     *
+     * @ORM\Column(name="is_notif_follow", type="boolean", nullable=false, options={"default": true})
      */
     private $isNotifFollow = true;
 
     /**
      * @var bool
+     *
+     * @ORM\Column(name="is_notif_successor", type="boolean", nullable=false, options={"default": true})
      */
     private $isNotifSuccessor = true;
 
     /**
      * @var bool
+     *
+     * @ORM\Column(name="is_share_decks", type="boolean", nullable=false, options={"default": false})
      */
     private $isShareDecks = false;
 
     /**
      * @var bool
+     *
+     * @ORM\Column(name="dark_mode", type="boolean", nullable=false, options={"default": false})
      */
     private $darkMode = false;
 
     /**
      * @var Collection<int, Deck>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Deck", mappedBy="user", cascade={"remove"})
+     * @ORM\OrderBy({"dateUpdate"="DESC"})
      */
     private $decks;
 
     /**
      * @var Collection<int, Decklist>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Decklist", mappedBy="user")
      */
     private $decklists;
 
     /**
      * @var Collection<int, Comment>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="user")
+     * @ORM\OrderBy({"dateCreation"="DESC"})
      */
     private $comments;
 
     /**
      * @var Collection<int, Review>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Review", mappedBy="user")
+     * @ORM\OrderBy({"dateCreation"="DESC"})
      */
     private $reviews;
 
     /**
      * @var Collection<int, Decklist>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\Decklist", mappedBy="favorites", cascade={"remove"})
      */
     private $favorites;
 
     /**
      * @var Collection<int, Decklist>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\Decklist", mappedBy="votes", cascade={"remove"})
      */
     private $votes;
 
     /**
      * @var Collection<int, Review>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\Review", mappedBy="votes", cascade={"remove"})
      */
     private $reviewvotes;
 
@@ -595,11 +656,20 @@ class User extends BaseUser
 
     /**
      * @var Collection<int, User>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="followers")
      */
     private $following;
 
     /**
      * @var Collection<int, User>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="following")
+     * @ORM\JoinTable(
+     *     name="follow",
+     *     joinColumns={@ORM\JoinColumn(name="following_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="follower_id", referencedColumnName="id")}
+     * )
      */
     private $followers;
 
@@ -661,6 +731,8 @@ class User extends BaseUser
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(type="text", nullable=true)
      */
     private $ownedPacks;
 
@@ -686,6 +758,8 @@ class User extends BaseUser
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(name="art_preferences", type="text", nullable=true)
      */
     private $artPreferences;
 
@@ -711,6 +785,9 @@ class User extends BaseUser
 
     /**
      * @var Collection<int, Fellowship>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Fellowship", mappedBy="user", cascade={"remove"})
+     * @ORM\OrderBy({"dateUpdate"="DESC"})
      */
     private $fellowships;
 
@@ -761,16 +838,23 @@ class User extends BaseUser
 
     /**
      * @var Collection<int, FellowshipComment>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\FellowshipComment", mappedBy="user")
+     * @ORM\OrderBy({"dateCreation"="DESC"})
      */
     private $fellowship_comments;
 
     /**
      * @var Collection<int, Fellowship>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\Fellowship", mappedBy="favorites", cascade={"remove"})
      */
     private $fellowship_favorites;
 
     /**
      * @var Collection<int, Fellowship>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\Fellowship", mappedBy="votes", cascade={"remove"})
      */
     private $fellowship_votes;
 
@@ -860,11 +944,17 @@ class User extends BaseUser
 
     /**
      * @var Collection<int, Questlog>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Questlog", mappedBy="user", cascade={"remove"})
+     * @ORM\OrderBy({"dateUpdate"="DESC"})
      */
     private $questlogs;
 
     /**
      * @var Collection<int, QuestlogComment>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\QuestlogComment", mappedBy="user")
+     * @ORM\OrderBy({"dateCreation"="DESC"})
      */
     private $questlog_comments;
 
@@ -926,11 +1016,15 @@ class User extends BaseUser
 
     /**
      * @var Collection<int, Questlog>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\Questlog", mappedBy="favorites", cascade={"remove"})
      */
     private $questlog_favorites;
 
     /**
      * @var Collection<int, Questlog>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\Questlog", mappedBy="votes", cascade={"remove"})
      */
     private $questlog_votes;
 
@@ -992,6 +1086,8 @@ class User extends BaseUser
 
     /**
      * @var bool
+     *
+     * @ORM\Column(type="boolean")
      */
     protected $locked = false;
 
@@ -1017,21 +1113,29 @@ class User extends BaseUser
 
     /**
      * @var bool
+     *
+     * @ORM\Column(type="boolean")
      */
     protected $expired = false;
 
     /**
      * @var \DateTime|null
+     *
+     * @ORM\Column(name="expires_at", type="datetime", nullable=true)
      */
     protected $expiresAt;
 
     /**
      * @var bool
+     *
+     * @ORM\Column(name="credentials_expired", type="boolean")
      */
     protected $credentialsExpired = false;
 
     /**
      * @var \DateTime|null
+     *
+     * @ORM\Column(name="credentials_expire_at", type="datetime", nullable=true)
      */
     protected $credentialsExpireAt;
 

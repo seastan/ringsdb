@@ -4,30 +4,57 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+
 /**
  * Reviewcomment.
+ *
+ * @ORM\Entity
+ * @ORM\Table(name="reviewcomment")
  */
 class Reviewcomment
 {
     /**
      * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @var \DateTime
+     *
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
      */
     private $dateCreation;
 
     /**
      * @var \DateTime
+     *
+     * @ORM\Column(name="date_update", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="update")
      */
     private $dateUpdate;
 
+    /**
+     * @ORM\Column(type="text", nullable=false)
+     */
     private string $text;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     */
     private User $user;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Review", inversedBy="comments")
+     * @ORM\JoinColumn(name="review_id", referencedColumnName="id", nullable=false)
+     */
     private Review $review;
 
     public function __construct(User $user, Review $review, string $text)

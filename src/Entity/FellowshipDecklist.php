@@ -4,23 +4,42 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
  * FellowshipDecklist.
+ *
+ * @ORM\Entity
+ * @ORM\Table(name="fellowship_decklist")
  */
 class FellowshipDecklist
 {
     /**
      * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @var int
+     *
+     * @ORM\Column(name="deck_number", type="smallint")
      */
     private $deckNumber;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Fellowship", inversedBy="decklists")
+     * @ORM\JoinColumn(name="fellowship_id", referencedColumnName="id", nullable=false)
+     */
     private Fellowship $fellowship;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Decklist", inversedBy="fellowships")
+     * @ORM\JoinColumn(name="decklist_id", referencedColumnName="id", nullable=false)
+     */
     private Decklist $decklist;
 
     public function __construct(Decklist $decklist, Fellowship $fellowship)

@@ -6,106 +6,188 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
+/**
+ * @ORM\Entity(repositoryClass="App\Repository\CardRepository")
+ * @ORM\Table(
+ *     name="card",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(name="card_code_idx", columns={"code"})
+ *     }
+ * )
+ * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="entity_region")
+ */
 class Card
 {
     /**
      * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=false)
      */
     private $position;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(type="string", length=255, nullable=false)
      */
     private $code;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(type="string", length=1024, nullable=false)
      */
     private $name;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $traits;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(type="text", nullable=true)
      */
     private $text;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(type="text", nullable=true)
      */
     private $flavor;
 
     /**
      * @var bool
+     *
+     * @ORM\Column(name="is_unique", type="boolean", nullable=false)
      */
     private $isUnique = false;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(type="string", length=3, nullable=true)
      */
     private $cost;
 
     /**
      * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
      */
     private $threat;
 
     /**
      * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
      */
     private $willpower;
 
     /**
      * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
      */
     private $attack;
 
     /**
      * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
      */
     private $defense;
 
     /**
      * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
      */
     private $health;
 
     /**
      * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
      */
     private $victory;
 
     /**
+     * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $quest;
+
+    /**
      * @var int
+     *
+     * @ORM\Column(name="deck_limit", type="smallint", nullable=false, options={"default": 3})
      */
     private $deckLimit = 3;
 
+    /**
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
+     */
     private \DateTime $dateCreation;
 
+    /**
+     * @ORM\Column(name="date_update", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="update")
+     */
     private \DateTime $dateUpdate;
 
     /**
      * @var Collection<int, Review>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Review", mappedBy="card")
+     * @ORM\OrderBy({"dateCreation"="DESC"})
      */
     private $reviews;
 
     /**
      * @var Collection<int, CardPrinting>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\CardPrinting", mappedBy="card", cascade={"remove"}, orphanRemoval=true)
+     * @ORM\OrderBy({"position"="ASC"})
      */
     private $printings;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Type", inversedBy="cards")
+     * @ORM\JoinColumn(name="type_id", referencedColumnName="id", nullable=false)
+     */
     private ?Type $type = null;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Sphere", inversedBy="cards")
+     * @ORM\JoinColumn(name="sphere_id", referencedColumnName="id", nullable=false)
+     */
     private ?Sphere $sphere = null;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="has_errata", type="boolean", nullable=false, options={"default": false})
+     */
+    private $hasErrata = false;
 
     /**
      * Constructor.
@@ -632,11 +714,6 @@ class Card
     }
 
     /**
-     * @var int|null
-     */
-    private $quest;
-
-    /**
      * Set quest.
      *
      * @param int|null $quest
@@ -655,11 +732,6 @@ class Card
     {
         return $this->quest;
     }
-
-    /**
-     * @var bool
-     */
-    private $hasErrata = false;
 
     /**
      * Set hasErrata.
