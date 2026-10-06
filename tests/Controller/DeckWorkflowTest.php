@@ -37,7 +37,7 @@ class DeckWorkflowTest extends WebTestCase
     {
         if ($this->deckIds) {
             $connection = $this->client->getContainer()->get('doctrine')->getConnection();
-            $ids = implode(',', array_map('intval', $this->deckIds));
+            $ids = implode(',', array_map(intval(...), $this->deckIds));
             $decklists = "SELECT id FROM decklist WHERE parent_deck_id IN ($ids)";
             foreach ([
                 "DELETE FROM decklist_spheres WHERE decklist_id IN ($decklists)",
@@ -52,7 +52,7 @@ class DeckWorkflowTest extends WebTestCase
                 // MySQL cannot use a subquery on the table being deleted from: resolve it first
                 if (str_contains($sql, $decklists)) {
                     $decklistIds = $connection->fetchAll($decklists);
-                    $in = $decklistIds ? implode(',', array_map('intval', array_column($decklistIds, 'id'))) : 'NULL';
+                    $in = $decklistIds ? implode(',', array_map(intval(...), array_column($decklistIds, 'id'))) : 'NULL';
                     $sql = str_replace($decklists, $in, $sql);
                 }
 
@@ -99,7 +99,7 @@ class DeckWorkflowTest extends WebTestCase
             [$id]
         );
 
-        return array_map('intval', array_column($rows, 'quantity', 'code'));
+        return array_map(intval(...), array_column($rows, 'quantity', 'code'));
     }
 
     /**
@@ -164,9 +164,9 @@ class DeckWorkflowTest extends WebTestCase
             'description_md' => '',
             'tags' => '',
             'problem' => 'too_few_heroes',
-            'major_version' => '0',
-            'minor_version' => '0',
-            'user_id' => (string) $userId,
+            'major_version' => 0,
+            'minor_version' => 0,
+            'user_id' => $userId,
             'last_pack' => null,
         ], $this->fetchDeck($deckId));
         $this->assertSame([], $this->fetchSlots('deckslot', 'deck_id', $deckId));
@@ -180,9 +180,9 @@ class DeckWorkflowTest extends WebTestCase
             'description_md' => 'First *version*',
             'tags' => 'leadership core',
             'problem' => null,
-            'major_version' => '0',
-            'minor_version' => '1',
-            'user_id' => (string) $userId,
+            'major_version' => 0,
+            'minor_version' => 1,
+            'user_id' => $userId,
             'last_pack' => 'Core',
         ], $this->fetchDeck($deckId));
         $this->assertSame($main, $this->fetchSlots('deckslot', 'deck_id', $deckId));
@@ -209,9 +209,9 @@ class DeckWorkflowTest extends WebTestCase
             'description_md' => 'Second version',
             'tags' => 'leadership tactics',
             'problem' => null,
-            'major_version' => '0',
-            'minor_version' => '2',
-            'user_id' => (string) $userId,
+            'major_version' => 0,
+            'minor_version' => 2,
+            'user_id' => $userId,
             'last_pack' => 'Core',
         ], $this->fetchDeck($deckId));
         $this->assertSame($expected, $this->fetchSlots('deckslot', 'deck_id', $deckId));
@@ -221,12 +221,12 @@ class DeckWorkflowTest extends WebTestCase
         $this->assertSame([
             [
                 'variation' => json_encode([$main, [], [], []]),
-                'is_saved' => '1',
+                'is_saved' => 1,
                 'version' => '0.1',
             ],
             [
                 'variation' => json_encode([['01004' => 1, '01030' => 3], ['01003' => 1, '01029' => 3], [], []]),
-                'is_saved' => '1',
+                'is_saved' => 1,
                 'version' => '0.2',
             ],
         ], $changes);
@@ -261,18 +261,18 @@ class DeckWorkflowTest extends WebTestCase
             'version' => '1.0',
             'description_md' => 'Published **deck**',
             'description_html' => '<p>Published <strong>deck</strong></p>',
-            'user_id' => (string) $userId,
-            'parent_deck_id' => (string) $deckId,
+            'user_id' => $userId,
+            'parent_deck_id' => $deckId,
             'precedent_decklist_id' => null,
-            'nb_votes' => '0',
-            'nb_favorites' => '0',
-            'nb_comments' => '0',
+            'nb_votes' => 0,
+            'nb_favorites' => 0,
+            'nb_comments' => 0,
         ], $decklist);
         $this->assertSame($expected, $this->fetchSlots('decklistslot', 'decklist_id', $decklistId));
 
         // the decklist is published as 1.0, and the deck moves on to 1.1
         $deck = $this->fetchDeck($deckId);
-        $this->assertSame(['1', '1'], [$deck['major_version'], $deck['minor_version']]);
+        $this->assertSame([1, 1], [$deck['major_version'], $deck['minor_version']]);
 
         // 5. the decklist is public
         $client->request('GET', '/logout');
@@ -298,7 +298,7 @@ class DeckWorkflowTest extends WebTestCase
         $this->saveDeck($client, $deckId, 'PHPUnit Empty', '', '', []);
 
         $deck = $this->fetchDeck($deckId);
-        $this->assertSame(['PHPUnit Empty', 'too_few_heroes', null, '2'], [$deck['name'], $deck['problem'], $deck['last_pack'], $deck['minor_version']]);
+        $this->assertSame(['PHPUnit Empty', 'too_few_heroes', null, 2], [$deck['name'], $deck['problem'], $deck['last_pack'], $deck['minor_version']]);
         $this->assertSame([], $this->fetchSlots('deckslot', 'deck_id', $deckId));
 
         $client->request('GET', '/decks');
@@ -324,7 +324,7 @@ class DeckWorkflowTest extends WebTestCase
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertSame('Cannot import an empty deck', $client->getResponse()->getContent());
         $deck = $this->fetchDeck($deckId);
-        $this->assertSame(['New Deck', '0'], [$deck['name'], $deck['minor_version']]);
+        $this->assertSame(['New Deck', 0], [$deck['name'], $deck['minor_version']]);
     }
 
     /**
@@ -368,7 +368,7 @@ class DeckWorkflowTest extends WebTestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame(['success' => true, 'id' => $deckId], json_decode($response->getContent(), true));
         $deck = $this->fetchDeck($deckId);
-        $this->assertSame(['PHPUnit Ajax', null, '1'], [$deck['name'], $deck['problem'], $deck['minor_version']]);
+        $this->assertSame(['PHPUnit Ajax', null, 1], [$deck['name'], $deck['problem'], $deck['minor_version']]);
         $this->assertSame($main, $this->fetchSlots('deckslot', 'deck_id', $deckId));
 
         // what the builder sends for an empty deck is rejected, as on /deck/save
@@ -385,7 +385,7 @@ class DeckWorkflowTest extends WebTestCase
      */
     private function newDeckIds(int $maxId): array
     {
-        $ids = array_map('intval', array_column($this->db()->fetchAll('SELECT id FROM deck WHERE id > ? ORDER BY id', [$maxId]), 'id'));
+        $ids = array_map(intval(...), array_column($this->db()->fetchAll('SELECT id FROM deck WHERE id > ? ORDER BY id', [$maxId]), 'id'));
         $this->deckIds = array_merge($this->deckIds, $ids);
 
         return $ids;
@@ -580,7 +580,7 @@ class DeckWorkflowTest extends WebTestCase
     public function testCopyDecklistEditAndPublishAgain(): void
     {
         $client = $this->createAuthenticatedClient();
-        $userId = (string) $this->db()->fetchColumn("SELECT id FROM user WHERE username = 'test'");
+        $userId = (int) $this->db()->fetchColumn("SELECT id FROM user WHERE username = 'test'");
         $original = $this->fetchSlots('decklistslot', 'decklist_id', 1);
 
         // 1. copy: a new deck, with the decklist's name and cards, derived from the decklist
@@ -590,12 +590,12 @@ class DeckWorkflowTest extends WebTestCase
             'description_md' => '',
             'tags' => 'tactics leadership lore',
             'problem' => null,
-            'major_version' => '0',
-            'minor_version' => '1',
+            'major_version' => 0,
+            'minor_version' => 1,
             'user_id' => $userId,
             'last_pack' => 'TMV',
         ], $this->fetchDeck($deckId));
-        $this->assertSame('1', $this->db()->fetchColumn('SELECT parent_decklist_id FROM deck WHERE id = ?', [$deckId]));
+        $this->assertSame(1, $this->db()->fetchColumn('SELECT parent_decklist_id FROM deck WHERE id = ?', [$deckId]));
         $this->assertSame($original, $this->fetchSlots('deckslot', 'deck_id', $deckId));
 
         $crawler = $client->request('GET', "/deck/view/$deckId");
@@ -608,7 +608,7 @@ class DeckWorkflowTest extends WebTestCase
         $edited['01039'] = 1;
         ksort($edited);
         $this->saveDeck($client, $deckId, 'PHPUnit Dwarves Remix', 'Remixed', 'dwarf', $edited);
-        $this->assertSame('1', $this->db()->fetchColumn('SELECT parent_decklist_id FROM deck WHERE id = ?', [$deckId]));
+        $this->assertSame(1, $this->db()->fetchColumn('SELECT parent_decklist_id FROM deck WHERE id = ?', [$deckId]));
 
         // 3. publish: the new decklist is derived from decklist 1
         $crawler = $client->request('GET', "/deck/publish/$deckId");
@@ -621,7 +621,7 @@ class DeckWorkflowTest extends WebTestCase
         $this->assertRegExp('#^/decklist/view/\d+/phpunitdwarvesremix-1\.0$#', $location);
         $decklist = $this->db()->fetchAssoc('SELECT id, name, parent_deck_id, precedent_decklist_id FROM decklist WHERE parent_deck_id = ?', [$deckId]);
         $this->assertNotFalse($decklist);
-        $this->assertSame(['PHPUnit Dwarves Remix', (string) $deckId, '1'], [$decklist['name'], $decklist['parent_deck_id'], $decklist['precedent_decklist_id']]);
+        $this->assertSame(['PHPUnit Dwarves Remix', $deckId, 1], [$decklist['name'], $decklist['parent_deck_id'], $decklist['precedent_decklist_id']]);
         $this->assertSame($edited, $this->fetchSlots('decklistslot', 'decklist_id', $decklist['id']));
 
         // 4. both decklist pages show the link
@@ -636,7 +636,7 @@ class DeckWorkflowTest extends WebTestCase
         $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => 'admin', '_password' => 'admin']));
-        $adminId = (string) $this->db()->fetchColumn("SELECT id FROM user WHERE username = 'admin'");
+        $adminId = (int) $this->db()->fetchColumn("SELECT id FROM user WHERE username = 'admin'");
 
         $deckId = $this->copyDecklist($client, 2);
 
@@ -715,7 +715,7 @@ class DeckWorkflowTest extends WebTestCase
         $this->assertSame("/deck/view/$deckId", $client->getResponse()->headers->get('Location'));
         $crawler = $client->followRedirect();
         $this->assertStringContainsString('This deck cannot be published because it is invalid.', $crawler->filter('body')->text());
-        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM decklist WHERE parent_deck_id = ?', [$deckId]));
+        $this->assertSame(0, $this->db()->fetchColumn('SELECT COUNT(*) FROM decklist WHERE parent_deck_id = ?', [$deckId]));
     }
 
     /**
@@ -727,7 +727,7 @@ class DeckWorkflowTest extends WebTestCase
         $client->request('POST', '/decklist/create', $parameters + ['name' => 'PHPUnit Unknown']);
 
         $this->assertSame(400, $client->getResponse()->getStatusCode());
-        $this->assertSame('0', $this->db()->fetchColumn("SELECT COUNT(*) FROM decklist WHERE name = 'PHPUnit Unknown'"));
+        $this->assertSame(0, $this->db()->fetchColumn("SELECT COUNT(*) FROM decklist WHERE name = 'PHPUnit Unknown'"));
     }
 
     /**
@@ -763,7 +763,7 @@ class DeckWorkflowTest extends WebTestCase
             $this->assertSame(403, $client->getResponse()->getStatusCode());
 
             $this->assertSame('Dwarf Lore/Leadership/Tactics', $connection->fetchColumn('SELECT name FROM deck WHERE id = 1'));
-            $this->assertSame('0', $connection->fetchColumn("SELECT COUNT(*) FROM decklist WHERE name = 'Hacked'"));
+            $this->assertSame(0, $connection->fetchColumn("SELECT COUNT(*) FROM decklist WHERE name = 'Hacked'"));
         } finally {
             $connection->update('deck', ['user_id' => 1], ['id' => 1]);
         }

@@ -7,6 +7,7 @@ namespace App\Controller\Decklist;
 use App\Controller\CurrentUserTrait;
 use App\Entity\Deck;
 use App\Entity\Decklist;
+use App\Helper\StringSanitizer;
 use App\Model\DecklistFactory;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
@@ -46,7 +47,7 @@ class CreateDecklistController extends AbstractController
             throw $this->createAccessDeniedException('Access denied to this object.');
         }
 
-        $name = filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES) ?: '';
+        $name = StringSanitizer::sanitize($request->request->get('name'), false);
         $descriptionMd = trim((string) $request->request->get('descriptionMd'));
         $precedent_id = trim((string) $request->request->get('precedent'));
         if (!preg_match('/^\\d+$/', $precedent_id)) {

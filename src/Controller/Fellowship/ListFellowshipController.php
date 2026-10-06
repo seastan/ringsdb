@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Fellowship;
 
 use App\Entity\Cycle;
+use App\Helper\StringSanitizer;
 use App\Model\FellowshipManager;
 use App\Repository\CycleRepository;
 use Doctrine\DBAL\Connection;
@@ -15,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ListFellowshipController extends AbstractController
 {
-    public function __construct(private int $cacheExpiration, private FellowshipManager $fellowshipManager, private CycleRepository $cycleRepository)
+    public function __construct(private readonly int $cacheExpiration, private readonly FellowshipManager $fellowshipManager, private readonly CycleRepository $cycleRepository)
     {
     }
 
@@ -93,8 +94,8 @@ class ListFellowshipController extends AbstractController
     {
         $dbh = $this->getDoctrine()->getConnection();
         $cards_code = $request->query->all('cards');
-        $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
-        $fellowship_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
+        $author_name = StringSanitizer::sanitize($request->query->get('author'));
+        $fellowship_name = StringSanitizer::sanitize($request->query->get('name'));
         $nb_decks = intval(filter_var($request->query->get('nb_decks'), FILTER_SANITIZE_NUMBER_INT));
         $numcores = $request->query->get('numcores');
         $numplaysets = $request->query->get('numplaysets');

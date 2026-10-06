@@ -17,7 +17,7 @@ use Twig\Environment;
  */
 class UserMailer
 {
-    public function __construct(private MailerInterface $mailer, private UrlGeneratorInterface $router, private Environment $twig, private string $senderAddress, private string $senderName)
+    public function __construct(private readonly MailerInterface $mailer, private readonly UrlGeneratorInterface $router, private readonly Environment $twig, private readonly string $senderAddress, private readonly string $senderName)
     {
     }
 

@@ -19,9 +19,9 @@ use Symfony\Component\VarDumper\VarDumper;
 class ScrapBeornJsonDataCommand extends Command
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private CardPrintingRepository $cardPrintingRepository,
-        private PackRepository $packRepository
+        private readonly EntityManagerInterface $entityManager,
+        private readonly CardPrintingRepository $cardPrintingRepository,
+        private readonly PackRepository $packRepository
     ) {
         parent::__construct();
     }

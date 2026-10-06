@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class EditReviewController extends AbstractController
 {
-    public function __construct(private EntityManagerInterface $entityManager, private ReviewRepository $reviewRepository, private Texts $texts)
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly ReviewRepository $reviewRepository, private readonly Texts $texts)
     {
     }
 

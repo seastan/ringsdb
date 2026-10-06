@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DefaultController extends AbstractController
 {
-    public function __construct(private int $cacheExpiration, private ?string $gameName, private ?string $publisherName, private EntityManagerInterface $entityManager)
+    public function __construct(private readonly int $cacheExpiration, private readonly ?string $gameName, private readonly ?string $publisherName, private readonly EntityManagerInterface $entityManager)
     {
     }
 
@@ -252,7 +252,7 @@ class DefaultController extends AbstractController
         }
 
         // Sort all comments by date
-        usort($all_comments, [$this, 'orderNew']);
+        usort($all_comments, $this->orderNew(...));
         $num_comments_displayed = 8;
         // Limit number to $num_comments
         $all_comments = array_slice($all_comments, 0, $num_comments_displayed);

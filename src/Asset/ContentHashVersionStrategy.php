@@ -18,7 +18,7 @@ class ContentHashVersionStrategy implements VersionStrategyInterface
      */
     private array $versions = [];
 
-    public function __construct(private string $publicDir)
+    public function __construct(private readonly string $publicDir)
     {
     }
 

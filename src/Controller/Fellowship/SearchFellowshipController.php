@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SearchFellowshipController extends AbstractController
 {
-    public function __construct(private int $cacheExpiration, private Connection $connection, private CycleRepository $cycleRepository)
+    public function __construct(private readonly int $cacheExpiration, private readonly Connection $connection, private readonly CycleRepository $cycleRepository)
     {
     }
 

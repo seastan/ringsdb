@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class BuildAssetsCommand extends Command
 {
-    public function __construct(private string $publicDir)
+    public function __construct(private readonly string $publicDir)
     {
         parent::__construct();
     }

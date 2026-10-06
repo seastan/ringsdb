@@ -136,8 +136,8 @@ class UserProfileTest extends WebTestCase
             'username' => 'test', 'email' => 'test@example.com',
             // FILTER_SANITIZE_STRING strips the tags
             'resume' => 'I play Dwarves.', 'color' => 'lore',
-            'is_notif_author' => '0', 'is_notif_commenter' => '1', 'is_notif_mention' => '0',
-            'is_share_decks' => '1', 'dark_mode' => '1',
+            'is_notif_author' => 0, 'is_notif_commenter' => 1, 'is_notif_mention' => 0,
+            'is_share_decks' => 1, 'dark_mode' => 1,
         ], array_intersect_key($user, array_flip(['username', 'email', 'resume', 'color', 'is_notif_author', 'is_notif_commenter', 'is_notif_mention', 'is_share_decks', 'dark_mode'])));
 
         $crawler = $client->followRedirect();
@@ -150,7 +150,7 @@ class UserProfileTest extends WebTestCase
         $form = $this->profileForm($client);
         $this->checkbox($form, 'dark_mode')->untick();
         $client->submit($form);
-        $this->assertSame('0', $this->fetchUser()['dark_mode']);
+        $this->assertSame(0, $this->fetchUser()['dark_mode']);
         $cookie = $client->getCookieJar()->get('dark_mode');
         $this->assertInstanceOf(\Symfony\Component\BrowserKit\Cookie::class, $cookie);
         $this->assertSame('0', $cookie->getValue());

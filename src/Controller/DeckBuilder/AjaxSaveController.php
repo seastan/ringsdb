@@ -7,6 +7,7 @@ namespace App\Controller\DeckBuilder;
 use App\Controller\CurrentUserTrait;
 use App\Entity\Deck;
 use App\Entity\User;
+use App\Helper\StringSanitizer;
 use App\Repository\DeckRepository;
 use App\Services\Decks;
 use Doctrine\ORM\EntityManagerInterface;
@@ -55,7 +56,7 @@ class AjaxSaveController extends AbstractController
             return new JsonResponse(['success' => false, 'error' => 'Cannot save an empty deck.'], 422);
         }
 
-        $name = filter_var($request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+        $name = StringSanitizer::sanitize($request->get('name'), false);
         if (empty($name)) {
             $name = 'Untitled Deck';
         }
@@ -66,7 +67,7 @@ class AjaxSaveController extends AbstractController
         }
 
         $description = trim($request->get('description') ?? '');
-        $tags = filter_var($request->get('tags'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES) ?: '';
+        $tags = StringSanitizer::sanitize($request->get('tags'), false);
         $this->decks->saveDeck($user, $deck, (int) $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);
         $this->entityManager->flush();
 

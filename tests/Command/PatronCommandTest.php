@@ -56,7 +56,7 @@ class PatronCommandTest extends KernelTestCase
         return (string) preg_replace('/^\S+ /m', '', $display);
     }
 
-    private function donation(string $username)
+    private function donation(string $username): int
     {
         return $this->connection->fetchColumn('SELECT donation FROM user WHERE username = ?', [$username]);
     }
@@ -66,18 +66,18 @@ class PatronCommandTest extends KernelTestCase
     public function testAddADonationByEmail(): void
     {
         $this->assertSame("Success\n", $this->runCommand(['email' => 'test@example.com', 'donation' => '10']));
-        $this->assertSame('10', $this->donation('test'));
+        $this->assertSame(10, $this->donation('test'));
 
         // donations add up
         $this->runCommand(['email' => 'test@example.com', 'donation' => '5']);
-        $this->assertSame('15', $this->donation('test'));
-        $this->assertSame('0', $this->donation('admin'));
+        $this->assertSame(15, $this->donation('test'));
+        $this->assertSame(0, $this->donation('admin'));
     }
 
     public function testAddADonationByUsername(): void
     {
         $this->assertSame("Success\n", $this->runCommand(['email' => 'admin', 'donation' => '7']));
-        $this->assertSame('7', $this->donation('admin'));
+        $this->assertSame(7, $this->donation('admin'));
     }
 
     public function testShowTheDonation(): void
@@ -87,7 +87,7 @@ class PatronCommandTest extends KernelTestCase
         $this->assertSame("User test donated 25\n", $this->runCommand(['email' => 'test']));
         // an amount of 0 also only shows the donation
         $this->assertSame("User test donated 25\n", $this->runCommand(['email' => 'test', 'donation' => '0']));
-        $this->assertSame('25', $this->donation('test'));
+        $this->assertSame(25, $this->donation('test'));
     }
 
     public function testUnknownUser(): void
@@ -104,7 +104,7 @@ class PatronCommandTest extends KernelTestCase
         $this->connection->update('user', ['donation' => 10], ['username' => 'test']);
 
         $this->runCommand(['email' => 'test', 'donation' => '-4']);
-        $this->assertSame('6', $this->donation('test'));
+        $this->assertSame(6, $this->donation('test'));
     }
 
     public function testEmailOrUsernameIsRequired(): void

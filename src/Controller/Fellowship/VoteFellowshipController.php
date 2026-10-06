@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class VoteFellowshipController extends AbstractController
 {
-    public function __construct(private EntityManagerInterface $entityManager, private FellowshipRepository $fellowshipRepository)
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly FellowshipRepository $fellowshipRepository)
     {
     }
 

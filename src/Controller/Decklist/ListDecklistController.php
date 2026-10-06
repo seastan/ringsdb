@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Decklist;
 
 use App\Entity\Cycle;
+use App\Helper\StringSanitizer;
 use App\Model\DecklistManager;
 use App\Repository\CycleRepository;
 use Doctrine\DBAL\Connection;
@@ -15,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ListDecklistController extends AbstractController
 {
-    public function __construct(private int $cacheExpiration, private DecklistManager $decklistManager, private CycleRepository $cycleRepository)
+    public function __construct(private readonly int $cacheExpiration, private readonly DecklistManager $decklistManager, private readonly CycleRepository $cycleRepository)
     {
     }
 
@@ -96,9 +97,9 @@ class ListDecklistController extends AbstractController
         $dbh = $this->getDoctrine()->getConnection();
         $cards_code = $request->query->all('cards');
         $cards_to_exclude = $request->query->all('cards_to_exclude');
-        $sphere_code = filter_var($request->query->get('sphere'), FILTER_SANITIZE_STRING);
-        $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
-        $decklist_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
+        $sphere_code = StringSanitizer::sanitize($request->query->get('sphere'));
+        $author_name = StringSanitizer::sanitize($request->query->get('author'));
+        $decklist_name = StringSanitizer::sanitize($request->query->get('name'));
         $starting_threat = intval(filter_var($request->query->get('threat'), FILTER_SANITIZE_NUMBER_INT));
         $starting_threat_o = $request->query->get('threato');
         $author_reputation = intval(filter_var($request->query->get('reputation'), FILTER_SANITIZE_NUMBER_INT));

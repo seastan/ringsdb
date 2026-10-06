@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Decklist;
 
 use App\Entity\Decklist;
+use App\Helper\StringSanitizer;
 use App\Repository\DecklistRepository;
 use App\Services\Texts;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SaveDecklistController extends AbstractController
 {
-    public function __construct(private EntityManagerInterface $entityManager, private DecklistRepository $decklistRepository, private Texts $texts)
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly DecklistRepository $decklistRepository, private readonly Texts $texts)
     {
     }
 
@@ -45,7 +46,7 @@ class SaveDecklistController extends AbstractController
             throw $this->createAccessDeniedException('Access denied');
         }
 
-        $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $name = trim(StringSanitizer::sanitize($request->request->get('name'), false));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = 'Untitled';

@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class FixSignaturesCommand extends Command
 {
-    public function __construct(private EntityManagerInterface $entityManager, private DecklistRepository $decklistRepository)
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly DecklistRepository $decklistRepository)
     {
         parent::__construct();
     }

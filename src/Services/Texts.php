@@ -8,9 +8,9 @@ use HTMLPurifier;
 
 class Texts
 {
-    private \HTMLPurifier $purifier_service;
+    private readonly \HTMLPurifier $purifier_service;
 
-    private \Parsedown $markdown_service;
+    private readonly \Parsedown $markdown_service;
 
     /**
      * @param string $cache_dir where HTMLPurifier caches its definitions

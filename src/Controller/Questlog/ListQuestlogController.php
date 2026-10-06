@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Questlog;
 
 use App\Entity\Cycle;
+use App\Helper\StringSanitizer;
 use App\Model\QuestLogManager;
 use App\Repository\CycleRepository;
 use App\Services\SnapshotManager;
@@ -16,7 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ListQuestlogController extends AbstractController
 {
-    public function __construct(private int $cacheExpiration, private QuestLogManager $questlogManager, private SnapshotManager $snapshotManager, private CycleRepository $cycleRepository)
+    public function __construct(private readonly int $cacheExpiration, private readonly QuestLogManager $questlogManager, private readonly SnapshotManager $snapshotManager, private readonly CycleRepository $cycleRepository)
     {
     }
 
@@ -96,9 +97,9 @@ class ListQuestlogController extends AbstractController
     {
         $dbh = $this->getDoctrine()->getConnection();
         $cards_code = $request->query->all('cards');
-        $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
-        $questlog_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
-        $scenario = filter_var($request->query->get('scenario'), FILTER_SANITIZE_STRING);
+        $author_name = StringSanitizer::sanitize($request->query->get('author'));
+        $questlog_name = StringSanitizer::sanitize($request->query->get('name'));
+        $scenario = StringSanitizer::sanitize($request->query->get('scenario'));
         $nb_decks = intval(filter_var($request->query->get('nb_decks'), FILTER_SANITIZE_NUMBER_INT));
         $sort = $request->query->get('sort');
         $packs = $request->query->all('packs');

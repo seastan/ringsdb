@@ -22,7 +22,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class Encounter implements \JsonSerializable, \Stringable
 {
     /**
-     * @return array<string, mixed>
+     * @return array{id: int|null, code: string, name: string}
      */
     public function jsonSerialize(): array
     {

@@ -47,6 +47,9 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         return $this->slots->count();
     }
 
+    /**
+     * @return \Traversable<int, T>
+     */
     public function getIterator(): \Traversable
     {
         return $this->slots->getIterator();
@@ -57,6 +60,9 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         return $this->slots->offsetExists($offset);
     }
 
+    /**
+     * @return T|null
+     */
     public function offsetGet($offset): mixed
     {
         return $this->slots->offsetGet($offset);

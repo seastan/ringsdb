@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DownloadImagesCommand extends Command
 {
-    public function __construct(private Packages $packages, private string $publicDir, private CardRepository $cardRepository)
+    public function __construct(private readonly Packages $packages, private readonly string $publicDir, private readonly CardRepository $cardRepository)
     {
         parent::__construct();
     }

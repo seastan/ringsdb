@@ -8,6 +8,7 @@ use App\Entity\Card;
 use App\Entity\Decklist;
 use App\Entity\Sphere;
 use App\Entity\User;
+use App\Helper\StringSanitizer;
 use App\Repository\CardRepository;
 use App\Repository\SphereRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -58,7 +59,7 @@ class DecklistManager
      */
     protected $user;
 
-    public function __construct(private EntityManagerInterface $doctrine, private RequestStack $request_stack, private UrlGeneratorInterface $router, private CardRepository $cardRepository, private SphereRepository $sphereRepository)
+    public function __construct(private readonly EntityManagerInterface $doctrine, private readonly RequestStack $request_stack, private readonly UrlGeneratorInterface $router, private readonly CardRepository $cardRepository, private readonly SphereRepository $sphereRepository)
     {
     }
 
@@ -268,22 +269,22 @@ class DecklistManager
         $cards_code = $request->query->all('cards');
         $cards_to_exclude = $request->query->all('cards_to_exclude');
 
-        $sphere_code = filter_var($request->query->get('sphere'), FILTER_SANITIZE_STRING);
+        $sphere_code = StringSanitizer::sanitize($request->query->get('sphere'));
         if ($sphere_code) {
             $sphere = $this->sphereRepository->findOneBy(['code' => $sphere_code]);
         }
 
         $numcores = $request->query->get('numcores');
 
-        $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
+        $author_name = StringSanitizer::sanitize($request->query->get('author'));
 
-        $decklist_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
+        $decklist_name = StringSanitizer::sanitize($request->query->get('name'));
 
         $sort = $request->query->get('sort');
 
         $packs = $request->query->all('packs');
 
-        $customPackCodes = array_values(array_filter((array) $request->query->all('custom_packs'), 'is_string'));
+        $customPackCodes = array_values(array_filter((array) $request->query->all('custom_packs'), is_string(...)));
 
         $threat_op = $request->query->get('threato');
         $threat = $request->query->get('threat');
@@ -382,10 +383,10 @@ class DecklistManager
                 // filtered out — this keeps the short-circuit table-free with no per-request scan.
                 $skipBuildable = false;
                 if (count($packs) > 0 && !$useCustomPacks) {
-                    $packsWithCards = array_map('intval', $this->doctrine->getConnection()
+                    $packsWithCards = array_map(intval(...), $this->doctrine->getConnection()
                         ->executeQuery('SELECT DISTINCT pack_id FROM card_printing')
                         ->fetchAll(\PDO::FETCH_COLUMN));
-                    $skipBuildable = 0 === count(array_diff($packsWithCards, array_map('intval', $packs)));
+                    $skipBuildable = 0 === count(array_diff($packsWithCards, array_map(intval(...), $packs)));
                 }
 
                 if (!$skipBuildable) {

@@ -248,13 +248,13 @@ class AdminPagesTest extends WebTestCase
             $client->request('GET', '/admin/user/toggle_locked/1');
             $this->assertSame(302, $client->getResponse()->getStatusCode());
             $this->assertSame('/admin/user/show/1', $client->getResponse()->headers->get('Location'));
-            $this->assertSame('1', $this->db()->fetchColumn('SELECT locked FROM user WHERE id = 1'));
+            $this->assertSame(1, $this->db()->fetchColumn('SELECT locked FROM user WHERE id = 1'));
 
             $crawler = $client->followRedirect();
             $this->assertSame('Unblock', trim($crawler->filter('a[href="/admin/user/toggle_locked/1"]')->text()));
 
             $client->request('GET', '/admin/user/toggle_locked/1');
-            $this->assertSame('0', $this->db()->fetchColumn('SELECT locked FROM user WHERE id = 1'));
+            $this->assertSame(0, $this->db()->fetchColumn('SELECT locked FROM user WHERE id = 1'));
         } finally {
             $this->db()->update('user', ['locked' => 0], ['id' => 1]);
         }

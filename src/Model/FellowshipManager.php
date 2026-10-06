@@ -7,6 +7,7 @@ namespace App\Model;
 use App\Entity\Card;
 use App\Entity\Fellowship;
 use App\Entity\User;
+use App\Helper\StringSanitizer;
 use App\Repository\CardRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -51,7 +52,7 @@ class FellowshipManager
      */
     protected $user;
 
-    public function __construct(private EntityManagerInterface $doctrine, private RequestStack $request_stack, private UrlGeneratorInterface $router, private CardRepository $cardRepository)
+    public function __construct(private readonly EntityManagerInterface $doctrine, private readonly RequestStack $request_stack, private readonly UrlGeneratorInterface $router, private readonly CardRepository $cardRepository)
     {
     }
 
@@ -253,8 +254,8 @@ class FellowshipManager
 
         $cards_code = $request->query->all('cards');
 
-        $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
-        $fellowship_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
+        $author_name = StringSanitizer::sanitize($request->query->get('author'));
+        $fellowship_name = StringSanitizer::sanitize($request->query->get('name'));
         $nb_decks = intval(filter_var($request->query->get('nb_decks'), FILTER_SANITIZE_NUMBER_INT));
         $numcores = $request->query->get('numcores');
         $numplaysets = $request->query->get('numplaysets');
@@ -262,7 +263,7 @@ class FellowshipManager
         $sort = $request->query->get('sort');
         $packs = $request->query->all('packs');
 
-        $customPackCodes = array_values(array_filter((array) $request->query->all('custom_packs'), 'is_string'));
+        $customPackCodes = array_values(array_filter((array) $request->query->all('custom_packs'), is_string(...)));
 
         $qb = $this->getQueryBuilder();
         $joinTables = [];
