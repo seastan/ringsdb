@@ -1,0 +1,7 @@
+api_oauth2_load_deck:
+    path: /deck/load/{id}
+    methods: [GET]
+    defaults:
+        _controller: AppBundle:Oauth2:loadDeck
+    requirements:
+        id: \d+

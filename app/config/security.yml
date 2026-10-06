@@ -43,6 +43,7 @@ security:
         - { path: ^/remind, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: ROLE_ADMIN }
         - { path: ^/api/public, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/oauth2, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/private, role: ROLE_USER }
         - { path: ^/$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/js/, role: IS_AUTHENTICATED_ANONYMOUSLY }
