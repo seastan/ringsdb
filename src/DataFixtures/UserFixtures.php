@@ -27,6 +27,7 @@ class UserFixtures extends Fixture
         $user->setEnabled(true);
         $user->setDateCreation(new \DateTime('2015-08-16'));
         $user->setDateUpdate(new \DateTime('2015-08-16'));
+
         $this->passwordUpdater->hashPassword($user);
         $manager->persist($user);
 
@@ -40,6 +41,7 @@ class UserFixtures extends Fixture
         $admin->addRole('ROLE_ADMIN');
         $admin->setDateCreation(new \DateTime('2015-08-16'));
         $admin->setDateUpdate(new \DateTime('2015-08-16'));
+
         $this->passwordUpdater->hashPassword($admin);
         $manager->persist($admin);
 

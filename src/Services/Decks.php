@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\CardPrinting;
-use App\Repository\DecklistRepository;
-use App\Repository\DeckchangeRepository;
-use App\Repository\CardRepository;
 use App\Entity\Card;
+use App\Entity\CardPrinting;
 use App\Entity\Deck;
 use App\Entity\Deckchange;
 use App\Entity\Decklist;
@@ -257,7 +254,7 @@ class Decks
         foreach ($content['main'] as $card_code => $qty) {
             $card = $this->findCardByCode((string) $card_code);
 
-            if (!$card) {
+            if (!$card instanceof Card) {
                 continue;
             }
 
@@ -285,7 +282,7 @@ class Decks
         foreach ($content['side'] as $card_code => $qty) {
             $card = $this->findCardByCode((string) $card_code);
 
-            if (!$card) {
+            if (!$card instanceof Card) {
                 continue;
             }
 
@@ -358,6 +355,7 @@ class Decks
             if (!isset($cards[$card_code])) {
                 continue;
             }
+
             $card = $cards[$card_code];
             $slot = new Deckslot($deck, $card, $qty);
             $deck->addSlot($slot);
@@ -367,6 +365,7 @@ class Decks
             if (!isset($cards[$card_code])) {
                 continue;
             }
+
             $card = $cards[$card_code];
             $slot = new Decksideslot($deck, $card, $qty);
             $deck->addSideslot($slot);
@@ -377,14 +376,14 @@ class Decks
         return $deck->getId();
     }
 
-
     /**
      * The card with this code, or else the canonical card of the printing with this image code:
      * deck contents stored as JSON (quest log snapshots...) still use the codes of the cards
      * merged by the card-printings migration.
      */
-    private function findCardByCode(string $code): ?Card {
-        $card = $this->doctrine->getRepository(Card::class)->findOneBy(['code' => $code]);
+    private function findCardByCode(string $code): ?Card
+    {
+        $card = $this->cardRepository->findOneBy(['code' => $code]);
         if ($card) {
             return $card;
         }
@@ -397,7 +396,7 @@ class Decks
     /**
      * @param array{main: array<string, int>, side: array<string, int>} $content
      */
-    public function setSlots(Deck $deck, $content): void
+    public function setSlots(Deck $deck, array $content): void
     {
         /* @var $latestPack Pack */
 
@@ -406,7 +405,7 @@ class Decks
         foreach ($content['main'] as $card_code => $qty) {
             $card = $this->findCardByCode((string) $card_code);
 
-            if (!$card) {
+            if (!$card instanceof Card) {
                 continue;
             }
 
@@ -420,7 +419,7 @@ class Decks
         foreach ($content['side'] as $card_code => $qty) {
             $card = $this->findCardByCode((string) $card_code);
 
-            if (!$card) {
+            if (!$card instanceof Card) {
                 continue;
             }
 

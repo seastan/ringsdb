@@ -37,7 +37,7 @@ class ResettingSendEmailController extends AbstractController
         $username = (string) $request->request->get('username');
         $user = $userRepository->findOneByUsernameOrEmail($username);
 
-        if (null !== $user && !$user->isPasswordRequestNonExpired(self::RETRY_TTL)) {
+        if ($user instanceof \App\Entity\User && !$user->isPasswordRequestNonExpired(self::RETRY_TTL)) {
             if (null === $user->getConfirmationToken()) {
                 $user->setConfirmationToken($tokenGenerator->generateToken());
             }

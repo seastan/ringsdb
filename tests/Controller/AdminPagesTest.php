@@ -261,12 +261,12 @@ class AdminPagesTest extends WebTestCase
     }
 
     /**
-     * A blocked user cannot log in: User::isAccountNonLocked() reads the "locked" column
-     * (FOSUserBundle 2's own version always returns true).
+     * A blocked user cannot log in: App\Security\UserChecker reads the "locked" column.
      */
-    public function testBlockedUserCannotLogIn(): void {
-        $client = static::createClient();
-        $this->db($client)->update('user', ['locked' => 1], ['username' => 'test']);
+    public function testBlockedUserCannotLogIn(): void
+    {
+        $client = $this->client;
+        $this->db()->update('user', ['locked' => 1], ['username' => 'test']);
         try {
             $crawler = $client->request('GET', '/login');
             $client->submit($crawler->selectButton('_submit')->form(['_username' => 'test', '_password' => 'test']));

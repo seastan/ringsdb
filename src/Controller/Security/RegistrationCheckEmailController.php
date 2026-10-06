@@ -34,7 +34,7 @@ class RegistrationCheckEmailController extends AbstractController
 
         $session->remove(self::SESSION_EMAIL);
         $user = $userRepository->findOneByEmail($email);
-        if (null === $user) {
+        if (!$user instanceof \App\Entity\User) {
             return $this->redirectToRoute('fos_user_security_login');
         }
 

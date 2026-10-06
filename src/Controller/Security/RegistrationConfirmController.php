@@ -27,12 +27,13 @@ class RegistrationConfirmController extends AbstractController
         LoginManager $loginManager
     ): Response {
         $user = $userRepository->findOneByConfirmationToken($token);
-        if (null === $user) {
+        if (!$user instanceof \App\Entity\User) {
             return $this->redirectToRoute('fos_user_security_login');
         }
 
         $user->setConfirmationToken(null);
         $user->setEnabled(true);
+
         $entityManager->flush();
         $loginManager->logInUser($user);
 

@@ -55,7 +55,7 @@ class LoginManager
     {
         try {
             $this->userChecker->checkPreAuth($user);
-        } catch (AccountStatusException $exception) {
+        } catch (AccountStatusException $accountStatusException) {
             return;
         }
 
@@ -64,6 +64,7 @@ class LoginManager
         if (null !== $request) {
             $this->sessionStrategy->onAuthentication($request, $token);
         }
+
         $this->tokenStorage->setToken($token);
 
         $user->setLastLogin(new \DateTime());

@@ -51,7 +51,7 @@ class ResettingResetController extends AbstractController
     public function __invoke(Request $request, string $token): Response
     {
         $user = $this->userRepository->findOneByConfirmationToken($token);
-        if (null === $user) {
+        if (!$user instanceof \App\Entity\User) {
             return $this->redirectToRoute('fos_user_security_login');
         }
 

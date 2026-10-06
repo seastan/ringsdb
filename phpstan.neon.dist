@@ -11,7 +11,7 @@ parameters:
     # phpstan/phpstan-symfony: the service types, read from the container dumped in debug mode
     # (make phpstan warms up the test cache first)
     symfony:
-        containerXmlPath: var/cache/test/srcApp_KernelTestDebugContainer.xml
+        containerXmlPath: var/cache/test/App_KernelTestDebugContainer.xml
         consoleApplicationLoader: src/PHPStan/console-application.php
     # phpstan/phpstan-doctrine: the entity metadata (annotations), for the repositories, the
     # fields and the DQL

@@ -60,7 +60,7 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
     {
         if (preg_match('/^.+\@\S+\.\S+$/', $usernameOrEmail)) {
             $user = $this->findOneByEmail($usernameOrEmail);
-            if (null !== $user) {
+            if ($user instanceof User) {
                 return $user;
             }
         }

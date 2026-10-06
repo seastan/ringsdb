@@ -36,9 +36,8 @@ Each removal reduces what has to be ported.
 - **`/admin/stat_cards` and the `app:stats:precompute-cards` cron**: nothing in the repository
   consumes that JSON, probably an external report. Ask the maintainers / check the nginx logs
   (see "Card statistics").
-- **User blocking**: FOSUserBundle 2 no longer enforces the `locked` column; `User` now
-  overrides `isAccountNonLocked()` (and the expiry checks) so the admin "Block" button works
-  again. Move this to a `UserChecker` when replacing FOSUser (see "Admin area").
+- Done: **User blocking**, the admin "Block" button works again (`App\Security\UserChecker`, see
+  "Admin area").
 - Done: **JSONP on the public API**, the callback is validated (see "Public API").
 - **Card scraping commands**: `app:beorn:html` (`ScrapBeornCardDataCommand`, scrapes the Hall of
   Beorn HTML pages, still full of debug output), `app:beorn:json` and `app:download-images`
@@ -626,9 +625,11 @@ deployment can no longer check it, so a rollback would lock those users out.
 - **Registration with email confirmation**: account created disabled with a `confirmationToken`,
   email containing the `/register/confirm/{token}` link, activation + automatic login,
   single-use token.
-- **Login refused for an unconfirmed account**: `UserChecker` throws a `DisabledException`;
-  `hide_user_not_found: true` turns it into "Invalid credentials." (pinned by
-  `testFullRegistrationWorkflow`). The login template still has the `/user/remind/{username}`
+- **Login refused for an unconfirmed, blocked or expired account**: `UserChecker` throws a
+  `DisabledException`, `LockedException`, `AccountExpiredException` or
+  `CredentialsExpiredException` (the checks of Symfony 3.4's `UserChecker`);
+  `hide_user_not_found: true` turns them into "Invalid credentials." (pinned by
+  `testFullRegistrationWorkflow` and `testBlockedUserCannotLogIn`). The login template still has the `/user/remind/{username}`
   link for the `Account is disabled.` message, which is therefore never shown.
 - **Registration validation**: unique username and email, valid email format, username of at
   least 2 characters, password confirmation, CSRF protection.
@@ -1082,8 +1083,8 @@ hasErrata`. Pinned by `AdminCsvTest`:
 - Fixed: blocking a user had no effect, FOSUser 2's `isAccountNonLocked()` always returns
   `true` (production's FOSUser dev-master still honoured it). `User` overrides
   `isAccountNonLocked()`, `isAccountNonExpired()` and `isCredentialsNonExpired()` to read the
-  columns again (covered by `testBlockedUserCannotLogIn`). Move to a `UserChecker` when
-  replacing FOSUser.
+  columns again (covered by `testBlockedUserCannotLogIn`); since FOSUserBundle's removal,
+  `App\Security\UserChecker` calls them, as Symfony 3.4's checker did.
 - The user's "Date of last update" changes at each login (`last_login`, then Gedmo
   timestampable); it is masked in the admin user page snapshot.
 - `StatController` concatenates the `month` query parameter into its SQL

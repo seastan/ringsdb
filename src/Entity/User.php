@@ -295,14 +295,14 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
 
     public function __toString(): string
     {
-        return (string) $this->getUsername();
+        return $this->getUsername();
     }
 
     /**
      * What the session stores (the user is reloaded by id on each request): the format of
      * FOSUserBundle's base class, so that the sessions opened before its removal stay valid.
      *
-     * @return mixed[]
+     * @return array<int, bool|int|string|null>
      */
     public function __serialize(): array
     {
@@ -1481,17 +1481,17 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
      */
     protected $credentialsExpireAt;
 
-    /*
-     * FOSUserBundle 2.x hardcodes the three checks below to true, so the
-     * locked/expired columns above would otherwise be ignored at login.
-     * These restore the 1.x behavior the Symfony UserChecker relies on.
+    /**
+     * False when blocked by the admin ("Block" button). Checked by App\Security\UserChecker, as
+     * the expiry checks below.
      */
-
-    public function isAccountNonLocked(): bool {
+    public function isAccountNonLocked(): bool
+    {
         return !$this->locked;
     }
 
-    public function isAccountNonExpired(): bool {
+    public function isAccountNonExpired(): bool
+    {
         if (true === $this->expired) {
             return false;
         }
@@ -1503,7 +1503,8 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
         return true;
     }
 
-    public function isCredentialsNonExpired(): bool {
+    public function isCredentialsNonExpired(): bool
+    {
         if (true === $this->credentialsExpired) {
             return false;
         }

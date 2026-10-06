@@ -1,7 +1,0 @@
-api_oauth2_load_deck:
-    path: /deck/load/{id}
-    methods: [GET]
-    defaults:
-        _controller: App\Controller\Oauth2Controller::loadDeckAction
-    requirements:
-        id: \d+

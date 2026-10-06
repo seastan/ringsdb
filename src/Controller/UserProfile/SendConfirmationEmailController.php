@@ -33,7 +33,7 @@ class SendConfirmationEmailController extends AbstractController
     public function __invoke(Request $request, string $username): Response
     {
         $user = $this->userRepository->findOneByUsername($username);
-        if (!$user) {
+        if (!$user instanceof \App\Entity\User) {
             throw new NotFoundHttpException("Cannot find user from username [{$username}]");
         }
 

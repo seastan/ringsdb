@@ -34,6 +34,13 @@ class UserInfoController extends AbstractController
     }
 
     /**
+     * Public (anonymous-safe) user info: the header widget calls this on every page to
+     * detect the login state. It must NOT be behind /api/private (ROLE_USER) — a protected
+     * route makes anonymous requests create a session (302 + Set-Cookie), which defeats the
+     * anonymous FastCGI cache and saturates php-fpm. infoAction already returns null for
+     * anonymous visitors. (api_private_user_info is kept for the API tests.).
+     *
+     * @Route("/api/public/user/info", name="api_public_user_info")
      * @Route("/api/private/user/info", name="api_private_user_info")
      */
     public function infoAction(Request $request, CardRepository $cardRepository, DecklistRepository $decklistRepository, FellowshipRepository $fellowshipRepository, QuestlogRepository $questlogRepository): Response

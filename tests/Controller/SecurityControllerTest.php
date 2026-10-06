@@ -139,7 +139,7 @@ class SecurityControllerTest extends WebTestCase
         // 2. user is created, disabled, with a confirmation token
         $user = $this->findUser($client, $username);
         $this->assertInstanceOf(User::class, $user);
-        $this->assertEquals($email, $user->getEmail());
+        $this->assertSame($email, $user->getEmail());
         $this->assertFalse($user->isEnabled());
         $this->assertNotEmpty($user->getConfirmationToken());
         $this->assertNotSame('secret123', $user->getPassword(), 'Password must be encoded');
