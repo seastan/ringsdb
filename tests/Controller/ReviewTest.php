@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Controller;
 
 use App\Listener\CoreExceptionListener;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -112,7 +113,7 @@ class ReviewTest extends WebTestCase
         );
     }
 
-    private function reviewText(): string
+    private static function reviewText(): string
     {
         return "Théodred is a **cheap** hero: he gives a resource to a questing hero.\n\nSee http://example.com/theodred";
     }
@@ -123,7 +124,7 @@ class ReviewTest extends WebTestCase
     {
         $client = $this->createAuthenticatedClient('admin');
 
-        $response = $this->ajax($client, '/review/post', ['card_id' => 2, 'review_id' => '', 'review' => $this->reviewText()]);
+        $response = $this->ajax($client, '/review/post', ['card_id' => 2, 'review_id' => '', 'review' => self::reviewText()]);
 
         $this->assertJsonAnswer($response, 200, ['success' => true]);
         $this->assertSame([[
@@ -143,9 +144,8 @@ class ReviewTest extends WebTestCase
 
     /**
      * Errors are generic exceptions: 500, with the message in the JSON answer.
-     *
-     * @dataProvider refusedReviewProvider
      */
+    #[DataProvider('refusedReviewProvider')]
     public function testRefusedReview(string $username, int $reputation, array $parameters, string $message): void
     {
         $client = $this->createAuthenticatedClient($username);
@@ -160,9 +160,9 @@ class ReviewTest extends WebTestCase
     /**
      * @return array<string, string[]|int[]|array<string, int|string>[]>
      */
-    public function refusedReviewProvider(): array
+    public static function refusedReviewProvider(): array
     {
-        $text = $this->reviewText();
+        $text = self::reviewText();
 
         return [
             // "test" already wrote 1 review, with a reputation of 1
@@ -184,7 +184,7 @@ class ReviewTest extends WebTestCase
         $releaseDate = $connection->fetchOne("SELECT date_release FROM pack WHERE code = 'HfG'");
         try {
             $connection->update('pack', ['date_release' => null], ['code' => 'HfG']);
-            $response = $this->ajax($client, '/review/post', ['card_id' => 74, 'review_id' => '', 'review' => $this->reviewText()]);
+            $response = $this->ajax($client, '/review/post', ['card_id' => 74, 'review_id' => '', 'review' => self::reviewText()]);
             $this->assertJsonAnswer($response, 500, ['success' => false, 'message' => 'You may not write a review for an unreleased card.']);
         } finally {
             $connection->update('pack', ['date_release' => $releaseDate], ['code' => 'HfG']);
@@ -196,7 +196,7 @@ class ReviewTest extends WebTestCase
     public function testAnonymousCannotWriteAReview(): void
     {
         $client = $this->client;
-        $response = $this->ajax($client, '/review/post', ['card_id' => 2, 'review' => $this->reviewText()]);
+        $response = $this->ajax($client, '/review/post', ['card_id' => 2, 'review' => self::reviewText()]);
 
         $this->assertJsonAnswer($response, 403, ['success' => false, 'message' => 'You are not logged in.']);
         $this->assertSame([], $this->newReviews());
@@ -227,9 +227,7 @@ class ReviewTest extends WebTestCase
         $this->assertSame($this->fixtureReview['text_md'], $this->db()->fetchOne('SELECT text_md FROM review WHERE id = 1'));
     }
 
-    /**
-     * @dataProvider refusedEditProvider
-     */
+    #[DataProvider('refusedEditProvider')]
     public function testRefusedEdit(string $username, int $reviewId, string $message): void
     {
         $client = $this->createAuthenticatedClient($username);
@@ -244,7 +242,7 @@ class ReviewTest extends WebTestCase
     /**
      * @return array<string, string[]|int[]>
      */
-    public function refusedEditProvider(): array
+    public static function refusedEditProvider(): array
     {
         return [
             "another user's review" => ['admin', 1, 'You cannot edit this review.'],
@@ -310,9 +308,7 @@ class ReviewTest extends WebTestCase
         $this->assertSame('Agreed &lt;b&gt;100%&lt;/b&gt; —', trim((string) preg_replace('/\s+/u', ' ', $text)));
     }
 
-    /**
-     * @dataProvider refusedCommentProvider
-     */
+    #[DataProvider('refusedCommentProvider')]
     public function testRefusedComment(array $parameters, string $message): void
     {
         $client = $this->createAuthenticatedClient('admin');
@@ -324,7 +320,7 @@ class ReviewTest extends WebTestCase
     /**
      * @return array<string, string[]|array<string, int|string>[]>
      */
-    public function refusedCommentProvider(): array
+    public static function refusedCommentProvider(): array
     {
         return [
             'empty comment' => [['comment_review_id' => 1, 'comment' => ' '], 'Your comment is empty.'],

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -146,9 +147,8 @@ class TagControllerTest extends WebTestCase
 
     /**
      * Unknown decks and other users' decks are skipped silently.
-     *
-     * @dataProvider actionProvider
      */
+    #[DataProvider('actionProvider')]
     public function testForeignAndUnknownDecksAreSkipped(string $action): void
     {
         $client = $this->createAuthenticatedClient('admin');
@@ -162,7 +162,7 @@ class TagControllerTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function actionProvider(): array
+    public static function actionProvider(): array
     {
         return ['add' => ['add'], 'remove' => ['remove'], 'clear' => ['clear']];
     }
@@ -170,9 +170,8 @@ class TagControllerTest extends WebTestCase
     /**
      * The JavaScript sends AJAX requests: an anonymous one gets a 403 JSON answer (built by
      * CoreExceptionListener). Nothing is changed.
-     *
-     * @dataProvider actionProvider
      */
+    #[DataProvider('actionProvider')]
     public function testAnonymousAjaxIsDenied(string $action): void
     {
         $client = $this->client;
@@ -183,9 +182,7 @@ class TagControllerTest extends WebTestCase
         $this->assertSame(array_column($this->fixtureDecks, 'tags', 'id'), $this->tags());
     }
 
-    /**
-     * @dataProvider actionProvider
-     */
+    #[DataProvider('actionProvider')]
     public function testAnonymousIsRedirectedToLogin(string $action): void
     {
         $client = $this->client;

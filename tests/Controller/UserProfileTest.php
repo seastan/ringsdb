@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
@@ -238,10 +239,7 @@ class UserProfileTest extends WebTestCase
     }
 
     /* -------------------------------------------------- change password */
-
-    /**
-     * @dataProvider invalidPasswordChangeProvider
-     */
+    #[DataProvider('invalidPasswordChangeProvider')]
     public function testInvalidPasswordChange(string $current, string $first, string $second, string $error): void
     {
         $client = $this->createAuthenticatedClient();
@@ -260,7 +258,7 @@ class UserProfileTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function invalidPasswordChangeProvider(): array
+    public static function invalidPasswordChangeProvider(): array
     {
         return [
             'wrong current password' => ['wrong', 'secret123', 'secret123', 'The entered password is invalid.'],

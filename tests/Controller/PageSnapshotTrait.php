@@ -14,7 +14,7 @@ use Symfony\Component\DomCrawler\Crawler;
  * (CSS classes, CSRF tokens, asset URLs...), which are expected to change during the migration.
  *
  * To (re)generate the snapshots, run the tests with UPDATE_SNAPSHOTS=1, then review the diff:
- *   docker compose exec -e UPDATE_SNAPSHOTS=1 -u www-data symfony php bin/simple-phpunit
+ *   make phpunit-update-snapshots
  */
 trait PageSnapshotTrait
 {

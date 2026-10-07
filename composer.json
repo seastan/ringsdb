@@ -16,7 +16,7 @@
         }
     },
     "require": {
-        "php": ">=8.3",
+        "php": ">=8.4",
         "ext-dom": "*",
         "ext-fileinfo": "*",
         "ext-iconv": "*",
@@ -74,19 +74,19 @@
         "symfony/validator": "*",
         "symfony/var-dumper": "*",
         "symfony/yaml": "*",
-        "twig/twig": "^2.10"
+        "twig/twig": "^3.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.95",
-        "nikic/php-parser": "^4.19",
+        "nikic/php-parser": "^5.0",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.2",
         "phpstan/phpstan-doctrine": "^2.0",
         "phpstan/phpstan-symfony": "^2.0",
+        "phpunit/phpunit": "^12",
         "rector/rector": "^2.6",
         "symfony/browser-kit": "*",
         "symfony/debug-bundle": "*",
-        "symfony/phpunit-bridge": "*",
         "symfony/process": "*",
         "symfony/stopwatch": "*",
         "symfony/web-profiler-bundle": "*"
@@ -107,7 +107,7 @@
     },
     "config": {
         "platform": {
-            "php": "8.3.35"
+            "php": "8.4.26"
         },
         "sort-packages": true,
         "allow-plugins": {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -35,9 +36,7 @@ class CardSearchTest extends WebTestCase
         return array_column(json_decode($client->getResponse()->getContent(), true), 'name');
     }
 
-    /**
-     * @dataProvider acronymProvider
-     */
+    #[DataProvider('acronymProvider')]
     public function testAcronym(string $acronym, array $expected): void
     {
         $names = $this->search($acronym);
@@ -49,7 +48,7 @@ class CardSearchTest extends WebTestCase
     /**
      * @return array<string, string[]|string[][]>
      */
-    public function acronymProvider(): array
+    public static function acronymProvider(): array
     {
         return [
             'initials' => ['LOS', ['Longbeard Orc Slayer']],

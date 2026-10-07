@@ -7,6 +7,7 @@ namespace App\Tests\Model;
 use App\Entity\User;
 use App\Model\FellowshipManager;
 use Doctrine\DBAL\Connection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -196,10 +197,7 @@ class FellowshipManagerTest extends KernelTestCase
     }
 
     /* ------------------------------------------------------------- search */
-
-    /**
-     * @dataProvider searchProvider
-     */
+    #[DataProvider('searchProvider')]
     public function testComplexSearch(array $query, array $expected, ?string $username = null): void
     {
         $this->assertSame($expected, $this->names($this->manager($query, $username)->findFellowshipsWithComplexSearch()));
@@ -208,7 +206,7 @@ class FellowshipManagerTest extends KernelTestCase
     /**
      * @return array<string, mixed[]>
      */
-    public function searchProvider(): array
+    public static function searchProvider(): array
     {
         return [
             'no criteria' => [[], ['F2', 'F3', 'F5', 'F1']],

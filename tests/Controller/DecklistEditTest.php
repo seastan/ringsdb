@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -156,9 +157,7 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame('PHPUnit Renamed · RingsDB', trim($crawler->filter('title')->text()));
     }
 
-    /**
-     * @dataProvider nameProvider
-     */
+    #[DataProvider('nameProvider')]
     public function testName(string $name, string $expected): void
     {
         $client = $this->createAuthenticatedClient();
@@ -170,7 +169,7 @@ class DecklistEditTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function nameProvider(): array
+    public static function nameProvider(): array
     {
         return [
             'empty' => ['  ', 'Untitled'],
@@ -181,9 +180,8 @@ class DecklistEditTest extends WebTestCase
 
     /**
      * The predecessor ("Derived from") is given as an id or as a decklist URL.
-     *
-     * @dataProvider precedentProvider
      */
+    #[DataProvider('precedentProvider')]
     public function testPrecedent(string $precedent, ?int $expected): void
     {
         $client = $this->createAuthenticatedClient();
@@ -195,7 +193,7 @@ class DecklistEditTest extends WebTestCase
     /**
      * @return array<string, string[]|string[]|null[]>
      */
-    public function precedentProvider(): array
+    public static function precedentProvider(): array
     {
         return [
             'id' => ['3', 3],
@@ -208,10 +206,7 @@ class DecklistEditTest extends WebTestCase
     }
 
     /* ------------------------------------------------------ access to edit */
-
-    /**
-     * @dataProvider editRouteProvider
-     */
+    #[DataProvider('editRouteProvider')]
     public function testAnotherUserCannotEdit(string $method, string $uri): void
     {
         $client = $this->createAuthenticatedClient('admin');
@@ -224,7 +219,7 @@ class DecklistEditTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function editRouteProvider(): array
+    public static function editRouteProvider(): array
     {
         return [
             'edit form' => ['GET', '/decklist/edit/1'],
@@ -247,9 +242,7 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame('Moderated', $this->fetchDecklist(1)['name']);
     }
 
-    /**
-     * @dataProvider editRouteProvider
-     */
+    #[DataProvider('editRouteProvider')]
     public function testAnonymousIsRedirectedToLogin(string $method, string $uri): void
     {
         $client = $this->client;
@@ -297,9 +290,8 @@ class DecklistEditTest extends WebTestCase
     /**
      * Refusals are 403 (AccessDeniedHttpException): anonymous users are not redirected to the
      * login page, unlike on the edit routes.
-     *
-     * @dataProvider refusedDeleteProvider
      */
+    #[DataProvider('refusedDeleteProvider')]
     public function testRefusedDelete(?string $username, int $decklist): void
     {
         $client = $username ? $this->createAuthenticatedClient($username) : $this->client;
@@ -312,7 +304,7 @@ class DecklistEditTest extends WebTestCase
     /**
      * @return array<string, string[]|int[]|null[]>
      */
-    public function refusedDeleteProvider(): array
+    public static function refusedDeleteProvider(): array
     {
         return [
             'with a comment' => ['test', 1],

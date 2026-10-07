@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -54,7 +55,7 @@ class ApiControllerTest extends WebTestCase
      *
      * @return array<string, string[]|string[]|null[]>
      */
-    public function jsonEndpointProvider(): array
+    public static function jsonEndpointProvider(): array
     {
         return [
             'packs' => ['packs', '/api/public/packs/', 'Wed, 25 Mar 2026 16:18:09 GMT'],
@@ -76,9 +77,7 @@ class ApiControllerTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider jsonEndpointProvider
-     */
+    #[DataProvider('jsonEndpointProvider')]
     public function testJsonEndpoint(string $snapshot, string $uri, ?string $lastModified): void
     {
         $client = $this->client;
@@ -106,10 +105,7 @@ class ApiControllerTest extends WebTestCase
     }
 
     /* -------------------------------------------------------------- JSONP */
-
-    /**
-     * @dataProvider jsonpEndpointProvider
-     */
+    #[DataProvider('jsonpEndpointProvider')]
     public function testJsonp(string $snapshot, string $uri): void
     {
         $client = $this->client;
@@ -126,9 +122,8 @@ class ApiControllerTest extends WebTestCase
     /**
      * Fixed: the callback was echoed as is into the script (XSS). It must be a JavaScript
      * identifier, dots and brackets allowed, not a reserved word; otherwise 400.
-     *
-     * @dataProvider invalidJsonpProvider
      */
+    #[DataProvider('invalidJsonpProvider')]
     public function testInvalidJsonpCallbackIsRefused(string $callback): void
     {
         $client = $this->client;
@@ -143,7 +138,7 @@ class ApiControllerTest extends WebTestCase
     /**
      * @return array<string, array{string}>
      */
-    public function invalidJsonpProvider(): array
+    public static function invalidJsonpProvider(): array
     {
         return [
             'script injection' => ['alert(document.cookie)//'],
@@ -177,7 +172,7 @@ class ApiControllerTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function jsonpEndpointProvider(): array
+    public static function jsonpEndpointProvider(): array
     {
         return [
             'packs' => ['packs', '/api/public/packs/'],
@@ -192,10 +187,7 @@ class ApiControllerTest extends WebTestCase
     }
 
     /* ------------------------------------------------------- HTTP caching */
-
-    /**
-     * @dataProvider cachedEndpointProvider
-     */
+    #[DataProvider('cachedEndpointProvider')]
     public function testNotModifiedSince(string $uri, string $lastModified): void
     {
         $client = $this->client;
@@ -212,7 +204,7 @@ class ApiControllerTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function cachedEndpointProvider(): array
+    public static function cachedEndpointProvider(): array
     {
         return [
             'packs' => ['/api/public/packs/', 'Wed, 25 Mar 2026 16:18:09 GMT'],
@@ -227,10 +219,7 @@ class ApiControllerTest extends WebTestCase
     }
 
     /* ------------------------------------------------------------- errors */
-
-    /**
-     * @dataProvider errorProvider
-     */
+    #[DataProvider('errorProvider')]
     public function testErrors(string $uri, int $expectedStatus): void
     {
         $client = $this->client;
@@ -242,7 +231,7 @@ class ApiControllerTest extends WebTestCase
     /**
      * @return array<string, array<int, string|int>>
      */
-    public function errorProvider(): array
+    public static function errorProvider(): array
     {
         return [
             'unknown pack' => ['/api/public/cards/nope', 404],
@@ -255,9 +244,7 @@ class ApiControllerTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider unsupportedFormatProvider
-     */
+    #[DataProvider('unsupportedFormatProvider')]
     public function testUnsupportedFormatOnCardsByPack(string $format, string $contentType): void
     {
         $client = $this->client;
@@ -271,7 +258,7 @@ class ApiControllerTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function unsupportedFormatProvider(): array
+    public static function unsupportedFormatProvider(): array
     {
         return [
             'xml' => ['xml', 'text/xml; charset=UTF-8'],

@@ -6,6 +6,7 @@ namespace App\Tests\Controller;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
@@ -184,9 +185,7 @@ class SecurityControllerTest extends WebTestCase
         $this->assertAuthenticatedAs($client, $username);
     }
 
-    /**
-     * @dataProvider invalidRegistrationProvider
-     */
+    #[DataProvider('invalidRegistrationProvider')]
     public function testRegistrationValidationErrors(string $username, string $email, string $password, ?string $confirmation, string $expectedError): void
     {
         $client = $this->client;
@@ -204,7 +203,7 @@ class SecurityControllerTest extends WebTestCase
     /**
      * @return array<string, string[]|string[]|null[]>
      */
-    public function invalidRegistrationProvider(): array
+    public static function invalidRegistrationProvider(): array
     {
         return [
             'password mismatch' => [self::PREFIX.'sam', 'phpunit_sam@example.com', 'secret123', 'other123', 'The entered passwords don'],
@@ -273,9 +272,7 @@ class SecurityControllerTest extends WebTestCase
         $this->assertRedirectsTo($client, '#^http://localhost/decks$#');
     }
 
-    /**
-     * @dataProvider invalidCredentialsProvider
-     */
+    #[DataProvider('invalidCredentialsProvider')]
     public function testLoginWithInvalidCredentials(string $username, string $password): void
     {
         $client = $this->client;
@@ -291,7 +288,7 @@ class SecurityControllerTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function invalidCredentialsProvider(): array
+    public static function invalidCredentialsProvider(): array
     {
         return [
             'wrong password' => ['test', 'wrong'],

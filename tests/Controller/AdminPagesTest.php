@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -47,7 +48,7 @@ class AdminPagesTest extends WebTestCase
     /**
      * GET pages of the admin area: [uri, snapshot name or null].
      */
-    public function adminPageProvider(): array
+    public static function adminPageProvider(): array
     {
         $pages = [
             'home' => ['/admin/', 'index'],
@@ -76,11 +77,8 @@ class AdminPagesTest extends WebTestCase
     }
 
     /* ----------------------------------------------------- access control */
-
-    /**
-     * @dataProvider adminPageProvider
-     */
-    public function testAnonymousIsRedirectedToLogin(string $uri): void
+    #[DataProvider('adminPageProvider')]
+    public function testAnonymousIsRedirectedToLogin(string $uri, ?string $snapshot): void
     {
         $client = $this->client;
         $client->request('GET', $uri);
@@ -89,10 +87,8 @@ class AdminPagesTest extends WebTestCase
         $this->assertSame('http://localhost/login', $client->getResponse()->headers->get('Location'));
     }
 
-    /**
-     * @dataProvider adminPageProvider
-     */
-    public function testUsersAreDenied(string $uri): void
+    #[DataProvider('adminPageProvider')]
+    public function testUsersAreDenied(string $uri, ?string $snapshot): void
     {
         $client = $this->createAuthenticatedClient('test');
         $client->request('GET', $uri);
@@ -102,9 +98,8 @@ class AdminPagesTest extends WebTestCase
 
     /**
      * Write routes are denied to users before anything is done.
-     *
-     * @dataProvider writeRouteProvider
      */
+    #[DataProvider('writeRouteProvider')]
     public function testUsersCannotWrite(string $method, string $uri, array $parameters): void
     {
         $client = $this->createAuthenticatedClient('test');
@@ -119,7 +114,7 @@ class AdminPagesTest extends WebTestCase
     /**
      * @return array<string, mixed[]>
      */
-    public function writeRouteProvider(): array
+    public static function writeRouteProvider(): array
     {
         return [
             'create' => ['POST', '/admin/cycle/create', ['appbundle_cycle' => ['code' => 'X', 'name' => 'Hacked', 'position' => 99]]],
@@ -136,14 +131,12 @@ class AdminPagesTest extends WebTestCase
      * The pages with a text snapshot (the big lists are checked by testBigLists, the statistics
      * by testStatistics).
      */
-    public function snapshotPageProvider(): array
+    public static function snapshotPageProvider(): array
     {
-        return array_filter($this->adminPageProvider(), fn (array $page): bool => null !== $page[1]);
+        return array_filter(self::adminPageProvider(), fn (array $page): bool => null !== $page[1]);
     }
 
-    /**
-     * @dataProvider snapshotPageProvider
-     */
+    #[DataProvider('snapshotPageProvider')]
     public function testAdminPage(string $uri, $snapshot): void
     {
         $client = $this->createAuthenticatedClient('admin');
@@ -153,9 +146,7 @@ class AdminPagesTest extends WebTestCase
         $this->assertMatchesSnapshot("admin/$snapshot.txt", self::pageText($crawler));
     }
 
-    /**
-     * @dataProvider bigListProvider
-     */
+    #[DataProvider('bigListProvider')]
     public function testBigLists(string $uri, string $table): void
     {
         $client = $this->createAuthenticatedClient('admin');
@@ -168,7 +159,7 @@ class AdminPagesTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function bigListProvider(): array
+    public static function bigListProvider(): array
     {
         return [
             'cards' => ['/admin/card/', 'card'],
@@ -178,9 +169,8 @@ class AdminPagesTest extends WebTestCase
 
     /**
      * The statistics are JSON, for a month (default: last month, so the tests give one).
-     *
-     * @dataProvider statisticsProvider
      */
+    #[DataProvider('statisticsProvider')]
     public function testStatistics(string $uri, string $snapshot): void
     {
         $client = $this->createAuthenticatedClient('admin');
@@ -194,7 +184,7 @@ class AdminPagesTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function statisticsProvider(): array
+    public static function statisticsProvider(): array
     {
         return [
             'decks and users by cycle' => ['/admin/stat?month=2015-08', 'stat_2015-08'],

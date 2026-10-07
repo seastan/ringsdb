@@ -660,7 +660,7 @@ value types and `{}` vs `[]`, but not on whitespace or JSON escaping. Status cod
 checked too, as well as `304 Not Modified` on `If-Modified-Since` and JSONP (`?jsonp=callback`).
 
 Regenerate the snapshots only on purpose, and review the diff:
-`docker compose exec -e UPDATE_SNAPSHOTS=1 -u www-data symfony php bin/simple-phpunit`
+`make phpunit-update-snapshots`
 
 The private API (`/api/private`) is kept: the site's own JavaScript uses its 4 routes,
 authenticated by the regular session cookie (`api_private_load_deck`, `api_private_my_decks`,

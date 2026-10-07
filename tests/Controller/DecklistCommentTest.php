@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Mime\Address;
@@ -191,9 +192,7 @@ class DecklistCommentTest extends WebTestCase
         }
     }
 
-    /**
-     * @dataProvider markdownProvider
-     */
+    #[DataProvider('markdownProvider')]
     public function testCommentMarkdown(string $text, string $expectedHtml): void
     {
         $client = $this->createAuthenticatedClient('test');
@@ -207,7 +206,7 @@ class DecklistCommentTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function markdownProvider(): array
+    public static function markdownProvider(): array
     {
         return [
             'bare URLs become links' => ['See http://example.com/page', '<p>See <a href="http://example.com/page">example.com</a></p>'],

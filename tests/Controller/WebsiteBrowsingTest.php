@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -59,7 +60,7 @@ class WebsiteBrowsingTest extends WebTestCase
      *
      * @return array<string, string[]>
      */
-    public function publicPageProvider(): array
+    public static function publicPageProvider(): array
     {
         return [
             'home' => ['/', 'index', 'Deckbuilder · RingsDB'],
@@ -95,17 +96,13 @@ class WebsiteBrowsingTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider publicPageProvider
-     */
+    #[DataProvider('publicPageProvider')]
     public function testPublicPageAsAnonymous(string $uri, string $snapshot, string $title): void
     {
         $this->assertPage($this->client, $uri, 'anonymous/'.$snapshot, $title);
     }
 
-    /**
-     * @dataProvider publicPageProvider
-     */
+    #[DataProvider('publicPageProvider')]
     public function testPublicPageAsUser(string $uri, string $snapshot, string $title): void
     {
         $this->assertPage($this->createAuthenticatedClient(), $uri, 'user/'.$snapshot, $title);
@@ -117,7 +114,7 @@ class WebsiteBrowsingTest extends WebTestCase
      *
      * @return array<string, string[]>
      */
-    public function memberPageProvider(): array
+    public static function memberPageProvider(): array
     {
         return [
             'my decks' => ['/decks', 'decks', 'My Decks · RingsDB'],
@@ -147,9 +144,7 @@ class WebsiteBrowsingTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider memberPageProvider
-     */
+    #[DataProvider('memberPageProvider')]
     public function testMemberPage(string $uri, string $snapshot, string $title): void
     {
         $this->assertPage($this->createAuthenticatedClient(), $uri, 'user/'.$snapshot, $title);
@@ -161,7 +156,7 @@ class WebsiteBrowsingTest extends WebTestCase
      *
      * @return array<string, string[]|int[]>
      */
-    public function anonymousAccessProvider(): array
+    public static function anonymousAccessProvider(): array
     {
         $login = 'http://localhost/login';
 
@@ -191,9 +186,7 @@ class WebsiteBrowsingTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider anonymousAccessProvider
-     */
+    #[DataProvider('anonymousAccessProvider')]
     public function testAnonymousAccessIsDenied(string $uri, int $status, string $expected): void
     {
         $client = $this->client;
@@ -220,7 +213,7 @@ class WebsiteBrowsingTest extends WebTestCase
      *
      * @return array<string, string[]>
      */
-    public function redirectProvider(): array
+    public static function redirectProvider(): array
     {
         return [
             'search matching a pack' => ['/find?q=e:Core', '/set/Core/list/name'],
@@ -231,9 +224,7 @@ class WebsiteBrowsingTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider redirectProvider
-     */
+    #[DataProvider('redirectProvider')]
     public function testRedirect(string $uri, string $location): void
     {
         $client = $this->client;
@@ -248,7 +239,7 @@ class WebsiteBrowsingTest extends WebTestCase
      *
      * @return array<string, string[]>
      */
-    public function notFoundProvider(): array
+    public static function notFoundProvider(): array
     {
         return [
             'unknown pack' => ['/set/nope', 'This pack does not exist (404 Not Found)'],
@@ -259,9 +250,7 @@ class WebsiteBrowsingTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider notFoundProvider
-     */
+    #[DataProvider('notFoundProvider')]
     public function testNotFound(string $uri, string $title): void
     {
         $client = $this->client;
@@ -277,7 +266,7 @@ class WebsiteBrowsingTest extends WebTestCase
      *
      * @return array<string, string[]|bool[]>
      */
-    public function downloadProvider(): array
+    public static function downloadProvider(): array
     {
         return [
             'decklist as text' => ['/decklist/export/text/1', 'decklist_1.txt', 'text/plain; charset=UTF-8', 'attachment; filename=dwarfloreleadershiptactics-1.0.txt', false],
@@ -287,9 +276,7 @@ class WebsiteBrowsingTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider downloadProvider
-     */
+    #[DataProvider('downloadProvider')]
     public function testDownload(string $uri, string $snapshot, string $contentType, string $disposition, bool $authenticated): void
     {
         $client = $authenticated ? $this->createAuthenticatedClient() : $this->client;
@@ -310,7 +297,7 @@ class WebsiteBrowsingTest extends WebTestCase
      *
      * @return array<string, string[]|array<string, string>[]>
      */
-    public function zipDownloadProvider(): array
+    public static function zipDownloadProvider(): array
     {
         return [
             'decks as text' => ['/deck/export/text/list?ids[]=1&ids[]=2', [
@@ -344,9 +331,7 @@ class WebsiteBrowsingTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider zipDownloadProvider
-     */
+    #[DataProvider('zipDownloadProvider')]
     public function testZipDownload(string $uri, array $entries): void
     {
         $client = $this->createAuthenticatedClient();
