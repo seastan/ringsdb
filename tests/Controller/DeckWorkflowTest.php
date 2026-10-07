@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -139,7 +140,7 @@ class DeckWorkflowTest extends WebTestCase
     /**
      * @return array<string, int>
      */
-    private function coreLeadershipDeck(): array
+    private static function coreLeadershipDeck(): array
     {
         $main = ['01001' => 1, '01002' => 1, '01003' => 1];
         foreach (range(13, 29) as $i) {
@@ -172,7 +173,7 @@ class DeckWorkflowTest extends WebTestCase
         $this->assertSame([], $this->fetchSlots('deckslot', 'deck_id', $deckId));
 
         // 2. first save: 3 heroes + 51 cards
-        $main = $this->coreLeadershipDeck();
+        $main = self::coreLeadershipDeck();
         $this->saveDeck($client, $deckId, 'PHPUnit Leadership', 'First *version*', 'leadership core', $main);
 
         $this->assertSame([
@@ -293,7 +294,7 @@ class DeckWorkflowTest extends WebTestCase
         $client = $this->createAuthenticatedClient();
         $deckId = $this->createDeck($client);
         // start from a non-empty deck, to check that saving empties it
-        $this->saveDeck($client, $deckId, 'PHPUnit Full', '', '', $this->coreLeadershipDeck());
+        $this->saveDeck($client, $deckId, 'PHPUnit Full', '', '', self::coreLeadershipDeck());
 
         $this->saveDeck($client, $deckId, 'PHPUnit Empty', '', '', []);
 
@@ -307,9 +308,7 @@ class DeckWorkflowTest extends WebTestCase
         $this->assertSame(200, $client->getResponse()->getStatusCode());
     }
 
-    /**
-     * @dataProvider refusedContentProvider
-     */
+    #[DataProvider('refusedContentProvider')]
     public function testSavingADeckWithoutCardsIsRefused(string|bool $content): void
     {
         $client = $this->createAuthenticatedClient();
@@ -330,7 +329,7 @@ class DeckWorkflowTest extends WebTestCase
     /**
      * @return array<string, string[]|string[]|bool[]>
      */
-    public function refusedContentProvider(): array
+    public static function refusedContentProvider(): array
     {
         return [
             'no main' => [json_encode(['side' => []])],
@@ -363,7 +362,7 @@ class DeckWorkflowTest extends WebTestCase
         $this->assertSame(['success' => false, 'error' => 'Cannot save an empty deck.'], json_decode($response->getContent(), true));
         $this->assertSame('New Deck', $this->fetchDeck($deckId)['name']);
 
-        $main = $this->coreLeadershipDeck();
+        $main = self::coreLeadershipDeck();
         $response = $post(json_encode(['main' => $main, 'side' => []]));
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame(['success' => true, 'id' => $deckId], json_decode($response->getContent(), true));
@@ -400,9 +399,8 @@ class DeckWorkflowTest extends WebTestCase
      * The import page parses the pasted text in JavaScript and posts the result, as the builder
      * does, to /deck/save: {"main": {...}, "side": {...}}, or an empty "content" if nothing was
      * pasted.
-     *
-     * @dataProvider importProvider
      */
+    #[DataProvider('importProvider')]
     public function testImportPage(string|bool $content, ?array $expectedSlots): void
     {
         $client = $this->createAuthenticatedClient();
@@ -433,9 +431,9 @@ class DeckWorkflowTest extends WebTestCase
     /**
      * @return array<string, string[]|bool[]|array<string, int>[]|null[]>
      */
-    public function importProvider(): array
+    public static function importProvider(): array
     {
-        $main = $this->coreLeadershipDeck();
+        $main = self::coreLeadershipDeck();
 
         return [
             'a deck' => [json_encode(['main' => $main, 'side' => new \stdClass()]), $main],
@@ -448,9 +446,8 @@ class DeckWorkflowTest extends WebTestCase
     /**
      * The file is parsed on the server and forwarded to /deck/save. A file without any
      * recognized card gives {"main": [], "side": []}, which the guard refuses.
-     *
-     * @dataProvider fileImportProvider
      */
+    #[DataProvider('fileImportProvider')]
     public function testFileImport(string $filename, string $fileContent, array $expectedSlots, ?string $expectedProblem = null): void
     {
         $client = $this->createAuthenticatedClient();
@@ -474,7 +471,7 @@ class DeckWorkflowTest extends WebTestCase
     /**
      * @return array<string, string[]|array<string, int>[]|never[][]>
      */
-    public function fileImportProvider(): array
+    public static function fileImportProvider(): array
     {
         return [
             'text file' => ['PHPUnit Text.txt', "1x Aragorn\n3x Guard of the Citadel\n", ['01001' => 1, '01013' => 3], 'too_few_cards'],
@@ -486,9 +483,8 @@ class DeckWorkflowTest extends WebTestCase
 
     /**
      * A deck exported as text ("1x Gimli (Core Set)" lines) can be imported back as is.
-     *
-     * @dataProvider fixtureDeckProvider
      */
+    #[DataProvider('fixtureDeckProvider')]
     public function testTextExportCanBeImportedBack(int $deckId): void
     {
         $client = $this->createAuthenticatedClient();
@@ -515,9 +511,8 @@ class DeckWorkflowTest extends WebTestCase
     /**
      * A deck exported for OCTGN (.o8d, the octgnid of each card's primary printing) can be
      * imported back as is.
-     *
-     * @dataProvider fixtureDeckProvider
      */
+    #[DataProvider('fixtureDeckProvider')]
     public function testOctgnExportCanBeImportedBack(int $deckId): void
     {
         $client = $this->createAuthenticatedClient();
@@ -545,7 +540,7 @@ class DeckWorkflowTest extends WebTestCase
     /**
      * @return array<string, int[]>
      */
-    public function fixtureDeckProvider(): array
+    public static function fixtureDeckProvider(): array
     {
         return [
             'deck 1' => [1],
@@ -668,9 +663,8 @@ class DeckWorkflowTest extends WebTestCase
     /**
      * The tags typed in the builder are split on spaces; empty tags are dropped, and a deck
      * without tags gets the spheres of its heroes.
-     *
-     * @dataProvider tagsProvider
      */
+    #[DataProvider('tagsProvider')]
     public function testSavedTags(string $tags, string $expected): void
     {
         $client = $this->createAuthenticatedClient();
@@ -680,7 +674,7 @@ class DeckWorkflowTest extends WebTestCase
             'id' => $deckId,
             'name' => 'PHPUnit Tags',
             'tags' => $tags,
-            'content' => json_encode(['main' => $this->coreLeadershipDeck(), 'side' => []]),
+            'content' => json_encode(['main' => self::coreLeadershipDeck(), 'side' => []]),
         ]);
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -690,7 +684,7 @@ class DeckWorkflowTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function tagsProvider(): array
+    public static function tagsProvider(): array
     {
         return [
             'tags' => ['gondor leadership', 'gondor leadership'],
@@ -718,9 +712,7 @@ class DeckWorkflowTest extends WebTestCase
         $this->assertSame(0, $this->db()->fetchOne('SELECT COUNT(*) FROM decklist WHERE parent_deck_id = ?', [$deckId]));
     }
 
-    /**
-     * @dataProvider invalidDeckIdProvider
-     */
+    #[DataProvider('invalidDeckIdProvider')]
     public function testPublishingAnUnknownDeckIsABadRequest(array $parameters): void
     {
         $client = $this->createAuthenticatedClient();
@@ -733,7 +725,7 @@ class DeckWorkflowTest extends WebTestCase
     /**
      * @return array<string, array<int, array<string, int>>|array<int, never[]>>
      */
-    public function invalidDeckIdProvider(): array
+    public static function invalidDeckIdProvider(): array
     {
         return [
             'unknown deck' => [['deck_id' => 999]],

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -90,7 +91,7 @@ class ApiPrivateControllerTest extends WebTestCase
      *
      * @return array<string, string[]>
      */
-    public function cacheableEndpointProvider(): array
+    public static function cacheableEndpointProvider(): array
     {
         return [
             'my decks: decklists then decks' => ['test', '/api/private/decks', 'private/decks_test'],
@@ -101,9 +102,7 @@ class ApiPrivateControllerTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider cacheableEndpointProvider
-     */
+    #[DataProvider('cacheableEndpointProvider')]
     public function testCacheableEndpoint(string $user, string $uri, string $snapshot): void
     {
         $client = $this->createAuthenticatedClient($user);
@@ -118,7 +117,7 @@ class ApiPrivateControllerTest extends WebTestCase
      *
      * @return array<string, string[]|never[][]|array<string, bool|string>[]>
      */
-    public function uncachedEndpointProvider(): array
+    public static function uncachedEndpointProvider(): array
     {
         $notShared = 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.';
 
@@ -134,9 +133,8 @@ class ApiPrivateControllerTest extends WebTestCase
 
     /**
      * Errors are answered with a 200 and {"success": false, "error": ...}.
-     *
-     * @dataProvider uncachedEndpointProvider
      */
+    #[DataProvider('uncachedEndpointProvider')]
     public function testUncachedEndpoint(string $user, string $uri, array $expected): void
     {
         $client = $this->createAuthenticatedClient($user);
@@ -170,11 +168,8 @@ class ApiPrivateControllerTest extends WebTestCase
     }
 
     /* ------------------------------------------------------- HTTP caching */
-
-    /**
-     * @dataProvider cacheableEndpointProvider
-     */
-    public function testNotModifiedSince(string $user, string $uri): void
+    #[DataProvider('cacheableEndpointProvider')]
+    public function testNotModifiedSince(string $user, string $uri, string $snapshot): void
     {
         $client = $this->createAuthenticatedClient($user);
 
@@ -190,7 +185,7 @@ class ApiPrivateControllerTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function privateUriProvider(): array
+    public static function privateUriProvider(): array
     {
         return [
             'my decks' => ['/api/private/decks'],
@@ -200,9 +195,7 @@ class ApiPrivateControllerTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider privateUriProvider
-     */
+    #[DataProvider('privateUriProvider')]
     public function testAnonymousAjaxIsDenied(string $uri): void
     {
         $client = $this->client;
@@ -213,9 +206,7 @@ class ApiPrivateControllerTest extends WebTestCase
         $this->assertSame(['success' => false, 'message' => 'Access Denied.'], json_decode($response->getContent(), true));
     }
 
-    /**
-     * @dataProvider privateUriProvider
-     */
+    #[DataProvider('privateUriProvider')]
     public function testAnonymousIsRedirectedToLogin(string $uri): void
     {
         $client = $this->client;

@@ -117,9 +117,9 @@ class AdminCsvTest extends WebTestCase
         $in = fopen(self::SAMPLE, 'r');
         self::assertNotFalse($in);
         fseek($in, 3); // UTF-8 BOM
-        $header = (array) fgetcsv($in);
+        $header = (array) fgetcsv($in, escape: '\\');
         $lines = [];
-        while (is_array($row = fgetcsv($in))) {
+        while (is_array($row = fgetcsv($in, escape: '\\'))) {
             $row = $change(array_combine($header, $row));
             if (null !== $row) {
                 $lines[] = $this->csvLine(array_values($row));
@@ -141,7 +141,7 @@ class AdminCsvTest extends WebTestCase
     {
         $stream = fopen('php://memory', 'r+');
         self::assertNotFalse($stream);
-        fputcsv($stream, $values);
+        fputcsv($stream, $values, escape: '\\');
         rewind($stream);
 
         return rtrim((string) stream_get_contents($stream), "\n")."\r\n";

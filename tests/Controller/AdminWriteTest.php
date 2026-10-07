@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -115,7 +116,7 @@ class AdminWriteTest extends WebTestCase
      *
      * @return array<string, string[]|array<string, bool|string>[]|array<string, string>[]>
      */
-    public function crudProvider(): array
+    public static function crudProvider(): array
     {
         return [
             'cycle' => ['cycle', 'appbundle_cycletype', 'cycle',
@@ -169,9 +170,7 @@ class AdminWriteTest extends WebTestCase
         ];
     }
 
-    /**
-     * @dataProvider crudProvider
-     */
+    #[DataProvider('crudProvider')]
     public function testCreateEditDelete(string $slug, string $formName, string $table, array $created, array $expectedCreated, array $updated, array $expectedUpdated): void
     {
         $client = $this->createAdminClient();
@@ -286,10 +285,7 @@ class AdminWriteTest extends WebTestCase
     }
 
     /* -------------------------------------------------------- moderation */
-
-    /**
-     * @dataProvider findUserProvider
-     */
+    #[DataProvider('findUserProvider')]
     public function testFindUser(array $values, string $location): void
     {
         $client = $this->createAdminClient();
@@ -302,7 +298,7 @@ class AdminWriteTest extends WebTestCase
     /**
      * @return array<string, string[]|array<string, string>[]>
      */
-    public function findUserProvider(): array
+    public static function findUserProvider(): array
     {
         return [
             'by username' => [['username' => 'test'], '/admin/user/show/1'],

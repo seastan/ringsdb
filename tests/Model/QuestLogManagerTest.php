@@ -7,6 +7,7 @@ namespace App\Tests\Model;
 use App\Entity\User;
 use App\Model\QuestLogManager;
 use Doctrine\DBAL\Connection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -197,10 +198,7 @@ class QuestLogManagerTest extends KernelTestCase
     }
 
     /* ------------------------------------------------------------- search */
-
-    /**
-     * @dataProvider searchProvider
-     */
+    #[DataProvider('searchProvider')]
     public function testComplexSearch(array $query, array $expected, ?string $username = null): void
     {
         $this->assertSame($expected, $this->names($this->manager($query, $username)->findQuestLogsWithComplexSearch()));
@@ -209,7 +207,7 @@ class QuestLogManagerTest extends KernelTestCase
     /**
      * @return array<string, mixed[]>
      */
-    public function searchProvider(): array
+    public static function searchProvider(): array
     {
         return [
             'no criteria' => [[], ['Q2', 'Q3', 'Q5', 'Q1']],

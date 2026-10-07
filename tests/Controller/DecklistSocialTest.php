@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -171,10 +172,7 @@ class DecklistSocialTest extends WebTestCase
     }
 
     /* ------------------------------------------------------------ access */
-
-    /**
-     * @dataProvider actionProvider
-     */
+    #[DataProvider('actionProvider')]
     public function testAnonymousAjaxIsDenied(string $action): void
     {
         $client = $this->client;
@@ -188,14 +186,12 @@ class DecklistSocialTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function actionProvider(): array
+    public static function actionProvider(): array
     {
         return ['favorite' => ['favorite'], 'vote' => ['like']];
     }
 
-    /**
-     * @dataProvider actionProvider
-     */
+    #[DataProvider('actionProvider')]
     public function testGetIsNotAllowed(string $action): void
     {
         $client = $this->createAuthenticatedClient('admin');

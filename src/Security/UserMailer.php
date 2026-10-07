@@ -43,7 +43,7 @@ class UserMailer
         $context = ['user' => $user, 'confirmationUrl' => $confirmationUrl];
         $template = $this->twig->load($templateName);
 
-        $message = (new Email())
+        $message = new Email()
             ->subject($template->renderBlock('subject', $context))
             ->from(new Address($this->senderAddress, $this->senderName))
             ->to((string) $user->getEmail())

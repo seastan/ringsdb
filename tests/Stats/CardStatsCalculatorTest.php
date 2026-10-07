@@ -7,6 +7,7 @@ namespace App\Tests\Stats;
 use App\Stats\CardStatsCalculator;
 use App\Tests\Controller\JsonSnapshotTrait;
 use Doctrine\DBAL\Connection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -142,10 +143,7 @@ class CardStatsCalculatorTest extends KernelTestCase
     }
 
     /* --------------------------------------------------------- fixtures */
-
-    /**
-     * @dataProvider stepProvider
-     */
+    #[DataProvider('stepProvider')]
     public function testFixtureMonthSnapshot(string $step): void
     {
         $this->assertMatchesJsonSnapshot("stats/cards_2015-08_step$step", json_encode($this->calculator->computeCards('2015-08', $step)));
@@ -154,7 +152,7 @@ class CardStatsCalculatorTest extends KernelTestCase
     /**
      * @return array<string, string[]>
      */
-    public function stepProvider(): array
+    public static function stepProvider(): array
     {
         return ['full decks' => ['1'], 'limited decks' => ['2'], 'sideboards and totals' => ['3']];
     }
@@ -234,9 +232,8 @@ class CardStatsCalculatorTest extends KernelTestCase
     /**
      * Which private decks belong to a month changed in 2022: the update date before July 2022,
      * the creation or update date in July 2022, the creation date from August 2022.
-     *
-     * @dataProvider monthRuleProvider
      */
+    #[DataProvider('monthRuleProvider')]
     public function testMonthRuleForPrivateDecks(string $month, string $created, string $updated, bool $counted): void
     {
         $this->insertDeck(['date_creation' => $created, 'date_update' => $updated], [1 => 1]);
@@ -248,7 +245,7 @@ class CardStatsCalculatorTest extends KernelTestCase
     /**
      * @return array<string, string[]|bool[]>
      */
-    public function monthRuleProvider(): array
+    public static function monthRuleProvider(): array
     {
         return [
             'before 2022-07: updated in the month' => ['2021-03', '2020-01-01 00:00:00', '2021-03-15 00:00:00', true],

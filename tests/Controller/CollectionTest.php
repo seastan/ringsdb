@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -233,9 +234,7 @@ class CollectionTest extends WebTestCase
         $this->assertSame('Test Custom Pack', $this->fetchPack(1)['name']);
     }
 
-    /**
-     * @dataProvider foreignPackRouteProvider
-     */
+    #[DataProvider('foreignPackRouteProvider')]
     public function testCannotChangeAnotherUsersPack(string $method, string $uri): void
     {
         $client = $this->createAuthenticatedClient('admin');
@@ -249,7 +248,7 @@ class CollectionTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function foreignPackRouteProvider(): array
+    public static function foreignPackRouteProvider(): array
     {
         return [
             'edit form' => ['GET', '/collection/custom-pack/1/edit'],
@@ -285,9 +284,7 @@ class CollectionTest extends WebTestCase
         $this->assertSame($this->maxIds['user_custom_pack'], $this->db()->fetchOne('SELECT MAX(id) FROM user_custom_pack'));
     }
 
-    /**
-     * @dataProvider anonymousRouteProvider
-     */
+    #[DataProvider('anonymousRouteProvider')]
     public function testAnonymousIsRedirectedToLogin(string $uri): void
     {
         $client = $this->client;
@@ -300,7 +297,7 @@ class CollectionTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function anonymousRouteProvider(): array
+    public static function anonymousRouteProvider(): array
     {
         return [
             'owned packs' => ['/collection/packs/save'],

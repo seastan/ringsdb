@@ -43,13 +43,13 @@ class AssetsCardImageLocatorTest extends TestCase
 
     public function testCardImageUrl(): void
     {
-        $this->assertSame('/bundles/cards/01001.png?v1', $this->locator->getCardImageUrl((new Card())->setCode('01001')));
-        $this->assertNull($this->locator->getCardImageUrl((new Card())->setCode('01002')));
+        $this->assertSame('/bundles/cards/01001.png?v1', $this->locator->getCardImageUrl(new Card()->setCode('01001')));
+        $this->assertNull($this->locator->getCardImageUrl(new Card()->setCode('01002')));
     }
 
     public function testPrintingImageUrl(): void
     {
-        $this->assertSame('/bundles/cards/01001.png?v1', $this->locator->getPrintingImageUrl((new CardPrinting())->setImageCode('01001')));
-        $this->assertNull($this->locator->getPrintingImageUrl((new CardPrinting())->setImageCode('01002')));
+        $this->assertSame('/bundles/cards/01001.png?v1', $this->locator->getPrintingImageUrl(new CardPrinting()->setImageCode('01001')));
+        $this->assertNull($this->locator->getPrintingImageUrl(new CardPrinting()->setImageCode('01002')));
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -326,9 +327,8 @@ class DeckManagementTest extends WebTestCase
      * An empty diff creates no history entry (the builder does not send empty diffs). It did
      * before PHP 7.4: the diff was decoded as objects, and count() of an object was always 1; an
      * empty diff in 2 parts read the missing parts 3 and 4 (undefined offset).
-     *
-     * @dataProvider emptyDiffProvider
      */
+    #[DataProvider('emptyDiffProvider')]
     public function testAutosaveEmptyDiff(string $diff): void
     {
         $client = $this->createAuthenticatedClient();
@@ -344,7 +344,7 @@ class DeckManagementTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function emptyDiffProvider(): array
+    public static function emptyDiffProvider(): array
     {
         return [
             'in 4 parts' => ['[{},{},{},{}]'],
@@ -363,9 +363,7 @@ class DeckManagementTest extends WebTestCase
         $this->assertSame('[{"01001":1},[]]', $this->db()->fetchOne('SELECT variation FROM deckchange WHERE deck_id = ?', [$id]));
     }
 
-    /**
-     * @dataProvider invalidAutosaveProvider
-     */
+    #[DataProvider('invalidAutosaveProvider')]
     public function testInvalidAutosave(string $username, ?int $deckId, string $diff, int $status, string $message): void
     {
         $client = $this->createAuthenticatedClient($username);
@@ -382,7 +380,7 @@ class DeckManagementTest extends WebTestCase
     /**
      * @return array<string, string[]|int[]|null[]>
      */
-    public function invalidAutosaveProvider(): array
+    public static function invalidAutosaveProvider(): array
     {
         return [
             'unknown deck' => ['test', 999, '[[],[],[],[]]', 500, 'Cannot find deck 999'],
@@ -490,10 +488,7 @@ class DeckManagementTest extends WebTestCase
     }
 
     /* ------------------------------------------------------------ access */
-
-    /**
-     * @dataProvider anonymousRouteProvider
-     */
+    #[DataProvider('anonymousRouteProvider')]
     public function testAnonymousIsRedirectedToLogin(string $method, string $uri): void
     {
         $client = $this->client;
@@ -507,7 +502,7 @@ class DeckManagementTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function anonymousRouteProvider(): array
+    public static function anonymousRouteProvider(): array
     {
         return [
             'clone' => ['GET', '/deck/clone/1'],

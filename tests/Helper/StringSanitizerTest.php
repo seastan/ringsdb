@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Helper;
 
 use App\Helper\StringSanitizer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -12,9 +13,7 @@ use PHPUnit\Framework\TestCase;
  */
 class StringSanitizerTest extends TestCase
 {
-    /**
-     * @dataProvider valueProvider
-     */
+    #[DataProvider('valueProvider')]
     public function testSanitize(mixed $value, string $encoded, string $notEncoded): void
     {
         $this->assertSame($encoded, StringSanitizer::sanitize($value));
@@ -24,7 +23,7 @@ class StringSanitizerTest extends TestCase
     /**
      * @return array<string, string[]|int[]|string[]|string[][]|null[]>
      */
-    public function valueProvider(): array
+    public static function valueProvider(): array
     {
         return [
             'plain text' => ['Dwarf Deck', 'Dwarf Deck', 'Dwarf Deck'],

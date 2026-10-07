@@ -43,15 +43,18 @@ test-fixtures:
 	$(EXEC_SYMFONY) php bin/console doctrine:migrations:migrate -n --env=test
 	$(EXEC_SYMFONY) php bin/console doctrine:fixtures:load --append --env=test
 
+# Xdebug is off: with it (develop mode), PHP segfaults in the middle of the suite
+PHPUNIT := $(EXEC) -it -u www-data -e XDEBUG_MODE=off symfony php vendor/bin/phpunit
+
 phpunit: test-fixtures
-	$(EXEC_SYMFONY) php vendor/bin/simple-phpunit
+	$(PHPUNIT)
 
 phpunit-update-snapshots: test-fixtures
-	$(EXEC_SYMFONY) -it -u www-data -e UPDATE_SNAPSHOTS=1 symfony php vendor/bin/simple-phpunit
+	$(EXEC) -it -u www-data -e XDEBUG_MODE=off -e UPDATE_SNAPSHOTS=1 symfony php vendor/bin/phpunit
 
 # Code coverage report in var/cache/coverage/index.html (uses Xdebug)
 coverage: test-fixtures
-	$(EXEC) -it -u www-data -e XDEBUG_MODE=coverage symfony php vendor/bin/simple-phpunit --coverage-html var/cache/coverage --coverage-text=php://stdout --colors=never
+	$(EXEC) -it -u www-data -e XDEBUG_MODE=coverage symfony php vendor/bin/phpunit --coverage-html var/cache/coverage --coverage-text=php://stdout --colors=never
 	@echo "Code coverage report: \033[36mfile://${PWD}/var/cache/coverage/index.html\033[0m"
 
 # cache:warmup: the service types are read from the dumped container (see phpstan.neon.dist)
@@ -59,8 +62,11 @@ phpstan:
 	$(EXEC_SYMFONY) php bin/console cache:warmup --env=test
 	$(EXEC_SYMFONY) php vendor/bin/phpstan --memory-limit=-1
 
-deprecations:
-	$(EXEC) -it -u www-data -e SYMFONY_DEPRECATIONS_HELPER=verbose=max[total]=999999 symfony php vendor/bin/simple-phpunit
+# All the deprecations, including the indirect ones (triggered in vendor/, even when caused by
+# src/, e.g. validation annotations on an entity), which phpunit.dist.xml ignores
+deprecations: test-fixtures
+	sed 's/ignoreIndirectDeprecations="true"/ignoreIndirectDeprecations="false"/' phpunit.dist.xml > .phpunit-deprecations.xml
+	$(PHPUNIT) -c .phpunit-deprecations.xml --no-logging; status=$$?; rm -f .phpunit-deprecations.xml; exit $$status
 
 lint-twig:
 	$(EXEC_SYMFONY) php bin/console lint:twig templates
