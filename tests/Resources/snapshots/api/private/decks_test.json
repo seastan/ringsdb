@@ -231,11 +231,7 @@
         },
         "sideslots": [],
         "version": "1.1",
-        "last_pack": {
-            "__initializer__": null,
-            "__cloner__": null,
-            "__isInitialized__": true
-        },
+        "last_pack": "The Morgul Vale",
         "is_published": false,
         "problem": null,
         "tags": "tactics",
@@ -317,11 +313,7 @@
         },
         "sideslots": [],
         "version": "1.1",
-        "last_pack": {
-            "__initializer__": null,
-            "__cloner__": null,
-            "__isInitialized__": true
-        },
+        "last_pack": "Heirs of Númenor",
         "is_published": false,
         "problem": null,
         "tags": "spirit lore",
@@ -407,11 +399,7 @@
         },
         "sideslots": [],
         "version": "1.1",
-        "last_pack": {
-            "__initializer__": null,
-            "__cloner__": null,
-            "__isInitialized__": true
-        },
+        "last_pack": "The Morgul Vale",
         "is_published": false,
         "problem": null,
         "tags": "leadership spirit",
@@ -494,11 +482,7 @@
         },
         "sideslots": [],
         "version": "1.1",
-        "last_pack": {
-            "__initializer__": null,
-            "__cloner__": null,
-            "__isInitialized__": true
-        },
+        "last_pack": "The Morgul Vale",
         "is_published": false,
         "problem": null,
         "tags": "tactics leadership lore",
