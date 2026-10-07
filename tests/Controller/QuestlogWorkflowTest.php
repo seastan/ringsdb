@@ -144,7 +144,7 @@ class QuestlogWorkflowTest extends WebTestCase
     {
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $location = self::location($client->getResponse());
-        $this->assertRegExp('#^/questlog/view/\d+/#', $location);
+        $this->assertMatchesRegularExpression('#^/questlog/view/\d+/#', $location);
 
         return (int) explode('/', $location)[3];
     }

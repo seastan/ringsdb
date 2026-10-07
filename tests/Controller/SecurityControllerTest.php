@@ -87,7 +87,7 @@ class SecurityControllerTest extends WebTestCase
     {
         $response = $client->getResponse();
         $this->assertTrue($response->isRedirect(), 'Expected a redirect, got '.$response->getStatusCode());
-        $this->assertRegExp($pathPattern, self::location($response));
+        $this->assertMatchesRegularExpression($pathPattern, self::location($response));
     }
 
     private function assertAnonymous(KernelBrowser $client): void

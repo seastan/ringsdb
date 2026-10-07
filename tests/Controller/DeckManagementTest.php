@@ -307,7 +307,7 @@ class DeckManagementTest extends WebTestCase
 
         // the answer is the date of the change
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d:\d\d$/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d:\d\d$/', $client->getResponse()->getContent());
         $changes = $this->db()->fetchAllAssociative('SELECT variation, is_saved FROM deckchange WHERE deck_id = ?', [$id]);
         $this->assertSame([['variation' => json_encode($diff), 'is_saved' => 0]], $changes);
         // the deck itself is not changed

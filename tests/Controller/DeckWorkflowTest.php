@@ -129,7 +129,7 @@ class DeckWorkflowTest extends WebTestCase
         $client->request('GET', '/deck/new');
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $location = self::location($client->getResponse());
-        $this->assertRegExp('#^/deck/edit/\d+$#', $location);
+        $this->assertMatchesRegularExpression('#^/deck/edit/\d+$#', $location);
         $deckId = (int) substr($location, strlen('/deck/edit/'));
         $this->deckIds[] = $deckId;
 
@@ -246,7 +246,7 @@ class DeckWorkflowTest extends WebTestCase
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $location = self::location($client->getResponse());
-        $this->assertRegExp('#^/decklist/view/(\d+)/phpunitpublished-1\.0$#', $location);
+        $this->assertMatchesRegularExpression('#^/decklist/view/(\d+)/phpunitpublished-1\.0$#', $location);
         preg_match('#/view/(\d+)/#', $location, $matches);
         $decklistId = (int) ($matches[1] ?? 0);
 
@@ -618,7 +618,7 @@ class DeckWorkflowTest extends WebTestCase
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $location = self::location($client->getResponse());
-        $this->assertRegExp('#^/decklist/view/\d+/phpunitdwarvesremix-1\.0$#', $location);
+        $this->assertMatchesRegularExpression('#^/decklist/view/\d+/phpunitdwarvesremix-1\.0$#', $location);
         $decklist = $this->db()->fetchAssociative('SELECT id, name, parent_deck_id, precedent_decklist_id FROM decklist WHERE parent_deck_id = ?', [$deckId]);
         $this->assertNotFalse($decklist);
         $this->assertSame(['PHPUnit Dwarves Remix', $deckId, 1], [$decklist['name'], $decklist['parent_deck_id'], $decklist['precedent_decklist_id']]);
