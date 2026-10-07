@@ -22,7 +22,7 @@ class LoginManager
     /**
      * The firewall of security.yaml.
      */
-    private const FIREWALL = 'main';
+    private const string FIREWALL = 'main';
 
     public function __construct(
         private readonly TokenStorageInterface $tokenStorage,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\CardImageLocator\CardImageLocatorInterface;
 use App\Entity\Card;
 use App\Entity\CardPrinting;
 use App\Entity\Review;
@@ -15,7 +16,6 @@ use App\Repository\SphereRepository;
 use App\Search\SearchKeys;
 use App\Search\SearchTypes;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Asset\Packages;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CardsData
@@ -23,12 +23,11 @@ class CardsData
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly UrlGeneratorInterface $router,
-        private readonly Packages $assets_packages,
-        private readonly string $publicDir,
         private readonly CardRepository $cardRepository,
         private readonly CycleRepository $cycleRepository,
         private readonly ReviewRepository $reviewRepository,
-        private readonly SphereRepository $sphereRepository
+        private readonly SphereRepository $sphereRepository,
+        private readonly CardImageLocatorInterface $cardImageLocator
     ) {
     }
 
@@ -436,12 +435,11 @@ class CardsData
     }
 
     /**
-     * @param Card $card
      * @param bool $api
      *
      * @return array<string, mixed>
      */
-    public function getCardInfo($card, $api = false): array
+    public function getCardInfo(Card $card, $api = false): array
     {
         $cardinfo = [];
 
@@ -480,22 +478,15 @@ class CardsData
 
         // Fields removed from Card ORM in Phase 9 — supply from the primary printing.
         $primaryPrinting = $card->getPrimaryPrinting();
-        $primaryPack = $primaryPrinting ? $primaryPrinting->getPack() : null;
-        $cardinfo['pack_code'] = $primaryPack ? $primaryPack->getCode() : null;
-        $cardinfo['pack_name'] = $primaryPack ? $primaryPack->getName() : null;
-        $cardinfo['illustrator'] = $primaryPrinting ? $primaryPrinting->getIllustrator() : null;
-        $cardinfo['octgnid'] = $primaryPrinting ? $primaryPrinting->getOctgnid() : null;
-        $cardinfo['quantity'] = $primaryPrinting ? intval($primaryPrinting->getQuantity()) : null;
+        $primaryPack = $primaryPrinting instanceof CardPrinting ? $primaryPrinting->getPack() : null;
+        $cardinfo['pack_code'] = $primaryPack instanceof \App\Entity\Pack ? $primaryPack->getCode() : null;
+        $cardinfo['pack_name'] = $primaryPack instanceof \App\Entity\Pack ? $primaryPack->getName() : null;
+        $cardinfo['illustrator'] = $primaryPrinting instanceof CardPrinting ? $primaryPrinting->getIllustrator() : null;
+        $cardinfo['octgnid'] = $primaryPrinting instanceof CardPrinting ? $primaryPrinting->getOctgnid() : null;
+        $cardinfo['quantity'] = $primaryPrinting instanceof CardPrinting ? intval($primaryPrinting->getQuantity()) : null;
 
         $cardinfo['url'] = $this->router->generate('cards_zoom', ['card_code' => $card->getCode()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $imageurl = $this->assets_packages->getUrl('bundles/cards/'.$card->getCode().'.png');
-        $imagepath = $this->publicDir.preg_replace('/\?.*/', '', $imageurl);
-
-        if (file_exists($imagepath)) {
-            $cardinfo['imagesrc'] = $imageurl;
-        } else {
-            $cardinfo['imagesrc'] = null;
-        }
+        $cardinfo['imagesrc'] = $this->cardImageLocator->getCardImageUrl($card);
 
         // All printings of this card (one per pack it appears in). pack_code/pack_name
         // above stay as the canonical/primary printing for backward compatibility.
@@ -506,8 +497,6 @@ class CardsData
                 continue;
             }
 
-            $prImageUrl = $this->assets_packages->getUrl('bundles/cards/'.$printing->getImageCode().'.png');
-            $prImagePath = $this->publicDir.preg_replace('/\?.*/', '', $prImageUrl);
             $dateRelease = $pack->getDateRelease();
 
             $cardinfo['packs'][] = [
@@ -518,7 +507,7 @@ class CardsData
                 'image_code' => $printing->getImageCode(),
                 'illustrator' => $printing->getIllustrator(),
                 'octgnid' => $printing->getOctgnid(),
-                'imagesrc' => file_exists($prImagePath) ? $prImageUrl : null,
+                'imagesrc' => $this->cardImageLocator->getPrintingImageUrl($printing),
                 'date_release' => $dateRelease ? $dateRelease->format('Y-m-d') : null,
             ];
         }

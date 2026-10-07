@@ -16,7 +16,7 @@
         }
     },
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.3",
         "ext-dom": "*",
         "ext-fileinfo": "*",
         "ext-iconv": "*",
@@ -107,7 +107,7 @@
     },
     "config": {
         "platform": {
-            "php": "8.2.34"
+            "php": "8.3.35"
         },
         "sort-packages": true,
         "allow-plugins": {

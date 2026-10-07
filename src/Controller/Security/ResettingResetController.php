@@ -23,7 +23,7 @@ class ResettingResetController extends AbstractController
     /**
      * How long the link of the email is valid, in seconds.
      */
-    private const TOKEN_TTL = 86400;
+    private const int TOKEN_TTL = 86400;
 
     public function __construct(
         private readonly UserRepository $userRepository,

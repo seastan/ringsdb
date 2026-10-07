@@ -1,4 +1,4 @@
-FROM php:8.2-alpine
+FROM php:8.3-alpine
 
 RUN apk update && apk add --no-cache \
     libzip-dev \
@@ -9,7 +9,7 @@ RUN docker-php-ext-install pdo_mysql gd zip
 
 # Xdebug (dev stack), used for code coverage (make coverage).
 RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
-    && pecl install xdebug-3.4.5 \
+    && pecl install xdebug-3.5.3 \
     && docker-php-ext-enable xdebug \
     && apk del .build-deps
 

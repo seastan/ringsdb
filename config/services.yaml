@@ -63,3 +63,5 @@ services:
     decklist_factory: { alias: App\Model\DecklistFactory, public: true }
     fellowship_manager: { alias: App\Model\FellowshipManager, public: true }
     questlog_manager: { alias: App\Model\QuestLogManager, public: true }
+
+    App\CardImageLocator\CardImageLocatorInterface: '@App\CardImageLocator\AssetsCardImageLocator'
