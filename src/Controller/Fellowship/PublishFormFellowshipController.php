@@ -44,13 +44,13 @@ class PublishFormFellowshipController extends AbstractController
 
         $problem = $this->fellowshipValidationHelper->findProblem($fellowship);
         if ($problem) {
-            $this->get('session')->getFlashBag()->set('error', 'This fellowship cannot be published because it is invalid.');
+            $this->addFlash('error', 'This fellowship cannot be published because it is invalid.');
 
             return $this->redirect($this->generateUrl('fellowship_view', ['fellowship_id' => $fellowship->getId()]));
         }
 
         if ($fellowship->getIsPublic()) {
-            $this->get('session')->getFlashBag()->set('error', 'This fellowship is already published.');
+            $this->addFlash('error', 'This fellowship is already published.');
 
             return $this->redirect($this->generateUrl('fellowship_view', ['fellowship_id' => $fellowship->getId()]));
         }

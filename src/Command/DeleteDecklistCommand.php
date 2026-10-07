@@ -33,7 +33,7 @@ class DeleteDecklistCommand extends Command
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $decklist_id = $input->getArgument('decklist_id');
         $decklist = $this->decklistRepository->find($decklist_id);

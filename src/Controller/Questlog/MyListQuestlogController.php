@@ -48,7 +48,7 @@ class MyListQuestlogController extends AbstractController
         $playedEasy = [];
         $playedNormal = [];
         $playedNightmare = [];
-        $played = $this->connection->executeQuery('SELECT DISTINCT scenario_id, quest_mode, sum(success) as victory FROM questlog WHERE user_id = ? GROUP BY scenario_id, quest_mode', [$user->getId()])->fetchAll(\PDO::FETCH_NAMED);
+        $played = $this->connection->executeQuery('SELECT DISTINCT scenario_id, quest_mode, sum(success) as victory FROM questlog WHERE user_id = ? GROUP BY scenario_id, quest_mode', [$user->getId()])->fetchAllAssociative();
         foreach ($played as $c) {
             if ('easy' == $c['quest_mode']) {
                 $playedEasy[$c['scenario_id']] = $c['victory'];

@@ -35,7 +35,7 @@ class SavePacksController extends AbstractController
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
-        $this->get('session')->getFlashBag()->set('notice', 'Collection saved.');
+        $this->addFlash('notice', 'Collection saved.');
 
         return $this->forward(GetPacksController::class, ['reloaduser' => true]);
     }

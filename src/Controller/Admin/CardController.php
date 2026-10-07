@@ -24,8 +24,12 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CardController extends AbstractController
 {
-    public function __construct(private readonly string $publicDir, private readonly CardRepository $cardRepository, private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly string $publicDir,
+        private readonly CardRepository $cardRepository,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly Connection $connection
+    ) {
     }
 
     /**
@@ -180,22 +184,20 @@ class CardController extends AbstractController
                 throw $this->createNotFoundException('Unable to find Card entity.');
             }
 
-            /* @var $dbh Connection */
-            $dbh = $this->getDoctrine()->getConnection();
             $query = 'DELETE FROM deckslot WHERE card_id = '.$id;
-            $dbh->executeQuery($query, []);
+            $this->connection->executeQuery($query, []);
             $query = 'DELETE FROM decksideslot WHERE card_id = '.$id;
-            $dbh->executeQuery($query, []);
+            $this->connection->executeQuery($query, []);
             $query = 'DELETE FROM decklistslot WHERE card_id = '.$id;
-            $dbh->executeQuery($query, []);
+            $this->connection->executeQuery($query, []);
             $query = 'DELETE FROM decklistsideslot WHERE card_id = '.$id;
-            $dbh->executeQuery($query, []);
+            $this->connection->executeQuery($query, []);
             $query = 'DELETE FROM card_printing WHERE card_id = '.$id;
-            $dbh->executeQuery($query, []);
+            $this->connection->executeQuery($query, []);
             $query = 'DELETE FROM reviewvote WHERE review_id IN (SELECT id FROM review WHERE card_id = '.$id.')';
-            $dbh->executeQuery($query, []);
+            $this->connection->executeQuery($query, []);
             $query = 'DELETE FROM review WHERE card_id = '.$id;
-            $dbh->executeQuery($query, []);
+            $this->connection->executeQuery($query, []);
             $this->entityManager->remove($entity);
             $this->entityManager->flush();
         }

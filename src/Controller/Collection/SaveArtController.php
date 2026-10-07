@@ -50,7 +50,6 @@ class SaveArtController extends AbstractController
             $prefs[$cardCode] = $packCode;
         }
 
-        $this->entityManager = $this->getDoctrine()->getManager();
         $user->setArtPreferences([] === $prefs ? null : (string) json_encode($prefs));
         $this->entityManager->persist($user);
         $this->entityManager->flush();

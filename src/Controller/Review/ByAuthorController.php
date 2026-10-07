@@ -2,6 +2,7 @@
 
 namespace App\Controller\Review;
 
+use App\Entity\Review;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -42,7 +43,7 @@ class ByAuthorController extends AbstractController
         }
 
         $pagetitle = 'Card Reviews by '.$user->getUsername();
-        $dql = 'SELECT r FROM App:Review r WHERE r.user=:USER ORDER BY r.dateCreation DESC, r.id DESC';
+        $dql = 'SELECT r FROM '.Review::class.' r WHERE r.user=:USER ORDER BY r.dateCreation DESC, r.id DESC';
         $query = $this->entityManager->createQuery($dql)->setFirstResult($start)->setMaxResults($limit)->setParameter('USER', $user);
         $paginator = new Paginator($query, false);
         $maxcount = count($paginator);

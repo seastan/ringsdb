@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Decklist;
+use App\Entity\Fellowship;
+use App\Entity\Review;
 use App\Model\DecklistManager;
 use App\Model\FellowshipManager;
 use App\Repository\ScenarioRepository;
@@ -64,7 +66,7 @@ class DefaultController extends AbstractController
         $num_trending = 3;
         $qb = $this->entityManager->createQueryBuilder();
         $qb->select('d');
-        $qb->from('App:Decklist', 'd');
+        $qb->from(Decklist::class, 'd');
         $qb->setMaxResults($num_trending);
         $qb->distinct();
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
@@ -78,7 +80,7 @@ class DefaultController extends AbstractController
         $num_trending_fellowships = 1;
         $qb = $this->entityManager->createQueryBuilder();
         $qb->select('d');
-        $qb->from('App:Fellowship', 'd');
+        $qb->from(Fellowship::class, 'd');
         $qb->setMaxResults($num_trending_fellowships);
         $qb->distinct();
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
@@ -96,7 +98,7 @@ class DefaultController extends AbstractController
         $num_trending = 3;
         $qb = $this->entityManager->createQueryBuilder();
         $qb->select('d');
-        $qb->from('App:Decklist', 'd');
+        $qb->from(Decklist::class, 'd');
         $qb->setMaxResults($num_new + $num_trending);
         $qb->distinct();
         $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'), 0));
@@ -125,7 +127,7 @@ class DefaultController extends AbstractController
         $num_new_fellowships = 1;
         $qb = $this->entityManager->createQueryBuilder();
         $qb->select('d');
-        $qb->from('App:Fellowship', 'd');
+        $qb->from(Fellowship::class, 'd');
         $qb->setMaxResults($num_new_fellowships + $num_trending_fellowships);
         $qb->distinct();
         $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'), 0));
@@ -213,7 +215,7 @@ class DefaultController extends AbstractController
         }
 
         // Get recent card reviews
-        $dql = 'SELECT DISTINCT r FROM App:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC, r.id DESC';
+        $dql = 'SELECT DISTINCT r FROM '.Review::class.' r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC, r.id DESC';
         $query = $this->entityManager->createQuery($dql)->setMaxResults($num_comments);
         $paginator = new Paginator($query, false);
         $reviews_recent = iterator_to_array($paginator->getIterator());
@@ -230,7 +232,7 @@ class DefaultController extends AbstractController
         }
 
         // Recent review comments
-        $dql = 'SELECT DISTINCT r FROM App:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateLastComment DESC, r.id DESC';
+        $dql = 'SELECT DISTINCT r FROM '.Review::class.' r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateLastComment DESC, r.id DESC';
         $query = $this->entityManager->createQuery($dql)->setMaxResults($num_comments);
         $paginator = new Paginator($query, false);
         $reviews_recent_discussion = iterator_to_array($paginator->getIterator());

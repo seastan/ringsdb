@@ -37,7 +37,7 @@ class DeleteCustomPackController extends AbstractController
 
         $this->entityManager->remove($pack);
         $this->entityManager->flush();
-        $this->get('session')->getFlashBag()->set('notice', 'Custom pack deleted.');
+        $this->addFlash('notice', 'Custom pack deleted.');
 
         return $this->redirectToRoute('collection_packs');
     }

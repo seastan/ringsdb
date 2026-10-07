@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Card;
+use App\Entity\CardPrinting;
 use App\Entity\Review;
 use App\Entity\Sphere;
 use App\Repository\CardRepository;
@@ -184,7 +185,7 @@ class CardsData
                             // cycle filter: card has a printing in a pack of this cycle (any printing)
                             $or = [];
                             foreach ($condition as $arg) {
-                                $sub = "SELECT cpc{$i}.id FROM App:CardPrinting cpc{$i} JOIN cpc{$i}.pack ppc{$i} JOIN ppc{$i}.cycle yc{$i} WHERE cpc{$i}.card = c AND yc{$i}.code = ?$i";
+                                $sub = "SELECT cpc{$i}.id FROM ".CardPrinting::class." cpc{$i} JOIN cpc{$i}.pack ppc{$i} JOIN ppc{$i}.cycle yc{$i} WHERE cpc{$i}.card = c AND yc{$i}.code = ?$i";
                                 switch ($operator) {
                                     case ':':
                                         $or[] = "EXISTS ($sub)";
@@ -204,7 +205,7 @@ class CardsData
                             // pack filter: card has a printing in this pack (any printing)
                             $or = [];
                             foreach ($condition as $arg) {
-                                $base = "SELECT cpe{$i}.id FROM App:CardPrinting cpe{$i} JOIN cpe{$i}.pack ppe{$i} WHERE cpe{$i}.card = c";
+                                $base = "SELECT cpe{$i}.id FROM ".CardPrinting::class." cpe{$i} JOIN cpe{$i}.pack ppe{$i} WHERE cpe{$i}.card = c";
                                 switch ($operator) {
                                     case ':':
                                         $or[] = "EXISTS ($base AND ppe{$i}.code = ?$i)";
@@ -213,10 +214,10 @@ class CardsData
                                         $or[] = "NOT EXISTS ($base AND ppe{$i}.code = ?$i)";
                                         break;
                                     case '<':
-                                        $or[] = "EXISTS ($base AND ppe{$i}.dateRelease < (SELECT p2{$i}.dateRelease FROM App:Pack p2{$i} WHERE p2{$i}.code = ?$i))";
+                                        $or[] = "EXISTS ($base AND ppe{$i}.dateRelease < (SELECT p2{$i}.dateRelease FROM '.Pack::class.' p2{$i} WHERE p2{$i}.code = ?$i))";
                                         break;
                                     case '>':
-                                        $or[] = "EXISTS ($base AND ppe{$i}.dateRelease > (SELECT p3{$i}.dateRelease FROM App:Pack p3{$i} WHERE p3{$i}.code = ?$i))";
+                                        $or[] = "EXISTS ($base AND ppe{$i}.dateRelease > (SELECT p3{$i}.dateRelease FROM '.Pack::class.' p3{$i} WHERE p3{$i}.code = ?$i))";
                                         break;
                                 }
 
@@ -342,7 +343,7 @@ class CardsData
                             // illustrator — search via CardPrinting (field moved off Card in Phase 9)
                             $or = [];
                             foreach ($condition as $arg) {
-                                $sub = "SELECT cpi{$i}.id FROM App:CardPrinting cpi{$i} WHERE cpi{$i}.card = c AND cpi{$i}.illustrator = ?$i";
+                                $sub = "SELECT cpi{$i}.id FROM ".CardPrinting::class." cpi{$i} WHERE cpi{$i}.card = c AND cpi{$i}.illustrator = ?$i";
                                 switch ($operator) {
                                     case ':':
                                         $or[] = "EXISTS ($sub)";
@@ -362,7 +363,7 @@ class CardsData
                             // release: card has a printing released by / after this date (any printing)
                             $or = [];
                             foreach ($condition as $arg) {
-                                $base = "SELECT cpr{$i}.id FROM App:CardPrinting cpr{$i} JOIN cpr{$i}.pack ppr{$i} WHERE cpr{$i}.card = c";
+                                $base = "SELECT cpr{$i}.id FROM ".CardPrinting::class." cpr{$i} JOIN cpr{$i}.pack ppr{$i} WHERE cpr{$i}.card = c";
                                 switch ($operator) {
                                     case '<':
                                         $or[] = "EXISTS ($base AND ppr{$i}.dateRelease <= ?$i)";
@@ -684,7 +685,7 @@ class CardsData
     public function getDistinctTraits(): array
     {
         $qb = $this->entityManager->createQueryBuilder();
-        $qb->from('App:Card', 'c');
+        $qb->from(Card::class, 'c');
         $qb->select('c.traits');
         $qb->distinct();
 

@@ -24,7 +24,7 @@ class FixCanonicalNamesCommand extends Command
              ->setDescription('Fix canonical names for scenarios');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $texts = $this->texts;
         $count = 0;

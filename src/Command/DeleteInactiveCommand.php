@@ -24,7 +24,7 @@ class DeleteInactiveCommand extends Command
             ->setDescription('Delete users inactive since 48 hours');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $limit = new \DateTime();
         $limit->sub(new \DateInterval('PT48H'));

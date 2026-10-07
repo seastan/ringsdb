@@ -60,7 +60,7 @@ phpstan:
 	$(EXEC_SYMFONY) php vendor/bin/phpstan --memory-limit=-1
 
 deprecations:
-	$(EXEC_SYMFONY) -it -u www-data -e SYMFONY_DEPRECATIONS_HELPER=verbose=max[total]=999999 symfony php vendor/bin/simple-phpunit
+	$(EXEC) -it -u www-data -e SYMFONY_DEPRECATIONS_HELPER=verbose=max[total]=999999 symfony php vendor/bin/simple-phpunit
 
 lint-twig:
 	$(EXEC_SYMFONY) php bin/console lint:twig templates

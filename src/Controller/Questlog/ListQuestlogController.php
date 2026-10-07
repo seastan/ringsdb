@@ -17,8 +17,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ListQuestlogController extends AbstractController
 {
-    public function __construct(private readonly int $cacheExpiration, private readonly QuestLogManager $questlogManager, private readonly SnapshotManager $snapshotManager, private readonly CycleRepository $cycleRepository)
-    {
+    public function __construct(
+        private readonly int $cacheExpiration,
+        private readonly QuestLogManager $questlogManager,
+        private readonly SnapshotManager $snapshotManager,
+        private readonly CycleRepository $cycleRepository,
+        private readonly Connection $connection
+    ) {
     }
 
     /**
@@ -95,7 +100,6 @@ class ListQuestlogController extends AbstractController
 
     private function searchForm(Request $request): string
     {
-        $dbh = $this->getDoctrine()->getConnection();
         $cards_code = $request->query->all('cards');
         $author_name = StringSanitizer::sanitize($request->query->get('author'));
         $questlog_name = StringSanitizer::sanitize($request->query->get('name'));
@@ -104,7 +108,7 @@ class ListQuestlogController extends AbstractController
         $sort = $request->query->get('sort');
         $packs = $request->query->all('packs');
         if (0 === count($packs)) {
-            $packs = $dbh->executeQuery('SELECT id FROM pack')->fetchAll(\PDO::FETCH_COLUMN);
+            $packs = $this->connection->executeQuery('SELECT id FROM pack')->fetchFirstColumn();
         }
 
         $categories = [];
@@ -150,7 +154,7 @@ class ListQuestlogController extends AbstractController
         $params['sort_'.$sort] = ' selected="selected"';
         $params['nb_decks_selected'] = $nb_decks;
         if (count($cards_code) > 0) {
-            $cards = $dbh->executeQuery("SELECT\n    \t\t\t\tc.name,\n    \t\t\t\tc.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card c\n                    INNER JOIN sphere s ON s.id = c.sphere_id\n                    INNER JOIN type t ON t.id = c.type_id\n                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 WHERE cp2.card_id = c.id ORDER BY cp2.position ASC, cp2.id ASC LIMIT 1)\n                    INNER JOIN pack p ON p.id = cpr.pack_id\n                    WHERE c.code IN (?)\n    \t\t\t\tORDER BY c.code DESC", [$cards_code], [Connection::PARAM_INT_ARRAY])->fetchAll();
+            $cards = $this->connection->executeQuery("SELECT\n    \t\t\t\tc.name,\n    \t\t\t\tc.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card c\n                    INNER JOIN sphere s ON s.id = c.sphere_id\n                    INNER JOIN type t ON t.id = c.type_id\n                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 WHERE cp2.card_id = c.id ORDER BY cp2.position ASC, cp2.id ASC LIMIT 1)\n                    INNER JOIN pack p ON p.id = cpr.pack_id\n                    WHERE c.code IN (?)\n    \t\t\t\tORDER BY c.code DESC", [$cards_code], [Connection::PARAM_INT_ARRAY])->fetchAllAssociative();
             $params['cards'] = '';
             foreach ($cards as $card) {
                 $params['cards'] .= $this->renderView('Search/card.html.twig', $card);

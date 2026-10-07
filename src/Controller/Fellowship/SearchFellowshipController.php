@@ -27,7 +27,7 @@ class SearchFellowshipController extends AbstractController
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
 
-        $spheres = $this->connection->executeQuery('SELECT s.name, s.code FROM sphere s ORDER BY s.name ASC')->fetchAll();
+        $spheres = $this->connection->executeQuery('SELECT s.name, s.code FROM sphere s ORDER BY s.name ASC')->fetchAllAssociative();
         $owned_packs = '';
         if ($this->getUser()) {
             $owned_packs = $this->getUser()->getOwnedPacks();
@@ -45,7 +45,7 @@ class SearchFellowshipController extends AbstractController
                 }
             }
         } else {
-            $packs = $this->connection->executeQuery('SELECT id FROM pack WHERE date_release IS NOT NULL')->fetchAll(\PDO::FETCH_COLUMN);
+            $packs = $this->connection->executeQuery('SELECT id FROM pack WHERE date_release IS NOT NULL')->fetchFirstColumn();
         }
 
         $categories = [];

@@ -37,7 +37,7 @@ class PatronCommand extends Command
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $email = self::stringArgument($input, 'email');
         $donation = (int) $input->getArgument('donation');

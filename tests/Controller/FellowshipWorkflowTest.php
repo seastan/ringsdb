@@ -33,16 +33,19 @@ class FellowshipWorkflowTest extends WebTestCase
 
     private array $fixtureFellowship;
 
+    private array $fixtureUsers;
+
     protected function setUp(): void
     {
         $this->client = static::createClient();
         $connection = $this->db();
         foreach (['fellowship', 'fellowship_deck', 'fellowship_decklist', 'decklist', 'deck'] as $table) {
-            $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
+            $this->maxIds[$table] = (int) $connection->fetchOne("SELECT MAX(id) FROM $table");
         }
 
-        $this->fixtureDecks = $connection->fetchAll('SELECT id, major_version, minor_version, date_update FROM deck');
+        $this->fixtureDecks = $connection->fetchAllAssociative('SELECT id, major_version, minor_version, date_update FROM deck');
         $this->fixtureFellowship = $this->fellowshipOneState($connection);
+        $this->fixtureUsers = $connection->fetchAllAssociative('SELECT id, reputation FROM user');
     }
 
     /**
@@ -51,9 +54,9 @@ class FellowshipWorkflowTest extends WebTestCase
     private function fellowshipOneState(\Doctrine\DBAL\Connection $connection): array
     {
         return [
-            $connection->fetchAssoc('SELECT name, is_public, nb_decks, nb_votes, nb_favorites, nb_comments FROM fellowship WHERE id = 1'),
-            $connection->fetchAll('SELECT deck_id, deck_number FROM fellowship_deck WHERE fellowship_id = 1 ORDER BY deck_number'),
-            $connection->fetchAll('SELECT decklist_id, deck_number FROM fellowship_decklist WHERE fellowship_id = 1 ORDER BY deck_number'),
+            $connection->fetchAssociative('SELECT name, is_public, nb_decks, nb_votes, nb_favorites, nb_comments, date_update FROM fellowship WHERE id = 1'),
+            $connection->fetchAllAssociative('SELECT deck_id, deck_number FROM fellowship_deck WHERE fellowship_id = 1 ORDER BY deck_number'),
+            $connection->fetchAllAssociative('SELECT decklist_id, deck_number FROM fellowship_decklist WHERE fellowship_id = 1 ORDER BY deck_number'),
         ];
     }
 
@@ -62,6 +65,7 @@ class FellowshipWorkflowTest extends WebTestCase
         $connection = $this->db();
         $max = $this->maxIds;
         foreach ([
+            'DELETE FROM fellowship_favorite',
             "DELETE FROM fellowship_decklist WHERE id > {$max['fellowship_decklist']} OR fellowship_id > {$max['fellowship']}",
             "DELETE FROM fellowship_deck WHERE id > {$max['fellowship_deck']} OR fellowship_id > {$max['fellowship']}",
             "DELETE FROM fellowship WHERE id > {$max['fellowship']}",
@@ -74,7 +78,7 @@ class FellowshipWorkflowTest extends WebTestCase
             "DELETE FROM decksideslot WHERE deck_id > {$max['deck']}",
             "DELETE FROM deck WHERE id > {$max['deck']}",
         ] as $sql) {
-            $connection->exec($sql);
+            $connection->executeStatement($sql);
         }
 
         foreach ($this->fixtureDecks as $deck) {
@@ -85,8 +89,8 @@ class FellowshipWorkflowTest extends WebTestCase
         if ($this->fellowshipOneState($connection) != $this->fixtureFellowship) {
             [$fellowship, $decks, $decklists] = $this->fixtureFellowship;
             $connection->update('fellowship', $fellowship, ['id' => 1]);
-            $connection->exec('DELETE FROM fellowship_deck WHERE fellowship_id = 1');
-            $connection->exec('DELETE FROM fellowship_decklist WHERE fellowship_id = 1');
+            $connection->executeStatement('DELETE FROM fellowship_deck WHERE fellowship_id = 1');
+            $connection->executeStatement('DELETE FROM fellowship_decklist WHERE fellowship_id = 1');
             foreach ($decks as $row) {
                 $connection->insert('fellowship_deck', $row + ['fellowship_id' => 1]);
             }
@@ -94,6 +98,10 @@ class FellowshipWorkflowTest extends WebTestCase
             foreach ($decklists as $row) {
                 $connection->insert('fellowship_decklist', $row + ['fellowship_id' => 1]);
             }
+        }
+
+        foreach ($this->fixtureUsers as $user) {
+            $connection->update('user', $user, ['id' => $user['id']]);
         }
 
         $connection->update('user', ['is_share_decks' => 0], ['username' => 'test']);
@@ -132,7 +140,7 @@ class FellowshipWorkflowTest extends WebTestCase
 
     private function fetchFellowship(int $id)
     {
-        return $this->db()->fetchAssoc(
+        return $this->db()->fetchAssociative(
             'SELECT f.name, f.name_canonical, f.description_md, f.description_html, f.is_public, f.nb_decks, u.username, f.date_publish IS NOT NULL AS published
              FROM fellowship f JOIN user u ON u.id = f.user_id WHERE f.id = ?',
             [$id]
@@ -145,11 +153,11 @@ class FellowshipWorkflowTest extends WebTestCase
     private function fetchFellowshipDecks(int $id): array
     {
         $decks = [];
-        foreach ($this->db()->fetchAll('SELECT deck_number, deck_id FROM fellowship_deck WHERE fellowship_id = ?', [$id]) as $row) {
+        foreach ($this->db()->fetchAllAssociative('SELECT deck_number, deck_id FROM fellowship_deck WHERE fellowship_id = ?', [$id]) as $row) {
             $decks[(int) $row['deck_number']] = 'deck:'.$row['deck_id'];
         }
 
-        foreach ($this->db()->fetchAll('SELECT deck_number, decklist_id FROM fellowship_decklist WHERE fellowship_id = ?', [$id]) as $row) {
+        foreach ($this->db()->fetchAllAssociative('SELECT deck_number, decklist_id FROM fellowship_decklist WHERE fellowship_id = ?', [$id]) as $row) {
             $decks[(int) $row['deck_number']] = 'decklist:'.$row['decklist_id'];
         }
 
@@ -246,7 +254,7 @@ class FellowshipWorkflowTest extends WebTestCase
         ], $this->fetchFellowship($id));
 
         // deck 1 was published as a new decklist, the fellowship now only references decklists
-        $newDecklist = $this->db()->fetchAssoc('SELECT id, name, version FROM decklist WHERE id > ? AND parent_deck_id = 1', [$this->maxIds['decklist']]);
+        $newDecklist = $this->db()->fetchAssociative('SELECT id, name, version FROM decklist WHERE id > ? AND parent_deck_id = 1', [$this->maxIds['decklist']]);
         $this->assertNotFalse($newDecklist);
         $this->assertSame(['Dwarf Lore/Leadership/Tactics', '2.0'], [$newDecklist['name'], $newDecklist['version']]);
         $this->assertSame([1 => 'decklist:'.$newDecklist['id'], 2 => 'decklist:3'], $this->fetchFellowshipDecks($id));
@@ -282,7 +290,7 @@ class FellowshipWorkflowTest extends WebTestCase
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame([1 => 'decklist:1', 2 => 'decklist:2'], $this->fetchFellowshipDecks($id));
-        $this->assertSame(0, $this->db()->fetchColumn('SELECT COUNT(*) FROM decklist WHERE id > ?', [$this->maxIds['decklist']]));
+        $this->assertSame(0, $this->db()->fetchOne('SELECT COUNT(*) FROM decklist WHERE id > ?', [$this->maxIds['decklist']]));
     }
 
     public function testSaveAndPublishDoesPublish(): void
@@ -327,7 +335,7 @@ class FellowshipWorkflowTest extends WebTestCase
         $client->submit($form);
 
         $this->assertSame(422, $client->getResponse()->getStatusCode());
-        $this->assertSame(0, $this->db()->fetchColumn('SELECT COUNT(*) FROM fellowship WHERE id > ?', [$this->maxIds['fellowship']]));
+        $this->assertSame(0, $this->db()->fetchOne('SELECT COUNT(*) FROM fellowship WHERE id > ?', [$this->maxIds['fellowship']]));
     }
 
     public function testNewFellowshipFormIsPrefilledWithTheGivenDecks(): void
@@ -354,7 +362,7 @@ class FellowshipWorkflowTest extends WebTestCase
         // "test" does not share their decks
         $client->submit($form);
         $this->assertSame(403, $client->getResponse()->getStatusCode());
-        $this->assertSame(0, $this->db()->fetchColumn('SELECT COUNT(*) FROM fellowship WHERE id > ?', [$this->maxIds['fellowship']]));
+        $this->assertSame(0, $this->db()->fetchOne('SELECT COUNT(*) FROM fellowship WHERE id > ?', [$this->maxIds['fellowship']]));
 
         // once shared, the deck is cloned for the admin
         $this->db()->update('user', ['is_share_decks' => 1], ['username' => 'test']);
@@ -364,7 +372,7 @@ class FellowshipWorkflowTest extends WebTestCase
         $decks = $this->fetchFellowshipDecks($id);
         $cloneId = (int) substr($decks[1], strlen('deck:'));
         $this->assertGreaterThan($this->maxIds['deck'], $cloneId);
-        $clone = $this->db()->fetchAssoc('SELECT d.name, u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$cloneId]);
+        $clone = $this->db()->fetchAssociative('SELECT d.name, u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$cloneId]);
         $this->assertNotFalse($clone);
         $this->assertSame(['Dwarf Lore/Leadership/Tactics', 'admin'], [$clone['name'], $clone['username']]);
     }
@@ -405,7 +413,7 @@ class FellowshipWorkflowTest extends WebTestCase
         $this->assertFalse($this->fetchFellowship($id));
         $this->assertSame([], $this->fetchFellowshipDecks($id));
         // the decks themselves are kept
-        $this->assertSame(1, $this->db()->fetchColumn('SELECT COUNT(*) FROM deck WHERE id = 1'));
+        $this->assertSame(1, $this->db()->fetchOne('SELECT COUNT(*) FROM deck WHERE id = 1'));
     }
 
     public function testFellowshipWithSocialActivityCannotBeDeleted(): void
@@ -448,5 +456,28 @@ class FellowshipWorkflowTest extends WebTestCase
 
         $client->request('POST', '/user/fellowship_like', ['id' => 999]);
         $this->assertSame(400, $client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * Favorite is a toggle (POST /user/fellowship_favorite, answers the new count as plain text);
+     * the author gains (then loses) 5 reputation points.
+     */
+    public function testFavoriteAndUnfavorite(): void
+    {
+        $client = $this->createAuthenticatedClient('admin');
+        $state = fn () => $this->db()->fetchAssociative(
+            'SELECT f.nb_favorites, (SELECT COUNT(*) FROM fellowship_favorite WHERE fellowship_id = 1) AS favorites, u.reputation AS author_reputation
+            FROM fellowship f JOIN user u ON u.id = f.user_id WHERE f.id = 1'
+        );
+
+        $client->request('POST', '/user/fellowship_favorite', ['id' => 1]);
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame('1', $client->getResponse()->getContent());
+        $this->assertSame(['nb_favorites' => 1, 'favorites' => 1, 'author_reputation' => 6], $state());
+        $this->assertGreaterThan('2015-08-16 00:00:00', $this->db()->fetchOne('SELECT date_update FROM fellowship WHERE id = 1'));
+
+        $client->request('POST', '/user/fellowship_favorite', ['id' => 1]);
+        $this->assertSame('0', $client->getResponse()->getContent());
+        $this->assertSame(['nb_favorites' => 0, 'favorites' => 0, 'author_reputation' => 1], $state());
     }
 }

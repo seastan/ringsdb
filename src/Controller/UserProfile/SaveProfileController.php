@@ -33,7 +33,7 @@ class SaveProfileController extends AbstractController
         if ($username !== $user->getUsername()) {
             $user_existing = $this->userRepository->findOneBy(['username' => $username]);
             if ($user_existing) {
-                $this->get('session')->getFlashBag()->set('error', "Username {$username} is already taken.");
+                $this->addFlash('error', "Username {$username} is already taken.");
 
                 return $this->redirect($this->generateUrl('user_profile_edit'));
             }
@@ -62,7 +62,7 @@ class SaveProfileController extends AbstractController
         $user->setDarkMode($darkMode);
 
         $this->entityManager->flush();
-        $this->get('session')->getFlashBag()->set('notice', 'Successfully saved your profile.');
+        $this->addFlash('notice', 'Successfully saved your profile.');
         $response = $this->redirect($this->generateUrl('user_profile_edit'));
         // Persist the preference in a long-lived cookie so the theme can be applied
         // immediately (without a flash of the wrong theme) on this device, even though

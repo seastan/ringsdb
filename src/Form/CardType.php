@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Form;
 
 use App\Entity\Card;
+use App\Entity\Sphere;
+use App\Entity\Type;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -24,8 +26,8 @@ class CardType extends AbstractType
             ->add('position')
             ->add('deck_limit')
             ->add('code')
-            ->add('type', EntityType::class, ['class' => 'App:Type', 'choice_label' => 'name'])
-            ->add('sphere', EntityType::class, ['class' => 'App:Sphere', 'choice_label' => 'name'])
+            ->add('type', EntityType::class, ['class' => Type::class, 'choice_label' => 'name'])
+            ->add('sphere', EntityType::class, ['class' => Sphere::class, 'choice_label' => 'name'])
             ->add('name')
             ->add('traits')
             ->add('text', TextareaType::class, ['required' => false])
@@ -50,7 +52,7 @@ class CardType extends AbstractType
         ]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'appbundle_cardtype';
     }

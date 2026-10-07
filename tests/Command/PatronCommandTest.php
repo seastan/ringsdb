@@ -26,7 +26,7 @@ class PatronCommandTest extends KernelTestCase
     {
         static::bootKernel();
         $this->connection = static::$kernel->getContainer()->get('doctrine')->getConnection();
-        $this->fixtureUsers = $this->connection->fetchAll('SELECT id, donation FROM user');
+        $this->fixtureUsers = $this->connection->fetchAllAssociative('SELECT id, donation FROM user');
     }
 
     protected function tearDown(): void
@@ -58,7 +58,7 @@ class PatronCommandTest extends KernelTestCase
 
     private function donation(string $username): int
     {
-        return $this->connection->fetchColumn('SELECT donation FROM user WHERE username = ?', [$username]);
+        return $this->connection->fetchOne('SELECT donation FROM user WHERE username = ?', [$username]);
     }
 
     /* -------------------------------------------------------------- tests */

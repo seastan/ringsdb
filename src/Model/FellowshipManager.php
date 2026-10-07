@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Entity\Card;
+use App\Entity\CardPrinting;
+use App\Entity\Decklistslot;
 use App\Entity\Fellowship;
+use App\Entity\FellowshipComment;
+use App\Entity\FellowshipDecklist;
 use App\Entity\User;
+use App\Entity\UserCustomPackCard;
 use App\Helper\StringSanitizer;
 use App\Repository\CardRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -97,7 +102,7 @@ class FellowshipManager
     {
         $qb = $this->doctrine->createQueryBuilder();
         $qb->select('d');
-        $qb->from('App:Fellowship', 'd');
+        $qb->from(Fellowship::class, 'd');
         $qb->andWhere('d.isPublic = 1');
         $qb->setFirstResult($this->start);
         $qb->setMaxResults($this->limit);
@@ -235,7 +240,7 @@ class FellowshipManager
     {
         $qb = $this->getQueryBuilder();
 
-        $qb->addSelect('(SELECT count(c) FROM App:FellowshipComment c WHERE c.fellowship=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
+        $qb->addSelect('(SELECT count(c) FROM '.FellowshipComment::class.' c WHERE c.fellowship=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
         $qb->orderBy('nbRecentComments', 'DESC');
         $qb->addOrderBy('d.nbComments', 'DESC');
 
@@ -312,19 +317,19 @@ class FellowshipManager
                 // packs AND is not present in any selected custom pack.
                 $sub = $this->doctrine->createQueryBuilder();
                 $sub->select('c');
-                $sub->from('App:Card', 'c');
-                $sub->innerJoin('App:Decklistslot', 's', 'WITH', 's.card = c');
+                $sub->from(Card::class, 'c');
+                $sub->innerJoin(Decklistslot::class, 's', 'WITH', 's.card = c');
                 $sub->where('s.decklist = ld');
 
                 if (count($packs) > 0) {
-                    $sub->andWhere('NOT EXISTS (SELECT cpfm.id FROM App:CardPrinting cpfm WHERE cpfm.card = c AND cpfm.pack IN (:fm_packs))');
+                    $sub->andWhere('NOT EXISTS (SELECT cpfm.id FROM '.CardPrinting::class.' cpfm WHERE cpfm.card = c AND cpfm.pack IN (:fm_packs))');
                     $qb->setParameter('fm_packs', $packs);
                 }
 
                 if ($useCustomPacks) {
                     $sub->andWhere(
                         'NOT EXISTS ('.
-                            'SELECT ucpcfm.id FROM App:UserCustomPackCard ucpcfm '.
+                            'SELECT ucpcfm.id FROM '.UserCustomPackCard::class.' ucpcfm '.
                             'JOIN ucpcfm.customPack ucpfm '.
                             'WHERE ucpcfm.card = c '.
                             'AND ucpfm.code IN (:fm_custom_codes) '.
@@ -342,10 +347,10 @@ class FellowshipManager
             // SELECT fellowship.id, decklistslot.card_id, SUM(decklistslot.quantity), card.quantity FROM (((fellowship INNER JOIN fellowship_decklist ON fellowship.id = fellowship_decklist.fellowship_id) INNER JOIN decklistslot ON fellowship_decklist.decklist_id = decklistslot.decklist_id) INNER JOIN card ON decklistslot.card_id = card.id) WHERE card.pack_id = 1 GROUP BY fellowship.id,decklistslot.card_id HAVING SUM(decklistslot.quantity)>3*card.quantity;
             $sub = $this->doctrine->createQueryBuilder();
             $sub->select('jp.quantity');
-            $sub->from('App:Card', 'j');
-            $sub->innerJoin('App:CardPrinting', 'jp', 'WITH', 'jp.card = j AND jp.pack = 1'); // Match Core Set printing
-            $sub->innerJoin('App:Decklistslot', 'dls', 'WITH', 'dls.card = j');
-            $sub->innerJoin('App:FellowshipDecklist', 'fdl', 'WITH', 'fdl.decklist = dls.decklist');
+            $sub->from(Card::class, 'j');
+            $sub->innerJoin(CardPrinting::class, 'jp', 'WITH', 'jp.card = j AND jp.pack = 1'); // Match Core Set printing
+            $sub->innerJoin(Decklistslot::class, 'dls', 'WITH', 'dls.card = j');
+            $sub->innerJoin(FellowshipDecklist::class, 'fdl', 'WITH', 'fdl.decklist = dls.decklist');
             $sub->where('fdl.fellowship = d');
             $sub->groupBy('d.id, dls.card, jp.quantity');
             $sub->having('SUM(dls.quantity) > :numcores * jp.quantity');
@@ -354,10 +359,10 @@ class FellowshipManager
 
             $sub = $this->doctrine->createQueryBuilder();
             $sub->select('jp2.quantity');
-            $sub->from('App:Card', 'j2');
-            $sub->innerJoin('App:CardPrinting', 'jp2', 'WITH', 'jp2.card = j2 AND jp2.pack = 1'); // Match Core Set printing
-            $sub->innerJoin('App:Decklistslot', 'dls2', 'WITH', 'dls2.card = j2');
-            $sub->innerJoin('App:FellowshipDecklist', 'fdl2', 'WITH', 'fdl2.decklist = dls2.decklist');
+            $sub->from(Card::class, 'j2');
+            $sub->innerJoin(CardPrinting::class, 'jp2', 'WITH', 'jp2.card = j2 AND jp2.pack = 1'); // Match Core Set printing
+            $sub->innerJoin(Decklistslot::class, 'dls2', 'WITH', 'dls2.card = j2');
+            $sub->innerJoin(FellowshipDecklist::class, 'fdl2', 'WITH', 'fdl2.decklist = dls2.decklist');
             $sub->where('fdl2.fellowship = d');
             $sub->groupBy('d.id, dls2.card, jp2.quantity');
             $sub->having('SUM(dls2.quantity) > :numplaysets * jp2.quantity');

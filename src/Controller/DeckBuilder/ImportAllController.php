@@ -74,7 +74,7 @@ class ImportAllController extends AbstractController
 
         $zip->close();
         $this->entityManager->flush();
-        $this->get('session')->getFlashBag()->set('notice', 'Decks imported.');
+        $this->addFlash('notice', 'Decks imported.');
 
         return $this->redirect($this->generateUrl('decks_list'));
     }

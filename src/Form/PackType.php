@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Form;
 
+use App\Entity\Cycle;
 use App\Entity\Pack;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -27,7 +28,7 @@ class PackType extends AbstractType
                 ['years' => ['2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030']]
             )
             ->add('size')
-            ->add('cycle', EntityType::class, ['class' => 'App:Cycle', 'choice_label' => 'name'])
+            ->add('cycle', EntityType::class, ['class' => Cycle::class, 'choice_label' => 'name'])
             ->add('position');
     }
 
@@ -38,7 +39,7 @@ class PackType extends AbstractType
         ]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'appbundle_packtype';
     }

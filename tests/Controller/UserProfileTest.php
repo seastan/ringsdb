@@ -29,7 +29,7 @@ class UserProfileTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $this->fixtureUsers = $this->db()->fetchAll('SELECT * FROM user ORDER BY id');
+        $this->fixtureUsers = $this->db()->fetchAllAssociative('SELECT * FROM user ORDER BY id');
     }
 
     protected function tearDown(): void
@@ -73,7 +73,7 @@ class UserProfileTest extends WebTestCase
      */
     private function fetchUser($id = 1)
     {
-        return $this->db()->fetchAssoc('SELECT * FROM user WHERE id = ?', [$id]);
+        return $this->db()->fetchAssociative('SELECT * FROM user WHERE id = ?', [$id]);
     }
 
     private function checkbox(Form $form, string $name): ChoiceFormField

@@ -24,7 +24,7 @@ class FixSignaturesCommand extends Command
              ->setDescription('Fix canonical names for decklists');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $count = 0;
 
