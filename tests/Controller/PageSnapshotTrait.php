@@ -22,7 +22,7 @@ trait PageSnapshotTrait
     {
         $crawler->filter('script, style, noscript')->each(function (Crawler $node): void {
             $domNode = $node->getNode(0);
-            if (null !== $domNode && null !== $domNode->parentNode) {
+            if ($domNode instanceof \DOMNode && $domNode->parentNode instanceof \DOMNode) {
                 $domNode->parentNode->removeChild($domNode);
             }
         });

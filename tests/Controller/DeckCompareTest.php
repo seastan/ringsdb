@@ -131,7 +131,7 @@ class DeckCompareTest extends WebTestCase
      */
     private function columns(Crawler $row): array
     {
-        return $row->filter('.col-xs-6')->each(fn (Crawler $column) => $column->children()->each(fn (Crawler $line): string => trim((string) preg_replace('/\s+/u', ' ', $line->text()))));
+        return $row->filter('.col-xs-6')->each(fn (Crawler $column): array => $column->children()->each(fn (Crawler $line): string => trim((string) preg_replace('/\s+/u', ' ', $line->text()))));
     }
 
     /* -------------------------------------------------------------- tests */
