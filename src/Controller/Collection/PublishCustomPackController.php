@@ -15,8 +15,10 @@ class PublishCustomPackController extends AbstractController
 {
     use CurrentUserTrait;
 
-    public function __construct(private EntityManagerInterface $entityManager, private CustomPackManager $customPackManager)
-    {
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private CustomPackManager $customPackManager
+    ) {
     }
 
     /**

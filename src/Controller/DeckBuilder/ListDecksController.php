@@ -16,8 +16,9 @@ class ListDecksController extends AbstractController
 {
     use CurrentUserTrait;
 
-    public function __construct(private Decks $decks)
-    {
+    public function __construct(
+        private Decks $decks
+    ) {
     }
 
     /**

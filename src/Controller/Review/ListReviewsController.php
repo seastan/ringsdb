@@ -13,8 +13,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ListReviewsController extends AbstractController
 {
-    public function __construct(private readonly int $cacheExpiration, private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly int $cacheExpiration,
+        private readonly EntityManagerInterface $entityManager
+    ) {
     }
 
     /**

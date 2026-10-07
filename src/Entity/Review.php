@@ -77,18 +77,22 @@ class Review
     /**
      * Constructor.
      */
-    public function __construct(/**
+    public function __construct(
+        /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="reviews")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */
-        private User $user, /**
+        private User $user,
+        /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Card", inversedBy="reviews")
      * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false)
      */
-        private Card $card, /**
+        private Card $card,
+        /**
      * @ORM\Column(name="text_md", type="text", nullable=false)
      */
-        private string $textMd, /**
+        private string $textMd,
+        /**
      * @ORM\Column(name="text_html", type="text", nullable=false)
      */
         private string $textHtml

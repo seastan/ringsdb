@@ -16,8 +16,11 @@ use App\Services\Texts;
 
 class DecklistFactory
 {
-    public function __construct(private readonly DeckValidationHelper $deckValidationHelper, private readonly Texts $texts, private readonly SphereRepository $sphereRepository)
-    {
+    public function __construct(
+        private readonly DeckValidationHelper $deckValidationHelper,
+        private readonly Texts $texts,
+        private readonly SphereRepository $sphereRepository
+    ) {
     }
 
     public function createDecklistFromDeck(Deck $deck, ?string $name = null, ?string $descriptionMd = null): Decklist

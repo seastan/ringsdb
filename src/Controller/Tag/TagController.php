@@ -20,8 +20,11 @@ class TagController extends AbstractController
 {
     use CurrentUserTrait;
 
-    public function __construct(private Decks $decks, private DeckRepository $deckRepository, private EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private Decks $decks,
+        private DeckRepository $deckRepository,
+        private EntityManagerInterface $entityManager
+    ) {
     }
 
     /**

@@ -13,8 +13,12 @@ use Twig\Error\SyntaxError;
 
 class DeckArchiver
 {
-    public function __construct(private readonly string $cacheDir, private readonly DeckRepository $deckRepository, private readonly Environment $twig, private readonly Texts $texts)
-    {
+    public function __construct(
+        private readonly string $cacheDir,
+        private readonly DeckRepository $deckRepository,
+        private readonly Environment $twig,
+        private readonly Texts $texts
+    ) {
     }
 
     /**

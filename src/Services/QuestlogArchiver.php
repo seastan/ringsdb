@@ -12,8 +12,13 @@ use Twig\Environment;
 
 class QuestlogArchiver
 {
-    public function __construct(private readonly string $cacheDir, private readonly QuestlogRepository $questlogRepository, private readonly Decks $decks, private readonly Environment $twig, private readonly Texts $texts)
-    {
+    public function __construct(
+        private readonly string $cacheDir,
+        private readonly QuestlogRepository $questlogRepository,
+        private readonly Decks $decks,
+        private readonly Environment $twig,
+        private readonly Texts $texts
+    ) {
     }
 
     public function downloadFromSelection(User $user, int $questlog_id, bool $octgn): Response

@@ -11,8 +11,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ProcessSearchController extends AbstractController
 {
-    public function __construct(private readonly SphereRepository $sphereRepository)
-    {
+    public function __construct(
+        private readonly SphereRepository $sphereRepository
+    ) {
     }
 
     /**

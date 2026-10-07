@@ -12,8 +12,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SimpleSearchController extends AbstractController
 {
-    public function __construct(private readonly CardsData $cardsData)
-    {
+    public function __construct(
+        private readonly CardsData $cardsData
+    ) {
     }
 
     /**

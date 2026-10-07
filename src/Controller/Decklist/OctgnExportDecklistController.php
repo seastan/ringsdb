@@ -14,8 +14,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class OctgnExportDecklistController extends AbstractController
 {
-    public function __construct(private readonly int $cacheExpiration, private readonly DecklistRepository $decklistRepository)
-    {
+    public function __construct(
+        private readonly int $cacheExpiration,
+        private readonly DecklistRepository $decklistRepository
+    ) {
     }
 
     /**

@@ -42,15 +42,18 @@ class FellowshipComment
      */
     private $isHidden = false;
 
-    public function __construct(/**
+    public function __construct(
+        /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="fellowship_comments")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */
-        private User $user, /**
+        private User $user,
+        /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Fellowship", inversedBy="comments")
      * @ORM\JoinColumn(name="fellowship_id", referencedColumnName="id", nullable=false)
      */
-        private Fellowship $fellowship, /**
+        private Fellowship $fellowship,
+        /**
      * @ORM\Column(type="text")
      */
         private string $text

@@ -14,8 +14,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FileImportDeckController extends AbstractController
 {
-    public function __construct(private readonly DeckImporter $deckImporter)
-    {
+    public function __construct(
+        private readonly DeckImporter $deckImporter
+    ) {
     }
 
     /**

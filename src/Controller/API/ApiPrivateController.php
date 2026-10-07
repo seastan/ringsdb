@@ -22,8 +22,10 @@ class ApiPrivateController extends AbstractController
 {
     use CurrentUserTrait;
 
-    public function __construct(private DeckRepository $deckRepository, private DecklistRepository $decklistRepository)
-    {
+    public function __construct(
+        private DeckRepository $deckRepository,
+        private DecklistRepository $decklistRepository
+    ) {
     }
 
     /**

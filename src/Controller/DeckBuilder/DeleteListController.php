@@ -16,8 +16,10 @@ class DeleteListController extends AbstractController
 {
     use CurrentUserTrait;
 
-    public function __construct(private EntityManagerInterface $entityManager, private DeckRepository $deckRepository)
-    {
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private DeckRepository $deckRepository
+    ) {
     }
 
     /**

@@ -21,8 +21,12 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class RegisterController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly UserPasswordUpdater $passwordUpdater, private readonly TokenGenerator $tokenGenerator, private readonly UserMailer $mailer)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly UserPasswordUpdater $passwordUpdater,
+        private readonly TokenGenerator $tokenGenerator,
+        private readonly UserMailer $mailer
+    ) {
     }
 
     /**

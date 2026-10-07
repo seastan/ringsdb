@@ -7,8 +7,9 @@ use App\Entity\Questlog;
 
 class SnapshotManager
 {
-    public function __construct(private readonly Decks $decks)
-    {
+    public function __construct(
+        private readonly Decks $decks
+    ) {
     }
 
     public function setSnapshot(Questlog $questlog): void

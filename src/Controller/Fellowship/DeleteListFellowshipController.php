@@ -15,8 +15,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DeleteListFellowshipController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly FellowshipRepository $fellowshipRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly FellowshipRepository $fellowshipRepository
+    ) {
     }
 
     /**

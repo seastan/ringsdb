@@ -21,8 +21,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class UserAdminController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly CommentRepository $commentRepository, private readonly UserRepository $userRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly CommentRepository $commentRepository,
+        private readonly UserRepository $userRepository
+    ) {
     }
 
     /**

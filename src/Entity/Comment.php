@@ -37,15 +37,18 @@ class Comment
      */
     private $isHidden = false;
 
-    public function __construct(/**
+    public function __construct(
+        /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="comments")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */
-        private User $user, /**
+        private User $user,
+        /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Decklist", inversedBy="comments")
      * @ORM\JoinColumn(name="decklist_id", referencedColumnName="id", nullable=false)
      */
-        private Decklist $decklist, /**
+        private Decklist $decklist,
+        /**
      * @ORM\Column(type="text")
      */
         private string $text

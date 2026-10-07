@@ -18,8 +18,11 @@ class CopyCustomPackController extends AbstractController
 {
     use CurrentUserTrait;
 
-    public function __construct(private EntityManagerInterface $entityManager, private UserCustomPackRepository $userCustomPackRepository, private CustomPackManager $customPackManager)
-    {
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private UserCustomPackRepository $userCustomPackRepository,
+        private CustomPackManager $customPackManager
+    ) {
     }
 
     /**

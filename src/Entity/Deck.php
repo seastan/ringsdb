@@ -338,7 +338,8 @@ class Deck extends ExportableDeck implements \JsonSerializable
     /**
      * Constructor.
      */
-    public function __construct(/**
+    public function __construct(
+        /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="decks")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */

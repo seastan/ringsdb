@@ -12,8 +12,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class EditFormDecklistController extends AbstractController
 {
-    public function __construct(private readonly DecklistRepository $decklistRepository)
-    {
+    public function __construct(
+        private readonly DecklistRepository $decklistRepository
+    ) {
     }
 
     /**

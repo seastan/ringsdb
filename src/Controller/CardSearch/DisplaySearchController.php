@@ -15,8 +15,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DisplaySearchController extends AbstractController
 {
-    public function __construct(private readonly int $cacheExpiration, private readonly CardsData $cardsData, private readonly PackRepository $packRepository, private readonly CycleRepository $cycleRepository, private readonly CardPrintingRepository $cardPrintingRepository)
-    {
+    public function __construct(
+        private readonly int $cacheExpiration,
+        private readonly CardsData $cardsData,
+        private readonly PackRepository $packRepository,
+        private readonly CycleRepository $cycleRepository,
+        private readonly CardPrintingRepository $cardPrintingRepository
+    ) {
     }
 
     /**

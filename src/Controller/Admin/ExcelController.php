@@ -25,8 +25,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ExcelController extends AbstractController
 {
-    public function __construct(private readonly CardRepository $cardRepository, private readonly PackRepository $packRepository, private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly CardRepository $cardRepository,
+        private readonly PackRepository $packRepository,
+        private readonly EntityManagerInterface $entityManager
+    ) {
     }
 
     /**

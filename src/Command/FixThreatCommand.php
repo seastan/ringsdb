@@ -13,8 +13,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class FixThreatCommand extends Command
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly DecklistRepository $decklistRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly DecklistRepository $decklistRepository
+    ) {
         parent::__construct();
     }
 

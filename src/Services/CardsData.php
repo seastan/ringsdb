@@ -20,8 +20,16 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CardsData
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly UrlGeneratorInterface $router, private readonly Packages $assets_packages, private readonly string $publicDir, private readonly CardRepository $cardRepository, private readonly CycleRepository $cycleRepository, private readonly ReviewRepository $reviewRepository, private readonly SphereRepository $sphereRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly UrlGeneratorInterface $router,
+        private readonly Packages $assets_packages,
+        private readonly string $publicDir,
+        private readonly CardRepository $cardRepository,
+        private readonly CycleRepository $cycleRepository,
+        private readonly ReviewRepository $reviewRepository,
+        private readonly SphereRepository $sphereRepository
+    ) {
     }
 
     /**

@@ -19,8 +19,11 @@ class ImportAllController extends AbstractController
 {
     use CurrentUserTrait;
 
-    public function __construct(private EntityManagerInterface $entityManager, private DeckImporter $deckImporter, private Decks $decks)
-    {
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private DeckImporter $deckImporter,
+        private Decks $decks
+    ) {
     }
 
     /**

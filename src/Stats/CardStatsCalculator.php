@@ -16,8 +16,9 @@ use Doctrine\DBAL\Connection;
  */
 class CardStatsCalculator
 {
-    public function __construct(private readonly Connection $conn)
-    {
+    public function __construct(
+        private readonly Connection $conn
+    ) {
     }
 
     /**

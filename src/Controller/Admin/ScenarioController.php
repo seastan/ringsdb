@@ -21,8 +21,10 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ScenarioController extends AbstractController
 {
-    public function __construct(private readonly ScenarioRepository $scenarioRepository, private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly ScenarioRepository $scenarioRepository,
+        private readonly EntityManagerInterface $entityManager
+    ) {
     }
 
     /**

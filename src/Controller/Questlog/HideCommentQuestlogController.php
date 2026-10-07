@@ -15,8 +15,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class HideCommentQuestlogController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly QuestlogCommentRepository $questlogCommentRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly QuestlogCommentRepository $questlogCommentRepository
+    ) {
     }
 
     /**

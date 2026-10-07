@@ -20,8 +20,12 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DefaultController extends AbstractController
 {
-    public function __construct(private readonly int $cacheExpiration, private readonly ?string $gameName, private readonly ?string $publisherName, private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly int $cacheExpiration,
+        private readonly ?string $gameName,
+        private readonly ?string $publisherName,
+        private readonly EntityManagerInterface $entityManager
+    ) {
     }
 
     /**

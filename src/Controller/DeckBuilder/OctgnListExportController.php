@@ -15,8 +15,9 @@ class OctgnListExportController extends AbstractController
 {
     use CurrentUserTrait;
 
-    public function __construct(private DeckArchiver $deckArchiver)
-    {
+    public function __construct(
+        private DeckArchiver $deckArchiver
+    ) {
     }
 
     /**

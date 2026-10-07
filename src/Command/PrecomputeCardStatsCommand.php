@@ -26,8 +26,10 @@ class PrecomputeCardStatsCommand extends Command
 {
     use StringInputTrait;
 
-    public function __construct(private Connection $connection, private CardStatsCalculator $cardStats)
-    {
+    public function __construct(
+        private Connection $connection,
+        private CardStatsCalculator $cardStats
+    ) {
         parent::__construct();
     }
 
