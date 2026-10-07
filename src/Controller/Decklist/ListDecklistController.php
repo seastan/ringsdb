@@ -55,7 +55,7 @@ class ListDecklistController extends AbstractController
             case 'favorites':
                 $response->setPrivate();
                 $user = $this->getUser();
-                if ($user) {
+                if ($user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
                     $paginator = $this->decklistManager->findDecklistsByFavorite($user);
                 } else {
                     $paginator = $this->decklistManager->getEmptyList();
@@ -66,7 +66,7 @@ class ListDecklistController extends AbstractController
             case 'mine':
                 $response->setPrivate();
                 $user = $this->getUser();
-                if ($user) {
+                if ($user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
                     $paginator = $this->decklistManager->findDecklistsByAuthor($user);
                 } else {
                     $paginator = $this->decklistManager->getEmptyList();

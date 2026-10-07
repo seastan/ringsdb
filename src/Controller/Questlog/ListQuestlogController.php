@@ -55,7 +55,7 @@ class ListQuestlogController extends AbstractController
             case 'favorites':
                 $response->setPrivate();
                 $user = $this->getUser();
-                if ($user) {
+                if ($user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
                     $paginator = $this->questlogManager->findQuestLogsByFavorite($user);
                 } else {
                     $paginator = $this->questlogManager->getEmptyList();
@@ -66,7 +66,7 @@ class ListQuestlogController extends AbstractController
             case 'mine':
                 $response->setPrivate();
                 $user = $this->getUser();
-                if ($user) {
+                if ($user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
                     $paginator = $this->questlogManager->findQuestLogsByAuthor($user);
                 } else {
                     $paginator = $this->questlogManager->getEmptyList();

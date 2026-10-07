@@ -66,7 +66,7 @@ class SuggestionsCommandTest extends KernelTestCase
         $application = new Application(static::$kernel);
         $tester = new CommandTester($application->find('app:suggestions'));
 
-        $this->assertSame(0, (int) $tester->execute(['command' => 'app:suggestions']));
+        $this->assertSame(0, $tester->execute(['command' => 'app:suggestions']));
         $this->assertSame("done\n", $tester->getDisplay());
         $this->assertFileExists($this->file);
 

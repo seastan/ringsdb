@@ -78,4 +78,4 @@ rector:
 all: install lint-twig rector cs phpstan phpunit
 
 reset:
-	rm -rf var/ vendor/
+	rm -rf var/ vendor/ public/bundles public/css public/js

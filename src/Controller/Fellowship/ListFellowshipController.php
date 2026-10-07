@@ -53,7 +53,7 @@ class ListFellowshipController extends AbstractController
             case 'favorites':
                 $response->setPrivate();
                 $user = $this->getUser();
-                if ($user) {
+                if ($user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
                     $paginator = $this->fellowshipManager->findFellowshipsByFavorite($user);
                 } else {
                     $paginator = $this->fellowshipManager->getEmptyList();
@@ -64,7 +64,7 @@ class ListFellowshipController extends AbstractController
             case 'mine':
                 $response->setPrivate();
                 $user = $this->getUser();
-                if ($user) {
+                if ($user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
                     $paginator = $this->fellowshipManager->findFellowshipsByAuthor($user);
                 } else {
                     $paginator = $this->fellowshipManager->getEmptyList();
