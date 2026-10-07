@@ -38,11 +38,11 @@ class Card
     private $position;
 
     /**
-     * @var string|null
+     * @var string
      *
      * @ORM\Column(type="string", length=255, nullable=false)
      */
-    private $code;
+    private $code = '';
 
     /**
      * @var string|null
@@ -309,7 +309,7 @@ class Card
     /**
      * Get code.
      */
-    public function getCode(): ?string
+    public function getCode(): string
     {
         return $this->code;
     }
