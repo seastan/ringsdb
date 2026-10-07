@@ -61,7 +61,7 @@ class Scenario implements \JsonSerializable
      */
     #[ORM\ManyToMany(targetEntity: Encounter::class)]
     #[ORM\JoinTable(name: 'scenario_encounter', joinColumns: [new ORM\JoinColumn(name: 'scenario_id', referencedColumnName: 'id')], inverseJoinColumns: [new ORM\JoinColumn(name: 'encounter_id', referencedColumnName: 'id')])]
-    #[ORM\OrderBy(['pack' => 'ASC'])]
+    #[ORM\OrderBy(['pack' => \SortDirection::Ascending])]
     private $encounters;
 
     /**

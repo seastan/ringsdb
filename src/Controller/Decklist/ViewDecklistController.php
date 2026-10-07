@@ -44,7 +44,7 @@ class ViewDecklistController extends AbstractController
             $decklist->getComments()->getValues()
         );
         $commenters[] = $decklist->getUser()->getUsername();
-        $versions = $this->decklistRepository->findBy(['parent' => $decklist->getParent()], ['version' => 'DESC', 'id' => 'DESC']);
+        $versions = $this->decklistRepository->findBy(['parent' => $decklist->getParent()], ['version' => \SortDirection::Descending, 'id' => \SortDirection::Descending]);
 
         return $this->render('Decklist/decklist.html.twig', ['pagetitle' => $decklist->getName(), 'decklist' => $decklist, 'duplicate' => $duplicate, 'commenters' => $commenters, 'versions' => $versions], $response);
     }

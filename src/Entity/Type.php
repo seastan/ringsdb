@@ -38,7 +38,7 @@ class Type
      * @var Collection<int, Card>
      */
     #[ORM\OneToMany(mappedBy: 'type', targetEntity: Card::class)]
-    #[ORM\OrderBy(['position' => 'ASC'])]
+    #[ORM\OrderBy(['position' => \SortDirection::Ascending])]
     private $cards;
 
     /**

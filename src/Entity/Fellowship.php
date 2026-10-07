@@ -108,7 +108,7 @@ class Fellowship
      * @var Collection<int, FellowshipComment>
      */
     #[ORM\OneToMany(mappedBy: 'fellowship', targetEntity: FellowshipComment::class, cascade: ['persist', 'remove'])]
-    #[ORM\OrderBy(['dateCreation' => 'ASC'])]
+    #[ORM\OrderBy(['dateCreation' => \SortDirection::Ascending])]
     private $comments;
 
     /**

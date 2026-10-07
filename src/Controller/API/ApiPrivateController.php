@@ -32,13 +32,13 @@ class ApiPrivateController extends AbstractController
     public function listDecksAction(Request $request): Response
     {
         /* @var $decklists Decklist[] */
-        $decklists = $this->decklistRepository->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC', 'id' => 'DESC']);
+        $decklists = $this->decklistRepository->findBy(['user' => $this->getUser()], ['dateCreation' => \SortDirection::Descending, 'id' => \SortDirection::Descending]);
         foreach ($decklists as &$decklist) {
             $decklist->setDescriptionMd('');
         }
 
         /* @var $decks \App\Entity\Deck[] */
-        $decks = $this->deckRepository->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC', 'id' => 'DESC']);
+        $decks = $this->deckRepository->findBy(['user' => $this->getUser()], ['dateCreation' => \SortDirection::Descending, 'id' => \SortDirection::Descending]);
         foreach ($decks as &$deck) {
             $deck->setDescriptionMd('');
         }
@@ -77,14 +77,14 @@ class ApiPrivateController extends AbstractController
 
         $show_private_decks = $this->currentUser()->isEqualTo($user);
         /* @var $decklists Decklist[] */
-        $decklists = $this->decklistRepository->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
+        $decklists = $this->decklistRepository->findBy(['user' => $user], ['dateCreation' => \SortDirection::Descending, 'id' => \SortDirection::Descending]);
         foreach ($decklists as &$decklist) {
             $decklist->setDescriptionMd('');
         }
 
         if ($show_private_decks) {
             /* @var $decks \App\Entity\Deck[] */
-            $decks = $this->deckRepository->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
+            $decks = $this->deckRepository->findBy(['user' => $user], ['dateCreation' => \SortDirection::Descending, 'id' => \SortDirection::Descending]);
             foreach ($decks as &$deck) {
                 $deck->setDescriptionMd('');
             }

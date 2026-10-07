@@ -30,7 +30,7 @@ class NewQuestlogController extends AbstractController
     {
         $response = new Response();
         /* @var $quests Scenario[] */
-        $quests = $this->scenarioRepository->findBy([], ['position' => 'ASC']);
+        $quests = $this->scenarioRepository->findBy([], ['position' => \SortDirection::Ascending]);
         /* @var $decks \App\Entity\Deck[] */
         $decks = [];
         $deck_ids = func_get_args();

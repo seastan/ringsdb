@@ -120,7 +120,7 @@ class Questlog
      * @var Collection<int, QuestlogComment>
      */
     #[ORM\OneToMany(mappedBy: 'questlog', targetEntity: QuestlogComment::class, cascade: ['persist', 'remove'])]
-    #[ORM\OrderBy(['dateCreation' => 'ASC'])]
+    #[ORM\OrderBy(['dateCreation' => \SortDirection::Ascending])]
     private $comments;
 
     #[ORM\ManyToOne(targetEntity: Scenario::class, inversedBy: 'questlogs')]

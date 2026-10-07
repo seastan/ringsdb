@@ -35,22 +35,22 @@ class SearchFormController extends AbstractController
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
 
-        $list_packs = $this->packRepository->findBy([], ['dateRelease' => 'ASC', 'position' => 'ASC']);
+        $list_packs = $this->packRepository->findBy([], ['dateRelease' => \SortDirection::Ascending, 'position' => \SortDirection::Ascending]);
         $packs = [];
         foreach ($list_packs as $pack) {
             /* @var $pack Pack */
             $packs[] = ['name' => $pack->getName(), 'code' => $pack->getCode()];
         }
 
-        $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
+        $list_cycles = $this->cycleRepository->findBy([], ['position' => \SortDirection::Ascending]);
         $cycles = [];
         foreach ($list_cycles as $cycle) {
             /* @var $cycle Cycle */
             $cycles[] = ['name' => $cycle->getName(), 'code' => $cycle->getCode()];
         }
 
-        $types = $typeRepository->findBy([], ['name' => 'ASC']);
-        $spheres = $this->sphereRepository->findBy([], ['id' => 'ASC']);
+        $types = $typeRepository->findBy([], ['name' => \SortDirection::Ascending]);
+        $spheres = $this->sphereRepository->findBy([], ['id' => \SortDirection::Ascending]);
         $traits = $this->cardsData->getDistinctTraits();
         $traits = array_filter(array_keys($traits));
         sort($traits);

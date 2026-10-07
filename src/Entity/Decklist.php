@@ -115,14 +115,14 @@ class Decklist extends ExportableDeck implements \JsonSerializable
      * @var Collection<int, Comment>
      */
     #[ORM\OneToMany(mappedBy: 'decklist', targetEntity: Comment::class, cascade: ['persist', 'remove'])]
-    #[ORM\OrderBy(['dateCreation' => 'ASC'])]
+    #[ORM\OrderBy(['dateCreation' => \SortDirection::Ascending])]
     private $comments;
 
     /**
      * @var Collection<int, Decklist>
      */
     #[ORM\OneToMany(mappedBy: 'precedent', targetEntity: Decklist::class)]
-    #[ORM\OrderBy(['dateCreation' => 'ASC'])]
+    #[ORM\OrderBy(['dateCreation' => \SortDirection::Ascending])]
     private $successors;
 
     /**

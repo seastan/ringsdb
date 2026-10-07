@@ -148,7 +148,7 @@ class DeckImporter
             ->join('cp.card', 'c')
             ->where('cp.octgnid = :octgnid')
             ->setParameter('octgnid', $octgnid)
-            ->orderBy('c.id', 'ASC')
+            ->orderBy('c.id', \SortDirection::Ascending)
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();

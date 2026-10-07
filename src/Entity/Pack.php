@@ -78,7 +78,7 @@ class Pack
      * @var Collection<int, CardPrinting>
      */
     #[ORM\OneToMany(mappedBy: 'pack', targetEntity: CardPrinting::class)]
-    #[ORM\OrderBy(['position' => 'ASC'])]
+    #[ORM\OrderBy(['position' => \SortDirection::Ascending])]
     private $printings;
 
     #[ORM\ManyToOne(targetEntity: Cycle::class, inversedBy: 'packs')]

@@ -18,6 +18,7 @@ doctrine:
             !php/const PDO::ATTR_STRINGIFY_FETCHES: true
 
     orm:
+        enable_native_lazy_objects: true
         auto_generate_proxy_classes: "%kernel.debug%"
         naming_strategy:             doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping:                true

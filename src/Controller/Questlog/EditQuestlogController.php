@@ -42,7 +42,7 @@ class EditQuestlogController extends AbstractController
         }
 
         /* @var $quests Scenario[] */
-        $quests = $this->scenarioRepository->findBy([], ['position' => 'ASC']);
+        $quests = $this->scenarioRepository->findBy([], ['position' => \SortDirection::Ascending]);
         $is_locked_as_public = $questlog->getNbVotes() > 0 || $questlog->getNbFavorites() > 0 || $questlog->getNbComments() > 0;
         $data = ['quests' => $quests, 'pagetitle' => 'Edit Quest Log', 'deck1' => null, 'deck2' => null, 'deck3' => null, 'deck4' => null, 'questlogdeck1_content' => null, 'questlogdeck2_content' => null, 'questlogdeck3_content' => null, 'questlogdeck4_content' => null, 'questlogdeck1_player_name' => null, 'questlogdeck2_player_name' => null, 'questlogdeck3_player_name' => null, 'questlogdeck4_player_name' => null, 'questlog' => $questlog, 'is_locked_as_public' => $is_locked_as_public, 'nbDecks' => $questlog->getNbDecks()];
         /* @var $questlog_decks \App\Entity\QuestlogDeck[] */

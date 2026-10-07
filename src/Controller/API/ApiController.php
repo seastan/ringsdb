@@ -61,7 +61,7 @@ class ApiController extends AbstractController
         $jsonp = $request->query->get('jsonp');
         /* @var $em EntityManager */
         /* @var $list_packs \App\Entity\Pack[] */
-        $list_packs = $this->packRepository->findBy([], ['dateRelease' => 'ASC', 'position' => 'ASC']);
+        $list_packs = $this->packRepository->findBy([], ['dateRelease' => \SortDirection::Ascending, 'position' => \SortDirection::Ascending]);
         // check the last-modified-since header
         $lastModified = null;
         foreach ($list_packs as $pack) {
@@ -183,7 +183,7 @@ class ApiController extends AbstractController
         /* @var $list_cards \App\Entity\Card[] */
         // Eager-load printings (+ their packs) and the card's pack/type/sphere so
         // getCardInfo doesn't issue N+1 queries while building packs[] for every card.
-        $list_cards = $this->cardRepository->createQueryBuilder('c')->leftJoin('c.printings', 'cp')->addSelect('cp')->leftJoin('cp.pack', 'cpp')->addSelect('cpp')->leftJoin('c.type', 't')->addSelect('t')->leftJoin('c.sphere', 's')->addSelect('s')->orderBy('c.code', 'ASC')->getQuery()->getResult();
+        $list_cards = $this->cardRepository->createQueryBuilder('c')->leftJoin('c.printings', 'cp')->addSelect('cp')->leftJoin('cp.pack', 'cpp')->addSelect('cpp')->leftJoin('c.type', 't')->addSelect('t')->leftJoin('c.sphere', 's')->addSelect('s')->orderBy('c.code', \SortDirection::Ascending)->getQuery()->getResult();
         // check the last-modified-since header (cards AND their printings, so a new
         // printing or repointed art invalidates the cached card list)
         $lastModified = null;
@@ -495,8 +495,8 @@ class ApiController extends AbstractController
         $qb->from(Decklist::class, 'd');
         // high popularity
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
-        $qb->orderBy('popularity', 'DESC');
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->orderBy('popularity', \SortDirection::Descending);
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
         // containing the card
         $qb->innerJoin('d.slots', 's');
         $qb->andWhere('s.card = :card');
