@@ -24,7 +24,7 @@ class LikeReviewController extends AbstractController
     public function likeAction(Request $request): JsonResponse
     {
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw $this->createAccessDeniedException('You are not logged in.');
         }
 

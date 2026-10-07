@@ -24,7 +24,7 @@ class RemoveReviewController extends AbstractController
     public function removeAction(Request $request, int $id): JsonResponse
     {
         $user = $this->getUser();
-        if (!$user || !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface || !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
             throw $this->createAccessDeniedException('No user or not admin');
         }
 

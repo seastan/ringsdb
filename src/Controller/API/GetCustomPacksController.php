@@ -22,7 +22,7 @@ class GetCustomPacksController extends AbstractController
     public function __invoke(): JsonResponse
     {
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             return new JsonResponse([], 401);
         }
 

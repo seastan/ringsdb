@@ -30,7 +30,7 @@ class SaveArtController extends AbstractController
     public function __invoke(Request $request): Response
     {
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             return new JsonResponse(['success' => false, 'error' => 'not logged in'], 403);
         }
 

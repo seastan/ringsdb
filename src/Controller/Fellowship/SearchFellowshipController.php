@@ -32,7 +32,7 @@ class SearchFellowshipController extends AbstractController
 
         $spheres = $this->connection->executeQuery('SELECT s.name, s.code FROM sphere s ORDER BY s.name ASC')->fetchAllAssociative();
         $owned_packs = '';
-        if ($this->getUser()) {
+        if ($this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             $owned_packs = $this->getUser()->getOwnedPacks();
         }
 

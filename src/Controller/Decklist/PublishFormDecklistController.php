@@ -33,7 +33,7 @@ class PublishFormDecklistController extends AbstractController
     {
         /* @var $user \App\Entity\User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw $this->createAccessDeniedException('You must be logged in for this operation.');
         }
 

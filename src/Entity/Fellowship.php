@@ -160,9 +160,9 @@ class Fellowship
      */
     public function __construct(
         /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="fellowships")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
-     */
+         * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="fellowships")
+         * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+         */
         private User $user
     ) {
         $this->decks = new ArrayCollection();

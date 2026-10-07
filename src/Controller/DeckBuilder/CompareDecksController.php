@@ -38,12 +38,12 @@ class CompareDecksController extends AbstractController
             throw new NotFoundHttpException("This deck doesn't exist.");
         }
 
-        $is_owner = $this->getUser() && $this->getUser()->getId() == $deck1->getUser()->getId();
+        $is_owner = $this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface && $this->getUser()->getId() == $deck1->getUser()->getId();
         if (!$deck1->getUser()->getIsShareDecks() && !$is_owner) {
             throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
         }
 
-        $is_owner = $this->getUser() && $this->getUser()->getId() == $deck2->getUser()->getId();
+        $is_owner = $this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface && $this->getUser()->getId() == $deck2->getUser()->getId();
         if (!$deck2->getUser()->getIsShareDecks() && !$is_owner) {
             throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
         }

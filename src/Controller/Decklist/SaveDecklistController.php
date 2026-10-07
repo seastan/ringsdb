@@ -36,7 +36,7 @@ class SaveDecklistController extends AbstractController
     public function __invoke(Request $request, int $decklist_id): RedirectResponse
     {
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw $this->createAccessDeniedException('Anonymous access denied');
         }
 

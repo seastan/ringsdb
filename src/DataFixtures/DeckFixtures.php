@@ -42,7 +42,7 @@ class DeckFixtures extends Fixture implements ContainerAwareInterface, Dependent
         $deckService = $this->container->get('decks');
 
         /** @var User $user */
-        $user = $this->getReference('test-user');
+        $user = $this->getReference('test-user', User::class);
 
         $deckData = [
             [

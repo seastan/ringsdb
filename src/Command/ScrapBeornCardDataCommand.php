@@ -240,7 +240,7 @@ class ScrapBeornCardDataCommand extends Command
                 $cost = $c->filter('span')->eq(1)->text();
                 $threat = $cost;
                 $output->writeln('9a');
-                $limit = ('Hero' == $type) ? 1 : 3;
+                $limit = ('Hero' === $type) ? 1 : 3;
                 $output->writeln('9b');
                 $willpower = null;
                 $output->writeln('9c');
@@ -255,7 +255,7 @@ class ScrapBeornCardDataCommand extends Command
                 $quest = null;
                 $output->writeln('9h');
 
-                if ('Hero' == $type || 'Ally' == $type) {
+                if ('Hero' === $type || 'Ally' === $type) {
                     $output->writeln('9i');
                     $willpower = $c->filter('img[src="/Images/willpower-med.png"]')->previousAll()->last()->text();
                     $output->writeln('9j');
@@ -265,7 +265,7 @@ class ScrapBeornCardDataCommand extends Command
                     $output->writeln('9l');
                     $health = $c->filter('img[src="/Images/heart-med.png"]')->previousAll()->last()->text();
                     $output->writeln('9m');
-                } elseif ('Player-Side-Quest' == $type) {
+                } elseif ('Player-Side-Quest' === $type) {
                     $type = 'Player Side Quest';
                     $output->writeln('9n');
                     $quest = $c->filter('span')->eq(4)->text();
@@ -280,13 +280,13 @@ class ScrapBeornCardDataCommand extends Command
                 $traits = implode(' ', $traits);
                 $output->writeln('11');
 
-                $text = $c->filter('p:not(.flavor-text)')->each(fn (Crawler $node, $i) => $node->html());
+                $text = $c->filter('p:not(.flavor-text)')->each(fn (Crawler $node, $i): string => $node->html());
                 $output->writeln('12');
 
                 $text = implode('<br>', $text);
                 $output->writeln('13');
 
-                $flavor = $c->filter('p.flavor-text')->each(fn (Crawler $node, $i) => $node->html());
+                $flavor = $c->filter('p.flavor-text')->each(fn (Crawler $node, $i): string => $node->html());
                 $output->writeln('14');
 
                 $flavor = implode('<br>', $flavor);

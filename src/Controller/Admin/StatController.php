@@ -92,7 +92,7 @@ class StatController extends AbstractController
     {
         $query = "SELECT name, date_release\nFROM pack\nWHERE date_release IS NOT NULL\nORDER BY date_release";
 
-        return $this->connection->executeQuery($query, [])->fetchAllAssociative(\PDO::FETCH_ASSOC);
+        return $this->connection->executeQuery($query, [])->fetchAllAssociative();
     }
 
     /**

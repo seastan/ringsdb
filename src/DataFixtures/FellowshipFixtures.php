@@ -27,7 +27,7 @@ class FellowshipFixtures extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         /** @var User $user */
-        $user = $this->getReference('test-user');
+        $user = $this->getReference('test-user', User::class);
 
         $fellowship = new Fellowship($user);
         $fellowship->setIsPublic(true);
@@ -44,7 +44,7 @@ class FellowshipFixtures extends Fixture implements DependentFixtureInterface
 
         for ($i = 1; $i < 5; ++$i) {
             /** @var Deck $deck */
-            $deck = $this->getReference('test-deck-'.$i);
+            $deck = $this->getReference('test-deck-'.$i, Deck::class);
             $fellowship_deck = new FellowshipDeck($fellowship, $deck, $i);
             $fellowship->addDeck($fellowship_deck);
         }

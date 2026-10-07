@@ -44,18 +44,18 @@ class FellowshipComment
 
     public function __construct(
         /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="fellowship_comments")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
-     */
+         * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="fellowship_comments")
+         * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+         */
         private User $user,
         /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Fellowship", inversedBy="comments")
-     * @ORM\JoinColumn(name="fellowship_id", referencedColumnName="id", nullable=false)
-     */
+         * @ORM\ManyToOne(targetEntity="App\Entity\Fellowship", inversedBy="comments")
+         * @ORM\JoinColumn(name="fellowship_id", referencedColumnName="id", nullable=false)
+         */
         private Fellowship $fellowship,
         /**
-     * @ORM\Column(type="text")
-     */
+         * @ORM\Column(type="text")
+         */
         private string $text
     ) {
         $this->dateCreation = new \DateTime();

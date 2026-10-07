@@ -27,9 +27,9 @@ class CommentFixtures extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         /** @var User $user */
-        $user = $this->getReference('test-user');
+        $user = $this->getReference('test-user', User::class);
         /** @var Decklist $decklist */
-        $decklist = $this->getReference('test-decklist-1');
+        $decklist = $this->getReference('test-decklist-1', Decklist::class);
 
         $comment = new Comment($user, $decklist, 'Comment test');
         $comment->setDateCreation(new \DateTime('2015-08-16'));

@@ -31,7 +31,7 @@ class HideCommentDecklistController extends AbstractController
     {
         /* @var $user User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 

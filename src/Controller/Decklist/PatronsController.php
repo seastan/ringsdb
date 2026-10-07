@@ -26,7 +26,7 @@ class PatronsController extends AbstractController
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
 
-        $users = $this->connection->executeQuery('SELECT * FROM user WHERE donation > 0 ORDER BY donation DESC, username', [])->fetchAllAssociative(\PDO::FETCH_ASSOC);
+        $users = $this->connection->executeQuery('SELECT * FROM user WHERE donation > 0 ORDER BY donation DESC, username', [])->fetchAllAssociative();
 
         return $this->render('Default/patrons.html.twig', ['pagetitle' => 'The Gracious Patrons', 'patrons' => $users], $response);
     }

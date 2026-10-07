@@ -42,7 +42,7 @@ class DecklistFixtures extends Fixture implements ContainerAwareInterface, Depen
 
         for ($i = 1; $i < 5; ++$i) {
             /** @var Deck $deck */
-            $deck = $this->getReference('test-deck-'.$i);
+            $deck = $this->getReference('test-deck-'.$i, Deck::class);
 
             $decklist = $decklistFactory->createDecklistFromDeck($deck, $deck->getName(), 'Hello World');
             $decklist->setDateCreation(new \DateTime('2015-08-16'));

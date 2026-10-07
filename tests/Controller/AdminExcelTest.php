@@ -14,8 +14,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  * Excel export / import of the cards (ExcelController, admin only): the tests download a pack,
  * change the file with PhpSpreadsheet, and upload it back.
  *
- * - the download is a StreamedResponse, sent by Symfony's StreamedResponseListener as soon as
- *   the controller returns it: it is captured with an output buffer around the request;
+ * - the download is a StreamedResponse: the test client sends it and keeps its output as the
+ *   content of the internal response;
  * - the upload echoes an HTML report of the changes before returning its response: also
  *   captured.
  *
@@ -82,9 +82,8 @@ class AdminExcelTest extends WebTestCase
      */
     private function download(KernelBrowser $client, int $packId): string
     {
-        ob_start();
         $client->request('POST', '/admin/excel/download', ['pack' => $packId]);
-        $content = ob_get_clean();
+        $content = $client->getInternalResponse()->getContent();
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $file = self::temporaryFile('excel').'.xlsx';

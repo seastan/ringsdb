@@ -70,7 +70,7 @@ class QuestLogManager
     private function currentRequest(): Request
     {
         $request = $this->request_stack->getCurrentRequest();
-        if (null === $request) {
+        if (!$request instanceof Request) {
             throw new \LogicException('No current request.');
         }
 
