@@ -268,17 +268,12 @@ class CSVController extends AbstractController {
 
 		$em->flush();
 
-		$lines = [];
-		$lines[] = sprintf('Imported into pack "%s" (%s).', $pack->getName(), $pack->getCode());
-		$lines[] = sprintf('Rows processed: %d', $summary['rows']);
-		$lines[] = sprintf('Cards created: %d%s', $summary['cards_created'],
-			$createdCards ? ' — ' . implode(', ', $createdCards) : '');
-		$lines[] = sprintf('Printings created: %d%s', $summary['printings_created'],
-			$createdPrintings ? ' — ' . implode(', ', $createdPrintings) : '');
-		$lines[] = sprintf('Existing rows updated: %d', $summary['updated']);
-		$lines[] = sprintf('Cards removed from pack (marked deleted): %d%s', $summary['deleted'],
-			$deletedCards ? ' — ' . implode(', ', $deletedCards) : '');
-
-		return new Response(implode("\n", $lines));
+		return $this->render('AppBundle:CSV:upload_result.html.twig', [
+			'pack' => $pack,
+			'summary' => $summary,
+			'createdCards' => $createdCards,
+			'createdPrintings' => $createdPrintings,
+			'deletedCards' => $deletedCards,
+		]);
 	}
 }

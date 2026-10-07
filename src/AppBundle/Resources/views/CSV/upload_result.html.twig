@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>CSV import result — {{ pack.name }}</title>
+    <style>
+        body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 2rem; color: #222; line-height: 1.4; }
+        h1 { font-size: 1.3rem; margin-bottom: .25rem; }
+        h2 { font-size: 1rem; margin: 1.25rem 0 .25rem; }
+        .pack { color: #666; font-weight: normal; }
+        table.summary { border-collapse: collapse; margin: 1rem 0; }
+        table.summary th, table.summary td { text-align: left; padding: .35rem .9rem; border-bottom: 1px solid #eee; }
+        table.summary td.num { text-align: right; font-variant-numeric: tabular-nums; }
+        ul { margin: .25rem 0 0; padding-left: 1.4rem; }
+        li { margin: .1rem 0; }
+        code { background: #f4f4f4; padding: 0 .3rem; border-radius: 3px; }
+        .muted { color: #888; }
+        .back { margin-top: 1.75rem; }
+    </style>
+</head>
+<body>
+    <h1>CSV import complete
+        <span class="pack">— {{ pack.name }} (<code>{{ pack.code }}</code>)</span></h1>
+
+    <table class="summary">
+        <tr><th>Rows processed</th>        <td class="num">{{ summary.rows }}</td></tr>
+        <tr><th>Cards created</th>         <td class="num">{{ summary.cards_created }}</td></tr>
+        <tr><th>Printings created</th>     <td class="num">{{ summary.printings_created }}</td></tr>
+        <tr><th>Existing rows updated</th> <td class="num">{{ summary.updated }}</td></tr>
+        <tr><th>Cards removed from pack</th><td class="num">{{ summary.deleted }}</td></tr>
+    </table>
+
+    {% if createdCards %}
+        <h2>New cards</h2>
+        <ul>{% for c in createdCards %}<li><code>{{ c }}</code></li>{% endfor %}</ul>
+    {% endif %}
+
+    {% if createdPrintings %}
+        <h2>New printings</h2>
+        <ul>{% for p in createdPrintings %}<li>{{ p }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    {% if deletedCards %}
+        <h2>Cards removed from pack (marked deleted)</h2>
+        <ul>{% for c in deletedCards %}<li><code>{{ c }}</code></li>{% endfor %}</ul>
+    {% endif %}
+
+    {% if not createdCards and not createdPrintings and not deletedCards %}
+        <p class="muted">No new or removed cards — existing entries were updated in place.</p>
+    {% endif %}
+
+    <p class="back"><a href="{{ path('csv_upload_form') }}">← Upload another CSV</a></p>
+</body>
+</html>
