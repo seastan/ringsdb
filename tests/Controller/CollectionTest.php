@@ -187,7 +187,7 @@ class CollectionTest extends WebTestCase
         $id = (int) $this->db()->fetchOne('SELECT MAX(id) FROM user_custom_pack');
         $this->assertGreaterThan($this->maxIds['user_custom_pack'], $id);
         $pack = $this->fetchPack($id);
-        $this->assertRegExp("/^custom_{$id}_[0-9a-f]{6}$/", $pack['code']);
+        $this->assertMatchesRegularExpression("/^custom_{$id}_[0-9a-f]{6}$/", $pack['code']);
         $this->assertSame(['PHPUnit Pack', 1, 0, 'test'], [$pack['name'], $pack['is_enabled'], $pack['is_published'], $pack['username']]);
         $this->assertSame(['01001' => 2, '01013' => 3, '01016' => 1], $this->packCards($id));
         // flash messages are displayed by JavaScript: app.ui.insert_alert_message('success', <JSON>)

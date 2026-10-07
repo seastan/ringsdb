@@ -51,7 +51,7 @@ class PatronCommandTest extends KernelTestCase
 
         $this->assertSame(0, (int) $tester->execute(['command' => 'app:patron'] + $arguments));
         $display = $tester->getDisplay();
-        $this->assertRegExp('/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d:\d\d /', $display);
+        $this->assertMatchesRegularExpression('/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d:\d\d /', $display);
 
         return (string) preg_replace('/^\S+ /m', '', $display);
     }

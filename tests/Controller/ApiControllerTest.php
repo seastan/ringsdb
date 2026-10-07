@@ -118,7 +118,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('application/javascript', $response->headers->get('Content-Type'));
         // the comment prefix protects against content sniffing (JsonResponse::setCallback())
-        $this->assertRegExp('/^\/\*\*\/myCallback\((.*)\);$/s', $response->getContent());
+        $this->assertMatchesRegularExpression('/^\/\*\*\/myCallback\((.*)\);$/s', $response->getContent());
         $json = preg_replace('/^\/\*\*\/myCallback\((.*)\);$/s', '$1', $response->getContent());
         $this->assertMatchesJsonSnapshot($snapshot, $json);
     }

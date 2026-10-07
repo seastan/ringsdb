@@ -180,7 +180,7 @@ class FellowshipWorkflowTest extends WebTestCase
         $client->submit($form);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('#^/fellowship/view/\d+$#', self::location($client->getResponse()));
+        $this->assertMatchesRegularExpression('#^/fellowship/view/\d+$#', self::location($client->getResponse()));
 
         return (int) substr(self::location($client->getResponse()), strlen('/fellowship/view/'));
     }

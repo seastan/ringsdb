@@ -180,7 +180,7 @@ class AdminWriteTest extends WebTestCase
         // create: redirect to the show page
         $response = $this->submitForm($client, "/admin/$slug/new", "/admin/$slug/create", $this->prefixed($formName, $created));
         $this->assertSame(302, $response->getStatusCode());
-        $this->assertRegExp("#^/admin/$slug/\\d+/show$#", self::location($response));
+        $this->assertMatchesRegularExpression("#^/admin/$slug/\\d+/show$#", self::location($response));
         $id = (int) explode('/', self::location($response))[3];
         $this->assertGreaterThan($this->maxIds[$table], $id);
         $this->assertEquals($expectedCreated, $this->db()->fetchAssociative("SELECT $columns FROM $table WHERE id = ?", [$id]));

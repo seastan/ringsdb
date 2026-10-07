@@ -192,8 +192,8 @@ class AdminCsvTest extends WebTestCase
         $beornCore = $this->fetchPrinting('OHaUH', 'Beorn');
 
         $response = $this->upload($client, self::SAMPLE, 'THo', 'ALeP - The Hobbit');
-        $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $response);
-        $this->assertNotContains('marked deleted', $response);
+        $this->assertStringContainsString('<!-- RINGSDB_CSV_IMPORT_OK -->', $response);
+        $this->assertStringNotContainsString('marked deleted', $response);
 
         $this->assertSame($counts, [$this->rowCount('card'), $this->rowCount('card_printing'), $this->rowCount('pack')]);
         $this->assertSame($bilbo, $this->fetchPrinting('THo', 'Bilbo Baggins'));
@@ -220,7 +220,7 @@ class AdminCsvTest extends WebTestCase
             return $row;
         });
 
-        $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, $file, 'THo', 'ALeP - The Hobbit'));
+        $this->assertStringContainsString('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, $file, 'THo', 'ALeP - The Hobbit'));
 
         $beornAfter = $this->fetchPrinting('THo', 'Beorn');
         $this->assertSame('PHPUnit Artist', $beornAfter['illustrator']);
@@ -245,7 +245,7 @@ class AdminCsvTest extends WebTestCase
             return $row;
         });
 
-        $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, $file, 'PHPU', 'PHPUnit Pack'));
+        $this->assertStringContainsString('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, $file, 'PHPU', 'PHPUnit Pack'));
 
         $this->assertSame(
             [$counts[0] + 21, $counts[1] + 21, $counts[2] + 1],
@@ -273,11 +273,11 @@ class AdminCsvTest extends WebTestCase
         $client = $this->createAdminClient();
         $file = $this->sampleVariant(fn (array $row) => 'Bilbo Baggins' === $row['name'] ? null : $row);
 
-        $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, $file, 'THo', 'ALeP - The Hobbit'));
+        $this->assertStringContainsString('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, $file, 'THo', 'ALeP - The Hobbit'));
 
         $bilbo = $this->fetchPrinting('THo', 'Bilbo Baggins');
         $this->assertSame('[deleted] Bilbo Baggins', $bilbo['name']);
-        $this->assertRegExp('/^503007_\w+$/', $bilbo['code']);
+        $this->assertMatchesRegularExpression('/^503007_\w+$/', $bilbo['code']);
         $this->assertSame('Lucky Number', $this->fetchPrinting('THo', 'Lucky Number')['name']);
     }
 
@@ -289,7 +289,7 @@ class AdminCsvTest extends WebTestCase
         $client = $this->createAdminClient();
         $packs = $this->rowCount('pack');
 
-        $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, self::SAMPLE, 'THo2', 'ALeP - The Hobbit (renamed)', 'THo'));
+        $this->assertStringContainsString('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, self::SAMPLE, 'THo2', 'ALeP - The Hobbit (renamed)', 'THo'));
 
         $this->assertSame($packs, $this->rowCount('pack'));
         $this->assertSame('ALeP - The Hobbit (renamed)', $this->db()->fetchOne("SELECT name FROM pack WHERE code = 'THo2'"));
