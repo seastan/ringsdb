@@ -1,10 +1,15 @@
 # services to handle doctrine extensions
-# import it in config.yml
 services:
-    # Doctrine Extension listeners to handle behaviors
+    # Attribute mapping driver for the Doctrine Extension listeners
+    gedmo.mapping.driver.attribute:
+        class: Gedmo\Mapping\Driver\AttributeReader
+
     gedmo.listener.timestampable:
         class: Gedmo\Timestampable\TimestampableListener
         tags:
-            - { name: doctrine.event_subscriber, connection: default }
+            - { name: doctrine.event_listener, event: 'prePersist' }
+            - { name: doctrine.event_listener, event: 'onFlush' }
+            - { name: doctrine.event_listener, event: 'loadClassMetadata' }
         calls:
-            - [ setAnnotationReader, [ "@annotation_reader" ] ]
+            - [ setAnnotationReader, [ '@gedmo.mapping.driver.attribute' ] ]
+            - [ setClock, [ '@clock' ] ]

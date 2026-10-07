@@ -43,6 +43,7 @@
         "scssphp/scssphp": "^1.13",
         "symfony/asset": "*",
         "symfony/cache": "*",
+        "symfony/clock": "6.4.*",
         "symfony/config": "*",
         "symfony/console": "*",
         "symfony/css-selector": "*",

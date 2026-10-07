@@ -26,8 +26,8 @@ class Comment
 
     /**
      * @ORM\Column(name="date_creation", type="datetime", nullable=false)
-     * @Gedmo\Timestampable(on="create")
      */
+    #[Gedmo\Timestampable(on: 'create')]
     private \DateTime $dateCreation;
 
     /**

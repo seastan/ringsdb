@@ -65,16 +65,16 @@ class Pack
      * @var \DateTime
      *
      * @ORM\Column(name="date_creation", type="datetime", nullable=false)
-     * @Gedmo\Timestampable(on="create")
      */
+    #[Gedmo\Timestampable(on: 'create')]
     private $dateCreation;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="date_update", type="datetime", nullable=false)
-     * @Gedmo\Timestampable(on="update")
      */
+    #[Gedmo\Timestampable(on: 'update')]
     private $dateUpdate;
 
     /**
