@@ -27,15 +27,15 @@ class DecklistSocialTest extends WebTestCase
     {
         $this->client = static::createClient();
         $connection = $this->db();
-        $this->fixtureDecklists = $connection->fetchAll('SELECT id, nb_votes, nb_favorites, date_update FROM decklist');
-        $this->fixtureUsers = $connection->fetchAll('SELECT id, reputation FROM user');
+        $this->fixtureDecklists = $connection->fetchAllAssociative('SELECT id, nb_votes, nb_favorites, date_update FROM decklist');
+        $this->fixtureUsers = $connection->fetchAllAssociative('SELECT id, reputation FROM user');
     }
 
     protected function tearDown(): void
     {
         $connection = $this->db();
-        $connection->exec('DELETE FROM favorite');
-        $connection->exec('DELETE FROM vote');
+        $connection->executeStatement('DELETE FROM favorite');
+        $connection->executeStatement('DELETE FROM vote');
         foreach ($this->fixtureDecklists as $decklist) {
             $connection->update('decklist', $decklist, ['id' => $decklist['id']]);
         }
@@ -79,11 +79,11 @@ class DecklistSocialTest extends WebTestCase
         $connection = $this->db();
 
         return [
-            'nb_favorites' => $connection->fetchColumn('SELECT nb_favorites FROM decklist WHERE id = 2'),
-            'nb_votes' => $connection->fetchColumn('SELECT nb_votes FROM decklist WHERE id = 2'),
-            'favorites' => $connection->fetchColumn('SELECT COUNT(*) FROM favorite WHERE decklist_id = 2'),
-            'votes' => $connection->fetchColumn('SELECT COUNT(*) FROM vote WHERE decklist_id = 2'),
-            'author_reputation' => $connection->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"),
+            'nb_favorites' => $connection->fetchOne('SELECT nb_favorites FROM decklist WHERE id = 2'),
+            'nb_votes' => $connection->fetchOne('SELECT nb_votes FROM decklist WHERE id = 2'),
+            'favorites' => $connection->fetchOne('SELECT COUNT(*) FROM favorite WHERE decklist_id = 2'),
+            'votes' => $connection->fetchOne('SELECT COUNT(*) FROM vote WHERE decklist_id = 2'),
+            'author_reputation' => $connection->fetchOne("SELECT reputation FROM user WHERE username = 'test'"),
         ];
     }
 
@@ -100,7 +100,7 @@ class DecklistSocialTest extends WebTestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('1', $response->getContent());
         $this->assertSame(['nb_favorites' => 1, 'nb_votes' => 0, 'favorites' => 1, 'votes' => 0, 'author_reputation' => 6], $this->state());
-        $this->assertGreaterThan('2015-08-16 00:00:00', $this->db()->fetchColumn('SELECT date_update FROM decklist WHERE id = 2'));
+        $this->assertGreaterThan('2015-08-16 00:00:00', $this->db()->fetchOne('SELECT date_update FROM decklist WHERE id = 2'));
 
         // the decklist is listed in the user's favorites
         $crawler = $client->request('GET', '/decklists/favorites');
@@ -143,7 +143,7 @@ class DecklistSocialTest extends WebTestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('1', $response->getContent());
         $this->assertSame(['nb_favorites' => 0, 'nb_votes' => 1, 'favorites' => 0, 'votes' => 1, 'author_reputation' => 2], $this->state());
-        $this->assertGreaterThan('2015-08-16 00:00:00', $this->db()->fetchColumn('SELECT date_update FROM decklist WHERE id = 2'));
+        $this->assertGreaterThan('2015-08-16 00:00:00', $this->db()->fetchOne('SELECT date_update FROM decklist WHERE id = 2'));
 
         $this->assertSame('1', $this->post($client, 'like', 2)->getContent());
         $this->assertSame(['nb_favorites' => 0, 'nb_votes' => 1, 'favorites' => 0, 'votes' => 1, 'author_reputation' => 2], $this->state());

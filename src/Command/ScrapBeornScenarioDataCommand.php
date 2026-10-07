@@ -43,7 +43,7 @@ class ScrapBeornScenarioDataCommand extends Command
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $name = (string) $input->getOption('name');
         $skip = (int) $input->getOption('skip');

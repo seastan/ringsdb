@@ -33,7 +33,7 @@ class RemoveUserCommand extends Command
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $user_id = $input->getArgument('user_id');
         $user = $this->userRepository->find($user_id);

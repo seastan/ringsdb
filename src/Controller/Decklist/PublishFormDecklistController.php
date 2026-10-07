@@ -40,7 +40,7 @@ class PublishFormDecklistController extends AbstractController
 
         $problem = $this->deckValidationHelper->findProblem($deck, true);
         if ($problem) {
-            $this->get('session')->getFlashBag()->set('error', 'This deck cannot be published because it is invalid.');
+            $this->addFlash('error', 'This deck cannot be published because it is invalid.');
 
             return $this->redirect($this->generateUrl('deck_view', ['deck_id' => $deck->getId()]));
         }
@@ -54,7 +54,7 @@ class PublishFormDecklistController extends AbstractController
             $deck_content = ['main' => $decklist->getSlots()->getContent(), 'side' => $decklist->getSideslots()->getContent()];
             if (json_encode($deck_content) == $new_content) {
                 $url = $this->generateUrl('decklist_detail', ['decklist_id' => $decklist->getId(), 'decklist_name' => $decklist->getNameCanonical()]);
-                $this->get('session')->getFlashBag()->set('warning', "This deck <a href=\"{$url}\">has already been published</a> before. You are going to create a duplicate.");
+                $this->addFlash('warning', "This deck <a href=\"{$url}\">has already been published</a> before. You are going to create a duplicate.");
             }
         }
 

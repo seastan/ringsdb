@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Entity\Card;
+use App\Entity\CardPrinting;
+use App\Entity\Deckslot;
 use App\Entity\Questlog;
+use App\Entity\QuestlogComment;
 use App\Entity\User;
+use App\Entity\UserCustomPackCard;
 use App\Helper\StringSanitizer;
 use App\Repository\CardRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -97,7 +101,7 @@ class QuestLogManager
     {
         $qb = $this->doctrine->createQueryBuilder();
         $qb->select('d');
-        $qb->from('App:Questlog', 'd');
+        $qb->from(Questlog::class, 'd');
         $qb->andWhere('d.isPublic = 1');
         $qb->setFirstResult($this->start);
         $qb->setMaxResults($this->limit);
@@ -219,7 +223,7 @@ class QuestLogManager
     {
         $qb = $this->getQueryBuilder();
 
-        $qb->addSelect('(SELECT count(c) FROM App:QuestlogComment c WHERE c.questlog=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
+        $qb->addSelect('(SELECT count(c) FROM '.QuestlogComment::class.' c WHERE c.questlog=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
         $qb->orderBy('nbRecentComments', 'DESC');
         $qb->addOrderBy('d.nbComments', 'DESC');
 
@@ -292,19 +296,19 @@ class QuestLogManager
             if (count($packs) > 0 || $useCustomPacks) {
                 $sub = $this->doctrine->createQueryBuilder();
                 $sub->select('c');
-                $sub->from('App:Card', 'c');
-                $sub->innerJoin('App:Deckslot', 's', 'WITH', 's.card = c');
+                $sub->from(Card::class, 'c');
+                $sub->innerJoin(Deckslot::class, 's', 'WITH', 's.card = c');
                 $sub->where('s.deck = ld');
 
                 if (count($packs) > 0) {
-                    $sub->andWhere('NOT EXISTS (SELECT cpqlm.id FROM App:CardPrinting cpqlm WHERE cpqlm.card = c AND cpqlm.pack IN (:qlm_packs))');
+                    $sub->andWhere('NOT EXISTS (SELECT cpqlm.id FROM '.CardPrinting::class.' cpqlm WHERE cpqlm.card = c AND cpqlm.pack IN (:qlm_packs))');
                     $qb->setParameter('qlm_packs', $packs);
                 }
 
                 if ($useCustomPacks) {
                     $sub->andWhere(
                         'NOT EXISTS ('.
-                            'SELECT ucpcqlm.id FROM App:UserCustomPackCard ucpcqlm '.
+                            'SELECT ucpcqlm.id FROM '.UserCustomPackCard::class.' ucpcqlm '.
                             'JOIN ucpcqlm.customPack ucpqlm '.
                             'WHERE ucpcqlm.card = c '.
                             'AND ucpqlm.code IN (:qlm_custom_codes) '.

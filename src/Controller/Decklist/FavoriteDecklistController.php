@@ -6,6 +6,7 @@ namespace App\Controller\Decklist;
 
 use App\Entity\Decklist;
 use App\Repository\DecklistRepository;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,8 +17,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FavoriteDecklistController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly DecklistRepository $decklistRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly DecklistRepository $decklistRepository,
+        private readonly Connection $connection
+    ) {
     }
 
     /**
@@ -40,8 +44,7 @@ class FavoriteDecklistController extends AbstractController
         }
 
         $author = $decklist->getUser();
-        $dbh = $this->getDoctrine()->getConnection();
-        $is_favorite = $dbh->executeQuery("SELECT\n\t\t\t\tcount(*)\n\t\t\t\tFROM decklist d\n\t\t\t\tJOIN favorite f ON f.decklist_id = d.id\n\t\t\t\tWHERE f.user_id = ?\n\t\t\t\tAND d.id = ?", [$user->getId(), $decklist_id])->fetch(\PDO::FETCH_NUM)[0];
+        $is_favorite = $this->connection->executeQuery("SELECT\n\t\t\t\tcount(*)\n\t\t\t\tFROM decklist d\n\t\t\t\tJOIN favorite f ON f.decklist_id = d.id\n\t\t\t\tWHERE f.user_id = ?\n\t\t\t\tAND d.id = ?", [$user->getId(), $decklist_id])->fetchOne();
         if ($is_favorite) {
             $decklist->setNbfavorites($decklist->getNbFavorites() - 1);
             $user->removeFavorite($decklist);

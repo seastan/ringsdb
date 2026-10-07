@@ -30,7 +30,7 @@ class BuildAssetsCommand extends Command
              ->setDescription('Build the JavaScript and CSS files loaded by every page into public/');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $sourceDir = __DIR__.'/../Resources/public';
         $bundles = [];

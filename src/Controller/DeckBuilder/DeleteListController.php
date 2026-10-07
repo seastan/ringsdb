@@ -45,7 +45,7 @@ class DeleteListController extends AbstractController
         }
 
         $this->entityManager->flush();
-        $this->get('session')->getFlashBag()->set('notice', 'Decks deleted.');
+        $this->addFlash('notice', 'Decks deleted.');
 
         return $this->redirect($this->generateUrl('decks_list'));
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\API;
 
 use App\Entity\Card;
+use App\Entity\CardPrinting;
 use App\Entity\Decklist;
 use App\Entity\Pack;
 use App\Entity\Scenario;
@@ -196,7 +197,9 @@ class ApiController extends AbstractController
             }
         }
 
-        $printingMax = $this->entityManager->createQuery('SELECT MAX(cp.dateUpdate) FROM App:CardPrinting cp')->getSingleScalarResult();
+        $printingMax = $this->entityManager
+            ->createQuery('SELECT MAX(cp.dateUpdate) FROM '.CardPrinting::class.' cp')
+            ->getSingleScalarResult();
         if ($printingMax) {
             $printingMax = new \DateTime((string) $printingMax);
             if (!$lastModified || $lastModified < $printingMax) {
@@ -520,7 +523,7 @@ class ApiController extends AbstractController
         $qb = $this->entityManager->createQueryBuilder();
         // Select decklists
         $qb->select('d.id, d.name, d.nameCanonical, d.dateCreation, d.dateUpdate');
-        $qb->from('App:Decklist', 'd');
+        $qb->from(Decklist::class, 'd');
         // high popularity
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
         $qb->orderBy('popularity', 'DESC');

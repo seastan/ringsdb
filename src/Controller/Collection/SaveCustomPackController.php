@@ -29,7 +29,7 @@ class SaveCustomPackController extends AbstractController
         $user = $this->currentUser();
         $name = trim($request->get('name', ''));
         if ('' === $name) {
-            $this->get('session')->getFlashBag()->set('error', 'Pack name is required.');
+            $this->addFlash('error', 'Pack name is required.');
 
             return $this->redirectToRoute('collection_custom_pack_new');
         }
@@ -49,7 +49,7 @@ class SaveCustomPackController extends AbstractController
         $this->customPackManager->attachCards($pack, $cardEntries);
         $this->entityManager->persist($pack);
         $this->entityManager->flush();
-        $this->get('session')->getFlashBag()->set('notice', 'Custom pack "'.$name.'" created.');
+        $this->addFlash('notice', 'Custom pack "'.$name.'" created.');
 
         return $this->redirectToRoute('collection_packs');
     }

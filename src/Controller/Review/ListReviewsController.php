@@ -2,6 +2,7 @@
 
 namespace App\Controller\Review;
 
+use App\Entity\Review;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -38,7 +39,7 @@ class ListReviewsController extends AbstractController
         $start = ($page - 1) * $limit;
         $pagetitle = 'Card Reviews';
         /* @var $em EntityManager */
-        $dql = 'SELECT DISTINCT r FROM App:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC, r.id DESC';
+        $dql = 'SELECT DISTINCT r FROM '.Review::class.' r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC, r.id DESC';
         $query = $this->entityManager->createQuery($dql)->setFirstResult($start)->setMaxResults($limit);
         $paginator = new Paginator($query, false);
         $maxcount = count($paginator);

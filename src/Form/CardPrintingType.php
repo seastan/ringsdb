@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Form;
 
+use App\Entity\Card;
 use App\Entity\CardPrinting;
+use App\Entity\Pack;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -23,7 +25,7 @@ class CardPrintingType extends AbstractType
 
         $builder
             ->add('card', EntityType::class, [
-                'class' => 'App:Card',
+                'class' => Card::class,
                 'choice_label' => 'adminLabel',
                 'query_builder' => function (EntityRepository $er) use ($filterPack) {
                     $qb = $er->createQueryBuilder('c')
@@ -41,7 +43,7 @@ class CardPrintingType extends AbstractType
                     return $qb;
                 },
             ])
-            ->add('pack', EntityType::class, ['class' => 'App:Pack', 'choice_label' => 'name'])
+            ->add('pack', EntityType::class, ['class' => Pack::class, 'choice_label' => 'name'])
             ->add('position')
             ->add('quantity')
             ->add('imageCode')
@@ -67,7 +69,7 @@ class CardPrintingType extends AbstractType
         ]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'appbundle_cardprintingtype';
     }

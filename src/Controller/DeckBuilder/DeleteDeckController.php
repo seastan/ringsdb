@@ -38,7 +38,7 @@ class DeleteDeckController extends AbstractController
         }
 
         if (count($deck->getFellowships())) {
-            $this->get('session')->getFlashBag()->set('error', "You can't delete a deck that is member of a fellowship.");
+            $this->addFlash('error', "You can't delete a deck that is member of a fellowship.");
         } else {
             foreach ($deck->getChildren() as $decklist) {
                 $decklist->setParent();
@@ -46,7 +46,7 @@ class DeleteDeckController extends AbstractController
 
             $this->entityManager->remove($deck);
             $this->entityManager->flush();
-            $this->get('session')->getFlashBag()->set('notice', 'Deck deleted.');
+            $this->addFlash('notice', 'Deck deleted.');
         }
 
         return $this->redirect($this->generateUrl('decks_list'));

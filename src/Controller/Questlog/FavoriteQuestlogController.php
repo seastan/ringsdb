@@ -6,6 +6,7 @@ namespace App\Controller\Questlog;
 
 use App\Entity\User;
 use App\Repository\QuestlogRepository;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,8 +17,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FavoriteQuestlogController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly QuestlogRepository $questlogRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly QuestlogRepository $questlogRepository,
+        private readonly Connection $connection
+    ) {
     }
 
     /**
@@ -40,8 +44,7 @@ class FavoriteQuestlogController extends AbstractController
 
         /* @var $author User */
         $author = $questlog->getUser();
-        $dbh = $this->getDoctrine()->getConnection();
-        $is_favorite = $dbh->executeQuery("SELECT\n\t\t\t\tcount(*)\n\t\t\t\tFROM questlog d\n\t\t\t\tJOIN questlog_favorite f ON f.questlog_id = d.id\n\t\t\t\tWHERE f.user_id = ?\n\t\t\t\tAND d.id = ?", [$user->getId(), $questlog_id])->fetch(\PDO::FETCH_NUM)[0];
+        $is_favorite = $this->connection->executeQuery("SELECT\n\t\t\t\tcount(*)\n\t\t\t\tFROM questlog d\n\t\t\t\tJOIN questlog_favorite f ON f.questlog_id = d.id\n\t\t\t\tWHERE f.user_id = ?\n\t\t\t\tAND d.id = ?", [$user->getId(), $questlog_id])->fetchOne();
         if ($is_favorite) {
             $questlog->setNbfavorites($questlog->getNbFavorites() - 1);
             $questlog->removeFavorite($user);

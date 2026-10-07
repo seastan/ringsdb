@@ -41,7 +41,7 @@ class FavoriteFellowshipController extends AbstractController
 
         /* @var $author User */
         $author = $fellowship->getUser();
-        $is_favorite = $this->connection->executeQuery("SELECT\n\t\t\t\tcount(*)\n\t\t\t\tFROM fellowship d\n\t\t\t\tJOIN fellowship_favorite f ON f.fellowship_id = d.id\n\t\t\t\tWHERE f.user_id = ?\n\t\t\t\tAND d.id = ?", [$user->getId(), $fellowship_id])->fetch(\PDO::FETCH_NUM)[0];
+        $is_favorite = $this->connection->executeQuery("SELECT\n\t\t\t\tcount(*)\n\t\t\t\tFROM fellowship d\n\t\t\t\tJOIN fellowship_favorite f ON f.fellowship_id = d.id\n\t\t\t\tWHERE f.user_id = ?\n\t\t\t\tAND d.id = ?", [$user->getId(), $fellowship_id])->fetchOne();
         if ($is_favorite) {
             $fellowship->setNbfavorites($fellowship->getNbFavorites() - 1);
             $fellowship->removeFavorite($user);

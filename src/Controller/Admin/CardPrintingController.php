@@ -31,7 +31,15 @@ class CardPrintingController extends AbstractController
     {
         $packId = $request->query->get('pack');
         $cardName = $request->query->get('card');
-        $qb = $this->entityManager->createQueryBuilder()->select('cp', 'c', 'p')->from('App:CardPrinting', 'cp')->join('cp.card', 'c')->join('cp.pack', 'p')->orderBy('p.dateRelease', 'ASC')->addOrderBy('p.name', 'ASC')->addOrderBy('cp.position', 'ASC');
+        $qb = $this->entityManager
+            ->createQueryBuilder()
+            ->select('cp', 'c', 'p')
+            ->from(CardPrinting::class, 'cp')
+            ->join('cp.card', 'c')
+            ->join('cp.pack', 'p')
+            ->orderBy('p.dateRelease', 'ASC')
+            ->addOrderBy('p.name', 'ASC')
+            ->addOrderBy('cp.position', 'ASC');
         if ($packId) {
             $qb->andWhere('p.id = :pack')->setParameter('pack', $packId);
         }

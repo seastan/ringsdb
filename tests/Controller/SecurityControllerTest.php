@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Controller;
 
 use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -31,6 +32,7 @@ class SecurityControllerTest extends WebTestCase
     protected function tearDown(): void
     {
         $client = $this->client;
+        /** @var EntityManagerInterface $em */
         $em = $client->getContainer()->get('doctrine')->getManager();
         $em->createQuery('DELETE FROM App\Entity\User u WHERE u.username LIKE :prefix')
             ->setParameter('prefix', self::PREFIX.'%')

@@ -43,7 +43,7 @@ class CardStatsCalculatorTest extends KernelTestCase
         $this->connection = static::$kernel->getContainer()->get('doctrine')->getConnection();
         $this->calculator = static::$kernel->getContainer()->get('app.card_stats');
         foreach (['deck', 'decklist'] as $table) {
-            $this->maxIds[$table] = (int) $this->connection->fetchColumn("SELECT MAX(id) FROM $table");
+            $this->maxIds[$table] = (int) $this->connection->fetchOne("SELECT MAX(id) FROM $table");
         }
     }
 
@@ -58,7 +58,7 @@ class CardStatsCalculatorTest extends KernelTestCase
             "DELETE FROM deck WHERE id > {$max['deck']}",
             "DELETE FROM stat_cards_cache WHERE month IN ('2015-07', '2015-08', '2023-05')",
         ] as $sql) {
-            $this->connection->exec($sql);
+            $this->connection->executeStatement($sql);
         }
 
         parent::tearDown();
@@ -74,7 +74,7 @@ class CardStatsCalculatorTest extends KernelTestCase
      */
     private function insertDeck(array $values, array $main, array $side = []): int
     {
-        $row = $this->connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
+        $row = $this->connection->fetchAssociative('SELECT * FROM deck WHERE id = 2');
         $this->assertNotFalse($row);
         unset($row['id']);
         $this->connection->insert('deck', $values + ['last_pack_id' => self::WAR_OF_DALE, 'problem' => null] + $row);
@@ -98,7 +98,7 @@ class CardStatsCalculatorTest extends KernelTestCase
      */
     private function insertDecklist(array $values, array $main): int
     {
-        $row = $this->connection->fetchAssoc('SELECT * FROM decklist WHERE id = 2');
+        $row = $this->connection->fetchAssociative('SELECT * FROM decklist WHERE id = 2');
         $this->assertNotFalse($row);
         unset($row['id']);
         $this->connection->insert('decklist', $values + ['last_pack_id' => self::WAR_OF_DALE] + $row);
@@ -284,14 +284,14 @@ class CardStatsCalculatorTest extends KernelTestCase
         $this->assertStringContainsString("Computing 2015-08 ...\n", $display);
         $this->assertStringContainsString("Computing 2015-07 ...\n", $display);
         $this->assertStringEndsWith("done\n", $display);
-        $rows = $this->connection->fetchAll("SELECT month, step, payload FROM stat_cards_cache WHERE month IN ('2015-07', '2015-08') ORDER BY month, step");
+        $rows = $this->connection->fetchAllAssociative("SELECT month, step, payload FROM stat_cards_cache WHERE month IN ('2015-07', '2015-08') ORDER BY month, step");
         $this->assertSame([['2015-07', 1], ['2015-07', 2], ['2015-07', 3], ['2015-08', 1], ['2015-08', 2], ['2015-08', 3]], array_map(fn (array $row): array => [$row['month'], $row['step']], $rows));
         // the payload is the JSON of computeCards()
         $this->assertSame(json_encode($this->calculator->computeCards('2015-08', '2')), $rows[4]['payload']);
 
         // running it again replaces the rows
         $this->runCommand(['month' => '2015-08']);
-        $this->assertSame(6, $this->connection->fetchColumn("SELECT COUNT(*) FROM stat_cards_cache WHERE month IN ('2015-07', '2015-08')"));
+        $this->assertSame(6, $this->connection->fetchOne("SELECT COUNT(*) FROM stat_cards_cache WHERE month IN ('2015-07', '2015-08')"));
     }
 
     public function testPrecomputeCommandRefusesAnInvalidMonth(): void
@@ -300,6 +300,6 @@ class CardStatsCalculatorTest extends KernelTestCase
 
         $this->assertSame(1, $status);
         $this->assertStringContainsString("month must be YYYY-MM, got '2015-08' OR '1'", $display);
-        $this->assertSame(0, $this->connection->fetchColumn('SELECT COUNT(*) FROM stat_cards_cache'));
+        $this->assertSame(0, $this->connection->fetchOne('SELECT COUNT(*) FROM stat_cards_cache'));
     }
 }

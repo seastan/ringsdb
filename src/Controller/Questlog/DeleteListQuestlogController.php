@@ -57,7 +57,7 @@ class DeleteListQuestlogController extends AbstractController
         }
 
         $this->entityManager->flush();
-        $this->get('session')->getFlashBag()->set('notice', $message ?: 'Quest Logs deleted.');
+        $this->addFlash('notice', $message ?: 'Quest Logs deleted.');
 
         return $this->redirect($this->generateUrl('myquestlogs_list'));
     }

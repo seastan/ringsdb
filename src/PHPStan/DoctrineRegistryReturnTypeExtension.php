@@ -12,7 +12,7 @@ use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 
 /**
- * The application only uses the Doctrine ORM: the "doctrine" registry (Registry, getDoctrine())
+ * The application only uses the Doctrine ORM: the "doctrine" registry
  * always returns ORM entity managers and DBAL connections, not the generic ObjectManager / object
  * declared by doctrine/persistence. phpstan-doctrine types the repositories (getRepository() with
  * a class name), not the registry.

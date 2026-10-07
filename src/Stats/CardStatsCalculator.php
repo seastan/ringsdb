@@ -173,7 +173,7 @@ WHERE t.name != 'Campaign'
   AND CAST(p.date_release AS CHAR) <= '".$month."-31'
 GROUP BY c.code, cprim.octgnid, c.name, t.name, s.name, p.name, p.date_release, c.cost
 ORDER BY encounter, full_decks DESC, CAST(c.code AS UNSIGNED) DESC";
-            $cards = $dbh->executeQuery($query1, [])->fetchAll(\PDO::FETCH_ASSOC);
+            $cards = $dbh->executeQuery($query1, [])->fetchAllAssociative();
 
             return ['cards' => $cards];
         }
@@ -301,7 +301,7 @@ WHERE t.name != 'Campaign'
   AND CAST(p.date_release AS CHAR) <= '".$month."-31'
 GROUP BY c.code
 ORDER BY c.code";
-            $cards = $dbh->executeQuery($query2, [])->fetchAll(\PDO::FETCH_ASSOC);
+            $cards = $dbh->executeQuery($query2, [])->fetchAllAssociative();
 
             return ['cards' => $cards];
         }
@@ -415,7 +415,7 @@ ORDER BY c.code";
     AND CAST(p.date_release AS CHAR) <= '".$month."-31'
   GROUP BY c.code
   ORDER BY c.code";
-            $cards = $dbh->executeQuery($query3, [])->fetchAll(\PDO::FETCH_ASSOC);
+            $cards = $dbh->executeQuery($query3, [])->fetchAllAssociative();
 
             $query_total = "SELECT full_decks,
   limited_decks,
@@ -466,7 +466,7 @@ FROM (
       AND p.date_release < '2019-08-02'
     ) AS limited_decks
   ) t";
-            $total = $dbh->executeQuery($query_total, [])->fetchAll(\PDO::FETCH_ASSOC);
+            $total = $dbh->executeQuery($query_total, [])->fetchAllAssociative();
 
             $packs = $this->getPacks();
             $pack_rules = $this->getPackRuless();
@@ -494,7 +494,7 @@ FROM pack
 WHERE date_release IS NOT NULL
 ORDER BY date_release';
 
-        return $dbh->executeQuery($query, [])->fetchAll(\PDO::FETCH_ASSOC);
+        return $dbh->executeQuery($query, [])->fetchAllAssociative();
     }
 
     /**
@@ -533,7 +533,7 @@ ON source_code(c1.code, p.name) = c2.code
 JOIN (SELECT cpx.card_id, cpx.pack_id, cpx.octgnid FROM card_printing cpx WHERE cpx.id = (SELECT cpy.id FROM card_printing cpy JOIN pack py ON py.id = cpy.pack_id WHERE cpy.card_id = cpx.card_id ORDER BY (py.date_release IS NULL), py.date_release, cpy.position, cpy.id LIMIT 1)) cprim2 ON cprim2.card_id = c2.id
 WHERE c1.code != c2.code
 ORDER BY CAST(c1.code AS UNSIGNED)';
-        $res = $dbh->executeQuery($query, [])->fetchAll(\PDO::FETCH_ASSOC);
+        $res = $dbh->executeQuery($query, [])->fetchAllAssociative();
         $mapping = [];
         for ($i = 0; $i < count($res); ++$i) {
             $mapping[$res[$i]['id1']] = $res[$i]['id2'];

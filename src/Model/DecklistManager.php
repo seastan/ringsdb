@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Entity\Card;
+use App\Entity\CardPrinting;
+use App\Entity\Comment;
 use App\Entity\Decklist;
+use App\Entity\Decklistslot;
 use App\Entity\Sphere;
 use App\Entity\User;
+use App\Entity\UserCustomPackCard;
 use App\Helper\StringSanitizer;
 use App\Repository\CardRepository;
 use App\Repository\SphereRepository;
@@ -109,7 +113,7 @@ class DecklistManager
     {
         $qb = $this->doctrine->createQueryBuilder();
         $qb->select('d');
-        $qb->from('App:Decklist', 'd');
+        $qb->from(Decklist::class, 'd');
 
         if ($this->predominantSphere) {
             $qb->where('d.predominantSphere = :predominantSphere');
@@ -249,7 +253,7 @@ class DecklistManager
     {
         $qb = $this->getQueryBuilder();
 
-        $qb->addSelect('(SELECT count(c) FROM App:Comment c WHERE c.decklist=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
+        $qb->addSelect('(SELECT count(c) FROM '.Comment::class.' c WHERE c.decklist=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
         $qb->orderBy('nbRecentComments', 'DESC');
         $qb->addOrderBy('d.nbComments', 'DESC');
 
@@ -385,7 +389,7 @@ class DecklistManager
                 if (count($packs) > 0 && !$useCustomPacks) {
                     $packsWithCards = array_map(intval(...), $this->doctrine->getConnection()
                         ->executeQuery('SELECT DISTINCT pack_id FROM card_printing')
-                        ->fetchAll(\PDO::FETCH_COLUMN));
+                        ->fetchFirstColumn());
                     $skipBuildable = 0 === count(array_diff($packsWithCards, array_map(intval(...), $packs)));
                 }
 
@@ -407,7 +411,7 @@ class DecklistManager
                     if (count($packs) > 0) {
                         $officialSubquery =
                             '(SELECT COALESCE(SUM(CASE WHEN cp.pack = 1 THEN cp.quantity * :numcores ELSE cp.quantity END), 0) '.
-                            'FROM App:CardPrinting cp '.
+                            'FROM '.CardPrinting::class.' cp '.
                             'WHERE cp.card = s.card AND cp.pack IN (:packs))';
                         $qb->setParameter('packs', $packs);
                         $qb->setParameter('numcores', $cores);
@@ -422,8 +426,8 @@ class DecklistManager
                         // Inner version of the official subquery uses alias cp2 so it doesn't
                         // collide with cp from the outer official-check occurrence.
                         $officialSubquery2 = str_replace(
-                            ['FROM App:CardPrinting cp ', 'cp.pack', 'cp.card', 'cp.quantity'],
-                            ['FROM App:CardPrinting cp2 ', 'cp2.pack', 'cp2.card', 'cp2.quantity'],
+                            ['FROM '.CardPrinting::class.' cp ', 'cp.pack', 'cp.card', 'cp.quantity'],
+                            ['FROM '.CardPrinting::class.' cp2 ', 'cp2.pack', 'cp2.card', 'cp2.quantity'],
                             $officialSubquery
                         );
 
@@ -434,7 +438,7 @@ class DecklistManager
                         $uncoveredCondition =
                             's.quantity > '.$officialSubquery.
                             ' AND NOT EXISTS ('.
-                                'SELECT ucpc.id FROM App:UserCustomPackCard ucpc '.
+                                'SELECT ucpc.id FROM '.UserCustomPackCard::class.' ucpc '.
                                 'JOIN ucpc.customPack ucp '.
                                 'WHERE ucpc.card = s.card '.
                                 'AND ucp.code IN (:customPackCodes) '.
@@ -447,7 +451,7 @@ class DecklistManager
                         // Custom-only: custom pack must fully supply the slot on its own.
                         $uncoveredCondition =
                             'NOT EXISTS ('.
-                                'SELECT ucpc.id FROM App:UserCustomPackCard ucpc '.
+                                'SELECT ucpc.id FROM '.UserCustomPackCard::class.' ucpc '.
                                 'JOIN ucpc.customPack ucp '.
                                 'WHERE ucpc.card = s.card '.
                                 'AND ucp.code IN (:customPackCodes) '.
@@ -458,7 +462,7 @@ class DecklistManager
 
                     $qb->andWhere(
                         'NOT EXISTS ('.
-                            'SELECT s.id FROM App:Decklistslot s '.
+                            'SELECT s.id FROM '.Decklistslot::class.' s '.
                             'WHERE s.decklist = d AND '.$uncoveredCondition.
                         ')'
                     );
@@ -468,8 +472,8 @@ class DecklistManager
             if (count($cards_to_exclude) > 0) {
                 $sub = $this->doctrine->createQueryBuilder();
                 $sub->select('k');
-                $sub->from('App:Card', 'k');
-                $sub->innerJoin('App:Decklistslot', 't', 'WITH', 't.card = k');
+                $sub->from(Card::class, 'k');
+                $sub->innerJoin(Decklistslot::class, 't', 'WITH', 't.card = k');
                 $sub->where('t.decklist = d');
                 $sub->andWhere($sub->expr()->in('k.code', $cards_to_exclude));
                 $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));

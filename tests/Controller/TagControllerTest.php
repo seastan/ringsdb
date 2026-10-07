@@ -24,7 +24,7 @@ class TagControllerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $this->fixtureDecks = $this->db()->fetchAll('SELECT id, user_id, tags, date_update FROM deck ORDER BY id');
+        $this->fixtureDecks = $this->db()->fetchAllAssociative('SELECT id, user_id, tags, date_update FROM deck ORDER BY id');
     }
 
     protected function tearDown(): void
@@ -70,7 +70,7 @@ class TagControllerTest extends WebTestCase
      */
     private function tags(): array
     {
-        return array_column($this->db()->fetchAll('SELECT id, tags FROM deck ORDER BY id'), 'tags', 'id');
+        return array_column($this->db()->fetchAllAssociative('SELECT id, tags FROM deck ORDER BY id'), 'tags', 'id');
     }
 
     /* -------------------------------------------------------------- tests */

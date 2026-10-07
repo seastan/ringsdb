@@ -42,7 +42,7 @@ class DeleteQuestlogController extends AbstractController
         }
 
         if ($questlog->getNbVotes() || $questlog->getNbfavorites() || $questlog->getNbcomments()) {
-            $this->get('session')->getFlashBag()->set('error', "You can't delete a published quest log.");
+            $this->addFlash('error', "You can't delete a published quest log.");
         } else {
             /* @var $decks \App\Entity\QuestlogDeck[] */
             $decks = $questlog->getDecks();

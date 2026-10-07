@@ -54,7 +54,7 @@ class DeckCompareTest extends WebTestCase
     {
         $this->client = static::createClient();
         $connection = $this->db();
-        $this->maxDeckId = (int) $connection->fetchColumn('SELECT MAX(id) FROM deck');
+        $this->maxDeckId = (int) $connection->fetchOne('SELECT MAX(id) FROM deck');
         $this->deckA = $this->insertDeck(
             'PHPUnit Deck A',
             [self::GIMLI => 1, self::LEGOLAS => 1, self::VETERAN_AXEHAND => 3, self::GONDORIAN_SPEARMAN => 2],
@@ -71,10 +71,10 @@ class DeckCompareTest extends WebTestCase
     {
         $connection = $this->db();
         foreach (['deckslot', 'decksideslot'] as $table) {
-            $connection->exec("DELETE FROM $table WHERE deck_id > {$this->maxDeckId}");
+            $connection->executeStatement("DELETE FROM $table WHERE deck_id > {$this->maxDeckId}");
         }
 
-        $connection->exec("DELETE FROM deck WHERE id > {$this->maxDeckId}");
+        $connection->executeStatement("DELETE FROM deck WHERE id > {$this->maxDeckId}");
         $connection->update('user', ['is_share_decks' => 0], ['username' => 'test']);
         parent::tearDown();
     }
@@ -105,7 +105,7 @@ class DeckCompareTest extends WebTestCase
     private function insertDeck(string $name, array $main, array $side): int
     {
         $connection = $this->db();
-        $row = $connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
+        $row = $connection->fetchAssociative('SELECT * FROM deck WHERE id = 2');
         $this->assertNotFalse($row);
         unset($row['id']);
         $connection->insert('deck', ['name' => $name] + $row);
@@ -121,9 +121,9 @@ class DeckCompareTest extends WebTestCase
         return $id;
     }
 
-    private function slots(string $table, int $deckId)
+    private function slots(string $table, int $deckId): array
     {
-        return $this->db()->fetchAll("SELECT card_id, quantity FROM $table WHERE deck_id = ? ORDER BY card_id", [$deckId]);
+        return $this->db()->fetchAllAssociative("SELECT card_id, quantity FROM $table WHERE deck_id = ? ORDER BY card_id", [$deckId]);
     }
 
     /**

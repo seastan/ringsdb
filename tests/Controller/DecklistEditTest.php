@@ -32,10 +32,10 @@ class DecklistEditTest extends WebTestCase
     {
         $this->client = static::createClient();
         $connection = $this->db();
-        $this->fixtureDecklists = $connection->fetchAll('SELECT id, name, name_canonical, description_md, description_html, precedent_decklist_id, date_update FROM decklist');
-        $this->fixtureUsers = $connection->fetchAll('SELECT id, roles FROM user');
+        $this->fixtureDecklists = $connection->fetchAllAssociative('SELECT id, name, name_canonical, description_md, description_html, precedent_decklist_id, date_update FROM decklist');
+        $this->fixtureUsers = $connection->fetchAllAssociative('SELECT id, roles FROM user');
         foreach (['decklist', 'deck', 'fellowship'] as $table) {
-            $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
+            $this->maxIds[$table] = (int) $connection->fetchOne("SELECT MAX(id) FROM $table");
         }
     }
 
@@ -53,7 +53,7 @@ class DecklistEditTest extends WebTestCase
             "DELETE FROM decklistslot WHERE decklist_id > {$max['decklist']}",
             "DELETE FROM decklist WHERE id > {$max['decklist']}",
         ] as $sql) {
-            $connection->exec($sql);
+            $connection->executeStatement($sql);
         }
 
         foreach ($this->fixtureDecklists as $decklist) {
@@ -86,7 +86,7 @@ class DecklistEditTest extends WebTestCase
 
     private function fetchDecklist(int $id)
     {
-        return $this->db()->fetchAssoc('SELECT name, name_canonical, description_md, description_html, precedent_decklist_id, date_update FROM decklist WHERE id = ?', [$id]);
+        return $this->db()->fetchAssociative('SELECT name, name_canonical, description_md, description_html, precedent_decklist_id, date_update FROM decklist WHERE id = ?', [$id]);
     }
 
     /**
@@ -97,12 +97,12 @@ class DecklistEditTest extends WebTestCase
     private function insertDecklist(string $name, array $values = []): int
     {
         $connection = $this->db();
-        $row = $connection->fetchAssoc('SELECT * FROM decklist WHERE id = 2');
+        $row = $connection->fetchAssociative('SELECT * FROM decklist WHERE id = 2');
         $this->assertNotFalse($row);
         unset($row['id']);
         $connection->insert('decklist', $values + ['name' => $name] + $row);
         $id = (int) $connection->lastInsertId();
-        $connection->exec("INSERT INTO decklistslot (decklist_id, card_id, quantity) SELECT $id, card_id, quantity FROM decklistslot WHERE decklist_id = 2");
+        $connection->executeStatement("INSERT INTO decklistslot (decklist_id, card_id, quantity) SELECT $id, card_id, quantity FROM decklistslot WHERE decklist_id = 2");
 
         return $id;
     }
@@ -278,7 +278,7 @@ class DecklistEditTest extends WebTestCase
         $client = $this->createAuthenticatedClient();
         $id = $this->insertDecklist('PHPUnit To Delete', ['precedent_decklist_id' => 1]);
         $successor = $this->insertDecklist('PHPUnit Successor', ['precedent_decklist_id' => $id]);
-        $deck = $this->db()->fetchAssoc('SELECT * FROM deck WHERE id = 3');
+        $deck = $this->db()->fetchAssociative('SELECT * FROM deck WHERE id = 3');
         $this->assertNotFalse($deck);
         unset($deck['id']);
         $this->db()->insert('deck', ['name' => 'PHPUnit Child', 'parent_decklist_id' => $id] + $deck);
@@ -289,9 +289,9 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/decklists/mine', $client->getResponse()->headers->get('Location'));
         $this->assertFalse($this->fetchDecklist($id));
-        $this->assertSame(0, $this->db()->fetchColumn('SELECT COUNT(*) FROM decklistslot WHERE decklist_id = ?', [$id]));
+        $this->assertSame(0, $this->db()->fetchOne('SELECT COUNT(*) FROM decklistslot WHERE decklist_id = ?', [$id]));
         $this->assertSame(1, $this->fetchDecklist($successor)['precedent_decklist_id']);
-        $this->assertSame(1, $this->db()->fetchColumn('SELECT parent_decklist_id FROM deck WHERE id = ?', [$child]));
+        $this->assertSame(1, $this->db()->fetchOne('SELECT parent_decklist_id FROM deck WHERE id = ?', [$child]));
     }
 
     /**
@@ -306,7 +306,7 @@ class DecklistEditTest extends WebTestCase
         $client->request('POST', "/decklist/delete/$decklist");
 
         $this->assertSame(403, $client->getResponse()->getStatusCode());
-        $this->assertSame(4, $this->db()->fetchColumn('SELECT COUNT(*) FROM decklist'));
+        $this->assertSame(4, $this->db()->fetchOne('SELECT COUNT(*) FROM decklist'));
     }
 
     /**
@@ -343,9 +343,9 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertFalse($this->fetchDecklist($id));
         $this->assertSame([1, 1], [
-            $connection->fetchColumn('SELECT is_public FROM fellowship WHERE id = ?', [$fellowshipId]),
-            $connection->fetchColumn('SELECT nb_decks FROM fellowship WHERE id = ?', [$fellowshipId]),
+            $connection->fetchOne('SELECT is_public FROM fellowship WHERE id = ?', [$fellowshipId]),
+            $connection->fetchOne('SELECT nb_decks FROM fellowship WHERE id = ?', [$fellowshipId]),
         ]);
-        $this->assertSame(0, $connection->fetchColumn('SELECT COUNT(*) FROM fellowship_decklist WHERE fellowship_id = ?', [$fellowshipId]));
+        $this->assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM fellowship_decklist WHERE fellowship_id = ?', [$fellowshipId]));
     }
 }

@@ -39,7 +39,7 @@ class SuggestionsCommandTest extends KernelTestCase
     {
         static::bootKernel();
         $this->connection = static::$kernel->getContainer()->get('doctrine')->getConnection();
-        $this->maxDeckId = (int) $this->connection->fetchColumn('SELECT MAX(id) FROM deck');
+        $this->maxDeckId = (int) $this->connection->fetchOne('SELECT MAX(id) FROM deck');
         $this->file = static::$kernel->getProjectDir().'/public/suggestions.json';
         $this->backup = file_exists($this->file) ? (string) file_get_contents($this->file) : null;
     }
@@ -52,8 +52,8 @@ class SuggestionsCommandTest extends KernelTestCase
             file_put_contents($this->file, $this->backup);
         }
 
-        $this->connection->exec("DELETE FROM deckslot WHERE deck_id > {$this->maxDeckId}");
-        $this->connection->exec("DELETE FROM deck WHERE id > {$this->maxDeckId}");
+        $this->connection->executeStatement("DELETE FROM deckslot WHERE deck_id > {$this->maxDeckId}");
+        $this->connection->executeStatement("DELETE FROM deck WHERE id > {$this->maxDeckId}");
         parent::tearDown();
     }
 
@@ -78,7 +78,7 @@ class SuggestionsCommandTest extends KernelTestCase
      */
     private function insertDeck(array $cardIds): void
     {
-        $row = $this->connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
+        $row = $this->connection->fetchAssociative('SELECT * FROM deck WHERE id = 2');
         $this->assertNotFalse($row);
         unset($row['id']);
         $this->connection->insert('deck', ['name' => 'PHPUnit Suggestions'] + $row);
@@ -109,7 +109,7 @@ class SuggestionsCommandTest extends KernelTestCase
         $suggestions = $this->runCommand();
 
         // the cards of the 4 fixture decks, by card id
-        $expected = array_column($this->connection->fetchAll(
+        $expected = array_column($this->connection->fetchAllAssociative(
             'SELECT DISTINCT c.id, c.code FROM card c JOIN deckslot s ON s.card_id = c.id ORDER BY c.id'
         ), 'code');
         $this->assertSame(['index', 'matrix'], array_keys($suggestions));
@@ -125,7 +125,7 @@ class SuggestionsCommandTest extends KernelTestCase
         $this->assertSame(1, $this->value($suggestions, '01004', '01028'), 'Gimli and Veteran Axehand, deck 1');
         $this->assertSame(0, $this->value($suggestions, '01004', '01001'), 'Gimli (deck 1) and Aragorn (deck 2)');
         $total = array_sum(array_map(array_sum(...), $suggestions['matrix']));
-        $pairs = (int) $this->connection->fetchColumn('SELECT SUM(n * (n - 1) / 2) FROM (SELECT COUNT(*) n FROM deckslot GROUP BY deck_id) t');
+        $pairs = (int) $this->connection->fetchOne('SELECT SUM(n * (n - 1) / 2) FROM (SELECT COUNT(*) n FROM deckslot GROUP BY deck_id) t');
         $this->assertSame($pairs, $total);
     }
 

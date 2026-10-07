@@ -63,7 +63,7 @@ class DeleteListFellowshipController extends AbstractController
         }
 
         $this->entityManager->flush();
-        $this->get('session')->getFlashBag()->set('notice', $message ?: 'Fellowships deleted.');
+        $this->addFlash('notice', $message ?: 'Fellowships deleted.');
 
         return $this->redirect($this->generateUrl('myfellowships_list'));
     }

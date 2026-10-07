@@ -42,7 +42,7 @@ class DeleteFellowshipController extends AbstractController
         }
 
         if ($fellowship->getNbVotes() || $fellowship->getNbfavorites() || $fellowship->getNbcomments()) {
-            $this->get('session')->getFlashBag()->set('error', "You can't delete a published fellowship.");
+            $this->addFlash('error', "You can't delete a published fellowship.");
         } else {
             /* @var $decks \App\Entity\FellowshipDeck[] */
             $decks = $fellowship->getDecks();

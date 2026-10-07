@@ -37,7 +37,7 @@ class UpdateCustomPackController extends AbstractController
 
         $name = trim($request->get('name', ''));
         if ('' === $name) {
-            $this->get('session')->getFlashBag()->set('error', 'Pack name is required.');
+            $this->addFlash('error', 'Pack name is required.');
 
             return $this->redirectToRoute('collection_custom_pack_edit', ['id' => $id]);
         }
@@ -48,7 +48,6 @@ class UpdateCustomPackController extends AbstractController
             $cardEntries = [];
         }
 
-        $this->entityManager = $this->getDoctrine()->getManager();
         $pack->setName($name);
         $pack->setUpdatedAt(new \DateTime());
         $pack->clearCards();
@@ -58,7 +57,7 @@ class UpdateCustomPackController extends AbstractController
         $this->customPackManager->attachCards($pack, $cardEntries);
         $this->entityManager->persist($pack);
         $this->entityManager->flush();
-        $this->get('session')->getFlashBag()->set('notice', 'Custom pack updated.');
+        $this->addFlash('notice', 'Custom pack updated.');
 
         return $this->redirectToRoute('collection_packs');
     }
