@@ -48,21 +48,20 @@ class Decklist extends ExportableDeck implements \JsonSerializable
 
     /**
      * @ORM\Column(name="date_creation", type="datetime", nullable=false)
-     * @Gedmo\Timestampable(on="create")
      */
+    #[Gedmo\Timestampable(on: 'create')]
     private \DateTime $dateCreation;
 
     /**
      * @ORM\Column(name="date_update", type="datetime", nullable=false)
-     * @Gedmo\Timestampable(on="update")
      */
+    #[Gedmo\Timestampable(on: 'update')]
     private \DateTime $dateUpdate;
 
     /**
      * @var \DateTime|null
      *
      * @ORM\Column(name="date_last_comment", type="datetime", nullable=true)
-     * @Gedmo\Timestampable(on="update")
      */
     private $dateLastComment;
 

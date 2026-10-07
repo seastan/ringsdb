@@ -69,8 +69,8 @@ class Cycle
      * @var \DateTime
      *
      * @ORM\Column(name="date_creation", type="datetime", nullable=false)
-     * @Gedmo\Timestampable(on="create")
      */
+    #[Gedmo\Timestampable(on: 'create')]
     private $dateCreation;
 
     /**

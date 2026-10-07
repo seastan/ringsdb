@@ -2,7 +2,7 @@
 doctrine:
     dbal:
         driver:         pdo_mysql
-        server_version: 8.0
+        server_version: 8.0.46
         # the connection of each environment: .env (.env.test for the tests)
         host:           '%env(DATABASE_HOST)%'
         port:           '%env(int:DATABASE_PORT)%'
