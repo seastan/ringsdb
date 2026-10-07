@@ -27,7 +27,7 @@ class CustomPackFixtures extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         /** @var User $user */
-        $user = $this->getReference('test-user');
+        $user = $this->getReference('test-user', User::class);
         $cardRepo = $manager->getRepository(Card::class);
 
         $pack = new UserCustomPack($user, 'Test Custom Pack', 'custom_test');

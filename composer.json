@@ -3,6 +3,8 @@
     "description": "The Lord of the Rings LCG deckbuilder",
     "license": "proprietary",
     "type": "project",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "App\\": "src/"
@@ -23,26 +25,27 @@
         "ext-pdo": "*",
         "ext-zip": "*",
         "beberlei/doctrineextensions": "^1.3.0",
+        "doctrine/annotations": "^2.0.0",
         "doctrine/common": "^3.0.0",
-        "doctrine/dbal": "^2.5",
-        "doctrine/doctrine-bundle": "^2.0.0",
-        "doctrine/doctrine-migrations-bundle": "^3.3.0",
+        "doctrine/dbal": "^3.7.0",
+        "doctrine/doctrine-bundle": "^2.19.1",
+        "doctrine/doctrine-fixtures-bundle": "^3.5.0",
+        "doctrine/doctrine-migrations-bundle": "^3.7.1",
         "doctrine/orm": "^2.13",
-        "doctrine/persistence": "^2.0.0",
+        "doctrine/persistence": "^3.1",
         "erusev/parsedown": "^1.6",
         "ezyang/htmlpurifier": "^4.6",
-        "friendsofsymfony/jsrouting-bundle": "^2.2",
-        "gedmo/doctrine-extensions": "^3.3",
+        "friendsofsymfony/jsrouting-bundle": "^3.6.0",
+        "gedmo/doctrine-extensions": "^3.22.2",
         "nelmio/api-doc-bundle": "^4.38",
         "ocramius/proxy-manager": "~2.2.0",
-        "phpoffice/phpspreadsheet": "^1.30.7",
+        "phpoffice/phpspreadsheet": "^5.10.0",
         "scssphp/scssphp": "^1.13",
         "symfony/asset": "*",
         "symfony/cache": "*",
         "symfony/config": "*",
         "symfony/console": "*",
         "symfony/css-selector": "*",
-        "symfony/debug": "*",
         "symfony/dependency-injection": "*",
         "symfony/doctrine-bridge": "*",
         "symfony/dom-crawler": "*",
@@ -55,7 +58,6 @@
         "symfony/framework-bundle": "*",
         "symfony/http-foundation": "*",
         "symfony/http-kernel": "*",
-        "symfony/inflector": "*",
         "symfony/intl": "*",
         "symfony/mailer": "*",
         "symfony/monolog-bridge": "*",
@@ -63,9 +65,9 @@
         "symfony/options-resolver": "*",
         "symfony/property-access": "*",
         "symfony/routing": "*",
+        "symfony/runtime": "6.4.*",
         "symfony/security-bundle": "*",
         "symfony/serializer": "*",
-        "symfony/translation": "*",
         "symfony/twig-bridge": "*",
         "symfony/twig-bundle": "*",
         "symfony/validator": "*",
@@ -74,7 +76,6 @@
         "twig/twig": "^2.10"
     },
     "require-dev": {
-        "doctrine/doctrine-fixtures-bundle": "^3.4.5",
         "friendsofphp/php-cs-fixer": "^3.95",
         "nikic/php-parser": "^4.19",
         "phpstan/extension-installer": "^1.4",
@@ -91,8 +92,8 @@
     },
     "scripts": {
         "auto-scripts": {
-            "cache:clear --no-warmup": "symfony-cmd",
-            "assets:install public --symlink --relative": "symfony-cmd",
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR% --symlink --relative": "symfony-cmd",
             "ln -sfn ../../src/Resources/public public/bundles/app": "script",
             "app:assets": "symfony-cmd"
         },
@@ -109,14 +110,19 @@
         },
         "sort-packages": true,
         "allow-plugins": {
-            "phpstan/extension-installer": true,
+            "php-http/discovery": true,
             "symfony/flex": true,
-            "ocramius/package-versions": true
+            "symfony/runtime": true,
+            "phpstan/extension-installer": true
         }
+    },
+    "conflict": {
+        "symfony/symfony": "*"
     },
     "extra": {
         "symfony": {
-            "require": "5.4.*"
+            "allow-contrib": false,
+            "require": "6.4.*"
         }
     }
 }

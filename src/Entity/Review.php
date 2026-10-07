@@ -79,22 +79,22 @@ class Review
      */
     public function __construct(
         /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="reviews")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
-     */
+         * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="reviews")
+         * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+         */
         private User $user,
         /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Card", inversedBy="reviews")
-     * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false)
-     */
+         * @ORM\ManyToOne(targetEntity="App\Entity\Card", inversedBy="reviews")
+         * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false)
+         */
         private Card $card,
         /**
-     * @ORM\Column(name="text_md", type="text", nullable=false)
-     */
+         * @ORM\Column(name="text_md", type="text", nullable=false)
+         */
         private string $textMd,
         /**
-     * @ORM\Column(name="text_html", type="text", nullable=false)
-     */
+         * @ORM\Column(name="text_html", type="text", nullable=false)
+         */
         private string $textHtml
     ) {
         $this->nbVotes = 0;

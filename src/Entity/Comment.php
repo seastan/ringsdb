@@ -39,18 +39,18 @@ class Comment
 
     public function __construct(
         /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="comments")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
-     */
+         * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="comments")
+         * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+         */
         private User $user,
         /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Decklist", inversedBy="comments")
-     * @ORM\JoinColumn(name="decklist_id", referencedColumnName="id", nullable=false)
-     */
+         * @ORM\ManyToOne(targetEntity="App\Entity\Decklist", inversedBy="comments")
+         * @ORM\JoinColumn(name="decklist_id", referencedColumnName="id", nullable=false)
+         */
         private Decklist $decklist,
         /**
-     * @ORM\Column(type="text")
-     */
+         * @ORM\Column(type="text")
+         */
         private string $text
     ) {
         $this->dateCreation = new \DateTime();

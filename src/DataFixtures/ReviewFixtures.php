@@ -35,7 +35,7 @@ class ReviewFixtures extends Fixture implements ContainerAwareInterface, Depende
     public function load(ObjectManager $manager): void
     {
         /** @var User $user */
-        $user = $this->getReference('test-user');
+        $user = $this->getReference('test-user', User::class);
         $card = $manager->getRepository(Card::class)->findOneBy(['code' => '01001']);
         if (!$card instanceof Card || !$this->container instanceof ContainerInterface) {
             throw new \LogicException('Card 01001 or the container is missing.');

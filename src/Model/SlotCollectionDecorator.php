@@ -32,9 +32,9 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         $this->slots = $slots;
     }
 
-    public function add($element): bool
+    public function add($element): void
     {
-        return $this->slots->add($element);
+        $this->slots->add($element);
     }
 
     public function removeElement($element): bool

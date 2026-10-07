@@ -39,18 +39,18 @@ class QuestlogComment
 
     public function __construct(
         /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="questlog_comments")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
-     */
+         * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="questlog_comments")
+         * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+         */
         private User $user,
         /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Questlog", inversedBy="comments")
-     * @ORM\JoinColumn(name="questlog_id", referencedColumnName="id", nullable=false)
-     */
+         * @ORM\ManyToOne(targetEntity="App\Entity\Questlog", inversedBy="comments")
+         * @ORM\JoinColumn(name="questlog_id", referencedColumnName="id", nullable=false)
+         */
         private Questlog $questlog,
         /**
-     * @ORM\Column(type="text")
-     */
+         * @ORM\Column(type="text")
+         */
         private string $text
     ) {
         $this->dateCreation = new \DateTime();

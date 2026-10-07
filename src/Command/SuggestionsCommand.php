@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Command;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Statement;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -101,7 +100,6 @@ class SuggestionsCommand extends Command
 
         $decks = $dbh->executeQuery('SELECT d.id FROM deck d ORDER BY d.id')->fetchAllAssociative();
 
-        /** @var Statement $stmt */
         $stmt = $dbh->prepare('SELECT d.card_id FROM deckslot d WHERE d.deck_id = ? ORDER BY d.card_id');
 
         foreach ($decks as $deck_id) {

@@ -60,17 +60,17 @@ class UserCustomPack
 
     public function __construct(
         /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     */
+         * @ORM\ManyToOne(targetEntity="App\Entity\User")
+         * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+         */
         private User $user,
         /**
-     * @ORM\Column(type="string", length=255, nullable=false)
-     */
+         * @ORM\Column(type="string", length=255, nullable=false)
+         */
         private string $name,
         /**
-     * @ORM\Column(type="string", length=64, nullable=false)
-     */
+         * @ORM\Column(type="string", length=64, nullable=false)
+         */
         private string $code
     ) {
         $this->cards = new ArrayCollection();

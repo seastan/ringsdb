@@ -26,7 +26,7 @@ class EditFormDecklistController extends AbstractController
     {
         /* @var $user \App\Entity\User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw $this->createAccessDeniedException('Anonymous access denied');
         }
 

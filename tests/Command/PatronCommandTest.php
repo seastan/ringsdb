@@ -49,7 +49,7 @@ class PatronCommandTest extends KernelTestCase
         $application = new Application(static::$kernel);
         $tester = new CommandTester($application->find('app:patron'));
 
-        $this->assertSame(0, (int) $tester->execute(['command' => 'app:patron'] + $arguments));
+        $this->assertSame(0, $tester->execute(['command' => 'app:patron'] + $arguments));
         $display = $tester->getDisplay();
         $this->assertMatchesRegularExpression('/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d:\d\d /', $display);
 

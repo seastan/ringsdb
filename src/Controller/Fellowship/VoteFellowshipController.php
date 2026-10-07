@@ -31,7 +31,7 @@ class VoteFellowshipController extends AbstractController
     public function __invoke(Request $request): Response
     {
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 

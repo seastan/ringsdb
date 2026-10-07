@@ -34,7 +34,7 @@ class DeleteDecklistController extends AbstractController
     public function __invoke(int $decklist_id): RedirectResponse
     {
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
 

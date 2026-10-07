@@ -23,7 +23,7 @@ interface SlotCollectionInterface extends \Countable, IteratorAggregate, ArrayAc
      *
      * @param T $element
      */
-    public function add($element): bool;
+    public function add($element): void;
 
     /**
      * Remove a slot.

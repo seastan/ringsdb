@@ -29,7 +29,7 @@ class QuestlogFixtures extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         /** @var User $user */
-        $user = $this->getReference('test-user');
+        $user = $this->getReference('test-user', User::class);
 
         $questlog = new Questlog($user);
         $questlog->setSuccess(true);
@@ -59,7 +59,7 @@ class QuestlogFixtures extends Fixture implements DependentFixtureInterface
 
         for ($i = 1; $i < 5; ++$i) {
             /** @var Decklist $decklist */
-            $decklist = $this->getReference('test-decklist-'.$i);
+            $decklist = $this->getReference('test-decklist-'.$i, Decklist::class);
 
             $questlog_decklist = new QuestlogDeck($questlog);
             $questlog_decklist->setDecklist($decklist);

@@ -35,7 +35,7 @@ class ViewQuestlogController extends AbstractController
             throw new NotFoundHttpException('This questlog does not exists.');
         }
 
-        $is_owner = $this->getUser() && $this->getUser()->getId() == $questlog->getUser()->getId();
+        $is_owner = $this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface && $this->getUser()->getId() == $questlog->getUser()->getId();
         $is_public = $questlog->getIsPublic();
         if (!$questlog->getUser()->getIsShareDecks() && !$is_owner && !$is_public) {
             throw new AccessDeniedHttpException('You are not allowed to view this questlog. To get access, you can ask it\'s owner to enable "Share my decks" on their account.');

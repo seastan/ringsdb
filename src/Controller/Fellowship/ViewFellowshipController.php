@@ -35,7 +35,7 @@ class ViewFellowshipController extends AbstractController
             throw new NotFoundHttpException('This fellowship does not exists.');
         }
 
-        $is_owner = $this->getUser() && $this->getUser()->getId() == $fellowship->getUser()->getId();
+        $is_owner = $this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface && $this->getUser()->getId() == $fellowship->getUser()->getId();
         $is_public = $fellowship->getIsPublic();
         if (!$fellowship->getUser()->getIsShareDecks() && !$is_owner && !$is_public) {
             throw new AccessDeniedHttpException('You are not allowed to view this fellowship. To get access, you can ask it\'s owner to enable "Share my decks" on their account.');

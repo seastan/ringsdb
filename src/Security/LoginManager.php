@@ -46,7 +46,7 @@ class LoginManager
 
         $token = new UsernamePasswordToken($user, self::FIREWALL, $user->getRoles());
         $request = $this->requestStack->getCurrentRequest();
-        if (null !== $request) {
+        if ($request instanceof \Symfony\Component\HttpFoundation\Request) {
             $this->sessionStrategy->onAuthentication($request, $token);
         }
 
@@ -62,7 +62,7 @@ class LoginManager
     public function getTargetPath(): ?string
     {
         $request = $this->requestStack->getCurrentRequest();
-        if (null === $request || !$request->hasSession()) {
+        if (!$request instanceof \Symfony\Component\HttpFoundation\Request || !$request->hasSession()) {
             return null;
         }
 
