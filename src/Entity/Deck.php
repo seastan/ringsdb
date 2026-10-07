@@ -276,14 +276,14 @@ class Deck extends ExportableDeck implements \JsonSerializable
      * @var Collection<int, Decklist>
      */
     #[ORM\OneToMany(targetEntity: Decklist::class, mappedBy: 'parent')]
-    #[ORM\OrderBy(['dateCreation' => 'DESC'])]
+    #[ORM\OrderBy(['dateCreation' => \SortDirection::Descending])]
     private $children;
 
     /**
      * @var Collection<int, Deckchange>
      */
     #[ORM\OneToMany(targetEntity: Deckchange::class, mappedBy: 'deck', cascade: ['persist', 'remove'])]
-    #[ORM\OrderBy(['dateCreation' => 'DESC', 'isSaved' => 'DESC'])]
+    #[ORM\OrderBy(['dateCreation' => \SortDirection::Descending, 'isSaved' => \SortDirection::Descending])]
     private $changes;
 
     #[ORM\ManyToOne(targetEntity: Pack::class)]

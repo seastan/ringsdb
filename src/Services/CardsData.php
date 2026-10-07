@@ -69,7 +69,7 @@ class CardsData
      */
     public function allSetsData(): array
     {
-        $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
+        $list_cycles = $this->cycleRepository->findBy([], ['position' => \SortDirection::Ascending]);
         $cycles = [];
 
         foreach ($list_cycles as $cycle) {
@@ -120,7 +120,7 @@ class CardsData
      */
     public function getPrimarySpheres(): array
     {
-        return $this->sphereRepository->findBy(['is_primary' => true], ['code' => 'ASC']);
+        return $this->sphereRepository->findBy(['is_primary' => true], ['code' => \SortDirection::Ascending]);
     }
 
     /**
@@ -413,16 +413,16 @@ class CardsData
                 $qb->orderBy('c.cost')->addOrderBy('c.threat');
                 break;
             case 'attack':
-                $qb->orderBy('c.attack', 'DESC');
+                $qb->orderBy('c.attack', \SortDirection::Descending);
                 break;
             case 'willpower':
-                $qb->orderBy('c.willpower', 'DESC');
+                $qb->orderBy('c.willpower', \SortDirection::Descending);
                 break;
             case 'defense':
-                $qb->orderBy('c.defense', 'DESC');
+                $qb->orderBy('c.defense', \SortDirection::Descending);
                 break;
             case 'health':
-                $qb->orderBy('c.health', 'DESC');
+                $qb->orderBy('c.health', \SortDirection::Descending);
                 break;
         }
 
@@ -673,7 +673,7 @@ class CardsData
      */
     public function getReviews(Card $card): array
     {
-        return $this->reviewRepository->findBy(['card' => $card], ['nbVotes' => 'DESC', 'id' => 'ASC']);
+        return $this->reviewRepository->findBy(['card' => $card], ['nbVotes' => \SortDirection::Descending, 'id' => \SortDirection::Ascending]);
     }
 
     /**

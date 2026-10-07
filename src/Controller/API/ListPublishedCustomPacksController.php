@@ -19,7 +19,7 @@ class ListPublishedCustomPacksController extends AbstractController
     #[Route(path: '/api/public/custom-packs/published', name: 'api_public_custom_packs_published', methods: ['GET'])]
     public function __invoke(): JsonResponse
     {
-        $packs = $this->userCustomPackRepository->findBy(['isPublished' => true], ['createdAt' => 'ASC', 'id' => 'ASC']);
+        $packs = $this->userCustomPackRepository->findBy(['isPublished' => true], ['createdAt' => \SortDirection::Ascending, 'id' => \SortDirection::Ascending]);
         $result = [];
         foreach ($packs as $pack) {
             $cards = [];

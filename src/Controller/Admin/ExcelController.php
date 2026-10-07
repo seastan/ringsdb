@@ -35,7 +35,7 @@ class ExcelController extends AbstractController
     #[Route(path: '/admin/excel/download', name: 'excel_download_form', methods: ['GET'])]
     public function downloadFormAction(): Response
     {
-        $packs = $this->packRepository->findBy([], ['dateRelease' => 'ASC', 'name' => 'ASC']);
+        $packs = $this->packRepository->findBy([], ['dateRelease' => \SortDirection::Ascending, 'name' => \SortDirection::Ascending]);
 
         return $this->render('Excel/download_form.html.twig', ['packs' => $packs]);
     }
@@ -46,7 +46,7 @@ class ExcelController extends AbstractController
         $ignoredFields = ['id', 'dateCreation', 'dateUpdate'];
         $pack_id = $request->request->get('pack');
         if (0 == $pack_id) {
-            $cards = $this->cardRepository->findBy([], ['code' => 'ASC']);
+            $cards = $this->cardRepository->findBy([], ['code' => \SortDirection::Ascending]);
             $pack_name = 'LotR LCG Cards';
         } else {
             $pack = $this->packRepository->find($pack_id);

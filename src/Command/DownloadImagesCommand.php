@@ -37,7 +37,7 @@ class DownloadImagesCommand extends Command
         $publicDir = $this->publicDir;
         $output->writeln($publicDir);
 
-        $cards = $repo->findBy([], ['code' => 'ASC']);
+        $cards = $repo->findBy([], ['code' => \SortDirection::Ascending]);
         foreach ($cards as $card) {
             if (!$card->getPack()) {
                 continue;

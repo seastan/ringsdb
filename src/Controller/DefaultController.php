@@ -59,7 +59,7 @@ class DefaultController extends AbstractController
         $timebiday = intdiv($timesec, 24 * 60 * 60);
         // This value will increase by 1 every day
         mt_srand($timebiday);
-        $quests = $scenarioRepository->findBy([], ['position' => 'ASC']);
+        $quests = $scenarioRepository->findBy([], ['position' => \SortDirection::Ascending]);
         $randquest = $quests[array_rand($quests)];
         $challenges = ['using a Scout deck with no non-Scout characters', 'and reduce your threat by 10 more with a single South Away!', 'and kill at least 2 enemies with Hail of Stones', 'and kill at least 2 enemies at once with Rain of Arrows', 'and discard at least 2 enemies with Helm! Helm!', 'using a Dúnedain deck with no non-Dúnedain characters', 'using a Harad deck with no non-Harad allies', 'using a Trap deck with 3 copies of Interrogation', 'using a deck with Fastred', 'using a deck with Rossiel', 'using a deck with Elladan and Elrohir', "using a deck with Na'asiyah", 'using a deck with Tom Cotton', 'using a deck with hero Quickbeam', 'using a deck with Spirit Pippin', 'using a deck where every card costs 2', 'using a deck where every card costs 3', 'using the first deck you ever published', 'kill at least 2 full-health enemies with Dour-handed', 'using a deck where every hero has 1 printed willpower', 'using a deck with only allies', 'using a deck where every hero has 3 printed attack', 'using a deck with hero Elfhelm and a minimum of 15 Mount cards', 'using a deck that features the Palantir', 'using a Rohan deck where We Do Not Sleep, Forth Eorlingas!, and Charge of the Rohirrim are considered to have 0 cost, but if you do not play at least one of these three cards every round, you lose.', 'and heal at least 20 damage with a single Waters of Nimrodel', 'and kill at least 2 enemies with 1 Skyward Volley', 'using a deck where Trained for War and Ride them Down are both considered to have 0 cost, but only when played immediately one after the other.', 'and kill at least 2 enemies with Last Stand', 'and play Houses of Healing after reducing its cost to 0 at least once', 'and draw at least 6 cards with a single Old Toby', 'and play The Free Peoples at least once before the 5th round'];
         $randchallenge = $challenges[array_rand($challenges)];
@@ -73,8 +73,8 @@ class DefaultController extends AbstractController
         $qb->distinct();
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
         $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'), 0));
-        $qb->orderBy('popularity', 'DESC');
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->orderBy('popularity', \SortDirection::Descending);
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         $paginator = new Paginator($qb->getQuery(), $fetchJoinCollection = false);
         $decklists_trending = iterator_to_array($paginator->getIterator());
@@ -88,8 +88,8 @@ class DefaultController extends AbstractController
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
         $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'), 0));
         $qb->andWhere('d.isPublic = TRUE');
-        $qb->orderBy('popularity', 'DESC');
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->orderBy('popularity', \SortDirection::Descending);
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         $paginator = new Paginator($qb->getQuery(), $fetchJoinCollection = false);
         $fellowships_trending = iterator_to_array($paginator->getIterator());
@@ -104,8 +104,8 @@ class DefaultController extends AbstractController
         $qb->setMaxResults($num_new + $num_trending);
         $qb->distinct();
         $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'), 0));
-        $qb->orderBy('d.dateCreation', 'DESC');
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->orderBy('d.dateCreation', \SortDirection::Descending);
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         $paginator = new Paginator($qb->getQuery(), $fetchJoinCollection = false);
         $decklists_new_temp = iterator_to_array($paginator->getIterator());
@@ -134,8 +134,8 @@ class DefaultController extends AbstractController
         $qb->distinct();
         $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'), 0));
         $qb->andWhere('d.isPublic = TRUE');
-        $qb->orderBy('d.dateCreation', 'DESC');
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->orderBy('d.dateCreation', \SortDirection::Descending);
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         $paginator = new Paginator($qb->getQuery(), $fetchJoinCollection = false);
         $fellowships_new_temp = iterator_to_array($paginator->getIterator());

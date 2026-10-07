@@ -71,7 +71,7 @@ class Cycle
      * @var Collection<int, Pack>
      */
     #[ORM\OneToMany(mappedBy: 'cycle', targetEntity: Pack::class)]
-    #[ORM\OrderBy(['position' => 'ASC'])]
+    #[ORM\OrderBy(['position' => \SortDirection::Ascending])]
     private $packs;
 
     /**
