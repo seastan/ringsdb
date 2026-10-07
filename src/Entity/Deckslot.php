@@ -7,35 +7,26 @@ namespace App\Entity;
 use App\Model\SlotInterface;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="deckslot")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'deckslot')]
 class Deckslot implements SlotInterface
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     public function __construct(
-        /**
-         * @ORM\ManyToOne(targetEntity="App\Entity\Deck", inversedBy="slots")
-         * @ORM\JoinColumn(name="deck_id", referencedColumnName="id", nullable=false)
-         */
+        #[ORM\ManyToOne(targetEntity: Deck::class, inversedBy: 'slots')]
+        #[ORM\JoinColumn(name: 'deck_id', referencedColumnName: 'id', nullable: false)]
         private Deck $deck,
-        /**
-         * @ORM\ManyToOne(targetEntity="App\Entity\Card")
-         * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false)
-         */
+        #[ORM\ManyToOne(targetEntity: Card::class)]
+        #[ORM\JoinColumn(name: 'card_id', referencedColumnName: 'id', nullable: false)]
         private Card $card,
-        /**
-         * @ORM\Column(type="smallint")
-         */
+        #[ORM\Column(type: 'smallint')]
         private int $quantity
     ) {
     }

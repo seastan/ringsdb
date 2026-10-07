@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class PostReviewController extends AbstractController
 {
@@ -22,9 +22,7 @@ class PostReviewController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/review/post", name="card_review_post", methods={"POST"})
-     */
+    #[Route(path: '/review/post', name: 'card_review_post', methods: ['POST'])]
     public function postAction(Request $request, CardRepository $cardRepository): JsonResponse
     {
         /* @var $user \App\Entity\User */

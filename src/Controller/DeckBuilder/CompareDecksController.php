@@ -10,7 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class CompareDecksController extends AbstractController
 {
@@ -20,14 +20,7 @@ class CompareDecksController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/deck/compare/{deck1_id}/{deck2_id}",
-     *     name="decks_diff",
-     *     methods={"GET"},
-     *     requirements={"deck1_id"="\d+", "deck2_id"="\d+"}
-     * )
-     */
+    #[Route(path: '/deck/compare/{deck1_id}/{deck2_id}', name: 'decks_diff', requirements: ['deck1_id' => '\d+', 'deck2_id' => '\d+'], methods: ['GET'])]
     public function __invoke(int $deck1_id, int $deck2_id): Response
     {
         /* @var $deck1 \App\Entity\Deck */

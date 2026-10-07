@@ -7,55 +7,46 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\DeckchangeRepository")
- * @ORM\Table(name="deckchange")
- */
+#[ORM\Entity(repositoryClass: \App\Repository\DeckchangeRepository::class)]
+#[ORM\Table(name: 'deckchange')]
 class Deckchange
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
      */
     #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name: 'date_creation', type: 'datetime', nullable: false)]
     private $dateCreation;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", length=1024)
      */
+    #[ORM\Column(type: 'string', length: 1024)]
     private $variation;
 
     /**
      * @var bool
-     *
-     * @ORM\Column(name="is_saved", type="boolean")
      */
+    #[ORM\Column(name: 'is_saved', type: 'boolean')]
     private $isSaved;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="string", length=8, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 8, nullable: true)]
     private $version;
 
     public function __construct(
-        /**
-         * @ORM\ManyToOne(targetEntity="App\Entity\Deck", inversedBy="changes")
-         * @ORM\JoinColumn(name="deck_id", referencedColumnName="id", nullable=false)
-         */
+        #[ORM\ManyToOne(targetEntity: Deck::class, inversedBy: 'changes')]
+        #[ORM\JoinColumn(name: 'deck_id', referencedColumnName: 'id', nullable: false)]
         private Deck $deck
     ) {
     }

@@ -14,7 +14,7 @@ use App\Services\CardsData;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SearchFormController extends AbstractController
 {
@@ -28,9 +28,7 @@ class SearchFormController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/search", name="cards_search")
-     */
+    #[Route(path: '/search', name: 'cards_search')]
     public function formAction(TypeRepository $typeRepository): Response
     {
         $response = new Response();

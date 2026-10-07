@@ -9,7 +9,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ByAuthorController extends AbstractController
 {
@@ -20,14 +20,7 @@ class ByAuthorController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/user/reviews/{user_id}/{page}",
-     *     name="card_reviews_list_byauthor",
-     *     requirements={"page"="\d+", "user_id"="\d+"},
-     *     defaults={"page"=1}
-     * )
-     */
+    #[Route(path: '/user/reviews/{user_id}/{page}', name: 'card_reviews_list_byauthor', requirements: ['page' => '\d+', 'user_id' => '\d+'], defaults: ['page' => 1])]
     public function byauthorAction(Request $request, int $user_id, int $page = 1): Response
     {
         $response = new Response();

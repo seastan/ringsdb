@@ -10,7 +10,7 @@ use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SearchQuestlogController extends AbstractController
 {
@@ -21,9 +21,7 @@ class SearchQuestlogController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/questlogs/search", name="questlogs_searchform", methods={"GET"}, priority="2")
-     */
+    #[Route(path: '/questlogs/search', name: 'questlogs_searchform', methods: ['GET'], priority: 2)]
     public function __invoke(Request $request): Response
     {
         $response = new Response();

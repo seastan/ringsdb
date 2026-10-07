@@ -11,7 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class DeleteDeckController extends AbstractController
 {
@@ -23,9 +23,7 @@ class DeleteDeckController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/deck/delete", name="deck_delete", methods={"POST"})
-     */
+    #[Route(path: '/deck/delete', name: 'deck_delete', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         $deck_id = filter_var($request->get('deck_id'), FILTER_SANITIZE_NUMBER_INT);

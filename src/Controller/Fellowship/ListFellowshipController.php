@@ -12,7 +12,7 @@ use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ListFellowshipController extends AbstractController
 {
@@ -24,15 +24,7 @@ class ListFellowshipController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/fellowships/{type}/{page}",
-     *     name="fellowships_list",
-     *     methods={"GET"},
-     *     requirements={"page"="\d+"},
-     *     defaults={"type"="popular", "page"=1}
-     * )
-     */
+    #[Route(path: '/fellowships/{type}/{page}', name: 'fellowships_list', requirements: ['page' => '\d+'], defaults: ['type' => 'popular', 'page' => 1], methods: ['GET'])]
     public function __invoke(Request $request, string $type, int $page = 1): Response
     {
         $response = new Response();

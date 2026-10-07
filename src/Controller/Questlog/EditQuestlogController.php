@@ -13,7 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class EditQuestlogController extends AbstractController
 {
@@ -25,14 +25,7 @@ class EditQuestlogController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/questlog/edit/{questlog_id}",
-     *     name="questlog_edit",
-     *     methods={"GET"},
-     *     requirements={"questlog_id"="\d+"}
-     * )
-     */
+    #[Route(path: '/questlog/edit/{questlog_id}', name: 'questlog_edit', requirements: ['questlog_id' => '\d+'], methods: ['GET'])]
     public function __invoke(int $questlog_id): Response
     {
         $response = new Response();

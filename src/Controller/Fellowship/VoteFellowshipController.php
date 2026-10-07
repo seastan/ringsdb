@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class VoteFellowshipController extends AbstractController
 {
@@ -25,9 +25,7 @@ class VoteFellowshipController extends AbstractController
     /*
      * records a user's vote
      */
-    /**
-     * @Route("/user/fellowship_like", name="fellowship_like", methods={"POST"})
-     */
+    #[Route(path: '/user/fellowship_like', name: 'fellowship_like', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
         $user = $this->getUser();

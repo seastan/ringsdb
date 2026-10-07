@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class PublicProfileController extends AbstractController
 {
@@ -21,15 +21,8 @@ class PublicProfileController extends AbstractController
 
     /**
      * displays details about a user and the list of decklists he published.
-     *
-     * @Route(
-     *     "/user/profile/{user_id}/{user_name}/{page}",
-     *     name="user_profile_public",
-     *     methods={"GET"},
-     *     requirements={"user_id"="\d+","page"="\d+"},
-     *     defaults={"page"=1}
-     * )
      */
+    #[Route(path: '/user/profile/{user_id}/{user_name}/{page}', name: 'user_profile_public', requirements: ['user_id' => '\d+', 'page' => '\d+'], defaults: ['page' => 1], methods: ['GET'])]
     public function __invoke(int $user_id, string $user_name, int $page): Response
     {
         $response = new Response();

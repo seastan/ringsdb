@@ -10,7 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class EditDeckController extends AbstractController
 {
@@ -21,9 +21,7 @@ class EditDeckController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/deck/edit/{deck_id}", name="deck_edit", methods={"GET"}, requirements={"deck_id"="\d+"})
-     */
+    #[Route(path: '/deck/edit/{deck_id}', name: 'deck_edit', requirements: ['deck_id' => '\d+'], methods: ['GET'])]
     public function __invoke(int $deck_id): Response
     {
         /* @var $deck \App\Entity\Deck */

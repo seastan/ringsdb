@@ -11,7 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SendConfirmationEmailController extends AbstractController
 {
@@ -21,9 +21,7 @@ class SendConfirmationEmailController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/user/remind/{username}", name="remind_email")
-     */
+    #[Route(path: '/user/remind/{username}', name: 'remind_email')]
     public function __invoke(Request $request, string $username): Response
     {
         $user = $this->userRepository->findOneByUsername($username);

@@ -7,13 +7,11 @@ namespace App\Controller\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ResettingCheckEmailController extends AbstractController
 {
-    /**
-     * @Route("/resetting/check-email", name="fos_user_resetting_check_email", methods={"GET"})
-     */
+    #[Route(path: '/resetting/check-email', name: 'fos_user_resetting_check_email', methods: ['GET'])]
     public function __invoke(Request $request): Response
     {
         if ('' === (string) $request->query->get('username')) {

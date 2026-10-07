@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SimpleSearchController extends AbstractController
 {
@@ -19,9 +19,8 @@ class SimpleSearchController extends AbstractController
 
     /**
      * Processes the action of the single card search input.
-     *
-     * @Route("/find", name="cards_find")
      */
+    #[Route(path: '/find', name: 'cards_find')]
     public function findAction(Request $request): RedirectResponse|Response
     {
         $q = (string) $request->query->get('q');

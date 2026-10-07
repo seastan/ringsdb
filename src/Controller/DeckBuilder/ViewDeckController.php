@@ -10,7 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ViewDeckController extends AbstractController
 {
@@ -21,15 +21,7 @@ class ViewDeckController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/deck/view/{deck_id}",
-     *     name="deck_view",
-     *     methods={"GET"},
-     *     requirements={"deck_id"="\d+"},
-     *     defaults={"deck_id"=0}
-     * )
-     */
+    #[Route(path: '/deck/view/{deck_id}', name: 'deck_view', requirements: ['deck_id' => '\d+'], defaults: ['deck_id' => 0], methods: ['GET'])]
     public function __invoke(int $deck_id): Response
     {
         /* @var $deck \App\Entity\Deck */

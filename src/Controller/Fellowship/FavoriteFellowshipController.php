@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class FavoriteFellowshipController extends AbstractController
 {
@@ -24,9 +24,7 @@ class FavoriteFellowshipController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/user/fellowship_favorite", name="fellowship_favorite", methods={"POST"})
-     */
+    #[Route(path: '/user/fellowship_favorite', name: 'fellowship_favorite', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
         /* @var $user User */

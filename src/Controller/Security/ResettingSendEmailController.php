@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Sends the email with the password reset link. The answer is the same whether the user exists
@@ -24,9 +24,7 @@ class ResettingSendEmailController extends AbstractController
      */
     public const RETRY_TTL = 7200;
 
-    /**
-     * @Route("/resetting/send-email", name="fos_user_resetting_send_email", methods={"POST"})
-     */
+    #[Route(path: '/resetting/send-email', name: 'fos_user_resetting_send_email', methods: ['POST'])]
     public function __invoke(
         Request $request,
         UserRepository $userRepository,

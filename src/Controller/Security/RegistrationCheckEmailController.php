@@ -8,7 +8,7 @@ use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * "An email has been sent", after the registration or a new confirmation email
@@ -21,9 +21,7 @@ class RegistrationCheckEmailController extends AbstractController
      */
     public const SESSION_EMAIL = 'registration_check_email';
 
-    /**
-     * @Route("/register/check-email", name="fos_user_registration_check_email", methods={"GET"})
-     */
+    #[Route(path: '/register/check-email', name: 'fos_user_registration_check_email', methods: ['GET'])]
     public function __invoke(Request $request, UserRepository $userRepository): Response
     {
         $session = $request->getSession();

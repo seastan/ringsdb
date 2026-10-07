@@ -12,7 +12,7 @@ use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ListDecklistController extends AbstractController
 {
@@ -26,15 +26,8 @@ class ListDecklistController extends AbstractController
 
     /**
      * displays the lists of decklists.
-     *
-     * @Route(
-     *     "/decklists/{type}/{page}",
-     *     name="decklists_list",
-     *     methods={"GET"},
-     *     requirements={"page"="\d+"},
-     *     defaults={"type"="popular", "page"=1}
-     * )
      */
+    #[Route(path: '/decklists/{type}/{page}', name: 'decklists_list', requirements: ['page' => '\d+'], defaults: ['type' => 'popular', 'page' => 1], methods: ['GET'])]
     public function __invoke(Request $request, string $type, int $page = 1): Response
     {
         $response = new Response();

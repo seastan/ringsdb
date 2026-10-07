@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ViewQuestlogController extends AbstractController
 {
@@ -18,15 +18,7 @@ class ViewQuestlogController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/questlog/view/{questlog_id}/{questlog_name}",
-     *     name="questlog_view",
-     *     methods={"GET"},
-     *     requirements={"questlog_id"="\d+"},
-     *     defaults={"questlog_name"=null}
-     * )
-     */
+    #[Route(path: '/questlog/view/{questlog_id}/{questlog_name}', name: 'questlog_view', requirements: ['questlog_id' => '\d+'], defaults: ['questlog_name' => null], methods: ['GET'])]
     public function __invoke(int $questlog_id): Response
     {
         /* @var $questlog \App\Entity\Questlog */

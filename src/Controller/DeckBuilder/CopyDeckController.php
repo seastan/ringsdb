@@ -9,7 +9,7 @@ use App\Repository\DecklistRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class CopyDeckController extends AbstractController
 {
@@ -18,9 +18,7 @@ class CopyDeckController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/deck/copy/{decklist_id}", name="deck_copy", requirements={"decklist_id"="\d+"})
-     */
+    #[Route(path: '/deck/copy/{decklist_id}', name: 'deck_copy', requirements: ['decklist_id' => '\d+'])]
     public function __invoke(int $decklist_id): Response
     {
         /* @var $decklist Decklist */

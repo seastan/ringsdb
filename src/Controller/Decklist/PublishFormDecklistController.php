@@ -11,7 +11,7 @@ use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class PublishFormDecklistController extends AbstractController
 {
@@ -26,9 +26,8 @@ class PublishFormDecklistController extends AbstractController
     /**
      * Checks to see if a deck can be published in its current saved state
      * If it is, displays the decklist edit form for initial publication of a deck.
-     *
-     * @Route("/deck/publish/{deck_id}", name="deck_publish_form", methods={"GET"})
      */
+    #[Route(path: '/deck/publish/{deck_id}', name: 'deck_publish_form', methods: ['GET'])]
     public function __invoke(int $deck_id): Response
     {
         /* @var $user \App\Entity\User */

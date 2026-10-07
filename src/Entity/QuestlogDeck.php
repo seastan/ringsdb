@@ -8,52 +8,42 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * QuestlogDeck.
- *
- * @ORM\Entity
- * @ORM\Table(name="questlog_deck")
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'questlog_deck')]
 class QuestlogDeck
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="deck_number", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'deck_number', type: 'smallint', nullable: false)]
     private $deckNumber;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="text", nullable=false)
      */
+    #[ORM\Column(type: 'text', nullable: false)]
     private $content;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Deck", inversedBy="questlogs")
-     * @ORM\JoinColumn(name="deck_id", referencedColumnName="id", onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: Deck::class, inversedBy: 'questlogs')]
+    #[ORM\JoinColumn(name: 'deck_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     private ?Deck $deck = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Decklist", inversedBy="questlogs")
-     * @ORM\JoinColumn(name="decklist_id", referencedColumnName="id", onDelete="SET NULL")
-     */
+    #[ORM\ManyToOne(targetEntity: Decklist::class, inversedBy: 'questlogs')]
+    #[ORM\JoinColumn(name: 'decklist_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     private ?Decklist $decklist = null;
 
     public function __construct(
-        /**
-         * @ORM\ManyToOne(targetEntity="App\Entity\Questlog", inversedBy="decks")
-         * @ORM\JoinColumn(name="questlog_id", referencedColumnName="id", nullable=false)
-         */
+        #[ORM\ManyToOne(targetEntity: Questlog::class, inversedBy: 'decks')]
+        #[ORM\JoinColumn(name: 'questlog_id', referencedColumnName: 'id', nullable: false)]
         private Questlog $questlog
     ) {
     }
@@ -162,9 +152,8 @@ class QuestlogDeck
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="string", length=80, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 80, nullable: true)]
     private $player;
 
     /**

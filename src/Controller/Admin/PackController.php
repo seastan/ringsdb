@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Pack controller.
@@ -29,9 +29,8 @@ class PackController extends AbstractController
 
     /**
      * Lists all Pack entities.
-     *
-     * @Route("/admin/pack/", name="admin_pack")
      */
+    #[Route(path: '/admin/pack/', name: 'admin_pack')]
     public function indexAction(): Response
     {
         $entities = $this->packRepository->findAll();
@@ -41,9 +40,8 @@ class PackController extends AbstractController
 
     /**
      * Creates a new Pack entity.
-     *
-     * @Route("/admin/pack/create", name="admin_pack_create", methods={"POST"})
      */
+    #[Route(path: '/admin/pack/create', name: 'admin_pack_create', methods: ['POST'])]
     public function createAction(Request $request): Response
     {
         $entity = new Pack();
@@ -61,9 +59,8 @@ class PackController extends AbstractController
 
     /**
      * Displays a form to create a new Pack entity.
-     *
-     * @Route("/admin/pack/new", name="admin_pack_new")
      */
+    #[Route(path: '/admin/pack/new', name: 'admin_pack_new')]
     public function newAction(): Response
     {
         $entity = new Pack();
@@ -74,9 +71,8 @@ class PackController extends AbstractController
 
     /**
      * Finds and displays a Pack entity.
-     *
-     * @Route("/admin/pack/{id}/show", name="admin_pack_show")
      */
+    #[Route(path: '/admin/pack/{id}/show', name: 'admin_pack_show')]
     public function showAction(int $id): Response
     {
         $entity = $this->packRepository->find($id);
@@ -91,9 +87,8 @@ class PackController extends AbstractController
 
     /**
      * Displays a form to edit an existing Pack entity.
-     *
-     * @Route("/admin/pack/{id}/edit", name="admin_pack_edit")
      */
+    #[Route(path: '/admin/pack/{id}/edit', name: 'admin_pack_edit')]
     public function editAction(int $id): Response
     {
         $entity = $this->packRepository->find($id);
@@ -109,9 +104,8 @@ class PackController extends AbstractController
 
     /**
      * Edits an existing Pack entity.
-     *
-     * @Route("/admin/pack/{id}/update", name="admin_pack_update", methods={"POST", "PUT"})
      */
+    #[Route(path: '/admin/pack/{id}/update', name: 'admin_pack_update', methods: ['POST', 'PUT'])]
     public function updateAction(Request $request, int $id): Response
     {
         $entity = $this->packRepository->find($id);
@@ -134,9 +128,8 @@ class PackController extends AbstractController
 
     /**
      * Deletes a Pack entity.
-     *
-     * @Route("/admin/pack/{id}/delete", name="admin_pack_delete", methods={"POST", "DELETE"})
      */
+    #[Route(path: '/admin/pack/{id}/delete', name: 'admin_pack_delete', methods: ['POST', 'DELETE'])]
     public function deleteAction(Request $request, int $id): RedirectResponse
     {
         $form = $this->createDeleteForm($id);

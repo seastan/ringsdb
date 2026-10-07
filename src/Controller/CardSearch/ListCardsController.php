@@ -7,7 +7,7 @@ use App\Search\SearchKeys;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ListCardsController extends AbstractController
 {
@@ -16,13 +16,7 @@ class ListCardsController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/set/{pack_code}/{view}/{sort}/{page}",
-     *     name="cards_list",
-     *     defaults={"view"="list", "sort"="set", "page"=1}
-     * )
-     */
+    #[Route(path: '/set/{pack_code}/{view}/{sort}/{page}', name: 'cards_list', defaults: ['view' => 'list', 'sort' => 'set', 'page' => 1])]
     public function listAction(Request $request, string $pack_code, string $view, string $sort, int $page): Response
     {
         $pack = $this->packRepository->findOneBy(['code' => $pack_code]);

@@ -11,7 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class DeleteListFellowshipController extends AbstractController
 {
@@ -21,9 +21,7 @@ class DeleteListFellowshipController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/fellowship/delete_list", name="fellowship_delete_list", methods={"POST"})
-     */
+    #[Route(path: '/fellowship/delete_list', name: 'fellowship_delete_list', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         /* @var $user User */

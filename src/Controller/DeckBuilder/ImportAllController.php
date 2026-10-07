@@ -13,7 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ImportAllController extends AbstractController
 {
@@ -26,9 +26,7 @@ class ImportAllController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/deck/import/all", name="decks_upload_all", methods={"POST"})
-     */
+    #[Route(path: '/deck/import/all', name: 'decks_upload_all', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         $user = $this->currentUser();

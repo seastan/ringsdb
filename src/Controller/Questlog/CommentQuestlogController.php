@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CommentQuestlogController extends AbstractController
@@ -30,9 +30,7 @@ class CommentQuestlogController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/user/questlog_comment", name="questlog_comment", methods={"POST"})
-     */
+    #[Route(path: '/user/questlog_comment', name: 'questlog_comment', methods: ['POST'])]
     public function __invoke(Request $request, MailerInterface $mailer, UserRepository $userRepository): RedirectResponse
     {
         /* @var $user User */

@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class AjaxSaveController extends AbstractController
 {
@@ -28,9 +28,7 @@ class AjaxSaveController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/deck/save-ajax", name="deck_save_ajax", methods={"POST"})
-     */
+    #[Route(path: '/deck/save-ajax', name: 'deck_save_ajax', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse
     {
         /* @var $user User */

@@ -10,7 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class FileImportDeckController extends AbstractController
 {
@@ -19,9 +19,7 @@ class FileImportDeckController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/deck/fileimport", name="deck_fileimport", methods={"POST"})
-     */
+    #[Route(path: '/deck/fileimport', name: 'deck_fileimport', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
         $filetype = StringSanitizer::sanitize($request->get('type'));

@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ExcelController extends AbstractController
 {
@@ -32,9 +32,7 @@ class ExcelController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/admin/excel/download", name="excel_download_form", methods={"GET"})
-     */
+    #[Route(path: '/admin/excel/download', name: 'excel_download_form', methods: ['GET'])]
     public function downloadFormAction(): Response
     {
         $packs = $this->packRepository->findBy([], ['dateRelease' => 'ASC', 'name' => 'ASC']);
@@ -42,9 +40,7 @@ class ExcelController extends AbstractController
         return $this->render('Excel/download_form.html.twig', ['packs' => $packs]);
     }
 
-    /**
-     * @Route("/admin/excel/download", name="excel_download_process", methods={"POST"})
-     */
+    #[Route(path: '/admin/excel/download', name: 'excel_download_process', methods: ['POST'])]
     public function downloadProcessAction(Request $request, Texts $texts, CardPrintingRepository $cardPrintingRepository): StreamedResponse
     {
         $ignoredFields = ['id', 'dateCreation', 'dateUpdate'];
@@ -138,17 +134,13 @@ class ExcelController extends AbstractController
         return $response;
     }
 
-    /**
-     * @Route("/admin/excel/upload", name="excel_upload_form", methods={"GET"})
-     */
+    #[Route(path: '/admin/excel/upload', name: 'excel_upload_form', methods: ['GET'])]
     public function uploadFormAction(): Response
     {
         return $this->render('Excel/upload_form.html.twig');
     }
 
-    /**
-     * @Route("/admin/excel/upload", name="excel_upload_process", methods={"POST"})
-     */
+    #[Route(path: '/admin/excel/upload', name: 'excel_upload_process', methods: ['POST'])]
     public function uploadProcessAction(Request $request): Response
     {
         /* @var $uploadedFile UploadedFile */

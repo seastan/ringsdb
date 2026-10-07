@@ -12,7 +12,7 @@ use App\Repository\FellowshipRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class PublishFormFellowshipController extends AbstractController
 {
@@ -23,14 +23,7 @@ class PublishFormFellowshipController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/fellowship/publish/{fellowship_id}",
-     *     name="fellowship_publish_form",
-     *     methods={"GET"},
-     *     requirements={"fellowship_id"="\d+"}
-     * )
-     */
+    #[Route(path: '/fellowship/publish/{fellowship_id}', name: 'fellowship_publish_form', requirements: ['fellowship_id' => '\d+'], methods: ['GET'])]
     public function __invoke(int $fellowship_id): Response
     {
         /* @var $user User */

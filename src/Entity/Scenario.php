@@ -11,81 +11,63 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Scenario.
- *
- * @ORM\Entity(repositoryClass="App\Repository\ScenarioRepository")
- * @ORM\Table(
- *     name="scenario",
- *     uniqueConstraints={
- *         @ORM\UniqueConstraint(name="scenario_code_idx", columns={"code"})
- *     }
- * )
- * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="entity_region")
  */
+#[ORM\Entity(repositoryClass: \App\Repository\ScenarioRepository::class)]
+#[ORM\Cache(usage: 'NONSTRICT_READ_WRITE', region: 'entity_region')]
+#[ORM\Table(name: 'scenario')]
+#[ORM\UniqueConstraint(name: 'scenario_code_idx', columns: ['code'])]
 class Scenario implements \JsonSerializable
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", length=255, nullable=false)
      */
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
     private $code;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", length=255, nullable=false)
      */
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
     private $name;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
      */
     #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name: 'date_creation', type: 'datetime', nullable: false)]
     private $dateCreation;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="date_update", type="datetime", nullable=false)
      */
     #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(name: 'date_update', type: 'datetime', nullable: false)]
     private $dateUpdate;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Pack")
-     * @ORM\JoinColumn(name="pack_id", referencedColumnName="id")
-     */
+    #[ORM\ManyToOne(targetEntity: Pack::class)]
+    #[ORM\JoinColumn(name: 'pack_id', referencedColumnName: 'id')]
     private ?Pack $pack = null;
 
     /**
      * @var Collection<int, Encounter>
-     *
-     * @ORM\ManyToMany(targetEntity="App\Entity\Encounter")
-     * @ORM\JoinTable(
-     *     name="scenario_encounter",
-     *     joinColumns={@ORM\JoinColumn(name="scenario_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="encounter_id", referencedColumnName="id")}
-     * )
-     * @ORM\OrderBy({"pack"="ASC"})
      */
+    #[ORM\ManyToMany(targetEntity: Encounter::class)]
+    #[ORM\JoinTable(name: 'scenario_encounter', joinColumns: [new ORM\JoinColumn(name: 'scenario_id', referencedColumnName: 'id')], inverseJoinColumns: [new ORM\JoinColumn(name: 'encounter_id', referencedColumnName: 'id')])]
+    #[ORM\OrderBy(['pack' => 'ASC'])]
     private $encounters;
 
     /**
      * @var Collection<int, Questlog>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Questlog", mappedBy="scenario", cascade={"persist", "remove"})
      */
+    #[ORM\OneToMany(mappedBy: 'scenario', targetEntity: Questlog::class, cascade: ['persist', 'remove'])]
     private $questlogs;
 
     /**
@@ -233,9 +215,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * @var int
-     *
-     * @ORM\Column(type="smallint", nullable=false)
      */
+    #[ORM\Column(type: 'smallint', nullable: false)]
     private $position;
 
     /**
@@ -260,205 +241,176 @@ class Scenario implements \JsonSerializable
 
     /**
      * @var bool
-     *
-     * @ORM\Column(name="has_easy", type="boolean", nullable=false)
      */
+    #[ORM\Column(name: 'has_easy', type: 'boolean', nullable: false)]
     private $hasEasy;
 
     /**
      * @var bool
-     *
-     * @ORM\Column(name="has_nightmare", type="boolean", nullable=false)
      */
+    #[ORM\Column(name: 'has_nightmare', type: 'boolean', nullable: false)]
     private $hasNightmare;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="easy_cards", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'easy_cards', type: 'smallint', nullable: false)]
     private $easyCards;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="easy_enemies", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'easy_enemies', type: 'smallint', nullable: false)]
     private $easyEnemies;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="easy_locations", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'easy_locations', type: 'smallint', nullable: false)]
     private $easyLocations;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="easy_treacheries", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'easy_treacheries', type: 'smallint', nullable: false)]
     private $easyTreacheries;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="easy_objective_allies", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'easy_objective_allies', type: 'smallint', nullable: false)]
     private $easyObjectiveAllies;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="easy_objective_locations", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'easy_objective_locations', type: 'smallint', nullable: false)]
     private $easyObjectiveLocations;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="easy_surges", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'easy_surges', type: 'smallint', nullable: false)]
     private $easySurges;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="easy_shadows", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'easy_shadows', type: 'smallint', nullable: false)]
     private $easyShadows;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="easy_encounter_side_quests", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'easy_encounter_side_quests', type: 'smallint', nullable: false)]
     private $easyEncounterSideQuests;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="normal_cards", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'normal_cards', type: 'smallint', nullable: false)]
     private $normalCards;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="normal_enemies", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'normal_enemies', type: 'smallint', nullable: false)]
     private $normalEnemies;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="normal_locations", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'normal_locations', type: 'smallint', nullable: false)]
     private $normalLocations;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="normal_treacheries", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'normal_treacheries', type: 'smallint', nullable: false)]
     private $normalTreacheries;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="normal_objective_allies", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'normal_objective_allies', type: 'smallint', nullable: false)]
     private $normalObjectiveAllies;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="normal_objective_locations", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'normal_objective_locations', type: 'smallint', nullable: false)]
     private $normalObjectiveLocations;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="normal_surges", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'normal_surges', type: 'smallint', nullable: false)]
     private $normalSurges;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="normal_shadows", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'normal_shadows', type: 'smallint', nullable: false)]
     private $normalShadows;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="normal_encounter_side_quests", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'normal_encounter_side_quests', type: 'smallint', nullable: false)]
     private $normalEncounterSideQuests;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="nightmare_cards", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'nightmare_cards', type: 'smallint', nullable: false)]
     private $nightmareCards;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="nightmare_enemies", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'nightmare_enemies', type: 'smallint', nullable: false)]
     private $nightmareEnemies;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="nightmare_locations", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'nightmare_locations', type: 'smallint', nullable: false)]
     private $nightmareLocations;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="nightmare_treacheries", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'nightmare_treacheries', type: 'smallint', nullable: false)]
     private $nightmareTreacheries;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="nightmare_objective_allies", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'nightmare_objective_allies', type: 'smallint', nullable: false)]
     private $nightmareObjectiveAllies;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="nightmare_objective_locations", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'nightmare_objective_locations', type: 'smallint', nullable: false)]
     private $nightmareObjectiveLocations;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="nightmare_surges", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'nightmare_surges', type: 'smallint', nullable: false)]
     private $nightmareSurges;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="nightmare_shadows", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'nightmare_shadows', type: 'smallint', nullable: false)]
     private $nightmareShadows;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="nightmare_encounter_side_quests", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'nightmare_encounter_side_quests', type: 'smallint', nullable: false)]
     private $nightmareEncounterSideQuests;
 
     /**
@@ -1043,23 +995,20 @@ class Scenario implements \JsonSerializable
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="easy_objectives", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'easy_objectives', type: 'smallint', nullable: false)]
     private $easyObjectives;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="normal_objectives", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'normal_objectives', type: 'smallint', nullable: false)]
     private $normalObjectives;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="nightmare_objectives", type="smallint", nullable=false)
      */
+    #[ORM\Column(name: 'nightmare_objectives', type: 'smallint', nullable: false)]
     private $nightmareObjectives;
 
     /**
@@ -1152,9 +1101,8 @@ class Scenario implements \JsonSerializable
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="name_canonical", type="string", length=255)
      */
+    #[ORM\Column(name: 'name_canonical', type: 'string', length: 255)]
     private $nameCanonical;
 
     /**

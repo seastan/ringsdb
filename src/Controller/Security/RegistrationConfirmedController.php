@@ -8,15 +8,13 @@ use App\Controller\CurrentUserTrait;
 use App\Security\LoginManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class RegistrationConfirmedController extends AbstractController
 {
     use CurrentUserTrait;
 
-    /**
-     * @Route("/register/confirmed", name="fos_user_registration_confirmed", methods={"GET"})
-     */
+    #[Route(path: '/register/confirmed', name: 'fos_user_registration_confirmed', methods: ['GET'])]
     public function __invoke(LoginManager $loginManager): Response
     {
         return $this->render('Security/Registration/confirmed.html.twig', [

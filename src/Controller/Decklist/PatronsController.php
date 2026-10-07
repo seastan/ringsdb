@@ -7,7 +7,7 @@ namespace App\Controller\Decklist;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class PatronsController extends AbstractController
 {
@@ -17,9 +17,7 @@ class PatronsController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/patrons", name="patrons", methods={"GET"})
-     */
+    #[Route(path: '/patrons', name: 'patrons', methods: ['GET'])]
     public function __invoke(): Response
     {
         $response = new Response();

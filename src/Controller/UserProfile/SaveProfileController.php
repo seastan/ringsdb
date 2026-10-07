@@ -12,7 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SaveProfileController extends AbstractController
 {
@@ -24,9 +24,7 @@ class SaveProfileController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/user/profile_save", name="user_profile_save", methods={"POST"})
-     */
+    #[Route(path: '/user/profile_save', name: 'user_profile_save', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         /* @var $user \App\Entity\User */

@@ -9,7 +9,7 @@ use App\Security\LoginManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * The link of the confirmation email: enables the account and logs the user in. The token can
@@ -17,9 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class RegistrationConfirmController extends AbstractController
 {
-    /**
-     * @Route("/register/confirm/{token}", name="fos_user_registration_confirm", methods={"GET"})
-     */
+    #[Route(path: '/register/confirm/{token}', name: 'fos_user_registration_confirm', methods: ['GET'])]
     public function __invoke(
         string $token,
         UserRepository $userRepository,

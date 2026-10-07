@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class HideCommentDecklistController extends AbstractController
 {
@@ -24,9 +24,8 @@ class HideCommentDecklistController extends AbstractController
 
     /**
      * hides a comment, or if $hidden is false, unhide a comment.
-     *
-     * @Route("/user/hidecomment/{comment_id}/{hidden}", name="decklist_comment_hide", methods={"POST"})
      */
+    #[Route(path: '/user/hidecomment/{comment_id}/{hidden}', name: 'decklist_comment_hide', methods: ['POST'])]
     public function __invoke(int $comment_id, int $hidden): Response
     {
         /* @var $user User */

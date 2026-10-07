@@ -13,7 +13,7 @@ use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ListQuestlogController extends AbstractController
 {
@@ -26,15 +26,7 @@ class ListQuestlogController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/questlogs/{type}/{page}",
-     *     name="questlogs_list",
-     *     methods={"GET"},
-     *     requirements={"page"="\d+"},
-     *     defaults={"type"="popular", "page"=1}
-     * )
-     */
+    #[Route(path: '/questlogs/{type}/{page}', name: 'questlogs_list', requirements: ['page' => '\d+'], defaults: ['type' => 'popular', 'page' => 1], methods: ['GET'])]
     public function __invoke(Request $request, string $type, int $page = 1): Response
     {
         $response = new Response();

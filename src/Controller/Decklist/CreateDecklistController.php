@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class CreateDecklistController extends AbstractController
 {
@@ -32,9 +32,8 @@ class CreateDecklistController extends AbstractController
 
     /**
      * creates a new decklist from a deck (publish action).
-     *
-     * @Route("/decklist/create", name="decklist_create", methods={"POST"})
      */
+    #[Route(path: '/decklist/create', name: 'decklist_create', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
         /* @var $user \App\Entity\User */

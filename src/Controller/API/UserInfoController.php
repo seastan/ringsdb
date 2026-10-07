@@ -19,7 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class UserInfoController extends AbstractController
 {
@@ -36,10 +36,9 @@ class UserInfoController extends AbstractController
      * route makes anonymous requests create a session (302 + Set-Cookie), which defeats the
      * anonymous FastCGI cache and saturates php-fpm. infoAction already returns null for
      * anonymous visitors. (api_private_user_info is kept for the API tests.).
-     *
-     * @Route("/api/public/user/info", name="api_public_user_info")
-     * @Route("/api/private/user/info", name="api_private_user_info")
      */
+    #[Route(path: '/api/public/user/info', name: 'api_public_user_info')]
+    #[Route(path: '/api/private/user/info', name: 'api_private_user_info')]
     public function infoAction(Request $request, CardRepository $cardRepository, DecklistRepository $decklistRepository, FellowshipRepository $fellowshipRepository, QuestlogRepository $questlogRepository): Response
     {
         $jsonp = $request->query->get('jsonp');
