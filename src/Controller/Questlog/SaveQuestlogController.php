@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SaveQuestlogController extends AbstractController
 {
@@ -42,9 +42,7 @@ class SaveQuestlogController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/questlog/save", name="questlog_save", methods={"POST"})
-     */
+    #[Route(path: '/questlog/save', name: 'questlog_save', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
         /* @var $user User */

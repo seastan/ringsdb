@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class CommentReviewController extends AbstractController
 {
@@ -19,9 +19,7 @@ class CommentReviewController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/review/comment", name="card_reviewcomment_post", methods={"POST"})
-     */
+    #[Route(path: '/review/comment', name: 'card_reviewcomment_post', methods: ['POST'])]
     public function commentAction(Request $request): JsonResponse
     {
         /* @var $user \App\Entity\User */

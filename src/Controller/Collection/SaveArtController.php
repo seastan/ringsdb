@@ -10,7 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SaveArtController extends AbstractController
 {
@@ -24,9 +24,8 @@ class SaveArtController extends AbstractController
     /**
      * Save the user's preferred art (printing) for a card.
      * POST card_code + pack_code; pack_code empty/"default" clears the preference.
-     *
-     * @Route("/collection/art/save", name="collection_save_art", methods={"POST"})
      */
+    #[Route(path: '/collection/art/save', name: 'collection_save_art', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
         $user = $this->getUser();

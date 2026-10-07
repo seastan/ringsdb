@@ -8,7 +8,7 @@ use App\Controller\CurrentUserTrait;
 use App\Services\FellowshipArchiver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class OctgnExportController extends AbstractController
 {
@@ -19,14 +19,7 @@ class OctgnExportController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/fellowship/export/octgn/{fellowship_id}",
-     *     name="fellowship_export_octgn",
-     *     methods={"GET"},
-     *     requirements={"fellowship_id"="\d+"}
-     * )
-     */
+    #[Route(path: '/fellowship/export/octgn/{fellowship_id}', name: 'fellowship_export_octgn', requirements: ['fellowship_id' => '\d+'], methods: ['GET'])]
     public function __invoke(int $fellowship_id): Response
     {
         return $this->fellowshipArchiver->downloadFromSelection($this->currentUser(), $fellowship_id, true);

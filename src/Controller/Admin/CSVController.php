@@ -17,7 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class CSVController extends AbstractController
 {
@@ -26,17 +26,13 @@ class CSVController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/admin/csv/upload", name="csv_upload_form", methods={"GET"})
-     */
+    #[Route(path: '/admin/csv/upload', name: 'csv_upload_form', methods: ['GET'])]
     public function uploadFormAction(): Response
     {
         return $this->render('CSV/upload_form.html.twig');
     }
 
-    /**
-     * @Route("/admin/csv/upload", name="csv_upload_process", methods={"POST"})
-     */
+    #[Route(path: '/admin/csv/upload', name: 'csv_upload_process', methods: ['POST'])]
     public function uploadProcessAction(Request $request, CardRepository $cardRepository, CardPrintingRepository $cardPrintingRepository, CycleRepository $cycleRepository, PackRepository $packRepository): Response
     {
         $inputCode = (string) $request->request->get('code');

@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class VoteQuestlogController extends AbstractController
 {
@@ -24,9 +24,8 @@ class VoteQuestlogController extends AbstractController
 
     /**
      * records a user's vote.
-     *
-     * @Route("/user/questlog_like", name="questlog_like", methods={"POST"})
      */
+    #[Route(path: '/user/questlog_like', name: 'questlog_like', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
         $user = $this->getUser();

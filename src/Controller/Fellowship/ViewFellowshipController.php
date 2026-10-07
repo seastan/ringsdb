@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ViewFellowshipController extends AbstractController
 {
@@ -18,15 +18,7 @@ class ViewFellowshipController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/fellowship/view/{fellowship_id}/{fellowship_name}",
-     *     name="fellowship_view",
-     *     methods={"GET"},
-     *     requirements={"fellowship_id"="\d+"},
-     *     defaults={"fellowship_name"=null}
-     * )
-     */
+    #[Route(path: '/fellowship/view/{fellowship_id}/{fellowship_name}', name: 'fellowship_view', requirements: ['fellowship_id' => '\d+'], defaults: ['fellowship_name' => null], methods: ['GET'])]
     public function __invoke(int $fellowship_id): Response
     {
         /* @var $fellowship \App\Entity\Fellowship */

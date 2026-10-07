@@ -11,7 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class EditFellowshipController extends AbstractController
 {
@@ -22,14 +22,7 @@ class EditFellowshipController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/fellowship/edit/{fellowship_id}",
-     *     name="fellowship_edit",
-     *     methods={"GET"},
-     *     requirements={"fellowship_id"="\d+"}
-     * )
-     */
+    #[Route(path: '/fellowship/edit/{fellowship_id}', name: 'fellowship_edit', requirements: ['fellowship_id' => '\d+'], methods: ['GET'])]
     public function __invoke(int $fellowship_id): Response
     {
         $response = new Response();

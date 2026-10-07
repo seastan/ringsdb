@@ -9,7 +9,7 @@ use App\Entity\Deck;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class NewDeckController extends AbstractController
 {
@@ -20,9 +20,7 @@ class NewDeckController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/deck/new", name="deck_buildform", methods={"GET"})
-     */
+    #[Route(path: '/deck/new', name: 'deck_buildform', methods: ['GET'])]
     public function __invoke(): RedirectResponse
     {
         $deck = new Deck($this->currentUser());

@@ -9,7 +9,7 @@ use App\Services\CustomPackManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class PublishCustomPackController extends AbstractController
 {
@@ -21,14 +21,7 @@ class PublishCustomPackController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/collection/custom-pack/{id}/publish",
-     *     name="collection_custom_pack_publish",
-     *     methods={"POST"},
-     *     requirements={"id"="\d+"}
-     * )
-     */
+    #[Route(path: '/collection/custom-pack/{id}/publish', name: 'collection_custom_pack_publish', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function __invoke(int $id): RedirectResponse
     {
         $pack = $this->customPackManager->loadOwnedPack($this->currentUser(), $id);

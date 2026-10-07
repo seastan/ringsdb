@@ -9,7 +9,7 @@ use App\Repository\CycleRepository;
 use App\Repository\UserCustomPackRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class GetPacksController extends AbstractController
 {
@@ -23,9 +23,8 @@ class GetPacksController extends AbstractController
 
     /**
      * @param bool $reloaduser
-     *
-     * @Route("/collection/packs", name="collection_packs", methods={"GET"})
      */
+    #[Route(path: '/collection/packs', name: 'collection_packs', methods: ['GET'])]
     public function __invoke($reloaduser = false): Response
     {
         $categories = [];

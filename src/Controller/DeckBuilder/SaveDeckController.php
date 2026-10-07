@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SaveDeckController extends AbstractController
 {
@@ -29,9 +29,7 @@ class SaveDeckController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/deck/save", name="deck_save", methods={"POST"})
-     */
+    #[Route(path: '/deck/save', name: 'deck_save', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
         $user = $this->currentUser();

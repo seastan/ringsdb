@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SaveFellowshipController extends AbstractController
 {
@@ -40,9 +40,7 @@ class SaveFellowshipController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/fellowship/save", name="fellowship_save", methods={"POST"})
-     */
+    #[Route(path: '/fellowship/save', name: 'fellowship_save', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         /* @var $user User */

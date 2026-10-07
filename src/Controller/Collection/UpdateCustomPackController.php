@@ -10,7 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class UpdateCustomPackController extends AbstractController
 {
@@ -22,14 +22,7 @@ class UpdateCustomPackController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/collection/custom-pack/{id}/update",
-     *     name="collection_custom_pack_update",
-     *     methods={"POST"},
-     *     requirements={"id"="\d+"}
-     * )
-     */
+    #[Route(path: '/collection/custom-pack/{id}/update', name: 'collection_custom_pack_update', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function __invoke(Request $request, int $id): RedirectResponse
     {
         $pack = $this->customPackManager->loadOwnedPack($this->currentUser(), $id);

@@ -11,7 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class HideCommentQuestlogController extends AbstractController
 {
@@ -23,13 +23,8 @@ class HideCommentQuestlogController extends AbstractController
 
     /**
      * hides a comment, or if $hidden is false, unhide a comment.
-     *
-     * @Route(
-     *     "/user/questlog_hidecomment/{comment_id}/{hidden}",
-     *     name="questlog_comment_hide",
-     *     methods={"POST"}
-     * )
      */
+    #[Route(path: '/user/questlog_hidecomment/{comment_id}/{hidden}', name: 'questlog_comment_hide', methods: ['POST'])]
     public function __invoke(int $comment_id, int $hidden): Response
     {
         /* @var $user User */

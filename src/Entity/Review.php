@@ -11,89 +11,68 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Review.
- *
- * @ORM\Entity(repositoryClass="App\Repository\ReviewRepository")
- * @ORM\Table(name="review")
  */
+#[ORM\Entity(repositoryClass: \App\Repository\ReviewRepository::class)]
+#[ORM\Table(name: 'review')]
 class Review
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
      */
     #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name: 'date_creation', type: 'datetime', nullable: false)]
     private $dateCreation;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="date_update", type="datetime", nullable=false)
      */
     #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(name: 'date_update', type: 'datetime', nullable: false)]
     private $dateUpdate;
 
     /**
      * @var \DateTime|null
-     *
-     * @ORM\Column(name="date_last_comment", type="datetime", nullable=true)
      */
+    #[ORM\Column(name: 'date_last_comment', type: 'datetime', nullable: true)]
     private $dateLastComment;
 
-    /**
-     * @ORM\Column(name="nb_votes", type="smallint", nullable=false)
-     */
+    #[ORM\Column(name: 'nb_votes', type: 'smallint', nullable: false)]
     private int $nbVotes;
 
     /**
      * @var Collection<int, Reviewcomment>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Reviewcomment", mappedBy="review", cascade={"persist"})
      */
+    #[ORM\OneToMany(mappedBy: 'review', targetEntity: Reviewcomment::class, cascade: ['persist'])]
     private $comments;
 
     /**
      * @var Collection<int, User>
-     *
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="reviewvotes")
-     * @ORM\JoinTable(
-     *     name="reviewvote",
-     *     joinColumns={@ORM\JoinColumn(name="review_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
-     * )
      */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'reviewvotes')]
+    #[ORM\JoinTable(name: 'reviewvote', joinColumns: [new ORM\JoinColumn(name: 'review_id', referencedColumnName: 'id')], inverseJoinColumns: [new ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')])]
     private $votes;
 
     /**
      * Constructor.
      */
     public function __construct(
-        /**
-         * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="reviews")
-         * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
-         */
+        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'reviews')]
+        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
         private User $user,
-        /**
-         * @ORM\ManyToOne(targetEntity="App\Entity\Card", inversedBy="reviews")
-         * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false)
-         */
+        #[ORM\ManyToOne(targetEntity: Card::class, inversedBy: 'reviews')]
+        #[ORM\JoinColumn(name: 'card_id', referencedColumnName: 'id', nullable: false)]
         private Card $card,
-        /**
-         * @ORM\Column(name="text_md", type="text", nullable=false)
-         */
+        #[ORM\Column(name: 'text_md', type: 'text', nullable: false)]
         private string $textMd,
-        /**
-         * @ORM\Column(name="text_html", type="text", nullable=false)
-         */
+        #[ORM\Column(name: 'text_html', type: 'text', nullable: false)]
         private string $textHtml
     ) {
         $this->nbVotes = 0;

@@ -6,43 +6,28 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(
- *     name="user_custom_pack_card",
- *     uniqueConstraints={
- *         @ORM\UniqueConstraint(name="ucpc_pack_card_idx", columns={"custom_pack_id", "card_id"})
- *     },
- *     indexes={
- *         @ORM\Index(name="fk_ucpc_card", columns={"card_id"})
- *     }
- * )
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'user_custom_pack_card')]
+#[ORM\Index(columns: ['card_id'], name: 'fk_ucpc_card')]
+#[ORM\UniqueConstraint(name: 'ucpc_pack_card_idx', columns: ['custom_pack_id', 'card_id'])]
 class UserCustomPackCard
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     public function __construct(
-        /**
-         * @ORM\ManyToOne(targetEntity="App\Entity\UserCustomPack", inversedBy="cards")
-         * @ORM\JoinColumn(name="custom_pack_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-         */
+        #[ORM\ManyToOne(targetEntity: UserCustomPack::class, inversedBy: 'cards')]
+        #[ORM\JoinColumn(name: 'custom_pack_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
         private UserCustomPack $customPack,
-        /**
-         * @ORM\ManyToOne(targetEntity="App\Entity\Card")
-         * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-         */
+        #[ORM\ManyToOne(targetEntity: Card::class)]
+        #[ORM\JoinColumn(name: 'card_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
         private Card $card,
-        /**
-         * @ORM\Column(type="smallint", nullable=false, options={"default": 1, "unsigned": true})
-         */
+        #[ORM\Column(type: 'smallint', nullable: false, options: ['default' => 1, 'unsigned' => true])]
         public int $quantity
     ) {
     }

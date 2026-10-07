@@ -17,11 +17,11 @@ doctrine:
         naming_strategy:             doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping:                true
         mappings:
-            # the entities of the application (no longer a bundle): docblock annotations in the
+            # the entities of the application (no longer a bundle): PHP attributes in the
             # entity classes
             App:
                 is_bundle: false
-                type:      annotation
+                type:      attribute
                 dir:       '%kernel.project_dir%/src/Entity'
                 prefix:    'App\Entity'
                 # the 'App:Card' aliases of the DQL and the forms, until they are replaced with the

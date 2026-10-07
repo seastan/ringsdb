@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class OctgnDeckExportController extends AbstractController
 {
@@ -21,14 +21,7 @@ class OctgnDeckExportController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/deck/export/octgn/{deck_id}",
-     *     name="deck_export_octgn",
-     *     methods={"GET"},
-     *     requirements={"deck_id"="\d+"}
-     * )
-     */
+    #[Route(path: '/deck/export/octgn/{deck_id}', name: 'deck_export_octgn', requirements: ['deck_id' => '\d+'], methods: ['GET'])]
     public function __invoke(int $deck_id): Response
     {
         /* @var $deck \App\Entity\Deck */

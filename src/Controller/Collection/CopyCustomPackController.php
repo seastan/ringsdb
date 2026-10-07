@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class CopyCustomPackController extends AbstractController
 {
@@ -25,14 +25,7 @@ class CopyCustomPackController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/collection/custom-pack/{id}/copy",
-     *     name="collection_custom_pack_copy",
-     *     methods={"POST"},
-     *     requirements={"id"="\d+"}
-     * )
-     */
+    #[Route(path: '/collection/custom-pack/{id}/copy', name: 'collection_custom_pack_copy', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function __invoke(Request $request, int $id): JsonResponse
     {
         $user = $this->currentUser();

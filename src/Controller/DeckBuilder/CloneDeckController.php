@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class CloneDeckController extends AbstractController
 {
@@ -18,9 +18,7 @@ class CloneDeckController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/deck/clone/{deck_id}", name="deck_clone", methods={"GET"}, requirements={"deck_id"="\d+"})
-     */
+    #[Route(path: '/deck/clone/{deck_id}', name: 'deck_clone', requirements: ['deck_id' => '\d+'], methods: ['GET'])]
     public function __invoke(int $deck_id): Response
     {
         /* @var $deck \App\Entity\Deck */

@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SaveDecklistController extends AbstractController
 {
@@ -25,14 +25,8 @@ class SaveDecklistController extends AbstractController
 
     /**
      * save the name and description of a decklist by its publisher.
-     *
-     * @Route(
-     *     "/decklist/save/{decklist_id}",
-     *     name="decklist_save",
-     *     methods={"POST"},
-     *     requirements={"decklist_id"="\d+"}
-     * )
      */
+    #[Route(path: '/decklist/save/{decklist_id}', name: 'decklist_save', requirements: ['decklist_id' => '\d+'], methods: ['POST'])]
     public function __invoke(Request $request, int $decklist_id): RedirectResponse
     {
         $user = $this->getUser();

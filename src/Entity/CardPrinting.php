@@ -7,159 +7,131 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\CardPrintingRepository")
- * @ORM\Table(
- *     name="card_printing",
- *     indexes={
- *         @ORM\Index(name="card_printing_card_idx", columns={"card_id"}),
- *         @ORM\Index(name="card_printing_pack_idx", columns={"pack_id"})
- *     }
- * )
- * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="entity_region")
- */
+#[ORM\Entity(repositoryClass: \App\Repository\CardPrintingRepository::class)]
+#[ORM\Cache(usage: 'NONSTRICT_READ_WRITE', region: 'entity_region')]
+#[ORM\Table(name: 'card_printing')]
+#[ORM\Index(columns: ['card_id'], name: 'card_printing_card_idx')]
+#[ORM\Index(columns: ['pack_id'], name: 'card_printing_pack_idx')]
 class CardPrinting
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var int
-     *
-     * @ORM\Column(type="smallint", nullable=false)
      */
+    #[ORM\Column(type: 'smallint', nullable: false)]
     private $position;
 
     /**
      * @var int
-     *
-     * @ORM\Column(type="smallint", nullable=false)
      */
+    #[ORM\Column(type: 'smallint', nullable: false)]
     private $quantity;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="string", length=255, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $illustrator;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="string", nullable=true)
      */
+    #[ORM\Column(type: 'string', nullable: true)]
     private $octgnid;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="image_code", type="string", length=255, nullable=false)
      */
+    #[ORM\Column(name: 'image_code', type: 'string', length: 255, nullable: false)]
     private $imageCode;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="string", length=255, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $traits;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="text", nullable=true)
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $text;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="string", length=3, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 3, nullable: true)]
     private $cost;
 
     /**
      * @var int|null
-     *
-     * @ORM\Column(type="smallint", nullable=true)
      */
+    #[ORM\Column(type: 'smallint', nullable: true)]
     private $threat;
 
     /**
      * @var int|null
-     *
-     * @ORM\Column(type="smallint", nullable=true)
      */
+    #[ORM\Column(type: 'smallint', nullable: true)]
     private $willpower;
 
     /**
      * @var int|null
-     *
-     * @ORM\Column(type="smallint", nullable=true)
      */
+    #[ORM\Column(type: 'smallint', nullable: true)]
     private $attack;
 
     /**
      * @var int|null
-     *
-     * @ORM\Column(type="smallint", nullable=true)
      */
+    #[ORM\Column(type: 'smallint', nullable: true)]
     private $defense;
 
     /**
      * @var int|null
-     *
-     * @ORM\Column(type="smallint", nullable=true)
      */
+    #[ORM\Column(type: 'smallint', nullable: true)]
     private $health;
 
     /**
      * @var int|null
-     *
-     * @ORM\Column(type="smallint", nullable=true)
      */
+    #[ORM\Column(type: 'smallint', nullable: true)]
     private $victory;
 
     /**
      * @var int|null
-     *
-     * @ORM\Column(type="smallint", nullable=true)
      */
+    #[ORM\Column(type: 'smallint', nullable: true)]
     private $quest;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
      */
     #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name: 'date_creation', type: 'datetime', nullable: false)]
     private $dateCreation;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="date_update", type="datetime", nullable=false)
      */
     #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(name: 'date_update', type: 'datetime', nullable: false)]
     private $dateUpdate;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Card", inversedBy="printings")
-     * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Card::class, inversedBy: 'printings')]
+    #[ORM\JoinColumn(name: 'card_id', referencedColumnName: 'id', nullable: false)]
     private ?Card $card = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Pack", inversedBy="printings")
-     * @ORM\JoinColumn(name="pack_id", referencedColumnName="id", nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Pack::class, inversedBy: 'printings')]
+    #[ORM\JoinColumn(name: 'pack_id', referencedColumnName: 'id', nullable: false)]
     private ?Pack $pack = null;
 
     /**

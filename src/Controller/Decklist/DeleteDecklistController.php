@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class DeleteDecklistController extends AbstractController
 {
@@ -23,14 +23,8 @@ class DeleteDecklistController extends AbstractController
 
     /**
      * deletes a decklist if it has no comment, no vote, no favorite.
-     *
-     * @Route(
-     *     "/decklist/delete/{decklist_id}",
-     *     name="decklist_delete",
-     *     methods={"POST"},
-     *     requirements={"decklist_id"="\d+"}
-     * )
      */
+    #[Route(path: '/decklist/delete/{decklist_id}', name: 'decklist_delete', requirements: ['decklist_id' => '\d+'], methods: ['POST'])]
     public function __invoke(int $decklist_id): RedirectResponse
     {
         $user = $this->getUser();

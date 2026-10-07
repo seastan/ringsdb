@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class FavoriteDecklistController extends AbstractController
 {
@@ -26,9 +26,8 @@ class FavoriteDecklistController extends AbstractController
 
     /**
      * adds a decklist to a user's list of favorites.
-     *
-     * @Route("/user/favorite", name="decklist_favorite", methods={"POST"})
      */
+    #[Route(path: '/user/favorite', name: 'decklist_favorite', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
         $user = $this->getUser();

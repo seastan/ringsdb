@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * The link of the password reset email: the new password form. The token can only be used once;
@@ -33,9 +33,7 @@ class ResettingResetController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/resetting/reset/{token}", name="fos_user_resetting_reset", methods={"GET", "POST"})
-     */
+    #[Route(path: '/resetting/reset/{token}', name: 'fos_user_resetting_reset', methods: ['GET', 'POST'])]
     public function __invoke(Request $request, string $token): Response
     {
         $user = $this->userRepository->findOneByConfirmationToken($token);

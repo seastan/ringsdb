@@ -11,157 +11,126 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Fellowship.
- *
- * @ORM\Entity(repositoryClass="App\Repository\FellowshipRepository")
- * @ORM\Table(name="fellowship")
  */
+#[ORM\Entity(repositoryClass: \App\Repository\FellowshipRepository::class)]
+#[ORM\Table(name: 'fellowship')]
 class Fellowship
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", length=255)
      */
+    #[ORM\Column(type: 'string', length: 255)]
     private $name;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="name_canonical", type="string", length=255)
      */
+    #[ORM\Column(name: 'name_canonical', type: 'string', length: 255)]
     private $nameCanonical;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(name="description_md", type="text", nullable=true)
      */
+    #[ORM\Column(name: 'description_md', type: 'text', nullable: true)]
     private $descriptionMd;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(name="description_html", type="text", nullable=true)
      */
+    #[ORM\Column(name: 'description_html', type: 'text', nullable: true)]
     private $descriptionHtml;
 
     /**
      * @var bool
-     *
-     * @ORM\Column(name="is_public", type="boolean", nullable=false)
      */
+    #[ORM\Column(name: 'is_public', type: 'boolean', nullable: false)]
     private $isPublic = false;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="nb_votes", type="integer")
      */
+    #[ORM\Column(name: 'nb_votes', type: 'integer')]
     private $nbVotes = 0;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="nb_favorites", type="integer")
      */
+    #[ORM\Column(name: 'nb_favorites', type: 'integer')]
     private $nbFavorites = 0;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="nb_comments", type="integer")
      */
+    #[ORM\Column(name: 'nb_comments', type: 'integer')]
     private $nbComments = 0;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="nb_decks", type="integer")
      */
+    #[ORM\Column(name: 'nb_decks', type: 'integer')]
     private $nbDecks = 0;
 
-    /**
-     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
-     */
     #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name: 'date_creation', type: 'datetime', nullable: false)]
     private \DateTime $dateCreation;
 
-    /**
-     * @ORM\Column(name="date_update", type="datetime", nullable=false)
-     */
     #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(name: 'date_update', type: 'datetime', nullable: false)]
     private \DateTime $dateUpdate;
 
     /**
      * @var \DateTime|null
-     *
-     * @ORM\Column(name="date_last_comment", type="datetime", nullable=true)
      */
+    #[ORM\Column(name: 'date_last_comment', type: 'datetime', nullable: true)]
     private $dateLastComment;
 
     /**
      * @var Collection<int, FellowshipDeck>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\FellowshipDeck", mappedBy="fellowship", cascade={"persist", "remove"})
      */
+    #[ORM\OneToMany(mappedBy: 'fellowship', targetEntity: FellowshipDeck::class, cascade: ['persist', 'remove'])]
     private $decks;
 
     /**
      * @var Collection<int, FellowshipDecklist>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\FellowshipDecklist", mappedBy="fellowship", cascade={"persist", "remove"})
      */
+    #[ORM\OneToMany(mappedBy: 'fellowship', targetEntity: FellowshipDecklist::class, cascade: ['persist', 'remove'])]
     private $decklists;
 
     /**
      * @var Collection<int, FellowshipComment>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\FellowshipComment", mappedBy="fellowship", cascade={"persist", "remove"})
-     * @ORM\OrderBy({"dateCreation"="ASC"})
      */
+    #[ORM\OneToMany(mappedBy: 'fellowship', targetEntity: FellowshipComment::class, cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['dateCreation' => 'ASC'])]
     private $comments;
 
     /**
      * @var Collection<int, User>
-     *
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="fellowship_favorites")
-     * @ORM\JoinTable(
-     *     name="fellowship_favorite",
-     *     joinColumns={@ORM\JoinColumn(name="fellowship_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
-     * )
      */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'fellowship_favorites')]
+    #[ORM\JoinTable(name: 'fellowship_favorite', joinColumns: [new ORM\JoinColumn(name: 'fellowship_id', referencedColumnName: 'id')], inverseJoinColumns: [new ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')])]
     private $favorites;
 
     /**
      * @var Collection<int, User>
-     *
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="fellowship_votes")
-     * @ORM\JoinTable(
-     *     name="fellowship_vote",
-     *     joinColumns={@ORM\JoinColumn(name="fellowship_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
-     * )
      */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'fellowship_votes')]
+    #[ORM\JoinTable(name: 'fellowship_vote', joinColumns: [new ORM\JoinColumn(name: 'fellowship_id', referencedColumnName: 'id')], inverseJoinColumns: [new ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')])]
     private $votes;
 
     /**
      * Constructor.
      */
     public function __construct(
-        /**
-         * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="fellowships")
-         * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
-         */
+        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'fellowships')]
+        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
         private User $user
     ) {
         $this->decks = new ArrayCollection();
@@ -577,9 +546,8 @@ class Fellowship
 
     /**
      * @var \DateTime|null
-     *
-     * @ORM\Column(name="date_publish", type="datetime", nullable=true)
      */
+    #[ORM\Column(name: 'date_publish', type: 'datetime', nullable: true)]
     private $datePublish;
 
     /**

@@ -7,7 +7,7 @@ namespace App\Controller\API;
 use App\Repository\UserCustomPackRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class GetCustomPacksController extends AbstractController
 {
@@ -16,9 +16,7 @@ class GetCustomPacksController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/api/private/custom-packs", name="api_private_custom_packs", methods={"GET"})
-     */
+    #[Route(path: '/api/private/custom-packs', name: 'api_private_custom_packs', methods: ['GET'])]
     public function __invoke(): JsonResponse
     {
         $user = $this->getUser();

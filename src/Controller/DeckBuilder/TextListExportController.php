@@ -9,7 +9,7 @@ use App\Services\DeckArchiver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class TextListExportController extends AbstractController
 {
@@ -20,9 +20,7 @@ class TextListExportController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/deck/export/text/list", name="deck_export_text_list", methods={"GET"})
-     */
+    #[Route(path: '/deck/export/text/list', name: 'deck_export_text_list', methods: ['GET'])]
     public function __invoke(Request $request): Response
     {
         $list_id = $request->get('ids');

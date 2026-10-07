@@ -9,7 +9,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ListReviewsController extends AbstractController
 {
@@ -19,14 +19,7 @@ class ListReviewsController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/reviews/{page}",
-     *     name="card_reviews_list",
-     *     requirements={"page"="\d+"},
-     *     defaults={"page"=1}
-     * )
-     */
+    #[Route(path: '/reviews/{page}', name: 'card_reviews_list', requirements: ['page' => '\d+'], defaults: ['page' => 1])]
     public function listAction(Request $request, int $page = 1): Response
     {
         $response = new Response();

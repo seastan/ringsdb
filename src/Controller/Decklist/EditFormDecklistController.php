@@ -8,7 +8,7 @@ use App\Entity\Decklist;
 use App\Repository\DecklistRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class EditFormDecklistController extends AbstractController
 {
@@ -19,9 +19,8 @@ class EditFormDecklistController extends AbstractController
 
     /**
      * Displays the decklist edit form.
-     *
-     * @Route("/decklist/edit/{decklist_id}", name="decklist_edit", requirements={"decklist_id"="\d+"})
      */
+    #[Route(path: '/decklist/edit/{decklist_id}', name: 'decklist_edit', requirements: ['decklist_id' => '\d+'])]
     public function __invoke(int $decklist_id): Response
     {
         /* @var $user \App\Entity\User */

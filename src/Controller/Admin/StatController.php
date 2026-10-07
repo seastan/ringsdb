@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class StatController extends AbstractController
 {
@@ -18,9 +18,7 @@ class StatController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/admin/stat", name="app_stat", methods={"GET"})
-     */
+    #[Route(path: '/admin/stat', name: 'app_stat', methods: ['GET'])]
     public function getStatAction(Request $request): Response
     {
         $month = $request->query->get('month');
@@ -41,9 +39,7 @@ class StatController extends AbstractController
         return new JsonResponse($res);
     }
 
-    /**
-     * @Route("/admin/stat_cards", name="app_stat_cards", methods={"GET"})
-     */
+    #[Route(path: '/admin/stat_cards', name: 'app_stat_cards', methods: ['GET'])]
     public function getStatCardsAction(Request $request): Response
     {
         // Per-card stats are too heavy to compute on a request worker (they scan a
@@ -71,9 +67,7 @@ class StatController extends AbstractController
         return $response;
     }
 
-    /**
-     * @Route("/admin/stat_packs", name="app_stat_packs", methods={"GET"})
-     */
+    #[Route(path: '/admin/stat_packs', name: 'app_stat_packs', methods: ['GET'])]
     public function getStatPacksAction(Request $request): Response
     {
         /* @var $this->connection Connection */

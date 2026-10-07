@@ -10,7 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class OctgnExportDecklistController extends AbstractController
 {
@@ -22,14 +22,8 @@ class OctgnExportDecklistController extends AbstractController
 
     /**
      * returns a octgn file with the content of a decklist.
-     *
-     * @Route(
-     *     "/decklist/export/octgn/{decklist_id}",
-     *     name="decklist_export_octgn",
-     *     methods={"GET"},
-     *     requirements={"decklist_id"="\d+"}
-     * )
      */
+    #[Route(path: '/decklist/export/octgn/{decklist_id}', name: 'decklist_export_octgn', requirements: ['decklist_id' => '\d+'], methods: ['GET'])]
     public function __invoke(int $decklist_id): Response
     {
         $response = new Response();

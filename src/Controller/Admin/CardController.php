@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Card controller.
@@ -34,9 +34,8 @@ class CardController extends AbstractController
 
     /**
      * Lists all Card entities.
-     *
-     * @Route("/admin/card/", name="admin_card")
      */
+    #[Route(path: '/admin/card/', name: 'admin_card')]
     public function indexAction(): Response
     {
         $entities = $this->cardRepository->findAll();
@@ -46,9 +45,8 @@ class CardController extends AbstractController
 
     /**
      * Creates a new Card entity.
-     *
-     * @Route("/admin/card/create", name="admin_card_create", methods={"POST"})
      */
+    #[Route(path: '/admin/card/create', name: 'admin_card_create', methods: ['POST'])]
     public function createAction(Request $request): Response
     {
         $entity = new Card();
@@ -66,9 +64,8 @@ class CardController extends AbstractController
 
     /**
      * Displays a form to create a new Card entity.
-     *
-     * @Route("/admin/card/new", name="admin_card_new")
      */
+    #[Route(path: '/admin/card/new', name: 'admin_card_new')]
     public function newAction(): Response
     {
         $entity = new Card();
@@ -79,9 +76,8 @@ class CardController extends AbstractController
 
     /**
      * Finds and displays a Card entity.
-     *
-     * @Route("/admin/card/{id}/show", name="admin_card_show")
      */
+    #[Route(path: '/admin/card/{id}/show', name: 'admin_card_show')]
     public function showAction(int $id): Response
     {
         $entity = $this->cardRepository->find($id);
@@ -96,9 +92,8 @@ class CardController extends AbstractController
 
     /**
      * Displays a form to edit an existing Card entity.
-     *
-     * @Route("/admin/card/{id}/edit", name="admin_card_edit")
      */
+    #[Route(path: '/admin/card/{id}/edit', name: 'admin_card_edit')]
     public function editAction(int $id): Response
     {
         $entity = $this->cardRepository->find($id);
@@ -115,9 +110,8 @@ class CardController extends AbstractController
 
     /**
      * Edits an existing Card entity.
-     *
-     * @Route("/admin/card/{id}/update", name="admin_card_update", methods={"POST", "PUT"})
      */
+    #[Route(path: '/admin/card/{id}/update', name: 'admin_card_update', methods: ['POST', 'PUT'])]
     public function updateAction(Request $request, int $id, Packages $packages): Response
     {
         $entity = $this->cardRepository->find($id);
@@ -149,9 +143,8 @@ class CardController extends AbstractController
 
     /**
      * Deletes a Card entity.
-     *
-     * @Route("/admin/card/{id}/delete", name="admin_card_delete", methods={"POST", "DELETE"})
      */
+    #[Route(path: '/admin/card/{id}/delete', name: 'admin_card_delete', methods: ['POST', 'DELETE'])]
     public function deleteAction(Request $request, int $id): RedirectResponse
     {
         $form = $this->createDeleteForm($id);
@@ -171,9 +164,8 @@ class CardController extends AbstractController
 
     /**
      * Forcibly deletes a Card entity and all its deck/decklist slot references.
-     *
-     * @Route("/admin/card/{id}/force_delete", name="admin_card_force_delete", methods={"POST", "DELETE"})
      */
+    #[Route(path: '/admin/card/{id}/force_delete', name: 'admin_card_force_delete', methods: ['POST', 'DELETE'])]
     public function forceDeleteAction(Request $request, int $id): RedirectResponse
     {
         $form = $this->createForceDeleteForm($id);

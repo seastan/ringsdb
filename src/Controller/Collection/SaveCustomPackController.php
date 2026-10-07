@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SaveCustomPackController extends AbstractController
 {
@@ -23,9 +23,7 @@ class SaveCustomPackController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/collection/custom-pack/save", name="collection_custom_pack_save", methods={"POST"})
-     */
+    #[Route(path: '/collection/custom-pack/save', name: 'collection_custom_pack_save', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         $user = $this->currentUser();

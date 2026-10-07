@@ -8,7 +8,7 @@ use App\Entity\Decklist;
 use App\Repository\DecklistRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ViewDecklistController extends AbstractController
 {
@@ -20,15 +20,8 @@ class ViewDecklistController extends AbstractController
 
     /**
      * displays the content of a decklist along with comments, siblings, similar, etc..
-     *
-     * @Route(
-     *     "/decklist/view/{decklist_id}/{decklist_name}",
-     *     name="decklist_detail",
-     *     methods={"GET"},
-     *     requirements={"decklist_id"="\d+"},
-     *     defaults={"decklist_name"=null}
-     * )
      */
+    #[Route(path: '/decklist/view/{decklist_id}/{decklist_name}', name: 'decklist_detail', requirements: ['decklist_id' => '\d+'], defaults: ['decklist_name' => null], methods: ['GET'])]
     public function __invoke(int $decklist_id): Response
     {
         $response = new Response();

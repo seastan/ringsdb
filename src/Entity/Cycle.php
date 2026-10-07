@@ -9,84 +9,69 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\CycleRepository")
- * @ORM\Table(
- *     name="cycle",
- *     uniqueConstraints={
- *         @ORM\UniqueConstraint(name="cycle_code_idx", columns={"code"})
- *     }
- * )
- * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="entity_region")
- */
+#[ORM\Entity(repositoryClass: \App\Repository\CycleRepository::class)]
+#[ORM\Cache(usage: 'NONSTRICT_READ_WRITE', region: 'entity_region')]
+#[ORM\Table(name: 'cycle')]
+#[ORM\UniqueConstraint(name: 'cycle_code_idx', columns: ['code'])]
 class Cycle
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", length=255, nullable=false)
      */
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
     private $code;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", length=1024, nullable=false)
      */
+    #[ORM\Column(type: 'string', length: 1024, nullable: false)]
     private $name;
 
     /**
      * @var int
-     *
-     * @ORM\Column(type="smallint", nullable=false)
      */
+    #[ORM\Column(type: 'smallint', nullable: false)]
     private $position;
 
     /**
      * @var bool
-     *
-     * @ORM\Column(name="is_box", type="boolean", nullable=false)
      */
+    #[ORM\Column(name: 'is_box', type: 'boolean', nullable: false)]
     private $isBox;
 
     /**
      * @var bool
-     *
-     * @ORM\Column(name="is_saga", type="boolean", nullable=false)
      */
+    #[ORM\Column(name: 'is_saga', type: 'boolean', nullable: false)]
     private $isSaga;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
      */
     #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name: 'date_creation', type: 'datetime', nullable: false)]
     private $dateCreation;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="date_update", type="datetime", nullable=false)
      */
     #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(name: 'date_update', type: 'datetime', nullable: false)]
     private $dateUpdate;
 
     /**
      * @var Collection<int, Pack>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Pack", mappedBy="cycle")
-     * @ORM\OrderBy({"position"="ASC"})
      */
+    #[ORM\OneToMany(mappedBy: 'cycle', targetEntity: Pack::class)]
+    #[ORM\OrderBy(['position' => 'ASC'])]
     private $packs;
 
     /**

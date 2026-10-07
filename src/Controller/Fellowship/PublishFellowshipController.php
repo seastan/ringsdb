@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class PublishFellowshipController extends AbstractController
 {
@@ -32,9 +32,7 @@ class PublishFellowshipController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/fellowship/publish", name="fellowship_publish", methods={"POST"})
-     */
+    #[Route(path: '/fellowship/publish', name: 'fellowship_publish', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         /* @var $user User */

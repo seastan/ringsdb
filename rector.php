@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
+use Rector\CodeQuality\Rector\For_\ForRepeatedCountToOwnVariableRector;
 use Rector\Config\RectorConfig;
-use Rector\PHPUnit\Set\PHPUnitSetList;
-use Rector\Set\ValueObject\SetList;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -13,16 +12,20 @@ return RectorConfig::configure()
         __DIR__.'/tests',
     ])
     ->withPhpSets()
-    ->withSets([
-        SetList::DEAD_CODE,
-        SetList::CODE_QUALITY,
-        SetList::CODING_STYLE,
-        SetList::TYPE_DECLARATION,
-        SetList::PRIVATIZATION,
-        SetList::TYPE_DECLARATION_DOCBLOCKS,
-        PHPUnitSetList::PHPUNIT_NARROW_ASSERTS,
-    ])
+    ->withAttributesSets(
+        symfony: true,
+        doctrine: true
+    )
+    ->withPreparedSets(
+        deadCode: true,
+        codeQuality: true,
+        codingStyle: true,
+        typeDeclarations: true,
+        typeDeclarationDocblocks: true,
+        privatization: true,
+        phpunitNarrowAsserts: true,
+    )
     ->withSkip([
-        Rector\CodeQuality\Rector\For_\ForRepeatedCountToOwnVariableRector::class,
+        ForRepeatedCountToOwnVariableRector::class,
     ])
 ;

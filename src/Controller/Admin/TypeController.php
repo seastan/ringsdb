@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Type controller.
@@ -29,9 +29,8 @@ class TypeController extends AbstractController
 
     /**
      * Lists all Type entities.
-     *
-     * @Route("/admin/type/", name="admin_type")
      */
+    #[Route(path: '/admin/type/', name: 'admin_type')]
     public function indexAction(): Response
     {
         $entities = $this->typeRepository->findAll();
@@ -41,9 +40,8 @@ class TypeController extends AbstractController
 
     /**
      * Creates a new Type entity.
-     *
-     * @Route("/admin/type/create", name="admin_type_create", methods={"POST"})
      */
+    #[Route(path: '/admin/type/create', name: 'admin_type_create', methods: ['POST'])]
     public function createAction(Request $request): Response
     {
         $entity = new Type();
@@ -73,9 +71,8 @@ class TypeController extends AbstractController
 
     /**
      * Displays a form to create a new Type entity.
-     *
-     * @Route("/admin/type/new", name="admin_type_new")
      */
+    #[Route(path: '/admin/type/new', name: 'admin_type_new')]
     public function newAction(): Response
     {
         $entity = new Type();
@@ -86,9 +83,8 @@ class TypeController extends AbstractController
 
     /**
      * Finds and displays a Type entity.
-     *
-     * @Route("/admin/type/{id}/show", name="admin_type_show")
      */
+    #[Route(path: '/admin/type/{id}/show', name: 'admin_type_show')]
     public function showAction(int $id): Response
     {
         $entity = $this->typeRepository->find($id);
@@ -103,9 +99,8 @@ class TypeController extends AbstractController
 
     /**
      * Displays a form to edit an existing Type entity.
-     *
-     * @Route("/admin/type/{id}/edit", name="admin_type_edit")
      */
+    #[Route(path: '/admin/type/{id}/edit', name: 'admin_type_edit')]
     public function editAction(int $id): Response
     {
         $entity = $this->typeRepository->find($id);
@@ -136,9 +131,8 @@ class TypeController extends AbstractController
 
     /**
      * Edits an existing Type entity.
-     *
-     * @Route("/admin/type/{id}/update", name="admin_type_update", methods={"POST", "PUT"})
      */
+    #[Route(path: '/admin/type/{id}/update', name: 'admin_type_update', methods: ['POST', 'PUT'])]
     public function updateAction(Request $request, int $id): Response
     {
         $entity = $this->typeRepository->find($id);
@@ -160,9 +154,8 @@ class TypeController extends AbstractController
 
     /**
      * Deletes a Type entity.
-     *
-     * @Route("/admin/type/{id}/delete", name="admin_type_delete", methods={"POST", "DELETE"})
      */
+    #[Route(path: '/admin/type/{id}/delete', name: 'admin_type_delete', methods: ['POST', 'DELETE'])]
     public function deleteAction(Request $request, int $id): RedirectResponse
     {
         $form = $this->createDeleteForm($id);

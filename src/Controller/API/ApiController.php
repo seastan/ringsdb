@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ApiController extends AbstractController
@@ -49,9 +49,8 @@ class ApiController extends AbstractController
      *    {"name"="jsonp", "dataType"="string", "required"=false, "description"="JSONP callback"}
      *  },
      * )
-     *
-     * @Route("/api/public/packs/", name="api_packs", methods={"GET"})
      */
+    #[Route(path: '/api/public/packs/', name: 'api_packs', methods: ['GET'])]
     public function listPacksAction(Request $request): Response
     {
         $response = new Response();
@@ -126,15 +125,8 @@ class ApiController extends AbstractController
      *      }
      *  },
      * )
-     *
-     * @Route(
-     *     "/api/public/card/{card_code}.{_format}",
-     *     name="api_card",
-     *     methods={"GET"},
-     *     requirements={"_format"="json"},
-     *     defaults={"_format"="json"}
-     * )
      */
+    #[Route(path: '/api/public/card/{card_code}.{_format}', name: 'api_card', requirements: ['_format' => 'json'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function getCardAction(Request $request, string $card_code): Response
     {
         $response = new Response();
@@ -177,9 +169,8 @@ class ApiController extends AbstractController
      *      {"name"="jsonp", "dataType"="string", "required"=false, "description"="JSONP callback"}
      *  },
      * )
-     *
-     * @Route("/api/public/cards/", name="api_cards", methods={"GET"})
      */
+    #[Route(path: '/api/public/cards/', name: 'api_cards', methods: ['GET'])]
     public function listCardsAction(Request $request): Response
     {
         $response = new Response();
@@ -255,15 +246,8 @@ class ApiController extends AbstractController
      *      }
      *  },
      * )
-     *
-     * @Route(
-     *     "/api/public/cards/{pack_code}.{_format}",
-     *     name="api_cards_pack",
-     *     methods={"GET"},
-     *     requirements={"_format"="json|xml|xlsx|xls"},
-     *     defaults={"_format"="json"}
-     * )
      */
+    #[Route(path: '/api/public/cards/{pack_code}.{_format}', name: 'api_cards_pack', requirements: ['_format' => 'json|xml|xlsx|xls'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function listCardsByPackAction(Request $request, string $pack_code): Response
     {
         $response = new Response();
@@ -341,15 +325,8 @@ class ApiController extends AbstractController
      *      }
      *  },
      * )
-     *
-     * @Route(
-     *     "/api/public/decklist/{decklist_id}.{_format}",
-     *     name="api_decklist",
-     *     methods={"GET"},
-     *     requirements={"_format"="json", "decklist_id"="\d+"},
-     *     defaults={"_format"="json"}
-     * )
      */
+    #[Route(path: '/api/public/decklist/{decklist_id}.{_format}', name: 'api_decklist', requirements: ['_format' => 'json', 'decklist_id' => '\d+'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function getDecklistAction(Request $request, int $decklist_id): Response
     {
         $response = new Response();
@@ -408,15 +385,8 @@ class ApiController extends AbstractController
      *      }
      *  },
      * )
-     *
-     * @Route(
-     *     "/api/public/decklists/by_date/{date}.{_format}",
-     *     name="api_decklists_by_date",
-     *     methods={"GET"},
-     *     requirements={"_format"="json", "date"="\d\d\d\d-\d\d-\d\d"},
-     *     defaults={"_format"="json"}
-     * )
      */
+    #[Route(path: '/api/public/decklists/by_date/{date}.{_format}', name: 'api_decklists_by_date', requirements: ['_format' => 'json', 'date' => '\d\d\d\d-\d\d-\d\d'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function listDecklistsByDateAction(Request $request, UserRepository $userRepository, string $date): Response
     {
         $response = new Response();
@@ -494,15 +464,8 @@ class ApiController extends AbstractController
      *      }
      *  },
      * )
-     *
-     * @Route(
-     *     "/api/public/decklists/top_by_card/{card_code}.{_format}",
-     *     name="api_decklists_by_card",
-     *     methods={"GET"},
-     *     requirements={"_format"="json"},
-     *     defaults={"_format"="json"}
-     * )
      */
+    #[Route(path: '/api/public/decklists/top_by_card/{card_code}.{_format}', name: 'api_decklists_by_card', requirements: ['_format' => 'json'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function listTopDecklistsByCardAction(Request $request, string $card_code): Response
     {
         $response = new Response();
@@ -594,15 +557,8 @@ class ApiController extends AbstractController
      *      }
      *  },
      * )
-     *
-     * @Route(
-     *     "/api/public/scenario/{scenario_id}.{_format}",
-     *     name="api_scenario",
-     *     methods={"GET"},
-     *     requirements={"_format"="json", "scenario_id"="\d+"},
-     *     defaults={"_format"="json"}
-     * )
      */
+    #[Route(path: '/api/public/scenario/{scenario_id}.{_format}', name: 'api_scenario', requirements: ['_format' => 'json', 'scenario_id' => '\d+'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function getScenarioAction(Request $request, ScenarioRepository $scenarioRepository, int $scenario_id): Response
     {
         $response = new Response();
@@ -631,9 +587,7 @@ class ApiController extends AbstractController
         return $response;
     }
 
-    /**
-     * @Route("/api/public/cards/search/{q}", name="api_cards_search", methods={"GET"})
-     */
+    #[Route(path: '/api/public/cards/search/{q}', name: 'api_cards_search', methods: ['GET'])]
     public function searchCardsAction(Request $request, string $q): Response
     {
         $response = new Response();

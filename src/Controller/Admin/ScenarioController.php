@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Scenario controller.
@@ -29,9 +29,8 @@ class ScenarioController extends AbstractController
 
     /**
      * Lists all Scenario entities.
-     *
-     * @Route("/admin/scenario/", name="admin_scenario")
      */
+    #[Route(path: '/admin/scenario/', name: 'admin_scenario')]
     public function indexAction(): Response
     {
         $entities = $this->scenarioRepository->findAll();
@@ -41,9 +40,8 @@ class ScenarioController extends AbstractController
 
     /**
      * Creates a new Scenario entity.
-     *
-     * @Route("/admin/scenario/create", name="admin_scenario_create", methods={"POST"})
      */
+    #[Route(path: '/admin/scenario/create', name: 'admin_scenario_create', methods: ['POST'])]
     public function createAction(Request $request): Response
     {
         $entity = new Scenario();
@@ -97,9 +95,8 @@ class ScenarioController extends AbstractController
 
     /**
      * Displays a form to create a new Scenario entity.
-     *
-     * @Route("/admin/scenario/new", name="admin_scenario_new")
      */
+    #[Route(path: '/admin/scenario/new', name: 'admin_scenario_new')]
     public function newAction(): Response
     {
         $entity = new Scenario();
@@ -110,9 +107,8 @@ class ScenarioController extends AbstractController
 
     /**
      * Finds and displays a Scenario entity.
-     *
-     * @Route("/admin/scenario/{id}/show", name="admin_scenario_show")
      */
+    #[Route(path: '/admin/scenario/{id}/show', name: 'admin_scenario_show')]
     public function showAction(int $id): Response
     {
         $entity = $this->scenarioRepository->find($id);
@@ -127,9 +123,8 @@ class ScenarioController extends AbstractController
 
     /**
      * Displays a form to edit an existing Scenario entity.
-     *
-     * @Route("/admin/scenario/{id}/edit", name="admin_scenario_edit")
      */
+    #[Route(path: '/admin/scenario/{id}/edit', name: 'admin_scenario_edit')]
     public function editAction(int $id): Response
     {
         $entity = $this->scenarioRepository->find($id);
@@ -145,9 +140,8 @@ class ScenarioController extends AbstractController
 
     /**
      * Edits an existing Scenario entity.
-     *
-     * @Route("/admin/scenario/{id}/update", name="admin_scenario_update", methods={"POST", "PUT"})
      */
+    #[Route(path: '/admin/scenario/{id}/update', name: 'admin_scenario_update', methods: ['POST', 'PUT'])]
     public function updateAction(Request $request, int $id): Response
     {
         $entity = $this->scenarioRepository->find($id);
@@ -172,9 +166,8 @@ class ScenarioController extends AbstractController
 
     /**
      * Deletes a Scenario entity.
-     *
-     * @Route("/admin/scenario/{id}/delete", name="admin_scenario_delete", methods={"POST", "DELETE"})
      */
+    #[Route(path: '/admin/scenario/{id}/delete', name: 'admin_scenario_delete', methods: ['POST', 'DELETE'])]
     public function deleteAction(Request $request, int $id): RedirectResponse
     {
         $form = $this->createDeleteForm($id);

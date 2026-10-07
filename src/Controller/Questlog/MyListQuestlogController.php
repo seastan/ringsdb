@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class MyListQuestlogController extends AbstractController
 {
@@ -29,14 +29,7 @@ class MyListQuestlogController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/myquestlogs/{scenario_name_canonical}/{quest_mode}",
-     *     name="myquestlogs_list",
-     *     methods={"GET"},
-     *     defaults={"scenario_name_canonical"=null, "quest_mode"="normal"}
-     * )
-     */
+    #[Route(path: '/myquestlogs/{scenario_name_canonical}/{quest_mode}', name: 'myquestlogs_list', defaults: ['scenario_name_canonical' => null, 'quest_mode' => 'normal'], methods: ['GET'])]
     public function __invoke(?string $scenario_name_canonical, ?string $quest_mode): Response
     {
         // $quest_mode = 'normal';

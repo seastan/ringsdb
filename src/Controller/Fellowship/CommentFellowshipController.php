@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CommentFellowshipController extends AbstractController
@@ -34,9 +34,8 @@ class CommentFellowshipController extends AbstractController
 
     /**
      * records a user's comment.
-     *
-     * @Route("/user/fellowship_comment", name="fellowship_comment", methods={"POST"})
      */
+    #[Route(path: '/user/fellowship_comment', name: 'fellowship_comment', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         /* @var $user User */

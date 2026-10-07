@@ -16,7 +16,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class DefaultController extends AbstractController
 {
@@ -39,9 +39,7 @@ class DefaultController extends AbstractController
         return $b['dateCreation'] <=> $a['dateCreation'];
     }
 
-    /**
-     * @Route("/", name="index", methods={"GET"})
-     */
+    #[Route(path: '/', name: 'index', methods: ['GET'])]
     public function indexAction(DecklistManager $decklistManager, FellowshipManager $fellowshipManager, ScenarioRepository $scenarioRepository, TypeRepository $typeRepository): Response
     {
         $response = new Response();
@@ -326,9 +324,7 @@ class DefaultController extends AbstractController
         return $response;
     }
 
-    /**
-     * @Route("/about", name="about")
-     */
+    #[Route(path: '/about', name: 'about')]
     public function aboutAction(): Response
     {
         $response = new Response();
@@ -341,9 +337,7 @@ class DefaultController extends AbstractController
         ], $response);
     }
 
-    /**
-     * @Route("/api/", name="api_intro")
-     */
+    #[Route(path: '/api/', name: 'api_intro')]
     public function apiIntroAction(): Response
     {
         $response = new Response();

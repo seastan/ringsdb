@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * The account is created disabled, and enabled by the link of the confirmation email
@@ -29,9 +29,7 @@ class RegisterController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/register/", name="fos_user_registration_register", methods={"GET", "POST"})
-     */
+    #[Route(path: '/register/', name: 'fos_user_registration_register', methods: ['GET', 'POST'])]
     public function __invoke(Request $request): Response
     {
         $user = new User();

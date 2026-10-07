@@ -16,15 +16,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * User.
- *
- * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- * @ORM\Table(name="user")
- *
- * The validation groups are those of the account forms (src/Form/Security).
- *
- * @UniqueEntity(fields="usernameCanonical", errorPath="username", message="The username is already used.", groups={"Registration", "Profile"})
- * @UniqueEntity(fields="emailCanonical", errorPath="email", message="The email is already used.", groups={"Registration", "Profile"})
  */
+#[ORM\Entity(repositoryClass: \App\Repository\UserRepository::class)]
+#[UniqueEntity(fields: 'usernameCanonical', message: 'The username is already used.', errorPath: 'username', groups: ['Registration', 'Profile'])]
+#[UniqueEntity(fields: 'emailCanonical', message: 'The email is already used.', errorPath: 'email', groups: ['Registration', 'Profile'])]
+#[ORM\Table(name: 'user')]
 class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, EquatableInterface, \Stringable
 {
     public const ROLE_DEFAULT = 'ROLE_USER';
@@ -33,95 +29,70 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
 
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=180)
-     *
-     * @Assert\NotBlank(message="Please enter a username.", groups={"Registration", "Profile"})
-     *
-     * @Assert\Length(min=2, max=180, minMessage="The username is too short.", maxMessage="The username is too long.", groups={"Registration", "Profile"})
-     */
+    #[ORM\Column(type: 'string', length: 180)]
+    #[Assert\NotBlank(message: 'Please enter a username.', groups: ['Registration', 'Profile'])]
+    #[Assert\Length(min: 2, max: 180, minMessage: 'The username is too short.', maxMessage: 'The username is too long.', groups: ['Registration', 'Profile'])]
     private ?string $username = null;
 
     /**
      * Lowercased username, for the case-insensitive lookups (login, registration uniqueness).
-     *
-     * @ORM\Column(name="username_canonical", type="string", length=180, unique=true)
      */
+    #[ORM\Column(name: 'username_canonical', type: 'string', length: 180, unique: true)]
     private ?string $usernameCanonical = null;
 
-    /**
-     * @ORM\Column(type="string", length=180)
-     *
-     * @Assert\NotBlank(message="Please enter an email.", groups={"Registration", "Profile"})
-     *
-     * @Assert\Length(min=2, max=180, minMessage="The email is too short.", maxMessage="The email is too long.", groups={"Registration", "Profile"})
-     *
-     * @Assert\Email(message="The email is not valid.", groups={"Registration", "Profile"})
-     */
+    #[ORM\Column(type: 'string', length: 180)]
+    #[Assert\NotBlank(message: 'Please enter an email.', groups: ['Registration', 'Profile'])]
+    #[Assert\Length(min: 2, max: 180, minMessage: 'The email is too short.', maxMessage: 'The email is too long.', groups: ['Registration', 'Profile'])]
+    #[Assert\Email(message: 'The email is not valid.', groups: ['Registration', 'Profile'])]
     private ?string $email = null;
 
-    /**
-     * @ORM\Column(name="email_canonical", type="string", length=180, unique=true)
-     */
+    #[ORM\Column(name: 'email_canonical', type: 'string', length: 180, unique: true)]
     private ?string $emailCanonical = null;
 
     /**
      * False until the registration is confirmed by email.
-     *
-     * @ORM\Column(type="boolean")
      */
+    #[ORM\Column(type: 'boolean')]
     private bool $enabled = false;
 
     /**
      * The per-user salt of the legacy sha512 hashes (see security.yaml).
-     *
-     * @ORM\Column(type="string", nullable=true)
      */
+    #[ORM\Column(type: 'string', nullable: true)]
     private ?string $salt = null;
 
-    /**
-     * @ORM\Column(type="string")
-     */
+    #[ORM\Column(type: 'string')]
     private ?string $password = null;
 
     /**
      * Not persisted: hashed into $password by UserPasswordUpdater.
-     *
-     * @Assert\NotBlank(message="Please enter a password.", groups={"Registration", "ResetPassword", "ChangePassword"})
-     *
-     * @Assert\Length(min=2, max=4096, minMessage="The password is too short.", groups={"Registration", "Profile", "ResetPassword", "ChangePassword"})
      */
+    #[Assert\NotBlank(message: 'Please enter a password.', groups: ['Registration', 'ResetPassword', 'ChangePassword'])]
+    #[Assert\Length(min: 2, max: 4096, minMessage: 'The password is too short.', groups: ['Registration', 'Profile', 'ResetPassword', 'ChangePassword'])]
     private ?string $plainPassword = null;
 
-    /**
-     * @ORM\Column(name="last_login", type="datetime", nullable=true)
-     */
+    #[ORM\Column(name: 'last_login', type: 'datetime', nullable: true)]
     private ?\DateTime $lastLogin = null;
 
     /**
      * The token of the registration confirmation link, then of the password reset link.
-     *
-     * @ORM\Column(name="confirmation_token", type="string", length=180, unique=true, nullable=true)
      */
+    #[ORM\Column(name: 'confirmation_token', type: 'string', length: 180, unique: true, nullable: true)]
     private ?string $confirmationToken = null;
 
-    /**
-     * @ORM\Column(name="password_requested_at", type="datetime", nullable=true)
-     */
+    #[ORM\Column(name: 'password_requested_at', type: 'datetime', nullable: true)]
     private ?\DateTime $passwordRequestedAt = null;
 
     /**
      * @var string[]
-     *
-     * @ORM\Column(type="array")
      */
+    #[ORM\Column(type: 'array')]
     private array $roles = [];
 
     public function getMaxNbDecks(): float
@@ -131,143 +102,121 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
      */
     #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name: 'date_creation', type: 'datetime', nullable: false)]
     private $dateCreation;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="date_update", type="datetime", nullable=false)
      */
     #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(name: 'date_update', type: 'datetime', nullable: false)]
     private $dateUpdate;
 
-    /**
-     * @ORM\Column(type="integer", nullable=false)
-     */
+    #[ORM\Column(type: 'integer', nullable: false)]
     private int $reputation;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="text", nullable=true)
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $resume;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="string", length=255, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $color;
 
-    /**
-     * @ORM\Column(type="integer", nullable=false)
-     */
+    #[ORM\Column(type: 'integer', nullable: false)]
     private int $donation;
 
     /**
      * @var bool
-     *
-     * @ORM\Column(name="is_notif_author", type="boolean", nullable=false, options={"default": true})
      */
+    #[ORM\Column(name: 'is_notif_author', type: 'boolean', nullable: false, options: ['default' => true])]
     private $isNotifAuthor = true;
 
     /**
      * @var bool
-     *
-     * @ORM\Column(name="is_notif_commenter", type="boolean", nullable=false, options={"default": true})
      */
+    #[ORM\Column(name: 'is_notif_commenter', type: 'boolean', nullable: false, options: ['default' => true])]
     private $isNotifCommenter = true;
 
     /**
      * @var bool
-     *
-     * @ORM\Column(name="is_notif_mention", type="boolean", nullable=false, options={"default": true})
      */
+    #[ORM\Column(name: 'is_notif_mention', type: 'boolean', nullable: false, options: ['default' => true])]
     private $isNotifMention = true;
 
     /**
      * @var bool
-     *
-     * @ORM\Column(name="is_notif_follow", type="boolean", nullable=false, options={"default": true})
      */
+    #[ORM\Column(name: 'is_notif_follow', type: 'boolean', nullable: false, options: ['default' => true])]
     private $isNotifFollow = true;
 
     /**
      * @var bool
-     *
-     * @ORM\Column(name="is_notif_successor", type="boolean", nullable=false, options={"default": true})
      */
+    #[ORM\Column(name: 'is_notif_successor', type: 'boolean', nullable: false, options: ['default' => true])]
     private $isNotifSuccessor = true;
 
     /**
      * @var bool
-     *
-     * @ORM\Column(name="is_share_decks", type="boolean", nullable=false, options={"default": false})
      */
+    #[ORM\Column(name: 'is_share_decks', type: 'boolean', nullable: false, options: ['default' => false])]
     private $isShareDecks = false;
 
     /**
      * @var bool
-     *
-     * @ORM\Column(name="dark_mode", type="boolean", nullable=false, options={"default": false})
      */
+    #[ORM\Column(name: 'dark_mode', type: 'boolean', nullable: false, options: ['default' => false])]
     private $darkMode = false;
 
     /**
      * @var Collection<int, Deck>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Deck", mappedBy="user", cascade={"remove"})
-     * @ORM\OrderBy({"dateUpdate"="DESC"})
      */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Deck::class, cascade: ['remove'])]
+    #[ORM\OrderBy(['dateUpdate' => 'DESC'])]
     private $decks;
 
     /**
      * @var Collection<int, Decklist>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Decklist", mappedBy="user")
      */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Decklist::class)]
     private $decklists;
 
     /**
      * @var Collection<int, Comment>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="user")
-     * @ORM\OrderBy({"dateCreation"="DESC"})
      */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Comment::class)]
+    #[ORM\OrderBy(['dateCreation' => 'DESC'])]
     private $comments;
 
     /**
      * @var Collection<int, Review>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Review", mappedBy="user")
-     * @ORM\OrderBy({"dateCreation"="DESC"})
      */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Review::class)]
+    #[ORM\OrderBy(['dateCreation' => 'DESC'])]
     private $reviews;
 
     /**
      * @var Collection<int, Decklist>
-     *
-     * @ORM\ManyToMany(targetEntity="App\Entity\Decklist", mappedBy="favorites", cascade={"remove"})
      */
+    #[ORM\ManyToMany(targetEntity: Decklist::class, mappedBy: 'favorites', cascade: ['remove'])]
     private $favorites;
 
     /**
      * @var Collection<int, Decklist>
-     *
-     * @ORM\ManyToMany(targetEntity="App\Entity\Decklist", mappedBy="votes", cascade={"remove"})
      */
+    #[ORM\ManyToMany(targetEntity: Decklist::class, mappedBy: 'votes', cascade: ['remove'])]
     private $votes;
 
     /**
      * @var Collection<int, Review>
-     *
-     * @ORM\ManyToMany(targetEntity="App\Entity\Review", mappedBy="votes", cascade={"remove"})
      */
+    #[ORM\ManyToMany(targetEntity: Review::class, mappedBy: 'votes', cascade: ['remove'])]
     private $reviewvotes;
 
     public function __construct()
@@ -998,21 +947,15 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
 
     /**
      * @var Collection<int, User>
-     *
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="followers")
      */
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'followers')]
     private $following;
 
     /**
      * @var Collection<int, User>
-     *
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="following")
-     * @ORM\JoinTable(
-     *     name="follow",
-     *     joinColumns={@ORM\JoinColumn(name="following_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="follower_id", referencedColumnName="id")}
-     * )
      */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'following')]
+    #[ORM\JoinTable(name: 'follow', joinColumns: [new ORM\JoinColumn(name: 'following_id', referencedColumnName: 'id')], inverseJoinColumns: [new ORM\JoinColumn(name: 'follower_id', referencedColumnName: 'id')])]
     private $followers;
 
     /**
@@ -1073,9 +1016,8 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="text", nullable=true)
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $ownedPacks;
 
     /**
@@ -1100,9 +1042,8 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(name="art_preferences", type="text", nullable=true)
      */
+    #[ORM\Column(name: 'art_preferences', type: 'text', nullable: true)]
     private $artPreferences;
 
     /**
@@ -1127,10 +1068,9 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
 
     /**
      * @var Collection<int, Fellowship>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Fellowship", mappedBy="user", cascade={"remove"})
-     * @ORM\OrderBy({"dateUpdate"="DESC"})
      */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Fellowship::class, cascade: ['remove'])]
+    #[ORM\OrderBy(['dateUpdate' => 'DESC'])]
     private $fellowships;
 
     /**
@@ -1180,24 +1120,21 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
 
     /**
      * @var Collection<int, FellowshipComment>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\FellowshipComment", mappedBy="user")
-     * @ORM\OrderBy({"dateCreation"="DESC"})
      */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: FellowshipComment::class)]
+    #[ORM\OrderBy(['dateCreation' => 'DESC'])]
     private $fellowship_comments;
 
     /**
      * @var Collection<int, Fellowship>
-     *
-     * @ORM\ManyToMany(targetEntity="App\Entity\Fellowship", mappedBy="favorites", cascade={"remove"})
      */
+    #[ORM\ManyToMany(targetEntity: Fellowship::class, mappedBy: 'favorites', cascade: ['remove'])]
     private $fellowship_favorites;
 
     /**
      * @var Collection<int, Fellowship>
-     *
-     * @ORM\ManyToMany(targetEntity="App\Entity\Fellowship", mappedBy="votes", cascade={"remove"})
      */
+    #[ORM\ManyToMany(targetEntity: Fellowship::class, mappedBy: 'votes', cascade: ['remove'])]
     private $fellowship_votes;
 
     /**
@@ -1286,18 +1223,16 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
 
     /**
      * @var Collection<int, Questlog>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Questlog", mappedBy="user", cascade={"remove"})
-     * @ORM\OrderBy({"dateUpdate"="DESC"})
      */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Questlog::class, cascade: ['remove'])]
+    #[ORM\OrderBy(['dateUpdate' => 'DESC'])]
     private $questlogs;
 
     /**
      * @var Collection<int, QuestlogComment>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\QuestlogComment", mappedBy="user")
-     * @ORM\OrderBy({"dateCreation"="DESC"})
      */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: QuestlogComment::class)]
+    #[ORM\OrderBy(['dateCreation' => 'DESC'])]
     private $questlog_comments;
 
     /**
@@ -1358,16 +1293,14 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
 
     /**
      * @var Collection<int, Questlog>
-     *
-     * @ORM\ManyToMany(targetEntity="App\Entity\Questlog", mappedBy="favorites", cascade={"remove"})
      */
+    #[ORM\ManyToMany(targetEntity: Questlog::class, mappedBy: 'favorites', cascade: ['remove'])]
     private $questlog_favorites;
 
     /**
      * @var Collection<int, Questlog>
-     *
-     * @ORM\ManyToMany(targetEntity="App\Entity\Questlog", mappedBy="votes", cascade={"remove"})
      */
+    #[ORM\ManyToMany(targetEntity: Questlog::class, mappedBy: 'votes', cascade: ['remove'])]
     private $questlog_votes;
 
     /**
@@ -1428,9 +1361,8 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
 
     /**
      * @var bool
-     *
-     * @ORM\Column(type="boolean")
      */
+    #[ORM\Column(type: 'boolean')]
     protected $locked = false;
 
     /**
@@ -1455,30 +1387,26 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
 
     /**
      * @var bool
-     *
-     * @ORM\Column(type="boolean")
      */
+    #[ORM\Column(type: 'boolean')]
     protected $expired = false;
 
     /**
      * @var \DateTime|null
-     *
-     * @ORM\Column(name="expires_at", type="datetime", nullable=true)
      */
+    #[ORM\Column(name: 'expires_at', type: 'datetime', nullable: true)]
     protected $expiresAt;
 
     /**
      * @var bool
-     *
-     * @ORM\Column(name="credentials_expired", type="boolean")
      */
+    #[ORM\Column(name: 'credentials_expired', type: 'boolean')]
     protected $credentialsExpired = false;
 
     /**
      * @var \DateTime|null
-     *
-     * @ORM\Column(name="credentials_expire_at", type="datetime", nullable=true)
      */
+    #[ORM\Column(name: 'credentials_expire_at', type: 'datetime', nullable: true)]
     protected $credentialsExpireAt;
 
     /**

@@ -7,7 +7,7 @@ namespace App\Controller\API;
 use App\Repository\UserCustomPackRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ListPublishedCustomPacksController extends AbstractController
 {
@@ -16,13 +16,7 @@ class ListPublishedCustomPacksController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route(
-     *     "/api/public/custom-packs/published",
-     *     name="api_public_custom_packs_published",
-     *     methods={"GET"}
-     * )
-     */
+    #[Route(path: '/api/public/custom-packs/published', name: 'api_public_custom_packs_published', methods: ['GET'])]
     public function __invoke(): JsonResponse
     {
         $packs = $this->userCustomPackRepository->findBy(['isPublished' => true], ['createdAt' => 'ASC', 'id' => 'ASC']);

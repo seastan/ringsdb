@@ -10,7 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class DeleteListController extends AbstractController
 {
@@ -22,9 +22,7 @@ class DeleteListController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/deck/delete_list", name="deck_delete_list", methods={"POST"})
-     */
+    #[Route(path: '/deck/delete_list', name: 'deck_delete_list', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         $list_id = explode('-', $request->get('ids'));

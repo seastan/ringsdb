@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class AutosaveController extends AbstractController
 {
@@ -28,9 +28,7 @@ class AutosaveController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/deck/autosave", name="deck_autosave", methods={"POST"})
-     */
+    #[Route(path: '/deck/autosave', name: 'deck_autosave', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
         /* @var $user User */

@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Encounter controller.
@@ -29,9 +29,8 @@ class EncounterController extends AbstractController
 
     /**
      * Lists all Encounter entities.
-     *
-     * @Route("/admin/encounter/", name="admin_encounter")
      */
+    #[Route(path: '/admin/encounter/', name: 'admin_encounter')]
     public function indexAction(): Response
     {
         $entities = $this->encounterRepository->findAll();
@@ -41,9 +40,8 @@ class EncounterController extends AbstractController
 
     /**
      * Creates a new Encounter entity.
-     *
-     * @Route("/admin/encounter/create", name="admin_encounter_create", methods={"POST"})
      */
+    #[Route(path: '/admin/encounter/create', name: 'admin_encounter_create', methods: ['POST'])]
     public function createAction(Request $request): Response
     {
         $entity = new Encounter();
@@ -61,9 +59,8 @@ class EncounterController extends AbstractController
 
     /**
      * Displays a form to create a new Encounter entity.
-     *
-     * @Route("/admin/encounter/new", name="admin_encounter_new")
      */
+    #[Route(path: '/admin/encounter/new', name: 'admin_encounter_new')]
     public function newAction(): Response
     {
         $entity = new Encounter();
@@ -74,9 +71,8 @@ class EncounterController extends AbstractController
 
     /**
      * Finds and displays a Encounter entity.
-     *
-     * @Route("/admin/encounter/{id}/show", name="admin_encounter_show")
      */
+    #[Route(path: '/admin/encounter/{id}/show', name: 'admin_encounter_show')]
     public function showAction(int $id): Response
     {
         $entity = $this->encounterRepository->find($id);
@@ -91,9 +87,8 @@ class EncounterController extends AbstractController
 
     /**
      * Displays a form to edit an existing Encounter entity.
-     *
-     * @Route("/admin/encounter/{id}/edit", name="admin_encounter_edit")
      */
+    #[Route(path: '/admin/encounter/{id}/edit', name: 'admin_encounter_edit')]
     public function editAction(int $id): Response
     {
         $entity = $this->encounterRepository->find($id);
@@ -109,9 +104,8 @@ class EncounterController extends AbstractController
 
     /**
      * Edits an existing Encounter entity.
-     *
-     * @Route("/admin/encounter/{id}/update", name="admin_encounter_update", methods={"POST", "PUT"})
      */
+    #[Route(path: '/admin/encounter/{id}/update', name: 'admin_encounter_update', methods: ['POST', 'PUT'])]
     public function updateAction(Request $request, int $id): Response
     {
         $entity = $this->encounterRepository->find($id);
@@ -134,9 +128,8 @@ class EncounterController extends AbstractController
 
     /**
      * Deletes a Encounter entity.
-     *
-     * @Route("/admin/encounter/{id}/delete", name="admin_encounter_delete", methods={"POST", "DELETE"})
      */
+    #[Route(path: '/admin/encounter/{id}/delete', name: 'admin_encounter_delete', methods: ['POST', 'DELETE'])]
     public function deleteAction(Request $request, int $id): RedirectResponse
     {
         $form = $this->createDeleteForm($id);

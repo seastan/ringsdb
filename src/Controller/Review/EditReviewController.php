@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class EditReviewController extends AbstractController
 {
@@ -23,9 +23,7 @@ class EditReviewController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/review/edit", name="card_review_edit", methods={"POST"})
-     */
+    #[Route(path: '/review/edit', name: 'card_review_edit', methods: ['POST'])]
     public function editAction(Request $request): Response
     {
         /* @var $user \App\Entity\User */
