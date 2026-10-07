@@ -37,7 +37,10 @@ class CSVController extends AbstractController {
 
 		$columns = str_getcsv(array_shift($content_array));
 		$cards = [];
-		$newIds = [];
+		// Codes present in the CSV. Cards are identified by their unique `code`,
+		// NOT by octgnid: a MotK hero (e.g. "(MotK) Ori", 99311006) and its base
+		// ally ("Ori", 311006) deliberately share an octgnid but are distinct cards.
+		$newCodes = [];
 
 		foreach ($content_array as $row) {
 			$card = [];
@@ -47,7 +50,7 @@ class CSVController extends AbstractController {
 				$card[$columns[$i]] = (string) str_replace('<br/>', "\n", (string) $row[$i]);
 			}
 
-			$newIds[$card['octgnid']] = 1;
+			$newCodes[$card['code']] = 1;
 			array_push($cards, $card);
 		}
 
@@ -89,33 +92,32 @@ class CSVController extends AbstractController {
 			$em->flush();
 		}
 
-		// Build oldIds from the pack's CardPrintings (not Card rows, since a
-		// canonical Card may appear in multiple packs after the refactor).
-		$oldIds = [];
+		$summary = [
+			'rows' => 0,
+			'cards_created' => 0,
+			'printings_created' => 0,
+			'updated' => 0,
+			'deleted' => 0,
+		];
+		$createdCards = [];
+		$createdPrintings = [];
+		$deletedCards = [];
+
+		// Soft-delete cards that were in this pack but are no longer in the CSV
+		// (removed from the pack). Keyed by card CODE, not octgnid, so cards that
+		// merely share an octgnid with a card in another pack are never touched.
 		foreach ($pack->getPrintings() as $printing) {
-			$oldIds[$printing->getOctgnid()] = 1;
-			if (!array_key_exists($printing->getOctgnid(), $newIds) &&
-				strpos($printing->getCard()->getName(), '[deleted]') === false) {
-				$card = $printing->getCard();
-				$card->setName('[deleted] ' . $card->getName());
-				$card->setCode($card->getCode() . '_' . uniqid());
+			$existingCard = $printing->getCard();
+			if (!array_key_exists($existingCard->getCode(), $newCodes) &&
+				strpos($existingCard->getName(), '[deleted]') === false) {
+				$deletedCards[] = $existingCard->getCode();
+				$summary['deleted']++;
+				$existingCard->setName('[deleted] ' . $existingCard->getName());
+				$existingCard->setCode($existingCard->getCode() . '_' . uniqid());
 			}
 		}
 
-		// Cards that existed in ALePMotKA and are now being "promoted" into a
-		// main pack upload should have the MotKA printing's Card marked deleted.
-		$motkPack = $packRepo->findOneBy(['code' => 'ALePMotKA']);
-		if ($motkPack) {
-			foreach ($motkPack->getPrintings() as $printing) {
-				if (array_key_exists($printing->getOctgnid(), $oldIds) &&
-					strpos($printing->getCard()->getName(), '[deleted]') === false) {
-					$card = $printing->getCard();
-					$card->setName('[deleted] ' . $card->getName());
-					$card->setCode($card->getCode() . '_' . uniqid());
-				}
-			}
-		}
-
+		$cardRepo = $em->getRepository('AppBundle:Card');
 		$printingRepo = $em->getRepository('AppBundle:CardPrinting');
 		$cardMeta = $em->getClassMetadata('AppBundle:Card');
 		$cardFieldNames = $cardMeta->getFieldNames();
@@ -124,6 +126,7 @@ class CSVController extends AbstractController {
 		$printingFieldNames = $printingMeta->getFieldNames();
 
 		foreach ($cards as $card) {
+			$summary['rows']++;
 			$changed = false;
 
 			// Determine the target pack for this card: use the CSV 'pack'
@@ -137,42 +140,25 @@ class CSVController extends AbstractController {
 				}
 			}
 
-			// Look up by octgnid scoped to the card's target pack.
-			$printingEntity = $printingRepo->findOneBy([
-				'octgnid' => $card['octgnid'],
-				'pack' => $cardPack,
-			]);
-
-			if ($printingEntity) {
-				$cardEntity = $printingEntity->getCard();
+			// Resolve the canonical Card by its unique code. Distinct cards that
+			// share an octgnid (a base ally and its MotK hero) stay separate.
+			$cardEntity = $cardRepo->findOneBy(['code' => $card['code']]);
+			$cardIsNew = false;
+			if (!$cardEntity) {
+				$cardEntity = new Card();
+				$now = new \DateTime();
+				$cardEntity->setDateCreation($now);
+				$cardEntity->setDateUpdate($now);
+				$em->persist($cardEntity);
+				$cardIsNew = true;
+				$createdCards[] = $card['code'];
+				$summary['cards_created']++;
 			}
-			else {
-				// For cards being promoted from MotKA into a non-MotKA pack,
-				// reuse the existing canonical Card rather than creating a duplicate.
-				$cardEntity = null;
-				if ($motkPack && $cardPack !== $motkPack) {
-					$motkPrinting = $printingRepo->findOneBy([
-						'octgnid' => $card['octgnid'],
-						'pack' => $motkPack,
-					]);
-					if ($motkPrinting) {
-						$cardEntity = $motkPrinting->getCard();
-					}
-				}
 
-				if (!$cardEntity) {
-					$cardRepo = $em->getRepository('AppBundle:Card');
-					$cardEntity = $cardRepo->findOneBy(['code' => $card['code']]);
-				}
-
-				if (!$cardEntity) {
-					$cardEntity = new Card();
-					$now = new \DateTime();
-					$cardEntity->setDateCreation($now);
-					$cardEntity->setDateUpdate($now);
-					$em->persist($cardEntity);
-				}
-
+			// One printing per (card, pack).
+			$printingEntity = $printingRepo->findOneBy(['card' => $cardEntity, 'pack' => $cardPack]);
+			$printingIsNew = false;
+			if (!$printingEntity) {
 				$printingEntity = new CardPrinting();
 				$now = new \DateTime();
 				$printingEntity->setDateCreation($now);
@@ -186,7 +172,9 @@ class CSVController extends AbstractController {
 				// the field loop below override it from the CSV column.
 				$printingEntity->setImageCode($card['imageCode'] ?? $card['image_code'] ?? $card['code'] ?? '');
 				$em->persist($printingEntity);
-				$changed = true;
+				$printingIsNew = true;
+				$createdPrintings[] = $card['code'] . ' @ ' . $cardPack->getCode();
+				$summary['printings_created']++;
 			}
 
 			foreach ($card as $colName => $value) {
@@ -270,13 +258,27 @@ class CSVController extends AbstractController {
 				}
 			}
 
-			if ($changed) {
-				$em->persist($cardEntity);
-				$em->persist($printingEntity);
+			if (!$cardIsNew && !$printingIsNew && $changed) {
+				$summary['updated']++;
 			}
+
+			$em->persist($cardEntity);
+			$em->persist($printingEntity);
 		}
 
 		$em->flush();
-		return new Response('Done');
+
+		$lines = [];
+		$lines[] = sprintf('Imported into pack "%s" (%s).', $pack->getName(), $pack->getCode());
+		$lines[] = sprintf('Rows processed: %d', $summary['rows']);
+		$lines[] = sprintf('Cards created: %d%s', $summary['cards_created'],
+			$createdCards ? ' — ' . implode(', ', $createdCards) : '');
+		$lines[] = sprintf('Printings created: %d%s', $summary['printings_created'],
+			$createdPrintings ? ' — ' . implode(', ', $createdPrintings) : '');
+		$lines[] = sprintf('Existing rows updated: %d', $summary['updated']);
+		$lines[] = sprintf('Cards removed from pack (marked deleted): %d%s', $summary['deleted'],
+			$deletedCards ? ' — ' . implode(', ', $deletedCards) : '');
+
+		return new Response(implode("\n", $lines));
 	}
 }
