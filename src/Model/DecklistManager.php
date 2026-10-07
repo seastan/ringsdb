@@ -63,8 +63,13 @@ class DecklistManager
      */
     protected $user;
 
-    public function __construct(private readonly EntityManagerInterface $doctrine, private readonly RequestStack $request_stack, private readonly UrlGeneratorInterface $router, private readonly CardRepository $cardRepository, private readonly SphereRepository $sphereRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $doctrine,
+        private readonly RequestStack $request_stack,
+        private readonly UrlGeneratorInterface $router,
+        private readonly CardRepository $cardRepository,
+        private readonly SphereRepository $sphereRepository
+    ) {
     }
 
     /**

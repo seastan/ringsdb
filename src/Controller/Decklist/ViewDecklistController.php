@@ -12,8 +12,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ViewDecklistController extends AbstractController
 {
-    public function __construct(private readonly int $cacheExpiration, private readonly DecklistRepository $decklistRepository)
-    {
+    public function __construct(
+        private readonly int $cacheExpiration,
+        private readonly DecklistRepository $decklistRepository
+    ) {
     }
 
     /**

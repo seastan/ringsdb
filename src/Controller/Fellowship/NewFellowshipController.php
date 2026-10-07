@@ -16,8 +16,9 @@ class NewFellowshipController extends AbstractController
 {
     use CurrentUserTrait;
 
-    public function __construct(private DeckRepository $deckRepository)
-    {
+    public function __construct(
+        private DeckRepository $deckRepository
+    ) {
     }
 
     /**

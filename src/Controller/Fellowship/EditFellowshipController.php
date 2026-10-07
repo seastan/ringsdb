@@ -17,8 +17,9 @@ class EditFellowshipController extends AbstractController
 {
     use CurrentUserTrait;
 
-    public function __construct(private FellowshipRepository $fellowshipRepository)
-    {
+    public function __construct(
+        private FellowshipRepository $fellowshipRepository
+    ) {
     }
 
     /**

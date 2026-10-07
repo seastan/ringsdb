@@ -56,8 +56,12 @@ class QuestLogManager
      */
     protected $user;
 
-    public function __construct(private readonly EntityManagerInterface $doctrine, private readonly RequestStack $request_stack, private readonly UrlGeneratorInterface $router, private readonly CardRepository $cardRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $doctrine,
+        private readonly RequestStack $request_stack,
+        private readonly UrlGeneratorInterface $router,
+        private readonly CardRepository $cardRepository
+    ) {
     }
 
     /**

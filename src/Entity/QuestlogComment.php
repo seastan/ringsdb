@@ -37,15 +37,18 @@ class QuestlogComment
      */
     private $isHidden = false;
 
-    public function __construct(/**
+    public function __construct(
+        /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="questlog_comments")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */
-        private User $user, /**
+        private User $user,
+        /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Questlog", inversedBy="comments")
      * @ORM\JoinColumn(name="questlog_id", referencedColumnName="id", nullable=false)
      */
-        private Questlog $questlog, /**
+        private Questlog $questlog,
+        /**
      * @ORM\Column(type="text")
      */
         private string $text

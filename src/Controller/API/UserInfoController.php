@@ -25,8 +25,9 @@ class UserInfoController extends AbstractController
 {
     use CurrentUserTrait;
 
-    public function __construct(private Connection $connection)
-    {
+    public function __construct(
+        private Connection $connection
+    ) {
     }
 
     /**

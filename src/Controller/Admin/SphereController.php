@@ -21,8 +21,10 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class SphereController extends AbstractController
 {
-    public function __construct(private readonly SphereRepository $sphereRepository, private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly SphereRepository $sphereRepository,
+        private readonly EntityManagerInterface $entityManager
+    ) {
     }
 
     /**

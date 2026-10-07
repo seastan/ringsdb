@@ -16,8 +16,14 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SearchFormController extends AbstractController
 {
-    public function __construct(private readonly int $cacheExpiration, private readonly PackRepository $packRepository, private readonly CycleRepository $cycleRepository, private readonly SphereRepository $sphereRepository, private readonly CardsData $cardsData, private readonly Connection $connection)
-    {
+    public function __construct(
+        private readonly int $cacheExpiration,
+        private readonly PackRepository $packRepository,
+        private readonly CycleRepository $cycleRepository,
+        private readonly SphereRepository $sphereRepository,
+        private readonly CardsData $cardsData,
+        private readonly Connection $connection
+    ) {
     }
 
     /**

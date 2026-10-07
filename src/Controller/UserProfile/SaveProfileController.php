@@ -18,8 +18,10 @@ class SaveProfileController extends AbstractController
 {
     use CurrentUserTrait;
 
-    public function __construct(private EntityManagerInterface $entityManager, private UserRepository $userRepository)
-    {
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private UserRepository $userRepository
+    ) {
     }
 
     /**

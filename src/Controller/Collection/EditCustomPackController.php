@@ -14,8 +14,9 @@ class EditCustomPackController extends AbstractController
 {
     use CurrentUserTrait;
 
-    public function __construct(private CustomPackManager $customPackManager)
-    {
+    public function __construct(
+        private CustomPackManager $customPackManager
+    ) {
     }
 
     /**

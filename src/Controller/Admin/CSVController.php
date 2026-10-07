@@ -21,8 +21,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class CSVController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager
+    ) {
     }
 
     /**

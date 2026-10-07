@@ -15,8 +15,10 @@ class PatronCommand extends Command
 {
     use StringInputTrait;
 
-    public function __construct(private EntityManagerInterface $entityManager, private UserRepository $userRepository)
-    {
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private UserRepository $userRepository
+    ) {
         parent::__construct();
     }
 

@@ -11,8 +11,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PatronsController extends AbstractController
 {
-    public function __construct(private readonly int $cacheExpiration, private readonly Connection $connection)
-    {
+    public function __construct(
+        private readonly int $cacheExpiration,
+        private readonly Connection $connection
+    ) {
     }
 
     /**

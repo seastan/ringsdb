@@ -16,8 +16,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PublishFormFellowshipController extends AbstractController
 {
-    public function __construct(private readonly FellowshipValidationHelper $fellowshipValidationHelper, private readonly DecklistRepository $decklistRepository, private readonly FellowshipRepository $fellowshipRepository)
-    {
+    public function __construct(
+        private readonly FellowshipValidationHelper $fellowshipValidationHelper,
+        private readonly DecklistRepository $decklistRepository,
+        private readonly FellowshipRepository $fellowshipRepository
+    ) {
     }
 
     /**

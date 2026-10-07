@@ -22,8 +22,14 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PublishFellowshipController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly FellowshipValidationHelper $fellowshipValidationHelper, private readonly Texts $texts, private readonly DecklistFactory $decklistFactory, private readonly DecklistRepository $decklistRepository, private readonly FellowshipRepository $fellowshipRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly FellowshipValidationHelper $fellowshipValidationHelper,
+        private readonly Texts $texts,
+        private readonly DecklistFactory $decklistFactory,
+        private readonly DecklistRepository $decklistRepository,
+        private readonly FellowshipRepository $fellowshipRepository
+    ) {
     }
 
     /**

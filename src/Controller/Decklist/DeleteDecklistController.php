@@ -15,8 +15,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DeleteDecklistController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly DecklistRepository $decklistRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly DecklistRepository $decklistRepository
+    ) {
     }
 
     /**

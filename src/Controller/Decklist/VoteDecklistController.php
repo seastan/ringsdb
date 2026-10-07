@@ -16,8 +16,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class VoteDecklistController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly DecklistRepository $decklistRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly DecklistRepository $decklistRepository
+    ) {
     }
 
     /**

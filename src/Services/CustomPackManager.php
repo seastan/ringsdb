@@ -11,8 +11,11 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class CustomPackManager
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly CardRepository $cardRepository, private readonly UserCustomPackRepository $userCustomPackRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly CardRepository $cardRepository,
+        private readonly UserCustomPackRepository $userCustomPackRepository
+    ) {
     }
 
     /**

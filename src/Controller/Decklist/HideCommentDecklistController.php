@@ -16,8 +16,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class HideCommentDecklistController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly CommentRepository $commentRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly CommentRepository $commentRepository
+    ) {
     }
 
     /**

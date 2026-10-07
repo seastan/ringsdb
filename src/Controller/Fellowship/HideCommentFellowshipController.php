@@ -16,8 +16,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class HideCommentFellowshipController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly FellowshipCommentRepository $fellowshipCommentRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly FellowshipCommentRepository $fellowshipCommentRepository
+    ) {
     }
 
     /**

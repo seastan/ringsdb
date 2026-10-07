@@ -158,7 +158,8 @@ class Fellowship
     /**
      * Constructor.
      */
-    public function __construct(/**
+    public function __construct(
+        /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="fellowships")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */

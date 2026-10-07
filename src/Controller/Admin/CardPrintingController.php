@@ -20,8 +20,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class CardPrintingController extends AbstractController
 {
-    public function __construct(private readonly CardPrintingRepository $cardPrintingRepository, private readonly PackRepository $packRepository, private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly CardPrintingRepository $cardPrintingRepository,
+        private readonly PackRepository $packRepository,
+        private readonly EntityManagerInterface $entityManager
+    ) {
     }
 
     /**

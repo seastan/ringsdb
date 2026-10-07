@@ -21,8 +21,10 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class TypeController extends AbstractController
 {
-    public function __construct(private readonly TypeRepository $typeRepository, private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly TypeRepository $typeRepository,
+        private readonly EntityManagerInterface $entityManager
+    ) {
     }
 
     /**

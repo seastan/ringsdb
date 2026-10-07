@@ -21,8 +21,10 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CycleController extends AbstractController
 {
-    public function __construct(private readonly CycleRepository $cycleRepository, private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly CycleRepository $cycleRepository,
+        private readonly EntityManagerInterface $entityManager
+    ) {
     }
 
     /**

@@ -12,8 +12,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SuggestionsCommand extends Command
 {
-    public function __construct(private readonly Connection $connection, private readonly string $publicDir)
-    {
+    public function __construct(
+        private readonly Connection $connection,
+        private readonly string $publicDir
+    ) {
         parent::__construct();
     }
 

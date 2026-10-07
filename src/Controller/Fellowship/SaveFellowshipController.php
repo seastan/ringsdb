@@ -30,8 +30,14 @@ class SaveFellowshipController extends AbstractController
 {
     use CurrentUserTrait;
 
-    public function __construct(private EntityManagerInterface $entityManager, private Texts $texts, private Decks $decks, private DeckRepository $deckRepository, private DecklistRepository $decklistRepository, private FellowshipRepository $fellowshipRepository)
-    {
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private Texts $texts,
+        private Decks $decks,
+        private DeckRepository $deckRepository,
+        private DecklistRepository $decklistRepository,
+        private FellowshipRepository $fellowshipRepository
+    ) {
     }
 
     /**

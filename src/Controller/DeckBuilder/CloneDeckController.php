@@ -13,8 +13,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class CloneDeckController extends AbstractController
 {
-    public function __construct(private readonly DeckRepository $deckRepository)
-    {
+    public function __construct(
+        private readonly DeckRepository $deckRepository
+    ) {
     }
 
     /**

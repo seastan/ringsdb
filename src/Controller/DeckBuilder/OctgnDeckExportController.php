@@ -15,8 +15,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class OctgnDeckExportController extends AbstractController
 {
-    public function __construct(private readonly DeckRepository $deckRepository, private readonly Texts $texts)
-    {
+    public function __construct(
+        private readonly DeckRepository $deckRepository,
+        private readonly Texts $texts
+    ) {
     }
 
     /**

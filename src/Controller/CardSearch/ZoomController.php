@@ -12,8 +12,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ZoomController extends AbstractController
 {
-    public function __construct(private readonly CardRepository $cardRepository)
-    {
+    public function __construct(
+        private readonly CardRepository $cardRepository
+    ) {
     }
 
     /**

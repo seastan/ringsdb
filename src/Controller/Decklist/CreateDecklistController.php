@@ -22,8 +22,12 @@ class CreateDecklistController extends AbstractController
 {
     use CurrentUserTrait;
 
-    public function __construct(private EntityManagerInterface $entityManager, private DeckRepository $deckRepository, private DecklistRepository $decklistRepository, private DecklistFactory $decklistFactory)
-    {
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private DeckRepository $deckRepository,
+        private DecklistRepository $decklistRepository,
+        private DecklistFactory $decklistFactory
+    ) {
     }
 
     /**
