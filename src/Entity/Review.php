@@ -56,7 +56,7 @@ class Review
     /**
      * @var Collection<int, Reviewcomment>
      */
-    #[ORM\OneToMany(mappedBy: 'review', targetEntity: Reviewcomment::class, cascade: ['persist'])]
+    #[ORM\OneToMany(targetEntity: Reviewcomment::class, mappedBy: 'review', cascade: ['persist'])]
     private $comments;
 
     #[ORM\ManyToOne(targetEntity: Card::class, inversedBy: 'reviews')]
