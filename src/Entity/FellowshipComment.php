@@ -31,22 +31,28 @@ class FellowshipComment
      */
     private $dateUpdate;
 
+    #[ORM\Column(type: 'text')]
+    private string $text;
+
     /**
      * @var bool
      */
     #[ORM\Column(name: 'is_hidden', type: 'boolean')]
     private $isHidden = false;
 
-    public function __construct(
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'fellowship_comments')]
-        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
-        private User $user,
-        #[ORM\ManyToOne(targetEntity: Fellowship::class, inversedBy: 'comments')]
-        #[ORM\JoinColumn(name: 'fellowship_id', referencedColumnName: 'id', nullable: false)]
-        private Fellowship $fellowship,
-        #[ORM\Column(type: 'text')]
-        private string $text
-    ) {
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'fellowship_comments')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    private User $user;
+
+    #[ORM\ManyToOne(targetEntity: Fellowship::class, inversedBy: 'comments')]
+    #[ORM\JoinColumn(name: 'fellowship_id', referencedColumnName: 'id', nullable: false)]
+    private Fellowship $fellowship;
+
+    public function __construct(User $user, Fellowship $fellowship, string $text)
+    {
+        $this->user = $user;
+        $this->fellowship = $fellowship;
+        $this->text = $text;
         $this->dateCreation = new \DateTime();
     }
 

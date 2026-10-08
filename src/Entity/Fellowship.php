@@ -111,6 +111,10 @@ class Fellowship
     #[ORM\OrderBy(['dateCreation' => \SortDirection::Ascending])]
     private $comments;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'fellowships')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    private User $user;
+
     /**
      * @var Collection<int, User>
      */
@@ -128,11 +132,9 @@ class Fellowship
     /**
      * Constructor.
      */
-    public function __construct(
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'fellowships')]
-        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
-        private User $user
-    ) {
+    public function __construct(User $user)
+    {
+        $this->user = $user;
         $this->decks = new ArrayCollection();
         $this->decklists = new ArrayCollection();
         $this->comments = new ArrayCollection();

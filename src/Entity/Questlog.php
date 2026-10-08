@@ -123,6 +123,10 @@ class Questlog
     #[ORM\OrderBy(['dateCreation' => \SortDirection::Ascending])]
     private $comments;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'questlogs')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    private User $user;
+
     #[ORM\ManyToOne(targetEntity: Scenario::class, inversedBy: 'questlogs')]
     #[ORM\JoinColumn(name: 'scenario_id', referencedColumnName: 'id', nullable: false)]
     private ?Scenario $scenario = null;
@@ -144,11 +148,9 @@ class Questlog
     /**
      * Constructor.
      */
-    public function __construct(
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'questlogs')]
-        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
-        private User $user
-    ) {
+    public function __construct(User $user)
+    {
+        $this->user = $user;
         $this->decks = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->favorites = new ArrayCollection();

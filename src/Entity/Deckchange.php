@@ -44,11 +44,13 @@ class Deckchange
     #[ORM\Column(type: 'string', length: 8, nullable: true)]
     private $version;
 
-    public function __construct(
-        #[ORM\ManyToOne(targetEntity: Deck::class, inversedBy: 'changes')]
-        #[ORM\JoinColumn(name: 'deck_id', referencedColumnName: 'id', nullable: false)]
-        private Deck $deck
-    ) {
+    #[ORM\ManyToOne(targetEntity: Deck::class, inversedBy: 'changes')]
+    #[ORM\JoinColumn(name: 'deck_id', referencedColumnName: 'id', nullable: false)]
+    private Deck $deck;
+
+    public function __construct(Deck $deck)
+    {
+        $this->deck = $deck;
     }
 
     /**

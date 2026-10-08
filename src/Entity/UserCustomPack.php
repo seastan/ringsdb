@@ -22,6 +22,16 @@ class UserCustomPack
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    private User $user;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
+    private string $name;
+
+    #[ORM\Column(type: 'string', length: 64, nullable: false)]
+    private string $code;
+
     #[ORM\Column(name: 'is_enabled', type: 'boolean', nullable: false, options: ['default' => true])]
     private bool $isEnabled = true;
 
@@ -40,15 +50,11 @@ class UserCustomPack
     #[ORM\OneToMany(mappedBy: 'customPack', targetEntity: UserCustomPackCard::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $cards;
 
-    public function __construct(
-        #[ORM\ManyToOne(targetEntity: User::class)]
-        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
-        private User $user,
-        #[ORM\Column(type: 'string', length: 255, nullable: false)]
-        private string $name,
-        #[ORM\Column(type: 'string', length: 64, nullable: false)]
-        private string $code
-    ) {
+    public function __construct(User $user, string $name, string $code)
+    {
+        $this->user = $user;
+        $this->name = $name;
+        $this->code = $code;
         $this->cards = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
