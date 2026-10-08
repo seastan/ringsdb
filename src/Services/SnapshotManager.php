@@ -2,20 +2,25 @@
 
 namespace App\Services;
 
+use App\Entity\Card;
 use App\Entity\Deck;
+use App\Entity\Decksideslot;
+use App\Entity\Deckslot;
 use App\Entity\Questlog;
+use App\Entity\QuestlogDeck;
+use Doctrine\ORM\EntityManagerInterface;
 
 class SnapshotManager
 {
     public function __construct(
-        private readonly Decks $decks
+        private readonly EntityManagerInterface $entityManager,
+        private readonly CardManager $cardManager,
     ) {
     }
 
     public function setSnapshot(Questlog $questlog): void
     {
         $questlog_decks = $questlog->getDecks();
-        $decks_service = $this->decks;
         foreach ($questlog_decks as $questlog_deck) {
             $deck = $questlog_deck->getDeck();
             if (!$deck) {
@@ -24,8 +29,7 @@ class SnapshotManager
                 $questlog_deck->setDeck($deck);
             }
 
-            $questlogdeck_content = json_decode($questlog_deck->getContent(), true);
-            $decks_service->setSlots($deck, $questlogdeck_content);
+            $this->applySnapshot($deck, $questlog_deck);
         }
     }
 
@@ -36,6 +40,71 @@ class SnapshotManager
     {
         foreach ($questlogs as $questlog) {
             $this->setSnapshot($questlog);
+        }
+    }
+
+    public function applySnapshot(Deck $deck, QuestlogDeck $questlogDeck): void
+    {
+        $content = json_decode($questlogDeck->getContent(), true);
+
+        $cards = [];
+
+        foreach ($content['main'] as $card_code => $qty) {
+            $card = $this->cardManager->findCardByCode((string) $card_code);
+
+            if (!$card instanceof Card) {
+                continue;
+            }
+
+            $cards[$card_code] = $card;
+
+            if ($qty > $card->getDeckLimit()) {
+                $content['main'][$card_code] = $card->getDeckLimit();
+            }
+        }
+
+        foreach ($content['side'] as $card_code => $qty) {
+            $card = $this->cardManager->findCardByCode((string) $card_code);
+
+            if (!$card instanceof Card) {
+                continue;
+            }
+
+            $cards[$card_code] = $card;
+
+            if ($qty > $card->getDeckLimit()) {
+                $content['side'][$card_code] = $card->getDeckLimit();
+            }
+        }
+
+        foreach ($deck->getSlots() as $slot) {
+            $deck->removeSlot($slot);
+            $this->entityManager->remove($slot);
+        }
+
+        foreach ($deck->getSideslots() as $slot) {
+            $deck->removeSideslot($slot);
+            $this->entityManager->remove($slot);
+        }
+
+        foreach ($content['main'] as $card_code => $qty) {
+            if (!isset($cards[$card_code])) {
+                continue;
+            }
+
+            $card = $cards[$card_code];
+            $slot = new Deckslot($deck, $card, $qty);
+            $deck->addSlot($slot);
+        }
+
+        foreach ($content['side'] as $card_code => $qty) {
+            if (!isset($cards[$card_code])) {
+                continue;
+            }
+
+            $card = $cards[$card_code];
+            $slot = new Decksideslot($deck, $card, $qty);
+            $deck->addSideslot($slot);
         }
     }
 }

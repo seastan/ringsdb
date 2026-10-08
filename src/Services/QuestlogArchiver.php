@@ -15,9 +15,9 @@ class QuestlogArchiver
     public function __construct(
         private readonly string $cacheDir,
         private readonly QuestlogRepository $questlogRepository,
-        private readonly Decks $decks,
         private readonly Environment $twig,
-        private readonly Texts $texts
+        private readonly Texts $texts,
+        private readonly SnapshotManager $snapshotManager
     ) {
     }
 
@@ -25,7 +25,7 @@ class QuestlogArchiver
     {
         /* @var $questlog \App\Entity\QuestLog */
         $questlog = $this->questlogRepository->find($questlog_id);
-        if (!$questlog) {
+        if (!$questlog instanceof \App\Entity\Questlog) {
             throw new AccessDeniedHttpException("You don't have access to this questlog.");
         }
 
@@ -52,7 +52,7 @@ class QuestlogArchiver
             foreach ($questlog_decks as $questlog_deck) {
                 $deck = $questlog_deck->getDeck();
                 if ($deck instanceof Deck) {
-                    $this->decks->setSlots($deck, json_decode($questlog_deck->getContent(), true));
+                    $this->snapshotManager->applySnapshot($deck, $questlog_deck);
                     $decks[] = $deck;
                 }
             }
