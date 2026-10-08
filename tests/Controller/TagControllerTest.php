@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
- * Deck tags (TagController): add / remove / clear tags on a selection of decks, from the My Decks
+ * Deck tags (Tag/*Controller): add / remove / clear tags on a selection of decks, from the My Decks
  * page (ui.decks.js posts "ids" and "tags" with AJAX, and updates the page with the "tags" of
  * the JSON answer).
  *

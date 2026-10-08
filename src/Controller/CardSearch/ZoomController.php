@@ -18,10 +18,10 @@ class ZoomController extends AbstractController
     }
 
     #[Route(path: '/card/{card_code}', name: 'cards_zoom')]
-    public function zoomAction(Request $request, string $card_code): Response
+    public function __invoke(Request $request, string $card_code): Response
     {
         $card = $this->cardRepository->findOneBy(['code' => $card_code]);
-        if (!$card) {
+        if (!$card instanceof \App\Entity\Card) {
             throw $this->createNotFoundException('Sorry, this card is not in the database (yet?)');
         }
 

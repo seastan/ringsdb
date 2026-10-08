@@ -17,10 +17,10 @@ class ListCardsController extends AbstractController
     }
 
     #[Route(path: '/set/{pack_code}/{view}/{sort}/{page}', name: 'cards_list', defaults: ['view' => 'list', 'sort' => 'set', 'page' => 1])]
-    public function listAction(Request $request, string $pack_code, string $view, string $sort, int $page): Response
+    public function __invoke(Request $request, string $pack_code, string $view, string $sort, int $page): Response
     {
         $pack = $this->packRepository->findOneBy(['code' => $pack_code]);
-        if (!$pack) {
+        if (!$pack instanceof \App\Entity\Pack) {
             throw $this->createNotFoundException('This pack does not exist');
         }
 

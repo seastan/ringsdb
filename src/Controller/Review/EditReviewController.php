@@ -24,7 +24,7 @@ class EditReviewController extends AbstractController
     }
 
     #[Route(path: '/review/edit', name: 'card_review_edit', methods: ['POST'])]
-    public function editAction(Request $request): Response
+    public function __invoke(Request $request): Response
     {
         /* @var $user \App\Entity\User */
         $user = $this->getUser();

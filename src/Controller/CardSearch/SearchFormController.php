@@ -29,7 +29,7 @@ class SearchFormController extends AbstractController
     }
 
     #[Route(path: '/search', name: 'cards_search')]
-    public function formAction(TypeRepository $typeRepository): Response
+    public function __invoke(TypeRepository $typeRepository): Response
     {
         $response = new Response();
         $response->setPublic();

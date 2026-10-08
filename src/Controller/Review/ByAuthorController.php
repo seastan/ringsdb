@@ -21,7 +21,7 @@ class ByAuthorController extends AbstractController
     }
 
     #[Route(path: '/user/reviews/{user_id}/{page}', name: 'card_reviews_list_byauthor', requirements: ['page' => '\d+', 'user_id' => '\d+'], defaults: ['page' => 1])]
-    public function byauthorAction(Request $request, int $user_id, int $page = 1): Response
+    public function __invoke(Request $request, int $user_id, int $page = 1): Response
     {
         $response = new Response();
         $response->setPublic();

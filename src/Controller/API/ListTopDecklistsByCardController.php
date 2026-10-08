@@ -1,0 +1,121 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controller\API;
+
+use App\Entity\Card;
+use App\Entity\Decklist;
+use App\Repository\CardRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+
+class ListTopDecklistsByCardController extends AbstractController
+{
+    use JsonpTrait;
+
+    public function __construct(
+        private readonly int $cacheExpiration,
+        private readonly CardRepository $cardRepository,
+        private readonly EntityManagerInterface $entityManager
+    ) {
+    }
+
+    /**
+     * Get the top 10 decklists published containing given card, as an array of JSON objects.
+     *
+     * ApiDoc(
+     *  section="Decklist",
+     *  resource=true,
+     *  description="Top 10 Decklists containing a specific card",
+     *  parameters={
+     *      {"name"="jsonp", "dataType"="string", "required"=false, "description"="JSONP callback"}
+     *  },
+     *  requirements={
+     *      {
+     *          "name"="card_code",
+     *          "dataType"="string",
+     *          "description"="The code of the card to get, e.g. '01001'"
+     *      },
+     *      {
+     *          "name"="_format",
+     *          "dataType"="string",
+     *          "requirement"="json",
+     *          "description"="The format of the returned data. Only 'json' is supported at the moment."
+     *      }
+     *  },
+     * )
+     */
+    #[Route(path: '/api/public/decklists/top_by_card/{card_code}.{_format}', name: 'api_decklists_by_card', requirements: ['_format' => 'json'], defaults: ['_format' => 'json'], methods: ['GET'])]
+    public function __invoke(Request $request, string $card_code): Response
+    {
+        $response = new Response();
+        $response->setPublic();
+        $response->setMaxAge($this->cacheExpiration);
+        $response->headers->add(['Access-Control-Allow-Origin' => '*']);
+
+        $jsonp = $request->query->getString('jsonp');
+        $format = $request->getRequestFormat();
+        if ('json' !== $format) {
+            $response->setContent($request->getRequestFormat().' format not supported. Only json is supported.');
+
+            return $response;
+        }
+
+        /* @var $em EntityManager */
+        $card = $this->cardRepository->findOneBy(['code' => $card_code]);
+        if (!$card instanceof Card) {
+            $response->setContent('[]');
+
+            return $response;
+        }
+
+        $qb = $this->entityManager->createQueryBuilder();
+        // Select decklists
+        $qb->select('d.id, d.name, d.nameCanonical, d.dateCreation, d.dateUpdate');
+        $qb->from(Decklist::class, 'd');
+        // high popularity
+        $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
+        $qb->orderBy('popularity', \SortDirection::Descending);
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
+        // containing the card
+        $qb->innerJoin('d.slots', 's');
+        $qb->andWhere('s.card = :card');
+        $qb->setParameter('card', $card);
+        // limit 10
+        $qb->setMaxResults(10);
+
+        $query = $qb->getQuery();
+        /* @var $decklists ArrayCollection */
+        $decklists = $query->getArrayResult();
+        $lastModified = null;
+        foreach ($decklists as &$decklist) {
+            if (!$lastModified || $lastModified < $decklist['dateUpdate']) {
+                $lastModified = $decklist['dateUpdate'];
+            }
+        }
+
+        $response->setLastModified($lastModified);
+        if ($response->isNotModified($request)) {
+            return $response;
+        }
+
+        foreach ($decklists as &$decklist) {
+            $decklist['url'] = $this->generateUrl('decklist_detail', ['decklist_id' => $decklist['id'], 'decklist_name' => $decklist['nameCanonical']]);
+            unset($decklist['descriptionMd']);
+            unset($decklist['descriptionHtml']);
+            $decklist['dateCreation'] = $decklist['dateCreation']->format('c');
+            $decklist['dateUpdate'] = $decklist['dateUpdate']->format('c');
+        }
+
+        $content = json_encode($decklists);
+        $this->setJsonContent($response, (string) $content, $jsonp);
+
+        return $response;
+    }
+}
