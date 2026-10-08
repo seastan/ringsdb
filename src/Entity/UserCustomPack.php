@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: \App\Repository\UserCustomPackRepository::class)]
 #[ORM\Table(name: 'user_custom_pack')]
-#[ORM\Index(columns: ['user_id'], name: 'ucp_user_idx')]
+#[ORM\Index(name: 'ucp_user_idx', columns: ['user_id'])]
 #[ORM\UniqueConstraint(name: 'ucp_code_idx', columns: ['code'])]
 class UserCustomPack
 {
@@ -47,7 +47,7 @@ class UserCustomPack
     /**
      * @var Collection<int, UserCustomPackCard>
      */
-    #[ORM\OneToMany(mappedBy: 'customPack', targetEntity: UserCustomPackCard::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: UserCustomPackCard::class, mappedBy: 'customPack', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $cards;
 
     public function __construct(User $user, string $name, string $code)

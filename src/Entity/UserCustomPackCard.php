@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'user_custom_pack_card')]
-#[ORM\Index(columns: ['card_id'], name: 'fk_ucpc_card')]
+#[ORM\Index(name: 'fk_ucpc_card', columns: ['card_id'])]
 #[ORM\UniqueConstraint(name: 'ucpc_pack_card_idx', columns: ['custom_pack_id', 'card_id'])]
 class UserCustomPackCard
 {
