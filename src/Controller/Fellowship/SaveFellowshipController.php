@@ -15,7 +15,7 @@ use App\Helper\StringSanitizer;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use App\Repository\FellowshipRepository;
-use App\Services\Decks;
+use App\Services\DeckSaver;
 use App\Services\Texts;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -33,7 +33,7 @@ class SaveFellowshipController extends AbstractController
     public function __construct(
         private EntityManagerInterface $entityManager,
         private Texts $texts,
-        private Decks $decks,
+        private DeckSaver $deckSaver,
         private DeckRepository $deckRepository,
         private DecklistRepository $decklistRepository,
         private FellowshipRepository $fellowshipRepository
@@ -106,7 +106,7 @@ class SaveFellowshipController extends AbstractController
                         }
 
                         if (!$is_owner) {
-                            $deck = $this->decks->cloneDeck($deck, $user);
+                            $deck = $this->deckSaver->cloneDeck($user, $deck);
                         }
 
                         $fellowship_deck = new FellowshipDeck($fellowship, $deck, $i - $skip);
