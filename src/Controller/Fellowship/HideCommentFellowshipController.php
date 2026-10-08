@@ -35,7 +35,7 @@ class HideCommentFellowshipController extends AbstractController
         }
 
         $comment = $this->fellowshipCommentRepository->find($comment_id);
-        if (!$comment) {
+        if (!$comment instanceof \App\Entity\FellowshipComment) {
             throw new BadRequestHttpException('Unable to find comment');
         }
 

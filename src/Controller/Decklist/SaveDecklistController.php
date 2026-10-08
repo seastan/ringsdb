@@ -35,7 +35,7 @@ class SaveDecklistController extends AbstractController
         }
 
         $decklist = $this->decklistRepository->find($decklist_id);
-        if (!$decklist) {
+        if (!$decklist instanceof Decklist) {
             throw $this->createNotFoundException('Decklist not found');
         }
 

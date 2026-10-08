@@ -34,7 +34,7 @@ class HideCommentQuestlogController extends AbstractController
         }
 
         $comment = $this->questlogCommentRepository->find($comment_id);
-        if (!$comment) {
+        if (!$comment instanceof \App\Entity\QuestlogComment) {
             throw new BadRequestHttpException('Unable to find comment');
         }
 

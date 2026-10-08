@@ -283,7 +283,7 @@
                 }
                 $('<div class="decklist-hero"></div>')
                     .addClass('border-light-' + heroCard.sphere_code)
-                    .append('<div class="hero-thumbnail card-thumbnail-4x card-thumbnail-hero" style="background-image:url(\'/bundles/cards/' + heroCard.code + '.png\')"></div>')
+                    .append('<div class="hero-thumbnail card-thumbnail-4x card-thumbnail-hero" style="background-image:url(\'' + card.imagesrc + '\')"></div>')
                     .appendTo(td);
 
                 td.append(' ');

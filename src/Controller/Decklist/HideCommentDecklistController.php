@@ -35,7 +35,7 @@ class HideCommentDecklistController extends AbstractController
         }
 
         $comment = $this->commentRepository->find($comment_id);
-        if (!$comment) {
+        if (!$comment instanceof \App\Entity\Comment) {
             throw new BadRequestHttpException('Unable to find comment');
         }
 

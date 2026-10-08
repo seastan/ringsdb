@@ -7,5 +7,6 @@ twig:
         deck_validation_helper: '@App\Helper\DeckValidationHelper'
         dragncards_room:        '%env(DRAGNCARDS_ROOM)%'
         noindex:                '%env(bool:NOINDEX)%'
+        card_image_locator: '@App\CardImageLocator\CardImageLocatorInterface'
     form_themes:
         - 'bootstrap_3_layout.html.twig'

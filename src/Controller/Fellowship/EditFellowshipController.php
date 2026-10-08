@@ -30,7 +30,7 @@ class EditFellowshipController extends AbstractController
         $user = $this->currentUser();
         /* @var $fellowship \App\Entity\Fellowship */
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
-        if (!$fellowship) {
+        if (!$fellowship instanceof \App\Entity\Fellowship) {
             throw new NotFoundHttpException('This fellowship does not exists.');
         }
 

@@ -42,7 +42,7 @@ class CreateDecklistController extends AbstractController
         $deck_id = intval(filter_var($request->request->get('deck_id'), FILTER_SANITIZE_NUMBER_INT));
         /* @var $deck \App\Entity\Deck */
         $deck = $this->deckRepository->find($deck_id);
-        if (!$deck) {
+        if (!$deck instanceof Deck) {
             throw new BadRequestHttpException('Invalid deck_id.');
         }
 

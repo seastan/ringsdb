@@ -74,7 +74,7 @@ class PublishFellowshipController extends AbstractController
             $new_id = intval(filter_var($request->request->get('deck_selection_'.$fellowship_deck->getDeckNumber()), FILTER_SANITIZE_NUMBER_INT));
             if ($new_id) {
                 $decklist = $this->decklistRepository->find($new_id);
-                if (!$decklist) {
+                if (!$decklist instanceof \App\Entity\Decklist) {
                     throw new NotFoundHttpException('One of the selected decks does not exists.');
                 }
             } else {

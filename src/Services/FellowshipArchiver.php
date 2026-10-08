@@ -24,7 +24,7 @@ class FellowshipArchiver
     {
         /* @var $fellowship \App\Entity\Fellowship */
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
-        if (!$fellowship) {
+        if (!$fellowship instanceof \App\Entity\Fellowship) {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
 

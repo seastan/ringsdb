@@ -31,7 +31,7 @@ class PublicProfileController extends AbstractController
         /* @var $em EntityManager */
         /* @var $user \App\Entity\User */
         $user = $this->userRepository->find($user_id);
-        if (!$user) {
+        if (!$user instanceof \App\Entity\User) {
             throw new NotFoundHttpException('No such user.');
         }
 

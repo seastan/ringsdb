@@ -31,7 +31,7 @@ class OctgnExportDecklistController extends AbstractController
         $response->setMaxAge($this->cacheExpiration);
         /* @var $decklist \App\Entity\Decklist */
         $decklist = $this->decklistRepository->find($decklist_id);
-        if (!$decklist) {
+        if (!$decklist instanceof Decklist) {
             throw new NotFoundHttpException('Unable to find decklist.');
         }
 
