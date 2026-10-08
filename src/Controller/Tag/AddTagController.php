@@ -6,14 +6,15 @@ namespace App\Controller\Tag;
 
 use App\Controller\CurrentUserTrait;
 use App\Entity\Deck;
+use App\Model\TagDto;
 use App\Repository\DeckRepository;
 use App\Services\Decks;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AddTagController extends AbstractController
@@ -28,10 +29,10 @@ class AddTagController extends AbstractController
     }
 
     #[Route(path: '/tag/add', name: 'tag_add', methods: ['POST'])]
-    public function __invoke(Request $request): Response
+    public function __invoke(#[MapRequestPayload] TagDto $payload = new TagDto()): Response
     {
-        $list_id = $request->request->all('ids');
-        $list_tag = $this->decks->normalizeTags($request->request->all('tags'));
+        $list_id = $payload->ids;
+        $list_tag = $this->decks->normalizeTags($payload->tags);
         /* @var $em EntityManager */
         $response = ['success' => true];
         foreach ($list_id as $id) {

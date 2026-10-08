@@ -2,12 +2,14 @@
 
 namespace App\Controller\CardSearch;
 
+use App\Model\SimpleSearchDto;
 use App\Search\SearchKeys;
 use App\Services\CardsData;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 class SimpleSearchController extends AbstractController
@@ -21,14 +23,14 @@ class SimpleSearchController extends AbstractController
      * Processes the action of the single card search input.
      */
     #[Route(path: '/find', name: 'cards_find')]
-    public function __invoke(Request $request): RedirectResponse|Response
+    public function __invoke(Request $request, #[MapQueryString] SimpleSearchDto $query = new SimpleSearchDto()): RedirectResponse|Response
     {
-        $q = (string) $request->query->get('q');
+        $q = (string) $query->q;
         $q = str_replace('t:campaign', 't:treasure', $q);
 
-        $page = $request->query->get('page') ?: 1;
-        $view = $request->query->get('view') ?: 'list';
-        $sort = $request->query->get('sort') ?: 'name';
+        $page = $query->page ?: 1;
+        $view = $query->view ?: 'list';
+        $sort = $query->sort ?: 'name';
         // we may be able to redirect to a better url if the search is on a single set
         $conditions = $this->cardsData->syntax($q);
         if (1 === count($conditions) && 3 === count($conditions[0]) && ':' == $conditions[0][1]) {

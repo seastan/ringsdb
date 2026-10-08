@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Controller\Fellowship;
 
 use App\Entity\User;
+use App\Model\IdDto;
 use App\Repository\FellowshipRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
@@ -25,7 +26,7 @@ class FavoriteFellowshipController extends AbstractController
     }
 
     #[Route(path: '/user/fellowship_favorite', name: 'fellowship_favorite', methods: ['POST'])]
-    public function __invoke(Request $request): Response
+    public function __invoke(#[MapRequestPayload] IdDto $payload = new IdDto()): Response
     {
         /* @var $user User */
         $user = $this->getUser();
@@ -33,7 +34,7 @@ class FavoriteFellowshipController extends AbstractController
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 
-        $fellowship_id = filter_var($request->request->get('id'), FILTER_SANITIZE_NUMBER_INT);
+        $fellowship_id = filter_var($payload->id, FILTER_SANITIZE_NUMBER_INT);
         /* @var $fellowship \App\Entity\Fellowship */
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
         if (!$fellowship instanceof \App\Entity\Fellowship) {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Admin\Excel;
 
 use App\Entity\Card;
+use App\Model\ExcelDownloadDto;
 use App\Repository\CardPrintingRepository;
 use App\Repository\CardRepository;
 use App\Repository\PackRepository;
@@ -14,9 +15,9 @@ use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ExcelDownloadProcessController extends AbstractController
@@ -29,10 +30,10 @@ class ExcelDownloadProcessController extends AbstractController
     }
 
     #[Route(path: '/admin/excel/download', name: 'excel_download_process', methods: ['POST'])]
-    public function __invoke(Request $request, Texts $texts, CardPrintingRepository $cardPrintingRepository): StreamedResponse
+    public function __invoke(Texts $texts, CardPrintingRepository $cardPrintingRepository, #[MapRequestPayload] ExcelDownloadDto $payload = new ExcelDownloadDto()): StreamedResponse
     {
         $ignoredFields = ['id', 'dateCreation', 'dateUpdate'];
-        $pack_id = $request->request->get('pack');
+        $pack_id = $payload->pack;
         if (0 == $pack_id) {
             $cards = $this->cardRepository->findBy([], ['code' => 'ASC']);
             $pack_name = 'LotR LCG Cards';

@@ -4,13 +4,14 @@ namespace App\Controller\Review;
 
 use App\Entity\Card;
 use App\Entity\Review;
+use App\Model\PostReviewDto;
 use App\Repository\CardRepository;
 use App\Repository\ReviewRepository;
 use App\Services\Texts;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
 class PostReviewController extends AbstractController
@@ -23,7 +24,7 @@ class PostReviewController extends AbstractController
     }
 
     #[Route(path: '/review/post', name: 'card_review_post', methods: ['POST'])]
-    public function __invoke(Request $request, CardRepository $cardRepository): JsonResponse
+    public function __invoke(CardRepository $cardRepository, #[MapRequestPayload] PostReviewDto $payload = new PostReviewDto()): JsonResponse
     {
         /* @var $user \App\Entity\User */
         $user = $this->getUser();
@@ -36,7 +37,7 @@ class PostReviewController extends AbstractController
             throw new \Exception("Your reputation doesn't allow you to write more reviews.");
         }
 
-        $card_id = filter_var($request->request->get('card_id'), FILTER_SANITIZE_NUMBER_INT);
+        $card_id = filter_var($payload->cardId, FILTER_SANITIZE_NUMBER_INT);
         /* @var $card Card */
         $card = $cardRepository->find($card_id);
         if (!$card instanceof Card) {
@@ -53,7 +54,7 @@ class PostReviewController extends AbstractController
             throw new \Exception('You cannot write more than 1 review for a given card.');
         }
 
-        $review_raw = trim($request->request->getString('review'));
+        $review_raw = trim($payload->review);
         $review_raw = (string) preg_replace('%(?<!\\()\\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\\d\\x{00a1}-\\x{ffff}]+-?)*[a-z\\d\\x{00a1}-\\x{ffff}]+)(?:\\.(?:[a-z\\d\\x{00a1}-\\x{ffff}]+-?)*[a-z\\d\\x{00a1}-\\x{ffff}]+)*(?:\\.[a-z\\x{00a1}-\\x{ffff}]{2,6}))(?::\\d+)?)(?:[^\\s]*)?%iu', '[$1]($0)', $review_raw);
 
         $review_html = $this->texts->markdown($review_raw);

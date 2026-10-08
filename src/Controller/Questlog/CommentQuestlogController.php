@@ -6,13 +6,14 @@ namespace App\Controller\Questlog;
 
 use App\Entity\QuestlogComment;
 use App\Entity\User;
+use App\Model\CommentDto;
 use App\Repository\QuestlogRepository;
 use App\Repository\UserRepository;
 use App\Services\Texts;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Mailer\MailerInterface;
@@ -31,7 +32,7 @@ class CommentQuestlogController extends AbstractController
     }
 
     #[Route(path: '/user/questlog_comment', name: 'questlog_comment', methods: ['POST'])]
-    public function __invoke(Request $request, MailerInterface $mailer, UserRepository $userRepository): RedirectResponse
+    public function __invoke(MailerInterface $mailer, UserRepository $userRepository, #[MapRequestPayload] CommentDto $payload = new CommentDto()): RedirectResponse
     {
         /* @var $user User */
         $user = $this->getUser();
@@ -39,13 +40,13 @@ class CommentQuestlogController extends AbstractController
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 
-        $questlog_id = filter_var($request->request->get('id'), FILTER_SANITIZE_NUMBER_INT);
+        $questlog_id = filter_var($payload->id, FILTER_SANITIZE_NUMBER_INT);
         $questlog = $this->questlogRepository->find($questlog_id);
         if (!$questlog instanceof \App\Entity\Questlog) {
             throw new BadRequestHttpException('Wrong quest log id');
         }
 
-        $comment_text = trim($request->request->getString('comment'));
+        $comment_text = trim($payload->comment);
         if (!empty($comment_text)) {
             $comment_text = (string) preg_replace('%(?<!\\()\\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\\d\\x{00a1}-\\x{ffff}]+-?)*[a-z\\d\\x{00a1}-\\x{ffff}]+)(?:\\.(?:[a-z\\d\\x{00a1}-\\x{ffff}]+-?)*[a-z\\d\\x{00a1}-\\x{ffff}]+)*(?:\\.[a-z\\x{00a1}-\\x{ffff}]{2,6}))(?::\\d+)?)(?:[^\\s]*)?%iu', '[$1]($0)', $comment_text);
             $mentionned_usernames = [];

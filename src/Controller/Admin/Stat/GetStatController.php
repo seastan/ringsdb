@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin\Stat;
 
+use App\Model\StatDto;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 class GetStatController extends AbstractController
@@ -21,9 +22,9 @@ class GetStatController extends AbstractController
     }
 
     #[Route(path: '/admin/stat', name: 'app_stat', methods: ['GET'])]
-    public function __invoke(Request $request): Response
+    public function __invoke(#[MapQueryString] StatDto $statQuery = new StatDto()): Response
     {
-        $month = $request->query->get('month');
+        $month = $statQuery->month;
         if (!$month) {
             $month = date('Y-m', strtotime('first day of last month'));
         }

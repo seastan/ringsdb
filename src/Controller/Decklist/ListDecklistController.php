@@ -6,12 +6,14 @@ namespace App\Controller\Decklist;
 
 use App\Entity\Cycle;
 use App\Helper\StringSanitizer;
+use App\Model\DecklistSearchDto;
 use App\Repository\CycleRepository;
 use App\Services\DecklistManager;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ListDecklistController extends AbstractController
@@ -28,7 +30,7 @@ class ListDecklistController extends AbstractController
      * displays the lists of decklists.
      */
     #[Route(path: '/decklists/{type}/{page}', name: 'decklists_list', requirements: ['page' => '\d+'], defaults: ['type' => 'popular', 'page' => 1], methods: ['GET'])]
-    public function __invoke(Request $request, string $type, int $page = 1): Response
+    public function __invoke(Request $request, string $type, int $page = 1, #[MapQueryString] DecklistSearchDto $query = new DecklistSearchDto()): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -41,7 +43,7 @@ class ListDecklistController extends AbstractController
         switch ($type) {
             case 'find':
                 $pagetitle = 'Decklist search results';
-                $header = $this->searchForm($request);
+                $header = $this->searchForm($query);
                 $this->decklistManager->setUser($this->getUser());
                 $paginator = $this->decklistManager->findDecklistsWithComplexSearch();
                 break;
@@ -89,21 +91,21 @@ class ListDecklistController extends AbstractController
         return $this->render('Decklist/decklists.html.twig', ['pagetitle' => $pagetitle, 'pagedescription' => 'Browse the collection of thousands of premade decks.', 'decklists' => $paginator, 'url' => $request->getRequestUri(), 'header' => $header, 'type' => $type, 'pages' => $this->decklistManager->getClosePages(), 'prevurl' => $this->decklistManager->getPreviousUrl(), 'nexturl' => $this->decklistManager->getNextUrl()], $response);
     }
 
-    private function searchForm(Request $request): string
+    private function searchForm(DecklistSearchDto $query): string
     {
-        $cards_code = $request->query->all('cards');
-        $cards_to_exclude = $request->query->all('cards_to_exclude');
-        $sphere_code = StringSanitizer::sanitize($request->query->get('sphere'));
-        $author_name = StringSanitizer::sanitize($request->query->get('author'));
-        $decklist_name = StringSanitizer::sanitize($request->query->get('name'));
-        $starting_threat = intval(filter_var($request->query->get('threat'), FILTER_SANITIZE_NUMBER_INT));
-        $starting_threat_o = $request->query->get('threato');
-        $author_reputation = intval(filter_var($request->query->get('reputation'), FILTER_SANITIZE_NUMBER_INT));
-        $author_reputation_o = $request->query->get('reputationo');
-        $numcores = $request->query->get('numcores');
-        $require_description = $request->query->get('require_description');
-        $sort = $request->query->get('sort');
-        $packs = $request->query->all('packs');
+        $cards_code = $query->cards;
+        $cards_to_exclude = $query->cardsToExclude;
+        $sphere_code = StringSanitizer::sanitize($query->sphere);
+        $author_name = StringSanitizer::sanitize($query->author);
+        $decklist_name = StringSanitizer::sanitize($query->name);
+        $starting_threat = intval(filter_var($query->threat, FILTER_SANITIZE_NUMBER_INT));
+        $starting_threat_o = $query->threato;
+        $author_reputation = intval(filter_var($query->reputation, FILTER_SANITIZE_NUMBER_INT));
+        $author_reputation_o = $query->reputationo;
+        $numcores = $query->numcores;
+        $require_description = $query->requireDescription;
+        $sort = $query->sort;
+        $packs = $query->packs;
         if (0 === count($packs)) {
             $packs = $this->connection->executeQuery('SELECT id FROM pack')->fetchFirstColumn();
         }

@@ -6,12 +6,14 @@ namespace App\Controller\Fellowship;
 
 use App\Entity\Cycle;
 use App\Helper\StringSanitizer;
+use App\Model\FellowshipSearchDto;
 use App\Repository\CycleRepository;
 use App\Services\FellowshipManager;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ListFellowshipController extends AbstractController
@@ -25,7 +27,7 @@ class ListFellowshipController extends AbstractController
     }
 
     #[Route(path: '/fellowships/{type}/{page}', name: 'fellowships_list', requirements: ['page' => '\d+'], defaults: ['type' => 'popular', 'page' => 1], methods: ['GET'])]
-    public function __invoke(Request $request, string $type, int $page = 1): Response
+    public function __invoke(Request $request, string $type, int $page = 1, #[MapQueryString] FellowshipSearchDto $query = new FellowshipSearchDto()): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -38,7 +40,7 @@ class ListFellowshipController extends AbstractController
         switch ($type) {
             case 'find':
                 $pagetitle = 'Fellowship search results';
-                $header = $this->searchForm($request);
+                $header = $this->searchForm($query);
                 $this->fellowshipManager->setUser($this->getUser());
                 $paginator = $this->fellowshipManager->findFellowshipsWithComplexSearch();
                 break;
@@ -86,16 +88,16 @@ class ListFellowshipController extends AbstractController
         return $this->render('Fellowship/public-fellowships.html.twig', ['pagetitle' => $pagetitle, 'pagedescription' => 'Browse the collection of thousands of premade decks.', 'fellowships' => $paginator, 'url' => $request->getRequestUri(), 'header' => $header, 'type' => $type, 'pages' => $this->fellowshipManager->getClosePages(), 'prevurl' => $this->fellowshipManager->getPreviousUrl(), 'nexturl' => $this->fellowshipManager->getNextUrl()], $response);
     }
 
-    private function searchForm(Request $request): string
+    private function searchForm(FellowshipSearchDto $query): string
     {
-        $cards_code = $request->query->all('cards');
-        $author_name = StringSanitizer::sanitize($request->query->get('author'));
-        $fellowship_name = StringSanitizer::sanitize($request->query->get('name'));
-        $nb_decks = intval(filter_var($request->query->get('nb_decks'), FILTER_SANITIZE_NUMBER_INT));
-        $numcores = $request->query->get('numcores');
-        $numplaysets = $request->query->get('numplaysets');
-        $sort = $request->query->get('sort');
-        $packs = $request->query->all('packs');
+        $cards_code = $query->cards;
+        $author_name = StringSanitizer::sanitize($query->author);
+        $fellowship_name = StringSanitizer::sanitize($query->name);
+        $nb_decks = intval(filter_var($query->nbDecks, FILTER_SANITIZE_NUMBER_INT));
+        $numcores = $query->numcores;
+        $numplaysets = $query->numplaysets;
+        $sort = $query->sort;
+        $packs = $query->packs;
         if (0 === count($packs)) {
             $packs = $this->connection->executeQuery('SELECT id FROM pack')->fetchFirstColumn();
         }

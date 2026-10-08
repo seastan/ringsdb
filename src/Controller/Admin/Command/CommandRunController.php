@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Controller\Admin\Command;
 
 use App\Command\ScrapBeornScenarioDataCommand;
+use App\Model\CommandRunDto;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
 class CommandRunController extends AbstractController
@@ -19,11 +20,11 @@ class CommandRunController extends AbstractController
     }
 
     #[Route(path: '/admin/command/', name: 'command_run', methods: ['POST'])]
-    public function __invoke(Request $request): Response
+    public function __invoke(#[MapRequestPayload] CommandRunDto $payload = new CommandRunDto()): Response
     {
-        $command = $request->request->get('command');
-        $scenario = (string) $request->request->get('scenario');
-        $customjson = (string) $request->request->get('customjson');
+        $command = $payload->command;
+        $scenario = (string) $payload->scenario;
+        $customjson = (string) $payload->customjson;
         if ('scenario' == $command) {
             $res = ScrapBeornScenarioDataCommand::command($this->entityManager, $scenario, 0, $customjson);
         } else {

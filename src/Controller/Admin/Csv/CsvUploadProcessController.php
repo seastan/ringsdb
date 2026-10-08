@@ -9,14 +9,17 @@ use App\Entity\CardPrinting;
 use App\Entity\Pack;
 use App\Entity\Sphere;
 use App\Entity\Type;
+use App\Model\CsvUploadDto;
 use App\Repository\CardPrintingRepository;
 use App\Repository\CardRepository;
 use App\Repository\CycleRepository;
 use App\Repository\PackRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Attribute\MapUploadedFile;
 use Symfony\Component\Routing\Attribute\Route;
 
 class CsvUploadProcessController extends AbstractController
@@ -27,12 +30,12 @@ class CsvUploadProcessController extends AbstractController
     }
 
     #[Route(path: '/admin/csv/upload', name: 'csv_upload_process', methods: ['POST'])]
-    public function __invoke(Request $request, CardRepository $cardRepository, CardPrintingRepository $cardPrintingRepository, CycleRepository $cycleRepository, PackRepository $packRepository): Response
+    public function __invoke(#[MapUploadedFile] UploadedFile $upfile, CardRepository $cardRepository, CardPrintingRepository $cardPrintingRepository, CycleRepository $cycleRepository, PackRepository $packRepository, #[MapRequestPayload] CsvUploadDto $payload = new CsvUploadDto()): Response
     {
-        $inputCode = (string) $request->request->get('code');
-        $inputOldCode = (string) $request->request->get('old_code');
-        $inputName = (string) $request->request->get('name');
-        $inputFileName = $request->files->get('upfile')->getPathname();
+        $inputCode = (string) $payload->code;
+        $inputOldCode = (string) $payload->oldCode;
+        $inputName = (string) $payload->name;
+        $inputFileName = $upfile->getPathname();
         $content = str_replace("\xEF\xBB\xBF", '', trim((string) file_get_contents($inputFileName)));
         $content = str_replace("\r", "\n", str_replace("\n", '<br/>', str_replace("\r\n", "\r", $content)));
 

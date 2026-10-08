@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Controller\Fellowship;
 
 use App\Entity\User;
+use App\Model\DeleteListDto;
 use App\Repository\FellowshipRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -22,7 +23,7 @@ class DeleteListFellowshipController extends AbstractController
     }
 
     #[Route(path: '/fellowship/delete_list', name: 'fellowship_delete_list', methods: ['POST'])]
-    public function __invoke(Request $request): RedirectResponse
+    public function __invoke(#[MapRequestPayload] DeleteListDto $payload = new DeleteListDto()): RedirectResponse
     {
         /* @var $user User */
         $user = $this->getUser();
@@ -30,7 +31,7 @@ class DeleteListFellowshipController extends AbstractController
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
 
-        $list_id = explode('-', $request->request->getString('ids'));
+        $list_id = explode('-', $payload->ids);
         $message = null;
         foreach ($list_id as $id) {
             /* @var $fellowship \App\Entity\Fellowship */

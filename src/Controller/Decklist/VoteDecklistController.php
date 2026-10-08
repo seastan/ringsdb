@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Controller\Decklist;
 
 use App\Entity\Decklist;
+use App\Model\IdDto;
 use App\Repository\DecklistRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
@@ -26,14 +27,14 @@ class VoteDecklistController extends AbstractController
      * records a user's vote.
      */
     #[Route(path: '/user/like', name: 'decklist_like', methods: ['POST'])]
-    public function __invoke(Request $request): Response
+    public function __invoke(#[MapRequestPayload] IdDto $payload = new IdDto()): Response
     {
         $user = $this->getUser();
         if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 
-        $decklist_id = filter_var($request->request->get('id'), FILTER_SANITIZE_NUMBER_INT);
+        $decklist_id = filter_var($payload->id, FILTER_SANITIZE_NUMBER_INT);
         /* @var $decklist \App\Entity\Decklist */
         $decklist = $this->decklistRepository->find($decklist_id);
         if (!$decklist instanceof Decklist) {

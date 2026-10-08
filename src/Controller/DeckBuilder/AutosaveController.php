@@ -7,12 +7,13 @@ namespace App\Controller\DeckBuilder;
 use App\Controller\CurrentUserTrait;
 use App\Entity\Deckchange;
 use App\Entity\User;
+use App\Model\AutosaveDto;
 use App\Repository\DeckRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Attribute\Route;
@@ -29,11 +30,11 @@ class AutosaveController extends AbstractController
     }
 
     #[Route(path: '/deck/autosave', name: 'deck_autosave', methods: ['POST'])]
-    public function __invoke(Request $request): Response
+    public function __invoke(#[MapRequestPayload] AutosaveDto $payload = new AutosaveDto()): Response
     {
         /* @var $user User */
         $user = $this->currentUser();
-        $deck_id = $request->request->get('deck_id');
+        $deck_id = $payload->deckId;
         /* @var $deck \App\Entity\Deck */
         $deck = $this->deckRepository->find($deck_id);
         if (!$deck instanceof \App\Entity\Deck) {
@@ -45,7 +46,7 @@ class AutosaveController extends AbstractController
         }
 
         // decoded as arrays: count() of an object is a warning since PHP 7.2
-        $diff = json_decode($request->request->getString('diff'), true);
+        $diff = json_decode($payload->diff, true);
         if (!is_array($diff) || 4 !== count($diff) && 2 !== count($diff)) {
             $this->logger->error('cannot use diff', (array) $diff);
             throw new UnprocessableEntityHttpException('Wrong content '.json_encode($diff));

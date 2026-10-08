@@ -12,6 +12,7 @@ use App\Entity\QuestlogDeck;
 use App\Entity\Scenario;
 use App\Entity\User;
 use App\Helper\StringSanitizer;
+use App\Model\SaveQuestlogDto;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use App\Repository\QuestlogRepository;
@@ -20,8 +21,8 @@ use App\Services\DeckSaver;
 use App\Services\Texts;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -43,11 +44,11 @@ class SaveQuestlogController extends AbstractController
     }
 
     #[Route(path: '/questlog/save', name: 'questlog_save', methods: ['POST'])]
-    public function __invoke(Request $request): Response
+    public function __invoke(#[MapRequestPayload] SaveQuestlogDto $payload = new SaveQuestlogDto()): Response
     {
         /* @var $user User */
         $user = $this->currentUser();
-        $questlog_id = intval(filter_var($request->request->get('questlog_id'), FILTER_SANITIZE_NUMBER_INT));
+        $questlog_id = intval(filter_var($payload->questlogId, FILTER_SANITIZE_NUMBER_INT));
         if ($questlog_id) {
             /* @var $questlog \App\Entity\Questlog */
             $questlog = $this->questlogRepository->find($questlog_id);
@@ -66,20 +67,20 @@ class SaveQuestlogController extends AbstractController
             $questlog->setNbDecks(0);
         }
 
-        $name = trim(StringSanitizer::sanitize($request->request->get('name'), false));
+        $name = trim(StringSanitizer::sanitize($payload->name, false));
         $name = substr($name, 0, 250);
         if (empty($name)) {
             $name = 'Untitled Questlog';
         }
 
-        $descriptionMd = trim((string) $request->request->get('descriptionMd'));
+        $descriptionMd = trim((string) $payload->descriptionMd);
         $descriptionHtml = $this->texts->markdown($descriptionMd);
-        $quest = intval(filter_var($request->request->get('quest'), FILTER_SANITIZE_NUMBER_INT));
-        $date = trim(StringSanitizer::sanitize($request->request->get('date'), false));
-        $difficulty = trim(StringSanitizer::sanitize($request->request->get('difficulty'), false));
-        $victory = trim(StringSanitizer::sanitize($request->request->get('victory'), false));
-        $score = intval(filter_var($request->request->get('score'), FILTER_SANITIZE_NUMBER_INT));
-        $public = boolval(filter_var($request->request->get('public'), FILTER_SANITIZE_NUMBER_INT));
+        $quest = intval(filter_var($payload->quest, FILTER_SANITIZE_NUMBER_INT));
+        $date = trim(StringSanitizer::sanitize($payload->date, false));
+        $difficulty = trim(StringSanitizer::sanitize($payload->difficulty, false));
+        $victory = trim(StringSanitizer::sanitize($payload->victory, false));
+        $score = intval(filter_var($payload->score, FILTER_SANITIZE_NUMBER_INT));
+        $public = boolval(filter_var($payload->public, FILTER_SANITIZE_NUMBER_INT));
         $victory = 'no' !== $victory;
         $difficulty = in_array($difficulty, ['normal', 'easy', 'nightmare'], true) ? $difficulty : 'normal';
         /* @var $scenario Scenario */
@@ -115,11 +116,12 @@ class SaveQuestlogController extends AbstractController
 
             $nb_decks = 0;
             $skip = 0;
-            for ($i = 1; $i <= 4; ++$i) {
-                $deck_id = intval(filter_var($request->request->get('deck'.$i.'_id'), FILTER_SANITIZE_NUMBER_INT));
-                $is_decklist = 'true' === StringSanitizer::sanitize($request->request->get('deck'.$i.'_is_decklist'));
-                $player = trim(StringSanitizer::sanitize($request->request->get('questlogdeck'.$i.'_player_name'), false));
-                $content = (array) json_decode($request->request->getString('questlogdeck'.$i.'_content'), true);
+            for ($i = 1; $i <= SaveQuestlogDto::NB_DECKS; ++$i) {
+                $slot = $payload->deck($i);
+                $deck_id = intval(filter_var($slot['id'], FILTER_SANITIZE_NUMBER_INT));
+                $is_decklist = 'true' === StringSanitizer::sanitize($slot['isDecklist']);
+                $player = trim(StringSanitizer::sanitize($slot['playerName'], false));
+                $content = (array) json_decode($slot['questlogdeckContent'], true);
                 if ($deck_id) {
                     if (!$is_decklist) {
                         /* @var $deck \App\Entity\Deck */
@@ -174,7 +176,7 @@ class SaveQuestlogController extends AbstractController
                     // deck_id == 0 occurs if:
                     // 1. the deck slot in the builder is empty
                     // 2. the deck being referenced was deleted
-                    $content = json_decode($request->request->getString('deck'.$i.'_content'), true);
+                    $content = json_decode($slot['deckContent'], true);
                     if (!isset($content['main']) || empty($content['main'])) {
                         // Deck slot was empty
                         ++$skip;

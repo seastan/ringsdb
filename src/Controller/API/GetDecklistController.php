@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Controller\API;
 
 use App\Entity\Decklist;
+use App\Model\JsonpDto;
 use App\Repository\DecklistRepository;
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 class GetDecklistController extends AbstractController
@@ -49,14 +51,14 @@ class GetDecklistController extends AbstractController
      * )
      */
     #[Route(path: '/api/public/decklist/{decklist_id}.{_format}', name: 'api_decklist', requirements: ['_format' => 'json', 'decklist_id' => '\d+'], defaults: ['_format' => 'json'], methods: ['GET'])]
-    public function __invoke(Request $request, int $decklist_id): Response
+    public function __invoke(Request $request, int $decklist_id, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        $jsonp = $request->query->getString('jsonp');
+        $jsonp = $query->jsonp;
         $format = $request->getRequestFormat();
         if ('json' !== $format) {
             $response->setContent($request->getRequestFormat().' format not supported. Only json is supported.');

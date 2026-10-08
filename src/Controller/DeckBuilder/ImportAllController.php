@@ -8,8 +8,9 @@ use App\Controller\CurrentUserTrait;
 use App\Services\DeckImporter;
 use App\Services\DeckSaver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapUploadedFile;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -24,13 +25,12 @@ class ImportAllController extends AbstractController
     }
 
     #[Route(path: '/deck/import/all', name: 'decks_upload_all', methods: ['POST'])]
-    public function __invoke(Request $request): RedirectResponse
+    public function __invoke(#[MapUploadedFile(name: 'uparchive')] ?UploadedFile $uploadedFile = null): RedirectResponse
     {
         $user = $this->currentUser();
 
         // time-consuming task
         ini_set('max_execution_time', '300');
-        $uploadedFile = $request->files->get('uparchive');
         if (!isset($uploadedFile)) {
             throw new UnprocessableEntityHttpException('No file uploaded');
         }

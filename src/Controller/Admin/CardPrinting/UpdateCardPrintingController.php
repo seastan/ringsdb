@@ -8,12 +8,14 @@ use App\Controller\Admin\DeleteFormTrait;
 use App\Entity\CardPrinting;
 use App\Entity\Pack;
 use App\Form\CardPrintingType;
+use App\Model\FilterPackDto;
 use App\Repository\CardPrintingRepository;
 use App\Repository\PackRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 class UpdateCardPrintingController extends AbstractController
@@ -29,14 +31,14 @@ class UpdateCardPrintingController extends AbstractController
     }
 
     #[Route(path: '/admin/card-printing/{id}/update', name: 'admin_card_printing_update', methods: ['POST', 'PUT'])]
-    public function __invoke(Request $request, int $id): Response
+    public function __invoke(Request $request, int $id, #[MapQueryString] FilterPackDto $query = new FilterPackDto()): Response
     {
         $entity = $this->cardPrintingRepository->find($id);
         if (!$entity instanceof CardPrinting) {
             throw $this->createNotFoundException('Unable to find CardPrinting entity.');
         }
 
-        $filterPack = $this->resolveFilterPack($request);
+        $filterPack = $this->resolveFilterPack($query);
         $deleteForm = $this->createDeleteForm($id);
         $editForm = $this->createForm(CardPrintingType::class, $entity, ['filter_pack' => $filterPack, 'method' => 'PUT']);
         $editForm->handleRequest($request);

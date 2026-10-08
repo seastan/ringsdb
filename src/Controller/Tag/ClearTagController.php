@@ -6,13 +6,14 @@ namespace App\Controller\Tag;
 
 use App\Controller\CurrentUserTrait;
 use App\Entity\Deck;
+use App\Model\TagDto;
 use App\Repository\DeckRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ClearTagController extends AbstractController
@@ -26,9 +27,9 @@ class ClearTagController extends AbstractController
     }
 
     #[Route(path: '/tag/clear', name: 'tag_clear', methods: ['POST'])]
-    public function __invoke(Request $request): Response
+    public function __invoke(#[MapRequestPayload] TagDto $payload = new TagDto()): Response
     {
-        $list_id = $request->request->all('ids');
+        $list_id = $payload->ids;
         /* @var $em EntityManager */
         $response = ['success' => true];
         foreach ($list_id as $id) {

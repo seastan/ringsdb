@@ -8,6 +8,7 @@ use App\Entity\FellowshipDecklist;
 use App\Entity\User;
 use App\Helper\FellowshipValidationHelper;
 use App\Helper\StringSanitizer;
+use App\Model\PublishFellowshipDto;
 use App\Repository\DecklistRepository;
 use App\Repository\FellowshipRepository;
 use App\Services\DecklistFactory;
@@ -15,7 +16,7 @@ use App\Services\Texts;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
@@ -33,7 +34,7 @@ class PublishFellowshipController extends AbstractController
     }
 
     #[Route(path: '/fellowship/publish', name: 'fellowship_publish', methods: ['POST'])]
-    public function __invoke(Request $request): RedirectResponse
+    public function __invoke(#[MapRequestPayload] PublishFellowshipDto $payload = new PublishFellowshipDto()): RedirectResponse
     {
         /* @var $user User */
         $user = $this->getUser();
@@ -41,7 +42,7 @@ class PublishFellowshipController extends AbstractController
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
 
-        $fellowship_id = intval(filter_var($request->request->get('fellowship_id'), FILTER_SANITIZE_NUMBER_INT));
+        $fellowship_id = intval(filter_var($payload->fellowshipId, FILTER_SANITIZE_NUMBER_INT));
         /* @var $fellowship \App\Entity\Fellowship */
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
         if (!$fellowship || !$fellowship->getUser()->isEqualTo($user)) {
@@ -54,13 +55,13 @@ class PublishFellowshipController extends AbstractController
             return $this->redirect($this->generateUrl('fellowship_view', ['fellowship_id' => $fellowship->getId()]));
         }
 
-        $name = trim(StringSanitizer::sanitize($request->request->get('name'), false));
+        $name = trim(StringSanitizer::sanitize($payload->name, false));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = 'Untitled Fellowship';
         }
 
-        $descriptionMd = trim((string) $request->request->get('descriptionMd'));
+        $descriptionMd = trim((string) $payload->descriptionMd);
         $descriptionHtml = $this->texts->markdown($descriptionMd);
         $fellowship->setName($name);
         $fellowship->setNameCanonical($this->texts->slugify($name));
@@ -71,7 +72,7 @@ class PublishFellowshipController extends AbstractController
         $fellowship->setDatePublish(new \DateTime());
         foreach ($fellowship->getDecks() as &$fellowship_deck) {
             /* @var $fellowship_deck \App\Entity\FellowshipDeck */
-            $new_id = intval(filter_var($request->request->get('deck_selection_'.$fellowship_deck->getDeckNumber()), FILTER_SANITIZE_NUMBER_INT));
+            $new_id = intval(filter_var($payload->deckSelection($fellowship_deck->getDeckNumber()), FILTER_SANITIZE_NUMBER_INT));
             if ($new_id) {
                 $decklist = $this->decklistRepository->find($new_id);
                 if (!$decklist instanceof \App\Entity\Decklist) {
