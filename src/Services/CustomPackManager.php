@@ -33,7 +33,7 @@ class CustomPackManager
             }
 
             $card = $cardRepo->findOneBy(['code' => $code]);
-            if (!$card) {
+            if (!$card instanceof \App\Entity\Card) {
                 continue;
             }
 

@@ -535,7 +535,7 @@
         cards.forEach(function(card) {
             if (card.type_code == 'hero' && sortKey == 'type_code' && !is_sideboard) {
                 var div = $('<div class="deck-hero"/>')
-                    .append('<div class="hero-thumbnail card-thumbnail-2x card-thumbnail-hero" style="background-image:url(\'/bundles/cards/' + card.code + '.png\')"></div>');
+                    .append('<div class="hero-thumbnail card-thumbnail-2x card-thumbnail-hero" style="background-image:url(\'' + card.imagesrc + '\')"></div>');
 
                 // A hero normally has no count prefix, but if the copies in use
                 // exceed what the player owns, prefix an orange "Nx" carrying the
@@ -1320,7 +1320,7 @@ app.multiDeck = {
                         if (!heroCard) return;
                         jQuery('<div class="decklist-hero"/>')
                             .addClass('border-light-' + heroCard.sphere_code)
-                            .append('<div class="hero-thumbnail card-thumbnail-4x card-thumbnail-hero" style="background-image:url(\'/bundles/cards/' + heroCard.code + '.png\')"></div>')
+                            .append('<div class="hero-thumbnail card-thumbnail-4x card-thumbnail-hero" style="background-image:url(\'' + card.imagesrc + '\')"></div>')
                             .appendTo(tdHero);
                     });
 

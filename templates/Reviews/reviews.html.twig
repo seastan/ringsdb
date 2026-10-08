@@ -38,7 +38,7 @@
                         <div class="row" style="margin-bottom:1em;padding-bottom:1em;border-bottom:1px solid #ddd">
                             <div class="col-lg-12">
                                 <div class="review-header">
-                                    <img src="/bundles/cards/{{ review.card.code }}.png" alt="{{ review.card.name }}" class="pull-right" style="width:100px; margin:0 0 10px 15px;">
+                                    <img src="{{ card_image_locator.cardImageUrl(review.card) }}" alt="{{ review.card.name }}" class="pull-right" style="width:100px; margin:0 0 10px 15px;">
                                     <h4 class="text-right">
                                         <a href="{{ path('cards_zoom',{ card_code:review.card.code}) }}#review-{{ review.id }}" data-code="{{ review.card.code }}" data-toggle="modal" data-target="#cardModal" data-remote="false" class="card card-name">{{ review.card.name }}</a>
                                     </h4>

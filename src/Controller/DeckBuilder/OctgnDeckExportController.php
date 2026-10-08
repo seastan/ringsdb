@@ -26,7 +26,7 @@ class OctgnDeckExportController extends AbstractController
     {
         /* @var $deck \App\Entity\Deck */
         $deck = $this->deckRepository->find($deck_id);
-        if (!$deck) {
+        if (!$deck instanceof \App\Entity\Deck) {
             throw new NotFoundHttpException("This deck doesn't exist.");
         }
 

@@ -161,7 +161,7 @@ class ScrapBeornCardDataCommand extends Command
         foreach ($sets as $set) {
             $pack = $this->packRepository->findOneBy(['name' => $set]);
 
-            if (!$pack) {
+            if (!$pack instanceof \App\Entity\Pack) {
                 $output->writeln('<error>Cannot find pack ['.$set.']</error>');
                 exit;
             }

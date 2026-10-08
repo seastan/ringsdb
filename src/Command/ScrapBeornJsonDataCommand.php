@@ -69,7 +69,7 @@ class ScrapBeornJsonDataCommand extends Command
             /* @var $pack Pack */
             $pack = $this->packRepository->findOneBy(['name' => $cardset]);
 
-            if (!$pack) {
+            if (!$pack instanceof Pack) {
                 VarDumper::dump('Could not find pack '.$data->CardSet);
                 continue;
             }

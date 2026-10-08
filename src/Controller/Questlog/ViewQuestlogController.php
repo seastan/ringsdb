@@ -23,7 +23,7 @@ class ViewQuestlogController extends AbstractController
     {
         /* @var $questlog \App\Entity\Questlog */
         $questlog = $this->questlogRepository->find($questlog_id);
-        if (!$questlog) {
+        if (!$questlog instanceof \App\Entity\Questlog) {
             throw new NotFoundHttpException('This questlog does not exists.');
         }
 

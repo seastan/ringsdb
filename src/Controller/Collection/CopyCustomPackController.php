@@ -31,7 +31,7 @@ class CopyCustomPackController extends AbstractController
         $user = $this->currentUser();
 
         $source = $this->userCustomPackRepository->findOneBy(['id' => $id, 'isPublished' => true]);
-        if (!$source) {
+        if (!$source instanceof UserCustomPack) {
             return new JsonResponse(['error' => 'Pack not found'], 404);
         }
 

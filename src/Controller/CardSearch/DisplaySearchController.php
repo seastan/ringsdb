@@ -57,14 +57,14 @@ class DisplaySearchController extends AbstractController
                 if (1 === count($conditions) && 3 === count($conditions[0]) && ':' == $conditions[0][1]) {
                     if ('e' == $conditions[0][0]) {
                         $pack = $this->packRepository->findOneBy(['code' => $conditions[0][2]]);
-                        if ($pack) {
+                        if ($pack instanceof Pack) {
                             $pagetitle = $pack->getName();
                         }
                     }
 
                     if ('c' == $conditions[0][0]) {
                         $cycle = $this->cycleRepository->findOneBy(['code' => $conditions[0][2]]);
-                        if ($cycle) {
+                        if ($cycle instanceof \App\Entity\Cycle) {
                             $pagetitle = $cycle->getName();
                         }
                     }
@@ -168,15 +168,15 @@ class DisplaySearchController extends AbstractController
             $selectedPack = $this->packRepository->findOneBy(['code' => $selectedPackCode]);
         }
 
-        if ($selectedPack) {
+        if ($selectedPack instanceof Pack) {
             // Navigate within the selected printing's pack via CardPrinting positions.
             $printing = $this->cardPrintingRepository->findOneBy(['card' => $card, 'pack' => $selectedPack]);
-            if ($printing) {
+            if ($printing instanceof \App\Entity\CardPrinting) {
                 $pos = $printing->getPosition();
                 $prevPrinting = $this->cardPrintingRepository->findOneBy(['pack' => $selectedPack, 'position' => $pos - 1]);
                 $nextPrinting = $this->cardPrintingRepository->findOneBy(['pack' => $selectedPack, 'position' => $pos + 1]);
-                $prev = $prevPrinting ? $prevPrinting->getCard() : null;
-                $next = $nextPrinting ? $nextPrinting->getCard() : null;
+                $prev = $prevPrinting instanceof \App\Entity\CardPrinting ? $prevPrinting->getCard() : null;
+                $next = $nextPrinting instanceof \App\Entity\CardPrinting ? $nextPrinting->getCard() : null;
             } else {
                 $prev = null;
                 $next = null;
@@ -188,8 +188,8 @@ class DisplaySearchController extends AbstractController
                 $pos = $primaryPrinting->getPosition();
                 $prevP = $this->cardPrintingRepository->findOneBy(['pack' => $selectedPack, 'position' => $pos - 1]);
                 $nextP = $this->cardPrintingRepository->findOneBy(['pack' => $selectedPack, 'position' => $pos + 1]);
-                $prev = $prevP ? $prevP->getCard() : null;
-                $next = $nextP ? $nextP->getCard() : null;
+                $prev = $prevP instanceof \App\Entity\CardPrinting ? $prevP->getCard() : null;
+                $next = $nextP instanceof \App\Entity\CardPrinting ? $nextP->getCard() : null;
             } else {
                 $prev = null;
                 $next = null;
@@ -203,8 +203,8 @@ class DisplaySearchController extends AbstractController
             'prevhref' => $prev ? $this->generateUrl('cards_zoom', array_merge(['card_code' => $prev->getCode()], $packParam)) : '',
             'nexttitle' => $next ? $next->getName() : '',
             'nexthref' => $next ? $this->generateUrl('cards_zoom', array_merge(['card_code' => $next->getCode()], $packParam)) : '',
-            'settitle' => $selectedPack ? $selectedPack->getName() : '',
-            'sethref' => $selectedPack ? $this->generateUrl('cards_list', [
+            'settitle' => $selectedPack instanceof Pack ? $selectedPack->getName() : '',
+            'sethref' => $selectedPack instanceof Pack ? $this->generateUrl('cards_list', [
                 'pack_code' => $selectedPack->getCode(),
             ]) : '',
         ]);

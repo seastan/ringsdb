@@ -40,7 +40,7 @@ class DeleteDecklistCommand extends Command
     {
         $decklist_id = $input->getArgument('decklist_id');
         $decklist = $this->decklistRepository->find($decklist_id);
-        if (!$decklist) {
+        if (!$decklist instanceof Decklist) {
             $output->writeln('Decklist not found');
 
             return 1;

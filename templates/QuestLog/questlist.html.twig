@@ -68,7 +68,7 @@
                                 {% for hero in decklist.getSlots().getHeroDeck() %}
                                     {% set card = hero.getCard() %}
                                     <div class="decklist-hero border-light-{{ card.sphere.code }}">
-                                        <div class="hero-thumbnail card-thumbnail-5x card-thumbnail-hero" style="background-image:url('{{ asset('/bundles/cards/' ~ card.code ~ '.png') }}')"></div>
+                                        <div class="hero-thumbnail card-thumbnail-5x card-thumbnail-hero" style="background-image:url('{{ card_image_locator.cardImageUrl(card) }}')"></div>
                                     </div>
                                 {% endfor %}
                             </div>

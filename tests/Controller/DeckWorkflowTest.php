@@ -345,7 +345,7 @@ class DeckWorkflowTest extends WebTestCase
     {
         $client = $this->createAuthenticatedClient();
         $deckId = $this->createDeck($client);
-        $post = function ($content) use ($client, $deckId) {
+        $post = function ($content) use ($client, $deckId): object {
             $client->request('POST', '/deck/save-ajax', [
                 'id' => $deckId,
                 'name' => 'PHPUnit Ajax',
