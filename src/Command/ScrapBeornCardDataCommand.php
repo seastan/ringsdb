@@ -166,7 +166,7 @@ class ScrapBeornCardDataCommand extends Command
                 exit;
             }
 
-            if (!$pack->getCycle()) {
+            if (!$pack->getCycle() instanceof \App\Entity\Cycle) {
                 throw new \RuntimeException('Pack must be part of a cycle');
             }
 

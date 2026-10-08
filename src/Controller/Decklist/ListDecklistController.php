@@ -6,8 +6,8 @@ namespace App\Controller\Decklist;
 
 use App\Entity\Cycle;
 use App\Helper\StringSanitizer;
-use App\Model\DecklistManager;
 use App\Repository\CycleRepository;
+use App\Services\DecklistManager;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

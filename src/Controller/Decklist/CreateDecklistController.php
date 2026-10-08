@@ -6,11 +6,10 @@ namespace App\Controller\Decklist;
 
 use App\Controller\CurrentUserTrait;
 use App\Entity\Deck;
-use App\Entity\Decklist;
 use App\Helper\StringSanitizer;
-use App\Model\DecklistFactory;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
+use App\Services\DecklistFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

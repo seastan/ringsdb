@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Model;
 
 use App\Entity\User;
-use App\Model\FellowshipManager;
+use App\Services\FellowshipManager;
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;

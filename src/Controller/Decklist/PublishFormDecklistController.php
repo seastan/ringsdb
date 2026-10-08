@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controller\Decklist;
 
-use App\Entity\Decklist;
 use App\Helper\DeckValidationHelper;
-use App\Model\DecklistFactory;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
+use App\Services\DecklistFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
