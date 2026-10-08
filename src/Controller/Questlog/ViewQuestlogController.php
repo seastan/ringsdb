@@ -45,7 +45,7 @@ class ViewQuestlogController extends AbstractController
         }
 
         $data = [
-            'pagetitle' => ($questlog->getScenario() ? $questlog->getScenario()->getName() : 'Unknown Scenario').' - Quest Log',
+            'pagetitle' => ($questlog->getScenario() instanceof \App\Entity\Scenario ? $questlog->getScenario()->getName() : 'Unknown Scenario').' - Quest Log',
             'deck1' => null,
             'deck2' => null,
             'deck3' => null,

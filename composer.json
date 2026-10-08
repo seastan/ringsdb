@@ -36,7 +36,7 @@
         "ezyang/htmlpurifier": "^4.6",
         "friendsofsymfony/jsrouting-bundle": "^3.6.0",
         "gedmo/doctrine-extensions": "^3.22.2",
-        "nelmio/api-doc-bundle": "^4.38",
+        "nelmio/api-doc-bundle": "^5.13",
         "ocramius/proxy-manager": "~2.2.0",
         "phpoffice/phpspreadsheet": "^5.10.0",
         "scssphp/scssphp": "^1.13",

@@ -6,8 +6,8 @@ namespace App\Controller\Fellowship;
 
 use App\Entity\Cycle;
 use App\Helper\StringSanitizer;
-use App\Model\FellowshipManager;
 use App\Repository\CycleRepository;
+use App\Services\FellowshipManager;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

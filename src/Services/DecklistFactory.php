@@ -2,17 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Model;
+namespace App\Services;
 
 use App\Entity\Deck;
 use App\Entity\Decklist;
 use App\Entity\Decklistsideslot;
 use App\Entity\Decklistslot;
-use App\Entity\Pack;
 use App\Entity\Sphere;
 use App\Helper\DeckValidationHelper;
 use App\Repository\SphereRepository;
-use App\Services\Texts;
 
 class DecklistFactory
 {
@@ -25,8 +23,6 @@ class DecklistFactory
 
     public function createDecklistFromDeck(Deck $deck, ?string $name = null, ?string $descriptionMd = null): Decklist
     {
-        /* @var $lastPack Pack */
-        $deck->getLastPack();
         $problem = $this->deckValidationHelper->findProblem($deck, true);
         if ($problem) {
             throw new \Exception('This deck cannot be published  because it is invalid: "'.$this->deckValidationHelper->getProblemLabel($problem).'".');

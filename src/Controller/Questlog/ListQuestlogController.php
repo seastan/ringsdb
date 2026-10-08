@@ -6,8 +6,8 @@ namespace App\Controller\Questlog;
 
 use App\Entity\Cycle;
 use App\Helper\StringSanitizer;
-use App\Model\QuestLogManager;
 use App\Repository\CycleRepository;
+use App\Services\QuestLogManager;
 use App\Services\SnapshotManager;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

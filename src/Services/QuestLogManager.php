@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Model;
+namespace App\Services;
 
 use App\Entity\Card;
 use App\Entity\CardPrinting;
-use App\Entity\Decklistslot;
-use App\Entity\Fellowship;
-use App\Entity\FellowshipComment;
-use App\Entity\FellowshipDecklist;
+use App\Entity\Deckslot;
+use App\Entity\Questlog;
+use App\Entity\QuestlogComment;
 use App\Entity\User;
 use App\Entity\UserCustomPackCard;
 use App\Helper\StringSanitizer;
@@ -24,13 +23,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * The job of this class is to find and return fellowships.
+ * The job of this class is to find and return questlogs.
  *
- * @author alsciende
+ * @author seastan
  *
  * @property int $maxcount Number of found rows for last request
  */
-class FellowshipManager
+class QuestLogManager
 {
     /**
      * @var int
@@ -106,7 +105,7 @@ class FellowshipManager
     {
         $qb = $this->doctrine->createQueryBuilder();
         $qb->select('d');
-        $qb->from(Fellowship::class, 'd');
+        $qb->from(Questlog::class, 'd');
         $qb->andWhere('d.isPublic = 1');
         $qb->setFirstResult($this->start);
         $qb->setMaxResults($this->limit);
@@ -118,9 +117,9 @@ class FellowshipManager
     /**
      * creates the paginator around the query.
      *
-     * @param Query<mixed, Fellowship> $query
+     * @param Query<mixed, Questlog> $query
      *
-     * @return Paginator<Fellowship>
+     * @return Paginator<Questlog>
      */
     private function getPaginator(Query $query): Paginator
     {
@@ -131,7 +130,7 @@ class FellowshipManager
     }
 
     /**
-     * @return ArrayCollection<int, Fellowship>
+     * @return ArrayCollection<int, Questlog>
      */
     public function getEmptyList(): ArrayCollection
     {
@@ -141,9 +140,9 @@ class FellowshipManager
     }
 
     /**
-     * @return Paginator<Fellowship>
+     * @return Paginator<Questlog>
      */
-    public function findFellowshipsByPopularity(): Paginator
+    public function findQuestLogsByPopularity(): Paginator
     {
         $qb = $this->getQueryBuilder();
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.datePublish), 2)) AS HIDDEN popularity');
@@ -156,9 +155,9 @@ class FellowshipManager
     }
 
     /**
-     * @return Paginator<Fellowship>
+     * @return Paginator<Questlog>
      */
-    public function findFellowshipsByAge(): Paginator
+    public function findQuestLogsByAge(): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -171,25 +170,9 @@ class FellowshipManager
     }
 
     /**
-     * @return Paginator<Fellowship>
+     * @return Paginator<Questlog>
      */
-    public function findFellowshipsByRecentDiscussion(): Paginator
-    {
-        $qb = $this->getQueryBuilder();
-
-        $qb->andWhere('d.nbComments > 0');
-        $qb->orderBy('d.dateLastComment', \SortDirection::Descending);
-
-        // tie-breaker, for a stable order and pagination
-        $qb->addOrderBy('d.id', \SortDirection::Descending);
-
-        return $this->getPaginator($qb->getQuery());
-    }
-
-    /**
-     * @return Paginator<Fellowship>
-     */
-    public function findFellowshipsByFavorite(User $user): Paginator
+    public function findQuestLogsByFavorite(User $user): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -205,9 +188,9 @@ class FellowshipManager
     }
 
     /**
-     * @return Paginator<Fellowship>
+     * @return Paginator<Questlog>
      */
-    public function findFellowshipsByAuthor(User $user): Paginator
+    public function findQuestLogsByAuthor(User $user): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -222,9 +205,9 @@ class FellowshipManager
     }
 
     /**
-     * @return Paginator<Fellowship>
+     * @return Paginator<Questlog>
      */
-    public function findFellowshipsInHallOfFame(): Paginator
+    public function findQuestLogsInHallOfFame(): Paginator
     {
         $qb = $this->getQueryBuilder();
 
@@ -238,13 +221,13 @@ class FellowshipManager
     }
 
     /**
-     * @return Paginator<Fellowship>
+     * @return Paginator<Questlog>
      */
-    public function findFellowshipsInHotTopic(): Paginator
+    public function findQuestLogsInHotTopic(): Paginator
     {
         $qb = $this->getQueryBuilder();
 
-        $qb->addSelect('(SELECT count(c) FROM '.FellowshipComment::class.' c WHERE c.fellowship=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
+        $qb->addSelect('(SELECT count(c) FROM '.QuestlogComment::class.' c WHERE c.questlog=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
         $qb->orderBy('nbRecentComments', \SortDirection::Descending);
         $qb->addOrderBy('d.nbComments', \SortDirection::Descending);
 
@@ -255,19 +238,17 @@ class FellowshipManager
     }
 
     /**
-     * @return Paginator<Fellowship>
+     * @return Paginator<Questlog>
      */
-    public function findFellowshipsWithComplexSearch(): Paginator
+    public function findQuestLogsWithComplexSearch(): Paginator
     {
         $request = $this->currentRequest();
 
         $cards_code = $request->query->all('cards');
 
         $author_name = StringSanitizer::sanitize($request->query->get('author'));
-        $fellowship_name = StringSanitizer::sanitize($request->query->get('name'));
+        $questlog_name = StringSanitizer::sanitize($request->query->get('name'));
         $nb_decks = intval(filter_var($request->query->get('nb_decks'), FILTER_SANITIZE_NUMBER_INT));
-        $numcores = $request->query->get('numcores');
-        $numplaysets = $request->query->get('numplaysets');
 
         $sort = $request->query->get('sort');
         $packs = $request->query->all('packs');
@@ -284,9 +265,9 @@ class FellowshipManager
             $qb->setParameter('username', $author_name);
         }
 
-        if (!empty($fellowship_name)) {
-            $qb->andWhere('d.name like :fellowname');
-            $qb->setParameter('fellowname', "%$fellowship_name%");
+        if (!empty($questlog_name)) {
+            $qb->andWhere('d.name like :logname');
+            $qb->setParameter('logname', "%$questlog_name%");
         }
 
         if ($nb_decks) {
@@ -297,11 +278,11 @@ class FellowshipManager
         $useCustomPacks = [] !== $customPackCodes && $this->user;
 
         if (count($cards_code) > 0 || count($packs) > 0 || $useCustomPacks) {
-            $qb->innerJoin('d.decklists', 'l');
-            $qb->innerJoin('l.decklist', 'ld');
+            $qb->innerJoin('d.decks', 'l');
+            $qb->innerJoin('l.deck', 'ld');
 
             foreach ($cards_code as $i => $card_code) {
-                /* @var $card \App\Entity\Card */
+                /* @var $card Card */
                 $card = $this->cardRepository->findOneBy(['code' => $card_code]);
                 if (!$card instanceof Card) {
                     continue;
@@ -310,66 +291,38 @@ class FellowshipManager
                 $qb->innerJoin('ld.slots', "s$i");
                 $qb->andWhere("s$i.card = :card$i");
                 $qb->setParameter("card$i", $card);
-                // Add packs containing requested# Add packs containing requested cards
+
                 // $packs[] = $card->getPack()->getId();
             }
 
             if (count($packs) > 0 || $useCustomPacks) {
-                // A card is "not covered" if it has no printing in the official allowed
-                // packs AND is not present in any selected custom pack.
                 $sub = $this->doctrine->createQueryBuilder();
                 $sub->select('c');
                 $sub->from(Card::class, 'c');
-                $sub->innerJoin(Decklistslot::class, 's', Query\Expr\Join::ON, 's.card = c');
-                $sub->where('s.decklist = ld');
+                $sub->innerJoin(Deckslot::class, 's', Query\Expr\Join::ON, 's.card = c');
+                $sub->where('s.deck = ld');
 
                 if (count($packs) > 0) {
-                    $sub->andWhere('NOT EXISTS (SELECT cpfm.id FROM '.CardPrinting::class.' cpfm WHERE cpfm.card = c AND cpfm.pack IN (:fm_packs))');
-                    $qb->setParameter('fm_packs', $packs);
+                    $sub->andWhere('NOT EXISTS (SELECT cpqlm.id FROM '.CardPrinting::class.' cpqlm WHERE cpqlm.card = c AND cpqlm.pack IN (:qlm_packs))');
+                    $qb->setParameter('qlm_packs', $packs);
                 }
 
                 if ($useCustomPacks) {
                     $sub->andWhere(
                         'NOT EXISTS ('.
-                            'SELECT ucpcfm.id FROM '.UserCustomPackCard::class.' ucpcfm '.
-                            'JOIN ucpcfm.customPack ucpfm '.
-                            'WHERE ucpcfm.card = c '.
-                            'AND ucpfm.code IN (:fm_custom_codes) '.
-                            'AND ucpfm.user = :fm_custom_user'.
+                            'SELECT ucpcqlm.id FROM '.UserCustomPackCard::class.' ucpcqlm '.
+                            'JOIN ucpcqlm.customPack ucpqlm '.
+                            'WHERE ucpcqlm.card = c '.
+                            'AND ucpqlm.code IN (:qlm_custom_codes) '.
+                            'AND ucpqlm.user = :qlm_custom_user'.
                         ')'
                     );
-                    $qb->setParameter('fm_custom_codes', $customPackCodes);
-                    $qb->setParameter('fm_custom_user', $this->user);
+                    $qb->setParameter('qlm_custom_codes', $customPackCodes);
+                    $qb->setParameter('qlm_custom_user', $this->user);
                 }
 
                 $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
             }
-
-            // Num cores
-            // SELECT fellowship.id, decklistslot.card_id, SUM(decklistslot.quantity), card.quantity FROM (((fellowship INNER JOIN fellowship_decklist ON fellowship.id = fellowship_decklist.fellowship_id) INNER JOIN decklistslot ON fellowship_decklist.decklist_id = decklistslot.decklist_id) INNER JOIN card ON decklistslot.card_id = card.id) WHERE card.pack_id = 1 GROUP BY fellowship.id,decklistslot.card_id HAVING SUM(decklistslot.quantity)>3*card.quantity;
-            $numCoresSub = $this->doctrine->createQueryBuilder();
-            $numCoresSub->select('jp.quantity');
-            $numCoresSub->from(Card::class, 'j');
-            $numCoresSub->innerJoin(CardPrinting::class, 'jp', Query\Expr\Join::ON, 'jp.card = j AND jp.pack = 1'); // Match Core Set printing
-            $numCoresSub->innerJoin(Decklistslot::class, 'dls', Query\Expr\Join::ON, 'dls.card = j');
-            $numCoresSub->innerJoin(FellowshipDecklist::class, 'fdl', Query\Expr\Join::ON, 'fdl.decklist = dls.decklist');
-            $numCoresSub->where('fdl.fellowship = d');
-            $numCoresSub->groupBy('d.id, dls.card, jp.quantity');
-            $numCoresSub->having('SUM(dls.quantity) > :numcores * jp.quantity');
-            $qb->setParameter('numcores', $numcores);
-            $qb->andWhere($qb->expr()->not($qb->expr()->exists($numCoresSub->getDQL())));
-
-            $numPlaysetsSub = $this->doctrine->createQueryBuilder();
-            $numPlaysetsSub->select('jp2.quantity');
-            $numPlaysetsSub->from(Card::class, 'j2');
-            $numPlaysetsSub->innerJoin(CardPrinting::class, 'jp2', Query\Expr\Join::ON, 'jp2.card = j2 AND jp2.pack = 1'); // Match Core Set printing
-            $numPlaysetsSub->innerJoin(Decklistslot::class, 'dls2', Query\Expr\Join::ON, 'dls2.card = j2');
-            $numPlaysetsSub->innerJoin(FellowshipDecklist::class, 'fdl2', Query\Expr\Join::ON, 'fdl2.decklist = dls2.decklist');
-            $numPlaysetsSub->where('fdl2.fellowship = d');
-            $numPlaysetsSub->groupBy('d.id, dls2.card, jp2.quantity');
-            $numPlaysetsSub->having('SUM(dls2.quantity) > :numplaysets * jp2.quantity');
-            $qb->setParameter('numplaysets', $numplaysets);
-            $qb->andWhere($qb->expr()->not($qb->expr()->exists($numPlaysetsSub->getDQL())));
         }
 
         switch ($sort) {

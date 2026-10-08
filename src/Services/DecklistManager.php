@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Model;
+namespace App\Services;
 
 use App\Entity\Card;
 use App\Entity\CardPrinting;

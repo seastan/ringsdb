@@ -199,10 +199,10 @@ class DisplaySearchController extends AbstractController
         $packParam = $selectedPackCode ? ['pack' => $selectedPackCode] : [];
 
         return $this->renderView('Search/setnavigation.html.twig', [
-            'prevtitle' => $prev ? $prev->getName() : '',
-            'prevhref' => $prev ? $this->generateUrl('cards_zoom', array_merge(['card_code' => $prev->getCode()], $packParam)) : '',
-            'nexttitle' => $next ? $next->getName() : '',
-            'nexthref' => $next ? $this->generateUrl('cards_zoom', array_merge(['card_code' => $next->getCode()], $packParam)) : '',
+            'prevtitle' => $prev instanceof Card ? $prev->getName() : '',
+            'prevhref' => $prev instanceof Card ? $this->generateUrl('cards_zoom', array_merge(['card_code' => $prev->getCode()], $packParam)) : '',
+            'nexttitle' => $next instanceof Card ? $next->getName() : '',
+            'nexthref' => $next instanceof Card ? $this->generateUrl('cards_zoom', array_merge(['card_code' => $next->getCode()], $packParam)) : '',
             'settitle' => $selectedPack instanceof Pack ? $selectedPack->getName() : '',
             'sethref' => $selectedPack instanceof Pack ? $this->generateUrl('cards_list', [
                 'pack_code' => $selectedPack->getCode(),

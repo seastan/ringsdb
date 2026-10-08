@@ -20,7 +20,7 @@ services:
     # every class of the application is a service, identified by its class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{Kernel.php,DependencyInjection,DQL,Entity,Exception,PHPStan,Resources,Migrations,Model/ExportableDeck.php,Model/SlotCollectionDecorator.php,Model/SlotCollectionInterface.php,Model/SlotInterface.php,Command/StringInputTrait.php,Controller/CurrentUserTrait.php}'
+        exclude: '../src/{Kernel.php,DependencyInjection,DQL,Entity,Exception,PHPStan,Resources,Migrations,Model}'
 
     # controllers are fetched from the container by the controller resolver, and can receive
     # services as action arguments
@@ -55,13 +55,5 @@ services:
         arguments:
             $senderAddress: '%env(EMAIL_SENDER_ADDRESS)%'
             $senderName: '%env(EMAIL_SENDER_NAME)%'
-
-    # the historical ids, still fetched with get() by the fixtures and the tests
-    decks: { alias: App\Services\Decks, public: true }
-    texts: { alias: App\Services\Texts, public: true }
-    app.card_stats: { alias: App\Stats\CardStatsCalculator, public: true }
-    decklist_factory: { alias: App\Model\DecklistFactory, public: true }
-    fellowship_manager: { alias: App\Model\FellowshipManager, public: true }
-    questlog_manager: { alias: App\Model\QuestLogManager, public: true }
 
     App\CardImageLocator\CardImageLocatorInterface: '@App\CardImageLocator\AssetsCardImageLocator'
