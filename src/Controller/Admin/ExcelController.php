@@ -35,7 +35,7 @@ class ExcelController extends AbstractController
     #[Route(path: '/admin/excel/download', name: 'excel_download_form', methods: ['GET'])]
     public function downloadFormAction(): Response
     {
-        $packs = $this->packRepository->findBy([], ['dateRelease' => \SortDirection::Ascending, 'name' => \SortDirection::Ascending]);
+        $packs = $this->packRepository->findBy([], ['dateRelease' => 'ASC', 'name' => 'ASC']);
 
         return $this->render('Excel/download_form.html.twig', ['packs' => $packs]);
     }
@@ -46,11 +46,11 @@ class ExcelController extends AbstractController
         $ignoredFields = ['id', 'dateCreation', 'dateUpdate'];
         $pack_id = $request->request->get('pack');
         if (0 == $pack_id) {
-            $cards = $this->cardRepository->findBy([], ['code' => \SortDirection::Ascending]);
+            $cards = $this->cardRepository->findBy([], ['code' => 'ASC']);
             $pack_name = 'LotR LCG Cards';
         } else {
             $pack = $this->packRepository->find($pack_id);
-            if (!$pack) {
+            if (!$pack instanceof \App\Entity\Pack) {
                 throw $this->createNotFoundException('Pack not found.');
             }
 
@@ -191,7 +191,7 @@ class ExcelController extends AbstractController
         foreach ($cards as $card) {
             /* @var $entity \App\Entity\Card */
             $entity = $repo->findOneBy(['code' => $card['code']]);
-            if (!$entity) {
+            if (!$entity instanceof Card) {
                 if ($enableCardCreation) {
                     $entity = new Card();
                     $now = new \DateTime();

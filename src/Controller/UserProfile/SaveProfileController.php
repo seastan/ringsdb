@@ -29,7 +29,7 @@ class SaveProfileController extends AbstractController
     {
         /* @var $user \App\Entity\User */
         $user = $this->currentUser();
-        $username = StringSanitizer::sanitize($request->get('username'));
+        $username = StringSanitizer::sanitize($request->request->get('username'));
         if ($username !== $user->getUsername()) {
             $user_existing = $this->userRepository->findOneBy(['username' => $username]);
             if ($user_existing) {
@@ -41,18 +41,18 @@ class SaveProfileController extends AbstractController
             $user->setUsername($username);
         }
 
-        $email = StringSanitizer::sanitize($request->get('email'));
+        $email = StringSanitizer::sanitize($request->request->get('email'));
         if ($email !== $user->getEmail()) {
             $user->setEmail($email);
         }
 
-        $resume = StringSanitizer::sanitize($request->get('resume'), false);
-        $sphere_code = StringSanitizer::sanitize($request->get('user_sphere_code'));
-        $notifAuthor = (bool) $request->get('notif_author');
-        $notifCommenter = (bool) $request->get('notif_commenter');
-        $notifMention = (bool) $request->get('notif_mention');
-        $shareDecks = (bool) $request->get('share_decks');
-        $darkMode = (bool) $request->get('dark_mode');
+        $resume = StringSanitizer::sanitize($request->request->get('resume'), false);
+        $sphere_code = StringSanitizer::sanitize($request->request->get('user_sphere_code'));
+        $notifAuthor = $request->request->getBoolean('notif_author');
+        $notifCommenter = $request->request->getBoolean('notif_commenter');
+        $notifMention = $request->request->getBoolean('notif_mention');
+        $shareDecks = $request->request->getBoolean('share_decks');
+        $darkMode = $request->request->getBoolean('dark_mode');
         $user->setColor($sphere_code);
         $user->setResume($resume);
         $user->setIsNotifAuthor($notifAuthor);

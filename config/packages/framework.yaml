@@ -5,8 +5,6 @@ framework:
         strict_requirements: ~
     form:            ~
     csrf_protection: ~
-    validation:      { enable_annotations: true }
-    #serializer:      { enable_annotations: true }
     assets:
         # ?v=<hash> on the JavaScript and CSS files (see ContentHashVersionStrategy)
         version_strategy: App\Asset\ContentHashVersionStrategy

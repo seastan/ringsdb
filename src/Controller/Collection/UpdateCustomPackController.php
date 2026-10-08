@@ -30,14 +30,14 @@ class UpdateCustomPackController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $name = trim($request->get('name', ''));
+        $name = trim($request->request->getString('name'));
         if ('' === $name) {
             $this->addFlash('error', 'Pack name is required.');
 
             return $this->redirectToRoute('collection_custom_pack_edit', ['id' => $id]);
         }
 
-        $cardsJson = $request->get('cards_json', '[]');
+        $cardsJson = $request->request->getString('cards_json', '[]');
         $cardEntries = json_decode($cardsJson, true);
         if (!is_array($cardEntries)) {
             $cardEntries = [];

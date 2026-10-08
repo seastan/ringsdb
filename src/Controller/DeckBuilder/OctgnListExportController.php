@@ -23,7 +23,7 @@ class OctgnListExportController extends AbstractController
     #[Route(path: '/deck/export/octgn/list', name: 'deck_export_octgn_list', methods: ['GET'])]
     public function __invoke(Request $request): Response
     {
-        $list_id = $request->get('ids');
+        $list_id = $request->query->all('ids');
 
         return $this->deckArchiver->downloadFromSelection($this->currentUser(), $list_id, true);
     }

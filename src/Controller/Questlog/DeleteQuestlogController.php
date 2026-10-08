@@ -30,7 +30,7 @@ class DeleteQuestlogController extends AbstractController
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
 
-        $questlog_id = filter_var($request->get('questlog_id'), FILTER_SANITIZE_NUMBER_INT);
+        $questlog_id = filter_var($request->request->get('questlog_id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $questlog \App\Entity\Questlog */
         $questlog = $this->questlogRepository->find($questlog_id);
         if (!$questlog) {

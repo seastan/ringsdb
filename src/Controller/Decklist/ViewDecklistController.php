@@ -29,7 +29,7 @@ class ViewDecklistController extends AbstractController
         $response->setMaxAge($this->cacheExpiration);
 
         $decklist = $this->decklistRepository->find($decklist_id);
-        if (!$decklist) {
+        if (!$decklist instanceof Decklist) {
             throw $this->createNotFoundException('Decklist not found.');
         }
 
@@ -44,7 +44,7 @@ class ViewDecklistController extends AbstractController
             $decklist->getComments()->getValues()
         );
         $commenters[] = $decklist->getUser()->getUsername();
-        $versions = $this->decklistRepository->findBy(['parent' => $decklist->getParent()], ['version' => \SortDirection::Descending, 'id' => \SortDirection::Descending]);
+        $versions = $this->decklistRepository->findBy(['parent' => $decklist->getParent()], ['version' => 'DESC', 'id' => 'DESC']);
 
         return $this->render('Decklist/decklist.html.twig', ['pagetitle' => $decklist->getName(), 'decklist' => $decklist, 'duplicate' => $duplicate, 'commenters' => $commenters, 'versions' => $versions], $response);
     }

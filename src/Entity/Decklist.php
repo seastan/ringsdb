@@ -14,7 +14,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: \App\Repository\DecklistRepository::class)]
 #[ORM\Table(name: 'decklist')]
-#[ORM\Index(columns: ['date_creation'], name: 'idx_decklist_date_creation')]
+#[ORM\Index(name: 'idx_decklist_date_creation', columns: ['date_creation'])]
 class Decklist extends ExportableDeck implements \JsonSerializable
 {
     /**
@@ -102,33 +102,33 @@ class Decklist extends ExportableDeck implements \JsonSerializable
     /**
      * @var Collection<int, Decklistslot>
      */
-    #[ORM\OneToMany(mappedBy: 'decklist', targetEntity: Decklistslot::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: Decklistslot::class, mappedBy: 'decklist', cascade: ['persist', 'remove'])]
     private $slots;
 
     /**
      * @var Collection<int, Decklistsideslot>
      */
-    #[ORM\OneToMany(mappedBy: 'decklist', targetEntity: Decklistsideslot::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: Decklistsideslot::class, mappedBy: 'decklist', cascade: ['persist', 'remove'])]
     private $sideslots;
 
     /**
      * @var Collection<int, Comment>
      */
-    #[ORM\OneToMany(mappedBy: 'decklist', targetEntity: Comment::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'decklist', cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['dateCreation' => \SortDirection::Ascending])]
     private $comments;
 
     /**
      * @var Collection<int, Decklist>
      */
-    #[ORM\OneToMany(mappedBy: 'precedent', targetEntity: Decklist::class)]
+    #[ORM\OneToMany(targetEntity: Decklist::class, mappedBy: 'precedent')]
     #[ORM\OrderBy(['dateCreation' => \SortDirection::Ascending])]
     private $successors;
 
     /**
      * @var Collection<int, Deck>
      */
-    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: Deck::class)]
+    #[ORM\OneToMany(targetEntity: Deck::class, mappedBy: 'parent')]
     private $children;
 
     #[ORM\ManyToOne(targetEntity: Pack::class)]
@@ -160,7 +160,7 @@ class Decklist extends ExportableDeck implements \JsonSerializable
     /**
      * @var Collection<int, QuestlogDeck>
      */
-    #[ORM\OneToMany(mappedBy: 'decklist', targetEntity: QuestlogDeck::class, cascade: ['persist'])]
+    #[ORM\OneToMany(targetEntity: QuestlogDeck::class, mappedBy: 'decklist', cascade: ['persist'])]
     private $questlogs;
 
     /**
@@ -172,7 +172,7 @@ class Decklist extends ExportableDeck implements \JsonSerializable
     /**
      * @var Collection<int, FellowshipDecklist>
      */
-    #[ORM\OneToMany(mappedBy: 'decklist', targetEntity: FellowshipDecklist::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: FellowshipDecklist::class, mappedBy: 'decklist', cascade: ['persist', 'remove'])]
     private $fellowships;
 
     #[ORM\ManyToOne(targetEntity: Sphere::class)]

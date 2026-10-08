@@ -58,10 +58,10 @@ class ApiController extends AbstractController
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        $jsonp = $request->query->get('jsonp');
+        $jsonp = $request->query->getString('jsonp');
         /* @var $em EntityManager */
         /* @var $list_packs \App\Entity\Pack[] */
-        $list_packs = $this->packRepository->findBy([], ['dateRelease' => \SortDirection::Ascending, 'position' => \SortDirection::Ascending]);
+        $list_packs = $this->packRepository->findBy([], ['dateRelease' => 'ASC', 'position' => 'ASC']);
         // check the last-modified-since header
         $lastModified = null;
         foreach ($list_packs as $pack) {
@@ -134,7 +134,7 @@ class ApiController extends AbstractController
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        $jsonp = $request->query->get('jsonp');
+        $jsonp = $request->query->getString('jsonp');
         /* @var $em EntityManager */
         /* @var $card \App\Entity\Card */
         $card = $this->cardRepository->findOneBy(['code' => $card_code]);
@@ -178,7 +178,7 @@ class ApiController extends AbstractController
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        $jsonp = $request->query->get('jsonp');
+        $jsonp = $request->query->getString('jsonp');
         /* @var $em EntityManager */
         /* @var $list_cards \App\Entity\Card[] */
         // Eager-load printings (+ their packs) and the card's pack/type/sphere so
@@ -255,7 +255,7 @@ class ApiController extends AbstractController
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        $jsonp = $request->query->get('jsonp');
+        $jsonp = $request->query->getString('jsonp');
         $format = $request->getRequestFormat();
         if ('json' !== $format) {
             $response->setContent($request->getRequestFormat().' format not supported. Only json is supported.');
@@ -266,7 +266,7 @@ class ApiController extends AbstractController
         /* @var $em EntityManager */
         /* @var $pack \App\Entity\Pack */
         $pack = $this->packRepository->findOneBy(['code' => $pack_code]);
-        if (!$pack) {
+        if (!$pack instanceof Pack) {
             throw $this->createNotFoundException('Pack not found');
         }
 
@@ -334,7 +334,7 @@ class ApiController extends AbstractController
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        $jsonp = $request->query->get('jsonp');
+        $jsonp = $request->query->getString('jsonp');
         $format = $request->getRequestFormat();
         if ('json' !== $format) {
             $response->setContent($request->getRequestFormat().' format not supported. Only json is supported.');
@@ -345,7 +345,7 @@ class ApiController extends AbstractController
         /* @var $em EntityManager */
         /* @var $decklist \App\Entity\Decklist */
         $decklist = $this->decklistRepository->find($decklist_id);
-        if (!$decklist) {
+        if (!$decklist instanceof Decklist) {
             throw $this->createNotFoundException('Decklist not found');
         }
 
@@ -394,7 +394,7 @@ class ApiController extends AbstractController
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        $jsonp = $request->query->get('jsonp');
+        $jsonp = $request->query->getString('jsonp');
         $format = $request->getRequestFormat();
         if ('json' !== $format) {
             $response->setContent($request->getRequestFormat().' format not supported. Only json is supported.');
@@ -414,7 +414,7 @@ class ApiController extends AbstractController
             $decklist['heroes_details'] = [];
             $username = '';
             $user = $userRepo->findOneBy(['id' => $decklist['user_id']]);
-            if ($user) {
+            if ($user instanceof \App\Entity\User) {
                 $username = $user->getUsername();
             }
 
@@ -422,14 +422,14 @@ class ApiController extends AbstractController
             $codes = array_keys($decklist['heroes']);
             foreach ($codes as $code) {
                 $card = $cardRepo->findOneBy(['code' => $code]);
-                if (!$card) {
+                if (!$card instanceof Card) {
                     continue;
                 }
 
                 $decklist['heroes_details'][] = [
                     'name' => $card->getName(),
-                    'sphere' => $card->getSphere() ? $card->getSphere()->getName() : null,
-                    'pack' => $card->getPack() ? $card->getPack()->getName() : null,
+                    'sphere' => $card->getSphere() instanceof \App\Entity\Sphere ? $card->getSphere()->getName() : null,
+                    'pack' => $card->getPack() instanceof Pack ? $card->getPack()->getName() : null,
                 ];
             }
         }
@@ -473,7 +473,7 @@ class ApiController extends AbstractController
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        $jsonp = $request->query->get('jsonp');
+        $jsonp = $request->query->getString('jsonp');
         $format = $request->getRequestFormat();
         if ('json' !== $format) {
             $response->setContent($request->getRequestFormat().' format not supported. Only json is supported.');
@@ -483,7 +483,7 @@ class ApiController extends AbstractController
 
         /* @var $em EntityManager */
         $card = $this->cardRepository->findOneBy(['code' => $card_code]);
-        if (!$card) {
+        if (!$card instanceof Card) {
             $response->setContent('[]');
 
             return $response;
@@ -566,7 +566,7 @@ class ApiController extends AbstractController
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        $jsonp = $request->query->get('jsonp');
+        $jsonp = $request->query->getString('jsonp');
         /* @var $em EntityManager */
         /* @var $scenario \App\Entity\Scenario */
         $scenario = $scenarioRepository->findOneBy(['id' => $scenario_id]);
@@ -595,7 +595,7 @@ class ApiController extends AbstractController
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        $jsonp = $request->query->get('jsonp');
+        $jsonp = $request->query->getString('jsonp');
         $cards = [];
         $conditions = $this->cardsData->syntax(urldecode($q));
         $conditions = $this->cardsData->validateConditions($conditions);
@@ -631,12 +631,10 @@ class ApiController extends AbstractController
      * callback is validated by JsonResponse::setCallback() (a JavaScript identifier, with dots and
      * brackets, no reserved word) and the script prefixed with a comment, against content sniffing.
      * An empty callback is ignored.
-     *
-     * @param string|null $callback
      */
-    private function setJsonContent(Response $response, string $json, $callback): void
+    private function setJsonContent(Response $response, string $json, string $callback): void
     {
-        if (null === $callback || '' === $callback) {
+        if ('' === $callback) {
             $response->headers->set('Content-Type', 'application/json');
             $response->setContent($json);
 

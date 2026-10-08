@@ -33,7 +33,7 @@ class AutosaveController extends AbstractController
     {
         /* @var $user User */
         $user = $this->currentUser();
-        $deck_id = $request->get('deck_id');
+        $deck_id = $request->request->get('deck_id');
         /* @var $deck \App\Entity\Deck */
         $deck = $this->deckRepository->find($deck_id);
         if (!$deck) {
@@ -45,7 +45,7 @@ class AutosaveController extends AbstractController
         }
 
         // decoded as arrays: count() of an object is a warning since PHP 7.2
-        $diff = json_decode((string) $request->get('diff'), true);
+        $diff = json_decode($request->request->getString('diff'), true);
         if (!is_array($diff) || 4 !== count($diff) && 2 !== count($diff)) {
             $this->logger->error('cannot use diff', (array) $diff);
             throw new UnprocessableEntityHttpException('Wrong content '.json_encode($diff));

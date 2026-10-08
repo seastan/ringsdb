@@ -10,16 +10,12 @@ use App\Services\Decks;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DeckFixtures extends Fixture implements ContainerAwareInterface, DependentFixtureInterface
+class DeckFixtures extends Fixture implements DependentFixtureInterface
 {
-    private ?ContainerInterface $container = null;
-
-    public function setContainer(?ContainerInterface $container = null): void
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly Decks $decks
+    ) {
     }
 
     /**
@@ -34,13 +30,6 @@ class DeckFixtures extends Fixture implements ContainerAwareInterface, Dependent
 
     public function load(ObjectManager $manager): void
     {
-        if (!$this->container instanceof ContainerInterface) {
-            throw new \LogicException('The container is not set.');
-        }
-
-        /** @var Decks $deckService */
-        $deckService = $this->container->get('decks');
-
         /** @var User $user */
         $user = $this->getReference('test-user', User::class);
 
@@ -178,7 +167,7 @@ class DeckFixtures extends Fixture implements ContainerAwareInterface, Dependent
 
         foreach ($deckData as $i => $data) {
             $deck = new Deck($user);
-            $deckService->saveDeck(
+            $this->decks->saveDeck(
                 $user,
                 $deck,
                 null,

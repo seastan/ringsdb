@@ -53,7 +53,7 @@
         "symfony/event-dispatcher": "*",
         "symfony/filesystem": "*",
         "symfony/finder": "*",
-        "symfony/flex": "^1.22",
+        "symfony/flex": "^2.11",
         "symfony/form": "*",
         "symfony/framework-bundle": "*",
         "symfony/http-foundation": "*",
@@ -122,7 +122,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "6.4.*"
+            "require": "7.4.*"
         }
     }
 }

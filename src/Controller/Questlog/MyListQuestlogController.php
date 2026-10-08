@@ -34,7 +34,7 @@ class MyListQuestlogController extends AbstractController
     {
         // $quest_mode = 'normal';
         /* @var $quests Scenario[] */
-        $quests = $this->scenarioRepository->findBy([], ['position' => \SortDirection::Ascending]);
+        $quests = $this->scenarioRepository->findBy([], ['position' => 'ASC']);
         /* @var $user User */
         $user = $this->getUser();
         if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
@@ -78,9 +78,9 @@ class MyListQuestlogController extends AbstractController
 
         /* @var $questlogs \App\Entity\Questlog[] */
         if ($show_all) {
-            $questlogs = $this->questlogRepository->findBy(['user' => $user], ['dateCreation' => \SortDirection::Descending, 'id' => \SortDirection::Descending]);
+            $questlogs = $this->questlogRepository->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
         } else {
-            $questlogs = $this->questlogRepository->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => \SortDirection::Descending, 'id' => \SortDirection::Descending]);
+            $questlogs = $this->questlogRepository->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => 'DESC', 'id' => 'DESC']);
         }
 
         $this->snapshotManager->setSnapshots($questlogs);

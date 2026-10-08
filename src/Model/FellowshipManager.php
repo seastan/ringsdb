@@ -272,7 +272,7 @@ class FellowshipManager
         $sort = $request->query->get('sort');
         $packs = $request->query->all('packs');
 
-        $customPackCodes = array_values(array_filter((array) $request->query->all('custom_packs'), is_string(...)));
+        $customPackCodes = array_values(array_filter($request->query->all('custom_packs'), is_string(...)));
 
         $qb = $this->getQueryBuilder();
         $joinTables = [];
@@ -300,20 +300,18 @@ class FellowshipManager
             $qb->innerJoin('d.decklists', 'l');
             $qb->innerJoin('l.decklist', 'ld');
 
-            if (count($cards_code) > 0) {
-                foreach ($cards_code as $i => $card_code) {
-                    /* @var $card \App\Entity\Card */
-                    $card = $this->cardRepository->findOneBy(['code' => $card_code]);
-                    if (!$card) {
-                        continue;
-                    }
-
-                    $qb->innerJoin('ld.slots', "s$i");
-                    $qb->andWhere("s$i.card = :card$i");
-                    $qb->setParameter("card$i", $card);
-                    // Add packs containing requested# Add packs containing requested cards
-                    // $packs[] = $card->getPack()->getId();
+            foreach ($cards_code as $i => $card_code) {
+                /* @var $card \App\Entity\Card */
+                $card = $this->cardRepository->findOneBy(['code' => $card_code]);
+                if (!$card instanceof Card) {
+                    continue;
                 }
+
+                $qb->innerJoin('ld.slots', "s$i");
+                $qb->andWhere("s$i.card = :card$i");
+                $qb->setParameter("card$i", $card);
+                // Add packs containing requested# Add packs containing requested cards
+                // $packs[] = $card->getPack()->getId();
             }
 
             if (count($packs) > 0 || $useCustomPacks) {
@@ -349,29 +347,29 @@ class FellowshipManager
 
             // Num cores
             // SELECT fellowship.id, decklistslot.card_id, SUM(decklistslot.quantity), card.quantity FROM (((fellowship INNER JOIN fellowship_decklist ON fellowship.id = fellowship_decklist.fellowship_id) INNER JOIN decklistslot ON fellowship_decklist.decklist_id = decklistslot.decklist_id) INNER JOIN card ON decklistslot.card_id = card.id) WHERE card.pack_id = 1 GROUP BY fellowship.id,decklistslot.card_id HAVING SUM(decklistslot.quantity)>3*card.quantity;
-            $sub = $this->doctrine->createQueryBuilder();
-            $sub->select('jp.quantity');
-            $sub->from(Card::class, 'j');
-            $sub->innerJoin(CardPrinting::class, 'jp', Query\Expr\Join::ON, 'jp.card = j AND jp.pack = 1'); // Match Core Set printing
-            $sub->innerJoin(Decklistslot::class, 'dls', Query\Expr\Join::ON, 'dls.card = j');
-            $sub->innerJoin(FellowshipDecklist::class, 'fdl', Query\Expr\Join::ON, 'fdl.decklist = dls.decklist');
-            $sub->where('fdl.fellowship = d');
-            $sub->groupBy('d.id, dls.card, jp.quantity');
-            $sub->having('SUM(dls.quantity) > :numcores * jp.quantity');
+            $numCoresSub = $this->doctrine->createQueryBuilder();
+            $numCoresSub->select('jp.quantity');
+            $numCoresSub->from(Card::class, 'j');
+            $numCoresSub->innerJoin(CardPrinting::class, 'jp', Query\Expr\Join::ON, 'jp.card = j AND jp.pack = 1'); // Match Core Set printing
+            $numCoresSub->innerJoin(Decklistslot::class, 'dls', Query\Expr\Join::ON, 'dls.card = j');
+            $numCoresSub->innerJoin(FellowshipDecklist::class, 'fdl', Query\Expr\Join::ON, 'fdl.decklist = dls.decklist');
+            $numCoresSub->where('fdl.fellowship = d');
+            $numCoresSub->groupBy('d.id, dls.card, jp.quantity');
+            $numCoresSub->having('SUM(dls.quantity) > :numcores * jp.quantity');
             $qb->setParameter('numcores', $numcores);
-            $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
+            $qb->andWhere($qb->expr()->not($qb->expr()->exists($numCoresSub->getDQL())));
 
-            $sub = $this->doctrine->createQueryBuilder();
-            $sub->select('jp2.quantity');
-            $sub->from(Card::class, 'j2');
-            $sub->innerJoin(CardPrinting::class, 'jp2', Query\Expr\Join::ON, 'jp2.card = j2 AND jp2.pack = 1'); // Match Core Set printing
-            $sub->innerJoin(Decklistslot::class, 'dls2', Query\Expr\Join::ON, 'dls2.card = j2');
-            $sub->innerJoin(FellowshipDecklist::class, 'fdl2', Query\Expr\Join::ON, 'fdl2.decklist = dls2.decklist');
-            $sub->where('fdl2.fellowship = d');
-            $sub->groupBy('d.id, dls2.card, jp2.quantity');
-            $sub->having('SUM(dls2.quantity) > :numplaysets * jp2.quantity');
+            $numPlaysetsSub = $this->doctrine->createQueryBuilder();
+            $numPlaysetsSub->select('jp2.quantity');
+            $numPlaysetsSub->from(Card::class, 'j2');
+            $numPlaysetsSub->innerJoin(CardPrinting::class, 'jp2', Query\Expr\Join::ON, 'jp2.card = j2 AND jp2.pack = 1'); // Match Core Set printing
+            $numPlaysetsSub->innerJoin(Decklistslot::class, 'dls2', Query\Expr\Join::ON, 'dls2.card = j2');
+            $numPlaysetsSub->innerJoin(FellowshipDecklist::class, 'fdl2', Query\Expr\Join::ON, 'fdl2.decklist = dls2.decklist');
+            $numPlaysetsSub->where('fdl2.fellowship = d');
+            $numPlaysetsSub->groupBy('d.id, dls2.card, jp2.quantity');
+            $numPlaysetsSub->having('SUM(dls2.quantity) > :numplaysets * jp2.quantity');
             $qb->setParameter('numplaysets', $numplaysets);
-            $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
+            $qb->andWhere($qb->expr()->not($qb->expr()->exists($numPlaysetsSub->getDQL())));
         }
 
         switch ($sort) {
@@ -417,8 +415,8 @@ class FellowshipManager
     public function getAllPages(): array
     {
         $request = $this->currentRequest();
-        $route = $request->get('_route');
-        $route_params = $request->get('_route_params');
+        $route = $request->attributes->get('_route');
+        $route_params = $request->attributes->all('_route_params');
         $query = $request->query->all();
 
         $params = $query + $route_params;
@@ -460,8 +458,8 @@ class FellowshipManager
         }
 
         $request = $this->currentRequest();
-        $route = $request->get('_route');
-        $route_params = $request->get('_route_params');
+        $route = $request->attributes->get('_route');
+        $route_params = $request->attributes->all('_route_params');
 
         $query = $request->query->all();
         $params = $query + $route_params;
@@ -479,8 +477,8 @@ class FellowshipManager
         }
 
         $request = $this->currentRequest();
-        $route = $request->get('_route');
-        $route_params = $request->get('_route_params');
+        $route = $request->attributes->get('_route');
+        $route_params = $request->attributes->all('_route_params');
 
         $query = $request->query->all();
         $params = $query + $route_params;
