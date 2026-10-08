@@ -11,7 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
- * Excel export / import of the cards (ExcelController, admin only): the tests download a pack,
+ * Excel export / import of the cards (Admin/Excel/*Controller, admin only): the tests download a pack,
  * change the file with PhpSpreadsheet, and upload it back.
  *
  * - the download is a StreamedResponse: the test client sends it and keeps its output as the

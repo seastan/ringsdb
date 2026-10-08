@@ -17,10 +17,10 @@ class GetCycleController extends AbstractController
     }
 
     #[Route(path: '/cycle/{cycle_code}/{view}/{sort}/{page}', name: 'cards_cycle', defaults: ['view' => 'list', 'sort' => 'sphere', 'page' => 1])]
-    public function cycleAction(Request $request, string $cycle_code, string $view, string $sort, int $page): Response
+    public function __invoke(Request $request, string $cycle_code, string $view, string $sort, int $page): Response
     {
         $cycle = $this->cycleRepository->findOneBy(['code' => $cycle_code]);
-        if (!$cycle) {
+        if (!$cycle instanceof \App\Entity\Cycle) {
             throw $this->createNotFoundException('This cycle does not exist');
         }
 

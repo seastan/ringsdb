@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
  * External-integration deck endpoint (used by the DragnCards "Play on DragnCards"
  * links for private decks). Despite the legacy "oauth2" path it uses no OAuth: it is
  * anonymous (security.yaml) and CORS-open, and only returns a deck when its owner has enabled
- * "Share my decks". Published decklists go through ApiController instead.
+ * "Share my decks". Published decklists go through GetDecklistController instead.
  */
 class LoadSharedDeckController extends AbstractController
 {
@@ -34,7 +34,7 @@ class LoadSharedDeckController extends AbstractController
 
         $deck = $this->deckRepository->find($id);
 
-        if (!$deck) {
+        if (!$deck instanceof \App\Entity\Deck) {
             $response->setContent((string) json_encode([
                 'success' => false,
                 'error' => 'Deck not found.',

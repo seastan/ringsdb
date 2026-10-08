@@ -21,7 +21,7 @@ class SimpleSearchController extends AbstractController
      * Processes the action of the single card search input.
      */
     #[Route(path: '/find', name: 'cards_find')]
-    public function findAction(Request $request): RedirectResponse|Response
+    public function __invoke(Request $request): RedirectResponse|Response
     {
         $q = (string) $request->query->get('q');
         $q = str_replace('t:campaign', 't:treasure', $q);

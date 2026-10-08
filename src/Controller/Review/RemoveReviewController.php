@@ -18,7 +18,7 @@ class RemoveReviewController extends AbstractController
     }
 
     #[Route(path: '/review/remove/{id}', name: 'card_review_remove')]
-    public function removeAction(int $id): JsonResponse
+    public function __invoke(int $id): JsonResponse
     {
         $user = $this->getUser();
         if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface || !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {

@@ -23,7 +23,7 @@ class PostReviewController extends AbstractController
     }
 
     #[Route(path: '/review/post', name: 'card_review_post', methods: ['POST'])]
-    public function postAction(Request $request, CardRepository $cardRepository): JsonResponse
+    public function __invoke(Request $request, CardRepository $cardRepository): JsonResponse
     {
         /* @var $user \App\Entity\User */
         $user = $this->getUser();

@@ -39,7 +39,7 @@ class UserInfoController extends AbstractController
      */
     #[Route(path: '/api/public/user/info', name: 'api_public_user_info')]
     #[Route(path: '/api/private/user/info', name: 'api_private_user_info')]
-    public function infoAction(Request $request, CardRepository $cardRepository, DecklistRepository $decklistRepository, FellowshipRepository $fellowshipRepository, QuestlogRepository $questlogRepository): Response
+    public function __invoke(Request $request, CardRepository $cardRepository, DecklistRepository $decklistRepository, FellowshipRepository $fellowshipRepository, QuestlogRepository $questlogRepository): Response
     {
         $jsonp = $request->query->get('jsonp');
         $decklist_id = $request->query->get('decklist_id');
@@ -55,43 +55,43 @@ class UserInfoController extends AbstractController
             if (isset($decklist_id)) {
                 /* @var $decklist Decklist */
                 $decklist = $decklistRepository->find($decklist_id);
-                if ($decklist) {
+                if ($decklist instanceof Decklist) {
                     $decklist_id = $decklist->getId();
                     $content['is_liked'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM decklist d\n        \t\t\t\tJOIN vote v ON v.decklist_id = d.id\n        \t\t\t\tWHERE v.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $decklist_id])->fetchOne();
                     $content['is_favorite'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM decklist d\n        \t\t\t\tJOIN favorite f ON f.decklist_id = d.id\n        \t\t\t\tWHERE f.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $decklist_id])->fetchOne();
                     $content['is_author'] = $user_id == $decklist->getUser()->getId();
-                    $content['can_delete'] = 0 == $decklist->getNbcomments() && 0 == $decklist->getNbfavorites() && 0 == $decklist->getNbVotes();
+                    $content['can_delete'] = 0 === $decklist->getNbcomments() && 0 === $decklist->getNbfavorites() && 0 === $decklist->getNbVotes();
                 }
             }
 
             if (isset($fellowship_id)) {
                 /* @var $fellowship Fellowship */
                 $fellowship = $fellowshipRepository->find($fellowship_id);
-                if ($fellowship) {
+                if ($fellowship instanceof Fellowship) {
                     $fellowship_id = $fellowship->getId();
                     $content['is_liked'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM fellowship d\n        \t\t\t\tJOIN fellowship_vote v ON v.fellowship_id = d.id\n        \t\t\t\tWHERE v.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $fellowship_id])->fetchOne();
                     $content['is_favorite'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM fellowship d\n        \t\t\t\tJOIN fellowship_favorite f ON f.fellowship_id = d.id\n        \t\t\t\tWHERE f.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $fellowship_id])->fetchOne();
                     $content['is_author'] = $user_id == $fellowship->getUser()->getId();
-                    $content['can_delete'] = 0 == $fellowship->getNbcomments() && 0 == $fellowship->getNbfavorites() && 0 == $fellowship->getNbVotes();
+                    $content['can_delete'] = 0 === $fellowship->getNbcomments() && 0 === $fellowship->getNbfavorites() && 0 === $fellowship->getNbVotes();
                 }
             }
 
             if (isset($questlog_id)) {
                 /* @var $questlog Questlog */
                 $questlog = $questlogRepository->find($questlog_id);
-                if ($questlog) {
+                if ($questlog instanceof Questlog) {
                     $questlog_id = $questlog->getId();
                     $content['is_liked'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM questlog d\n        \t\t\t\tJOIN questlog_vote v ON v.questlog_id = d.id\n        \t\t\t\tWHERE v.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $questlog_id])->fetchOne();
                     $content['is_favorite'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM questlog d\n        \t\t\t\tJOIN questlog_favorite f ON f.questlog_id = d.id\n        \t\t\t\tWHERE f.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $questlog_id])->fetchOne();
                     $content['is_author'] = $questlog->getUser()->isEqualTo($user);
-                    $content['can_delete'] = 0 == $questlog->getNbcomments() && 0 == $questlog->getNbfavorites() && 0 == $questlog->getNbVotes();
+                    $content['can_delete'] = 0 === $questlog->getNbcomments() && 0 === $questlog->getNbfavorites() && 0 === $questlog->getNbVotes();
                 }
             }
 
             if (isset($card_id)) {
                 /* @var $card Card */
                 $card = $cardRepository->find($card_id);
-                if ($card) {
+                if ($card instanceof Card) {
                     $reviews = $card->getReviews();
                     /* @var $review Review */
                     foreach ($reviews as $review) {

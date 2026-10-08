@@ -20,7 +20,7 @@ class ListReviewsController extends AbstractController
     }
 
     #[Route(path: '/reviews/{page}', name: 'card_reviews_list', requirements: ['page' => '\d+'], defaults: ['page' => 1])]
-    public function listAction(Request $request, int $page = 1): Response
+    public function __invoke(Request $request, int $page = 1): Response
     {
         $response = new Response();
         $response->setPublic();

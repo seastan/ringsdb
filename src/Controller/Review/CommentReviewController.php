@@ -20,7 +20,7 @@ class CommentReviewController extends AbstractController
     }
 
     #[Route(path: '/review/comment', name: 'card_reviewcomment_post', methods: ['POST'])]
-    public function commentAction(Request $request): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
         /* @var $user \App\Entity\User */
         $user = $this->getUser();

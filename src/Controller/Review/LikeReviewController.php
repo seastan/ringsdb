@@ -19,7 +19,7 @@ class LikeReviewController extends AbstractController
     }
 
     #[Route(path: '/review/like', name: 'card_review_like', methods: ['POST'])]
-    public function likeAction(Request $request): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
         $user = $this->getUser();
         if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
@@ -29,7 +29,7 @@ class LikeReviewController extends AbstractController
         $review_id = filter_var($request->request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $review Review */
         $review = $this->reviewRepository->find($review_id);
-        if (!$review) {
+        if (!$review instanceof Review) {
             throw new \Exception('Unable to find review.');
         }
 

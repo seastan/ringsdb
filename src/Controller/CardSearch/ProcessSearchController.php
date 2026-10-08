@@ -20,7 +20,7 @@ class ProcessSearchController extends AbstractController
      * Processes the action of the card search form.
      */
     #[Route(path: '/process', name: 'cards_processSearchForm')]
-    public function processAction(Request $request): RedirectResponse
+    public function __invoke(Request $request): RedirectResponse
     {
         $view = $request->query->get('view') ?: 'list';
         $sort = $request->query->get('sort') ?: 'name';
@@ -51,7 +51,7 @@ class ProcessSearchController extends AbstractController
                     }
 
                     $op = $request->query->get($key.'o');
-                    if (!in_array($op, $operators)) {
+                    if (!in_array($op, $operators, true)) {
                         $op = ':';
                     }
                 }
