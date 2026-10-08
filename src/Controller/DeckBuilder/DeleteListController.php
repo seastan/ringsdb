@@ -29,7 +29,7 @@ class DeleteListController extends AbstractController
         foreach ($list_id as $id) {
             /* @var $deck \App\Entity\Deck */
             $deck = $this->deckRepository->find($id);
-            if (!$deck) {
+            if (!$deck instanceof \App\Entity\Deck) {
                 continue;
             }
 

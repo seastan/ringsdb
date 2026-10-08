@@ -29,7 +29,7 @@ class DeleteDeckController extends AbstractController
         $deck_id = filter_var($request->request->get('deck_id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $deck \App\Entity\Deck */
         $deck = $this->deckRepository->find($deck_id);
-        if (!$deck) {
+        if (!$deck instanceof \App\Entity\Deck) {
             return $this->redirect($this->generateUrl('decks_list'));
         }
 

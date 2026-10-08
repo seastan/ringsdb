@@ -36,7 +36,7 @@ class AutosaveController extends AbstractController
         $deck_id = $request->request->get('deck_id');
         /* @var $deck \App\Entity\Deck */
         $deck = $this->deckRepository->find($deck_id);
-        if (!$deck) {
+        if (!$deck instanceof \App\Entity\Deck) {
             throw new UnprocessableEntityHttpException('Cannot find deck '.$deck_id);
         }
 

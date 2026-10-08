@@ -27,7 +27,7 @@ class RemoveReviewController extends AbstractController
 
         /* @var $review Review */
         $review = $this->reviewRepository->find($id);
-        if (!$review) {
+        if (!$review instanceof Review) {
             throw new \Exception('Unable to find review.');
         }
 

@@ -33,7 +33,7 @@ class DeleteQuestlogController extends AbstractController
         $questlog_id = filter_var($request->request->get('questlog_id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $questlog \App\Entity\Questlog */
         $questlog = $this->questlogRepository->find($questlog_id);
-        if (!$questlog) {
+        if (!$questlog instanceof \App\Entity\Questlog) {
             return $this->redirect($this->generateUrl('myquestlogs_list'));
         }
 

@@ -37,7 +37,7 @@ class TagController extends AbstractController
         foreach ($list_id as $id) {
             /* @var $deck Deck */
             $deck = $this->deckRepository->find($id);
-            if (!$deck) {
+            if (!$deck instanceof Deck) {
                 continue;
             }
 
@@ -65,7 +65,7 @@ class TagController extends AbstractController
         foreach ($list_id as $id) {
             /* @var $deck Deck */
             $deck = $this->deckRepository->find($id);
-            if (!$deck) {
+            if (!$deck instanceof Deck) {
                 continue;
             }
 
@@ -92,7 +92,7 @@ class TagController extends AbstractController
         foreach ($list_id as $id) {
             /* @var $deck Deck */
             $deck = $this->deckRepository->find($id);
-            if (!$deck) {
+            if (!$deck instanceof Deck) {
                 continue;
             }
 

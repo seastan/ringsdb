@@ -49,7 +49,7 @@ class SaveFellowshipController extends AbstractController
         if ($fellowship_id) {
             /* @var $fellowship \App\Entity\Fellowship */
             $fellowship = $this->fellowshipRepository->find($fellowship_id);
-            if (!$fellowship) {
+            if (!$fellowship instanceof Fellowship) {
                 throw new NotFoundHttpException('This fellowship does not exists.');
             }
 
@@ -96,7 +96,7 @@ class SaveFellowshipController extends AbstractController
                     if (!$is_decklist) {
                         /* @var $deck Deck */
                         $deck = $this->deckRepository->find($deck_id);
-                        if (!$deck) {
+                        if (!$deck instanceof Deck) {
                             throw new NotFoundHttpException('One of the selected decks does not exists.');
                         }
 
@@ -114,7 +114,7 @@ class SaveFellowshipController extends AbstractController
                     } else {
                         /* @var $decklist Decklist */
                         $decklist = $this->decklistRepository->find($deck_id);
-                        if (!$decklist) {
+                        if (!$decklist instanceof Decklist) {
                             throw new NotFoundHttpException('One of the selected decks does not exists.');
                         }
 

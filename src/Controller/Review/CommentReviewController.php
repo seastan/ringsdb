@@ -31,7 +31,7 @@ class CommentReviewController extends AbstractController
         $review_id = filter_var($request->request->get('comment_review_id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $review Review */
         $review = $this->reviewRepository->find($review_id);
-        if (!$review) {
+        if (!$review instanceof Review) {
             throw new \Exception('Unable to find review.');
         }
 

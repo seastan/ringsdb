@@ -46,7 +46,7 @@ class CommentFellowshipController extends AbstractController
 
         $fellowship_id = filter_var($request->request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
-        if (!$fellowship) {
+        if (!$fellowship instanceof \App\Entity\Fellowship) {
             throw new BadRequestHttpException('Wrong fellowship id');
         }
 

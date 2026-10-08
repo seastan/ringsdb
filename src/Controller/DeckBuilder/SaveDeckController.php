@@ -6,8 +6,8 @@ namespace App\Controller\DeckBuilder;
 
 use App\Controller\CurrentUserTrait;
 use App\Repository\DeckRepository;
-use App\Services\DeckSaver;
 use App\Services\Decks;
+use App\Services\DeckSaver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,7 +43,7 @@ class SaveDeckController extends AbstractController
 
         $cancel_edits = (bool) filter_var($request->request->get('cancel_edits'), FILTER_SANITIZE_NUMBER_INT);
         if ($cancel_edits) {
-            if ($deck) {
+            if ($deck instanceof \App\Entity\Deck) {
                 $this->decks->revertDeck($deck);
             }
 

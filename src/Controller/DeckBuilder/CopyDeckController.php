@@ -28,7 +28,7 @@ class CopyDeckController extends AbstractController
     {
         /* @var $decklist Decklist */
         $decklist = $this->decklistRepository->find($decklist_id);
-        if (!$decklist) {
+        if (!$decklist instanceof Decklist) {
             throw new NotFoundHttpException("This deck doesn't exist.");
         }
 

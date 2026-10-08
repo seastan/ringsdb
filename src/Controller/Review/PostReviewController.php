@@ -39,17 +39,17 @@ class PostReviewController extends AbstractController
         $card_id = filter_var($request->request->get('card_id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $card Card */
         $card = $cardRepository->find($card_id);
-        if (!$card) {
+        if (!$card instanceof Card) {
             throw new \Exception('This card does not exist.');
         }
 
-        if (!$card->getPack() || !$card->getPack()->getDateRelease()) {
+        if (!$card->getPack() instanceof \App\Entity\Pack || !$card->getPack()->getDateRelease() instanceof \DateTime) {
             throw new \Exception('You may not write a review for an unreleased card.');
         }
 
         // checking the user didn't already write a review for that card
         $review = $this->reviewRepository->findOneBy(['card' => $card, 'user' => $user]);
-        if ($review) {
+        if ($review instanceof Review) {
             throw new \Exception('You cannot write more than 1 review for a given card.');
         }
 

@@ -34,7 +34,7 @@ class ByAuthorController extends AbstractController
 
         $start = ($page - 1) * $limit;
         $user = $this->userRepository->find($user_id);
-        if (!$user) {
+        if (!$user instanceof \App\Entity\User) {
             throw $this->createNotFoundException('User not found.');
         }
 

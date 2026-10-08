@@ -33,7 +33,7 @@ class DeleteFellowshipController extends AbstractController
         $fellowship_id = filter_var($request->request->get('fellowship_id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $fellowship \App\Entity\Fellowship */
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
-        if (!$fellowship) {
+        if (!$fellowship instanceof \App\Entity\Fellowship) {
             return $this->redirect($this->generateUrl('myfellowships_list'));
         }
 
