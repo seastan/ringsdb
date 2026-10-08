@@ -12,7 +12,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 class SaveDeckController extends AbstractController
@@ -55,22 +54,16 @@ class SaveDeckController extends AbstractController
             return new Response('Cannot import an empty deck');
         }
 
-        $decklist_id = filter_var($request->request->get('decklist_id'), FILTER_SANITIZE_NUMBER_INT);
-        if (false === $decklist_id) {
-            throw new BadRequestHttpException('Wrong decklist_id');
-        }
-
         // a copy is a new deck, its changes computed from the copied deck
         $is_copy = (bool) filter_var($request->request->get('copy'), FILTER_SANITIZE_NUMBER_INT);
         $this->deckSaver->save(
             $user,
-            $is_copy ? null : $deck,
-            $deck,
             $content,
             $request->request->getString('name'),
             $request->request->getString('description'),
             $request->request->getString('tags'),
-            (int) $decklist_id
+            deck: $is_copy ? null : $deck,
+            sourceDeck: $deck,
         );
 
         return $this->redirect($this->generateUrl('decks_list'));

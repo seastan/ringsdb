@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace App\Controller\DeckBuilder;
 
 use App\Controller\CurrentUserTrait;
-use App\Entity\Deck;
 use App\Services\DeckImporter;
-use App\Services\Decks;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Services\DeckSaver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,9 +18,8 @@ class ImportAllController extends AbstractController
     use CurrentUserTrait;
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
         private DeckImporter $deckImporter,
-        private Decks $decks
+        private DeckSaver $deckSaver
     ) {
     }
 
@@ -67,14 +64,15 @@ class ImportAllController extends AbstractController
 
                 $deckname = pathinfo($name, PATHINFO_FILENAME);
                 // one deck per file, even without any card (an empty deck)
-                $deck = new Deck($user);
-                $this->entityManager->persist($deck);
-                $this->decks->saveDeck($user, $deck, null, $deckname, '', '', $parse['content'], null);
+                $this->deckSaver->save(
+                    $user,
+                    $parse['content'],
+                    $deckname
+                );
             }
         }
 
         $zip->close();
-        $this->entityManager->flush();
         $this->addFlash('notice', 'Decks imported.');
 
         return $this->redirect($this->generateUrl('decks_list'));

@@ -58,7 +58,12 @@ class FileImportDeckController extends AbstractController
             $parse = $this->deckImporter->parseTextImport($contents);
         }
 
-        $this->deckSaver->save($this->currentUser(), null, null, $parse['content'], str_replace(".{$origext}", '', $origname), $parse['description']);
+        $this->deckSaver->save(
+            $this->currentUser(),
+            $parse['content'],
+            str_replace(".{$origext}", '', $origname),
+            $parse['description']
+        );
 
         return $this->redirectToRoute('decks_list');
     }

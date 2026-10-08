@@ -16,7 +16,7 @@ use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use App\Repository\QuestlogRepository;
 use App\Repository\ScenarioRepository;
-use App\Services\Decks;
+use App\Services\DeckSaver;
 use App\Services\Texts;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -38,7 +38,7 @@ class SaveQuestlogController extends AbstractController
         private ScenarioRepository $scenarioRepository,
         private DeckRepository $deckRepository,
         private DecklistRepository $decklistRepository,
-        private Decks $decks
+        private DeckSaver $deckSaver
     ) {
     }
 
@@ -134,7 +134,7 @@ class SaveQuestlogController extends AbstractController
                         }
 
                         if (!$is_owner) {
-                            $deck = $this->decks->cloneDeck($deck, $user);
+                            $deck = $this->deckSaver->cloneDeck($user, $deck);
                         }
 
                         // $content = (array) json_decode($request->get("deck".$i."_content"));

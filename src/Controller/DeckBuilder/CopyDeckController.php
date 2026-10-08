@@ -41,7 +41,12 @@ class CopyDeckController extends AbstractController
             $content['side'][$slot->getCard()->getCode()] = $slot->getQuantity();
         }
 
-        $this->deckSaver->save($this->currentUser(), null, null, $content, $decklist->getName(), decklistId: $decklist_id);
+        $this->deckSaver->save(
+            $this->currentUser(),
+            $content,
+            $decklist->getName(),
+            decklist: $decklist
+        );
 
         return $this->redirectToRoute('decks_list');
     }

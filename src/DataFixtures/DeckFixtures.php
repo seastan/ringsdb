@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\DataFixtures;
 
-use App\Entity\Deck;
 use App\Entity\User;
-use App\Services\Decks;
+use App\Services\DeckSaver;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -14,7 +13,7 @@ use Doctrine\Persistence\ObjectManager;
 class DeckFixtures extends Fixture implements DependentFixtureInterface
 {
     public function __construct(
-        private readonly Decks $decks
+        private readonly DeckSaver $deckSaver
     ) {
     }
 
@@ -166,16 +165,11 @@ class DeckFixtures extends Fixture implements DependentFixtureInterface
         ];
 
         foreach ($deckData as $i => $data) {
-            $deck = new Deck($user);
-            $this->decks->saveDeck(
+            $deck = $this->deckSaver->save(
                 $user,
-                $deck,
-                null,
-                $data['name'],
-                'Description',
-                null,
                 $data['content'],
-                null
+                $data['name'],
+                'Description'
             );
             $deck->setDateCreation(new \DateTime('2015-08-16'));
             $deck->setDateUpdate(new \DateTime('2015-08-16'));

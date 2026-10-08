@@ -11,7 +11,6 @@ use App\Services\DeckSaver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AjaxSaveController extends AbstractController
@@ -44,21 +43,15 @@ class AjaxSaveController extends AbstractController
             return new JsonResponse(['success' => false, 'error' => 'Cannot save an empty deck.'], 422);
         }
 
-        $decklist_id = filter_var($request->request->get('decklist_id'), FILTER_SANITIZE_NUMBER_INT);
-        if (false === $decklist_id) {
-            throw new BadRequestHttpException('Wrong decklist_id');
-        }
-
         try {
             $deck = $this->deckSaver->save(
                 $user,
-                $deck,
-                $deck,
                 $content,
                 $request->request->getString('name'),
                 $request->request->getString('description'),
                 $request->request->getString('tags'),
-                (int) $decklist_id
+                deck: $deck,
+                sourceDeck: $deck,
             );
         } catch (TooManyDecksException) {
             return new JsonResponse(['success' => false, 'error' => 'You have reached the maximum number of decks allowed.'], 422);
