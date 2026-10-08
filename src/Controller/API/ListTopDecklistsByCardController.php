@@ -7,10 +7,9 @@ namespace App\Controller\API;
 use App\Entity\Card;
 use App\Entity\Decklist;
 use App\Model\JsonpDto;
-use App\Repository\CardRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,7 +22,6 @@ class ListTopDecklistsByCardController extends AbstractController
 
     public function __construct(
         private readonly int $cacheExpiration,
-        private readonly CardRepository $cardRepository,
         private readonly EntityManagerInterface $entityManager
     ) {
     }
@@ -54,7 +52,7 @@ class ListTopDecklistsByCardController extends AbstractController
      * )
      */
     #[Route(path: '/api/public/decklists/top_by_card/{card_code}.{_format}', name: 'api_decklists_by_card', requirements: ['_format' => 'json'], defaults: ['_format' => 'json'], methods: ['GET'])]
-    public function __invoke(Request $request, string $card_code, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
+    public function __invoke(Request $request, #[MapEntity(mapping: ['card_code' => 'code'])] ?Card $card, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -69,8 +67,6 @@ class ListTopDecklistsByCardController extends AbstractController
             return $response;
         }
 
-        /* @var $em EntityManager */
-        $card = $this->cardRepository->findOneBy(['code' => $card_code]);
         if (!$card instanceof Card) {
             $response->setContent('[]');
 

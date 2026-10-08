@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Entity\Deck;
+use App\Entity\Fellowship;
 use App\Entity\User;
-use App\Repository\FellowshipRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -14,20 +14,13 @@ class FellowshipArchiver
 {
     public function __construct(
         private readonly string $cacheDir,
-        private readonly FellowshipRepository $fellowshipRepository,
         private readonly Environment $twig,
         private readonly Texts $texts
     ) {
     }
 
-    public function downloadFromSelection(User $user, int $fellowship_id, bool $octgn): Response
+    public function downloadFromSelection(User $user, Fellowship $fellowship, bool $octgn): Response
     {
-        /* @var $fellowship \App\Entity\Fellowship */
-        $fellowship = $this->fellowshipRepository->find($fellowship_id);
-        if (!$fellowship instanceof \App\Entity\Fellowship) {
-            throw new AccessDeniedHttpException("You don't have access to this fellowship.");
-        }
-
         $fellowship_user = $fellowship->getUser();
         $is_public = $fellowship->getIsPublic();
         if (!$fellowship_user->isEqualTo($user) && !$fellowship_user->getIsShareDecks() && !$is_public) {
@@ -76,7 +69,7 @@ class FellowshipArchiver
         $response = new Response();
         $response->headers->set('Content-Type', 'application/zip');
         $response->headers->set('Content-Length', (string) filesize($file));
-        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->texts->slugify('RingsDB - Fellowship '.$fellowship_id).'.zip'));
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->texts->slugify('RingsDB - Fellowship '.$fellowship->getId()).'.zip'));
 
         $contents = file_get_contents($file);
         if (false === $contents) {

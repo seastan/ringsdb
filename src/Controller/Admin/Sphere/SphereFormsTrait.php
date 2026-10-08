@@ -46,7 +46,7 @@ trait SphereFormsTrait
      *
      * @return FormInterface<mixed> The form
      */
-    private function createDeleteForm(int $id): FormInterface
+    private function createDeleteForm(?int $id): FormInterface
     {
         return $this->createFormBuilder()->setAction($this->generateUrl('admin_sphere_delete', ['id' => $id]))->setMethod('DELETE')->getForm();
     }

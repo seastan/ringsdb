@@ -9,6 +9,7 @@ use App\Entity\Decklist;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Attribute\Route;
@@ -21,14 +22,8 @@ class DeleteDecklistController extends AbstractController
     }
 
     #[Route(path: '/admin/decklist/delete/{decklist_id}', name: 'admin_decklist_delete', methods: ['GET'])]
-    public function __invoke(int $decklist_id, DeckRepository $deckRepository, DecklistRepository $decklistRepository): RedirectResponse
+    public function __invoke(#[MapEntity(id: 'decklist_id', message: 'Decklist not found')] Decklist $decklist, DeckRepository $deckRepository, DecklistRepository $decklistRepository): RedirectResponse
     {
-        /* @var $decklist Decklist */
-        $decklist = $decklistRepository->find($decklist_id);
-        if (!$decklist instanceof Decklist) {
-            throw $this->createNotFoundException('Decklist not found');
-        }
-
         // first we remove the foreign keys in Decklist and Deck pointing to this decklist
         $successors = $decklistRepository->findBy(['precedent' => $decklist]);
         foreach ($successors as $successor) {

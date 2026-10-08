@@ -6,12 +6,12 @@ namespace App\Controller\Collection;
 
 use App\Controller\CurrentUserTrait;
 use App\Entity\UserCustomPack;
-use App\Repository\UserCustomPackRepository;
 use App\Services\CustomPackManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 class CopyCustomPackController extends AbstractController
@@ -20,19 +20,17 @@ class CopyCustomPackController extends AbstractController
 
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private UserCustomPackRepository $userCustomPackRepository,
         private CustomPackManager $customPackManager
     ) {
     }
 
     #[Route(path: '/collection/custom-pack/{id}/copy', name: 'collection_custom_pack_copy', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function __invoke(Request $request, int $id): JsonResponse
+    public function __invoke(Request $request, UserCustomPack $source): JsonResponse
     {
         $user = $this->currentUser();
 
-        $source = $this->userCustomPackRepository->findOneBy(['id' => $id, 'isPublished' => true]);
-        if (!$source instanceof UserCustomPack) {
-            return new JsonResponse(['error' => 'Pack not found'], 404);
+        if (!$source->getIsPublished()) {
+            throw new BadRequestHttpException('Source is not published');
         }
 
         $copy = new UserCustomPack($user, $source->getName(), 'tmp');

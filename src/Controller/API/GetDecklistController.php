@@ -6,8 +6,8 @@ namespace App\Controller\API;
 
 use App\Entity\Decklist;
 use App\Model\JsonpDto;
-use App\Repository\DecklistRepository;
 use Doctrine\ORM\EntityManager;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,8 +19,7 @@ class GetDecklistController extends AbstractController
     use JsonpTrait;
 
     public function __construct(
-        private readonly int $cacheExpiration,
-        private readonly DecklistRepository $decklistRepository
+        private readonly int $cacheExpiration
     ) {
     }
 
@@ -51,7 +50,7 @@ class GetDecklistController extends AbstractController
      * )
      */
     #[Route(path: '/api/public/decklist/{decklist_id}.{_format}', name: 'api_decklist', requirements: ['_format' => 'json', 'decklist_id' => '\d+'], defaults: ['_format' => 'json'], methods: ['GET'])]
-    public function __invoke(Request $request, int $decklist_id, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
+    public function __invoke(Request $request, #[MapEntity(id: 'decklist_id', message: 'Decklist not found')] Decklist $decklist, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -67,12 +66,6 @@ class GetDecklistController extends AbstractController
         }
 
         /* @var $em EntityManager */
-        /* @var $decklist \App\Entity\Decklist */
-        $decklist = $this->decklistRepository->find($decklist_id);
-        if (!$decklist instanceof Decklist) {
-            throw $this->createNotFoundException('Decklist not found');
-        }
-
         $response->setLastModified($decklist->getDateUpdate());
         if ($response->isNotModified($request)) {
             return $response;

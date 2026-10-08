@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace App\Controller\Questlog;
 
+use App\Entity\QuestlogComment;
 use App\Entity\User;
-use App\Repository\QuestlogCommentRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 class HideCommentQuestlogController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly QuestlogCommentRepository $questlogCommentRepository
+        private readonly EntityManagerInterface $entityManager
     ) {
     }
 
@@ -25,17 +24,12 @@ class HideCommentQuestlogController extends AbstractController
      * hides a comment, or if $hidden is false, unhide a comment.
      */
     #[Route(path: '/user/questlog_hidecomment/{comment_id}/{hidden}', name: 'questlog_comment_hide', methods: ['POST'])]
-    public function __invoke(int $comment_id, int $hidden): Response
+    public function __invoke(#[MapEntity(id: 'comment_id', message: 'Unable to find comment')] QuestlogComment $comment, int $hidden): Response
     {
         /* @var $user User */
         $user = $this->getUser();
         if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw $this->createAccessDeniedException('You are not logged in.');
-        }
-
-        $comment = $this->questlogCommentRepository->find($comment_id);
-        if (!$comment instanceof \App\Entity\QuestlogComment) {
-            throw new BadRequestHttpException('Unable to find comment');
         }
 
         if (!$comment->getQuestlog()->getUser()->isEqualTo($user)) {

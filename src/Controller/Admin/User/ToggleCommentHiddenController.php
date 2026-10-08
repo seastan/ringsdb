@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Controller\Admin\User;
 
 use App\Entity\Comment;
-use App\Repository\CommentRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Attribute\Route;
@@ -14,20 +14,13 @@ use Symfony\Component\Routing\Attribute\Route;
 class ToggleCommentHiddenController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly CommentRepository $commentRepository
+        private readonly EntityManagerInterface $entityManager
     ) {
     }
 
     #[Route(path: '/admin/comment/toggle_hidden/{comment_id}', name: 'admin_comment_hidden_toggle', methods: ['GET'])]
-    public function __invoke(int $comment_id): RedirectResponse
+    public function __invoke(#[MapEntity(id: 'comment_id', message: 'Comment not found')] Comment $comment): RedirectResponse
     {
-        /* @var $comment Comment */
-        $comment = $this->commentRepository->find($comment_id);
-        if (!$comment instanceof Comment) {
-            throw $this->createNotFoundException('Comment not found');
-        }
-
         $comment->setIsHidden(!$comment->getIsHidden());
         $this->entityManager->flush();
 

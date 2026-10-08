@@ -4,32 +4,25 @@ declare(strict_types=1);
 
 namespace App\Controller\DeckBuilder;
 
-use App\Repository\DeckRepository;
+use App\Entity\Deck;
 use App\Services\Texts;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 class OctgnDeckExportController extends AbstractController
 {
     public function __construct(
-        private readonly DeckRepository $deckRepository,
         private readonly Texts $texts
     ) {
     }
 
     #[Route(path: '/deck/export/octgn/{deck_id}', name: 'deck_export_octgn', requirements: ['deck_id' => '\d+'], methods: ['GET'])]
-    public function __invoke(int $deck_id): Response
+    public function __invoke(#[MapEntity(id: 'deck_id', message: "This deck doesn't exist.")] Deck $deck): Response
     {
-        /* @var $deck \App\Entity\Deck */
-        $deck = $this->deckRepository->find($deck_id);
-        if (!$deck instanceof \App\Entity\Deck) {
-            throw new NotFoundHttpException("This deck doesn't exist.");
-        }
-
         $is_owner = $this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface && $this->getUser()->getId() == $deck->getUser()->getId();
         if (!$deck->getUser()->getIsShareDecks() && !$is_owner) {
             throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');

@@ -46,7 +46,7 @@ trait TypeFormsTrait
      *
      * @return FormInterface<mixed> The form
      */
-    private function createDeleteForm(int $id): FormInterface
+    private function createDeleteForm(?int $id): FormInterface
     {
         return $this->createFormBuilder()->setAction($this->generateUrl('admin_type_delete', ['id' => $id]))->setMethod('DELETE')->getForm();
     }

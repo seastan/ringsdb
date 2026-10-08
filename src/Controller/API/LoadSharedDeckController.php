@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\API;
 
-use App\Repository\DeckRepository;
+use App\Entity\Deck;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -17,24 +17,17 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class LoadSharedDeckController extends AbstractController
 {
-    public function __construct(
-        private readonly DeckRepository $deckRepository
-    ) {
-    }
-
     /**
      * Return one Deck as JSON, if the owner shares their decks.
      */
     #[Route(path: '/api/oauth2/deck/load/{id}', name: 'api_oauth2_load_deck', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function __invoke(int $id): Response
+    public function __invoke(?Deck $deck): Response
     {
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        $deck = $this->deckRepository->find($id);
-
-        if (!$deck instanceof \App\Entity\Deck) {
+        if (!$deck instanceof Deck) {
             $response->setContent((string) json_encode([
                 'success' => false,
                 'error' => 'Deck not found.',

@@ -289,28 +289,28 @@ class DecklistEditTest extends WebTestCase
 
     /**
      * Refusals are 403 (AccessDeniedHttpException): anonymous users are not redirected to the
-     * login page, unlike on the edit routes.
+     * login page, unlike on the edit routes. An unknown decklist is a 404.
      */
     #[DataProvider('refusedDeleteProvider')]
-    public function testRefusedDelete(?string $username, int $decklist): void
+    public function testRefusedDelete(?string $username, int $decklist, int $status): void
     {
         $client = $username ? $this->createAuthenticatedClient($username) : $this->client;
         $client->request('POST', "/decklist/delete/$decklist");
 
-        $this->assertSame(403, $client->getResponse()->getStatusCode());
+        $this->assertSame($status, $client->getResponse()->getStatusCode());
         $this->assertSame(4, $this->db()->fetchOne('SELECT COUNT(*) FROM decklist'));
     }
 
     /**
-     * @return array<string, string[]|int[]|null[]>
+     * @return array<string, array{?string, int, int}>
      */
     public static function refusedDeleteProvider(): array
     {
         return [
-            'with a comment' => ['test', 1],
-            'of another user' => ['admin', 2],
-            'unknown' => ['test', 999],
-            'anonymous' => [null, 2],
+            'with a comment' => ['test', 1, 403],
+            'of another user' => ['admin', 2, 403],
+            'unknown' => ['test', 999, 404],
+            'anonymous' => [null, 2, 403],
         ];
     }
 

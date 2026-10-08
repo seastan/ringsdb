@@ -6,9 +6,9 @@ namespace App\Controller\Admin\Card;
 
 use App\Controller\Admin\DeleteFormTrait;
 use App\Entity\Card;
-use App\Repository\CardRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,7 +19,6 @@ class ForceDeleteCardController extends AbstractController
     use DeleteFormTrait;
 
     public function __construct(
-        private readonly CardRepository $cardRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly Connection $connection
     ) {
@@ -29,30 +28,18 @@ class ForceDeleteCardController extends AbstractController
      * Forcibly deletes a Card entity and all its deck/decklist slot references.
      */
     #[Route(path: '/admin/card/{id}/force_delete', name: 'admin_card_force_delete', methods: ['POST', 'DELETE'])]
-    public function __invoke(Request $request, int $id): RedirectResponse
+    public function __invoke(Request $request, #[MapEntity(message: 'Unable to find Card entity.')] Card $entity): RedirectResponse
     {
-        $form = $this->createDeleteForm($id);
+        $form = $this->createDeleteForm($entity->getId());
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $entity = $this->cardRepository->find($id);
-            if (!$entity instanceof Card) {
-                throw $this->createNotFoundException('Unable to find Card entity.');
-            }
-
-            $query = 'DELETE FROM deckslot WHERE card_id = '.$id;
-            $this->connection->executeQuery($query, []);
-            $query = 'DELETE FROM decksideslot WHERE card_id = '.$id;
-            $this->connection->executeQuery($query, []);
-            $query = 'DELETE FROM decklistslot WHERE card_id = '.$id;
-            $this->connection->executeQuery($query, []);
-            $query = 'DELETE FROM decklistsideslot WHERE card_id = '.$id;
-            $this->connection->executeQuery($query, []);
-            $query = 'DELETE FROM card_printing WHERE card_id = '.$id;
-            $this->connection->executeQuery($query, []);
-            $query = 'DELETE FROM reviewvote WHERE review_id IN (SELECT id FROM review WHERE card_id = '.$id.')';
-            $this->connection->executeQuery($query, []);
-            $query = 'DELETE FROM review WHERE card_id = '.$id;
-            $this->connection->executeQuery($query, []);
+            $this->connection->executeQuery('DELETE FROM deckslot WHERE card_id = ?', [$entity->getId()]);
+            $this->connection->executeQuery('DELETE FROM decksideslot WHERE card_id = ?', [$entity->getId()]);
+            $this->connection->executeQuery('DELETE FROM decklistslot WHERE card_id = ?', [$entity->getId()]);
+            $this->connection->executeQuery('DELETE FROM decklistsideslot WHERE card_id = ?', [$entity->getId()]);
+            $this->connection->executeQuery('DELETE FROM card_printing WHERE card_id = ?', [$entity->getId()]);
+            $this->connection->executeQuery('DELETE FROM reviewvote WHERE review_id IN (SELECT id FROM review WHERE card_id = ?)', [$entity->getId()]);
+            $this->connection->executeQuery('DELETE FROM review WHERE card_id = ?', [$entity->getId()]);
             $this->entityManager->remove($entity);
             $this->entityManager->flush();
         }

@@ -7,8 +7,8 @@ namespace App\Controller\Admin\Card;
 use App\Controller\Admin\DeleteFormTrait;
 use App\Entity\Card;
 use App\Form\CardType;
-use App\Repository\CardRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -22,7 +22,6 @@ class UpdateCardController extends AbstractController
 
     public function __construct(
         private readonly string $publicDir,
-        private readonly CardRepository $cardRepository,
         private readonly EntityManagerInterface $entityManager
     ) {
     }
@@ -31,15 +30,10 @@ class UpdateCardController extends AbstractController
      * Edits an existing Card entity.
      */
     #[Route(path: '/admin/card/{id}/update', name: 'admin_card_update', methods: ['POST', 'PUT'])]
-    public function __invoke(Request $request, int $id, Packages $packages): Response
+    public function __invoke(Request $request, #[MapEntity(message: 'Unable to find Card entity.')] Card $entity, Packages $packages): Response
     {
-        $entity = $this->cardRepository->find($id);
-        if (!$entity instanceof Card) {
-            throw $this->createNotFoundException('Unable to find Card entity.');
-        }
-
-        $deleteForm = $this->createDeleteForm($id);
-        $forceDeleteForm = $this->createDeleteForm($id);
+        $deleteForm = $this->createDeleteForm($entity->getId());
+        $forceDeleteForm = $this->createDeleteForm($entity->getId());
         $editForm = $this->createForm(CardType::class, $entity, ['method' => 'PUT']);
         $editForm->handleRequest($request);
         if ($editForm->isSubmitted() && $editForm->isValid()) {
@@ -54,7 +48,7 @@ class UpdateCardController extends AbstractController
                 $file->move($imagedirpath, $imagefilename);
             }
 
-            return $this->redirect($this->generateUrl('admin_card_edit', ['id' => $id]));
+            return $this->redirect($this->generateUrl('admin_card_edit', ['id' => $entity->getId()]));
         }
 
         return $this->render('Card/edit.html.twig', ['entity' => $entity, 'edit_form' => $editForm->createView(), 'delete_form' => $deleteForm->createView(), 'force_delete_form' => $forceDeleteForm->createView()]);

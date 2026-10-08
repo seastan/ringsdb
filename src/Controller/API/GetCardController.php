@@ -6,9 +6,8 @@ namespace App\Controller\API;
 
 use App\Entity\Card;
 use App\Model\JsonpDto;
-use App\Repository\CardRepository;
 use App\Services\CardsData;
-use Doctrine\ORM\EntityManager;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,8 +20,7 @@ class GetCardController extends AbstractController
 
     public function __construct(
         private readonly CardsData $cardsData,
-        private readonly int $cacheExpiration,
-        private readonly CardRepository $cardRepository
+        private readonly int $cacheExpiration
     ) {
     }
 
@@ -52,7 +50,7 @@ class GetCardController extends AbstractController
      * )
      */
     #[Route(path: '/api/public/card/{card_code}.{_format}', name: 'api_card', requirements: ['_format' => 'json'], defaults: ['_format' => 'json'], methods: ['GET'])]
-    public function __invoke(Request $request, string $card_code, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
+    public function __invoke(Request $request, #[MapEntity(mapping: ['card_code' => 'code'], message: 'Card not found')] Card $card, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -60,13 +58,6 @@ class GetCardController extends AbstractController
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $query->jsonp;
-        /* @var $em EntityManager */
-        /* @var $card \App\Entity\Card */
-        $card = $this->cardRepository->findOneBy(['code' => $card_code]);
-        if (!$card instanceof Card) {
-            throw $this->createNotFoundException('Card not found');
-        }
-
         // check the last-modified-since header
         $lastModified = $card->getDateUpdate();
         $response->setLastModified($lastModified);
@@ -75,9 +66,7 @@ class GetCardController extends AbstractController
         }
 
         // build the response
-        /* @var $card \App\Entity\Card */
-        $card = $this->cardsData->getCardInfo($card, true);
-        $content = json_encode($card);
+        $content = json_encode($this->cardsData->getCardInfo($card, true));
         $this->setJsonContent($response, (string) $content, $jsonp);
 
         return $response;

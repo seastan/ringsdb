@@ -4,29 +4,18 @@ declare(strict_types=1);
 
 namespace App\Controller\Fellowship;
 
-use App\Repository\FellowshipRepository;
+use App\Entity\Fellowship;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ViewFellowshipController extends AbstractController
 {
-    public function __construct(
-        private readonly FellowshipRepository $fellowshipRepository
-    ) {
-    }
-
     #[Route(path: '/fellowship/view/{fellowship_id}/{fellowship_name}', name: 'fellowship_view', requirements: ['fellowship_id' => '\d+'], defaults: ['fellowship_name' => null], methods: ['GET'])]
-    public function __invoke(int $fellowship_id): Response
+    public function __invoke(#[MapEntity(id: 'fellowship_id', message: 'This fellowship does not exists.')] Fellowship $fellowship): Response
     {
-        /* @var $fellowship \App\Entity\Fellowship */
-        $fellowship = $this->fellowshipRepository->find($fellowship_id);
-        if (!$fellowship instanceof \App\Entity\Fellowship) {
-            throw new NotFoundHttpException('This fellowship does not exists.');
-        }
-
         $is_owner = $this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface && $this->getUser()->getId() == $fellowship->getUser()->getId();
         $is_public = $fellowship->getIsPublic();
         if (!$fellowship->getUser()->getIsShareDecks() && !$is_owner && !$is_public) {
