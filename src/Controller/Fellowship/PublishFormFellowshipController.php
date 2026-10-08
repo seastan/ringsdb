@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Controller\Fellowship;
 
 use App\Entity\Decklist;
+use App\Entity\Fellowship;
 use App\Entity\User;
 use App\Helper\FellowshipValidationHelper;
 use App\Repository\DecklistRepository;
-use App\Repository\FellowshipRepository;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -18,13 +19,12 @@ class PublishFormFellowshipController extends AbstractController
 {
     public function __construct(
         private readonly FellowshipValidationHelper $fellowshipValidationHelper,
-        private readonly DecklistRepository $decklistRepository,
-        private readonly FellowshipRepository $fellowshipRepository
+        private readonly DecklistRepository $decklistRepository
     ) {
     }
 
     #[Route(path: '/fellowship/publish/{fellowship_id}', name: 'fellowship_publish_form', requirements: ['fellowship_id' => '\d+'], methods: ['GET'])]
-    public function __invoke(int $fellowship_id): Response
+    public function __invoke(#[MapEntity(id: 'fellowship_id', message: 'This fellowship does not exists.')] Fellowship $fellowship): Response
     {
         /* @var $user User */
         $user = $this->getUser();
@@ -32,9 +32,7 @@ class PublishFormFellowshipController extends AbstractController
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
 
-        /* @var $fellowship \App\Entity\Fellowship */
-        $fellowship = $this->fellowshipRepository->find($fellowship_id);
-        if (!$fellowship || !$fellowship->getUser()->isEqualTo($user)) {
+        if (!$fellowship->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException("You don't have access to this fellowship.");
         }
 

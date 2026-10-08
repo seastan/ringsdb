@@ -17,7 +17,7 @@ trait DeleteFormTrait
      *
      * @return FormInterface<mixed> The form
      */
-    private function createDeleteForm(int $id): FormInterface
+    private function createDeleteForm(?int $id): FormInterface
     {
         return $this->createFormBuilder(['id' => $id])->add('id', HiddenType::class)->setMethod('DELETE')->getForm();
     }

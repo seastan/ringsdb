@@ -6,8 +6,7 @@ namespace App\Controller\API;
 
 use App\Entity\Scenario;
 use App\Model\JsonpDto;
-use App\Repository\ScenarioRepository;
-use Doctrine\ORM\EntityManager;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -49,7 +48,7 @@ class GetScenarioController extends AbstractController
      * )
      */
     #[Route(path: '/api/public/scenario/{scenario_id}.{_format}', name: 'api_scenario', requirements: ['_format' => 'json', 'scenario_id' => '\d+'], defaults: ['_format' => 'json'], methods: ['GET'])]
-    public function __invoke(Request $request, ScenarioRepository $scenarioRepository, int $scenario_id, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
+    public function __invoke(Request $request, #[MapEntity(id: 'scenario_id', message: 'Scenario not found.')] Scenario $scenario, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -57,13 +56,6 @@ class GetScenarioController extends AbstractController
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
         $jsonp = $query->jsonp;
-        /* @var $em EntityManager */
-        /* @var $scenario \App\Entity\Scenario */
-        $scenario = $scenarioRepository->findOneBy(['id' => $scenario_id]);
-        if (!$scenario instanceof Scenario) {
-            throw $this->createNotFoundException('Scenario not found.');
-        }
-
         // check the last-modified-since header
         $lastModified = $scenario->getDateUpdate();
         $response->setLastModified($lastModified);

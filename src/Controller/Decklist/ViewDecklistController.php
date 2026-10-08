@@ -6,6 +6,7 @@ namespace App\Controller\Decklist;
 
 use App\Entity\Decklist;
 use App\Repository\DecklistRepository;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -22,16 +23,11 @@ class ViewDecklistController extends AbstractController
      * displays the content of a decklist along with comments, siblings, similar, etc..
      */
     #[Route(path: '/decklist/view/{decklist_id}/{decklist_name}', name: 'decklist_detail', requirements: ['decklist_id' => '\d+'], defaults: ['decklist_name' => null], methods: ['GET'])]
-    public function __invoke(int $decklist_id): Response
+    public function __invoke(#[MapEntity(id: 'decklist_id', message: 'Decklist not found.')] Decklist $decklist): Response
     {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
-
-        $decklist = $this->decklistRepository->find($decklist_id);
-        if (!$decklist instanceof Decklist) {
-            throw $this->createNotFoundException('Decklist not found.');
-        }
 
         $duplicate = $this->decklistRepository->findOneBy(['signature' => $decklist->getSignature()]);
         if (!$duplicate || $duplicate->getDateCreation() >= $decklist->getDateCreation() || $duplicate->getId() === $decklist->getId()) {

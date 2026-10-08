@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller\Decklist;
 
+use App\Entity\Deck;
 use App\Helper\DeckValidationHelper;
 use App\Repository\DecklistRepository;
-use App\Repository\DeckRepository;
 use App\Services\DecklistFactory;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -15,7 +16,6 @@ use Symfony\Component\Routing\Attribute\Route;
 class PublishFormDecklistController extends AbstractController
 {
     public function __construct(
-        private readonly DeckRepository $deckRepository,
         private readonly DecklistRepository $decklistRepository,
         private readonly DecklistFactory $decklistFactory,
         private readonly DeckValidationHelper $deckValidationHelper
@@ -27,7 +27,7 @@ class PublishFormDecklistController extends AbstractController
      * If it is, displays the decklist edit form for initial publication of a deck.
      */
     #[Route(path: '/deck/publish/{deck_id}', name: 'deck_publish_form', methods: ['GET'])]
-    public function __invoke(int $deck_id): Response
+    public function __invoke(#[MapEntity(id: 'deck_id', message: "This deck doesn't exist.")] Deck $deck): Response
     {
         /* @var $user \App\Entity\User */
         $user = $this->getUser();
@@ -35,8 +35,7 @@ class PublishFormDecklistController extends AbstractController
             throw $this->createAccessDeniedException('You must be logged in for this operation.');
         }
 
-        $deck = $this->deckRepository->find($deck_id);
-        if (!$deck || !$deck->getUser()->isEqualTo($user)) {
+        if (!$deck->getUser()->isEqualTo($user)) {
             throw $this->createAccessDeniedException("You don't have access to this decklist.");
         }
 

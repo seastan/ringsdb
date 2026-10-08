@@ -10,6 +10,7 @@ use App\Model\SaveDecklistDto;
 use App\Repository\DecklistRepository;
 use App\Services\Texts;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -28,16 +29,11 @@ class SaveDecklistController extends AbstractController
      * save the name and description of a decklist by its publisher.
      */
     #[Route(path: '/decklist/save/{decklist_id}', name: 'decklist_save', requirements: ['decklist_id' => '\d+'], methods: ['POST'])]
-    public function __invoke(int $decklist_id, #[MapRequestPayload] SaveDecklistDto $payload = new SaveDecklistDto()): RedirectResponse
+    public function __invoke(#[MapEntity(id: 'decklist_id', message: 'Decklist not found')] Decklist $decklist, #[MapRequestPayload] SaveDecklistDto $payload = new SaveDecklistDto()): RedirectResponse
     {
         $user = $this->getUser();
         if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw $this->createAccessDeniedException('Anonymous access denied');
-        }
-
-        $decklist = $this->decklistRepository->find($decklist_id);
-        if (!$decklist instanceof Decklist) {
-            throw $this->createNotFoundException('Decklist not found');
         }
 
         if (!$this->isGranted('ROLE_SUPER_ADMIN') && !$decklist->getUser()->isEqualTo($user)) {
@@ -62,7 +58,7 @@ class SaveDecklistController extends AbstractController
             }
         }
 
-        $precedent = $precedent_id && $precedent_id != $decklist_id ? $this->decklistRepository->find($precedent_id) : null;
+        $precedent = $precedent_id && $precedent_id != $decklist->getId() ? $this->decklistRepository->find($precedent_id) : null;
         $decklist->setName($name);
         $decklist->setNameCanonical($this->texts->slugify($name).'-'.$decklist->getVersion());
         $decklist->setDescriptionMd($descriptionMd);
@@ -72,6 +68,6 @@ class SaveDecklistController extends AbstractController
 
         $this->entityManager->flush();
 
-        return $this->redirect($this->generateUrl('decklist_detail', ['decklist_id' => $decklist_id, 'decklist_name' => $decklist->getNameCanonical()]));
+        return $this->redirect($this->generateUrl('decklist_detail', ['decklist_id' => $decklist->getId(), 'decklist_name' => $decklist->getNameCanonical()]));
     }
 }

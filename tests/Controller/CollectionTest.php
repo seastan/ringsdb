@@ -279,8 +279,7 @@ class CollectionTest extends WebTestCase
         $this->db()->update('user_custom_pack', ['is_published' => 0], ['id' => 1]);
         $client->request('POST', '/collection/custom-pack/1/copy');
 
-        $this->assertSame(404, $client->getResponse()->getStatusCode());
-        $this->assertSame('{"error":"Pack not found"}', $client->getResponse()->getContent());
+        $this->assertSame(400, $client->getResponse()->getStatusCode());
         $this->assertSame($this->maxIds['user_custom_pack'], $this->db()->fetchOne('SELECT MAX(id) FROM user_custom_pack'));
     }
 

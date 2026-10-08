@@ -7,9 +7,8 @@ namespace App\Controller\API;
 use App\Entity\Card;
 use App\Entity\Pack;
 use App\Model\JsonpDto;
-use App\Repository\PackRepository;
 use App\Services\CardsData;
-use Doctrine\ORM\EntityManager;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,8 +21,7 @@ class ListCardsByPackController extends AbstractController
 
     public function __construct(
         private readonly CardsData $cardsData,
-        private readonly int $cacheExpiration,
-        private readonly PackRepository $packRepository
+        private readonly int $cacheExpiration
     ) {
     }
 
@@ -53,7 +51,7 @@ class ListCardsByPackController extends AbstractController
      * )
      */
     #[Route(path: '/api/public/cards/{pack_code}.{_format}', name: 'api_cards_pack', requirements: ['_format' => 'json|xml|xlsx|xls'], defaults: ['_format' => 'json'], methods: ['GET'])]
-    public function __invoke(Request $request, string $pack_code, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
+    public function __invoke(Request $request, #[MapEntity(mapping: ['pack_code' => 'code'], message: 'Pack not found')] Pack $pack, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -68,14 +66,7 @@ class ListCardsByPackController extends AbstractController
             return $response;
         }
 
-        /* @var $em EntityManager */
-        /* @var $pack \App\Entity\Pack */
-        $pack = $this->packRepository->findOneBy(['code' => $pack_code]);
-        if (!$pack instanceof Pack) {
-            throw $this->createNotFoundException('Pack not found');
-        }
-
-        $conditions = $this->cardsData->syntax("e:{$pack_code}");
+        $conditions = $this->cardsData->syntax('e:'.$pack->getCode());
         $this->cardsData->validateConditions($conditions);
         $query = $this->cardsData->buildQueryFromConditions($conditions);
         $cards = [];

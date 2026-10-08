@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Collection;
 
 use App\Controller\CurrentUserTrait;
+use App\Entity\UserCustomPack;
 use App\Model\CustomPackDto;
 use App\Services\CustomPackManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,10 +25,9 @@ class UpdateCustomPackController extends AbstractController
     }
 
     #[Route(path: '/collection/custom-pack/{id}/update', name: 'collection_custom_pack_update', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function __invoke(int $id, #[MapRequestPayload] CustomPackDto $payload = new CustomPackDto()): RedirectResponse
+    public function __invoke(UserCustomPack $pack, #[MapRequestPayload] CustomPackDto $payload = new CustomPackDto()): RedirectResponse
     {
-        $pack = $this->customPackManager->loadOwnedPack($this->currentUser(), $id);
-        if (!$pack instanceof \App\Entity\UserCustomPack) {
+        if (!$pack->getUser()->isEqualTo($this->currentUser())) {
             throw $this->createNotFoundException();
         }
 
@@ -35,7 +35,7 @@ class UpdateCustomPackController extends AbstractController
         if ('' === $name) {
             $this->addFlash('error', 'Pack name is required.');
 
-            return $this->redirectToRoute('collection_custom_pack_edit', ['id' => $id]);
+            return $this->redirectToRoute('collection_custom_pack_edit', ['id' => $pack->getId()]);
         }
 
         $cardsJson = $payload->cardsJson;

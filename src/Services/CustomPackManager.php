@@ -2,19 +2,16 @@
 
 namespace App\Services;
 
-use App\Entity\User;
 use App\Entity\UserCustomPack;
 use App\Entity\UserCustomPackCard;
 use App\Repository\CardRepository;
-use App\Repository\UserCustomPackRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CustomPackManager
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly CardRepository $cardRepository,
-        private readonly UserCustomPackRepository $userCustomPackRepository
+        private readonly CardRepository $cardRepository
     ) {
     }
 
@@ -42,15 +39,5 @@ class CustomPackManager
             $pack->addCard($packCard);
             $this->entityManager->persist($packCard);
         }
-    }
-
-    public function loadOwnedPack(User $user, int $id): ?UserCustomPack
-    {
-        $pack = $this->userCustomPackRepository->find($id);
-        if (!$pack || !$pack->getUser()->isEqualTo($user)) {
-            return null;
-        }
-
-        return $pack;
     }
 }

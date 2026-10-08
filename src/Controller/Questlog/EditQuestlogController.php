@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Controller\Questlog;
 
 use App\Controller\CurrentUserTrait;
+use App\Entity\Questlog;
 use App\Entity\Scenario;
 use App\Entity\User;
-use App\Repository\QuestlogRepository;
 use App\Repository\ScenarioRepository;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 class EditQuestlogController extends AbstractController
@@ -20,23 +20,16 @@ class EditQuestlogController extends AbstractController
     use CurrentUserTrait;
 
     public function __construct(
-        private QuestlogRepository $questlogRepository,
         private ScenarioRepository $scenarioRepository
     ) {
     }
 
     #[Route(path: '/questlog/edit/{questlog_id}', name: 'questlog_edit', requirements: ['questlog_id' => '\d+'], methods: ['GET'])]
-    public function __invoke(int $questlog_id): Response
+    public function __invoke(#[MapEntity(id: 'questlog_id', message: 'This questlog does not exists.')] Questlog $questlog): Response
     {
         $response = new Response();
         /* @var $user User */
         $user = $this->currentUser();
-        /* @var $questlog \App\Entity\Questlog */
-        $questlog = $this->questlogRepository->find($questlog_id);
-        if (!$questlog instanceof \App\Entity\Questlog) {
-            throw new NotFoundHttpException('This questlog does not exists.');
-        }
-
         if (!$questlog->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException('Access denied to this object.');
         }

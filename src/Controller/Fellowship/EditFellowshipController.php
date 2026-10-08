@@ -5,35 +5,24 @@ declare(strict_types=1);
 namespace App\Controller\Fellowship;
 
 use App\Controller\CurrentUserTrait;
+use App\Entity\Fellowship;
 use App\Entity\User;
-use App\Repository\FellowshipRepository;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 class EditFellowshipController extends AbstractController
 {
     use CurrentUserTrait;
 
-    public function __construct(
-        private FellowshipRepository $fellowshipRepository
-    ) {
-    }
-
     #[Route(path: '/fellowship/edit/{fellowship_id}', name: 'fellowship_edit', requirements: ['fellowship_id' => '\d+'], methods: ['GET'])]
-    public function __invoke(int $fellowship_id): Response
+    public function __invoke(#[MapEntity(id: 'fellowship_id', message: 'This fellowship does not exists.')] Fellowship $fellowship): Response
     {
         $response = new Response();
         /* @var $user User */
         $user = $this->currentUser();
-        /* @var $fellowship \App\Entity\Fellowship */
-        $fellowship = $this->fellowshipRepository->find($fellowship_id);
-        if (!$fellowship instanceof \App\Entity\Fellowship) {
-            throw new NotFoundHttpException('This fellowship does not exists.');
-        }
-
         if (!$fellowship->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException('Access denied to this object.');
         }

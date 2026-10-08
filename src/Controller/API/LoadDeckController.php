@@ -6,7 +6,6 @@ namespace App\Controller\API;
 
 use App\Entity\Deck;
 use App\Entity\User;
-use App\Repository\DeckRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,19 +14,12 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class LoadDeckController extends AbstractController
 {
-    public function __construct(
-        private readonly DeckRepository $deckRepository
-    ) {
-    }
-
     /*
      * Get the description of one Deck of the authenticated user
      */
     #[Route(path: '/api/private/deck/load/{id}', name: 'api_private_load_deck', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function __invoke(Request $request, int $id): Response
+    public function __invoke(Request $request, ?Deck $deck): Response
     {
-        /* @var $deck \App\Entity\Deck */
-        $deck = $this->deckRepository->find($id);
         if (!$deck instanceof Deck) {
             return new JsonResponse(['success' => false, 'error' => 'This deck does not exists.']);
         }

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Controller\Admin\User;
 
 use App\Entity\User;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Attribute\Route;
@@ -14,20 +14,13 @@ use Symfony\Component\Routing\Attribute\Route;
 class ToggleUserLockedController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly UserRepository $userRepository
+        private readonly EntityManagerInterface $entityManager
     ) {
     }
 
     #[Route(path: '/admin/user/toggle_locked/{user_id}', name: 'admin_user_locked_toggle', methods: ['GET'])]
-    public function __invoke(int $user_id): RedirectResponse
+    public function __invoke(#[MapEntity(id: 'user_id', message: 'User not found')] User $user): RedirectResponse
     {
-        /* @var $user User */
-        $user = $this->userRepository->find($user_id);
-        if (!$user instanceof User) {
-            throw $this->createNotFoundException('User not found');
-        }
-
         $user->setLocked(!$user->isLocked());
         $this->entityManager->flush();
 

@@ -6,8 +6,8 @@ namespace App\Controller\Admin\Encounter;
 
 use App\Controller\Admin\DeleteFormTrait;
 use App\Entity\Encounter;
-use App\Repository\EncounterRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +18,6 @@ class DeleteEncounterController extends AbstractController
     use DeleteFormTrait;
 
     public function __construct(
-        private readonly EncounterRepository $encounterRepository,
         private readonly EntityManagerInterface $entityManager
     ) {
     }
@@ -27,16 +26,11 @@ class DeleteEncounterController extends AbstractController
      * Deletes a Encounter entity.
      */
     #[Route(path: '/admin/encounter/{id}/delete', name: 'admin_encounter_delete', methods: ['POST', 'DELETE'])]
-    public function __invoke(Request $request, int $id): RedirectResponse
+    public function __invoke(Request $request, #[MapEntity(message: 'Unable to find Encounter entity.')] Encounter $entity): RedirectResponse
     {
-        $form = $this->createDeleteForm($id);
+        $form = $this->createDeleteForm($entity->getId());
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $entity = $this->encounterRepository->find($id);
-            if (!$entity instanceof Encounter) {
-                throw $this->createNotFoundException('Unable to find Encounter entity.');
-            }
-
             $this->entityManager->remove($entity);
             $this->entityManager->flush();
         }

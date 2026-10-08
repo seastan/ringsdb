@@ -7,8 +7,8 @@ namespace App\Controller\Admin\Scenario;
 use App\Controller\Admin\DeleteFormTrait;
 use App\Entity\Scenario;
 use App\Form\ScenarioType;
-use App\Repository\ScenarioRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +19,6 @@ class UpdateScenarioController extends AbstractController
     use DeleteFormTrait;
 
     public function __construct(
-        private readonly ScenarioRepository $scenarioRepository,
         private readonly EntityManagerInterface $entityManager
     ) {
     }
@@ -28,14 +27,9 @@ class UpdateScenarioController extends AbstractController
      * Edits an existing Scenario entity.
      */
     #[Route(path: '/admin/scenario/{id}/update', name: 'admin_scenario_update', methods: ['POST', 'PUT'])]
-    public function __invoke(Request $request, int $id): Response
+    public function __invoke(Request $request, #[MapEntity(message: 'Unable to find Scenario entity.')] Scenario $entity): Response
     {
-        $entity = $this->scenarioRepository->find($id);
-        if (!$entity instanceof Scenario) {
-            throw $this->createNotFoundException('Unable to find Scenario entity.');
-        }
-
-        $deleteForm = $this->createDeleteForm($id);
+        $deleteForm = $this->createDeleteForm($entity->getId());
         $editForm = $this->createForm(ScenarioType::class, $entity, ['method' => 'PUT']);
         $editForm->handleRequest($request);
         if ($editForm->isSubmitted() && $editForm->isValid()) {
@@ -44,7 +38,7 @@ class UpdateScenarioController extends AbstractController
             $this->entityManager->persist($entity);
             $this->entityManager->flush();
 
-            return $this->redirect($this->generateUrl('admin_scenario_edit', ['id' => $id]));
+            return $this->redirect($this->generateUrl('admin_scenario_edit', ['id' => $entity->getId()]));
         }
 
         return $this->render('Scenario/edit.html.twig', ['entity' => $entity, 'edit_form' => $editForm->createView(), 'delete_form' => $deleteForm->createView()]);

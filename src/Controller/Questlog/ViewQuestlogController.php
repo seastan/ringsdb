@@ -4,29 +4,18 @@ declare(strict_types=1);
 
 namespace App\Controller\Questlog;
 
-use App\Repository\QuestlogRepository;
+use App\Entity\Questlog;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ViewQuestlogController extends AbstractController
 {
-    public function __construct(
-        private readonly QuestlogRepository $questlogRepository
-    ) {
-    }
-
     #[Route(path: '/questlog/view/{questlog_id}/{questlog_name}', name: 'questlog_view', requirements: ['questlog_id' => '\d+'], defaults: ['questlog_name' => null], methods: ['GET'])]
-    public function __invoke(int $questlog_id): Response
+    public function __invoke(#[MapEntity(id: 'questlog_id', message: 'This questlog does not exists.')] Questlog $questlog): Response
     {
-        /* @var $questlog \App\Entity\Questlog */
-        $questlog = $this->questlogRepository->find($questlog_id);
-        if (!$questlog instanceof \App\Entity\Questlog) {
-            throw new NotFoundHttpException('This questlog does not exists.');
-        }
-
         $is_owner = $this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface && $this->getUser()->getId() == $questlog->getUser()->getId();
         $is_public = $questlog->getIsPublic();
         if (!$questlog->getUser()->getIsShareDecks() && !$is_owner && !$is_public) {
