@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Rector\CodeQuality\Rector\For_\ForRepeatedCountToOwnVariableRector;
 use Rector\Config\RectorConfig;
+use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -26,6 +27,7 @@ return RectorConfig::configure()
         phpunitNarrowAsserts: true,
     )
     ->withSkip([
+        ClassPropertyAssignToConstructorPromotionRector::class,
         ForRepeatedCountToOwnVariableRector::class,
     ])
 ;

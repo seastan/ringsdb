@@ -29,7 +29,8 @@ class DeckSaver
         private readonly EntityManagerInterface $entityManager,
         private readonly Decks $decks,
         private readonly DeckValidationHelper $deckValidationHelper,
-        private readonly Diff $diff
+        private readonly Diff $diff,
+        private readonly CardManager $cardManager,
     ) {
     }
 
@@ -70,7 +71,7 @@ class DeckSaver
         $spheres = [];
 
         foreach ($content['main'] as $card_code => $qty) {
-            $card = $this->decks->findCardByCode((string) $card_code);
+            $card = $this->cardManager->findCardByCode((string) $card_code);
 
             if (!$card instanceof Card) {
                 continue;
@@ -98,7 +99,7 @@ class DeckSaver
         }
 
         foreach ($content['side'] as $card_code => $qty) {
-            $card = $this->decks->findCardByCode((string) $card_code);
+            $card = $this->cardManager->findCardByCode((string) $card_code);
 
             if (!$card instanceof Card) {
                 continue;
