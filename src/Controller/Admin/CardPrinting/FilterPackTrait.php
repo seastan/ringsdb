@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace App\Controller\Admin\CardPrinting;
 
 use App\Entity\Pack;
-use Symfony\Component\HttpFoundation\Request;
+use App\Model\FilterPackDto;
 
 /**
- * The pack the card printing pages are filtered on (query parameter "filter_pack"), read from the
+ * The pack the card printing pages are filtered on (query parameter "filter_pack", see FilterPackDto), read from the
  * PackRepository $packRepository of the controller.
  */
 trait FilterPackTrait
 {
-    private function resolveFilterPack(Request $request): ?Pack
+    private function resolveFilterPack(FilterPackDto $query): ?Pack
     {
-        $id = $request->query->get('filter_pack');
+        $id = $query->filterPack;
         if (!$id) {
             return null;
         }

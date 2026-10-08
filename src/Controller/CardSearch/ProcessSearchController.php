@@ -2,11 +2,12 @@
 
 namespace App\Controller\CardSearch;
 
+use App\Model\ProcessSearchDto;
 use App\Repository\SphereRepository;
 use App\Search\SearchKeys;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ProcessSearchController extends AbstractController
@@ -20,20 +21,20 @@ class ProcessSearchController extends AbstractController
      * Processes the action of the card search form.
      */
     #[Route(path: '/process', name: 'cards_processSearchForm')]
-    public function __invoke(Request $request): RedirectResponse
+    public function __invoke(#[MapQueryString] ProcessSearchDto $query = new ProcessSearchDto()): RedirectResponse
     {
-        $view = $request->query->get('view') ?: 'list';
-        $sort = $request->query->get('sort') ?: 'name';
+        $view = $query->view ?: 'list';
+        $sort = $query->sort ?: 'name';
         $operators = [':', '!', '<', '>'];
         $spheres = $this->sphereRepository->findAll();
         $params = [];
-        if ('' != $request->query->get('q')) {
-            $params[] = $request->query->get('q');
+        if ('' != $query->q) {
+            $params[] = $query->q;
         }
 
         foreach (SearchKeys::$searchKeys as $key => $searchName) {
             if ('sphere' === $searchName) {
-                $val = $request->query->all($key);
+                $val = $query->sphere;
                 if (count($val) > 0 && count($val) < count($spheres)) {
                     $params[] = $key.':'.implode('|', array_map(fn ($s) => str_contains($s, ' ') ? "\"{$s}\"" : $s, $val));
                 }
@@ -41,8 +42,8 @@ class ProcessSearchController extends AbstractController
                 continue;
             }
 
-            $val = $request->query->get($key);
-            if (isset($val) && '' != $val) {
+            $val = $query->value($key);
+            if (isset($val) && '' !== $val) {
                 if ('date_release' == $searchName) {
                     $op = '';
                 } else {
@@ -50,7 +51,7 @@ class ProcessSearchController extends AbstractController
                         $val = "\"{$val}\"";
                     }
 
-                    $op = $request->query->get($key.'o');
+                    $op = $query->operator($key);
                     if (!in_array($op, $operators, true)) {
                         $op = ':';
                     }
@@ -61,11 +62,11 @@ class ProcessSearchController extends AbstractController
         }
 
         $find = ['q' => implode(' ', $params)];
-        if ('name' != $sort) {
+        if ('name' !== $sort) {
             $find['sort'] = $sort;
         }
 
-        if ('list' != $view) {
+        if ('list' !== $view) {
             $find['view'] = $view;
         }
 

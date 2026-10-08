@@ -10,6 +10,7 @@ use App\Entity\Decklist;
 use App\Entity\Fellowship;
 use App\Entity\Questlog;
 use App\Entity\Review;
+use App\Model\UserInfoDto;
 use App\Repository\CardRepository;
 use App\Repository\DecklistRepository;
 use App\Repository\FellowshipRepository;
@@ -17,8 +18,8 @@ use App\Repository\QuestlogRepository;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 class UserInfoController extends AbstractController
@@ -39,13 +40,13 @@ class UserInfoController extends AbstractController
      */
     #[Route(path: '/api/public/user/info', name: 'api_public_user_info')]
     #[Route(path: '/api/private/user/info', name: 'api_private_user_info')]
-    public function __invoke(Request $request, CardRepository $cardRepository, DecklistRepository $decklistRepository, FellowshipRepository $fellowshipRepository, QuestlogRepository $questlogRepository): Response
+    public function __invoke(CardRepository $cardRepository, DecklistRepository $decklistRepository, FellowshipRepository $fellowshipRepository, QuestlogRepository $questlogRepository, #[MapQueryString] UserInfoDto $query = new UserInfoDto()): Response
     {
-        $jsonp = $request->query->get('jsonp');
-        $decklist_id = $request->query->get('decklist_id');
-        $fellowship_id = $request->query->get('fellowship_id');
-        $questlog_id = $request->query->get('questlog_id');
-        $card_id = $request->query->get('card_id');
+        $jsonp = $query->jsonp;
+        $decklist_id = $query->decklistId;
+        $fellowship_id = $query->fellowshipId;
+        $questlog_id = $query->questlogId;
+        $card_id = $query->cardId;
         $content = null;
         if ($this->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $user = $this->currentUser();

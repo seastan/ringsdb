@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Controller\Admin\CardPrinting;
 
 use App\Entity\CardPrinting;
+use App\Model\CardPrintingIndexDto;
 use App\Repository\PackRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 class IndexCardPrintingController extends AbstractController
@@ -21,10 +22,10 @@ class IndexCardPrintingController extends AbstractController
     }
 
     #[Route(path: '/admin/card-printing/', name: 'admin_card_printing')]
-    public function __invoke(Request $request): Response
+    public function __invoke(#[MapQueryString] CardPrintingIndexDto $query = new CardPrintingIndexDto()): Response
     {
-        $packId = $request->query->get('pack');
-        $cardName = $request->query->get('card');
+        $packId = $query->pack;
+        $cardName = $query->card;
         $qb = $this->entityManager
             ->createQueryBuilder()
             ->select('cp', 'c', 'p')

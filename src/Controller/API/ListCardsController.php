@@ -7,6 +7,7 @@ namespace App\Controller\API;
 use App\Entity\Card;
 use App\Entity\CardPrinting;
 use App\Entity\Pack;
+use App\Model\JsonpDto;
 use App\Repository\CardRepository;
 use App\Services\CardsData;
 use Doctrine\ORM\EntityManager;
@@ -14,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ListCardsController extends AbstractController
@@ -41,14 +43,14 @@ class ListCardsController extends AbstractController
      * )
      */
     #[Route(path: '/api/public/cards/', name: 'api_cards', methods: ['GET'])]
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        $jsonp = $request->query->getString('jsonp');
+        $jsonp = $query->jsonp;
         /* @var $em EntityManager */
         /* @var $list_cards \App\Entity\Card[] */
         // Eager-load printings (+ their packs) and the card's pack/type/sphere so

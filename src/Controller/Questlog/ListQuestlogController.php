@@ -6,6 +6,7 @@ namespace App\Controller\Questlog;
 
 use App\Entity\Cycle;
 use App\Helper\StringSanitizer;
+use App\Model\QuestlogSearchDto;
 use App\Repository\CycleRepository;
 use App\Services\QuestLogManager;
 use App\Services\SnapshotManager;
@@ -13,6 +14,7 @@ use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ListQuestlogController extends AbstractController
@@ -27,7 +29,7 @@ class ListQuestlogController extends AbstractController
     }
 
     #[Route(path: '/questlogs/{type}/{page}', name: 'questlogs_list', requirements: ['page' => '\d+'], defaults: ['type' => 'popular', 'page' => 1], methods: ['GET'])]
-    public function __invoke(Request $request, string $type, int $page = 1): Response
+    public function __invoke(Request $request, string $type, int $page = 1, #[MapQueryString] QuestlogSearchDto $query = new QuestlogSearchDto()): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -40,7 +42,7 @@ class ListQuestlogController extends AbstractController
         switch ($type) {
             case 'find':
                 $pagetitle = 'Quest Log search results';
-                $header = $this->searchForm($request);
+                $header = $this->searchForm($query);
                 $this->questlogManager->setUser($this->getUser());
                 $paginator = $this->questlogManager->findQuestLogsWithComplexSearch();
                 break;
@@ -90,15 +92,15 @@ class ListQuestlogController extends AbstractController
         return $this->render('QuestLog/public-questlogs.html.twig', ['pagetitle' => $pagetitle, 'pagedescription' => 'Browse the collection of thousands of premade decks.', 'questlogs' => $paginator, 'url' => $request->getRequestUri(), 'header' => $header, 'type' => $type, 'pages' => $this->questlogManager->getClosePages(), 'prevurl' => $this->questlogManager->getPreviousUrl(), 'nexturl' => $this->questlogManager->getNextUrl()], $response);
     }
 
-    private function searchForm(Request $request): string
+    private function searchForm(QuestlogSearchDto $query): string
     {
-        $cards_code = $request->query->all('cards');
-        $author_name = StringSanitizer::sanitize($request->query->get('author'));
-        $questlog_name = StringSanitizer::sanitize($request->query->get('name'));
-        $scenario = StringSanitizer::sanitize($request->query->get('scenario'));
-        $nb_decks = intval(filter_var($request->query->get('nb_decks'), FILTER_SANITIZE_NUMBER_INT));
-        $sort = $request->query->get('sort');
-        $packs = $request->query->all('packs');
+        $cards_code = $query->cards;
+        $author_name = StringSanitizer::sanitize($query->author);
+        $questlog_name = StringSanitizer::sanitize($query->name);
+        $scenario = StringSanitizer::sanitize($query->scenario);
+        $nb_decks = intval(filter_var($query->nbDecks, FILTER_SANITIZE_NUMBER_INT));
+        $sort = $query->sort;
+        $packs = $query->packs;
         if (0 === count($packs)) {
             $packs = $this->connection->executeQuery('SELECT id FROM pack')->fetchFirstColumn();
         }

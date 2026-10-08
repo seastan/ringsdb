@@ -6,6 +6,7 @@ namespace App\Controller\API;
 
 use App\Entity\Card;
 use App\Entity\Decklist;
+use App\Model\JsonpDto;
 use App\Repository\CardRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
@@ -13,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ListTopDecklistsByCardController extends AbstractController
@@ -52,14 +54,14 @@ class ListTopDecklistsByCardController extends AbstractController
      * )
      */
     #[Route(path: '/api/public/decklists/top_by_card/{card_code}.{_format}', name: 'api_decklists_by_card', requirements: ['_format' => 'json'], defaults: ['_format' => 'json'], methods: ['GET'])]
-    public function __invoke(Request $request, string $card_code): Response
+    public function __invoke(Request $request, string $card_code, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        $jsonp = $request->query->getString('jsonp');
+        $jsonp = $query->jsonp;
         $format = $request->getRequestFormat();
         if ('json' !== $format) {
             $response->setContent($request->getRequestFormat().' format not supported. Only json is supported.');

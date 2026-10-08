@@ -6,10 +6,11 @@ namespace App\Controller\DeckBuilder;
 
 use App\Controller\CurrentUserTrait;
 use App\Entity\User;
+use App\Model\ListDecksDto;
 use App\Services\Decks;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ListDecksController extends AbstractController
@@ -22,12 +23,12 @@ class ListDecksController extends AbstractController
     }
 
     #[Route(path: '/decks', name: 'decks_list', methods: ['GET'])]
-    public function __invoke(Request $request): Response
+    public function __invoke(#[MapQueryString] ListDecksDto $query = new ListDecksDto()): Response
     {
         /* @var $user User */
         $user = $this->currentUser();
         $decksService = $this->decks;
-        $showAll = (bool) $request->query->get('all', false);
+        $showAll = (bool) $query->all;
         $limit = $showAll ? null : 10;
         $totalDecks = $decksService->countDecksForUser($user);
         if (0 === $totalDecks) {

@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Controller\API;
 
 use App\Entity\Pack;
+use App\Model\JsonpDto;
 use App\Repository\PackRepository;
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -36,14 +38,14 @@ class ListPacksController extends AbstractController
      * )
      */
     #[Route(path: '/api/public/packs/', name: 'api_packs', methods: ['GET'])]
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        $jsonp = $request->query->getString('jsonp');
+        $jsonp = $query->jsonp;
         /* @var $em EntityManager */
         /* @var $list_packs \App\Entity\Pack[] */
         $list_packs = $this->packRepository->findBy([], ['dateRelease' => 'ASC', 'position' => 'ASC']);

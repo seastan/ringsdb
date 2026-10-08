@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin\Stat;
 
+use App\Model\StatDto;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 class GetStatCardsController extends AbstractController
@@ -18,18 +19,18 @@ class GetStatCardsController extends AbstractController
     }
 
     #[Route(path: '/admin/stat_cards', name: 'app_stat_cards', methods: ['GET'])]
-    public function __invoke(Request $request): Response
+    public function __invoke(#[MapQueryString] StatDto $query = new StatDto()): Response
     {
         // Per-card stats are too heavy to compute on a request worker (they scan a
         // whole month of decklistslot/deckslot and would saturate the shared
         // php-fpm pool, 504-ing all three sites). They are precomputed off-line into
         // stat_cards_cache by `app:stats:precompute-cards` (cron); here we only read.
-        $month = $request->query->get('month');
+        $month = $query->month;
         if (!$month) {
             $month = date('Y-m', strtotime('first day of last month'));
         }
 
-        $step = $request->query->get('step');
+        $step = $query->step;
         if (!$step) {
             $step = '1';
         }

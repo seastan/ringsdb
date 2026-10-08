@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Controller\Security;
 
+use App\Model\ResettingDto;
 use App\Repository\UserRepository;
 use App\Security\TokenGenerator;
 use App\Security\UserMailer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
@@ -26,13 +27,14 @@ class ResettingSendEmailController extends AbstractController
 
     #[Route(path: '/resetting/send-email', name: 'fos_user_resetting_send_email', methods: ['POST'])]
     public function __invoke(
-        Request $request,
         UserRepository $userRepository,
         TokenGenerator $tokenGenerator,
         UserMailer $mailer,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        #[MapRequestPayload]
+        ResettingDto $payload = new ResettingDto(),
     ): Response {
-        $username = (string) $request->request->get('username');
+        $username = (string) $payload->username;
         $user = $userRepository->findOneByUsernameOrEmail($username);
 
         if ($user instanceof \App\Entity\User && !$user->isPasswordRequestNonExpired(self::RETRY_TTL)) {

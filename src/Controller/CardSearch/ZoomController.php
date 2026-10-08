@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controller\CardSearch;
 
+use App\Model\CardZoomDto;
 use App\Repository\CardRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ZoomController extends AbstractController
@@ -18,14 +20,14 @@ class ZoomController extends AbstractController
     }
 
     #[Route(path: '/card/{card_code}', name: 'cards_zoom')]
-    public function __invoke(Request $request, string $card_code): Response
+    public function __invoke(Request $request, string $card_code, #[MapQueryString] CardZoomDto $query = new CardZoomDto()): Response
     {
         $card = $this->cardRepository->findOneBy(['code' => $card_code]);
         if (!$card instanceof \App\Entity\Card) {
             throw $this->createNotFoundException('Sorry, this card is not in the database (yet?)');
         }
 
-        $selectedPackCode = $request->query->get('pack');
+        $selectedPackCode = $query->pack;
 
         return $this->forward(DisplaySearchController::class, [
             '_route' => $request->attributes->get('_route'),

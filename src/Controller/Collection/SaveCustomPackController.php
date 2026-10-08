@@ -6,11 +6,12 @@ namespace App\Controller\Collection;
 
 use App\Controller\CurrentUserTrait;
 use App\Entity\UserCustomPack;
+use App\Model\CustomPackDto;
 use App\Services\CustomPackManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
 class SaveCustomPackController extends AbstractController
@@ -24,17 +25,17 @@ class SaveCustomPackController extends AbstractController
     }
 
     #[Route(path: '/collection/custom-pack/save', name: 'collection_custom_pack_save', methods: ['POST'])]
-    public function __invoke(Request $request): RedirectResponse
+    public function __invoke(#[MapRequestPayload] CustomPackDto $payload = new CustomPackDto()): RedirectResponse
     {
         $user = $this->currentUser();
-        $name = trim($request->request->getString('name'));
+        $name = trim($payload->name);
         if ('' === $name) {
             $this->addFlash('error', 'Pack name is required.');
 
             return $this->redirectToRoute('collection_custom_pack_new');
         }
 
-        $cardsJson = $request->request->getString('cards_json', '[]');
+        $cardsJson = $payload->cardsJson;
         $cardEntries = json_decode($cardsJson, true);
         if (!is_array($cardEntries)) {
             $cardEntries = [];

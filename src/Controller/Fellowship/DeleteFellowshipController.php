@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Controller\Fellowship;
 
 use App\Entity\User;
+use App\Model\DeleteFellowshipDto;
 use App\Repository\FellowshipRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -22,7 +23,7 @@ class DeleteFellowshipController extends AbstractController
     }
 
     #[Route(path: '/fellowship/delete', name: 'fellowship_delete', methods: ['POST'])]
-    public function __invoke(Request $request): RedirectResponse
+    public function __invoke(#[MapRequestPayload] DeleteFellowshipDto $payload = new DeleteFellowshipDto()): RedirectResponse
     {
         /* @var $user User */
         $user = $this->getUser();
@@ -30,7 +31,7 @@ class DeleteFellowshipController extends AbstractController
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
 
-        $fellowship_id = filter_var($request->request->get('fellowship_id'), FILTER_SANITIZE_NUMBER_INT);
+        $fellowship_id = filter_var($payload->fellowshipId, FILTER_SANITIZE_NUMBER_INT);
         /* @var $fellowship \App\Entity\Fellowship */
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
         if (!$fellowship instanceof \App\Entity\Fellowship) {

@@ -6,11 +6,12 @@ namespace App\Controller\DeckBuilder;
 
 use App\Controller\CurrentUserTrait;
 use App\Exception\TooManyDecksException;
+use App\Model\SaveDeckDto;
 use App\Repository\DeckRepository;
 use App\Services\DeckSaver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AjaxSaveController extends AbstractController
@@ -24,11 +25,11 @@ class AjaxSaveController extends AbstractController
     }
 
     #[Route(path: '/deck/save-ajax', name: 'deck_save_ajax', methods: ['POST'])]
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(#[MapRequestPayload] SaveDeckDto $payload = new SaveDeckDto()): JsonResponse
     {
         $user = $this->currentUser();
 
-        $id = filter_var($request->request->get('id'), FILTER_SANITIZE_NUMBER_INT);
+        $id = filter_var($payload->id, FILTER_SANITIZE_NUMBER_INT);
         $deck = null;
         if ($id) {
             /* @var $deck \App\Entity\Deck */
@@ -38,7 +39,7 @@ class AjaxSaveController extends AbstractController
             }
         }
 
-        $content = json_decode($request->request->getString('content'), true);
+        $content = json_decode($payload->content, true);
         if (!isset($content['main']) || empty($content['main'])) {
             return new JsonResponse(['success' => false, 'error' => 'Cannot save an empty deck.'], 422);
         }
@@ -47,9 +48,9 @@ class AjaxSaveController extends AbstractController
             $deck = $this->deckSaver->save(
                 $user,
                 $content,
-                $request->request->getString('name'),
-                $request->request->getString('description'),
-                $request->request->getString('tags'),
+                $payload->name,
+                $payload->description,
+                $payload->tags,
                 deck: $deck,
                 sourceDeck: $deck,
             );

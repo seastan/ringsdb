@@ -129,7 +129,7 @@ class FellowshipManagerTest extends KernelTestCase
     {
         $container = static::$kernel->getContainer();
         $container->get('request_stack')->push(Request::create('/fellowships/find', 'GET', $query));
-        $manager = $container->get('fellowship_manager');
+        $manager = self::getContainer()->get(FellowshipManager::class);
         if ($username) {
             $manager->setUser($container->get('doctrine')->getRepository(User::class)->findOneBy(['username' => $username]));
         }

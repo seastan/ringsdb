@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin\User;
 
+use App\Model\FindUserDto;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
 class FindUserProcessController extends AbstractController
@@ -18,14 +19,14 @@ class FindUserProcessController extends AbstractController
     }
 
     #[Route(path: '/admin/user/find_process', name: 'admin_find_user_process', methods: ['POST'])]
-    public function __invoke(Request $request): RedirectResponse
+    public function __invoke(#[MapRequestPayload] FindUserDto $payload = new FindUserDto()): RedirectResponse
     {
         $user = null;
-        if ($request->request->get('username')) {
-            $user = $this->userRepository->findOneBy(['username' => $request->request->get('username')]);
+        if ($payload->username) {
+            $user = $this->userRepository->findOneBy(['username' => $payload->username]);
         } else {
-            if ($request->request->get('id')) {
-                $user = $this->userRepository->find($request->request->get('id'));
+            if ($payload->id) {
+                $user = $this->userRepository->find($payload->id);
             }
         }
 

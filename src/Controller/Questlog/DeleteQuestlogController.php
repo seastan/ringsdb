@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Controller\Questlog;
 
 use App\Entity\User;
+use App\Model\DeleteQuestlogDto;
 use App\Repository\QuestlogRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -22,7 +23,7 @@ class DeleteQuestlogController extends AbstractController
     }
 
     #[Route(path: '/questlog/delete', name: 'questlog_delete', methods: ['POST'])]
-    public function __invoke(Request $request): RedirectResponse
+    public function __invoke(#[MapRequestPayload] DeleteQuestlogDto $payload = new DeleteQuestlogDto()): RedirectResponse
     {
         /* @var $user User */
         $user = $this->getUser();
@@ -30,7 +31,7 @@ class DeleteQuestlogController extends AbstractController
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
 
-        $questlog_id = filter_var($request->request->get('questlog_id'), FILTER_SANITIZE_NUMBER_INT);
+        $questlog_id = filter_var($payload->questlogId, FILTER_SANITIZE_NUMBER_INT);
         /* @var $questlog \App\Entity\Questlog */
         $questlog = $this->questlogRepository->find($questlog_id);
         if (!$questlog instanceof \App\Entity\Questlog) {

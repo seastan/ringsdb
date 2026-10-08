@@ -131,7 +131,7 @@ class QuestLogManagerTest extends KernelTestCase
     {
         $container = static::$kernel->getContainer();
         $container->get('request_stack')->push(Request::create('/questlogs/find', 'GET', $query));
-        $manager = $container->get('questlog_manager');
+        $manager = self::getContainer()->get(QuestLogManager::class);
         if ($username) {
             $manager->setUser($this->user($username));
         }

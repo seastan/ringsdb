@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Controller\API;
 
 use App\Entity\Card;
+use App\Model\JsonpDto;
 use App\Repository\CardRepository;
 use App\Services\CardsData;
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 class GetCardController extends AbstractController
@@ -50,14 +52,14 @@ class GetCardController extends AbstractController
      * )
      */
     #[Route(path: '/api/public/card/{card_code}.{_format}', name: 'api_card', requirements: ['_format' => 'json'], defaults: ['_format' => 'json'], methods: ['GET'])]
-    public function __invoke(Request $request, string $card_code): Response
+    public function __invoke(Request $request, string $card_code, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
         $response->headers->add(['Access-Control-Allow-Origin' => '*']);
 
-        $jsonp = $request->query->getString('jsonp');
+        $jsonp = $query->jsonp;
         /* @var $em EntityManager */
         /* @var $card \App\Entity\Card */
         $card = $this->cardRepository->findOneBy(['code' => $card_code]);

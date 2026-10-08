@@ -7,13 +7,14 @@ namespace App\Controller\Decklist;
 use App\Controller\CurrentUserTrait;
 use App\Entity\Deck;
 use App\Helper\StringSanitizer;
+use App\Model\CreateDecklistDto;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use App\Services\DecklistFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -33,12 +34,12 @@ class CreateDecklistController extends AbstractController
      * creates a new decklist from a deck (publish action).
      */
     #[Route(path: '/decklist/create', name: 'decklist_create', methods: ['POST'])]
-    public function __invoke(Request $request): Response
+    public function __invoke(#[MapRequestPayload] CreateDecklistDto $payload = new CreateDecklistDto()): Response
     {
         /* @var $user \App\Entity\User */
         $user = $this->currentUser();
 
-        $deck_id = intval(filter_var($request->request->get('deck_id'), FILTER_SANITIZE_NUMBER_INT));
+        $deck_id = intval(filter_var($payload->deckId, FILTER_SANITIZE_NUMBER_INT));
         /* @var $deck \App\Entity\Deck */
         $deck = $this->deckRepository->find($deck_id);
         if (!$deck instanceof Deck) {
@@ -49,9 +50,9 @@ class CreateDecklistController extends AbstractController
             throw $this->createAccessDeniedException('Access denied to this object.');
         }
 
-        $name = StringSanitizer::sanitize($request->request->get('name'), false);
-        $descriptionMd = trim((string) $request->request->get('descriptionMd'));
-        $precedent_id = trim((string) $request->request->get('precedent'));
+        $name = StringSanitizer::sanitize($payload->name, false);
+        $descriptionMd = trim((string) $payload->descriptionMd);
+        $precedent_id = trim((string) $payload->precedent);
         if (!preg_match('/^\\d+$/', $precedent_id)) {
             // route decklist_detail hard-coded
             if (preg_match('/view\\/(\\d+)/', $precedent_id, $matches)) {

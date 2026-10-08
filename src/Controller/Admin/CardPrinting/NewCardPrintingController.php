@@ -7,10 +7,11 @@ namespace App\Controller\Admin\CardPrinting;
 use App\Entity\CardPrinting;
 use App\Entity\Pack;
 use App\Form\CardPrintingType;
+use App\Model\FilterPackDto;
 use App\Repository\PackRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 class NewCardPrintingController extends AbstractController
@@ -23,9 +24,9 @@ class NewCardPrintingController extends AbstractController
     }
 
     #[Route(path: '/admin/card-printing/new', name: 'admin_card_printing_new')]
-    public function __invoke(Request $request): Response
+    public function __invoke(#[MapQueryString] FilterPackDto $query = new FilterPackDto()): Response
     {
-        $filterPack = $this->resolveFilterPack($request);
+        $filterPack = $this->resolveFilterPack($query);
         $entity = new CardPrinting();
         $form = $this->createForm(CardPrintingType::class, $entity, ['filter_pack' => $filterPack]);
 

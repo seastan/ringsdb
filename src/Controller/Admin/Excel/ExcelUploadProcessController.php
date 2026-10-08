@@ -7,13 +7,15 @@ namespace App\Controller\Admin\Excel;
 use App\Entity\Card;
 use App\Entity\Sphere;
 use App\Entity\Type;
+use App\Model\ExcelUploadDto;
 use App\Repository\CardRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Attribute\MapUploadedFile;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ExcelUploadProcessController extends AbstractController
@@ -25,17 +27,15 @@ class ExcelUploadProcessController extends AbstractController
     }
 
     #[Route(path: '/admin/excel/upload', name: 'excel_upload_process', methods: ['POST'])]
-    public function __invoke(Request $request): Response
+    public function __invoke(#[MapUploadedFile] UploadedFile $upfile, #[MapRequestPayload] ExcelUploadDto $payload = new ExcelUploadDto()): Response
     {
-        /* @var $uploadedFile UploadedFile */
-        $uploadedFile = $request->files->get('upfile');
-        $inputFileName = $uploadedFile->getPathname();
+        $inputFileName = $upfile->getPathname();
         $objReader = IOFactory::createReaderForFile($inputFileName);
         $objReader->setReadDataOnly(true);
 
         $spreadsheet = $objReader->load($inputFileName);
         $objWorksheet = $spreadsheet->getActiveSheet();
-        $enableCardCreation = $request->request->has('create');
+        $enableCardCreation = null !== $payload->create;
         // analysis of first row
         $colNames = [];
         $cards = [];
