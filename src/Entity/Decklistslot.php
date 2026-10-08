@@ -19,16 +19,22 @@ class Decklistslot implements SlotInterface
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
-    public function __construct(
-        #[ORM\ManyToOne(targetEntity: Decklist::class, inversedBy: 'slots')]
-        #[ORM\JoinColumn(name: 'decklist_id', referencedColumnName: 'id', nullable: false)]
-        private Decklist $decklist,
-        #[ORM\ManyToOne(targetEntity: Card::class)]
-        #[ORM\JoinColumn(name: 'card_id', referencedColumnName: 'id', nullable: false)]
-        private Card $card,
-        #[ORM\Column(type: 'smallint')]
-        private int $quantity
-    ) {
+    #[ORM\Column(type: 'smallint')]
+    private int $quantity;
+
+    #[ORM\ManyToOne(targetEntity: Decklist::class, inversedBy: 'slots')]
+    #[ORM\JoinColumn(name: 'decklist_id', referencedColumnName: 'id', nullable: false)]
+    private Decklist $decklist;
+
+    #[ORM\ManyToOne(targetEntity: Card::class)]
+    #[ORM\JoinColumn(name: 'card_id', referencedColumnName: 'id', nullable: false)]
+    private Card $card;
+
+    public function __construct(Decklist $decklist, Card $card, int $quantity)
+    {
+        $this->decklist = $decklist;
+        $this->card = $card;
+        $this->quantity = $quantity;
     }
 
     /**

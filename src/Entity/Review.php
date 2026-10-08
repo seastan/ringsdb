@@ -44,6 +44,12 @@ class Review
     #[ORM\Column(name: 'date_last_comment', type: 'datetime', nullable: true)]
     private $dateLastComment;
 
+    #[ORM\Column(name: 'text_md', type: 'text', nullable: false)]
+    private string $textMd;
+
+    #[ORM\Column(name: 'text_html', type: 'text', nullable: false)]
+    private string $textHtml;
+
     #[ORM\Column(name: 'nb_votes', type: 'smallint', nullable: false)]
     private int $nbVotes;
 
@@ -52,6 +58,14 @@ class Review
      */
     #[ORM\OneToMany(mappedBy: 'review', targetEntity: Reviewcomment::class, cascade: ['persist'])]
     private $comments;
+
+    #[ORM\ManyToOne(targetEntity: Card::class, inversedBy: 'reviews')]
+    #[ORM\JoinColumn(name: 'card_id', referencedColumnName: 'id', nullable: false)]
+    private Card $card;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'reviews')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    private User $user;
 
     /**
      * @var Collection<int, User>
@@ -63,18 +77,12 @@ class Review
     /**
      * Constructor.
      */
-    public function __construct(
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'reviews')]
-        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
-        private User $user,
-        #[ORM\ManyToOne(targetEntity: Card::class, inversedBy: 'reviews')]
-        #[ORM\JoinColumn(name: 'card_id', referencedColumnName: 'id', nullable: false)]
-        private Card $card,
-        #[ORM\Column(name: 'text_md', type: 'text', nullable: false)]
-        private string $textMd,
-        #[ORM\Column(name: 'text_html', type: 'text', nullable: false)]
-        private string $textHtml
-    ) {
+    public function __construct(User $user, Card $card, string $textMd, string $textHtml)
+    {
+        $this->user = $user;
+        $this->card = $card;
+        $this->textMd = $textMd;
+        $this->textHtml = $textHtml;
         $this->nbVotes = 0;
         $this->comments = new ArrayCollection();
         $this->votes = new ArrayCollection();
