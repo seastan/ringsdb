@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Controller\API;
 
 use App\Repository\UserCustomPackRepository;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[OA\Tag(name: 'Custom Pack')]
 class ListPublishedCustomPacksController extends AbstractController
 {
     public function __construct(
@@ -16,6 +18,11 @@ class ListPublishedCustomPacksController extends AbstractController
     ) {
     }
 
+    /**
+     * All the Published Custom Packs.
+     *
+     * Get the custom packs published by the users, with their cards, as an array of JSON objects.
+     */
     #[Route(path: '/api/public/custom-packs/published', name: 'api_public_custom_packs_published', methods: ['GET'])]
     public function __invoke(): JsonResponse
     {

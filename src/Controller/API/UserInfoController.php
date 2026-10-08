@@ -39,7 +39,7 @@ class UserInfoController extends AbstractController
      * anonymous visitors. (api_private_user_info is kept for the API tests.).
      */
     #[Route(path: '/api/public/user/info', name: 'api_public_user_info')]
-    #[Route(path: '/api/private/user/info', name: 'api_private_user_info')]
+    #[Route(path: '/api/private/user/info', name: 'api_private_user_info', methods: ['GET'])]
     public function __invoke(CardRepository $cardRepository, DecklistRepository $decklistRepository, FellowshipRepository $fellowshipRepository, QuestlogRepository $questlogRepository, #[MapQueryString] UserInfoDto $query = new UserInfoDto()): Response
     {
         $jsonp = $query->jsonp;

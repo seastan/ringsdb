@@ -6,12 +6,14 @@ namespace App\Controller\API;
 
 use App\Model\JsonpDto;
 use App\Services\CardsData;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[OA\Tag(name: 'Card')]
 class SearchCardsController extends AbstractController
 {
     use JsonpTrait;
@@ -22,6 +24,12 @@ class SearchCardsController extends AbstractController
     ) {
     }
 
+    /**
+     * Search Cards.
+     *
+     * Get the description of the cards matching a search query, as an array of JSON objects.
+     */
+    #[OA\Parameter(name: 'q', in: 'path', description: "The search query, in the syntax of the card search, see the About page, e.g. 'e:Core s:leadership'")]
     #[Route(path: '/api/public/cards/search/{q}', name: 'api_cards_search', methods: ['GET'])]
     public function __invoke(Request $request, string $q, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {

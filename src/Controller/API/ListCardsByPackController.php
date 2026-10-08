@@ -8,6 +8,7 @@ use App\Entity\Card;
 use App\Entity\Pack;
 use App\Model\JsonpDto;
 use App\Services\CardsData;
+use OpenApi\Attributes as OA;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[OA\Tag(name: 'Card')]
 class ListCardsByPackController extends AbstractController
 {
     use JsonpTrait;
@@ -26,30 +28,11 @@ class ListCardsByPackController extends AbstractController
     }
 
     /**
-     * Get the description of all the card from a pack, as an array of JSON objects.
+     * All the Cards from One Pack.
      *
-     * ApiDoc(
-     *  section="Card",
-     *  resource=true,
-     *  description="All the Cards from One Pack",
-     *  parameters={
-     *      {"name"="jsonp", "dataType"="string", "required"=false, "description"="JSONP callback"}
-     *  },
-     *  requirements={
-     *      {
-     *          "name"="pack_code",
-     *          "dataType"="string",
-     *          "description"="The code of the pack to get the cards from, e.g. 'core'"
-     *      },
-     *      {
-     *          "name"="_format",
-     *          "dataType"="string",
-     *          "requirement"="json|xml|xlsx|xls",
-     *          "description"="The format of the returned data. Only 'json' is supported at the moment."
-     *      }
-     *  },
-     * )
+     * Get the description of all the card from a pack, as an array of JSON objects.
      */
+    #[OA\Parameter(name: 'pack_code', in: 'path', description: "The code of the pack to get the cards from, e.g. 'Core'")]
     #[Route(path: '/api/public/cards/{pack_code}.{_format}', name: 'api_cards_pack', requirements: ['_format' => 'json|xml|xlsx|xls'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function __invoke(Request $request, #[MapEntity(mapping: ['pack_code' => 'code'], message: 'Pack not found')] Pack $pack, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {

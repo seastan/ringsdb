@@ -9,6 +9,7 @@ use App\Entity\Decklist;
 use App\Model\JsonpDto;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use OpenApi\Attributes as OA;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[OA\Tag(name: 'Decklist')]
 class ListTopDecklistsByCardController extends AbstractController
 {
     use JsonpTrait;
@@ -27,30 +29,11 @@ class ListTopDecklistsByCardController extends AbstractController
     }
 
     /**
-     * Get the top 10 decklists published containing given card, as an array of JSON objects.
+     * Top 10 Decklists containing a specific card.
      *
-     * ApiDoc(
-     *  section="Decklist",
-     *  resource=true,
-     *  description="Top 10 Decklists containing a specific card",
-     *  parameters={
-     *      {"name"="jsonp", "dataType"="string", "required"=false, "description"="JSONP callback"}
-     *  },
-     *  requirements={
-     *      {
-     *          "name"="card_code",
-     *          "dataType"="string",
-     *          "description"="The code of the card to get, e.g. '01001'"
-     *      },
-     *      {
-     *          "name"="_format",
-     *          "dataType"="string",
-     *          "requirement"="json",
-     *          "description"="The format of the returned data. Only 'json' is supported at the moment."
-     *      }
-     *  },
-     * )
+     * Get the top 10 decklists published containing given card, as an array of JSON objects.
      */
+    #[OA\Parameter(name: 'card_code', in: 'path', description: "The code of the card, e.g. '01001'")]
     #[Route(path: '/api/public/decklists/top_by_card/{card_code}.{_format}', name: 'api_decklists_by_card', requirements: ['_format' => 'json'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function __invoke(Request $request, #[MapEntity(mapping: ['card_code' => 'code'])] ?Card $card, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {
