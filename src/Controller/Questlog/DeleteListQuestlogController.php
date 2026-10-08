@@ -35,7 +35,7 @@ class DeleteListQuestlogController extends AbstractController
         foreach ($list_id as $id) {
             /* @var $questlog \App\Entity\Questlog */
             $questlog = $this->questlogRepository->find($id);
-            if (!$questlog) {
+            if (!$questlog instanceof \App\Entity\Questlog) {
                 continue;
             }
 

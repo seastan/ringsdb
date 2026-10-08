@@ -51,7 +51,7 @@ class SaveQuestlogController extends AbstractController
         if ($questlog_id) {
             /* @var $questlog \App\Entity\Questlog */
             $questlog = $this->questlogRepository->find($questlog_id);
-            if (!$questlog) {
+            if (!$questlog instanceof Questlog) {
                 throw new NotFoundHttpException('This questlog does not exist.');
             }
 
@@ -84,7 +84,7 @@ class SaveQuestlogController extends AbstractController
         $difficulty = in_array($difficulty, ['normal', 'easy', 'nightmare'], true) ? $difficulty : 'normal';
         /* @var $scenario Scenario */
         $scenario = $this->scenarioRepository->find($quest);
-        if (!$scenario) {
+        if (!$scenario instanceof Scenario) {
             throw new NotFoundHttpException('This scenario does not exists.');
         }
 
@@ -124,7 +124,7 @@ class SaveQuestlogController extends AbstractController
                     if (!$is_decklist) {
                         /* @var $deck \App\Entity\Deck */
                         $deck = $this->deckRepository->find($deck_id);
-                        if (!$deck) {
+                        if (!$deck instanceof Deck) {
                             throw new NotFoundHttpException('One of the selected decks does not exist.');
                         }
 
@@ -151,7 +151,7 @@ class SaveQuestlogController extends AbstractController
                     } else {
                         /* @var $decklist Decklist */
                         $decklist = $this->decklistRepository->find($deck_id);
-                        if (!$decklist) {
+                        if (!$decklist instanceof Decklist) {
                             throw new NotFoundHttpException('One of the selected decks does not exist.');
                         }
 

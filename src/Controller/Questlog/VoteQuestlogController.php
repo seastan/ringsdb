@@ -36,7 +36,7 @@ class VoteQuestlogController extends AbstractController
         $questlog_id = filter_var($request->request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $questlog \App\Entity\QuestLog */
         $questlog = $this->questlogRepository->find($questlog_id);
-        if (!$questlog) {
+        if (!$questlog instanceof \App\Entity\Questlog) {
             throw new BadRequestHttpException('Unable to find quest log');
         }
 

@@ -179,7 +179,7 @@ class DecklistSocialTest extends WebTestCase
         $response = $this->post($client, $action, 2);
 
         $this->assertSame(403, $response->getStatusCode());
-        $this->assertSame(['success' => false, 'message' => 'Access Denied. The user doesn\'t have ROLE_USER.'], json_decode($response->getContent(), true));
+        $this->assertSame(['success' => false, 'message' => "Access Denied. The user doesn't have ROLE_USER."], json_decode($response->getContent(), true));
         $this->assertSame(['nb_favorites' => 0, 'nb_votes' => 0, 'favorites' => 0, 'votes' => 0, 'author_reputation' => 1], $this->state());
     }
 

@@ -203,7 +203,7 @@ class ApiPrivateControllerTest extends WebTestCase
 
         $this->assertSame(403, $response->getStatusCode());
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
-        $this->assertSame(['success' => false, 'message' => 'Access Denied. The user doesn\'t have ROLE_USER.'], json_decode($response->getContent(), true));
+        $this->assertSame(['success' => false, 'message' => "Access Denied. The user doesn't have ROLE_USER."], json_decode($response->getContent(), true));
     }
 
     #[DataProvider('privateUriProvider')]

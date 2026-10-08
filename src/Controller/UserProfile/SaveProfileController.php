@@ -32,7 +32,7 @@ class SaveProfileController extends AbstractController
         $username = StringSanitizer::sanitize($request->request->get('username'));
         if ($username !== $user->getUsername()) {
             $user_existing = $this->userRepository->findOneBy(['username' => $username]);
-            if ($user_existing) {
+            if ($user_existing instanceof \App\Entity\User) {
                 $this->addFlash('error', "Username {$username} is already taken.");
 
                 return $this->redirect($this->generateUrl('user_profile_edit'));

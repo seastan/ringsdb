@@ -35,7 +35,7 @@ class EditReviewController extends AbstractController
         $review_id = filter_var($request->request->get('review_id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $review Review */
         $review = $this->reviewRepository->find($review_id);
-        if (!$review) {
+        if (!$review instanceof Review) {
             throw new BadRequestHttpException('Unable to find review.');
         }
 

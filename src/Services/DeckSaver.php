@@ -25,9 +25,9 @@ class DeckSaver
     /**
      * The name, description and tags are user input, sanitized here.
      *
-     * @param Deck|null $deck       the deck to update, or null for a new deck
-     * @param Deck|null $sourceDeck the deck the changes are computed from (the edited deck, or the
-     *                              original of a copy)
+     * @param Deck|null                                                         $deck       the deck to update, or null for a new deck
+     * @param Deck|null                                                         $sourceDeck the deck the changes are computed from (the edited deck, or the
+     *                                                                                      original of a copy)
      * @param array{main: array<int|string, int>, side: array<int|string, int>} $content
      *
      * @throws TooManyDecksException

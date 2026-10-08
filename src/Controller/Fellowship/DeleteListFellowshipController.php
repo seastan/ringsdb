@@ -35,7 +35,7 @@ class DeleteListFellowshipController extends AbstractController
         foreach ($list_id as $id) {
             /* @var $fellowship \App\Entity\Fellowship */
             $fellowship = $this->fellowshipRepository->find($id);
-            if (!$fellowship) {
+            if (!$fellowship instanceof \App\Entity\Fellowship) {
                 continue;
             }
 

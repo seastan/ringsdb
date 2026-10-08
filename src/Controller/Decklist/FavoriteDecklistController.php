@@ -38,7 +38,7 @@ class FavoriteDecklistController extends AbstractController
         $decklist_id = filter_var($request->request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $decklist \App\Entity\Decklist */
         $decklist = $this->decklistRepository->find($decklist_id);
-        if (!$decklist) {
+        if (!$decklist instanceof Decklist) {
             throw new NotFoundHttpException('Wrong id');
         }
 
