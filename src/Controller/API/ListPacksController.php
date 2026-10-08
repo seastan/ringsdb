@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controller\API;
 
-use App\Entity\Pack;
 use App\Model\JsonpDto;
 use App\Repository\PackRepository;
 use Doctrine\ORM\EntityManager;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+#[OA\Tag(name: 'Pack')]
 class ListPacksController extends AbstractController
 {
     use JsonpTrait;
@@ -26,16 +27,9 @@ class ListPacksController extends AbstractController
     }
 
     /**
-     * Get the description of all the packs as an array of JSON objects.
+     * All the Packs.
      *
-     * ApiDoc(
-     *  section="Pack",
-     *  resource=true,
-     *  description="All the Packs",
-     *  parameters={
-     *    {"name"="jsonp", "dataType"="string", "required"=false, "description"="JSONP callback"}
-     *  },
-     * )
+     * Get the description of all the packs as an array of JSON objects.
      */
     #[Route(path: '/api/public/packs/', name: 'api_packs', methods: ['GET'])]
     public function __invoke(Request $request, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response

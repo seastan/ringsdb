@@ -7,6 +7,7 @@ namespace App\Controller\API;
 use App\Entity\Card;
 use App\Model\JsonpDto;
 use App\Services\CardsData;
+use OpenApi\Attributes as OA;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[OA\Tag(name: 'Card')]
 class GetCardController extends AbstractController
 {
     use JsonpTrait;
@@ -25,30 +27,11 @@ class GetCardController extends AbstractController
     }
 
     /**
-     * Get the description of a card as a JSON object.
+     * One Card.
      *
-     * ApiDoc(
-     *  section="Card",
-     *  resource=true,
-     *  description="One Card",
-     *  parameters={
-     *      {"name"="jsonp", "dataType"="string", "required"=false, "description"="JSONP callback"}
-     *  },
-     *  requirements={
-     *      {
-     *          "name"="card_code",
-     *          "dataType"="string",
-     *          "description"="The code of the card to get, e.g. '01001'"
-     *      },
-     *      {
-     *          "name"="_format",
-     *          "dataType"="string",
-     *          "requirement"="json",
-     *          "description"="The format of the returned data. Only 'json' is supported at the moment."
-     *      }
-     *  },
-     * )
+     * Get the description of a card as a JSON object.
      */
+    #[OA\Parameter(name: 'card_code', in: 'path', description: "The code of the card to get, e.g. '01001'")]
     #[Route(path: '/api/public/card/{card_code}.{_format}', name: 'api_card', requirements: ['_format' => 'json'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function __invoke(Request $request, #[MapEntity(mapping: ['card_code' => 'code'], message: 'Card not found')] Card $card, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {

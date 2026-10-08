@@ -5,19 +5,20 @@ declare(strict_types=1);
 namespace App\Controller\API;
 
 use App\Entity\Card;
-use App\Entity\Decklist;
 use App\Entity\Pack;
 use App\Model\JsonpDto;
 use App\Repository\CardRepository;
 use App\Repository\DecklistRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManager;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[OA\Tag(name: 'Decklist')]
 class ListDecklistsByDateController extends AbstractController
 {
     use JsonpTrait;
@@ -30,31 +31,11 @@ class ListDecklistsByDateController extends AbstractController
     }
 
     /**
-     * Get the description of all the decklists published at a given date, as an array of JSON objects.
+     * All the Decklists from One Day.
      *
-     * ApiDoc(
-     *  section="Decklist",
-     *  resource=true,
-     *  description="All the Decklists from One Day",
-     *  parameters={
-     *      {"name"="jsonp", "dataType"="string", "required"=false, "description"="JSONP callback"}
-     *  },
-     *  requirements={
-     *      {
-     *          "name"="date",
-     *          "dataType"="string",
-     *          "requirement"="\d\d\d\d-\d\d-\d\d",
-     *          "description"="The date, format 'Y-m-d'"
-     *      },
-     *      {
-     *          "name"="_format",
-     *          "dataType"="string",
-     *          "requirement"="json",
-     *          "description"="The format of the returned data. Only 'json' is supported at the moment."
-     *      }
-     *  },
-     * )
+     * Get the description of all the decklists published at a given date, as an array of JSON objects.
      */
+    #[OA\Parameter(name: 'date', in: 'path', description: "The date, format 'Y-m-d'", schema: new OA\Schema(type: 'string', format: 'date'))]
     #[Route(path: '/api/public/decklists/by_date/{date}.{_format}', name: 'api_decklists_by_date', requirements: ['_format' => 'json', 'date' => '\d\d\d\d-\d\d-\d\d'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function __invoke(Request $request, UserRepository $userRepository, string $date, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {

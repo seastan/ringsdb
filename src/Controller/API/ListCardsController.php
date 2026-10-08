@@ -12,12 +12,14 @@ use App\Repository\CardRepository;
 use App\Services\CardsData;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[OA\Tag(name: 'Card')]
 class ListCardsController extends AbstractController
 {
     use JsonpTrait;
@@ -31,16 +33,12 @@ class ListCardsController extends AbstractController
     }
 
     /**
+     * All the Cards.
+     *
      * Get the description of all the cards as an array of JSON objects.
      *
-     * ApiDoc(
-     *  section="Card",
-     *  resource=true,
-     *  description="All the Cards. Each card keeps pack_code/pack_name (its primary printing) plus a packs[] array listing every pack it appears in (pack_code, pack_name, position, quantity, image_code, illustrator, octgnid, imagesrc).",
-     *  parameters={
-     *      {"name"="jsonp", "dataType"="string", "required"=false, "description"="JSONP callback"}
-     *  },
-     * )
+     * Each card keeps pack_code/pack_name (its primary printing) plus a packs[] array listing every pack it
+     * appears in (pack_code, pack_name, position, quantity, image_code, illustrator, octgnid, imagesrc).
      */
     #[Route(path: '/api/public/cards/', name: 'api_cards', methods: ['GET'])]
     public function __invoke(Request $request, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
