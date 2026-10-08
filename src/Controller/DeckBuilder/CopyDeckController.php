@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controller\DeckBuilder;
 
+use App\Controller\CurrentUserTrait;
 use App\Entity\Decklist;
 use App\Repository\DecklistRepository;
+use App\Services\DeckSaver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -13,8 +15,11 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class CopyDeckController extends AbstractController
 {
+    use CurrentUserTrait;
+
     public function __construct(
-        private readonly DecklistRepository $decklistRepository
+        private readonly DecklistRepository $decklistRepository,
+        private readonly DeckSaver $deckSaver
     ) {
     }
 
@@ -36,6 +41,8 @@ class CopyDeckController extends AbstractController
             $content['side'][$slot->getCard()->getCode()] = $slot->getQuantity();
         }
 
-        return $this->forward(SaveDeckController::class, ['name' => $decklist->getName(), 'content' => json_encode($content), 'decklist_id' => $decklist_id]);
+        $this->deckSaver->save($this->currentUser(), null, null, $content, $decklist->getName(), decklistId: $decklist_id);
+
+        return $this->redirectToRoute('decks_list');
     }
 }

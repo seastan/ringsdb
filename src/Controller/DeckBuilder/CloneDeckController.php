@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controller\DeckBuilder;
 
+use App\Controller\CurrentUserTrait;
 use App\Repository\DeckRepository;
+use App\Services\DeckSaver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -13,8 +15,11 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class CloneDeckController extends AbstractController
 {
+    use CurrentUserTrait;
+
     public function __construct(
-        private readonly DeckRepository $deckRepository
+        private readonly DeckRepository $deckRepository,
+        private readonly DeckSaver $deckSaver
     ) {
     }
 
@@ -41,6 +46,8 @@ class CloneDeckController extends AbstractController
             $content['side'][$slot->getCard()->getCode()] = $slot->getQuantity();
         }
 
-        return $this->forward(SaveDeckController::class, ['name' => $deck->getName().' (clone)', 'content' => json_encode($content), 'decklist_id' => $deck->getParent() ? $deck->getParent()->getId() : null]);
+        $this->deckSaver->save($this->currentUser(), null, null, $content, $deck->getName().' (clone)', decklistId: $deck->getParent()?->getId());
+
+        return $this->redirectToRoute('decks_list');
     }
 }

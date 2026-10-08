@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controller\DeckBuilder;
 
+use App\Controller\CurrentUserTrait;
 use App\Helper\StringSanitizer;
 use App\Services\DeckImporter;
+use App\Services\DeckSaver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,8 +16,11 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class FileImportDeckController extends AbstractController
 {
+    use CurrentUserTrait;
+
     public function __construct(
-        private readonly DeckImporter $deckImporter
+        private readonly DeckImporter $deckImporter,
+        private readonly DeckSaver $deckSaver
     ) {
     }
 
@@ -53,6 +58,8 @@ class FileImportDeckController extends AbstractController
             $parse = $this->deckImporter->parseTextImport($contents);
         }
 
-        return $this->forward(SaveDeckController::class, ['name' => str_replace(".{$origext}", '', $origname), 'content' => json_encode($parse['content']), 'description' => $parse['description']]);
+        $this->deckSaver->save($this->currentUser(), null, null, $parse['content'], str_replace(".{$origext}", '', $origname), $parse['description']);
+
+        return $this->redirectToRoute('decks_list');
     }
 }
