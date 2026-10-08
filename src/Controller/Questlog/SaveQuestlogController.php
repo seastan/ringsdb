@@ -117,9 +117,9 @@ class SaveQuestlogController extends AbstractController
             $skip = 0;
             for ($i = 1; $i <= 4; ++$i) {
                 $deck_id = intval(filter_var($request->request->get('deck'.$i.'_id'), FILTER_SANITIZE_NUMBER_INT));
-                $is_decklist = 'true' === StringSanitizer::sanitize($request->get('deck'.$i.'_is_decklist'));
-                $player = trim(StringSanitizer::sanitize($request->get('questlogdeck'.$i.'_player_name'), false));
-                $content = (array) json_decode($request->get('questlogdeck'.$i.'_content'), true);
+                $is_decklist = 'true' === StringSanitizer::sanitize($request->request->get('deck'.$i.'_is_decklist'));
+                $player = trim(StringSanitizer::sanitize($request->request->get('questlogdeck'.$i.'_player_name'), false));
+                $content = (array) json_decode($request->request->getString('questlogdeck'.$i.'_content'), true);
                 if ($deck_id) {
                     if (!$is_decklist) {
                         /* @var $deck \App\Entity\Deck */
@@ -174,7 +174,7 @@ class SaveQuestlogController extends AbstractController
                     // deck_id == 0 occurs if:
                     // 1. the deck slot in the builder is empty
                     // 2. the deck being referenced was deleted
-                    $content = json_decode($request->get('deck'.$i.'_content') ?? '', true);
+                    $content = json_decode($request->request->getString('deck'.$i.'_content'), true);
                     if (!isset($content['main']) || empty($content['main'])) {
                         // Deck slot was empty
                         ++$skip;

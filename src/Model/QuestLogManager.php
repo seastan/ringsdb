@@ -281,20 +281,18 @@ class QuestLogManager
             $qb->innerJoin('d.decks', 'l');
             $qb->innerJoin('l.deck', 'ld');
 
-            if (count($cards_code) > 0) {
-                foreach ($cards_code as $i => $card_code) {
-                    /* @var $card Card */
-                    $card = $this->cardRepository->findOneBy(['code' => $card_code]);
-                    if (!$card) {
-                        continue;
-                    }
-
-                    $qb->innerJoin('ld.slots', "s$i");
-                    $qb->andWhere("s$i.card = :card$i");
-                    $qb->setParameter("card$i", $card);
-
-                    // $packs[] = $card->getPack()->getId();
+            foreach ($cards_code as $i => $card_code) {
+                /* @var $card Card */
+                $card = $this->cardRepository->findOneBy(['code' => $card_code]);
+                if (!$card instanceof Card) {
+                    continue;
                 }
+
+                $qb->innerJoin('ld.slots', "s$i");
+                $qb->andWhere("s$i.card = :card$i");
+                $qb->setParameter("card$i", $card);
+
+                // $packs[] = $card->getPack()->getId();
             }
 
             if (count($packs) > 0 || $useCustomPacks) {
@@ -370,8 +368,8 @@ class QuestLogManager
     public function getAllPages(): array
     {
         $request = $this->currentRequest();
-        $route = $request->get('_route');
-        $route_params = $request->get('_route_params');
+        $route = $request->attributes->get('_route');
+        $route_params = $request->attributes->all('_route_params');
         $query = $request->query->all();
 
         $params = $query + $route_params;
@@ -413,8 +411,8 @@ class QuestLogManager
         }
 
         $request = $this->currentRequest();
-        $route = $request->get('_route');
-        $route_params = $request->get('_route_params');
+        $route = $request->attributes->get('_route');
+        $route_params = $request->attributes->all('_route_params');
 
         $query = $request->query->all();
         $params = $query + $route_params;
@@ -432,8 +430,8 @@ class QuestLogManager
         }
 
         $request = $this->currentRequest();
-        $route = $request->get('_route');
-        $route_params = $request->get('_route_params');
+        $route = $request->attributes->get('_route');
+        $route_params = $request->attributes->all('_route_params');
 
         $query = $request->query->all();
         $params = $query + $route_params;

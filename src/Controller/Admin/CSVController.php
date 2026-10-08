@@ -79,9 +79,9 @@ class CSVController extends AbstractController
             $cycleRepo = $cycleRepository;
             // 'ALeP' cycle code doesn't exist; fall back to the most recent cycle.
             $cycle = $cycleRepo->findOneBy(['code' => 'ALeP'])
-                ?? $cycleRepo->findOneBy([], ['id' => \SortDirection::Descending]);
+                ?? $cycleRepo->findOneBy([], ['id' => 'DESC']);
 
-            if (!$cycle) {
+            if (!$cycle instanceof \App\Entity\Cycle) {
                 return new Response('Error: no cycle found to assign to new pack');
             }
 
@@ -94,7 +94,7 @@ class CSVController extends AbstractController
             $pack->setCycle($cycle);
             $this->entityManager->persist($pack);
             $this->entityManager->flush();
-        } elseif (!$pack) {
+        } elseif (!$pack instanceof Pack) {
             $pack = $oldPack;
             $pack->setCode($inputCode);
             $this->entityManager->persist($pack);
@@ -155,7 +155,7 @@ class CSVController extends AbstractController
             $cardPack = $pack;
             if (!empty($card['pack']) && $card['pack'] !== $pack->getName()) {
                 $namedPack = $packRepo->findOneBy(['name' => $card['pack']]);
-                if ($namedPack) {
+                if ($namedPack instanceof Pack) {
                     $cardPack = $namedPack;
                 }
             }
@@ -170,15 +170,15 @@ class CSVController extends AbstractController
             // as 503991). It is found by its octgnid, in the target pack only, and
             // only updates its printing: the canonical card is left alone.
             $isReprint = false;
-            if (!$cardEntity) {
+            if (!$cardEntity instanceof Card) {
                 $reprint = $printingRepo->findOneBy(['octgnid' => $card['octgnid'], 'pack' => $cardPack]);
-                if ($reprint) {
+                if ($reprint instanceof CardPrinting) {
                     $cardEntity = $reprint->getCard();
                     $isReprint = true;
                 }
             }
 
-            if (!$cardEntity) {
+            if (!$cardEntity instanceof Card) {
                 $cardEntity = new Card();
                 $now = new \DateTime();
                 $cardEntity->setDateCreation($now);
@@ -192,7 +192,7 @@ class CSVController extends AbstractController
             // One printing per (card, pack).
             $printingEntity = $printingRepo->findOneBy(['card' => $cardEntity, 'pack' => $cardPack]);
             $printingIsNew = false;
-            if (!$printingEntity) {
+            if (!$printingEntity instanceof CardPrinting) {
                 $printingEntity = new CardPrinting();
                 $now = new \DateTime();
                 $printingEntity->setDateCreation($now);

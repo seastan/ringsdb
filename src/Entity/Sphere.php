@@ -43,7 +43,7 @@ class Sphere
     /**
      * @var Collection<int, Card>
      */
-    #[ORM\OneToMany(mappedBy: 'sphere', targetEntity: Card::class)]
+    #[ORM\OneToMany(targetEntity: Card::class, mappedBy: 'sphere')]
     #[ORM\OrderBy(['position' => \SortDirection::Ascending])]
     private $cards;
 

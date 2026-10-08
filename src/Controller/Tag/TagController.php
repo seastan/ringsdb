@@ -30,8 +30,8 @@ class TagController extends AbstractController
     #[Route(path: '/tag/add', name: 'tag_add', methods: ['POST'])]
     public function addAction(Request $request): Response
     {
-        $list_id = $request->get('ids');
-        $list_tag = $this->decks->normalizeTags((array) $request->get('tags'));
+        $list_id = $request->request->all('ids');
+        $list_tag = $this->decks->normalizeTags($request->request->all('tags'));
         /* @var $em EntityManager */
         $response = ['success' => true];
         foreach ($list_id as $id) {
@@ -58,8 +58,8 @@ class TagController extends AbstractController
     #[Route(path: '/tag/remove', name: 'tag_remove', methods: ['POST'])]
     public function removeAction(Request $request): Response
     {
-        $list_id = $request->get('ids');
-        $list_tag = $this->decks->normalizeTags((array) $request->get('tags'));
+        $list_id = $request->request->all('ids');
+        $list_tag = $this->decks->normalizeTags($request->request->all('tags'));
         /* @var $em EntityManager */
         $response = ['success' => true];
         foreach ($list_id as $id) {
@@ -86,7 +86,7 @@ class TagController extends AbstractController
     #[Route(path: '/tag/clear', name: 'tag_clear', methods: ['POST'])]
     public function clearAction(Request $request): Response
     {
-        $list_id = $request->get('ids');
+        $list_id = $request->request->all('ids');
         /* @var $em EntityManager */
         $response = ['success' => true];
         foreach ($list_id as $id) {

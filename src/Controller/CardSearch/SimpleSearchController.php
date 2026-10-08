@@ -50,7 +50,7 @@ class SimpleSearchController extends AbstractController
             'view' => $view,
             'sort' => $sort,
             'page' => $page,
-            '_route' => $request->get('_route'),
+            '_route' => $request->attributes->get('_route'),
         ]);
     }
 }

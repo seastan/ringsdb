@@ -9,16 +9,12 @@ use App\Model\DecklistFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DecklistFixtures extends Fixture implements ContainerAwareInterface, DependentFixtureInterface
+class DecklistFixtures extends Fixture implements DependentFixtureInterface
 {
-    private ?ContainerInterface $container = null;
-
-    public function setContainer(?ContainerInterface $container = null): void
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly DecklistFactory $decklistFactory,
+    ) {
     }
 
     /**
@@ -33,18 +29,11 @@ class DecklistFixtures extends Fixture implements ContainerAwareInterface, Depen
 
     public function load(ObjectManager $manager): void
     {
-        if (!$this->container instanceof ContainerInterface) {
-            throw new \LogicException('The container is not set.');
-        }
-
-        /** @var DecklistFactory $decklistFactory */
-        $decklistFactory = $this->container->get('decklist_factory');
-
         for ($i = 1; $i < 5; ++$i) {
             /** @var Deck $deck */
             $deck = $this->getReference('test-deck-'.$i, Deck::class);
 
-            $decklist = $decklistFactory->createDecklistFromDeck($deck, $deck->getName(), 'Hello World');
+            $decklist = $this->decklistFactory->createDecklistFromDeck($deck, $deck->getName(), 'Hello World');
             $decklist->setDateCreation(new \DateTime('2015-08-16'));
             $decklist->setDateUpdate(new \DateTime('2015-08-16'));
             $decklist->setDateLastComment(new \DateTime('2015-08-16'));

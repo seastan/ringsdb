@@ -113,13 +113,13 @@ class Questlog
     /**
      * @var Collection<int, QuestlogDeck>
      */
-    #[ORM\OneToMany(mappedBy: 'questlog', targetEntity: QuestlogDeck::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: QuestlogDeck::class, mappedBy: 'questlog', cascade: ['persist', 'remove'])]
     private $decks;
 
     /**
      * @var Collection<int, QuestlogComment>
      */
-    #[ORM\OneToMany(mappedBy: 'questlog', targetEntity: QuestlogComment::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: QuestlogComment::class, mappedBy: 'questlog', cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['dateCreation' => \SortDirection::Ascending])]
     private $comments;
 

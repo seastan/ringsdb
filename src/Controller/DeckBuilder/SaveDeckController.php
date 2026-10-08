@@ -33,12 +33,15 @@ class SaveDeckController extends AbstractController
     public function __invoke(Request $request): Response
     {
         $user = $this->currentUser();
+        // CloneDeckController, CopyDeckController and FileImportDeckController forward() here: their
+        // parameters are then request attributes, not the POST body
+        $parameters = $request->attributes->has('content') ? $request->attributes : $request->request;
 
         if (count($user->getDecks()) > $user->getMaxNbDecks()) {
             throw new UnprocessableEntityHttpException('You have reached the maximum number of decks allowed. Delete some decks or increase your reputation.');
         }
 
-        $id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
+        $id = filter_var($parameters->get('id'), FILTER_SANITIZE_NUMBER_INT);
         $deck = null;
         $source_deck = null;
         if ($id) {
@@ -51,7 +54,7 @@ class SaveDeckController extends AbstractController
             $source_deck = $deck;
         }
 
-        $cancel_edits = (bool) filter_var($request->get('cancel_edits'), FILTER_SANITIZE_NUMBER_INT);
+        $cancel_edits = (bool) filter_var($parameters->get('cancel_edits'), FILTER_SANITIZE_NUMBER_INT);
         if ($cancel_edits) {
             if ($deck) {
                 $this->decks->revertDeck($deck);
@@ -60,29 +63,29 @@ class SaveDeckController extends AbstractController
             return $this->redirect($this->generateUrl('decks_list'));
         }
 
-        $is_copy = (bool) filter_var($request->get('copy'), FILTER_SANITIZE_NUMBER_INT);
+        $is_copy = (bool) filter_var($parameters->get('copy'), FILTER_SANITIZE_NUMBER_INT);
         if ($is_copy || !$id) {
             /* @var $deck \App\Entity\Deck */
             $deck = new Deck($user);
         }
 
-        $content = json_decode($request->get('content'), true);
+        $content = json_decode($parameters->getString('content'), true);
         if (!isset($content['main']) || !is_array($content['main'])) {
             return new Response('Cannot import an empty deck');
         }
 
-        $name = StringSanitizer::sanitize($request->get('name'), false);
+        $name = StringSanitizer::sanitize($parameters->get('name'), false);
         if (empty($name)) {
             $name = 'Untitled Deck';
         }
 
-        $decklist_id = filter_var($request->get('decklist_id'), FILTER_SANITIZE_NUMBER_INT);
+        $decklist_id = filter_var($parameters->get('decklist_id'), FILTER_SANITIZE_NUMBER_INT);
         if (false === $decklist_id) {
             throw new BadRequestHttpException('Wrong decklist_id');
         }
 
-        $description = trim($request->get('description') ?? '');
-        $tags = StringSanitizer::sanitize($request->get('tags'), false);
+        $description = trim($parameters->getString('description'));
+        $tags = StringSanitizer::sanitize($parameters->get('tags'), false);
         $this->decks->saveDeck($user, $deck, (int) $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);
         $this->entityManager->flush();
 

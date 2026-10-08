@@ -28,14 +28,14 @@ class CommentReviewController extends AbstractController
             throw $this->createAccessDeniedException('You are not logged in.');
         }
 
-        $review_id = filter_var($request->get('comment_review_id'), FILTER_SANITIZE_NUMBER_INT);
+        $review_id = filter_var($request->request->get('comment_review_id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $review Review */
         $review = $this->reviewRepository->find($review_id);
         if (!$review) {
             throw new \Exception('Unable to find review.');
         }
 
-        $comment_text = trim($request->get('comment'));
+        $comment_text = trim($request->request->getString('comment'));
         $comment_text = htmlspecialchars($comment_text);
         if (!$comment_text) {
             throw new \Exception('Your comment is empty.');

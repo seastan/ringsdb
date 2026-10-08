@@ -22,7 +22,7 @@ class FileImportDeckController extends AbstractController
     #[Route(path: '/deck/fileimport', name: 'deck_fileimport', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
-        $filetype = StringSanitizer::sanitize($request->get('type'));
+        $filetype = StringSanitizer::sanitize($request->request->get('type'));
         $uploadedFile = $request->files->get('upfile');
         if (!isset($uploadedFile)) {
             throw new UnprocessableEntityHttpException('No file uploaded');

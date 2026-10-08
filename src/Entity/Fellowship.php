@@ -95,19 +95,19 @@ class Fellowship
     /**
      * @var Collection<int, FellowshipDeck>
      */
-    #[ORM\OneToMany(mappedBy: 'fellowship', targetEntity: FellowshipDeck::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: FellowshipDeck::class, mappedBy: 'fellowship', cascade: ['persist', 'remove'])]
     private $decks;
 
     /**
      * @var Collection<int, FellowshipDecklist>
      */
-    #[ORM\OneToMany(mappedBy: 'fellowship', targetEntity: FellowshipDecklist::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: FellowshipDecklist::class, mappedBy: 'fellowship', cascade: ['persist', 'remove'])]
     private $decklists;
 
     /**
      * @var Collection<int, FellowshipComment>
      */
-    #[ORM\OneToMany(mappedBy: 'fellowship', targetEntity: FellowshipComment::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: FellowshipComment::class, mappedBy: 'fellowship', cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['dateCreation' => \SortDirection::Ascending])]
     private $comments;
 

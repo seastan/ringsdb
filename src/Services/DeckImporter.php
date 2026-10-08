@@ -54,12 +54,12 @@ class DeckImporter
             if ($pack_name) {
                 /* @var $pack Pack */
                 $pack = $this->packRepository->findOneBy(['name' => $pack_name]);
-                if (!$pack) {
+                if (!$pack instanceof Pack) {
                     $pack = $this->packRepository->findOneBy(['code' => $pack_name]);
                 }
             }
 
-            if ($pack) {
+            if ($pack instanceof Pack) {
                 // a card belongs to its packs through its printings
                 /* @var $card \App\Entity\Card */
                 $card = $this->entityManager->createQuery('SELECT c FROM '.Card::class.' c JOIN c.printings p WHERE c.name = :name AND p.pack = :pack ORDER BY c.code')->setParameter('name', $name)->setParameter('pack', $pack)->setMaxResults(1)->getOneOrNullResult();

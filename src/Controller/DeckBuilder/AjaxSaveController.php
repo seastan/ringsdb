@@ -37,7 +37,7 @@ class AjaxSaveController extends AbstractController
             return new JsonResponse(['success' => false, 'error' => 'You have reached the maximum number of decks allowed.'], 422);
         }
 
-        $id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
+        $id = filter_var($request->request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         $deck = null;
         $source_deck = null;
         if ($id) {
@@ -52,23 +52,23 @@ class AjaxSaveController extends AbstractController
             $deck = new Deck($user);
         }
 
-        $content = json_decode($request->get('content'), true);
+        $content = json_decode($request->request->getString('content'), true);
         if (!isset($content['main']) || empty($content['main'])) {
             return new JsonResponse(['success' => false, 'error' => 'Cannot save an empty deck.'], 422);
         }
 
-        $name = StringSanitizer::sanitize($request->get('name'), false);
+        $name = StringSanitizer::sanitize($request->request->get('name'), false);
         if (empty($name)) {
             $name = 'Untitled Deck';
         }
 
-        $decklist_id = filter_var($request->get('decklist_id'), FILTER_SANITIZE_NUMBER_INT);
+        $decklist_id = filter_var($request->request->get('decklist_id'), FILTER_SANITIZE_NUMBER_INT);
         if (false === $decklist_id) {
             throw new BadRequestHttpException('Wrong decklist_id');
         }
 
-        $description = trim($request->get('description') ?? '');
-        $tags = StringSanitizer::sanitize($request->get('tags'), false);
+        $description = trim($request->request->getString('description'));
+        $tags = StringSanitizer::sanitize($request->request->get('tags'), false);
         $this->decks->saveDeck($user, $deck, (int) $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);
         $this->entityManager->flush();
 

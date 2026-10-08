@@ -44,13 +44,13 @@ class CommentFellowshipController extends AbstractController
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 
-        $fellowship_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
+        $fellowship_id = filter_var($request->request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
         if (!$fellowship) {
             throw new BadRequestHttpException('Wrong fellowship id');
         }
 
-        $comment_text = trim($request->get('comment'));
+        $comment_text = trim($request->request->getString('comment'));
         if (!empty($comment_text)) {
             $comment_text = (string) preg_replace('%(?<!\\()\\b(?:(?:https?|ftp)://)(?:((?:(?:[a-z\\d\\x{00a1}-\\x{ffff}]+-?)*[a-z\\d\\x{00a1}-\\x{ffff}]+)(?:\\.(?:[a-z\\d\\x{00a1}-\\x{ffff}]+-?)*[a-z\\d\\x{00a1}-\\x{ffff}]+)*(?:\\.[a-z\\x{00a1}-\\x{ffff}]{2,6}))(?::\\d+)?)(?:[^\\s]*)?%iu', '[$1]($0)', $comment_text);
             $mentionned_usernames = [];

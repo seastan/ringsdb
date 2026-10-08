@@ -8,7 +8,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use SortDirection;
 
 #[ORM\Entity(repositoryClass: \App\Repository\CardRepository::class)]
 #[ORM\Cache(usage: 'NONSTRICT_READ_WRITE', region: 'entity_region')]
@@ -131,15 +130,15 @@ class Card
     /**
      * @var Collection<int, Review>
      */
-    #[ORM\OneToMany(mappedBy: 'card', targetEntity: Review::class)]
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'card')]
     #[ORM\OrderBy(['dateCreation' => \SortDirection::Descending])]
     private $reviews;
 
     /**
      * @var Collection<int, CardPrinting>
      */
-    #[ORM\OneToMany(mappedBy: 'card', targetEntity: CardPrinting::class, cascade: ['remove'], orphanRemoval: true)]
-    #[ORM\OrderBy(['position' => SortDirection::Ascending])]
+    #[ORM\OneToMany(targetEntity: CardPrinting::class, mappedBy: 'card', cascade: ['remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['position' => \SortDirection::Ascending])]
     private $printings;
 
     #[ORM\ManyToOne(targetEntity: Type::class, inversedBy: 'cards')]

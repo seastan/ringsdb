@@ -178,7 +178,7 @@ class TagControllerTest extends WebTestCase
         $client->request('POST', "/tag/$action", ['ids' => ['1'], 'tags' => ['hacked']], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
         $this->assertSame(403, $client->getResponse()->getStatusCode());
-        $this->assertSame(['success' => false, 'message' => 'Access Denied.'], json_decode($client->getResponse()->getContent(), true));
+        $this->assertSame(['success' => false, 'message' => 'Access Denied. The user doesn\'t have ROLE_USER.'], json_decode($client->getResponse()->getContent(), true));
         $this->assertSame(array_column($this->fixtureDecks, 'tags', 'id'), $this->tags());
     }
 

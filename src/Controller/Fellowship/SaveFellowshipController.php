@@ -91,7 +91,7 @@ class SaveFellowshipController extends AbstractController
             $skip = 0;
             for ($i = 1; $i <= 4; ++$i) {
                 $deck_id = intval(filter_var($request->request->get('deck'.$i.'_id'), FILTER_SANITIZE_NUMBER_INT));
-                $is_decklist = 'true' === StringSanitizer::sanitize($request->get('deck'.$i.'_is_decklist'));
+                $is_decklist = 'true' === StringSanitizer::sanitize($request->request->get('deck'.$i.'_is_decklist'));
                 if ($deck_id) {
                     if (!$is_decklist) {
                         /* @var $deck Deck */

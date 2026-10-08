@@ -33,7 +33,7 @@ class VoteQuestlogController extends AbstractController
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 
-        $questlog_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
+        $questlog_id = filter_var($request->request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $questlog \App\Entity\QuestLog */
         $questlog = $this->questlogRepository->find($questlog_id);
         if (!$questlog) {

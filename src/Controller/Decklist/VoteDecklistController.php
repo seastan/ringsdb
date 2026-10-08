@@ -33,7 +33,7 @@ class VoteDecklistController extends AbstractController
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 
-        $decklist_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
+        $decklist_id = filter_var($request->request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $decklist \App\Entity\Decklist */
         $decklist = $this->decklistRepository->find($decklist_id);
         if (!$decklist instanceof Decklist) {

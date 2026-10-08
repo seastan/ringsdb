@@ -30,7 +30,7 @@ class DeleteListFellowshipController extends AbstractController
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
 
-        $list_id = explode('-', $request->get('ids'));
+        $list_id = explode('-', $request->request->getString('ids'));
         $message = null;
         foreach ($list_id as $id) {
             /* @var $fellowship \App\Entity\Fellowship */

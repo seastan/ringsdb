@@ -25,7 +25,7 @@ class DeleteListController extends AbstractController
     #[Route(path: '/deck/delete_list', name: 'deck_delete_list', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
-        $list_id = explode('-', $request->get('ids'));
+        $list_id = explode('-', $request->request->getString('ids'));
         foreach ($list_id as $id) {
             /* @var $deck \App\Entity\Deck */
             $deck = $this->deckRepository->find($id);

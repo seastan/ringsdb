@@ -293,7 +293,7 @@ class DecklistManager
 
         $packs = $request->query->all('packs');
 
-        $customPackCodes = array_values(array_filter((array) $request->query->all('custom_packs'), is_string(...)));
+        $customPackCodes = array_values(array_filter($request->query->all('custom_packs'), is_string(...)));
 
         $threat_op = $request->query->get('threato');
         $threat = $request->query->get('threat');
@@ -304,7 +304,12 @@ class DecklistManager
         $require_description = $request->query->get('require_description');
 
         $qb = $this->getQueryBuilder();
-        $joinTables = [];
+
+        // the author, the reputation filter and the reputation sort all need the user, joined once
+        $filterByReputation = !empty($reputation) && is_numeric($reputation);
+        if (!empty($author_name) || $filterByReputation || 'reputation' === $sort) {
+            $qb->innerJoin('d.user', 'u');
+        }
 
         if (!empty($sphere)) {
             $qb->innerJoin('d.spheres', 'w');
@@ -313,8 +318,6 @@ class DecklistManager
         }
 
         if (!empty($author_name)) {
-            $qb->innerJoin('d.user', 'u');
-            $joinTables[] = 'd.user';
             $qb->andWhere('u.username = :username');
             $qb->setParameter('username', $author_name);
         }
@@ -336,8 +339,7 @@ class DecklistManager
             $qb->setParameter('threat', $threat);
         }
 
-        if (!empty($reputation) && is_numeric($reputation)) {
-            $qb->innerJoin('d.user', 'u');
+        if ($filterByReputation) {
             if ('>' == $reputation_op) {
                 $qb->andWhere('u.reputation > :reputation');
             } elseif ('<' == $reputation_op) {
@@ -356,20 +358,18 @@ class DecklistManager
         $useCustomPacks = [] !== $customPackCodes && $this->user;
 
         if (count($cards_code) > 0 || count($packs) > 0 || $useCustomPacks) {
-            if (count($cards_code) > 0) {
-                foreach ($cards_code as $i => $card_code) {
-                    /* @var $card \App\Entity\Card */
-                    $card = $this->cardRepository->findOneBy(['code' => $card_code]);
-                    if (!$card) {
-                        continue;
-                    }
-
-                    $qb->innerJoin('d.slots', "s$i");
-                    $qb->andWhere("s$i.card = :card$i");
-                    $qb->setParameter("card$i", $card);
-                    // Add packs containing requested cards
-                    // $packs[] = $card->getPack()->getId();
+            foreach ($cards_code as $i => $card_code) {
+                /* @var $card \App\Entity\Card */
+                $card = $this->cardRepository->findOneBy(['code' => $card_code]);
+                if (!$card instanceof Card) {
+                    continue;
                 }
+
+                $qb->innerJoin('d.slots', "s$i");
+                $qb->andWhere("s$i.card = :card$i");
+                $qb->setParameter("card$i", $card);
+                // Add packs containing requested cards
+                // $packs[] = $card->getPack()->getId();
             }
 
             if (count($packs) > 0 || $useCustomPacks) {
@@ -502,10 +502,6 @@ class DecklistManager
                 break;
 
             case 'reputation':
-                if (!in_array('d.user', $joinTables, true)) {
-                    $qb->innerJoin('d.user', 'u');
-                }
-
                 // with DISTINCT, MySQL 5.7+ only sorts on selected columns
                 $qb->addSelect('u.reputation AS HIDDEN reputation');
                 $qb->orderBy('reputation', \SortDirection::Descending);
@@ -535,8 +531,8 @@ class DecklistManager
     public function getAllPages(): array
     {
         $request = $this->currentRequest();
-        $route = $request->get('_route');
-        $route_params = $request->get('_route_params');
+        $route = $request->attributes->get('_route');
+        $route_params = $request->attributes->all('_route_params');
         $query = $request->query->all();
 
         $params = $query + $route_params;
@@ -578,8 +574,8 @@ class DecklistManager
         }
 
         $request = $this->currentRequest();
-        $route = $request->get('_route');
-        $route_params = $request->get('_route_params');
+        $route = $request->attributes->get('_route');
+        $route_params = $request->attributes->all('_route_params');
 
         $query = $request->query->all();
         $params = $query + $route_params;
@@ -597,8 +593,8 @@ class DecklistManager
         }
 
         $request = $this->currentRequest();
-        $route = $request->get('_route');
-        $route_params = $request->get('_route_params');
+        $route = $request->attributes->get('_route');
+        $route_params = $request->attributes->all('_route_params');
 
         $query = $request->query->all();
         $params = $query + $route_params;

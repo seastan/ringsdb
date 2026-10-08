@@ -23,7 +23,7 @@ class SavePacksController extends AbstractController
     #[Route(path: '/collection/packs/save', name: 'collection_save_packs', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
-        $selectedPacks = $request->get('selected-packs');
+        $selectedPacks = $request->request->getString('selected-packs');
         // accepts "id" / "id:count" tokens (and legacy "id-2"/"id-3")
         if (preg_match('/[^0-9:,\\-]/', $selectedPacks)) {
             return new Response('Invalid pack selection.');

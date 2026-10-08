@@ -33,7 +33,7 @@ class FavoriteFellowshipController extends AbstractController
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 
-        $fellowship_id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
+        $fellowship_id = filter_var($request->request->get('id'), FILTER_SANITIZE_NUMBER_INT);
         /* @var $fellowship \App\Entity\Fellowship */
         $fellowship = $this->fellowshipRepository->find($fellowship_id);
         if (!$fellowship) {
