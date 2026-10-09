@@ -295,10 +295,11 @@ class DecklistEditTest extends WebTestCase
     public function testRefusedDelete(?string $username, int $decklist, int $status): void
     {
         $client = $username ? $this->createAuthenticatedClient($username) : $this->client;
+        $count = $this->db()->fetchOne('SELECT COUNT(*) FROM decklist');
         $client->request('POST', "/decklist/delete/$decklist");
 
         $this->assertSame($status, $client->getResponse()->getStatusCode());
-        $this->assertSame(4, $this->db()->fetchOne('SELECT COUNT(*) FROM decklist'));
+        $this->assertSame($count, $this->db()->fetchOne('SELECT COUNT(*) FROM decklist'));
     }
 
     /**

@@ -312,9 +312,10 @@ class ReviewTest extends WebTestCase
     public function testRefusedComment(array $parameters, string $message): void
     {
         $client = $this->createAuthenticatedClient('admin');
+        $count = $this->db()->fetchOne('SELECT COUNT(*) FROM reviewcomment');
 
         $this->assertJsonAnswer($this->ajax($client, '/review/comment', $parameters), 500, ['success' => false, 'message' => $message]);
-        $this->assertSame(0, $this->db()->fetchOne('SELECT COUNT(*) FROM reviewcomment'));
+        $this->assertSame($count, $this->db()->fetchOne('SELECT COUNT(*) FROM reviewcomment'));
     }
 
     /**

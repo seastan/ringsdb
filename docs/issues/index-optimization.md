@@ -4,9 +4,13 @@ Status: open. Analysis and proposals only, nothing implemented yet.
 
 ## Problem
 
-`GET /` (`IndexController`) runs **122 SQL queries** on the test fixtures, which are small:
-4 decklists, 1 fellowship, 1 review, 1 comment. 97 of them load a single card
-(`SELECT … FROM card t0 WHERE t0.id = ?`).
+`GET /` (`IndexController`) runs **293 SQL queries** on the test fixtures (production-like volume,
+see [Fixtures](#fixtures)). Only 22 distinct SQL statements are behind them; the rest are N+1:
+- 97 load a single card (`SELECT … FROM card t0 WHERE t0.id = ?`);
+- 150 load the comments of one decklist, fellowship or review.
+
+With the original fixtures only (4 decklists, 1 fellowship, 1 review, 1 comment), the page ran 122
+queries. These fixtures did not show the fellowship block or the comment N+1.
 
 ### None of these queries is raw DBAL
 
@@ -30,7 +34,7 @@ Each query's origin is the first frame in `src/` plus the template line. It come
 back to the template line.
 
 ```bash
-make test-fixtures
+make test-fixtures   # loads VolumeFixtures too
 docker compose exec -T -u www-data -e XDEBUG_MODE=off -e DUMP_QUERIES=1 symfony \
     php vendor/bin/phpunit tests/Controller/IndexQueriesTest.php
 # full list, with parameters and origins: var/log/queries/index.txt
@@ -38,25 +42,46 @@ docker compose exec -T -u www-data -e XDEBUG_MODE=off -e DUMP_QUERIES=1 symfony 
 
 The trait works for any page: `$client->enableProfiler()`, then `databaseQueries($client)`.
 
-## Inventory (test fixtures, 122 queries)
+### Fixtures
+
+`src/DataFixtures/VolumeFixtures.php` gives the test and dev databases a production-like volume, so
+that every block of the page is filled and every N+1 is reached:
+- 10 users;
+- 60 copies of the 4 test decklists, with a lorem ipsum description and 3 comments each (the last
+  comment of every 10th decklist is hidden);
+- 50 public fellowships of 4 of those decklists, with 2 comments each;
+- 50 card reviews, with 2 comments each.
+
+They are dated 2014, before the other fixtures, which stay first in the lists sorted by date. The
+review cards are outside the Core Set that the tests use.
+
+One distortion remains. The copies share the cards of their 4 source decklists, and the identity
+map loads each card once per request. So the card loads stop at 97, the cards of the 4 source
+decks. In production, every displayed deck is different, so each one adds its own 25–40 cards.
+
+
+## Inventory (test fixtures, 293 queries)
 
 | Count | Query | Origin |
 |---:|---|---|
-| 97 | `card WHERE id = ?` | `SlotCollectionDecorator::getHeroDeck()` → `Card::getType()`, from `Default/index.html.twig:30, 155` |
-| 4 | `decklistslot WHERE decklist_id = ?` | `getHeroDeck()`, same lines |
+| 97 | `card WHERE id = ?` | `SlotCollectionDecorator::getHeroDeck()` → `Card::getType()`, from `Default/index.html.twig:30, 108` |
+| 50 | `comment WHERE decklist_id = ?` | `$decklist->getComments()->last()`, `IndexController.php:168` |
+| 50 | `fellowshipcomment WHERE fellowship_id = ?` | `$fellowship->getComments()->last()`, `IndexController.php:193` |
+| 50 | `reviewcomment WHERE review_id = ?` | `$review->getComments()->last()`, `IndexController.php:232` |
+| 14 | `decklistslot WHERE decklist_id = ?` | `getHeroDeck()`, `index.html.twig:30, 108, 155, 232` |
+| 8 | `user WHERE id = ?` | `decklist.user`, `fellowship.user`, `comment.user`: `index.html.twig:47, 94, 172, 218`, `macros.html.twig:66` |
 | 4 | `sphere WHERE id = ?` | `card.sphere.code`, `index.html.twig:32` |
+| 4 | `decklist WHERE id = ?` | `deck.decklist` in the fellowship block, `index.html.twig:107` |
 | 2 | `pack WHERE id = ?` | `decklist.lastPack.name`, `index.html.twig:42` |
-| 1 | `user WHERE id = ?` | `decklist.user.*`, `index.html.twig:47` |
+| 2 | `fellowship_decklist WHERE fellowship_id = ?` | `fellowship.decklists`, `index.html.twig:104, 228` |
 | 1 | `type` (findAll) | `IndexController.php:40` |
 | 1 | `scenario` (findBy, daily challenge) | `IndexController.php:50` |
 | 4 | trending and new decklists and fellowships (LIMIT 3/1/6/2) | `IndexController.php:68, 83, 99, 129` |
 | 2 | Paginator `COUNT(*)` on the decklists and fellowships "by recent discussion" | `DecklistManager.php:143`, `FellowshipManager.php:128` |
 | 2 | decklists and fellowships by recent discussion (LIMIT 50) | `IndexController.php:164, 189` |
 | 2 | recent reviews and recent review discussion (LIMIT 50) | `IndexController.php:211, 228` |
-| 1 | `comment WHERE decklist_id = ?` | `$decklist->getComments()->last()`, `IndexController.php:168` |
-| 1 | `reviewcomment WHERE review_id = ?` | `$review->getComments()->last()`, `IndexController.php:232` |
 
-There are **12 fixed queries**. Everything else is N+1, and the fixtures hide most of it.
+There are **12 fixed queries**. Everything else (281) is N+1.
 
 ### N+1 in the template: hero cards
 
@@ -68,8 +93,7 @@ of the deck is loaded one by one, only to display 1–3 heroes. With native lazy
 the identity map.
 
 This applies to every decklist shown (trending and new, up to 6) and to every deck of the fellowships
-shown (up to 2 × 4). The fixtures have no displayed fellowship: the one fellowship has no
-description. Each fellowship also adds:
+shown (up to 2 × 4): 14 slot collections here. Each fellowship also adds:
 - `fellowship.decklists`: 1 query;
 - `deck.decklist`: 1 query per deck;
 - `fellowship.user`: 1 query.
@@ -91,15 +115,10 @@ The template then loads `comment.user` (up to 8 queries) and `comment.review.car
 
 ### Estimate in production
 
-Assume decks of about 35 distinct cards, 6 decklists and 2 fellowships of 2–4 decks, and full
-comment threads:
-- about 12 fixed queries;
-- about 150 queries for the comment collections;
-- about 300–500 card loads;
-- about 30–40 user, pack, sphere and fellowship loads.
-
-That is **roughly 500–700 queries** on a cold page. This is an estimate, not a measurement; the dump
-gives the real figure on a prod copy.
+The fixtures reach every N+1 except the card loads (see [Fixtures](#fixtures)). With 14 distinct
+displayed decks of 25–40 cards each, these become 350–550 queries instead of 97. That puts a cold
+page at **roughly 550–750 queries**. This is still an estimate: the dump gives the real figure on a
+prod copy.
 
 ### Caching that does not apply
 
@@ -114,13 +133,21 @@ gives the real figure on a prod copy.
 
 ## Proposals
 
-They are ordered by gain over effort. Figures are queries saved on the fixtures, and in production.
+They are ordered by gain over effort. Figures are queries saved on the fixtures (293 queries), and in
+production when they differ.
 
-### 1. Load the hero cards in one query (−101 / −400 or more)
+### 1. Load the displayed decks in two queries (−121 / −400 or more)
 
-After the 4 decklist and fellowship queries, collect the ids of every decklist that will be
-displayed. That means the trending and new decklists plus the decklists of the displayed
-fellowships. Then initialize their slots with one fetch join:
+After the 4 decklist and fellowship queries, load the decklists of the displayed fellowships with a
+fetch join (`fellowship.decklists`, then `deck.decklist`: −6):
+
+```php
+$em->createQuery('SELECT f, fd, d FROM App\Entity\Fellowship f JOIN f.decklists fd JOIN fd.decklist d WHERE f.id IN (:ids)')
+```
+
+Then collect the ids of every decklist that will be displayed: the trending and new decklists plus
+the decklists of those fellowships. Initialize their slots with one more fetch join (97 cards,
+14 slot collections and 4 spheres: −115):
 
 ```php
 $em->createQuery('SELECT d, s, c FROM App\Entity\Decklist d JOIN d.slots s JOIN s.card c WHERE d.id IN (:ids)')
@@ -144,7 +171,7 @@ Alternatives:
 - The second-level cache on `Card` (proposal 5). The queries go away, but you still get hundreds of
   cache hits per page.
 
-### 2. Recent comments: query the comments, not their parents (−150 in prod)
+### 2. Recent comments: query the comments, not their parents (−150, plus some user loads)
 
 Replace the 4 "LIMIT 50 + `getComments()->last()`" blocks with 4 queries on the comment tables.
 Each query joins the user and the parent and returns the 8 most recent rows:
@@ -169,11 +196,11 @@ and keep 8.
 - Today, a decklist whose last comment is hidden is skipped entirely. With the new query, the latest
   visible comment of that decklist is shown instead.
 - Index needed: `comment(date_creation)`. The table has no index on it today, only `user_id` and
-  `decklist_id`. Check the same on `fellowship_comment`, `reviewcomment` and `review`.
+  `decklist_id`. Check the same on `fellowshipcomment`, `reviewcomment` and `review`.
 - Add `#[ORM\OrderBy(['dateCreation' => 'ASC'])]` to `Review::$comments`. It fixes `last()`
   elsewhere too.
 
-### 3. Fetch-join the ManyToOne associations in the main queries (−3 / −20)
+### 3. Fetch-join the ManyToOne associations in the main queries (about −8)
 
 - Decklists (trending, new): add `JOIN d.user u LEFT JOIN d.lastPack p` and select them.
 - Fellowships: add `JOIN f.user u`.
@@ -249,7 +276,5 @@ With proposals 1–4, about **10–15 queries** whatever the data volume:
 
 With 6 or 7 on top, close to **0** for most visitors.
 
-`IndexQueriesTest` then fails with the new count: update `EXPECTED_QUERIES` at each step. To
-measure the real gain, add a fellowship with a description and decks to the fixtures, plus a few
-comments per thread. As they stand, the fixtures exercise neither the fellowship block nor the
-comment N+1.
+`IndexQueriesTest` then fails with the new count: update `EXPECTED_QUERIES` at each step. The
+fixtures reach every N+1 of the page, so the count measures the real gain.
