@@ -4,9 +4,9 @@ Status: open. Analysis and proposals only, nothing implemented yet.
 
 ## Problem
 
-`GET /` (`IndexController`) runs **293 SQL queries** on the test fixtures (production-like volume,
+`GET /` (`IndexController`) runs **475 SQL queries** on the test fixtures (production-like volume,
 see [Fixtures](#fixtures)). Only 22 distinct SQL statements are behind them; the rest are N+1:
-- 97 load a single card (`SELECT … FROM card t0 WHERE t0.id = ?`);
+- 266 load a single card (`SELECT … FROM card t0 WHERE t0.id = ?`);
 - 150 load the comments of one decklist, fellowship or review.
 
 With the original fixtures only (4 decklists, 1 fellowship, 1 review, 1 comment), the page ran 122
@@ -47,32 +47,34 @@ The trait works for any page: `$client->enableProfiler()`, then `databaseQueries
 `src/DataFixtures/VolumeFixtures.php` gives the test and dev databases a production-like volume, so
 that every block of the page is filled and every N+1 is reached:
 - 10 users;
-- 60 copies of the 4 test decklists, with a lorem ipsum description and 3 comments each (the last
-  comment of every 10th decklist is hidden);
+- 60 decklists with the cards of 60 different production decklists (all with different heroes),
+  with a lorem ipsum name, description and 3 comments each (the last comment of every 10th
+  decklist is hidden);
 - 50 public fellowships of 4 of those decklists, with 2 comments each;
 - 50 card reviews, with 2 comments each.
 
 They are dated 2014, before the other fixtures, which stay first in the lists sorted by date. The
 review cards are outside the Core Set that the tests use.
 
-One distortion remains. The copies share the cards of their 4 source decklists, and the identity
-map loads each card once per request. So the card loads stop at 97, the cards of the 4 source
-decks. In production, every displayed deck is different, so each one adds its own 25–40 cards.
+The decklist contents come from `src/DataFixtures/volume-decklists.json`. It holds the cards only
+(`slots`, `sideslots`), the last pack, and the source URL, taken from the public API
+(`https://ringsdb.com/api/public/decklist/{id}` and `/api/public/decklists/by_date/{date}`). It
+holds no name, description or user. Every card code exists in `ringsdb_bootstrap.sql`; the fixture
+fails on an unknown code.
 
-
-## Inventory (test fixtures, 293 queries)
+## Inventory (test fixtures, 475 queries)
 
 | Count | Query | Origin |
 |---:|---|---|
-| 97 | `card WHERE id = ?` | `SlotCollectionDecorator::getHeroDeck()` → `Card::getType()`, from `Default/index.html.twig:30, 108` |
+| 266 | `card WHERE id = ?` | `SlotCollectionDecorator::getHeroDeck()` → `Card::getType()`, from `Default/index.html.twig:30, 108` |
 | 50 | `comment WHERE decklist_id = ?` | `$decklist->getComments()->last()`, `IndexController.php:168` |
 | 50 | `fellowshipcomment WHERE fellowship_id = ?` | `$fellowship->getComments()->last()`, `IndexController.php:193` |
 | 50 | `reviewcomment WHERE review_id = ?` | `$review->getComments()->last()`, `IndexController.php:232` |
 | 14 | `decklistslot WHERE decklist_id = ?` | `getHeroDeck()`, `index.html.twig:30, 108, 155, 232` |
 | 8 | `user WHERE id = ?` | `decklist.user`, `fellowship.user`, `comment.user`: `index.html.twig:47, 94, 172, 218`, `macros.html.twig:66` |
-| 4 | `sphere WHERE id = ?` | `card.sphere.code`, `index.html.twig:32` |
+| 13 | `pack WHERE id = ?` | `decklist.lastPack.name`, `index.html.twig:42, 119, 167, 243` |
+| 6 | `sphere WHERE id = ?` | `card.sphere.code`, `index.html.twig:32` |
 | 4 | `decklist WHERE id = ?` | `deck.decklist` in the fellowship block, `index.html.twig:107` |
-| 2 | `pack WHERE id = ?` | `decklist.lastPack.name`, `index.html.twig:42` |
 | 2 | `fellowship_decklist WHERE fellowship_id = ?` | `fellowship.decklists`, `index.html.twig:104, 228` |
 | 1 | `type` (findAll) | `IndexController.php:40` |
 | 1 | `scenario` (findBy, daily challenge) | `IndexController.php:50` |
@@ -81,7 +83,7 @@ decks. In production, every displayed deck is different, so each one adds its ow
 | 2 | decklists and fellowships by recent discussion (LIMIT 50) | `IndexController.php:164, 189` |
 | 2 | recent reviews and recent review discussion (LIMIT 50) | `IndexController.php:211, 228` |
 
-There are **12 fixed queries**. Everything else (281) is N+1.
+There are **12 fixed queries**. Everything else (463) is N+1.
 
 ### N+1 in the template: hero cards
 
@@ -113,12 +115,11 @@ reliably the latest comment.
 
 The template then loads `comment.user` (up to 8 queries) and `comment.review.card`.
 
-### Estimate in production
+### Compared with production
 
-The fixtures reach every N+1 except the card loads (see [Fixtures](#fixtures)). With 14 distinct
-displayed decks of 25–40 cards each, these become 350–550 queries instead of 97. That puts a cold
-page at **roughly 550–750 queries**. This is still an estimate: the dump gives the real figure on a
-prod copy.
+The fixtures reach every N+1 of the page, with 14 different displayed decks (266 distinct cards).
+The count in production should be of the same order, about 450–500 queries. Real comment threads
+are longer, but each one is still a single query. A dump on a prod copy would confirm the figure.
 
 ### Caching that does not apply
 
@@ -133,10 +134,9 @@ prod copy.
 
 ## Proposals
 
-They are ordered by gain over effort. Figures are queries saved on the fixtures (293 queries), and in
-production when they differ.
+They are ordered by gain over effort. Figures are queries saved on the fixtures (475 queries).
 
-### 1. Load the displayed decks in two queries (−121 / −400 or more)
+### 1. Load the displayed decks in two queries (−292)
 
 After the 4 decklist and fellowship queries, load the decklists of the displayed fellowships with a
 fetch join (`fellowship.decklists`, then `deck.decklist`: −6):
@@ -146,8 +146,8 @@ $em->createQuery('SELECT f, fd, d FROM App\Entity\Fellowship f JOIN f.decklists 
 ```
 
 Then collect the ids of every decklist that will be displayed: the trending and new decklists plus
-the decklists of those fellowships. Initialize their slots with one more fetch join (97 cards,
-14 slot collections and 4 spheres: −115):
+the decklists of those fellowships. Initialize their slots with one more fetch join (266 cards,
+14 slot collections and 6 spheres: −286):
 
 ```php
 $em->createQuery('SELECT d, s, c FROM App\Entity\Decklist d JOIN d.slots s JOIN s.card c WHERE d.id IN (:ids)')
@@ -200,7 +200,7 @@ and keep 8.
 - Add `#[ORM\OrderBy(['dateCreation' => 'ASC'])]` to `Review::$comments`. It fixes `last()`
   elsewhere too.
 
-### 3. Fetch-join the ManyToOne associations in the main queries (about −8)
+### 3. Fetch-join the ManyToOne associations in the main queries (about −15)
 
 - Decklists (trending, new): add `JOIN d.user u LEFT JOIN d.lastPack p` and select them.
 - Fellowships: add `JOIN f.user u`.

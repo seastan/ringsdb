@@ -12,8 +12,10 @@ use App\Entity\Decklistslot;
 use App\Entity\Fellowship;
 use App\Entity\FellowshipComment;
 use App\Entity\FellowshipDecklist;
+use App\Entity\Pack;
 use App\Entity\Review;
 use App\Entity\Reviewcomment;
+use App\Entity\Sphere;
 use App\Entity\User;
 use App\Security\UserPasswordUpdater;
 use App\Services\Texts;
@@ -25,7 +27,8 @@ use Doctrine\Persistence\ObjectManager;
  * A production-like volume of community content, so that the pages that list it (the home page
  * first, see docs/issues/index-optimization.md) run the same queries as in production:
  * - 10 users;
- * - 60 copies of the 4 test decklists, with a description and 3 comments each;
+ * - 60 decklists with the contents of 60 different production decklists (volume-decklists.json:
+ *   cards only), with a description and 3 comments each;
  * - 50 public fellowships of 4 of those decklists, with a description and 2 comments each;
  * - 50 card reviews, with 2 comments each.
  *
@@ -109,8 +112,9 @@ class VolumeFixtures extends Fixture implements DependentFixtureInterface
     }
 
     /**
-     * Copies of the test decklists, published one day apart, each followed by its comments. The
-     * last comment of every 10th decklist is hidden.
+     * Decklists with the contents of production decklists (volume-decklists.json), published
+     * one day apart, each followed by its comments. The last comment of every 10th decklist is
+     * hidden.
      *
      * @param list<User> $users
      *
@@ -118,13 +122,15 @@ class VolumeFixtures extends Fixture implements DependentFixtureInterface
      */
     private function createDecklists(ObjectManager $manager, array $users): array
     {
+        /** @var list<array{source: string, last_pack: string, slots: array<string, int>, sideslots: array<string, int>}> $contents */
+        $contents = json_decode((string) file_get_contents(__DIR__.'/volume-decklists.json'), true, flags: JSON_THROW_ON_ERROR);
+        $cards = $this->findCards($manager, $contents);
+
         $decklists = [];
         for ($i = 0; $i < self::DECKLISTS; ++$i) {
-            /** @var Decklist $source */
-            $source = $this->getReference('test-decklist-'.($i % 4 + 1), Decklist::class);
             $date = self::date($i * 24);
 
-            $decklist = $this->copyDecklist($source, $users[$i % self::USERS], ucfirst(self::lorem($i, 1, 4)).' '.($i + 1), $date);
+            $decklist = $this->createDecklist($manager, $contents[$i % count($contents)], $cards, $users[$i % self::USERS], ucfirst(self::lorem($i, 1, 4)).' '.($i + 1), $date);
             $decklist->setNbVotes($i * 7 % 11);
 
             for ($j = 1; $j <= self::DECKLIST_COMMENTS; ++$j) {
@@ -144,32 +150,67 @@ class VolumeFixtures extends Fixture implements DependentFixtureInterface
         return $decklists;
     }
 
-    private function copyDecklist(Decklist $source, User $user, string $name, \DateTime $date): Decklist
+    /**
+     * @param list<array{slots: array<string, int>, sideslots: array<string, int>}> $contents
+     *
+     * @return array<string, Card> by code
+     */
+    private function findCards(ObjectManager $manager, array $contents): array
     {
-        $descriptionMd = self::lorem($source->getStartingThreat(), 6)."\n\n".self::lorem($source->getStartingThreat() + 3, 4);
+        $codes = [];
+        foreach ($contents as $content) {
+            $codes = array_merge($codes, array_map('strval', array_keys($content['slots'] + $content['sideslots'])));
+        }
+
+        $cards = [];
+        foreach ($manager->getRepository(Card::class)->findBy(['code' => array_unique($codes)]) as $card) {
+            $cards[$card->getCode()] = $card;
+        }
+        if ($missing = array_diff($codes, array_keys($cards))) {
+            throw new \LogicException('Unknown cards: '.implode(', ', array_unique($missing)));
+        }
+
+        return $cards;
+    }
+
+    /**
+     * The derived fields (spheres, predominant sphere, starting threat) are computed like
+     * DecklistFactory does.
+     *
+     * @param array{source: string, last_pack: string, slots: array<string, int>, sideslots: array<string, int>} $content
+     * @param array<string, Card>                                                                                $cards
+     */
+    private function createDecklist(ObjectManager $manager, array $content, array $cards, User $user, string $name, \DateTime $date): Decklist
+    {
+        $descriptionMd = self::lorem(strlen($name), 6)."\n\n".self::lorem(strlen($name) + 3, 4);
 
         $decklist = new Decklist($user);
         $decklist->setName($name);
-        $decklist->setVersion($source->getVersion());
-        $decklist->setNameCanonical($this->texts->slugify($name).'-'.$source->getVersion());
+        $decklist->setVersion('1.0');
+        $decklist->setNameCanonical($this->texts->slugify($name).'-1.0');
         $decklist->setDescriptionMd($descriptionMd);
         $decklist->setDescriptionHtml($this->texts->markdown($descriptionMd));
-        // not the signature of the source: the copies are not published versions of its deck
         $decklist->setSignature(md5($name));
-        $decklist->setLastPack($source->getLastPack());
-        $decklist->setPredominantSphere($source->getPredominantSphere());
-        $decklist->setStartingThreat($source->getStartingThreat());
+        $decklist->setLastPack($manager->getRepository(Pack::class)->findOneBy(['name' => $content['last_pack']]));
         $decklist->setDateCreation($date);
         $decklist->setDateUpdate($date);
 
-        foreach ($source->getSlots() as $slot) {
-            $decklist->getSlots()->add(new Decklistslot($decklist, $slot->getCard(), $slot->getQuantity()));
+        foreach ($content['slots'] as $code => $quantity) {
+            $decklist->getSlots()->add(new Decklistslot($decklist, $cards[(string) $code], $quantity));
         }
-        foreach ($source->getSideslots() as $slot) {
-            $decklist->getSideslots()->add(new Decklistsideslot($decklist, $slot->getCard(), $slot->getQuantity()));
+        foreach ($content['sideslots'] as $code => $quantity) {
+            $decklist->getSideslots()->add(new Decklistsideslot($decklist, $cards[(string) $code], $quantity));
         }
-        foreach ($source->getSpheres() as $sphere) {
-            $decklist->addSphere($sphere);
+
+        $countBySphere = $decklist->getSlots()->getCountBySphere();
+        $predominantSphere = array_keys($countBySphere, max(...array_values($countBySphere)))[0];
+        $decklist->setPredominantSphere($manager->getRepository(Sphere::class)->findOneBy(['code' => $predominantSphere]));
+        $decklist->setStartingThreat($decklist->getSlots()->getStartingThreat());
+        foreach ($decklist->getSlots()->getHeroDeck() as $hero) {
+            $sphere = $hero->getCard()->getSphere();
+            if ($sphere instanceof Sphere && !$decklist->getSpheres()->contains($sphere)) {
+                $decklist->addSphere($sphere);
+            }
         }
 
         return $decklist;

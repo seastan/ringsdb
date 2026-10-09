@@ -71,7 +71,7 @@ class ApiControllerTest extends WebTestCase
             'decklist' => ['decklist_1', '/api/public/decklist/1', 'Sun, 16 Aug 2015 00:00:00 GMT'],
             'decklists by date' => ['decklists_2015-08-16', '/api/public/decklists/by_date/2015-08-16', null],
             'decklists by date, none' => ['empty_array', '/api/public/decklists/by_date/2000-01-01', null],
-            'top decklists by card' => ['top_decklists_01001', '/api/public/decklists/top_by_card/01001', 'Thu, 27 Feb 2014 00:00:00 GMT'],
+            'top decklists by card' => ['top_decklists_01001', '/api/public/decklists/top_by_card/01001', 'Sun, 16 Aug 2015 00:00:00 GMT'],
             'top decklists by unknown card' => ['empty_array', '/api/public/decklists/top_by_card/99999', null],
             'scenario' => ['scenario_1', '/api/public/scenario/1', 'Wed, 13 Mar 2019 18:44:33 GMT'],
         ];
@@ -213,7 +213,7 @@ class ApiControllerTest extends WebTestCase
             'cards by pack' => ['/api/public/cards/Core', 'Wed, 04 Mar 2020 14:07:55 GMT'],
             'search' => ['/api/public/cards/search/Aragorn', 'Fri, 09 Sep 2022 12:59:33 GMT'],
             'decklist' => ['/api/public/decklist/1', 'Sun, 16 Aug 2015 00:00:00 GMT'],
-            'top decklists by card' => ['/api/public/decklists/top_by_card/01001', 'Thu, 27 Feb 2014 00:00:00 GMT'],
+            'top decklists by card' => ['/api/public/decklists/top_by_card/01001', 'Sun, 16 Aug 2015 00:00:00 GMT'],
             'scenario' => ['/api/public/scenario/1', 'Wed, 13 Mar 2019 18:44:33 GMT'],
         ];
     }
