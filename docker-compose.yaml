@@ -58,6 +58,10 @@ services:
         volumes:
             - .:/var/www/html
             - ${CARD_IMAGES_DIR:-../card_images}:/var/card_images
+        # the Symfony cache (including the Doctrine second-level cache pool) lives in memory
+        # rather than on the slow bind mount; it is emptied when the container restarts
+        tmpfs:
+            - /var/www/html/var/cache:uid=82,gid=82,mode=0755,size=512m
         ports:
             - 8080:8000
         user: www-data
