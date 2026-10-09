@@ -245,7 +245,7 @@ class AdminWriteTest extends WebTestCase
 
     /**
      * A card used in decks and decklists cannot be deleted, but can be "force deleted": its
-     * slots, printings and reviews are deleted with it.
+     * slots, printings and reviews (with their votes and comments) are deleted with it.
      */
     public function testForceDeleteACard(): void
     {
@@ -257,6 +257,11 @@ class AdminWriteTest extends WebTestCase
         $connection = $this->db();
         $connection->insert('card_printing', ['card_id' => $cardId, 'pack_id' => 1, 'position' => 999, 'quantity' => 1, 'image_code' => '99901', 'date_creation' => '2015-08-16 00:00:00', 'date_update' => '2015-08-16 00:00:00']);
         $connection->insert('deckslot', ['deck_id' => 1, 'card_id' => $cardId, 'quantity' => 1]);
+        $connection->insert('decklistslot', ['decklist_id' => 1, 'card_id' => $cardId, 'quantity' => 1]);
+        $connection->insert('review', ['card_id' => $cardId, 'user_id' => 2, 'date_creation' => '2015-08-16 00:00:00', 'date_update' => '2015-08-16 00:00:00', 'text_md' => 'Review', 'text_html' => '<p>Review</p>', 'nb_votes' => 1]);
+        $reviewId = (int) $connection->lastInsertId();
+        $connection->insert('reviewvote', ['review_id' => $reviewId, 'user_id' => 3]);
+        $connection->insert('reviewcomment', ['review_id' => $reviewId, 'user_id' => 3, 'date_creation' => '2015-08-16 00:00:00', 'date_update' => '2015-08-16 00:00:00', 'text' => 'Comment']);
 
         // regular delete fails on the foreign keys
         $response = $this->submitForm($client, "/admin/card/$cardId/edit", "/admin/card/$cardId/delete", []);
@@ -269,6 +274,10 @@ class AdminWriteTest extends WebTestCase
         $this->assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM card WHERE id = ?', [$cardId]));
         $this->assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM card_printing WHERE card_id = ?', [$cardId]));
         $this->assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM deckslot WHERE card_id = ?', [$cardId]));
+        $this->assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM decklistslot WHERE card_id = ?', [$cardId]));
+        $this->assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM review WHERE card_id = ?', [$cardId]));
+        $this->assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM reviewvote WHERE review_id = ?', [$reviewId]));
+        $this->assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM reviewcomment WHERE review_id = ?', [$reviewId]));
         $this->assertSame(22, $connection->fetchOne('SELECT COUNT(*) FROM deckslot WHERE deck_id = 1'));
     }
 

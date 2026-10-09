@@ -137,6 +137,7 @@ class Card
     /**
      * @var Collection<int, CardPrinting>
      */
+    #[ORM\Cache(usage: 'NONSTRICT_READ_WRITE')]
     #[ORM\OneToMany(targetEntity: CardPrinting::class, mappedBy: 'card', cascade: ['remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['position' => \SortDirection::Ascending])]
     private $printings;

@@ -2,3 +2,8 @@ doctrine:
     dbal:
         # the origin of each query in the profiler (DatabaseQueriesTrait)
         profiling_collect_backtrace: true
+    orm:
+        # the test database is rebuilt underneath the cache (make test-fixtures), which would serve
+        # stale entities
+        second_level_cache:
+            enabled: false

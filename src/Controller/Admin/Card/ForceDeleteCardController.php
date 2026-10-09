@@ -6,7 +6,10 @@ namespace App\Controller\Admin\Card;
 
 use App\Controller\Admin\DeleteFormTrait;
 use App\Entity\Card;
-use Doctrine\DBAL\Connection;
+use App\Entity\Decklistsideslot;
+use App\Entity\Decklistslot;
+use App\Entity\Decksideslot;
+use App\Entity\Deckslot;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,8 +22,7 @@ class ForceDeleteCardController extends AbstractController
     use DeleteFormTrait;
 
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly Connection $connection
+        private readonly EntityManagerInterface $entityManager
     ) {
     }
 
@@ -33,15 +35,23 @@ class ForceDeleteCardController extends AbstractController
         $form = $this->createDeleteForm($entity->getId());
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->connection->executeQuery('DELETE FROM deckslot WHERE card_id = ?', [$entity->getId()]);
-            $this->connection->executeQuery('DELETE FROM decksideslot WHERE card_id = ?', [$entity->getId()]);
-            $this->connection->executeQuery('DELETE FROM decklistslot WHERE card_id = ?', [$entity->getId()]);
-            $this->connection->executeQuery('DELETE FROM decklistsideslot WHERE card_id = ?', [$entity->getId()]);
-            $this->connection->executeQuery('DELETE FROM card_printing WHERE card_id = ?', [$entity->getId()]);
-            $this->connection->executeQuery('DELETE FROM reviewvote WHERE review_id IN (SELECT id FROM review WHERE card_id = ?)', [$entity->getId()]);
-            $this->connection->executeQuery('DELETE FROM review WHERE card_id = ?', [$entity->getId()]);
-            $this->entityManager->remove($entity);
-            $this->entityManager->flush();
+            $this->entityManager->wrapInTransaction(function (EntityManagerInterface $entityManager) use ($entity): void {
+                // bulk deletes: a card can be in many decks
+                foreach ([Deckslot::class, Decksideslot::class, Decklistslot::class, Decklistsideslot::class] as $slotClass) {
+                    $entityManager->createQuery('DELETE FROM '.$slotClass.' s WHERE s.card = :card')
+                        ->setParameter('card', $entity)
+                        ->execute();
+                }
+
+                // the votes go with the reviews (join table), the printings with the card (cascade)
+                foreach ($entity->getReviews() as $review) {
+                    foreach ($review->getComments() as $comment) {
+                        $entityManager->remove($comment);
+                    }
+                    $entityManager->remove($review);
+                }
+                $entityManager->remove($entity);
+            });
         }
 
         return $this->redirect($this->generateUrl('admin_card'));

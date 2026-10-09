@@ -70,6 +70,7 @@ class Cycle
     /**
      * @var Collection<int, Pack>
      */
+    #[ORM\Cache(usage: 'NONSTRICT_READ_WRITE')]
     #[ORM\OneToMany(targetEntity: Pack::class, mappedBy: 'cycle')]
     #[ORM\OrderBy(['position' => \SortDirection::Ascending])]
     private $packs;

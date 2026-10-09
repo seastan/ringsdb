@@ -17,6 +17,12 @@ doctrine:
         auto_generate_proxy_classes: "%kernel.debug%"
         naming_strategy:             doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping:                true
+        # the entities marked with #[ORM\Cache] are cached on the filesystem (regions expire after
+        # region_lifetime: 1 hour by default)
+        second_level_cache:
+            region_cache_driver:
+                type: pool
+                pool: doctrine.second_level_cache_pool
         mappings:
             # the entities of the application (no longer a bundle): PHP attributes in the
             # entity classes
@@ -33,3 +39,9 @@ doctrine:
                 power: DoctrineExtensions\Query\Mysql\Power
             string_functions:
                 replace: DoctrineExtensions\Query\Mysql\Replace
+
+framework:
+    cache:
+        pools:
+            doctrine.second_level_cache_pool:
+                adapter: cache.adapter.filesystem
