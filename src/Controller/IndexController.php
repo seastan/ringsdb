@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\CardPrinting;
+use App\Entity\Comment;
 use App\Entity\Decklist;
 use App\Entity\Fellowship;
+use App\Entity\FellowshipComment;
 use App\Entity\Review;
+use App\Entity\Reviewcomment;
 use App\Repository\ScenarioRepository;
 use App\Repository\TypeRepository;
-use App\Services\DecklistManager;
-use App\Services\FellowshipManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,14 +30,12 @@ class IndexController extends AbstractController
     }
 
     #[Route(path: '/', name: 'index', methods: ['GET'])]
-    public function __invoke(DecklistManager $decklistManager, FellowshipManager $fellowshipManager, ScenarioRepository $scenarioRepository, TypeRepository $typeRepository): Response
+    public function __invoke(ScenarioRepository $scenarioRepository, TypeRepository $typeRepository): Response
     {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
-        // Managers
-        $decklist_manager = $decklistManager;
-        $fellowship_manager = $fellowshipManager;
+
         $typeNames = [];
         foreach ($typeRepository->findAll() as $type) {
             $typeNames[$type->getCode()] = $type->getName();
@@ -145,110 +145,64 @@ class IndexController extends AbstractController
 
         $this->loadDisplayedDecks(array_merge($decklists_trending, $decklists_new), array_merge($fellowships_trending, $fellowships_new));
 
-        // This will contain all the comments - a combination of decklist comments, fellowship comments,
-        // reviews, review comments, etc.
+        // Recent comments: the most recent decklist comments, fellowship comments, reviews and
+        // review comments, merged and sorted by date
+        $num_comments_displayed = 8;
         $all_comments = [];
-        // Number of recent comments to show on the front page
-        // BUG: It seems like the setDateLastComment I added to Decklists, Fellowships, and Reviews somehow
-        // gets called spontaneuosly on decks without recent comments, even though the only place
-        // setDateLastComment appears is in the commentAction in the SocialController, FellowshipController,
-        // and ReviewController. This results in decks with no recent comments being returned by
-        // find___ByRecentDiscussion(). When these get compared to the dateCreation of recent Reviews,
-        // which works properly, naturally the reviews win out, and the resulting top $num_comments end up
-        // being mostly reviews. One current workaround I have is to make $num_comments very large so that even
-        // with some old decklists finding there way in, there will be enough deckslists with real recent
-        // comments that it wont matter. Then, after sorting $all_comments by date, we trim down to the
-        // number we actually want.
-        $num_comments = 50;
+        // A review is shown only if its card has a released printing
+        $released_card = 'EXISTS (SELECT cp.id FROM '.CardPrinting::class.' cp JOIN cp.pack p WHERE cp.card = card AND p.dateRelease IS NOT NULL)';
+
         // Recent decklist comments
-        $decklist_manager->setLimit($num_comments);
-        $paginator = $decklist_manager->findDecklistsByRecentDiscussion();
-        $decklists_recent_discussion = iterator_to_array($paginator->getIterator());
-        for ($i = 0; $i < min($num_comments, count($decklists_recent_discussion)); ++$i) {
-            $decklist = $decklists_recent_discussion[$i];
-            $comment = [];
-            $lastcomment = $decklist->getComments()->last();
-            if ($lastcomment) {
-                if ($lastcomment->getIsHidden()) {
-                    continue;
-                }
-
-                $comment['type'] = 'decklist';
-                $comment['decklist'] = $decklist;
-                $comment['user'] = $lastcomment->getUser();
-                $comment['dateCreation'] = $lastcomment->getDateCreation();
-                $comment['text'] = $lastcomment->getText();
-            } else {
-                continue;
-            }
-
-            $all_comments[] = $comment;
+        $dql = 'SELECT c, u, d FROM '.Comment::class.' c JOIN c.user u JOIN c.decklist d WHERE c.isHidden = false ORDER BY c.dateCreation DESC, c.id DESC';
+        foreach ($this->entityManager->createQuery($dql)->setMaxResults($num_comments_displayed)->getResult() as $comment) {
+            $all_comments[] = [
+                'type' => 'decklist',
+                'decklist' => $comment->getDecklist(),
+                'user' => $comment->getUser(),
+                'dateCreation' => $comment->getDateCreation(),
+                'text' => $comment->getText(),
+            ];
         }
 
         // Recent fellowship comments
-        $fellowship_manager->setLimit($num_comments);
-        $paginator = $fellowship_manager->findFellowshipsByRecentDiscussion();
-        $fellowships_recent_discussion = iterator_to_array($paginator->getIterator());
-        for ($i = 0; $i < min($num_comments, count($fellowships_recent_discussion)); ++$i) {
-            $fellowship = $fellowships_recent_discussion[$i];
-            $comment = [];
-            $lastcomment = $fellowship->getComments()->last();
-            if ($lastcomment) {
-                $comment['type'] = 'fellowship';
-                $comment['fellowship'] = $fellowship;
-                $comment['user'] = $lastcomment->getUser();
-                $comment['dateCreation'] = $lastcomment->getDateCreation();
-                $comment['text'] = $lastcomment->getText();
-            } else {
-                continue;
-            }
-
-            $all_comments[] = $comment;
+        $dql = 'SELECT c, u, f FROM '.FellowshipComment::class.' c JOIN c.user u JOIN c.fellowship f WHERE f.isPublic = true AND c.isHidden = false ORDER BY c.dateCreation DESC, c.id DESC';
+        foreach ($this->entityManager->createQuery($dql)->setMaxResults($num_comments_displayed)->getResult() as $comment) {
+            $all_comments[] = [
+                'type' => 'fellowship',
+                'fellowship' => $comment->getFellowship(),
+                'user' => $comment->getUser(),
+                'dateCreation' => $comment->getDateCreation(),
+                'text' => $comment->getText(),
+            ];
         }
 
-        // Get recent card reviews
-        $dql = 'SELECT DISTINCT r FROM '.Review::class.' r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC, r.id DESC';
-        $query = $this->entityManager->createQuery($dql)->setMaxResults($num_comments);
-        $paginator = new Paginator($query, false);
-        $reviews_recent = iterator_to_array($paginator->getIterator());
-        for ($i = 0; $i < min($num_comments, count($reviews_recent)); ++$i) {
-            $review = $reviews_recent[$i];
-            $comment = [];
-            $comment['type'] = 'review';
-            $comment['review'] = $review;
-            $comment['user'] = $review->getUser();
-            $comment['dateCreation'] = $review->getDateCreation();
-            $comment['text'] = $review->getTextHtml();
-
-            $all_comments[] = $comment;
+        // Recent card reviews
+        $dql = 'SELECT r, u, card FROM '.Review::class.' r JOIN r.user u JOIN r.card card WHERE '.$released_card.' ORDER BY r.dateCreation DESC, r.id DESC';
+        foreach ($this->entityManager->createQuery($dql)->setMaxResults($num_comments_displayed)->getResult() as $review) {
+            $all_comments[] = [
+                'type' => 'review',
+                'review' => $review,
+                'user' => $review->getUser(),
+                'dateCreation' => $review->getDateCreation(),
+                'text' => $review->getTextHtml(),
+            ];
         }
 
         // Recent review comments
-        $dql = 'SELECT DISTINCT r FROM '.Review::class.' r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateLastComment DESC, r.id DESC';
-        $query = $this->entityManager->createQuery($dql)->setMaxResults($num_comments);
-        $paginator = new Paginator($query, false);
-        $reviews_recent_discussion = iterator_to_array($paginator->getIterator());
-        for ($i = 0; $i < min($num_comments, count($reviews_recent_discussion)); ++$i) {
-            $review = $reviews_recent_discussion[$i];
-            $comment = [];
-            $lastcomment = $review->getComments()->last();
-            if ($lastcomment) {
-                $comment['type'] = 'reviewcomment';
-                $comment['review'] = $review;
-                $comment['user'] = $lastcomment->getUser();
-                $comment['dateCreation'] = $lastcomment->getDateCreation();
-                $comment['text'] = $lastcomment->getText();
-            } else {
-                continue;
-            }
-
-            $all_comments[] = $comment;
+        $dql = 'SELECT c, u, r, card FROM '.Reviewcomment::class.' c JOIN c.user u JOIN c.review r JOIN r.card card WHERE '.$released_card.' ORDER BY c.dateCreation DESC, c.id DESC';
+        foreach ($this->entityManager->createQuery($dql)->setMaxResults($num_comments_displayed)->getResult() as $comment) {
+            $all_comments[] = [
+                'type' => 'reviewcomment',
+                'review' => $comment->getReview(),
+                'user' => $comment->getUser(),
+                'dateCreation' => $comment->getDateCreation(),
+                'text' => $comment->getText(),
+            ];
         }
 
         // Sort all comments by date
         usort($all_comments, $this->orderNew(...));
-        $num_comments_displayed = 8;
-        // Limit number to $num_comments
+        // Limit number to $num_comments_displayed
         $all_comments = array_slice($all_comments, 0, $num_comments_displayed);
         // Limit number of words in a comment
         for ($i = 0; $i < count($all_comments); ++$i) {

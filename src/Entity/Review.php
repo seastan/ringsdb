@@ -14,6 +14,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  */
 #[ORM\Entity(repositoryClass: \App\Repository\ReviewRepository::class)]
 #[ORM\Table(name: 'review')]
+#[ORM\Index(name: 'idx_review_date_creation', columns: ['date_creation'])]
 class Review
 {
     /**
@@ -57,6 +58,7 @@ class Review
      * @var Collection<int, Reviewcomment>
      */
     #[ORM\OneToMany(targetEntity: Reviewcomment::class, mappedBy: 'review', cascade: ['persist'])]
+    #[ORM\OrderBy(['dateCreation' => \SortDirection::Ascending])]
     private $comments;
 
     #[ORM\ManyToOne(targetEntity: Card::class, inversedBy: 'reviews')]

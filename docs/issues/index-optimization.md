@@ -1,6 +1,7 @@
 # Home page: too many SQL queries
 
-Status: open. Proposal 1 is implemented (475 → 185 queries); the inventory below is the state before it.
+Status: open. Proposals 1 and 2 are implemented (475 → 185 → 25 queries); the inventory below is
+the state before them.
 
 ## Problem
 
@@ -176,6 +177,14 @@ Alternatives:
   cache hits per page.
 
 ### 2. Recent comments: query the comments, not their parents (−150, plus some user loads)
+
+Done: 185 → 25 queries (−150 comment collections, −8 user loads, −2 Paginator `COUNT`s, the 4
+"LIMIT 50" queries replaced by 4 "LIMIT 8" queries). Implemented as described below, without the
+one-row-per-thread variant: a busy thread can fill several of the 8 slots. Hidden fellowship
+comments are now skipped too, like hidden decklist comments. The migration
+`Version20261009120000` adds the `date_creation` indexes on `comment`, `fellowshipcomment`,
+`reviewcomment` and `review`. `DecklistManager::findDecklistsByRecentDiscussion()` and
+`FellowshipManager::findFellowshipsByRecentDiscussion()` are no longer called.
 
 Replace the 4 "LIMIT 50 + `getComments()->last()`" blocks with 4 queries on the comment tables.
 Each query joins the user and the parent and returns the 8 most recent rows:

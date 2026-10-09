@@ -18,7 +18,7 @@ class IndexQueriesTest extends WebTestCase
 {
     use DatabaseQueriesTrait;
 
-    private const int EXPECTED_QUERIES = 185;
+    private const int EXPECTED_QUERIES = 25;
 
     public function testHomePageQueries(): void
     {

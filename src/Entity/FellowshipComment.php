@@ -12,6 +12,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  */
 #[ORM\Entity(repositoryClass: \App\Repository\FellowshipCommentRepository::class)]
 #[ORM\Table(name: 'fellowshipcomment')]
+#[ORM\Index(name: 'idx_fellowshipcomment_date_creation', columns: ['date_creation'])]
 class FellowshipComment
 {
     /**
