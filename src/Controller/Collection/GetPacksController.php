@@ -30,7 +30,7 @@ class GetPacksController extends AbstractController
         $categories = [];
         $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
         $repackaged = ['label' => 'Repackaged', 'packs' => []];
-        $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
+        $list_cycles = $this->cycleRepository->findAllWithPacks();
         // owned_packs is a per-pack COUNT map encoded as "id" / "id:count" tokens
         // (legacy "id-2"/"id-3" core copies each count as +1).
         $owned_packs = $this->currentUser()->getOwnedPacks();

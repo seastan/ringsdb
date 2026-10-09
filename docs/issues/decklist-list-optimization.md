@@ -135,9 +135,10 @@ In `DecklistManager::getQueryBuilder()` (`DecklistManager.php:117`), add
 ### 3. Search form: load the cycles with their packs (−32, −1 per requested card) — done
 
 Implemented with `CycleRepository::findAllWithPacks()`: `find` 48 → 5 queries. With no pack
-selected, every pack is checked, so the `SELECT id FROM pack` is simply dropped. The same
-cycle/pack N+1 is still in `SearchDecklistController`, `GetPacksController`, `ListFellowshipController`,
-`ListQuestlogController` and `SearchQuestlogController`: they can use `findAllWithPacks()` too.
+selected, every pack is checked, so the `SELECT id FROM pack` is simply dropped.
+`SearchDecklistController`, `GetPacksController`, `ListFellowshipController`,
+`ListQuestlogController`, `SearchQuestlogController` and `SearchFellowshipController` use
+`findAllWithPacks()` too.
 
 - Load the cycles and their packs in one query:
   `SELECT c, p FROM App\Entity\Cycle c LEFT JOIN c.packs p ORDER BY c.position, p.position`
