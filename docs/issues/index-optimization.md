@@ -1,6 +1,6 @@
 # Home page: too many SQL queries
 
-Status: open. Analysis and proposals only, nothing implemented yet.
+Status: open. Proposal 1 is implemented (475 → 185 queries); the inventory below is the state before it.
 
 ## Problem
 
@@ -136,7 +136,11 @@ are longer, but each one is still a single query. A dump on a prod copy would co
 
 They are ordered by gain over effort. Figures are queries saved on the fixtures (475 queries).
 
-### 1. Load the displayed decks in two queries (−292)
+### 1. Load the displayed decks in two queries (−292) — done
+
+Implemented in `IndexController::loadDisplayedDecks()`: 475 → 185 queries (−292 lazy loads, +2
+fetch-join queries). The joins are `LEFT JOIN`s, so a fellowship without decklists or a decklist
+without slots is still marked as loaded, and the fellowship decklists are ordered by id.
 
 After the 4 decklist and fellowship queries, load the decklists of the displayed fellowships with a
 fetch join (`fellowship.decklists`, then `deck.decklist`: −6):

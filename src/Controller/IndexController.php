@@ -143,6 +143,8 @@ class IndexController extends AbstractController
             $fellowships_new[] = $fellowship;
         }
 
+        $this->loadDisplayedDecks(array_merge($decklists_trending, $decklists_new), array_merge($fellowships_trending, $fellowships_new));
+
         // This will contain all the comments - a combination of decklist comments, fellowship comments,
         // reviews, review comments, etc.
         $all_comments = [];
@@ -294,6 +296,40 @@ class IndexController extends AbstractController
             'all_comments' => $all_comments,
             'daily_challenge' => $daily_challenge,
         ], $response);
+    }
+
+    /**
+     * Loads the decklists of the fellowships, then the slots, cards and spheres of every displayed
+     * decklist, so that getHeroDeck() runs without a query.
+     *
+     * The slots are not filtered on the hero type: Doctrine would mark the partial collections as
+     * initialized.
+     *
+     * @param Decklist[]   $decklists
+     * @param Fellowship[] $fellowships
+     */
+    private function loadDisplayedDecks(array $decklists, array $fellowships): void
+    {
+        if ([] !== $fellowships) {
+            $this->entityManager
+                ->createQuery('SELECT f, fd, d FROM '.Fellowship::class.' f LEFT JOIN f.decklists fd LEFT JOIN fd.decklist d WHERE f IN (:fellowships) ORDER BY fd.id')
+                ->setParameter('fellowships', $fellowships)
+                ->getResult();
+            foreach ($fellowships as $fellowship) {
+                foreach ($fellowship->getDecklists() as $fellowshipDecklist) {
+                    $decklists[] = $fellowshipDecklist->getDecklist();
+                }
+            }
+        }
+
+        if ([] === $decklists) {
+            return;
+        }
+
+        $this->entityManager
+            ->createQuery('SELECT d, s, c, sp FROM '.Decklist::class.' d LEFT JOIN d.slots s LEFT JOIN s.card c LEFT JOIN c.sphere sp WHERE d.id IN (:ids)')
+            ->setParameter('ids', array_unique(array_map(static fn (Decklist $decklist): ?int => $decklist->getId(), $decklists)))
+            ->getResult();
     }
 
     /**
