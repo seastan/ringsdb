@@ -1,0 +1,4 @@
+doctrine:
+    dbal:
+        # the origin of each query in the profiler (DatabaseQueriesTrait)
+        profiling_collect_backtrace: true
