@@ -11,6 +11,7 @@ use App\Entity\Fellowship;
 use App\Entity\FellowshipComment;
 use App\Entity\Review;
 use App\Entity\Reviewcomment;
+use App\Repository\DecklistRepository;
 use App\Repository\ScenarioRepository;
 use App\Repository\TypeRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,7 +26,8 @@ class IndexController extends AbstractController
         private readonly int $cacheExpiration,
         private readonly ?string $gameName,
         private readonly ?string $publisherName,
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly DecklistRepository $decklistRepository
     ) {
     }
 
@@ -253,11 +255,8 @@ class IndexController extends AbstractController
     }
 
     /**
-     * Loads the decklists of the fellowships, then the slots, cards and spheres of every displayed
-     * decklist, so that getHeroDeck() runs without a query.
-     *
-     * The slots are not filtered on the hero type: Doctrine would mark the partial collections as
-     * initialized.
+     * Loads the decklists of the fellowships, then the slots of every displayed decklist, so that
+     * getHeroDeck() runs without a query.
      *
      * @param Decklist[]   $decklists
      * @param Fellowship[] $fellowships
@@ -276,14 +275,7 @@ class IndexController extends AbstractController
             }
         }
 
-        if ([] === $decklists) {
-            return;
-        }
-
-        $this->entityManager
-            ->createQuery('SELECT d, s, c, sp FROM '.Decklist::class.' d LEFT JOIN d.slots s LEFT JOIN s.card c LEFT JOIN c.sphere sp WHERE d.id IN (:ids)')
-            ->setParameter('ids', array_unique(array_map(static fn (Decklist $decklist): ?int => $decklist->getId(), $decklists)))
-            ->getResult();
+        $this->decklistRepository->loadSlots($decklists);
     }
 
     /**
