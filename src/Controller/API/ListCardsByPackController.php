@@ -32,7 +32,7 @@ class ListCardsByPackController extends AbstractController
      *
      * Get the description of all the card from a pack, as an array of JSON objects.
      */
-    #[OA\Parameter(name: 'pack_code', in: 'path', description: "The code of the pack to get the cards from, e.g. 'Core'")]
+    #[OA\Parameter(name: 'pack_code', description: "The code of the pack to get the cards from, e.g. 'Core'", in: 'path')]
     #[Route(path: '/api/public/cards/{pack_code}.{_format}', name: 'api_cards_pack', requirements: ['_format' => 'json|xml|xlsx|xls'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function __invoke(Request $request, #[MapEntity(mapping: ['pack_code' => 'code'], message: 'Pack not found')] Pack $pack, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {

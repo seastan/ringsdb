@@ -48,8 +48,10 @@ class ForceDeleteCardController extends AbstractController
                     foreach ($review->getComments() as $comment) {
                         $entityManager->remove($comment);
                     }
+
                     $entityManager->remove($review);
                 }
+
                 $entityManager->remove($entity);
             });
         }

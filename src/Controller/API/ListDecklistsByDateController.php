@@ -35,7 +35,7 @@ class ListDecklistsByDateController extends AbstractController
      *
      * Get the description of all the decklists published at a given date, as an array of JSON objects.
      */
-    #[OA\Parameter(name: 'date', in: 'path', description: "The date, format 'Y-m-d'", schema: new OA\Schema(type: 'string', format: 'date'))]
+    #[OA\Parameter(name: 'date', description: "The date, format 'Y-m-d'", in: 'path', schema: new OA\Schema(type: 'string', format: 'date'))]
     #[Route(path: '/api/public/decklists/by_date/{date}.{_format}', name: 'api_decklists_by_date', requirements: ['_format' => 'json', 'date' => '\d\d\d\d-\d\d-\d\d'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function __invoke(Request $request, UserRepository $userRepository, string $date, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {

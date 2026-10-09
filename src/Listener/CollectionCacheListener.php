@@ -24,7 +24,7 @@ class CollectionCacheListener
 {
     /**
      * @var array<string, array{class-string, string, Card|Pack|Cycle}> the collections to evict
-     *                                                                   after the flush
+     *                                                                  after the flush
      */
     private array $collections = [];
 
@@ -54,12 +54,12 @@ class CollectionCacheListener
         $cache = $args->getObjectManager()->getCache();
         $collections = $this->collections;
         $this->collections = [];
-        if ($cache === null) {
+        if (null === $cache) {
             return;
         }
 
         foreach ($collections as [$class, $association, $owner]) {
-            if ($owner->getId() !== null) {
+            if (null !== $owner->getId()) {
                 $cache->evictCollection($class, $association, $owner->getId());
             }
         }
@@ -71,7 +71,7 @@ class CollectionCacheListener
     private function add(string $class, string $association, Card|Pack|Cycle|null ...$owners): void
     {
         foreach ($owners as $owner) {
-            if ($owner !== null) {
+            if (null !== $owner) {
                 $this->collections[$class.'.'.$association.'#'.spl_object_id($owner)] = [$class, $association, $owner];
             }
         }

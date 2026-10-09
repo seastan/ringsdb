@@ -71,6 +71,9 @@ deprecations: test-fixtures
 lint-twig:
 	$(EXEC_SYMFONY) php bin/console lint:twig templates
 
+lint-container:
+	$(EXEC_SYMFONY) php bin/console lint:container
+
 clear-cache:
 	$(EXEC_SYMFONY) php bin/console cache:clear --env=test
 	$(EXEC_SYMFONY) php bin/console cache:clear --env=dev
@@ -79,9 +82,12 @@ cs:
 	$(EXEC_SYMFONY) php vendor/bin/php-cs-fixer fix
 
 rector:
+	$(EXEC_SYMFONY) php vendor/bin/rector --dry-run
+
+rector-fix:
 	$(EXEC_SYMFONY) php vendor/bin/rector
 
-all: install lint-twig rector cs phpstan phpunit
+all: install lint-container lint-twig rector cs phpstan phpunit
 
 reset:
 	rm -rf var/ vendor/ public/bundles public/css public/js

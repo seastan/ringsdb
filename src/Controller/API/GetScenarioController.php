@@ -29,7 +29,7 @@ class GetScenarioController extends AbstractController
      *
      * Get the description of a scenario as a JSON object.
      */
-    #[OA\Parameter(name: 'scenario_id', in: 'path', description: 'The numeric identifier of the scenario', schema: new OA\Schema(type: 'integer'))]
+    #[OA\Parameter(name: 'scenario_id', description: 'The numeric identifier of the scenario', in: 'path', schema: new OA\Schema(type: 'integer'))]
     #[Route(path: '/api/public/scenario/{scenario_id}.{_format}', name: 'api_scenario', requirements: ['_format' => 'json', 'scenario_id' => '\d+'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function __invoke(Request $request, #[MapEntity(id: 'scenario_id', message: 'Scenario not found.')] Scenario $scenario, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {

@@ -73,19 +73,14 @@ class CardsData
      */
     public function allSetsData(): array
     {
-        $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
+        $list_cycles = $this->cycleRepository->findAllWithPacks();
         $cycles = [];
 
         foreach ($list_cycles as $cycle) {
             $packs = [];
-            $sreal = 0;
             $smax = 0;
 
             foreach ($cycle->getPacks() as $pack) {
-                // count via printings: a repackaged pack's cards live as printings of
-                // canonical cards in other packs, so getCards() would be empty for it.
-                $real = count($pack->getPrintings());
-                $sreal += $real;
                 $max = $pack->getSize();
                 $smax += $max;
 
@@ -93,7 +88,6 @@ class CardsData
                     'label' => $pack->getName(),
                     'code' => $pack->getCode(),
                     'available' => $pack->getDateRelease() ? $pack->getDateRelease()->format('Y-m-d') : '',
-                    'known' => intval($real),
                     'total' => $max,
                     'url' => $this->router->generate('cards_list', ['pack_code' => $pack->getCode()], UrlGeneratorInterface::ABSOLUTE_URL),
                     'search' => 'e:'.$pack->getCode(),
@@ -107,7 +101,6 @@ class CardsData
                 $cycles[] = [
                     'label' => $cycle->getName(),
                     'code' => $cycle->getCode(),
-                    'known' => intval($sreal),
                     'total' => $smax,
                     'url' => $this->router->generate('cards_cycle', ['cycle_code' => $cycle->getCode()], UrlGeneratorInterface::ABSOLUTE_URL),
                     'search' => 'c:'.$cycle->getCode(),

@@ -29,7 +29,7 @@ class SearchCardsController extends AbstractController
      *
      * Get the description of the cards matching a search query, as an array of JSON objects.
      */
-    #[OA\Parameter(name: 'q', in: 'path', description: "The search query, in the syntax of the card search, see the About page, e.g. 'e:Core s:leadership'")]
+    #[OA\Parameter(name: 'q', description: "The search query, in the syntax of the card search, see the About page, e.g. 'e:Core s:leadership'", in: 'path')]
     #[Route(path: '/api/public/cards/search/{q}', name: 'api_cards_search', methods: ['GET'])]
     public function __invoke(Request $request, string $q, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {

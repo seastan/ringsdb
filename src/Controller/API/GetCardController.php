@@ -31,7 +31,7 @@ class GetCardController extends AbstractController
      *
      * Get the description of a card as a JSON object.
      */
-    #[OA\Parameter(name: 'card_code', in: 'path', description: "The code of the card to get, e.g. '01001'")]
+    #[OA\Parameter(name: 'card_code', description: "The code of the card to get, e.g. '01001'", in: 'path')]
     #[Route(path: '/api/public/card/{card_code}.{_format}', name: 'api_card', requirements: ['_format' => 'json'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function __invoke(Request $request, #[MapEntity(mapping: ['card_code' => 'code'], message: 'Card not found')] Card $card, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {

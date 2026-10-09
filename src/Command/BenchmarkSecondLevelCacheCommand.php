@@ -38,7 +38,7 @@ class BenchmarkSecondLevelCacheCommand extends Command
 
         $cache = $this->entityManager->getCache();
         $cacheConfiguration = $this->entityManager->getConfiguration()->getSecondLevelCacheConfiguration();
-        if ($cache === null || $cacheConfiguration === null) {
+        if (!$cache instanceof \Doctrine\ORM\Cache || !$cacheConfiguration instanceof \Doctrine\ORM\Cache\CacheConfiguration) {
             $io->error('The Doctrine second-level cache is disabled.');
 
             return Command::FAILURE;
@@ -47,14 +47,15 @@ class BenchmarkSecondLevelCacheCommand extends Command
         // our own statistics, next to the logger the bundle may already have set (debug)
         $statistics = new StatisticsCacheLogger();
         $loggerChain = new CacheLoggerChain();
-        if ($cacheConfiguration->getCacheLogger() !== null) {
+        if ($cacheConfiguration->getCacheLogger() instanceof \Doctrine\ORM\Cache\Logging\CacheLogger) {
             $loggerChain->setLogger('previous', $cacheConfiguration->getCacheLogger());
         }
+
         $loggerChain->setLogger('benchmark', $statistics);
         $cacheConfiguration->setCacheLogger($loggerChain);
 
         /** @var list<int> $ids */
-        $ids = array_map('intval', $this->entityManager->getConnection()->fetchFirstColumn('SELECT id FROM card ORDER BY id'));
+        $ids = array_map(intval(...), $this->entityManager->getConnection()->fetchFirstColumn('SELECT id FROM card ORDER BY id'));
         $io->writeln(count($ids).' cards');
 
         $cache->evictEntityRegion(Card::class);
@@ -93,6 +94,7 @@ class BenchmarkSecondLevelCacheCommand extends Command
         foreach ($ids as $id) {
             $this->entityManager->find(Card::class, $id);
         }
+
         $time = (hrtime(true) - $start) / 1e6;
 
         return [$time, [$statistics->getHitCount(), $statistics->getMissCount(), $statistics->getPutCount()]];

@@ -259,6 +259,7 @@ class AdminWriteTest extends WebTestCase
         $connection->insert('deckslot', ['deck_id' => 1, 'card_id' => $cardId, 'quantity' => 1]);
         $connection->insert('decklistslot', ['decklist_id' => 1, 'card_id' => $cardId, 'quantity' => 1]);
         $connection->insert('review', ['card_id' => $cardId, 'user_id' => 2, 'date_creation' => '2015-08-16 00:00:00', 'date_update' => '2015-08-16 00:00:00', 'text_md' => 'Review', 'text_html' => '<p>Review</p>', 'nb_votes' => 1]);
+
         $reviewId = (int) $connection->lastInsertId();
         $connection->insert('reviewvote', ['review_id' => $reviewId, 'user_id' => 3]);
         $connection->insert('reviewcomment', ['review_id' => $reviewId, 'user_id' => 3, 'date_creation' => '2015-08-16 00:00:00', 'date_update' => '2015-08-16 00:00:00', 'text' => 'Comment']);

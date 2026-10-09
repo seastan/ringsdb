@@ -30,7 +30,7 @@ class GetDecklistController extends AbstractController
      *
      * Get the description of a decklist as a JSON object.
      */
-    #[OA\Parameter(name: 'decklist_id', in: 'path', description: 'The numeric identifier of the decklist', schema: new OA\Schema(type: 'integer'))]
+    #[OA\Parameter(name: 'decklist_id', description: 'The numeric identifier of the decklist', in: 'path', schema: new OA\Schema(type: 'integer'))]
     #[Route(path: '/api/public/decklist/{decklist_id}.{_format}', name: 'api_decklist', requirements: ['_format' => 'json', 'decklist_id' => '\d+'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function __invoke(Request $request, #[MapEntity(id: 'decklist_id', message: 'Decklist not found')] Decklist $decklist, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {

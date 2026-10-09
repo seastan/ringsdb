@@ -38,12 +38,19 @@ use Doctrine\Persistence\ObjectManager;
 class VolumeFixtures extends Fixture implements DependentFixtureInterface
 {
     private const int USERS = 10;
+
     private const int DECKLISTS = 60;
+
     private const int DECKLIST_COMMENTS = 3;
+
     private const int FELLOWSHIPS = 50;
+
     private const int FELLOWSHIP_DECKS = 4;
+
     private const int FELLOWSHIP_COMMENTS = 2;
+
     private const int REVIEWS = 50;
+
     private const int REVIEW_COMMENTS = 2;
 
     private const array LOREM = [
@@ -128,20 +135,21 @@ class VolumeFixtures extends Fixture implements DependentFixtureInterface
 
         $decklists = [];
         for ($i = 0; $i < self::DECKLISTS; ++$i) {
-            $date = self::date($i * 24);
+            $date = $this->date($i * 24);
 
-            $decklist = $this->createDecklist($manager, $contents[$i % count($contents)], $cards, $users[$i % self::USERS], ucfirst(self::lorem($i, 1, 4)).' '.($i + 1), $date);
+            $decklist = $this->createDecklist($manager, $contents[$i % count($contents)], $cards, $users[$i % self::USERS], ucfirst($this->lorem($i, 1, 4)).' '.($i + 1), $date);
             $decklist->setNbVotes($i * 7 % 11);
 
             for ($j = 1; $j <= self::DECKLIST_COMMENTS; ++$j) {
-                $comment = new Comment($users[($i + $j) % self::USERS], $decklist, $this->texts->markdown(self::lorem($i + $j, 1 + $j)));
-                $comment->setDateCreation(self::date($i * 24 + $j));
+                $comment = new Comment($users[($i + $j) % self::USERS], $decklist, $this->texts->markdown($this->lorem($i + $j, 1 + $j)));
+                $comment->setDateCreation($this->date($i * 24 + $j));
                 $comment->setIsHidden(0 === $i % 10 && self::DECKLIST_COMMENTS === $j);
                 $decklist->getComments()->add($comment);
                 $manager->persist($comment);
             }
+
             $decklist->setNbcomments(self::DECKLIST_COMMENTS);
-            $decklist->setDateLastComment(self::date($i * 24 + self::DECKLIST_COMMENTS));
+            $decklist->setDateLastComment($this->date($i * 24 + self::DECKLIST_COMMENTS));
 
             $manager->persist($decklist);
             $decklists[] = $decklist;
@@ -159,13 +167,14 @@ class VolumeFixtures extends Fixture implements DependentFixtureInterface
     {
         $codes = [];
         foreach ($contents as $content) {
-            $codes = array_merge($codes, array_map('strval', array_keys($content['slots'] + $content['sideslots'])));
+            $codes = array_merge($codes, array_map(strval(...), array_keys($content['slots'] + $content['sideslots'])));
         }
 
         $cards = [];
         foreach ($manager->getRepository(Card::class)->findBy(['code' => array_unique($codes)]) as $card) {
             $cards[$card->getCode()] = $card;
         }
+
         if ($missing = array_diff($codes, array_keys($cards))) {
             throw new \LogicException('Unknown cards: '.implode(', ', array_unique($missing)));
         }
@@ -182,7 +191,7 @@ class VolumeFixtures extends Fixture implements DependentFixtureInterface
      */
     private function createDecklist(ObjectManager $manager, array $content, array $cards, User $user, string $name, \DateTime $date): Decklist
     {
-        $descriptionMd = self::lorem(strlen($name), 6)."\n\n".self::lorem(strlen($name) + 3, 4);
+        $descriptionMd = $this->lorem(strlen($name), 6)."\n\n".$this->lorem(strlen($name) + 3, 4);
 
         $decklist = new Decklist($user);
         $decklist->setName($name);
@@ -198,6 +207,7 @@ class VolumeFixtures extends Fixture implements DependentFixtureInterface
         foreach ($content['slots'] as $code => $quantity) {
             $decklist->getSlots()->add(new Decklistslot($decklist, $cards[(string) $code], $quantity));
         }
+
         foreach ($content['sideslots'] as $code => $quantity) {
             $decklist->getSideslots()->add(new Decklistsideslot($decklist, $cards[(string) $code], $quantity));
         }
@@ -223,9 +233,9 @@ class VolumeFixtures extends Fixture implements DependentFixtureInterface
     private function createFellowships(ObjectManager $manager, array $users, array $decklists): void
     {
         for ($i = 0; $i < self::FELLOWSHIPS; ++$i) {
-            $date = self::date($i * 24 + 12);
-            $name = ucfirst(self::lorem($i + 2, 1, 5)).' '.($i + 1);
-            $descriptionMd = self::lorem($i, 5);
+            $date = $this->date($i * 24 + 12);
+            $name = ucfirst($this->lorem($i + 2, 1, 5)).' '.($i + 1);
+            $descriptionMd = $this->lorem($i, 5);
 
             $fellowship = new Fellowship($users[($i + 3) % self::USERS]);
             $fellowship->setIsPublic(true);
@@ -244,16 +254,18 @@ class VolumeFixtures extends Fixture implements DependentFixtureInterface
                 $fellowshipDecklist->setDeckNumber($j + 1);
                 $fellowship->addDecklist($fellowshipDecklist);
             }
+
             $fellowship->setNbDecks(self::FELLOWSHIP_DECKS);
 
             for ($j = 1; $j <= self::FELLOWSHIP_COMMENTS; ++$j) {
-                $comment = new FellowshipComment($users[($i + $j) % self::USERS], $fellowship, $this->texts->markdown(self::lorem($i + 2 * $j, 2)));
-                $comment->setDateCreation(self::date($i * 24 + 12 + $j));
-                $comment->setDateUpdate(self::date($i * 24 + 12 + $j));
+                $comment = new FellowshipComment($users[($i + $j) % self::USERS], $fellowship, $this->texts->markdown($this->lorem($i + 2 * $j, 2)));
+                $comment->setDateCreation($this->date($i * 24 + 12 + $j));
+                $comment->setDateUpdate($this->date($i * 24 + 12 + $j));
                 $fellowship->addComment($comment);
             }
+
             $fellowship->setNbComments(self::FELLOWSHIP_COMMENTS);
-            $fellowship->setDateLastComment(self::date($i * 24 + 12 + self::FELLOWSHIP_COMMENTS));
+            $fellowship->setDateLastComment($this->date($i * 24 + 12 + self::FELLOWSHIP_COMMENTS));
 
             $manager->persist($fellowship);
         }
@@ -279,8 +291,8 @@ class VolumeFixtures extends Fixture implements DependentFixtureInterface
             ->getResult();
 
         foreach ($cards as $i => $card) {
-            $date = self::date($i * 24 + 6);
-            $textMd = self::lorem($i + 1, 4)."\n\n".self::lorem($i + 5, 3);
+            $date = $this->date($i * 24 + 6);
+            $textMd = $this->lorem($i + 1, 4)."\n\n".$this->lorem($i + 5, 3);
 
             $review = new Review($users[($i + 5) % self::USERS], $card, $textMd, $this->texts->markdown($textMd));
             $review->setNbVotes($i * 3 % 5);
@@ -288,13 +300,14 @@ class VolumeFixtures extends Fixture implements DependentFixtureInterface
             $review->setDateUpdate($date);
 
             for ($j = 1; $j <= self::REVIEW_COMMENTS; ++$j) {
-                $comment = new Reviewcomment($users[($i + 5 + $j) % self::USERS], $review, self::lorem($i + 3 * $j, 2));
-                $comment->setDateCreation(self::date($i * 24 + 6 + $j));
-                $comment->setDateUpdate(self::date($i * 24 + 6 + $j));
+                $comment = new Reviewcomment($users[($i + 5 + $j) % self::USERS], $review, $this->lorem($i + 3 * $j, 2));
+                $comment->setDateCreation($this->date($i * 24 + 6 + $j));
+                $comment->setDateUpdate($this->date($i * 24 + 6 + $j));
                 $review->addComment($comment);
                 $manager->persist($comment);
             }
-            $review->setDateLastComment(self::date($i * 24 + 6 + self::REVIEW_COMMENTS));
+
+            $review->setDateLastComment($this->date($i * 24 + 6 + self::REVIEW_COMMENTS));
 
             $manager->persist($review);
         }
@@ -303,7 +316,7 @@ class VolumeFixtures extends Fixture implements DependentFixtureInterface
     /**
      * 2014-01-01 plus a number of hours.
      */
-    private static function date(int $hours): \DateTime
+    private function date(int $hours): \DateTime
     {
         return new \DateTime(sprintf('2014-01-01 00:00:00 +%d hours', $hours));
     }
@@ -311,12 +324,13 @@ class VolumeFixtures extends Fixture implements DependentFixtureInterface
     /**
      * $count lorem ipsum sentences from the $offset-th one, or their first $words words.
      */
-    private static function lorem(int $offset, int $count, ?int $words = null): string
+    private function lorem(int $offset, int $count, ?int $words = null): string
     {
         $sentences = [];
         for ($i = 0; $i < $count; ++$i) {
             $sentences[] = self::LOREM[($offset + $i) % count(self::LOREM)];
         }
+
         $text = implode(' ', $sentences);
 
         return null === $words ? $text : rtrim(implode(' ', array_slice(explode(' ', $text), 0, $words)), ',.');

@@ -55,6 +55,7 @@ trait DatabaseQueriesTrait
             $counts[$query['sql']] = ($counts[$query['sql']] ?? 0) + 1;
             $origins[$query['sql']][$query['origin']] = true;
         }
+
         arsort($counts);
 
         $report = sprintf("%d queries, %d distinct\n", count($queries), count($counts));
@@ -112,11 +113,13 @@ trait DatabaseQueriesTrait
             if (!is_string($file) || !is_int($line)) {
                 continue;
             }
+
             if (str_starts_with($file, $projectDir.'var/cache/') && str_contains($file, '/twig/')) {
                 $twigOrigin = self::twigOrigin($file, $line);
 
                 return null === $srcOrigin ? $twigOrigin : $srcOrigin.' < '.$twigOrigin;
             }
+
             if (str_starts_with($file, $projectDir.'src/')) {
                 $srcOrigin ??= substr($file, strlen($projectDir)).':'.$line;
             }
@@ -138,6 +141,7 @@ trait DatabaseQueriesTrait
                 break;
             }
         }
+
         $templateLine = '?';
         for ($i = min($line, count($lines)) - 1; $i >= 0; --$i) {
             if (1 === preg_match('#^\s*// line (\d+)$#', rtrim($lines[$i]), $match)) {
