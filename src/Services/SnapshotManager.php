@@ -4,10 +4,12 @@ namespace App\Services;
 
 use App\Entity\Card;
 use App\Entity\Deck;
+use App\Entity\Decklist;
 use App\Entity\Decksideslot;
 use App\Entity\Deckslot;
 use App\Entity\Questlog;
 use App\Entity\QuestlogDeck;
+use App\Repository\DeckRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class SnapshotManager
@@ -15,65 +17,102 @@ class SnapshotManager
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly CardManager $cardManager,
+        private readonly DeckRepository $deckRepository,
     ) {
     }
 
-    public function setSnapshot(Questlog $questlog): void
-    {
-        $questlog_decks = $questlog->getDecks();
-        foreach ($questlog_decks as $questlog_deck) {
-            $deck = $questlog_deck->getDeck();
-            if (!$deck) {
-                $deck = new Deck($questlog->getUser());
-                $deck->setName('[deleted]');
-                $questlog_deck->setDeck($deck);
-            }
-
-            $this->applySnapshot($deck, $questlog_deck);
-        }
-    }
-
     /**
+     * Rewrites the private deck of each quest log deck with its snapshot, for the quest log lists.
+     *
+     * The lists display the decklist of a quest log deck when it has one, and its deck only
+     * otherwise: the decks of the quest log decks with a decklist are left alone. The cards of all
+     * the snapshots are looked up together, and the slots of the decks loaded together.
+     *
      * @param iterable<Questlog> $questlogs
      */
-    public function setSnapshots($questlogs): void
+    public function setSnapshots(iterable $questlogs): void
     {
+        $questlogDecks = [];
+        $contents = [];
+        $codes = [];
         foreach ($questlogs as $questlog) {
-            $this->setSnapshot($questlog);
+            foreach ($questlog->getDecks() as $questlogDeck) {
+                if ($questlogDeck->getDecklist() instanceof Decklist) {
+                    continue;
+                }
+
+                if (!$questlogDeck->getDeck() instanceof Deck) {
+                    $deck = new Deck($questlog->getUser());
+                    $deck->setName('[deleted]');
+                    $questlogDeck->setDeck($deck);
+                }
+
+                $content = $this->decodeContent($questlogDeck);
+                $questlogDecks[] = $questlogDeck;
+                $contents[] = $content;
+                $codes = array_merge($codes, $this->codes($content));
+            }
+        }
+
+        $cards = $this->cardManager->findCardsByCodes($codes);
+        $this->deckRepository->loadSlots(array_filter(
+            array_map(fn (QuestlogDeck $questlogDeck): ?Deck => $questlogDeck->getDeck(), $questlogDecks),
+            fn (?Deck $deck): bool => null !== $deck?->getId(),
+        ));
+
+        foreach ($questlogDecks as $i => $questlogDeck) {
+            /** @var Deck $deck */
+            $deck = $questlogDeck->getDeck();
+            $this->fillDeck($deck, $contents[$i], $cards);
         }
     }
 
     public function applySnapshot(Deck $deck, QuestlogDeck $questlogDeck): void
     {
+        $content = $this->decodeContent($questlogDeck);
+        $this->fillDeck($deck, $content, $this->cardManager->findCardsByCodes($this->codes($content)));
+    }
+
+    /**
+     * @return array{main: array<int|string, int>, side: array<int|string, int>}
+     */
+    private function decodeContent(QuestlogDeck $questlogDeck): array
+    {
         $content = json_decode($questlogDeck->getContent(), true);
 
-        $cards = [];
+        return ['main' => $content['main'] ?? [], 'side' => $content['side'] ?? []];
+    }
 
-        foreach ($content['main'] as $card_code => $qty) {
-            $card = $this->cardManager->findCardByCode((string) $card_code);
+    /**
+     * @param array{main: array<int|string, int>, side: array<int|string, int>} $content
+     *
+     * @return list<string>
+     */
+    private function codes(array $content): array
+    {
+        return array_map(strval(...), array_merge(array_keys($content['main']), array_keys($content['side'])));
+    }
 
-            if (!$card instanceof Card) {
-                continue;
-            }
+    /**
+     * Replaces the slots of the deck with the snapshot. Quantities are capped at the deck limit
+     * of the card; unknown codes are dropped.
+     *
+     * @param array{main: array<int|string, int>, side: array<int|string, int>} $content
+     * @param array<string, Card>                                               $cards   by code
+     */
+    private function fillDeck(Deck $deck, array $content, array $cards): void
+    {
+        foreach (['main', 'side'] as $part) {
+            foreach ($content[$part] as $card_code => $qty) {
+                $card = $cards[(string) $card_code] ?? null;
+                if (!$card instanceof Card) {
+                    unset($content[$part][$card_code]);
+                    continue;
+                }
 
-            $cards[$card_code] = $card;
-
-            if ($qty > $card->getDeckLimit()) {
-                $content['main'][$card_code] = $card->getDeckLimit();
-            }
-        }
-
-        foreach ($content['side'] as $card_code => $qty) {
-            $card = $this->cardManager->findCardByCode((string) $card_code);
-
-            if (!$card instanceof Card) {
-                continue;
-            }
-
-            $cards[$card_code] = $card;
-
-            if ($qty > $card->getDeckLimit()) {
-                $content['side'][$card_code] = $card->getDeckLimit();
+                if ($qty > $card->getDeckLimit()) {
+                    $content[$part][$card_code] = $card->getDeckLimit();
+                }
             }
         }
 
@@ -88,22 +127,12 @@ class SnapshotManager
         }
 
         foreach ($content['main'] as $card_code => $qty) {
-            if (!isset($cards[$card_code])) {
-                continue;
-            }
-
-            $card = $cards[$card_code];
-            $slot = new Deckslot($deck, $card, $qty);
+            $slot = new Deckslot($deck, $cards[(string) $card_code], $qty);
             $deck->addSlot($slot);
         }
 
         foreach ($content['side'] as $card_code => $qty) {
-            if (!isset($cards[$card_code])) {
-                continue;
-            }
-
-            $card = $cards[$card_code];
-            $slot = new Decksideslot($deck, $card, $qty);
+            $slot = new Decksideslot($deck, $cards[(string) $card_code], $qty);
             $deck->addSideslot($slot);
         }
     }

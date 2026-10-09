@@ -17,4 +17,29 @@ class DeckRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Deck::class);
     }
+
+    /**
+     * Loads the slots and side slots of the decks, in one query each (joining both would return
+     * their product).
+     *
+     * @param iterable<Deck> $decks
+     */
+    public function loadSlots(iterable $decks): void
+    {
+        $ids = [];
+        foreach ($decks as $deck) {
+            $ids[$deck->getId()] = $deck->getId();
+        }
+
+        if ([] === $ids) {
+            return;
+        }
+
+        foreach (['slots', 'sideslots'] as $association) {
+            $this->getEntityManager()
+                ->createQuery('SELECT d, s FROM '.Deck::class." d LEFT JOIN d.$association s WHERE d.id IN (:ids)")
+                ->setParameter('ids', array_values($ids))
+                ->getResult();
+        }
+    }
 }

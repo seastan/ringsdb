@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Controller\Questlog;
 
 use App\Entity\Cycle;
+use App\Entity\Decklist;
 use App\Helper\StringSanitizer;
 use App\Model\QuestlogSearchDto;
 use App\Repository\CycleRepository;
+use App\Repository\DecklistRepository;
+use App\Repository\QuestlogRepository;
 use App\Services\QuestLogManager;
 use App\Services\SnapshotManager;
 use Doctrine\DBAL\Connection;
@@ -24,6 +27,8 @@ class ListQuestlogController extends AbstractController
         private readonly QuestLogManager $questlogManager,
         private readonly SnapshotManager $snapshotManager,
         private readonly CycleRepository $cycleRepository,
+        private readonly QuestlogRepository $questlogRepository,
+        private readonly DecklistRepository $decklistRepository,
         private readonly Connection $connection
     ) {
     }
@@ -87,9 +92,19 @@ class ListQuestlogController extends AbstractController
                 break;
         }
 
-        $this->snapshotManager->setSnapshots($paginator);
+        // iterated once: the Paginator runs its query on every iteration
+        $questlogs = iterator_to_array($paginator);
+        $decklists = [];
+        foreach ($this->questlogRepository->loadDecks($questlogs) as $questlogDeck) {
+            if ($questlogDeck->getDecklist() instanceof Decklist) {
+                $decklists[] = $questlogDeck->getDecklist();
+            }
+        }
 
-        return $this->render('QuestLog/public-questlogs.html.twig', ['pagetitle' => $pagetitle, 'pagedescription' => 'Browse the collection of thousands of premade decks.', 'questlogs' => $paginator, 'url' => $request->getRequestUri(), 'header' => $header, 'type' => $type, 'pages' => $this->questlogManager->getClosePages(), 'prevurl' => $this->questlogManager->getPreviousUrl(), 'nexturl' => $this->questlogManager->getNextUrl()], $response);
+        $this->decklistRepository->loadSlots($decklists);
+        $this->snapshotManager->setSnapshots($questlogs);
+
+        return $this->render('QuestLog/public-questlogs.html.twig', ['pagetitle' => $pagetitle, 'pagedescription' => 'Browse the collection of thousands of premade decks.', 'questlogs' => $questlogs, 'url' => $request->getRequestUri(), 'header' => $header, 'type' => $type, 'pages' => $this->questlogManager->getClosePages(), 'prevurl' => $this->questlogManager->getPreviousUrl(), 'nexturl' => $this->questlogManager->getNextUrl()], $response);
     }
 
     private function searchForm(QuestlogSearchDto $query): string
@@ -100,10 +115,8 @@ class ListQuestlogController extends AbstractController
         $scenario = StringSanitizer::sanitize($query->scenario);
         $nb_decks = intval(filter_var($query->nbDecks, FILTER_SANITIZE_NUMBER_INT));
         $sort = $query->sort;
+        // no pack selected: every pack is checked
         $packs = $query->packs;
-        if (0 === count($packs)) {
-            $packs = $this->connection->executeQuery('SELECT id FROM pack')->fetchFirstColumn();
-        }
 
         $categories = [];
         $on = 0;

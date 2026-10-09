@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\DataFixtures;
 
 use App\Entity\Card;
+use App\Entity\CardPrinting;
 use App\Entity\Comment;
+use App\Entity\Deck;
 use App\Entity\Decklist;
 use App\Entity\Decklistsideslot;
 use App\Entity\Decklistslot;
@@ -13,8 +15,11 @@ use App\Entity\Fellowship;
 use App\Entity\FellowshipComment;
 use App\Entity\FellowshipDecklist;
 use App\Entity\Pack;
+use App\Entity\Questlog;
+use App\Entity\QuestlogDeck;
 use App\Entity\Review;
 use App\Entity\Reviewcomment;
+use App\Entity\Scenario;
 use App\Entity\Sphere;
 use App\Entity\User;
 use App\Security\UserPasswordUpdater;
@@ -30,6 +35,7 @@ use Doctrine\Persistence\ObjectManager;
  * - 60 decklists with the contents of 60 different production decklists (volume-decklists.json:
  *   cards only), with a description and 3 comments each;
  * - 50 public fellowships of 4 of those decklists, with a description and 2 comments each;
+ * - 50 public quest logs of 1 to 4 decks each (see createQuestlogs());
  * - 50 card reviews, with 2 comments each.
  *
  * The texts are lorem ipsum. The dates are fixed, from 2014-01-01: before the other fixtures, which
@@ -48,6 +54,8 @@ class VolumeFixtures extends Fixture implements DependentFixtureInterface
     private const int FELLOWSHIP_DECKS = 4;
 
     private const int FELLOWSHIP_COMMENTS = 2;
+
+    private const int QUESTLOGS = 50;
 
     private const int REVIEWS = 50;
 
@@ -80,6 +88,7 @@ class VolumeFixtures extends Fixture implements DependentFixtureInterface
             DecklistFixtures::class,
             CommentFixtures::class,
             FellowshipFixtures::class,
+            QuestlogFixtures::class,
             ReviewFixtures::class,
         ];
     }
@@ -89,6 +98,7 @@ class VolumeFixtures extends Fixture implements DependentFixtureInterface
         $users = $this->createUsers($manager);
         $decklists = $this->createDecklists($manager, $users);
         $this->createFellowships($manager, $users, $decklists);
+        $this->createQuestlogs($manager, $users, $decklists);
         $this->createReviews($manager, $users);
 
         $manager->flush();
@@ -268,6 +278,104 @@ class VolumeFixtures extends Fixture implements DependentFixtureInterface
             $fellowship->setDateLastComment($this->date($i * 24 + 12 + self::FELLOWSHIP_COMMENTS));
 
             $manager->persist($fellowship);
+        }
+    }
+
+    /**
+     * Quest logs of 1 to 4 decks, played with the contents of volume-decklists.json. Like in
+     * production, the decks are of every kind, by deck number:
+     * - a published decklist, from a private deck still there;
+     * - a published decklist, from a deleted deck;
+     * - an unpublished private deck;
+     * - a deleted deck, unpublished.
+     *
+     * The private decks have no slots: their contents are not the snapshot, and the tests that
+     * compute statistics on all the decks (SuggestionsCommandTest) still see the fixture decks
+     * only. Every other quest log stores its snapshots with the codes from before the
+     * card-printings merge (card_printing.image_code), like the oldest quest logs.
+     *
+     * @param list<User>     $users
+     * @param list<Decklist> $decklists
+     */
+    private function createQuestlogs(ObjectManager $manager, array $users, array $decklists): void
+    {
+        /** @var list<array{source: string, last_pack: string, slots: array<string, int>, sideslots: array<string, int>}> $contents */
+        $contents = json_decode((string) file_get_contents(__DIR__.'/volume-decklists.json'), true, flags: JSON_THROW_ON_ERROR);
+
+        // an old code of each card that has one
+        $oldCodes = [];
+        foreach ($manager->getRepository(CardPrinting::class)->findAll() as $printing) {
+            $code = $printing->getCard()?->getCode();
+            if (null !== $code && $printing->getImageCode() !== $code) {
+                $oldCodes[$code] ??= $printing->getImageCode();
+            }
+        }
+
+        /** @var list<Scenario> $scenarios */
+        $scenarios = $manager->getRepository(Scenario::class)->findBy([], ['id' => 'ASC'], 20);
+
+        for ($i = 0; $i < self::QUESTLOGS; ++$i) {
+            $date = $this->date($i * 24 + 18);
+            $name = ucfirst($this->lorem($i + 4, 1, 3)).' '.($i + 1);
+            $descriptionMd = $this->lorem($i + 1, 3);
+            $user = $users[($i + 7) % self::USERS];
+            $nbDecks = 1 + $i % 4;
+
+            $questlog = new Questlog($user);
+            $questlog->setIsPublic(true);
+            $questlog->setNbVotes($i * 3 % 13);
+            $questlog->setNbFavorites(0);
+            $questlog->setNbComments(0);
+            $questlog->setNbDecks($nbDecks);
+            $questlog->setName($name);
+            $questlog->setNameCanonical($this->texts->slugify($name));
+            $questlog->setDescriptionMd($descriptionMd);
+            $questlog->setDescriptionHtml($this->texts->markdown($descriptionMd));
+            $questlog->setScenario($scenarios[$i % count($scenarios)]);
+            $questlog->setQuestMode(0 === $i % 3 ? 'easy' : 'normal');
+            $questlog->setSuccess(0 !== $i % 5);
+            $questlog->setScore(0 !== $i % 5 ? 50 + $i * 7 % 150 : null);
+            $questlog->setDatePlayed($date);
+            $questlog->setDateCreation($date);
+            $questlog->setDateUpdate($date);
+            $questlog->setDatePublish($date);
+
+            for ($j = 0; $j < $nbDecks; ++$j) {
+                $k = $i * 4 + $j;
+                $content = $contents[$k % count($contents)];
+                $codes = 1 === $i % 2 ? $oldCodes : [];
+                $snapshot = ['main' => [], 'side' => []];
+                foreach ($content['slots'] as $code => $quantity) {
+                    $snapshot['main'][$codes[(string) $code] ?? (string) $code] = $quantity;
+                }
+
+                foreach ($content['sideslots'] as $code => $quantity) {
+                    $snapshot['side'][$codes[(string) $code] ?? (string) $code] = $quantity;
+                }
+
+                $questlogDeck = new QuestlogDeck($questlog);
+                $questlogDeck->setDeckNumber($j + 1);
+                $questlogDeck->setPlayer(0 === $j ? null : 'Player '.($j + 1));
+                $questlogDeck->setContent((string) json_encode($snapshot));
+
+                $kind = ($i + $j) % 4;
+                if (in_array($kind, [0, 1], true)) {
+                    $questlogDeck->setDecklist($decklists[$k % self::DECKLISTS]);
+                }
+
+                if (in_array($kind, [0, 2], true)) {
+                    $deck = new Deck($user);
+                    $deck->setName(ucfirst($this->lorem($k, 1, 3)));
+                    $deck->setDateCreation($date);
+                    $deck->setDateUpdate($date);
+                    $manager->persist($deck);
+                    $questlogDeck->setDeck($deck);
+                }
+
+                $questlog->addDeck($questlogDeck);
+            }
+
+            $manager->persist($questlog);
         }
     }
 
