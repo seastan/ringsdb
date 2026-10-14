@@ -157,7 +157,7 @@ class AdminCsvTest extends WebTestCase {
         $beorn = $this->fetchPrinting($client, 'THo', 'Beorn');
         $this->assertSame(['131005', '5'], [$beorn['code'], $beorn['position']]);
 
-        $this->assertSame('Done', $this->upload($client, self::SAMPLE, 'THo', 'ALeP - The Hobbit'));
+        $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, self::SAMPLE, 'THo', 'ALeP - The Hobbit'));
 
         $this->assertSame($counts, [$this->rowCount($client, 'card'), $this->rowCount($client, 'card_printing'), $this->rowCount($client, 'pack')]);
         $this->assertSame($bilbo, $this->fetchPrinting($client, 'THo', 'Bilbo Baggins'));
@@ -181,7 +181,7 @@ class AdminCsvTest extends WebTestCase {
             return $row;
         });
 
-        $this->assertSame('Done', $this->upload($client, $file, 'PHPU', 'PHPUnit Pack'));
+        $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, $file, 'PHPU', 'PHPUnit Pack'));
 
         $this->assertSame([$counts[0] + 21, $counts[1] + 21, $counts[2] + 1],
             [$this->rowCount($client, 'card'), $this->rowCount($client, 'card_printing'), $this->rowCount($client, 'pack')]);
@@ -206,7 +206,7 @@ class AdminCsvTest extends WebTestCase {
             return $row['name'] === 'Bilbo Baggins' ? null : $row;
         });
 
-        $this->assertSame('Done', $this->upload($client, $file, 'THo', 'ALeP - The Hobbit'));
+        $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, $file, 'THo', 'ALeP - The Hobbit'));
 
         $bilbo = $this->fetchPrinting($client, 'THo', 'Bilbo Baggins');
         $this->assertSame('[deleted] Bilbo Baggins', $bilbo['name']);
@@ -221,7 +221,7 @@ class AdminCsvTest extends WebTestCase {
         $client = $this->createAdminClient();
         $packs = $this->rowCount($client, 'pack');
 
-        $this->assertSame('Done', $this->upload($client, self::SAMPLE, 'THo2', 'ALeP - The Hobbit (renamed)', 'THo'));
+        $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, self::SAMPLE, 'THo2', 'ALeP - The Hobbit (renamed)', 'THo'));
 
         $this->assertSame($packs, $this->rowCount($client, 'pack'));
         $this->assertSame('ALeP - The Hobbit (renamed)', $this->db($client)->fetchColumn("SELECT name FROM pack WHERE code = 'THo2'"));
