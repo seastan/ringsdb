@@ -137,6 +137,11 @@ class AdminCsvTest extends WebTestCase {
         return $row;
     }
 
+    private function printingPosition(Client $client, string $packCode, string $name): string {
+        return (string) $this->db($client)->fetchColumn('SELECT cp.position FROM card_printing cp JOIN pack p ON p.id = cp.pack_id
+            JOIN card c ON c.id = cp.card_id WHERE p.code = ? AND c.name = ?', [$packCode, $name]);
+    }
+
     private function rowCount(Client $client, string $table): int {
         return (int) $this->db($client)->fetchColumn("SELECT COUNT(*) FROM $table");
     }
@@ -144,11 +149,11 @@ class AdminCsvTest extends WebTestCase {
     /* -------------------------------------------------------------- tests */
 
     /**
-     * Uploading the pack again creates nothing: its printings are found by octgnid.
+     * Uploading the pack again creates nothing and deletes nothing: the cards are found by code,
+     * the reprints by the octgnid of their printing in the pack.
      *
-     * BUG: the card fields of the CSV are written to the canonical card, even for a reprint. Beorn
-     * is a reprint in this pack (card 131005, from another pack): the upload gives it the code,
-     * position, text and flavor of the ALeP printing (503991).
+     * Beorn is a reprint in this pack (card 131005, from OHaUH), with the code of the ALeP printing
+     * (503991) in the CSV: the canonical card is left unchanged, in both packs.
      */
     public function testUploadAnUnchangedPack(): void {
         $client = $this->createAdminClient();
@@ -156,13 +161,42 @@ class AdminCsvTest extends WebTestCase {
         $bilbo = $this->fetchPrinting($client, 'THo', 'Bilbo Baggins');
         $beorn = $this->fetchPrinting($client, 'THo', 'Beorn');
         $this->assertSame(['131005', '5'], [$beorn['code'], $beorn['position']]);
+        $beornCore = $this->fetchPrinting($client, 'OHaUH', 'Beorn');
 
-        $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, self::SAMPLE, 'THo', 'ALeP - The Hobbit'));
+        $response = $this->upload($client, self::SAMPLE, 'THo', 'ALeP - The Hobbit');
+        $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $response);
+        $this->assertNotContains('marked deleted', $response);
 
         $this->assertSame($counts, [$this->rowCount($client, 'card'), $this->rowCount($client, 'card_printing'), $this->rowCount($client, 'pack')]);
         $this->assertSame($bilbo, $this->fetchPrinting($client, 'THo', 'Bilbo Baggins'));
+        $this->assertSame($beorn, $this->fetchPrinting($client, 'THo', 'Beorn'));
+        $this->assertSame($beornCore, $this->fetchPrinting($client, 'OHaUH', 'Beorn'));
+        $this->assertSame('991', $this->printingPosition($client, 'THo', 'Beorn'));
+    }
+
+    /**
+     * A reprint row updates the fields of its printing (illustrator, position), not those of the
+     * canonical card (text).
+     */
+    public function testAReprintOnlyUpdatesItsPrinting(): void {
+        $client = $this->createAdminClient();
+        $beorn = $this->fetchPrinting($client, 'THo', 'Beorn');
+        $file = $this->sampleVariant(function (array $row) {
+            if ($row['name'] === 'Beorn') {
+                $row['illustrator'] = 'PHPUnit Artist';
+                $row['position'] = '992';
+                $row['text'] = 'PHPUnit text.';
+            }
+
+            return $row;
+        });
+
+        $this->assertContains('<!-- RINGSDB_CSV_IMPORT_OK -->', $this->upload($client, $file, 'THo', 'ALeP - The Hobbit'));
+
         $beornAfter = $this->fetchPrinting($client, 'THo', 'Beorn');
-        $this->assertSame([$beorn['id'], '503991', '991'], [$beornAfter['id'], $beornAfter['code'], $beornAfter['position']]);
+        $this->assertSame('PHPUnit Artist', $beornAfter['illustrator']);
+        $this->assertSame('992', $this->printingPosition($client, 'THo', 'Beorn'));
+        $this->assertSame(['131005', $beorn['text']], [$beornAfter['code'], $beornAfter['text']]);
     }
 
     /**

@@ -45,6 +45,9 @@ class CSVController extends AbstractController {
 		// NOT by octgnid: a MotK hero (e.g. "(MotK) Ori", 99311006) and its base
 		// ally ("Ori", 311006) deliberately share an octgnid but are distinct cards.
 		$newCodes = [];
+		// Octgnids present in the CSV: a reprint keeps the code of its canonical
+		// card, so the CSV row of a reprint is matched to its printing by octgnid.
+		$newOctgnids = [];
 
 		foreach ($content_array as $row) {
 			$card = [];
@@ -55,6 +58,7 @@ class CSVController extends AbstractController {
 			}
 
 			$newCodes[$card['code']] = 1;
+			$newOctgnids[$card['octgnid']] = 1;
 			array_push($cards, $card);
 		}
 
@@ -108,11 +112,15 @@ class CSVController extends AbstractController {
 		$deletedCards = [];
 
 		// Soft-delete cards that were in this pack but are no longer in the CSV
-		// (removed from the pack). Keyed by card CODE, not octgnid, so cards that
-		// merely share an octgnid with a card in another pack are never touched.
+		// (removed from the pack). A printing is still in the CSV if its card's
+		// code is (the card itself), or its own octgnid is (a reprint, whose CSV
+		// code is not the canonical card's). Only this pack's printings are
+		// checked, so cards that merely share an octgnid with a card in another
+		// pack are never touched.
 		foreach ($pack->getPrintings() as $printing) {
 			$existingCard = $printing->getCard();
 			if (!array_key_exists($existingCard->getCode(), $newCodes) &&
+				!array_key_exists((string) $printing->getOctgnid(), $newOctgnids) &&
 				strpos($existingCard->getName(), '[deleted]') === false) {
 				$deletedCards[] = $existingCard->getCode();
 				$summary['deleted']++;
@@ -144,10 +152,23 @@ class CSVController extends AbstractController {
 				}
 			}
 
-			// Resolve the canonical Card by its unique code. Distinct cards that
-			// share an octgnid (a base ally and its MotK hero) stay separate.
+			// Resolve the canonical Card by its unique code: the row overwrites
+			// that card. Distinct cards that share an octgnid (a base ally and its
+			// MotK hero) stay separate.
 			$cardEntity = $cardRepo->findOneBy(['code' => $card['code']]);
 			$cardIsNew = false;
+			// Unknown code: the row may be a reprint, an alternate printing of a
+			// card from another pack (e.g. Beorn 131005, reprinted in The Hobbit
+			// as 503991). It is found by its octgnid, in the target pack only, and
+			// only updates its printing: the canonical card is left alone.
+			$isReprint = false;
+			if (!$cardEntity) {
+				$reprint = $printingRepo->findOneBy(['octgnid' => $card['octgnid'], 'pack' => $cardPack]);
+				if ($reprint) {
+					$cardEntity = $reprint->getCard();
+					$isReprint = true;
+				}
+			}
 			if (!$cardEntity) {
 				$cardEntity = new Card();
 				$now = new \DateTime();
@@ -187,6 +208,13 @@ class CSVController extends AbstractController {
 					continue;
 				}
 
+				// A reprint only updates its printing's own fields (and its
+				// position in the pack), never the canonical card's.
+				if ($isReprint && $colName !== 'position' &&
+					(!in_array($colName, $printingFieldNames) || in_array($colName, $cardFieldNames))) {
+					continue;
+				}
+
 				$getter = str_replace(' ', '', ucwords(str_replace('_', ' ', "get_$colName")));
 				$setter = str_replace(' ', '', ucwords(str_replace('_', ' ', "set_$colName")));
 
@@ -218,7 +246,7 @@ class CSVController extends AbstractController {
 						$cardEntity->$setter($associationEntity);
 					}
 				}
-				elseif (in_array($colName, $cardFieldNames)) {
+				elseif (in_array($colName, $cardFieldNames) && !$isReprint) {
 					// Scalar field on Card.
 					$type = $cardMeta->getTypeOfField((string) $colName);
 
