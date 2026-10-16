@@ -13,7 +13,7 @@
      * @memberOf user
      */
     user.query = function query() {
-        $.ajax(Routing.generate('api_private_user_info', user.params), {
+        $.ajax(Routing.generate('api_public_user_info', user.params), {
             cache: false,
             dataType: 'json',
             success: function(data, textStatus, jqXHR) {
