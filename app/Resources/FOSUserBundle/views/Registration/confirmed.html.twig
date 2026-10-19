@@ -1,9 +1,0 @@
-{% extends "FOSUserBundle::layout.html.twig" %}
-
-{% trans_default_domain 'FOSUserBundle' %}
-
-{% block fos_user_content %}
-    <p class="lead">{{ 'registration.confirmed'|trans({'%username%': user.username}) }}</p>
-    {# targetUrl: the page requested before the registration, given by FOSUserBundle #}
-    {% if targetUrl is not empty %}<p><a href="{{ targetUrl }}">{{ 'registration.back'|trans }}</a></p>{% endif %}
-{% endblock fos_user_content %}

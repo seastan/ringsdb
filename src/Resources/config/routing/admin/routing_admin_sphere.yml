@@ -1,0 +1,30 @@
+admin_sphere:
+    path:  /
+    defaults: { _controller: 'App\Controller\SphereController::indexAction' }
+
+admin_sphere_show:
+    path:  /{id}/show
+    defaults: { _controller: 'App\Controller\SphereController::showAction' }
+
+admin_sphere_new:
+    path:  /new
+    defaults: { _controller: 'App\Controller\SphereController::newAction' }
+
+admin_sphere_create:
+    path:  /create
+    defaults: { _controller: 'App\Controller\SphereController::createAction' }
+    methods: [ post ]
+
+admin_sphere_edit:
+    path:  /{id}/edit
+    defaults: { _controller: 'App\Controller\SphereController::editAction' }
+
+admin_sphere_update:
+    path:  /{id}/update
+    defaults: { _controller: 'App\Controller\SphereController::updateAction' }
+    methods: [ post, put ]
+
+admin_sphere_delete:
+    path:  /{id}/delete
+    defaults: { _controller: 'App\Controller\SphereController::deleteAction' }
+    methods: [ post, delete ]

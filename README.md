@@ -8,23 +8,19 @@ This guide assumes you know how to use the command-line and that your machine ha
 - install composer: https://getcomposer.org/download/
 - clone the repo somewhere
 - cd to it
-- run `composer install` (at the end it will ask for the database configuration parameters)
-- run `php app/console doctrine:database:create`
-- run `php app/console doctrine:schema:create`
+- set the database configuration (`DATABASE_*`) in `.env.local` (the defaults are in `.env`, the
+  values of the Docker stack in `.env.dev`)
+- run `composer install`
+- run `php bin/console doctrine:database:create`
+- run `php bin/console doctrine:schema:create`
 - import data into mysql
-- run `php app/console server:run`
+- run `php bin/console server:run`
 
 To update all JavaScript and CSS assets, run:
 
-- `php app/console cache:clear`
-- `php app/console assetic:dump`
-
-To update the fonts, some SCSS assets, run:
-
-- `rm -rf web/bundles`
-- `php app/console assets:install`
+- `php bin/console app:assets`
 
 
 To run a command:
 
-- `php app/console app:beorn:scenario`
+- `php bin/console app:beorn:scenario`

@@ -1,0 +1,3 @@
+parameters:
+    # the login and registration pages are served over https
+    channel: https

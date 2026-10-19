@@ -1,0 +1,30 @@
+admin_encounter:
+    path:  /
+    defaults: { _controller: 'App\Controller\EncounterController::indexAction' }
+
+admin_encounter_show:
+    path:  /{id}/show
+    defaults: { _controller: 'App\Controller\EncounterController::showAction' }
+
+admin_encounter_new:
+    path:  /new
+    defaults: { _controller: 'App\Controller\EncounterController::newAction' }
+
+admin_encounter_create:
+    path:  /create
+    defaults: { _controller: 'App\Controller\EncounterController::createAction' }
+    methods: [ post ]
+
+admin_encounter_edit:
+    path:  /{id}/edit
+    defaults: { _controller: 'App\Controller\EncounterController::editAction' }
+
+admin_encounter_update:
+    path:  /{id}/update
+    defaults: { _controller: 'App\Controller\EncounterController::updateAction' }
+    methods: [ post, put ]
+
+admin_encounter_delete:
+    path:  /{id}/delete
+    defaults: { _controller: 'App\Controller\EncounterController::deleteAction' }
+    methods: [ post, delete ]

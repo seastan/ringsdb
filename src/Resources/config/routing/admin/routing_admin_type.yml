@@ -1,0 +1,30 @@
+admin_type:
+    path:  /
+    defaults: { _controller: 'App\Controller\TypeController::indexAction' }
+
+admin_type_show:
+    path:  /{id}/show
+    defaults: { _controller: 'App\Controller\TypeController::showAction' }
+
+admin_type_new:
+    path:  /new
+    defaults: { _controller: 'App\Controller\TypeController::newAction' }
+
+admin_type_create:
+    path:  /create
+    defaults: { _controller: 'App\Controller\TypeController::createAction' }
+    methods: [ post ]
+
+admin_type_edit:
+    path:  /{id}/edit
+    defaults: { _controller: 'App\Controller\TypeController::editAction' }
+
+admin_type_update:
+    path:  /{id}/update
+    defaults: { _controller: 'App\Controller\TypeController::updateAction' }
+    methods: [ post, put ]
+
+admin_type_delete:
+    path:  /{id}/delete
+    defaults: { _controller: 'App\Controller\TypeController::deleteAction' }
+    methods: [ post, delete ]

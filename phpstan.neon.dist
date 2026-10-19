@@ -1,0 +1,23 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    # phpstan/phpstan-symfony: the service types, read from the container dumped in debug mode
+    # (make phpstan warms up the test cache first)
+    symfony:
+        containerXmlPath: var/cache/test/srcApp_KernelTestDebugContainer.xml
+        consoleApplicationLoader: src/PHPStan/console-application.php
+    # phpstan/phpstan-doctrine: the entity metadata (YAML mappings), for the repositories, the
+    # fields and the DQL
+    doctrine:
+        objectManagerLoader: src/PHPStan/object-manager.php
+
+services:
+    -
+        class: App\PHPStan\DoctrineRegistryReturnTypeExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: App\PHPStan\ControllerGetUserReturnTypeExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension

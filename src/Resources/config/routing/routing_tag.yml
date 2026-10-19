@@ -1,0 +1,18 @@
+
+tag_add:
+    path: /add
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\TagController::addAction
+
+tag_remove:
+    path: /remove
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\TagController::removeAction
+
+tag_clear:
+    path: /clear
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\TagController::clearAction

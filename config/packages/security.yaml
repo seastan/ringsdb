@@ -1,0 +1,69 @@
+security:
+    # Symfony 3.4 also hides the account status errors (disabled, locked...) behind "Bad
+    # credentials": show them as Symfony 2.8 did, the login page offers to resend the
+    # confirmation email of a disabled account. An unknown username still reads "Invalid
+    # credentials." (app/Resources/translations/security.en.yml).
+    hide_user_not_found: false
+
+    encoders:
+        FOS\UserBundle\Model\UserInterface: sha512
+
+    role_hierarchy:
+        ROLE_ADMIN:       ROLE_USER
+        ROLE_SUPER_ADMIN: ROLE_ADMIN
+
+    providers:
+        fos_userbundle:
+            id: fos_user.user_provider.username_email
+
+    firewalls:
+        dev:
+            pattern:    ^/(_(profiler|wdt|error)|css|images|js)/
+            security: false
+
+        public_api:
+            pattern: ^/api/public
+            stateless: true
+            anonymous:    true
+
+        default:
+            pattern:    ^/
+            form_login:
+                provider: fos_userbundle
+                csrf_token_generator: security.csrf.token_manager
+                always_use_default_target_path: false
+                default_target_path: index
+            logout:       true
+            anonymous:    true
+            # the Symfony 4 behaviour: a session is closed when its user changes (password, disabled...)
+            logout_on_user_change: true
+            remember_me:
+                secret:   '%env(APP_SECRET)%'
+                lifetime: 31536000 # 365 jours en secondes
+                path:     /
+                domain:   ~ # Prend la valeur par défaut du domaine courant depuis $_SERVER
+
+    access_control:
+        - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: "%channel%" }
+        - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: "%channel%" }
+        - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/remind, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/admin/, role: ROLE_ADMIN }
+        - { path: ^/api/public, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/oauth2, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/private, role: ROLE_USER }
+        - { path: ^/$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/js/, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/user/, role: ROLE_USER }
+        - { path: ^/collection/, role: ROLE_USER }
+        - { path: ^/tag/, role: ROLE_USER }
+        - { path: ^/questlog/, role: ROLE_USER }
+        - { path: ^/deck/view/, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/deck/, role: ROLE_USER }
+        - { path: ^/decks, role: ROLE_USER }
+        - { path: ^/fellowship/view/, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/fellowship/, role: ROLE_USER }
+        - { path: ^/myfellowships, role: ROLE_USER }
+        - { path: ^/fellowships, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/decklists, role: IS_AUTHENTICATED_ANONYMOUSLY }
+

@@ -1,0 +1,121 @@
+app_admin_cycle:
+    resource: "admin/routing_admin_cycle.yml"
+    prefix: /cycle
+
+app_admin_pack:
+    resource: "admin/routing_admin_pack.yml"
+    prefix: /pack
+
+app_admin_type:
+    resource: "admin/routing_admin_type.yml"
+    prefix: /type
+
+app_admin_sphere:
+    resource: "admin/routing_admin_sphere.yml"
+    prefix: /sphere
+
+app_admin_card:
+    resource: "admin/routing_admin_card.yml"
+    prefix: /card
+
+app_admin_card_printing:
+    resource: "admin/routing_admin_card_printing.yml"
+    prefix: /card-printing
+
+app_admin_scenario:
+    resource: "admin/routing_admin_scenario.yml"
+    prefix: /scenario
+
+app_admin_encounter:
+    resource: "admin/routing_admin_encounter.yml"
+    prefix: /encounter
+
+app_admin_command:
+    resource: "admin/routing_admin_command.yml"
+    prefix: /command
+
+app_excel:
+    resource: "admin/routing_admin_excel.yml"
+    prefix: /excel
+
+app_csv:
+    resource: "admin/routing_admin_csv.yml"
+    prefix: /csv
+
+app_stat:
+    path: /stat
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\StatController::getStatAction
+
+app_stat_packs:
+    path: /stat_packs
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\StatController::getStatPacksAction
+
+app_stat_cards:
+    path: /stat_cards
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\StatController::getStatCardsAction
+
+admin:
+    path: /
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\AdminController::indexAction
+
+admin_find_user:
+    path: /user/find
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\UserAdminController::findAction
+
+admin_find_user_process:
+    path: /user/find_process
+    methods: [POST]
+    defaults:
+        _controller: App\Controller\UserAdminController::processAction
+
+admin_show_user:
+    path: /user/show/{user_id}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\UserAdminController::showAction
+
+admin_user_locked_toggle:
+    path: /user/toggle_locked/{user_id}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\UserAdminController::toggleLockedAction
+
+admin_user_decklists_show:
+    path: /user/decklists/{user_id}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\UserAdminController::decklistsAction
+
+admin_decklist_delete:
+    path: /decklist/delete/{decklist_id}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\UserAdminController::deleteDecklistAction
+
+admin_user_comments_show:
+    path: /user/comments/{user_id}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\UserAdminController::commentsAction
+
+admin_comment_hidden_toggle:
+    path: /comment/toggle_hidden/{comment_id}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\UserAdminController::toggleHiddenCommentAction
+
+admin_comment_delete:
+    path: /comment/delete/{comment_id}
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\UserAdminController::deleteCommentAction

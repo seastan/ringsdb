@@ -1,0 +1,5 @@
+doctrine_migrations:
+    # app/DoctrineMigrations/ and Application\Migrations before the Symfony 4 layout; the
+    # migration_versions table stores the version numbers only, so the move is transparent
+    migrations_paths:
+        App\Migrations: '%kernel.project_dir%/src/Migrations'

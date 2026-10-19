@@ -96,8 +96,8 @@ $CONSOLE assetic:dump --env=prod
 # Use setfacl, NOT chown — chown would strip the ACLs the web server needs.
 echo "==> Refreshing cache/log ACLs (best-effort)..."
 if command -v setfacl >/dev/null 2>&1; then
-    setfacl -R  -m u:rings:rwX -m u:www-data:rwX app/cache app/logs 2>/dev/null || true
-    setfacl -dR -m u:rings:rwX -m u:www-data:rwX app/cache app/logs 2>/dev/null || true
+    setfacl -R  -m u:rings:rwX -m u:www-data:rwX var/cache var/logs 2>/dev/null || true
+    setfacl -dR -m u:rings:rwX -m u:www-data:rwX var/cache var/logs 2>/dev/null || true
 fi
 
 echo "==> Done."

@@ -1,0 +1,35 @@
+admin_card:
+    path:  /
+    defaults: { _controller: 'App\Controller\CardController::indexAction' }
+
+admin_card_show:
+    path:  /{id}/show
+    defaults: { _controller: 'App\Controller\CardController::showAction' }
+
+admin_card_new:
+    path:  /new
+    defaults: { _controller: 'App\Controller\CardController::newAction' }
+
+admin_card_create:
+    path:  /create
+    defaults: { _controller: 'App\Controller\CardController::createAction' }
+    methods: [ post ]
+
+admin_card_edit:
+    path:  /{id}/edit
+    defaults: { _controller: 'App\Controller\CardController::editAction' }
+
+admin_card_update:
+    path:  /{id}/update
+    defaults: { _controller: 'App\Controller\CardController::updateAction' }
+    methods: [ post, put ]
+
+admin_card_delete:
+    path:  /{id}/delete
+    defaults: { _controller: 'App\Controller\CardController::deleteAction' }
+    methods: [ post, delete ]
+
+admin_card_force_delete:
+    path:  /{id}/force_delete
+    defaults: { _controller: 'App\Controller\CardController::forceDeleteAction' }
+    methods: [ post, delete ]
