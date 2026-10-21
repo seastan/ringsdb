@@ -108,7 +108,11 @@ class UserInfoController extends AbstractController
             }
         }
 
-        $response = new JsonResponse($content);
+        // Encode explicitly so that anonymous visitors ($content === null) get the
+        // JSON literal `null`, not `{}`: new JsonResponse(null) turns null into an
+        // empty ArrayObject ({}), which app.user.js reads as a truthy (logged-in)
+        // user and renders a broken header. The former controller used json_encode().
+        $response = JsonResponse::fromJsonString(json_encode($content));
         if (isset($jsonp)) {
             $response->setCallback($jsonp);
         }
