@@ -25,8 +25,14 @@ security:
 
         public_api:
             pattern: ^/api/public
-            stateless: true
-            anonymous:    true
+            # NOT stateless: the header widget calls /api/public/user/info on every page to
+            # detect the login state (account menu + dark mode), so this firewall must read the
+            # logged-in user. `context: main` shares the session login token with the main
+            # firewall (which does the form-login / remember-me), so a user authenticated there
+            # is seen here too. `anonymous: lazy` keeps anonymous requests session-free (no
+            # Set-Cookie) so they stay anonymous-FastCGI-cacheable.
+            context: main
+            anonymous:    lazy
 
         main:
             pattern:    ^/
