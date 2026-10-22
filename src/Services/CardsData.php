@@ -58,10 +58,14 @@ class CardsData
     /**
      * Searches for and replaces symbol tokens with markup in a given text.
      *
-     * @param string $text
+     * @param string|null $text
      */
     public function replaceSymbols($text): string
     {
+        if (null === $text) {
+            return '';
+        }
+
         /** @var array<string, string> $displayTextReplacements */
         static $displayTextReplacements = [
             '[willpower]' => '<span class="icon-willpower"></span>',
