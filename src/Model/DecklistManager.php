@@ -1,161 +1,149 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Model;
 
-use App\Repository\SphereRepository;
-use App\Repository\CardRepository;
 use App\Entity\Card;
+use App\Entity\Decklist;
+use App\Entity\Sphere;
+use App\Entity\User;
+use App\Repository\CardRepository;
+use App\Repository\SphereRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use App\Entity\User;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use App\Entity\Sphere;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * The job of this class is to find and return decklists
- * @author alsciende
- * @property integer $maxcount Number of found rows for last request
+ * The job of this class is to find and return decklists.
  *
+ * @author alsciende
+ *
+ * @property int $maxcount Number of found rows for last request
  */
-class DecklistManager {
-	/**
-	 * @var \App\Entity\Sphere|null
-	 */
-	protected $predominantSphere;
-	/**
-	 * @var int
-	 */
-	protected $page = 1;
-	/**
-	 * @var int
-	 */
-	protected $start = 0;
-	/**
-	 * @var int
-	 */
-	protected $limit = 30;
-	/**
-	 * @var int
-	 */
-	protected $maxcount = 0;
-	/**
-	 * @var \App\Entity\User|null
-	 */
-	protected $user = null;
-
-	/**
-	 * @var EntityManagerInterface
-	 */
-	private $doctrine;
-
-	/**
-	 * @var RequestStack
-	 */
-	private $request_stack;
-
-	/**
-	 * @var UrlGeneratorInterface
-	 */
-	private $router;
+class DecklistManager
+{
+    /**
+     * @var Sphere|null
+     */
+    protected $predominantSphere;
 
     /**
-     * @var CardRepository
+     * @var int
      */
-    private $cardRepository;
+    protected $page = 1;
 
     /**
-     * @var SphereRepository
+     * @var int
      */
-    private $sphereRepository;
+    protected $start = 0;
 
-	public function __construct(EntityManagerInterface $doctrine, RequestStack $request_stack, UrlGeneratorInterface $router, CardRepository $cardRepository, SphereRepository $sphereRepository) {
-		$this->doctrine = $doctrine;
-		$this->request_stack = $request_stack;
-		$this->router = $router;
+    /**
+     * @var int
+     */
+    protected $limit = 30;
+
+    /**
+     * @var int
+     */
+    protected $maxcount = 0;
+
+    /**
+     * @var User|null
+     */
+    protected $user;
+
+    private EntityManagerInterface $doctrine;
+
+    private RequestStack $request_stack;
+
+    private UrlGeneratorInterface $router;
+
+    private CardRepository $cardRepository;
+
+    private SphereRepository $sphereRepository;
+
+    public function __construct(EntityManagerInterface $doctrine, RequestStack $request_stack, UrlGeneratorInterface $router, CardRepository $cardRepository, SphereRepository $sphereRepository)
+    {
+        $this->doctrine = $doctrine;
+        $this->request_stack = $request_stack;
+        $this->router = $router;
         $this->cardRepository = $cardRepository;
         $this->sphereRepository = $sphereRepository;
-	}
+    }
 
-	/**
-	 * The current request: the searches and the pagination read its parameters.
-	 */
-	private function currentRequest(): Request {
-		$request = $this->request_stack->getCurrentRequest();
-		if ($request === null) {
-			throw new \LogicException('No current request.');
-		}
+    /**
+     * The current request: the searches and the pagination read its parameters.
+     */
+    private function currentRequest(): Request
+    {
+        $request = $this->request_stack->getCurrentRequest();
+        if (null === $request) {
+            throw new \LogicException('No current request.');
+        }
 
-		return $request;
-	}
+        return $request;
+    }
 
-	/**
-	 * @param mixed $user
-	 * @return void
-	 */
-	public function setUser($user) {
-		$this->user = $user;
-	}
+    public function setUser(?User $user): void
+    {
+        $this->user = $user;
+    }
 
-	/**
-	 * @return void
-	 */
-	public function setPredominantSphere(Sphere $predominantSphere = null) {
-		$this->predominantSphere = $predominantSphere;
-	}
+    public function setPredominantSphere(?Sphere $predominantSphere = null): void
+    {
+        $this->predominantSphere = $predominantSphere;
+    }
 
-	/**
-	 * @param mixed $limit
-	 * @return void
-	 */
-	public function setLimit($limit) {
-		$this->limit = $limit;
-	}
+    public function setLimit(int $limit): void
+    {
+        $this->limit = $limit;
+    }
 
-	/**
-	 * @param mixed $page
-	 * @return void
-	 */
-	public function setPage($page) {
-		$this->page = max($page, 1);
-		$this->start = ($this->page - 1) * $this->limit;
-	}
+    public function setPage(int $page): void
+    {
+        $this->page = max($page, 1);
+        $this->start = ($this->page - 1) * $this->limit;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getMaxCount() {
-		return $this->maxcount;
-	}
+    public function getMaxCount(): int
+    {
+        return $this->maxcount;
+    }
 
-	/**
-	 * creates the basic query builder and initializes it
-	 * @return \Doctrine\ORM\QueryBuilder
-	 */
-	private function getQueryBuilder() {
-		$qb = $this->doctrine->createQueryBuilder();
-		$qb->select('d');
-		$qb->from('App:Decklist', 'd');
+    /**
+     * creates the basic query builder and initializes it.
+     */
+    private function getQueryBuilder(): QueryBuilder
+    {
+        $qb = $this->doctrine->createQueryBuilder();
+        $qb->select('d');
+        $qb->from('App:Decklist', 'd');
 
         if ($this->predominantSphere) {
             $qb->where('d.predominantSphere = :predominantSphere');
             $qb->setParameter('predominantSphere', $this->predominantSphere);
         }
-		$qb->setFirstResult($this->start);
-		$qb->setMaxResults($this->limit);
-		$qb->distinct();
 
-		return $qb;
-	}
+        $qb->setFirstResult($this->start);
+        $qb->setMaxResults($this->limit);
+        $qb->distinct();
+
+        return $qb;
+    }
 
     /**
-     * @param \Doctrine\ORM\Query<mixed, \App\Entity\Decklist> $query
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Decklist>
+     * @param Query<mixed, Decklist> $query
+     *
+     * @return Paginator<Decklist>
      */
-    private function getPaginator(Query $query) {
+    private function getPaginator(Query $query): Paginator
+    {
         $paginator = new Paginator($query, $fetchJoinCollection = false);
         $this->maxcount = $paginator->count();
 
@@ -163,18 +151,20 @@ class DecklistManager {
     }
 
     /**
-     * @return \Doctrine\Common\Collections\ArrayCollection<int, \App\Entity\Decklist>
+     * @return ArrayCollection<int, Decklist>
      */
-    public function getEmptyList() {
+    public function getEmptyList(): ArrayCollection
+    {
         $this->maxcount = 0;
 
         return new ArrayCollection([]);
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Decklist>
+     * @return Paginator<Decklist>
      */
-    public function findDecklistsByPopularity() {
+    public function findDecklistsByPopularity(): Paginator
+    {
         $qb = $this->getQueryBuilder();
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
         $qb->orderBy('popularity', 'DESC');
@@ -186,9 +176,10 @@ class DecklistManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Decklist>
+     * @return Paginator<Decklist>
      */
-    public function findDecklistsByAge() {
+    public function findDecklistsByAge(): Paginator
+    {
         $qb = $this->getQueryBuilder();
 
         $qb->orderBy('d.dateCreation', 'DESC');
@@ -200,9 +191,10 @@ class DecklistManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Decklist>
+     * @return Paginator<Decklist>
      */
-    public function findDecklistsByRecentDiscussion() {
+    public function findDecklistsByRecentDiscussion(): Paginator
+    {
         $qb = $this->getQueryBuilder();
 
         $qb->andWhere('d.nbComments > 0');
@@ -214,9 +206,10 @@ class DecklistManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Decklist>
+     * @return Paginator<Decklist>
      */
-    public function findDecklistsByFavorite(User $user) {
+    public function findDecklistsByFavorite(User $user): Paginator
+    {
         $qb = $this->getQueryBuilder();
 
         $qb->leftJoin('d.favorites', 'u');
@@ -231,9 +224,10 @@ class DecklistManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Decklist>
+     * @return Paginator<Decklist>
      */
-    public function findDecklistsByAuthor(User $user) {
+    public function findDecklistsByAuthor(User $user): Paginator
+    {
         $qb = $this->getQueryBuilder();
 
         $qb->andWhere('d.user = :user');
@@ -247,9 +241,10 @@ class DecklistManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Decklist>
+     * @return Paginator<Decklist>
      */
-    public function findDecklistsInHallOfFame() {
+    public function findDecklistsInHallOfFame(): Paginator
+    {
         $qb = $this->getQueryBuilder();
 
         $qb->andWhere('d.nbVotes > 10');
@@ -262,9 +257,10 @@ class DecklistManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Decklist>
+     * @return Paginator<Decklist>
      */
-    public function findDecklistsInHotTopic() {
+    public function findDecklistsInHotTopic(): Paginator
+    {
         $qb = $this->getQueryBuilder();
 
         $qb->addSelect('(SELECT count(c) FROM App:Comment c WHERE c.decklist=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
@@ -278,19 +274,14 @@ class DecklistManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Decklist>
+     * @return Paginator<Decklist>
      */
-    public function findDecklistsWithComplexSearch() {
+    public function findDecklistsWithComplexSearch(): Paginator
+    {
         $request = $this->currentRequest();
 
-        $cards_code = $request->query->get('cards');
-        if (!is_array($cards_code)) {
-            $cards_code = [];
-        }
-	    $cards_to_exclude = $request->query->get('cards_to_exclude');
-        if (!is_array($cards_to_exclude)) {
-            $cards_to_exclude = [];
-        }
+        $cards_code = $request->query->all('cards');
+        $cards_to_exclude = $request->query->all('cards_to_exclude');
 
         $sphere_code = filter_var($request->query->get('sphere'), FILTER_SANITIZE_STRING);
         if ($sphere_code) {
@@ -305,12 +296,9 @@ class DecklistManager {
 
         $sort = $request->query->get('sort');
 
-        $packs = $request->query->get('packs');
-        if (!is_array($packs)) {
-            $packs = [];
-        }
+        $packs = $request->query->all('packs');
 
-        $customPackCodes = array_values(array_filter((array) $request->query->get('custom_packs', []), 'is_string'));
+        $customPackCodes = array_values(array_filter((array) $request->query->all('custom_packs'), 'is_string'));
 
         $threat_op = $request->query->get('threato');
         $threat = $request->query->get('threat');
@@ -324,9 +312,9 @@ class DecklistManager {
         $joinTables = [];
 
         if (!empty($sphere)) {
-            $qb->innerJoin('d.spheres', "w");
-            $qb->andWhere("w.id = :sphere");
-            $qb->setParameter("sphere", $sphere->getId());
+            $qb->innerJoin('d.spheres', 'w');
+            $qb->andWhere('w.id = :sphere');
+            $qb->setParameter('sphere', $sphere->getId());
         }
 
         if (!empty($author_name)) {
@@ -342,50 +330,54 @@ class DecklistManager {
         }
 
         if (!empty($threat) && is_numeric($threat)) {
-            if ($threat_op == '>') {
+            if ('>' == $threat_op) {
                 $qb->andWhere('d.startingThreat > :threat');
-            } elseif ($threat_op == '<') {
+            } elseif ('<' == $threat_op) {
                 $qb->andWhere('d.startingThreat < :threat');
             } else {
                 $qb->andWhere('d.startingThreat = :threat');
             }
+
             $qb->setParameter('threat', $threat);
         }
 
         if (!empty($reputation) && is_numeric($reputation)) {
             $qb->innerJoin('d.user', 'u');
-            if ($reputation_op == '>') {
+            if ('>' == $reputation_op) {
                 $qb->andWhere('u.reputation > :reputation');
-            } elseif ($reputation_op == '<') {
+            } elseif ('<' == $reputation_op) {
                 $qb->andWhere('u.reputation < :reputation');
             } else {
                 $qb->andWhere('u.reputation = :reputation');
             }
+
             $qb->setParameter('reputation', $reputation);
         }
 
         if ($require_description) {
-            $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'),0));
+            $qb->andWhere($qb->expr()->gt($qb->expr()->length('d.descriptionHtml'), 0));
         }
 
-        $useCustomPacks = !empty($customPackCodes) && $this->user;
+        $useCustomPacks = [] !== $customPackCodes && $this->user;
 
-        if (!empty($cards_code) || !empty($packs) || $useCustomPacks) {
-            if (!empty($cards_code)) {
+        if (count($cards_code) > 0 || count($packs) > 0 || $useCustomPacks) {
+            if (count($cards_code) > 0) {
                 foreach ($cards_code as $i => $card_code) {
                     /* @var $card \App\Entity\Card */
                     $card = $this->cardRepository->findOneBy(['code' => $card_code]);
                     if (!$card) {
                         continue;
                     }
+
                     $qb->innerJoin('d.slots', "s$i");
                     $qb->andWhere("s$i.card = :card$i");
                     $qb->setParameter("card$i", $card);
                     // Add packs containing requested cards
-                    // $packs[] = $card->getPack()->getId(); 
+                    // $packs[] = $card->getPack()->getId();
                 }
             }
-            if (!empty($packs) || $useCustomPacks) {
+
+            if (count($packs) > 0 || $useCustomPacks) {
                 // A decklist matches iff every slot's card can be supplied in sufficient
                 // quantity by the allowed official packs OR by the user's custom packs.
                 $cores = max(1, (int) $numcores);
@@ -404,11 +396,11 @@ class DecklistManager {
                 // card than exist in total (unbuildable with any collection anyway) are no longer
                 // filtered out — this keeps the short-circuit table-free with no per-request scan.
                 $skipBuildable = false;
-                if (!empty($packs) && !$useCustomPacks) {
+                if (count($packs) > 0 && !$useCustomPacks) {
                     $packsWithCards = array_map('intval', $this->doctrine->getConnection()
                         ->executeQuery('SELECT DISTINCT pack_id FROM card_printing')
                         ->fetchAll(\PDO::FETCH_COLUMN));
-                    $skipBuildable = count(array_diff($packsWithCards, array_map('intval', $packs))) === 0;
+                    $skipBuildable = 0 === count(array_diff($packsWithCards, array_map('intval', $packs)));
                 }
 
                 if (!$skipBuildable) {
@@ -426,10 +418,10 @@ class DecklistManager {
                     // Custom-only: same nested NOT EXISTS but with official_copies = 0, expressed
                     //   as ucpc.quantity >= s.quantity (left-side arithmetic becomes s.quantity - ucpc.quantity <= 0).
                     $officialSubquery = '';
-                    if (!empty($packs)) {
+                    if (count($packs) > 0) {
                         $officialSubquery =
-                            '(SELECT COALESCE(SUM(CASE WHEN cp.pack = 1 THEN cp.quantity * :numcores ELSE cp.quantity END), 0) ' .
-                            'FROM App:CardPrinting cp ' .
+                            '(SELECT COALESCE(SUM(CASE WHEN cp.pack = 1 THEN cp.quantity * :numcores ELSE cp.quantity END), 0) '.
+                            'FROM App:CardPrinting cp '.
                             'WHERE cp.card = s.card AND cp.pack IN (:packs))';
                         $qb->setParameter('packs', $packs);
                         $qb->setParameter('numcores', $cores);
@@ -440,7 +432,7 @@ class DecklistManager {
                         $qb->setParameter('customPackUser', $this->user);
                     }
 
-                    if (!empty($packs) && $useCustomPacks) {
+                    if (count($packs) > 0 && $useCustomPacks) {
                         // Inner version of the official subquery uses alias cp2 so it doesn't
                         // collide with cp from the outer official-check occurrence.
                         $officialSubquery2 = str_replace(
@@ -454,47 +446,49 @@ class DecklistManager {
                         // remaining = CASE WHEN s.quantity >= ucpc.quantity THEN s.quantity - ucpc.quantity ELSE 0 END
                         // (the CASE avoids unsigned-integer subtraction underflow when custom has surplus copies).
                         $uncoveredCondition =
-                            's.quantity > ' . $officialSubquery .
-                            ' AND NOT EXISTS (' .
-                                'SELECT ucpc.id FROM App:UserCustomPackCard ucpc ' .
-                                'JOIN ucpc.customPack ucp ' .
-                                'WHERE ucpc.card = s.card ' .
-                                'AND ucp.code IN (:customPackCodes) ' .
-                                'AND ucp.user = :customPackUser ' .
-                                'AND CASE WHEN s.quantity >= ucpc.quantity THEN s.quantity - ucpc.quantity ELSE 0 END <= ' . $officialSubquery2 .
+                            's.quantity > '.$officialSubquery.
+                            ' AND NOT EXISTS ('.
+                                'SELECT ucpc.id FROM App:UserCustomPackCard ucpc '.
+                                'JOIN ucpc.customPack ucp '.
+                                'WHERE ucpc.card = s.card '.
+                                'AND ucp.code IN (:customPackCodes) '.
+                                'AND ucp.user = :customPackUser '.
+                                'AND CASE WHEN s.quantity >= ucpc.quantity THEN s.quantity - ucpc.quantity ELSE 0 END <= '.$officialSubquery2.
                             ')';
-                    } elseif (!empty($packs)) {
-                        $uncoveredCondition = 's.quantity > ' . $officialSubquery;
+                    } elseif (count($packs) > 0) {
+                        $uncoveredCondition = 's.quantity > '.$officialSubquery;
                     } else {
                         // Custom-only: custom pack must fully supply the slot on its own.
                         $uncoveredCondition =
-                            'NOT EXISTS (' .
-                                'SELECT ucpc.id FROM App:UserCustomPackCard ucpc ' .
-                                'JOIN ucpc.customPack ucp ' .
-                                'WHERE ucpc.card = s.card ' .
-                                'AND ucp.code IN (:customPackCodes) ' .
-                                'AND ucp.user = :customPackUser ' .
-                                'AND ucpc.quantity >= s.quantity' .
+                            'NOT EXISTS ('.
+                                'SELECT ucpc.id FROM App:UserCustomPackCard ucpc '.
+                                'JOIN ucpc.customPack ucp '.
+                                'WHERE ucpc.card = s.card '.
+                                'AND ucp.code IN (:customPackCodes) '.
+                                'AND ucp.user = :customPackUser '.
+                                'AND ucpc.quantity >= s.quantity'.
                             ')';
                     }
 
                     $qb->andWhere(
-                        'NOT EXISTS (' .
-                            'SELECT s.id FROM App:Decklistslot s ' .
-                            'WHERE s.decklist = d AND ' . $uncoveredCondition .
+                        'NOT EXISTS ('.
+                            'SELECT s.id FROM App:Decklistslot s '.
+                            'WHERE s.decklist = d AND '.$uncoveredCondition.
                         ')'
                     );
                 }
             }
-            if (!empty($cards_to_exclude)) {
+
+            if (count($cards_to_exclude) > 0) {
                 $sub = $this->doctrine->createQueryBuilder();
-                $sub->select("k");
-                $sub->from("App:Card", "k");
+                $sub->select('k');
+                $sub->from('App:Card', 'k');
                 $sub->innerJoin('App:Decklistslot', 't', 'WITH', 't.card = k');
                 $sub->where('t.decklist = d');
                 $sub->andWhere($sub->expr()->in('k.code', $cards_to_exclude));
                 $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
             }
+
             // (the former Core-only "num cores" quantity check is now subsumed by the
             //  quantity-aware allowed-packs filter above.)
         }
@@ -513,9 +507,10 @@ class DecklistManager {
                 break;
 
             case 'reputation':
-                if (!in_array('d.user', $joinTables)) {
+                if (!in_array('d.user', $joinTables, true)) {
                     $qb->innerJoin('d.user', 'u');
                 }
+
                 // with DISTINCT, MySQL 5.7+ only sorts on selected columns
                 $qb->addSelect('u.reputation AS HIDDEN reputation');
                 $qb->orderBy('reputation', 'DESC');
@@ -534,17 +529,16 @@ class DecklistManager {
         return $this->getPaginator($qb->getQuery());
     }
 
-    /**
-     * @return int
-     */
-    public function getNumberOfPages() {
+    public function getNumberOfPages(): int
+    {
         return intval(ceil($this->maxcount / $this->limit));
     }
 
     /**
      * @return list<array{numero: int, url: string, current: bool}>
      */
-    public function getAllPages() {
+    public function getAllPages(): array
+    {
         $request = $this->currentRequest();
         $route = $request->get('_route');
         $route_params = $request->get('_route_params');
@@ -554,11 +548,11 @@ class DecklistManager {
 
         $number_of_pages = $this->getNumberOfPages();
         $pages = [];
-        for ($page = 1; $page <= $number_of_pages; $page++) {
+        for ($page = 1; $page <= $number_of_pages; ++$page) {
             $pages[] = [
-                "numero" => $page,
-                "url" => $this->router->generate($route, ["page" => $page] + $params),
-                "current" => $page == $this->page
+                'numero' => $page,
+                'url' => $this->router->generate($route, ['page' => $page] + $params),
+                'current' => $page == $this->page,
             ];
         }
 
@@ -568,12 +562,13 @@ class DecklistManager {
     /**
      * @return array<int, mixed>
      */
-    public function getClosePages() {
+    public function getClosePages(): array
+    {
         $allPages = $this->getAllPages();
         $numero_courant = $this->page - 1;
         $pages = [];
         foreach ($allPages as $numero => $page) {
-            if ($numero === 0 || $numero === count($allPages) - 1 || abs($numero - $numero_courant) <= 2) {
+            if (0 === $numero || $numero === count($allPages) - 1 || abs($numero - $numero_courant) <= 2) {
                 $pages[] = $page;
             }
         }
@@ -581,11 +576,9 @@ class DecklistManager {
         return $pages;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getPreviousUrl() {
-        if ($this->page === 1) {
+    public function getPreviousUrl(): ?string
+    {
+        if (1 === $this->page) {
             return null;
         }
 
@@ -602,10 +595,8 @@ class DecklistManager {
         return $this->router->generate($route, $params);
     }
 
-    /**
-     * @return string|null
-     */
-    public function getNextUrl() {
+    public function getNextUrl(): ?string
+    {
         if ($this->page === $this->getNumberOfPages()) {
             return null;
         }

@@ -1,100 +1,111 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
- * FellowshipDeck
+ * FellowshipDeck.
+ *
+ * @ORM\Entity
+ * @ORM\Table(name="fellowship_deck")
  */
-class FellowshipDeck {
+class FellowshipDeck
+{
     /**
-     * @var integer
+     * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-    /**
-     * @var integer
-     */
-    private $deckNumber;
-    /**
-     * @var \App\Entity\Fellowship
-     */
-    private $fellowship;
-    /**
-     * @var \App\Entity\Deck
-     */
-    private $deck;
 
     /**
-     * Get id
-     *
-     * @return integer
+     * @ORM\Column(name="deck_number", type="smallint")
      */
-    public function getId() {
+    private int $deckNumber;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Fellowship", inversedBy="decks")
+     * @ORM\JoinColumn(name="fellowship_id", referencedColumnName="id", nullable=false)
+     */
+    private Fellowship $fellowship;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Deck", inversedBy="fellowships")
+     * @ORM\JoinColumn(name="deck_id", referencedColumnName="id", nullable=false)
+     */
+    private Deck $deck;
+
+    public function __construct(Fellowship $fellowship, Deck $deck, int $deckNumber)
+    {
+        $this->fellowship = $fellowship;
+        $this->deck = $deck;
+        $this->deckNumber = $deckNumber;
+    }
+
+    /**
+     * Get id.
+     */
+    public function getId(): ?int
+    {
         return $this->id;
     }
 
     /**
-     * Set deckNumber
-     *
-     * @param integer $deckNumber
-     *
-     * @return FellowshipDeck
+     * Set deckNumber.
      */
-    public function setDeckNumber($deckNumber) {
+    public function setDeckNumber(int $deckNumber): FellowshipDeck
+    {
         $this->deckNumber = $deckNumber;
 
         return $this;
     }
 
     /**
-     * Get deckNumber
-     *
-     * @return integer
+     * Get deckNumber.
      */
-    public function getDeckNumber() {
+    public function getDeckNumber(): int
+    {
         return $this->deckNumber;
     }
 
     /**
-     * Set fellowship
-     *
-     * @param \App\Entity\Fellowship $fellowship
-     *
-     * @return FellowshipDeck
+     * Set fellowship.
      */
-    public function setFellowship(\App\Entity\Fellowship $fellowship) {
+    public function setFellowship(Fellowship $fellowship): FellowshipDeck
+    {
         $this->fellowship = $fellowship;
 
         return $this;
     }
 
     /**
-     * Get fellowship
-     *
-     * @return \App\Entity\Fellowship
+     * Get fellowship.
      */
-    public function getFellowship() {
+    public function getFellowship(): Fellowship
+    {
         return $this->fellowship;
     }
 
     /**
-     * Set deck
-     *
-     * @param \App\Entity\Deck $deck
-     *
-     * @return FellowshipDeck
+     * Set deck.
      */
-    public function setDeck(\App\Entity\Deck $deck) {
+    public function setDeck(Deck $deck): FellowshipDeck
+    {
         $this->deck = $deck;
 
         return $this;
     }
 
     /**
-     * Get deck
-     *
-     * @return \App\Entity\Deck
+     * Get deck.
      */
-    public function getDeck() {
+    public function getDeck(): Deck
+    {
         return $this->deck;
     }
 }

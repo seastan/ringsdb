@@ -1,163 +1,258 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-class Card {
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+
+/**
+ * @ORM\Entity(repositoryClass="App\Repository\CardRepository")
+ * @ORM\Table(
+ *     name="card",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(name="card_code_idx", columns={"code"})
+ *     }
+ * )
+ * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="entity_region")
+ */
+class Card
+{
     /**
-     * @var integer
+     * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-    /**
-     * @var integer
-     */
-    private $position;
-    /**
-     * @var string
-     */
-    private $code;
-    /**
-     * @var string
-     */
-    private $name;
-    /**
-     * @var string|null
-     */
-    private $traits;
-    /**
-     * @var string|null
-     */
-    private $text;
-    /**
-     * @var string|null
-     */
-    private $flavor;
-    /**
-     * @var boolean
-     */
-    private $isUnique;
-    /**
-     * @var string|null
-     */
-    private $cost;
-    /**
-     * @var int|null
-     */
-    private $threat;
-    /**
-     * @var int|null
-     */
-    private $willpower;
-    /**
-     * @var int|null
-     */
-    private $attack;
-    /**
-     * @var int|null
-     */
-    private $defense;
-    /**
-     * @var int|null
-     */
-    private $health;
-    /**
-     * @var int|null
-     */
-    private $victory;
-    /**
-     * @var integer
-     */
-    private $deckLimit = 3;
-    /**
-     * @var \DateTime
-     */
-    private $dateCreation;
-    /**
-     * @var \DateTime
-     */
-    private $dateUpdate;
-    /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Review>
-     */
-    private $reviews;
-    /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\CardPrinting>
-     */
-    private $printings;
-    /**
-     * @var \App\Entity\Type
-     */
-    private $type;
-    /**
-     * @var \App\Entity\Sphere
-     */
-    private $sphere;
 
     /**
-     * Constructor
+     * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=false)
      */
-    public function __construct() {
-        $this->reviews = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->printings = new \Doctrine\Common\Collections\ArrayCollection();
+    private $position;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(type="string", length=255, nullable=false)
+     */
+    private $code;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(type="string", length=1024, nullable=false)
+     */
+    private $name;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $traits;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $text;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $flavor;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_unique", type="boolean", nullable=false)
+     */
+    private $isUnique = false;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(type="string", length=3, nullable=true)
+     */
+    private $cost;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $threat;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $willpower;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $attack;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $defense;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $health;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $victory;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $quest;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="deck_limit", type="smallint", nullable=false, options={"default": 3})
+     */
+    private $deckLimit = 3;
+
+    /**
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
+     */
+    private \DateTime $dateCreation;
+
+    /**
+     * @ORM\Column(name="date_update", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="update")
+     */
+    private \DateTime $dateUpdate;
+
+    /**
+     * @var Collection<int, Review>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Review", mappedBy="card")
+     * @ORM\OrderBy({"dateCreation"="DESC"})
+     */
+    private $reviews;
+
+    /**
+     * @var Collection<int, CardPrinting>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\CardPrinting", mappedBy="card", cascade={"remove"}, orphanRemoval=true)
+     * @ORM\OrderBy({"position"="ASC"})
+     */
+    private $printings;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Type", inversedBy="cards")
+     * @ORM\JoinColumn(name="type_id", referencedColumnName="id", nullable=false)
+     */
+    private ?Type $type = null;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Sphere", inversedBy="cards")
+     * @ORM\JoinColumn(name="sphere_id", referencedColumnName="id", nullable=false)
+     */
+    private ?Sphere $sphere = null;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="has_errata", type="boolean", nullable=false, options={"default": false})
+     */
+    private $hasErrata = false;
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        $this->reviews = new ArrayCollection();
+        $this->printings = new ArrayCollection();
+        $this->dateCreation = new \DateTime();
+        $this->dateUpdate = new \DateTime();
     }
 
     /**
-     * Add printing
-     *
-     * @param \App\Entity\CardPrinting $printing
-     *
-     * @return Card
+     * Add printing.
      */
-    public function addPrinting(\App\Entity\CardPrinting $printing) {
+    public function addPrinting(CardPrinting $printing): Card
+    {
         $this->printings[] = $printing;
 
         return $this;
     }
 
     /**
-     * Remove printing
-     *
-     * @param \App\Entity\CardPrinting $printing
-     * @return void
+     * Remove printing.
      */
-    public function removePrinting(\App\Entity\CardPrinting $printing) {
+    public function removePrinting(CardPrinting $printing): void
+    {
         $this->printings->removeElement($printing);
     }
 
     /**
-     * Get printings
+     * Get printings.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\CardPrinting>
+     * @return Collection<int, CardPrinting>
      */
-    public function getPrintings() {
+    public function getPrintings(): Collection
+    {
         return $this->printings;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getPrimaryPrinting() {
+    public function getPrimaryPrinting(): ?CardPrinting
+    {
         $primary = null;
         foreach ($this->printings as $p) {
-            if ($primary === null) {
+            if (null === $primary) {
                 $primary = $p;
                 continue;
             }
 
             // a printing always has a pack (card_printing.pack_id is NOT NULL)
-            $pDate = $p->getPack()->getDateRelease();
-            $primaryDate = $primary->getPack()->getDateRelease();
+            // except for a Card that has not been persisted yet
+            $pDate = $p->getPack() ? $p->getPack()->getDateRelease() : null;
+            $primaryDate = $primary->getPack() ? $primary->getPack()->getDateRelease() : null;
 
             // Prefer the earliest-released pack so the canonical printing is the
             // original one (e.g. Core Set over a later reprint or starter). A
             // null release date (unreleased/spoiled pack) sorts last; ties fall
             // back to the lower position.
-            if ($pDate === null && $primaryDate === null) {
+            if (null === $pDate && null === $primaryDate) {
                 $better = $p->getPosition() < $primary->getPosition();
-            } else if ($pDate === null) {
+            } elseif (null === $pDate) {
                 $better = false;
-            } else if ($primaryDate === null) {
+            } elseif (null === $primaryDate) {
                 $better = true;
-            } else if ($pDate == $primaryDate) {
+            } elseif ($pDate == $primaryDate) {
                 $better = $p->getPosition() < $primary->getPosition();
             } else {
                 $better = $pDate < $primaryDate;
@@ -167,558 +262,494 @@ class Card {
                 $primary = $p;
             }
         }
+
         return $primary;
     }
 
     /**
-     * Get id
-     *
-     * @return integer
+     * Get id.
      */
-    public function getId() {
+    public function getId(): ?int
+    {
         return $this->id;
     }
 
     /**
-     * Set position
+     * Set position.
      *
-     * @param integer $position
-     *
-     * @return Card
+     * @param int $position
      */
-    public function setPosition($position) {
+    public function setPosition($position): Card
+    {
         $this->position = $position;
 
         return $this;
     }
 
     /**
-     * Get position
-     *
-     * @return integer
+     * Get position.
      */
-    public function getPosition() {
+    public function getPosition(): ?int
+    {
         return $this->position;
     }
 
     /**
-     * Set code
+     * Set code.
      *
      * @param string $code
-     *
-     * @return Card
      */
-    public function setCode($code) {
+    public function setCode($code): Card
+    {
         $this->code = $code;
 
         return $this;
     }
 
     /**
-     * Get code
-     *
-     * @return string
+     * Get code.
      */
-    public function getCode() {
+    public function getCode(): ?string
+    {
         return $this->code;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
-     *
-     * @return Card
      */
-    public function setName($name) {
+    public function setName($name): Card
+    {
         $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get name
-     *
-     * @return string
+     * Get name.
      */
-    public function getName() {
+    public function getName(): ?string
+    {
         return $this->name;
     }
 
-    /**
-     * @return string
-     */
-    public function getAdminLabel() {
-        return $this->name . ' (' . $this->sphere->getName() . ', ' . $this->type->getName() . ')';
+    public function getAdminLabel(): string
+    {
+        return sprintf(
+            '%s (%s, %s)',
+            $this->getName() ?? '<name>',
+            $this->getSphere() instanceof Sphere ? $this->getSphere()->getName() : '<sphere>',
+            $this->getType() instanceof Type ? $this->getType()->getName() : '<type>',
+        );
     }
 
     /**
-     * Set traits
+     * Set traits.
      *
      * @param string|null $traits
-     *
-     * @return Card
      */
-    public function setTraits($traits) {
+    public function setTraits($traits): Card
+    {
         $this->traits = $traits;
 
         return $this;
     }
 
     /**
-     * Get traits
-     *
-     * @return string|null
+     * Get traits.
      */
-    public function getTraits() {
+    public function getTraits(): ?string
+    {
         return $this->traits;
     }
 
     /**
-     * Set text
+     * Set text.
      *
      * @param string|null $text
-     *
-     * @return Card
      */
-    public function setText($text) {
+    public function setText($text): Card
+    {
         $this->text = $text;
 
         return $this;
     }
 
     /**
-     * Get text
-     *
-     * @return string|null
+     * Get text.
      */
-    public function getText() {
+    public function getText(): ?string
+    {
         return $this->text;
     }
 
     /**
-     * Set flavor
+     * Set flavor.
      *
      * @param string|null $flavor
-     *
-     * @return Card
      */
-    public function setFlavor($flavor) {
+    public function setFlavor($flavor): Card
+    {
         $this->flavor = $flavor;
 
         return $this;
     }
 
     /**
-     * Get flavor
-     *
-     * @return string|null
+     * Get flavor.
      */
-    public function getFlavor() {
+    public function getFlavor(): ?string
+    {
         return $this->flavor;
     }
 
     /**
-     * Set isUnique
+     * Set isUnique.
      *
-     * @param boolean $isUnique
-     *
-     * @return Card
+     * @param bool $isUnique
      */
-    public function setIsUnique($isUnique) {
+    public function setIsUnique($isUnique): Card
+    {
         $this->isUnique = $isUnique;
 
         return $this;
     }
 
     /**
-     * Get isUnique
-     *
-     * @return boolean
+     * Get isUnique.
      */
-    public function getIsUnique() {
+    public function getIsUnique(): bool
+    {
         return $this->isUnique;
     }
 
     /**
-     * Set cost
+     * Set cost.
      *
      * @param string|null $cost
-     *
-     * @return Card
      */
-    public function setCost($cost) {
+    public function setCost($cost): Card
+    {
         $this->cost = $cost;
 
         return $this;
     }
 
     /**
-     * Get cost
-     *
-     * @return string|null
+     * Get cost.
      */
-    public function getCost() {
+    public function getCost(): ?string
+    {
         return $this->cost;
     }
 
     /**
-     * Set threat
+     * Set threat.
      *
      * @param int|null $threat
-     *
-     * @return Card
      */
-    public function setThreat($threat) {
+    public function setThreat($threat): Card
+    {
         $this->threat = $threat;
 
         return $this;
     }
 
     /**
-     * Get threat
-     *
-     * @return int|null
+     * Get threat.
      */
-    public function getThreat() {
+    public function getThreat(): ?int
+    {
         return $this->threat;
     }
 
     /**
-     * Set willpower
+     * Set willpower.
      *
      * @param int|null $willpower
-     *
-     * @return Card
      */
-    public function setWillpower($willpower) {
+    public function setWillpower($willpower): Card
+    {
         $this->willpower = $willpower;
 
         return $this;
     }
 
     /**
-     * Get willpower
-     *
-     * @return int|null
+     * Get willpower.
      */
-    public function getWillpower() {
+    public function getWillpower(): ?int
+    {
         return $this->willpower;
     }
 
     /**
-     * Set attack
+     * Set attack.
      *
      * @param int|null $attack
-     *
-     * @return Card
      */
-    public function setAttack($attack) {
+    public function setAttack($attack): Card
+    {
         $this->attack = $attack;
 
         return $this;
     }
 
     /**
-     * Get attack
-     *
-     * @return int|null
+     * Get attack.
      */
-    public function getAttack() {
+    public function getAttack(): ?int
+    {
         return $this->attack;
     }
 
     /**
-     * Set defense
+     * Set defense.
      *
      * @param int|null $defense
-     *
-     * @return Card
      */
-    public function setDefense($defense) {
+    public function setDefense($defense): Card
+    {
         $this->defense = $defense;
 
         return $this;
     }
 
     /**
-     * Get defense
-     *
-     * @return int|null
+     * Get defense.
      */
-    public function getDefense() {
+    public function getDefense(): ?int
+    {
         return $this->defense;
     }
 
     /**
-     * Set health
+     * Set health.
      *
      * @param int|null $health
-     *
-     * @return Card
      */
-    public function setHealth($health) {
+    public function setHealth($health): Card
+    {
         $this->health = $health;
 
         return $this;
     }
 
     /**
-     * Get health
-     *
-     * @return int|null
+     * Get health.
      */
-    public function getHealth() {
+    public function getHealth(): ?int
+    {
         return $this->health;
     }
 
     /**
-     * Set victory
+     * Set victory.
      *
      * @param int|null $victory
-     *
-     * @return Card
      */
-    public function setVictory($victory) {
+    public function setVictory($victory): Card
+    {
         $this->victory = $victory;
 
         return $this;
     }
 
     /**
-     * Get victory
-     *
-     * @return int|null
+     * Get victory.
      */
-    public function getVictory() {
+    public function getVictory(): ?int
+    {
         return $this->victory;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getQuantity() {
+    public function getQuantity(): ?int
+    {
         $p = $this->getPrimaryPrinting();
-        return $p ? $p->getQuantity() : null;
+
+        return $p instanceof CardPrinting ? $p->getQuantity() : null;
     }
 
     /**
-     * Set deckLimit
+     * Set deckLimit.
      *
-     * @param integer|null $deckLimit null (an empty field of the admin form or of a CSV import) for
-     *                              the default, 3
-     *
-     * @return Card
+     * @param int|null $deckLimit null (an empty field of the admin form or of a CSV import) for
+     *                            the default, 3
      */
-    public function setDeckLimit($deckLimit) {
+    public function setDeckLimit($deckLimit): Card
+    {
         $this->deckLimit = $deckLimit ?? 3;
 
         return $this;
     }
 
     /**
-     * Get deckLimit
-     *
-     * @return integer
+     * Get deckLimit.
      */
-    public function getDeckLimit() {
+    public function getDeckLimit(): int
+    {
         return $this->deckLimit;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getIllustrator() {
+    public function getIllustrator(): ?string
+    {
         $p = $this->getPrimaryPrinting();
-        return $p ? $p->getIllustrator() : null;
+
+        return $p instanceof CardPrinting ? $p->getIllustrator() : null;
+    }
+
+    public function getOctgnid(): ?string
+    {
+        $p = $this->getPrimaryPrinting();
+
+        return $p instanceof CardPrinting ? $p->getOctgnid() : null;
     }
 
     /**
-     * @return mixed
+     * Set dateCreation.
      */
-    public function getOctgnid() {
-        $p = $this->getPrimaryPrinting();
-        return $p ? $p->getOctgnid() : null;
-    }
-
-    /**
-     * Set dateCreation
-     *
-     * @param \DateTime $dateCreation
-     *
-     * @return Card
-     */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation(\DateTime $dateCreation): Card
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
-     *
-     * @return \DateTime
+     * Get dateCreation.
      */
-    public function getDateCreation() {
+    public function getDateCreation(): \DateTime
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
-     *
-     * @param \DateTime $dateUpdate
-     *
-     * @return Card
+     * Set dateUpdate.
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate(\DateTime $dateUpdate): Card
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
-     *
-     * @return \DateTime
+     * Get dateUpdate.
      */
-    public function getDateUpdate() {
+    public function getDateUpdate(): \DateTime
+    {
         return $this->dateUpdate;
     }
 
     /**
-     * Add review
-     *
-     * @param \App\Entity\Review $review
-     *
-     * @return Card
+     * Add review.
      */
-    public function addReview(\App\Entity\Review $review) {
+    public function addReview(Review $review): Card
+    {
         $this->reviews[] = $review;
 
         return $this;
     }
 
     /**
-     * Remove review
-     *
-     * @param \App\Entity\Review $review
-     * @return void
+     * Remove review.
      */
-    public function removeReview(\App\Entity\Review $review) {
+    public function removeReview(Review $review): void
+    {
         $this->reviews->removeElement($review);
     }
 
     /**
-     * Get reviews
+     * Get reviews.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Review>
+     * @return Collection<int, Review>
      */
-    public function getReviews() {
+    public function getReviews(): Collection
+    {
         return $this->reviews;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getPack() {
+    public function getPack(): ?Pack
+    {
         $p = $this->getPrimaryPrinting();
-        return $p ? $p->getPack() : null;
+
+        return $p instanceof CardPrinting ? $p->getPack() : null;
     }
 
     /**
-     * Set type
-     *
-     * @param \App\Entity\Type $type
-     *
-     * @return Card
+     * Set type.
      */
-    public function setType(\App\Entity\Type $type) {
+    public function setType(Type $type): Card
+    {
         $this->type = $type;
 
         return $this;
     }
 
     /**
-     * Get type
-     *
-     * @return \App\Entity\Type
+     * Get type.
      */
-    public function getType() {
+    public function getType(): ?Type
+    {
         return $this->type;
     }
 
     /**
-     * Set sphere
-     *
-     * @param \App\Entity\Sphere $sphere
-     *
-     * @return Card
+     * Set sphere.
      */
-    public function setSphere(\App\Entity\Sphere $sphere) {
+    public function setSphere(Sphere $sphere): Card
+    {
         $this->sphere = $sphere;
 
         return $this;
     }
 
     /**
-     * Get sphere
-     *
-     * @return \App\Entity\Sphere
+     * Get sphere.
      */
-    public function getSphere() {
+    public function getSphere(): ?Sphere
+    {
         return $this->sphere;
     }
 
     /**
-     * @var int|null
-     */
-    private $quest;
-
-    /**
-     * Set quest
+     * Set quest.
      *
      * @param int|null $quest
-     *
-     * @return Card
      */
-    public function setQuest($quest) {
+    public function setQuest($quest): Card
+    {
         $this->quest = $quest;
 
         return $this;
     }
 
     /**
-     * Get quest
-     *
-     * @return int|null
+     * Get quest.
      */
-    public function getQuest() {
+    public function getQuest(): ?int
+    {
         return $this->quest;
     }
-    /**
-     * @var boolean
-     */
-    private $hasErrata;
 
     /**
-     * Set hasErrata
+     * Set hasErrata.
      *
-     * @param boolean $hasErrata
-     *
-     * @return Card
+     * @param bool $hasErrata
      */
-    public function setHasErrata($hasErrata) {
+    public function setHasErrata($hasErrata): Card
+    {
         $this->hasErrata = $hasErrata;
 
         return $this;
     }
 
     /**
-     * Get hasErrata
-     *
-     * @return boolean
+     * Get hasErrata.
      */
-    public function getHasErrata() {
+    public function getHasErrata(): bool
+    {
         return $this->hasErrata;
     }
 }

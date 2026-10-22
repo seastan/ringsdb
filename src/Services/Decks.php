@@ -1,90 +1,77 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
-use App\Entity\CardPrinting;
-use App\Repository\DecklistRepository;
-use App\Repository\DeckchangeRepository;
-use App\Repository\CardRepository;
 use App\Entity\Card;
+use App\Entity\CardPrinting;
 use App\Entity\Deck;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Deckslot;
-use App\Entity\Decksideslot;
-use Psr\Log\LoggerInterface;
 use App\Entity\Deckchange;
+use App\Entity\Decklist;
+use App\Entity\Decksideslot;
+use App\Entity\Deckslot;
+use App\Entity\Pack;
+use App\Entity\Sphere;
+use App\Entity\Type;
+use App\Entity\User;
 use App\Helper\DeckValidationHelper;
-use App\Services\Diff;
+use App\Repository\CardRepository;
+use App\Repository\DeckchangeRepository;
+use App\Repository\DecklistRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class Decks {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $doctrine;
+class Decks
+{
+    private EntityManagerInterface $doctrine;
 
-    /**
-     * @var DeckValidationHelper
-     */
-    private $deck_validation_helper;
+    private DeckValidationHelper $deck_validation_helper;
 
-    /**
-     * @var Diff
-     */
-    private $diff;
+    private Diff $diff;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private CardRepository $cardRepository;
 
-    /**
-     * @var CardRepository
-     */
-    private $cardRepository;
+    private DeckchangeRepository $deckchangeRepository;
 
-    /**
-     * @var DeckchangeRepository
-     */
-    private $deckchangeRepository;
+    private DecklistRepository $decklistRepository;
 
-    /**
-     * @var DecklistRepository
-     */
-    private $decklistRepository;
-
-    public function __construct(EntityManagerInterface $doctrine, DeckValidationHelper $deck_validation_helper, Diff $diff, LoggerInterface $logger, CardRepository $cardRepository, DeckchangeRepository $deckchangeRepository, DecklistRepository $decklistRepository) {
+    public function __construct(
+        EntityManagerInterface $doctrine,
+        DeckValidationHelper $deck_validation_helper,
+        Diff $diff,
+        CardRepository $cardRepository,
+        DeckchangeRepository $deckchangeRepository,
+        DecklistRepository $decklistRepository
+    ) {
         $this->doctrine = $doctrine;
         $this->deck_validation_helper = $deck_validation_helper;
         $this->diff = $diff;
-        $this->logger = $logger;
         $this->cardRepository = $cardRepository;
         $this->deckchangeRepository = $deckchangeRepository;
         $this->decklistRepository = $decklistRepository;
     }
 
     /**
-     * @param mixed $user
      * @return array<int, mixed>
      */
-    public function getByUser($user) {
-        /* @var $user \App\Entity\User */
+    public function getByUser(User $user): array
+    {
         $decks = $user->getDecks();
         $list = [];
 
         foreach ($decks as $deck) {
-            $list[] = $deck->jsonSerialize(false);
+            $list[] = $deck->jsonSerialize();
         }
 
         return $list;
     }
 
     /**
-     * @param mixed $user
-     * @param mixed $limit
      * @return list<array<string, mixed>>
      */
-    public function getDecksWithSlotsForUser($user, $limit = null) {
+    public function getDecksWithSlotsForUser(User $user, ?int $limit = null): array
+    {
         // Step 1: get the right deck IDs with no collection join so LIMIT works correctly
         $idQuery = $this->doctrine->createQuery(
             'SELECT d.id FROM App\Entity\Deck d
@@ -92,13 +79,13 @@ class Decks {
              ORDER BY d.dateUpdate DESC, d.id ASC'
         )->setParameter('user', $user);
 
-        if ($limit !== null) {
+        if (null !== $limit) {
             $idQuery->setMaxResults($limit);
         }
 
         $ids = array_column($idQuery->getScalarResult(), 'id');
 
-        if (empty($ids)) {
+        if ([] === $ids) {
             return [];
         }
 
@@ -127,23 +114,21 @@ class Decks {
         foreach ($rows as $row) {
             $deckId = $row['deck_id'];
 
-            if (!isset($decks[$deckId])) {
-                $decks[$deckId] = [
-                    'id' => (int) $deckId,
-                    'name' => $row['name'],
-                    'version' => $row['major_version'] . '.' . $row['minor_version'],
-                    'problem' => $row['problem'],
-                    'tags' => $row['tags'],
-                    'date_creation' => $row['date_creation'] ? new \DateTime($row['date_creation']) : null,
-                    'last_pack' => $row['last_pack_name'] !== null ? ['name' => $row['last_pack_name']] : null,
-                    'slots' => [],
-                    'heroes' => [],
-                ];
-            }
+            $decks[$deckId] ??= [
+                'id' => (int) $deckId,
+                'name' => $row['name'],
+                'version' => $row['major_version'].'.'.$row['minor_version'],
+                'problem' => $row['problem'],
+                'tags' => $row['tags'],
+                'date_creation' => $row['date_creation'] ? new \DateTime($row['date_creation']) : null,
+                'last_pack' => null !== $row['last_pack_name'] ? ['name' => $row['last_pack_name']] : null,
+                'slots' => [],
+                'heroes' => [],
+            ];
 
-            if ($row['card_code'] !== null) {
+            if (null !== $row['card_code']) {
                 $decks[$deckId]['slots'][$row['card_code']] = (int) $row['qty'];
-                if ($row['type_code'] === 'hero') {
+                if ('hero' === $row['type_code']) {
                     // remember hero codes; the Card entities are bulk-loaded below
                     $decks[$deckId]['heroes'][$row['card_code']] = true;
                     $heroCodes[$row['card_code']] = true;
@@ -154,7 +139,7 @@ class Decks {
         // Load the (small, bounded) set of distinct hero cards as real entities so the
         // template's hero.sphere.code / hero.pack.code accessors keep working unchanged.
         $heroCards = [];
-        if (!empty($heroCodes)) {
+        if ([] !== $heroCodes) {
             $heroEntities = $this->doctrine->createQuery(
                 'SELECT c, p, pk FROM App\Entity\Card c
                  LEFT JOIN c.printings p
@@ -176,37 +161,32 @@ class Decks {
                     $heroes[] = $heroCards[$code];
                 }
             }
+
             $deck['heroes'] = $heroes;
         }
+
         unset($deck);
 
         return array_values($decks);
     }
 
-    /**
-     * @param mixed $user
-     * @return int
-     */
-    public function countDecksForUser($user) {
+    public function countDecksForUser(User $user): int
+    {
         return (int) $this->doctrine->createQuery(
             'SELECT COUNT(d.id) FROM App\Entity\Deck d WHERE d.user = :user'
         )->setParameter('user', $user)->getSingleScalarResult();
     }
 
-    /**
-     * @param mixed $deck
-     * @param mixed $user
-     * @return \App\Entity\Deck
-     */
-    public function cloneDeck($deck, $user) {
+    public function cloneDeck(?Deck $deck, User $user): Deck
+    {
         /* @var $deck \App\Entity\Deck */
-        if (!$deck) {
+        if (!$deck instanceof Deck) {
             throw new NotFoundHttpException("This deck doesn't exist.");
         }
 
         $content = [
             'main' => [],
-            'side' => []
+            'side' => [],
         ];
 
         foreach ($deck->getSlots() as $slot) {
@@ -219,17 +199,17 @@ class Decks {
 
         $name = $deck->getName();
         $description = $deck->getDescriptionMd();
-        $decklist_id = $deck->getParent() ? $deck->getParent()->getId() : null;
+        $decklist_id = $deck->getParent() instanceof Decklist ? $deck->getParent()->getId() : null;
         $tags = '';
 
         if (empty($name)) {
             $name = 'Untitled Deck';
         }
 
-        /* @var $deck \App\Entity\Deck */
-        $deck = new Deck();
+        $deck = new Deck($user);
         $this->saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, null);
         $this->doctrine->flush();
+
         return $deck;
     }
 
@@ -238,107 +218,84 @@ class Decks {
      * distinct, trimmed, non-empty tags.
      *
      * @param string|string[]|null $tags
+     *
      * @return string[]
      */
-    public function normalizeTags($tags) {
+    public function normalizeTags($tags): array
+    {
         $tags = preg_split('/\s+/', trim(implode(' ', (array) $tags)), -1, PREG_SPLIT_NO_EMPTY) ?: [];
 
         return array_values(array_unique($tags));
     }
 
     /**
-     * @param mixed $user
-     * @param mixed $deck
-     * @param mixed $decklist_id
-     * @param mixed $name
-     * @param mixed $description
-     * @param mixed $tags
-     * @param mixed $content
-     * @param mixed $source_deck
-     * @return mixed
+     * @param array{main: array<int|string, int>, side: array<int|string, int>} $content
      */
-    public function saveDeck($user, $deck, $decklist_id, $name, $description, $tags, $content, $source_deck) {
-        /* @var $deck \App\Entity\Deck */
-        /* @var $source_deck \App\Entity\Deck */
-
+    public function saveDeck(User $user, Deck $deck, ?int $decklist_id, ?string $name, ?string $description, ?string $tags, array $content, ?Deck $source_deck): ?int
+    {
         if ($decklist_id) {
-            /* @var $decklist \App\Entity\Decklist */
+            /* @var $decklist Decklist */
             $decklist = $this->decklistRepository->find($decklist_id);
             if ($decklist) {
                 $deck->setParent($decklist);
             }
         }
 
-        $deck->setName($name);
+        $deck->setName($name ?? 'Untitled Deck');
         $deck->setDescriptionMd($description);
         $deck->setUser($user);
         $deck->setMinorVersion($deck->getMinorVersion() + 1);
 
         $cards = [];
-        /* @var $latestPack \App\Entity\Pack */
+        /* @var $latestPack Pack */
         $latestPack = null;
         $spheres = [];
 
         foreach ($content['main'] as $card_code => $qty) {
             $card = $this->findCardByCode((string) $card_code);
 
-            if (!$card) {
+            if (!$card instanceof Card) {
                 continue;
             }
 
-            /* @var $pack \App\Entity\Pack */
             $pack = $card->getPack();
-            if (!$latestPack) {
-                $latestPack = $pack;
-            } else {
-                if (!$latestPack->getDateRelease() && !$pack->getDateRelease()) {
-                    if ($latestPack->getCycle()->getPosition() < $pack->getCycle()->getPosition()) {
-                        $latestPack = $pack;
-                    } else {
-                        if ($latestPack->getCycle()->getPosition() == $pack->getCycle()->getPosition() && $latestPack->getPosition() < $pack->getPosition()) {
-                            $latestPack = $pack;
-                        }
-                    }
-                } else if (!$pack->getDateRelease() || $latestPack->getDateRelease() < $pack->getDateRelease()) {
+            if ($pack instanceof Pack) {
+                if (!$latestPack instanceof Pack) {
+                    $latestPack = $pack;
+                } elseif ($pack->isLaterThan($latestPack)) {
                     $latestPack = $pack;
                 }
             }
 
             $cards[$card_code] = $card;
-            if ($card->getType()->getCode() == 'hero') {
+            if ($card->getType() instanceof Type
+                && $card->getSphere() instanceof Sphere
+                && 'hero' === $card->getType()->getCode()) {
                 $spheres[] = $card->getSphere()->getCode();
             }
 
             if ($qty > $card->getDeckLimit()) {
-                if (is_array($content['main'])) {
-                    $content['main'][$card_code] = $card->getDeckLimit();
-                } else {
-                    $content['main']->$card_code = $card->getDeckLimit();
-                }
+                $content['main'][$card_code] = $card->getDeckLimit();
             }
         }
 
         foreach ($content['side'] as $card_code => $qty) {
             $card = $this->findCardByCode((string) $card_code);
 
-            if (!$card) {
+            if (!$card instanceof Card) {
                 continue;
             }
 
             $cards[$card_code] = $card;
 
             if ($qty > $card->getDeckLimit()) {
-                if (is_array($content['side'])) {
-                    $content['side'][$card_code] = $card->getDeckLimit();
-                } else {
-                    $content['side']->$card_code = $card->getDeckLimit();
-                }
+                $content['side'][$card_code] = $card->getDeckLimit();
             }
         }
 
         $deck->setLastPack($latestPack);
         $tags = $this->normalizeTags($tags);
-        if (empty($tags)) {
+        if ([] === $tags) {
             // tags can never be empty. if it is we put spheres in
             $tags = $this->normalizeTags($spheres);
         }
@@ -347,16 +304,16 @@ class Decks {
         $this->doctrine->persist($deck);
 
         // on the deck content
-        if ($source_deck) {
+        if ($source_deck instanceof Deck) {
             // compute diff between current content and saved content
-            list ($listings) = $this->diff->diffContents([
+            [$listings] = $this->diff->diffContents([
                 $content['main'],
-                $source_deck->getSlots()->getContent()
+                $source_deck->getSlots()->getContent(),
             ]);
 
-            list ($sideListings) = $this->diff->diffContents([
+            [$sideListings] = $this->diff->diffContents([
                 $content['side'],
-                $source_deck->getSideslots()->getContent()
+                $source_deck->getSideslots()->getContent(),
             ]);
 
             $listings[2] = $sideListings[0];
@@ -371,8 +328,7 @@ class Decks {
             $this->doctrine->flush();
             // save new change unless empty
             if (count($listings[0]) || count($listings[1]) || count($listings[2]) || count($listings[3])) {
-                $change = new Deckchange();
-                $change->setDeck($deck);
+                $change = new Deckchange($deck);
                 $change->setVariation((string) json_encode($listings));
                 $change->setIsSaved(true);
                 $change->setVersion($deck->getVersion());
@@ -399,11 +355,9 @@ class Decks {
             if (!isset($cards[$card_code])) {
                 continue;
             }
+
             $card = $cards[$card_code];
-            $slot = new Deckslot();
-            $slot->setQuantity($qty);
-            $slot->setCard($card);
-            $slot->setDeck($deck);
+            $slot = new Deckslot($deck, $card, $qty);
             $deck->addSlot($slot);
         }
 
@@ -411,11 +365,9 @@ class Decks {
             if (!isset($cards[$card_code])) {
                 continue;
             }
+
             $card = $cards[$card_code];
-            $slot = new Decksideslot();
-            $slot->setQuantity($qty);
-            $slot->setCard($card);
-            $slot->setDeck($deck);
+            $slot = new Decksideslot($deck, $card, $qty);
             $deck->addSideslot($slot);
         }
 
@@ -424,14 +376,14 @@ class Decks {
         return $deck->getId();
     }
 
-
     /**
      * The card with this code, or else the canonical card of the printing with this image code:
      * deck contents stored as JSON (quest log snapshots...) still use the codes of the cards
      * merged by the card-printings migration.
      */
-    private function findCardByCode(string $code): ?Card {
-        $card = $this->doctrine->getRepository(Card::class)->findOneBy(['code' => $code]);
+    private function findCardByCode(string $code): ?Card
+    {
+        $card = $this->cardRepository->findOneBy(['code' => $code]);
         if ($card) {
             return $card;
         }
@@ -442,50 +394,39 @@ class Decks {
     }
 
     /**
-     * @param mixed $deck
-     * @param mixed $content
-     * @return void
+     * @param array{main: array<string, int>, side: array<string, int>} $content
      */
-    public function setSlots(&$deck, $content) {
-        /* @var $deck \App\Entity\Deck */
-        /* @var $latestPack \App\Entity\Pack */
+    public function setSlots(Deck $deck, array $content): void
+    {
+        /* @var $latestPack Pack */
 
         $cards = [];
-        $latestPack = null;
 
         foreach ($content['main'] as $card_code => $qty) {
             $card = $this->findCardByCode((string) $card_code);
 
-            if (!$card) {
+            if (!$card instanceof Card) {
                 continue;
             }
 
             $cards[$card_code] = $card;
 
             if ($qty > $card->getDeckLimit()) {
-                if (is_array($content['main'])) {
-                    $content['main'][$card_code] = $card->getDeckLimit();
-                } else {
-                    $content['main']->$card_code = $card->getDeckLimit();
-                }
+                $content['main'][$card_code] = $card->getDeckLimit();
             }
         }
 
         foreach ($content['side'] as $card_code => $qty) {
             $card = $this->findCardByCode((string) $card_code);
 
-            if (!$card) {
+            if (!$card instanceof Card) {
                 continue;
             }
 
             $cards[$card_code] = $card;
 
             if ($qty > $card->getDeckLimit()) {
-                if (is_array($content['side'])) {
-                    $content['side'][$card_code] = $card->getDeckLimit();
-                } else {
-                    $content['side']->$card_code = $card->getDeckLimit();
-                }
+                $content['side'][$card_code] = $card->getDeckLimit();
             }
         }
 
@@ -503,11 +444,9 @@ class Decks {
             if (!isset($cards[$card_code])) {
                 continue;
             }
+
             $card = $cards[$card_code];
-            $slot = new Deckslot();
-            $slot->setQuantity($qty);
-            $slot->setCard($card);
-            $slot->setDeck($deck);
+            $slot = new Deckslot($deck, $card, $qty);
             $deck->addSlot($slot);
         }
 
@@ -515,21 +454,15 @@ class Decks {
             if (!isset($cards[$card_code])) {
                 continue;
             }
+
             $card = $cards[$card_code];
-            $slot = new Decksideslot();
-            $slot->setQuantity($qty);
-            $slot->setCard($card);
-            $slot->setDeck($deck);
+            $slot = new Decksideslot($deck, $card, $qty);
             $deck->addSideslot($slot);
         }
     }
 
-    /**
-     * @param mixed $deck
-     * @return void
-     */
-    public function revertDeck($deck) {
-        /* @var $deck \App\Entity\Deck */
+    public function revertDeck(Deck $deck): void
+    {
         $changes = $this->getUnsavedChanges($deck);
 
         foreach ($changes as $change) {
@@ -537,20 +470,21 @@ class Decks {
         }
 
         // if deck has only heroes, we delete it
-        if ($deck->getSlots()->getDrawDeck()->countCards() === 0) {
+        if (0 === $deck->getSlots()->getDrawDeck()->countCards()) {
             $this->doctrine->remove($deck);
         }
+
         $this->doctrine->flush();
     }
 
     /**
-     * @param mixed $deck
      * @return array<int, Deckchange>
      */
-    public function getUnsavedChanges($deck) {
+    public function getUnsavedChanges(Deck $deck): array
+    {
         return $this->deckchangeRepository->findBy([
             'deck' => $deck,
-            'isSaved' => false
+            'isSaved' => false,
         ]);
     }
 }

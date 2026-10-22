@@ -1,51 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
-use App\Repository\UserRepository;
+use App\Entity\Deck;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
-use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class RemoveUserCommand extends Command {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
+class RemoveUserCommand extends Command
+{
+    private EntityManagerInterface $entityManager;
 
-    /**
-     * @var DeckRepository
-     */
-    private $deckRepository;
+    private DeckRepository $deckRepository;
 
-    /**
-     * @var DecklistRepository
-     */
-    private $decklistRepository;
+    private DecklistRepository $decklistRepository;
 
-    /**
-     * @var UserRepository
-     */
-    private $userRepository;
+    private UserRepository $userRepository;
 
-    public function __construct(EntityManagerInterface $em, DeckRepository $deckRepository, DecklistRepository $decklistRepository, UserRepository $userRepository) {
+    public function __construct(EntityManagerInterface $entityManager, DeckRepository $deckRepository, DecklistRepository $decklistRepository, UserRepository $userRepository)
+    {
         parent::__construct();
-        $this->em = $em;
+        $this->entityManager = $entityManager;
         $this->deckRepository = $deckRepository;
         $this->decklistRepository = $decklistRepository;
         $this->userRepository = $userRepository;
     }
 
-    /**
-     * @return void
-     */
-    protected function configure() {
+    protected function configure(): void
+    {
         $this
             ->setName('app:user:remove')
             ->setDescription('Lock one user and delete all its content')
@@ -56,71 +45,71 @@ class RemoveUserCommand extends Command {
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
-        $em = $this->em;
-
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $user_id = $input->getArgument('user_id');
         $user = $this->userRepository->find($user_id);
 
         if (!$user) {
-            $output->writeln("User not found");
+            $output->writeln('User not found');
+
             return 1;
         }
 
-        $output->writeln("User " . $user->getUsername());
+        $output->writeln('User '.$user->getUsername());
 
         $decks = $this->deckRepository->findBy([
-            'user' => $user
+            'user' => $user,
         ]);
 
-        $output->writeln(count($decks) . " decks");
+        $output->writeln(count($decks).' decks');
 
         foreach ($decks as $deck) {
             $children = $this->decklistRepository->findBy([
-                'parent' => $deck
+                'parent' => $deck,
             ]);
 
             foreach ($children as $child) {
-                $child->setParent(null);
+                $child->setParent();
             }
 
-            $em->remove($deck);
+            $this->entityManager->remove($deck);
         }
 
-        $output->writeln("Decks deleted");
+        $output->writeln('Decks deleted');
 
         $decklists = $this->decklistRepository->findBy([
-            'user' => $user
+            'user' => $user,
         ]);
 
-        $output->writeln(count($decklists) . " decklists");
+        $output->writeln(count($decklists).' decklists');
 
         foreach ($decklists as $decklist) {
             $successors = $this->decklistRepository->findBy([
-                'precedent' => $decklist
+                'precedent' => $decklist,
             ]);
             foreach ($successors as $successor) {
-                $successor->setPrecedent(null);
+                $successor->setPrecedent();
             }
 
             $children = $this->deckRepository->findBy([
-                'parent' => $decklist
+                'parent' => $decklist,
             ]);
             foreach ($children as $child) {
-                /* @var $child \App\Entity\Deck */
-                $child->setParent(null);
+                /* @var $child Deck */
+                $child->setParent();
             }
 
-            $em->remove($decklist);
+            $this->entityManager->remove($decklist);
         }
 
-        $output->writeln("Decklists deleted");
+        $output->writeln('Decklists deleted');
 
         $user->setLocked(true);
 
-        $output->writeln("User locked");
+        $output->writeln('User locked');
 
-        $em->flush();
+        $this->entityManager->flush();
 
         return 0;
     }

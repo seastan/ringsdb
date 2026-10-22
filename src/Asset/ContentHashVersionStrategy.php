@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Asset;
 
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
@@ -9,30 +11,29 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
  * the browsers load them again when they change (Assetic's cache busting did it before). The other
  * assets (images...), and the files missing from public/, are left unversioned.
  */
-class ContentHashVersionStrategy implements VersionStrategyInterface {
-    /**
-     * @var string
-     */
-    private $webDir;
+class ContentHashVersionStrategy implements VersionStrategyInterface
+{
+    private string $webDir;
 
     /**
      * @var array<string, string>
      */
-    private $versions = [];
+    private array $versions = [];
 
-    public function __construct(string $publicDir) {
+    public function __construct(string $publicDir)
+    {
         $this->webDir = $publicDir;
     }
 
     /**
      * @param string $path
-     * @return string
      */
-    public function getVersion($path) {
+    public function getVersion($path): string
+    {
         if (!isset($this->versions[$path])) {
-            $file = $this->webDir . '/' . ltrim($path, '/');
+            $file = $this->webDir.'/'.ltrim($path, '/');
             $hash = preg_match('/\.(js|css)$/', $path) && is_file($file) ? md5_file($file) : false;
-            $this->versions[$path] = $hash !== false ? substr($hash, 0, 8) : '';
+            $this->versions[$path] = false !== $hash ? substr($hash, 0, 8) : '';
         }
 
         return $this->versions[$path];
@@ -40,11 +41,11 @@ class ContentHashVersionStrategy implements VersionStrategyInterface {
 
     /**
      * @param string $path
-     * @return string
      */
-    public function applyVersion($path) {
+    public function applyVersion($path): string
+    {
         $version = $this->getVersion($path);
 
-        return $version === '' ? $path : $path . '?v=' . $version;
+        return '' === $version ? $path : $path.'?v='.$version;
     }
 }

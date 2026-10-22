@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -16,39 +18,48 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * Not covered: the card image upload (writes into web/), the scenario import command and the
  * Excel / CSV imports.
  */
-class AdminWriteTest extends WebTestCase {
+class AdminWriteTest extends WebTestCase
+{
     use \App\Tests\LocationTrait;
 
     /** tables of the reference data, in an order that respects the foreign keys when deleting */
-    const TABLES = ['card_printing', 'scenario_encounter', 'scenario', 'encounter', 'card', 'pack', 'cycle', 'type', 'sphere'];
+    public const TABLES = ['card_printing', 'scenario_encounter', 'scenario', 'encounter', 'card', 'pack', 'cycle', 'type', 'sphere'];
+
+    private KernelBrowser $client;
 
     /** @var int[] */
-    private $maxIds = [];
+    private array $maxIds = [];
 
-    protected function setUp(): void {
-        $connection = $this->db(static::createClient());
+    protected function setUp(): void
+    {
+        $this->client = static::createClient();
+        $connection = $this->db();
         foreach (array_merge(self::TABLES, ['comment', 'decklist', 'deck']) as $table) {
-            $this->maxIds[$table] = $table === 'scenario_encounter' ? 0 : (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
+            $this->maxIds[$table] = 'scenario_encounter' === $table ? 0 : (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
         }
     }
 
-    protected function tearDown(): void {
-        $connection = $this->db(static::createClient());
+    protected function tearDown(): void
+    {
+        $connection = $this->db();
         $max = $this->maxIds;
         $connection->exec("DELETE FROM scenario_encounter WHERE scenario_id > {$max['scenario']} OR encounter_id > {$max['encounter']}");
         foreach (['decklist_spheres', 'decklistslot', 'decklistsideslot'] as $table) {
             $connection->exec("DELETE FROM $table WHERE decklist_id > {$max['decklist']}");
         }
+
         $connection->exec("DELETE FROM decklist WHERE id > {$max['decklist']}");
         foreach (['deckslot', 'decksideslot'] as $table) {
             $connection->exec("DELETE FROM $table WHERE deck_id > {$max['deck']} OR card_id > {$max['card']}");
         }
+
         $connection->exec("DELETE FROM deck WHERE id > {$max['deck']}");
         foreach (self::TABLES as $table) {
-            if ($table !== 'scenario_encounter') {
+            if ('scenario_encounter' !== $table) {
                 $connection->exec("DELETE FROM $table WHERE id > {$max[$table]}");
             }
         }
+
         $connection->exec("DELETE FROM comment WHERE id > {$max['comment']}");
         $connection->update('comment', ['is_hidden' => 0], ['id' => 1]);
         parent::tearDown();
@@ -56,18 +67,14 @@ class AdminWriteTest extends WebTestCase {
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db(Client $client) {
-        return $client->getContainer()->get('doctrine')->getConnection();
+    private function db(): \Doctrine\DBAL\Connection
+    {
+        return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    /**
-     * @return \Symfony\Bundle\FrameworkBundle\Client
-     */
-    private function createAdminClient() {
-        $client = static::createClient();
+    private function createAdminClient(): KernelBrowser
+    {
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => 'admin', '_password' => 'admin']));
         $this->assertTrue($client->getResponse()->isRedirect(), 'Login as admin failed');
@@ -76,11 +83,10 @@ class AdminWriteTest extends WebTestCase {
     }
 
     /**
-     * @param mixed $pageUri
-     * @param mixed $action
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param array<string, mixed> $values
      */
-    private function submitForm(Client $client, $pageUri, $action, array $values) {
+    private function submitForm(KernelBrowser $client, string $pageUri, string $action, array $values): \Symfony\Component\HttpFoundation\Response
+    {
         $crawler = $client->request('GET', $pageUri);
         $this->assertSame(200, $client->getResponse()->getStatusCode(), "GET $pageUri");
         $client->submit($crawler->filter("form[action=\"$action\"]")->form(), $values);
@@ -89,25 +95,28 @@ class AdminWriteTest extends WebTestCase {
     }
 
     /**
-     * @param mixed $prefix
+     * @param array<string, string> $values
+     *
      * @return array<string, mixed>
      */
-    private static function prefixed($prefix, array $values) {
+    private function prefixed(string $prefix, array $values): array
+    {
         $fields = [];
         foreach ($values as $name => $value) {
-            $fields[$prefix . '[' . str_replace('.', '][', $name) . ']'] = $value;
+            $fields[$prefix.'['.str_replace('.', '][', $name).']'] = $value;
         }
 
         return $fields;
     }
 
     /* -------------------------------------------------------------- CRUD */
-
     /**
-     * [route slug, form name, table, created values, expected columns, updated values, expected columns]
-     * @return array
+     * [route slug, form name, table, created values, expected columns, updated values, expected columns].
+     *
+     * @return array<string, string[]|array<string, bool|string>[]|array<string, string>[]>
      */
-    public function crudProvider() {
+    public function crudProvider(): array
+    {
         return [
             'cycle' => ['cycle', 'appbundle_cycletype', 'cycle',
                 ['code' => 'PHPU', 'name' => 'PHPUnit Cycle', 'position' => '99', 'isBox' => true],
@@ -162,42 +171,41 @@ class AdminWriteTest extends WebTestCase {
 
     /**
      * @dataProvider crudProvider
-     * @param mixed $slug
-     * @param mixed $formName
-     * @param mixed $table
      */
-    public function testCreateEditDelete($slug, $formName, $table, array $created, array $expectedCreated, array $updated, array $expectedUpdated): void {
+    public function testCreateEditDelete(string $slug, string $formName, string $table, array $created, array $expectedCreated, array $updated, array $expectedUpdated): void
+    {
         $client = $this->createAdminClient();
         $columns = implode(', ', array_keys($expectedCreated));
 
         // create: redirect to the show page
-        $response = $this->submitForm($client, "/admin/$slug/new", "/admin/$slug/create", self::prefixed($formName, $created));
+        $response = $this->submitForm($client, "/admin/$slug/new", "/admin/$slug/create", $this->prefixed($formName, $created));
         $this->assertSame(302, $response->getStatusCode());
         $this->assertRegExp("#^/admin/$slug/\\d+/show$#", self::location($response));
         $id = (int) explode('/', self::location($response))[3];
         $this->assertGreaterThan($this->maxIds[$table], $id);
-        $this->assertEquals($expectedCreated, $this->db($client)->fetchAssoc("SELECT $columns FROM $table WHERE id = ?", [$id]));
+        $this->assertEquals($expectedCreated, $this->db()->fetchAssoc("SELECT $columns FROM $table WHERE id = ?", [$id]));
 
         $client->followRedirect();
         $this->assertSame(200, $client->getResponse()->getStatusCode());
 
         // edit: redirect to the edit page
-        $response = $this->submitForm($client, "/admin/$slug/$id/edit", "/admin/$slug/$id/update", self::prefixed($formName, $updated));
+        $response = $this->submitForm($client, "/admin/$slug/$id/edit", "/admin/$slug/$id/update", $this->prefixed($formName, $updated));
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame("/admin/$slug/$id/edit", $response->headers->get('Location'));
-        $this->assertEquals($expectedUpdated, $this->db($client)->fetchAssoc("SELECT $columns FROM $table WHERE id = ?", [$id]));
+        $this->assertEquals($expectedUpdated, $this->db()->fetchAssoc("SELECT $columns FROM $table WHERE id = ?", [$id]));
 
         // delete: redirect to the list
         $response = $this->submitForm($client, "/admin/$slug/$id/edit", "/admin/$slug/$id/delete", []);
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame("/admin/$slug/", $response->headers->get('Location'));
-        $this->assertSame('0', $this->db($client)->fetchColumn("SELECT COUNT(*) FROM $table WHERE id = ?", [$id]));
+        $this->assertSame('0', $this->db()->fetchColumn("SELECT COUNT(*) FROM $table WHERE id = ?", [$id]));
     }
 
-    public function testScenarioEncounters(): void {
+    public function testScenarioEncounters(): void
+    {
         $client = $this->createAdminClient();
         $crawler = $client->request('GET', '/admin/scenario/new');
-        $form = $crawler->filter('form[action="/admin/scenario/create"]')->form(self::prefixed('appbundle_scenario', [
+        $form = $crawler->filter('form[action="/admin/scenario/create"]')->form($this->prefixed('appbundle_scenario', [
             'code' => 'PHPUnit Scenario', 'name' => 'PHPUnit Scenario', 'position' => '999', 'pack' => '1',
         ]));
         /** @var \Symfony\Component\DomCrawler\Field\ChoiceFormField[] $encounters */
@@ -207,7 +215,7 @@ class AdminWriteTest extends WebTestCase {
         $client->submit($form);
 
         $id = (int) explode('/', self::location($client->getResponse()))[3];
-        $encounters = $this->db($client)->fetchAll('SELECT encounter_id FROM scenario_encounter WHERE scenario_id = ? ORDER BY encounter_id', [$id]);
+        $encounters = $this->db()->fetchAll('SELECT encounter_id FROM scenario_encounter WHERE scenario_id = ? ORDER BY encounter_id', [$id]);
         $this->assertSame(['1', '3'], array_column($encounters, 'encounter_id'));
     }
 
@@ -215,7 +223,8 @@ class AdminWriteTest extends WebTestCase {
      * The delete button of a pack's page used to post to the cycle delete route: the delete forms
      * share their CSRF token, so it deleted the cycle with the same id.
      */
-    public function testPackPageDeletesThePack(): void {
+    public function testPackPageDeletesThePack(): void
+    {
         $client = $this->createAdminClient();
         $crawler = $client->request('GET', '/admin/pack/1/show');
 
@@ -224,27 +233,29 @@ class AdminWriteTest extends WebTestCase {
         $this->assertCount(0, $crawler->filter('form[action^="/admin/cycle/"]'));
     }
 
-    public function testDeleteRequiresTheFormToken(): void {
+    public function testDeleteRequiresTheFormToken(): void
+    {
         $client = $this->createAdminClient();
         $client->request('POST', '/admin/type/1/delete', []);
 
         // the delete form is invalid without its CSRF token: nothing is deleted
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/admin/type/', $client->getResponse()->headers->get('Location'));
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM type WHERE id = 1'));
+        $this->assertSame('1', $this->db()->fetchColumn('SELECT COUNT(*) FROM type WHERE id = 1'));
     }
 
     /**
      * A card used in decks and decklists cannot be deleted, but can be "force deleted": its
      * slots, printings and reviews are deleted with it.
      */
-    public function testForceDeleteACard(): void {
+    public function testForceDeleteACard(): void
+    {
         $client = $this->createAdminClient();
-        $response = $this->submitForm($client, '/admin/card/new', '/admin/card/create', self::prefixed('appbundle_cardtype', [
+        $response = $this->submitForm($client, '/admin/card/new', '/admin/card/create', $this->prefixed('appbundle_cardtype', [
             'position' => '1', 'deck_limit' => '3', 'code' => '99901', 'type' => '2', 'sphere' => '1', 'name' => 'PHPUnit Card',
         ]));
         $cardId = (int) explode('/', self::location($response))[3];
-        $connection = $this->db($client);
+        $connection = $this->db();
         $connection->insert('card_printing', ['card_id' => $cardId, 'pack_id' => 1, 'position' => 999, 'quantity' => 1, 'image_code' => '99901', 'date_creation' => '2015-08-16 00:00:00', 'date_update' => '2015-08-16 00:00:00']);
         $connection->insert('deckslot', ['deck_id' => 1, 'card_id' => $cardId, 'quantity' => 1]);
 
@@ -265,21 +276,22 @@ class AdminWriteTest extends WebTestCase {
     /**
      * Reference data still in use cannot be deleted (foreign keys): 500, nothing is deleted.
      */
-    public function testReferenceDataInUseCannotBeDeleted(): void {
+    public function testReferenceDataInUseCannotBeDeleted(): void
+    {
         $client = $this->createAdminClient();
         $response = $this->submitForm($client, '/admin/cycle/1/edit', '/admin/cycle/1/delete', []);
 
         $this->assertSame(500, $response->getStatusCode());
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM cycle WHERE id = 1'));
+        $this->assertSame('1', $this->db()->fetchColumn('SELECT COUNT(*) FROM cycle WHERE id = 1'));
     }
 
     /* -------------------------------------------------------- moderation */
 
     /**
      * @dataProvider findUserProvider
-     * @param mixed $location
      */
-    public function testFindUser(array $values, $location): void {
+    public function testFindUser(array $values, string $location): void
+    {
         $client = $this->createAdminClient();
         $client->request('POST', '/admin/user/find_process', $values);
 
@@ -288,9 +300,10 @@ class AdminWriteTest extends WebTestCase {
     }
 
     /**
-     * @return array
+     * @return array<string, string[]|array<string, string>[]>
      */
-    public function findUserProvider() {
+    public function findUserProvider(): array
+    {
         return [
             'by username' => [['username' => 'test'], '/admin/user/show/1'],
             'by id' => [['id' => '2'], '/admin/user/show/2'],
@@ -298,29 +311,31 @@ class AdminWriteTest extends WebTestCase {
         ];
     }
 
-    public function testToggleAndDeleteAComment(): void {
+    public function testToggleAndDeleteAComment(): void
+    {
         $client = $this->createAdminClient();
 
         $client->request('GET', '/admin/comment/toggle_hidden/1');
         $this->assertSame('/admin/user/comments/1', $client->getResponse()->headers->get('Location'));
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT is_hidden FROM comment WHERE id = 1'));
+        $this->assertSame('1', $this->db()->fetchColumn('SELECT is_hidden FROM comment WHERE id = 1'));
         $client->request('GET', '/admin/comment/toggle_hidden/1');
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT is_hidden FROM comment WHERE id = 1'));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT is_hidden FROM comment WHERE id = 1'));
 
         // delete a comment created for the test
-        $this->db($client)->insert('comment', ['decklist_id' => 1, 'user_id' => 2, 'text' => 'Spam', 'date_creation' => '2015-08-16 00:00:00', 'is_hidden' => 0]);
-        $commentId = (int) $this->db($client)->lastInsertId();
+        $this->db()->insert('comment', ['decklist_id' => 1, 'user_id' => 2, 'text' => 'Spam', 'date_creation' => '2015-08-16 00:00:00', 'is_hidden' => 0]);
+        $commentId = (int) $this->db()->lastInsertId();
         $client->request('GET', "/admin/comment/delete/$commentId");
         $this->assertSame('/admin/user/comments/2', $client->getResponse()->headers->get('Location'));
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM comment WHERE id = ?', [$commentId]));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM comment WHERE id = ?', [$commentId]));
     }
 
     /**
      * Deleting a decklist unlinks its successors and the decks copied from it.
      */
-    public function testDeleteADecklist(): void {
+    public function testDeleteADecklist(): void
+    {
         $client = $this->createAdminClient();
-        $connection = $this->db($client);
+        $connection = $this->db();
         // a copy of decklist 1, derived from it, with a deck copied from the copy
         $row = $connection->fetchAssoc('SELECT * FROM decklist WHERE id = 1');
         $this->assertNotFalse($row);

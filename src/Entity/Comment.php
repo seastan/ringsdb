@@ -1,152 +1,164 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+
 /**
- * Comment
+ * Comment.
+ *
+ * @ORM\Entity(repositoryClass="App\Repository\CommentRepository")
+ * @ORM\Table(name="comment")
  */
-class Comment {
+class Comment
+{
     /**
-     * @var integer
+     * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-    /**
-     * @var string
-     */
-    private $text;
-    /**
-     * @var \DateTime
-     */
-    private $dateCreation;
-    /**
-     * @var boolean
-     */
-    private $isHidden;
-    /**
-     * @var \App\Entity\User
-     */
-    private $user;
-    /**
-     * @var \App\Entity\Decklist
-     */
-    private $decklist;
 
     /**
-     * Get id
-     *
-     * @return integer
+     * @ORM\Column(type="text")
      */
-    public function getId() {
+    private string $text;
+
+    /**
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
+     */
+    private \DateTime $dateCreation;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_hidden", type="boolean")
+     */
+    private $isHidden = false;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="comments")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     */
+    private User $user;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Decklist", inversedBy="comments")
+     * @ORM\JoinColumn(name="decklist_id", referencedColumnName="id", nullable=false)
+     */
+    private Decklist $decklist;
+
+    public function __construct(User $user, Decklist $decklist, string $text)
+    {
+        $this->user = $user;
+        $this->decklist = $decklist;
+        $this->text = $text;
+        $this->dateCreation = new \DateTime();
+    }
+
+    /**
+     * Get id.
+     */
+    public function getId(): ?int
+    {
         return $this->id;
     }
 
     /**
-     * Set text
-     *
-     * @param string $text
-     *
-     * @return Comment
+     * Set text.
      */
-    public function setText($text) {
+    public function setText(string $text): Comment
+    {
         $this->text = $text;
 
         return $this;
     }
 
     /**
-     * Get text
-     *
-     * @return string
+     * Get text.
      */
-    public function getText() {
+    public function getText(): string
+    {
         return $this->text;
     }
 
     /**
-     * Set dateCreation
-     *
-     * @param \DateTime $dateCreation
-     *
-     * @return Comment
+     * Set dateCreation.
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation(\DateTime $dateCreation): Comment
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
-     *
-     * @return \DateTime
+     * Get dateCreation.
      */
-    public function getDateCreation() {
+    public function getDateCreation(): \DateTime
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set isHidden
+     * Set isHidden.
      *
-     * @param boolean $isHidden
-     *
-     * @return Comment
+     * @param bool $isHidden
      */
-    public function setIsHidden($isHidden) {
+    public function setIsHidden($isHidden): Comment
+    {
         $this->isHidden = $isHidden;
 
         return $this;
     }
 
     /**
-     * Get isHidden
-     *
-     * @return boolean
+     * Get isHidden.
      */
-    public function getIsHidden() {
+    public function getIsHidden(): bool
+    {
         return $this->isHidden;
     }
 
     /**
-     * Set user
-     *
-     * @param \App\Entity\User $user
-     *
-     * @return Comment
+     * Set user.
      */
-    public function setUser(\App\Entity\User $user) {
+    public function setUser(User $user): Comment
+    {
         $this->user = $user;
 
         return $this;
     }
 
     /**
-     * Get user
-     *
-     * @return \App\Entity\User
+     * Get user.
      */
-    public function getUser() {
+    public function getUser(): User
+    {
         return $this->user;
     }
 
     /**
-     * Set decklist
-     *
-     * @param \App\Entity\Decklist $decklist
-     *
-     * @return Comment
+     * Set decklist.
      */
-    public function setDecklist(\App\Entity\Decklist $decklist) {
+    public function setDecklist(Decklist $decklist): Comment
+    {
         $this->decklist = $decklist;
 
         return $this;
     }
 
     /**
-     * Get decklist
-     *
-     * @return \App\Entity\Decklist
+     * Get decklist.
      */
-    public function getDecklist() {
+    public function getDecklist(): Decklist
+    {
         return $this->decklist;
     }
 }

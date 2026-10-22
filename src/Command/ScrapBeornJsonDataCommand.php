@@ -1,74 +1,42 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
-use App\Repository\TypeRepository;
-use App\Repository\SphereRepository;
-use App\Repository\PackRepository;
+use App\Entity\Card;
+use App\Entity\Pack;
 use App\Repository\CardPrintingRepository;
-use Symfony\Component\Asset\Packages;
+use App\Repository\PackRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\VarDumper\VarDumper;
 
-class ScrapBeornJsonDataCommand extends Command {
+class ScrapBeornJsonDataCommand extends Command
+{
+    private EntityManagerInterface $entityManager;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
+    private CardPrintingRepository $cardPrintingRepository;
 
-    /**
-     * @var Packages
-     */
-    private $packages;
+    private PackRepository $packRepository;
 
-    /**
-     * @var string
-     */
-    private $publicDir;
-
-    /**
-     * @var CardPrintingRepository
-     */
-    private $cardPrintingRepository;
-
-    /**
-     * @var PackRepository
-     */
-    private $packRepository;
-
-    /**
-     * @var SphereRepository
-     */
-    private $sphereRepository;
-
-    /**
-     * @var TypeRepository
-     */
-    private $typeRepository;
-
-    public function __construct(EntityManagerInterface $em, Packages $packages, string $publicDir, CardPrintingRepository $cardPrintingRepository, PackRepository $packRepository, SphereRepository $sphereRepository, TypeRepository $typeRepository) {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        CardPrintingRepository $cardPrintingRepository,
+        PackRepository $packRepository
+    ) {
         parent::__construct();
-        $this->em = $em;
-        $this->packages = $packages;
-        $this->publicDir = $publicDir;
+        $this->entityManager = $entityManager;
         $this->cardPrintingRepository = $cardPrintingRepository;
         $this->packRepository = $packRepository;
-        $this->sphereRepository = $sphereRepository;
-        $this->typeRepository = $typeRepository;
     }
 
-    /**
-     * @return void
-     */
-    protected function configure() {
+    protected function configure(): void
+    {
         $this->setName('app:beorn:json')
              ->setDescription('Download new card data from Hall of Beorn JSON Export')
              ->addOption(
@@ -76,52 +44,24 @@ class ScrapBeornJsonDataCommand extends Command {
                  null,
                  InputOption::VALUE_REQUIRED,
                  'Number of cards to skip'
-             )
-             ->addOption(
-                 'force-data',
-                 null,
-                 InputOption::VALUE_NONE,
-                 'Redefine card data'
-             )
-             ->addOption(
-                 'force-image',
-                 null,
-                 InputOption::VALUE_NONE,
-                 'Redownload card image'
-             )
-             ->addOption(
-                 'show-texts',
-                 null,
-                 InputOption::VALUE_NONE,
-                 'Show card text and flavor'
              );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
-
-        $em = $this->em;
-
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $questionHelper = $this->getHelper('question');
 
-        $assets_helper = $this->packages;
-        $publicDir = $this->publicDir;
-
-        $allSpheres = $this->sphereRepository->findAll();
-        $allTypes = $this->typeRepository->findAll();
-
         $skip = (int) $input->getOption('skip');
-        $forceData = $input->getOption('force-data');
-        $forceImage = $input->getOption('force-image');
-        $showTexts = $input->getOption('show-texts');
 
         if (file_exists('beorn.json')) {
-            VarDumper::dump("Loading Local Beorn JSON");
+            VarDumper::dump('Loading Local Beorn JSON');
             $json = file_get_contents('beorn.json');
         } else {
-            VarDumper::dump("Loading Remote Beorn JSON");
-            $json = file_get_contents("http://hallofbeorn.com/Export/Cards");
+            VarDumper::dump('Loading Remote Beorn JSON');
+            $json = file_get_contents('http://hallofbeorn.com/Export/Cards');
             file_put_contents('beorn.json', $json);
         }
+
         $beorn = json_decode((string) $json);
 
         $i = 0;
@@ -130,93 +70,94 @@ class ScrapBeornJsonDataCommand extends Command {
                 continue;
             }
 
-            VarDumper::dump($data->Title . " $i");
+            VarDumper::dump($data->Title." $i");
 
             $cardset = $data->CardSet;
             $cardset = str_replace('The Hobbit: ', '', $cardset);
 
-            /* @var $pack \App\Entity\Pack */
+            /* @var $pack Pack */
             $pack = $this->packRepository->findOneBy(['name' => $cardset]);
 
             if (!$pack) {
-                VarDumper::dump('Could not find pack ' . $data->CardSet);
+                VarDumper::dump('Could not find pack '.$data->CardSet);
                 continue;
             }
 
-            /* @var $card \App\Entity\Card */
+            /* @var $card Card */
             $bjPrinting = $this->cardPrintingRepository->createQueryBuilder('cp')
                 ->join('cp.card', 'c')->where('c.name = :n')->andWhere('cp.pack = :p')
                 ->setParameter('n', $data->Title)->setParameter('p', $pack)->setMaxResults(1)->getQuery()->getOneOrNullResult();
             $card = $bjPrinting ? $bjPrinting->getCard() : null;
 
             if (!$card) {
-                if ($data->CardType == 'Hero' || $data->CardType == 'Ally' || $data->CardType == 'Attachment' || $data->CardType == 'Event') {
-                    VarDumper::dump('Could not find card ' . $data->Title);
-                    $question = new ConfirmationQuestion("Continue?");
+                if ('Hero' == $data->CardType || 'Ally' == $data->CardType || 'Attachment' == $data->CardType || 'Event' == $data->CardType) {
+                    VarDumper::dump('Could not find card '.$data->Title);
+                    $question = new ConfirmationQuestion('Continue?');
                     $questionHelper->ask($input, $output, $question);
                 }
+
                 continue;
             }
 
             if ($card->getHasErrata() != $data->HasErrata) {
-                VarDumper::dump('Errata Mismatch ' . $data->Title);
+                VarDumper::dump('Errata Mismatch '.$data->Title);
                 VarDumper::dump($card->getHasErrata());
                 VarDumper::dump($data->HasErrata);
 
-                $question = new ConfirmationQuestion("Continue?");
+                $question = new ConfirmationQuestion('Continue?');
                 $questionHelper->ask($input, $output, $question);
             }
 
             if (property_exists($data->Front->Stats, 'ThreatCost') && $card->getThreat() != $data->Front->Stats->ThreatCost) {
-                VarDumper::dump('Threat Mismatch ' . $data->Title);
+                VarDumper::dump('Threat Mismatch '.$data->Title);
                 VarDumper::dump($card->getThreat());
                 VarDumper::dump($data->Front->Stats->ThreatCost);
 
-                $question = new ConfirmationQuestion("Continue?");
+                $question = new ConfirmationQuestion('Continue?');
                 $questionHelper->ask($input, $output, $question);
             }
 
             if (property_exists($data->Front->Stats, 'Willpower') && $card->getWillpower() != $data->Front->Stats->Willpower) {
-                VarDumper::dump('Willpower Mismatch ' . $data->Title);
+                VarDumper::dump('Willpower Mismatch '.$data->Title);
                 VarDumper::dump($card->getWillpower());
                 VarDumper::dump($data->Front->Stats->Willpower);
 
-                $question = new ConfirmationQuestion("Continue?");
+                $question = new ConfirmationQuestion('Continue?');
                 $questionHelper->ask($input, $output, $question);
             }
 
             if (property_exists($data->Front->Stats, 'Attack') && $card->getAttack() != $data->Front->Stats->Attack) {
-                VarDumper::dump('Attack Mismatch ' . $data->Title);
+                VarDumper::dump('Attack Mismatch '.$data->Title);
                 VarDumper::dump($card->getAttack());
                 VarDumper::dump($data->Front->Stats->Attack);
 
-                $question = new ConfirmationQuestion("Continue?");
+                $question = new ConfirmationQuestion('Continue?');
                 $questionHelper->ask($input, $output, $question);
             }
 
             if (property_exists($data->Front->Stats, 'Defense') && $card->getDefense() != $data->Front->Stats->Defense) {
-                VarDumper::dump('Defense Mismatch ' . $data->Title);
+                VarDumper::dump('Defense Mismatch '.$data->Title);
                 VarDumper::dump($card->getDefense());
                 VarDumper::dump($data->Front->Stats->Defense);
 
-                $question = new ConfirmationQuestion("Continue?");
+                $question = new ConfirmationQuestion('Continue?');
                 $questionHelper->ask($input, $output, $question);
             }
 
             if (property_exists($data->Front->Stats, 'HitPoints') && $card->getHealth() != $data->Front->Stats->HitPoints) {
-                VarDumper::dump('HitPoints Mismatch ' . $data->Title);
+                VarDumper::dump('HitPoints Mismatch '.$data->Title);
                 VarDumper::dump($card->getHealth());
                 VarDumper::dump($data->Front->Stats->HitPoints);
 
-                $question = new ConfirmationQuestion("Continue?");
+                $question = new ConfirmationQuestion('Continue?');
                 $questionHelper->ask($input, $output, $question);
             }
 
-            $card->setIllustrator($data->Artist);
+            // $card->setIllustrator($data->Artist);
         }
 
-        $em->flush();
-        $output->writeln("Done.");
+        $this->entityManager->flush();
+        $output->writeln('Done.');
 
         return 0;
     }

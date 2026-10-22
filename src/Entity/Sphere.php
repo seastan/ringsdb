@@ -1,142 +1,164 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-class Sphere {
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity(repositoryClass="App\Repository\SphereRepository")
+ * @ORM\Table(
+ *     name="sphere",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(name="sphere_code_idx", columns={"code"})
+ *     }
+ * )
+ * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="entity_region")
+ */
+class Sphere
+{
     /**
-     * @var integer
+     * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=255, nullable=false)
      */
     private $code;
+
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=1024, nullable=false)
      */
     private $name;
+
     /**
-     * @var boolean
+     * @var bool
+     *
+     * @ORM\Column(type="boolean", nullable=false)
      */
     private $is_primary;
+
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Card>
+     * @var Collection<int, Card>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Card", mappedBy="sphere")
+     * @ORM\OrderBy({"position"="ASC"})
      */
     private $cards;
 
     /**
-     * Constructor
+     * Constructor.
      */
-    public function __construct() {
-        $this->cards = new \Doctrine\Common\Collections\ArrayCollection();
+    public function __construct()
+    {
+        $this->cards = new ArrayCollection();
     }
 
     /**
-     * Get id
-     *
-     * @return integer
+     * Get id.
      */
-    public function getId() {
+    public function getId(): ?int
+    {
         return $this->id;
     }
 
     /**
-     * Set code
+     * Set code.
      *
      * @param string $code
-     *
-     * @return Sphere
      */
-    public function setCode($code) {
+    public function setCode($code): Sphere
+    {
         $this->code = $code;
 
         return $this;
     }
 
     /**
-     * Get code
-     *
-     * @return string
+     * Get code.
      */
-    public function getCode() {
+    public function getCode(): string
+    {
         return $this->code;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
-     *
-     * @return Sphere
      */
-    public function setName($name) {
+    public function setName($name): Sphere
+    {
         $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get name
-     *
-     * @return string
+     * Get name.
      */
-    public function getName() {
+    public function getName(): string
+    {
         return $this->name;
     }
 
     /**
-     * Set isPrimary
+     * Set isPrimary.
      *
-     * @param boolean $isPrimary
-     *
-     * @return Sphere
+     * @param bool $isPrimary
      */
-    public function setIsPrimary($isPrimary) {
+    public function setIsPrimary($isPrimary): Sphere
+    {
         $this->is_primary = $isPrimary;
 
         return $this;
     }
 
     /**
-     * Get isPrimary
-     *
-     * @return boolean
+     * Get isPrimary.
      */
-    public function getIsPrimary() {
+    public function getIsPrimary(): bool
+    {
         return $this->is_primary;
     }
 
-
-
     /**
-     * Add card
-     *
-     * @param \App\Entity\Card $card
-     *
-     * @return Sphere
+     * Add card.
      */
-    public function addCard(\App\Entity\Card $card) {
+    public function addCard(Card $card): Sphere
+    {
         $this->cards[] = $card;
 
         return $this;
     }
 
     /**
-     * Remove card
-     *
-     * @param \App\Entity\Card $card
-     * @return void
+     * Remove card.
      */
-    public function removeCard(\App\Entity\Card $card) {
+    public function removeCard(Card $card): void
+    {
         $this->cards->removeElement($card);
     }
 
     /**
-     * Get cards
+     * Get cards.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Card>
+     * @return Collection<int, Card>
      */
-    public function getCards() {
+    public function getCards(): Collection
+    {
         return $this->cards;
     }
 }

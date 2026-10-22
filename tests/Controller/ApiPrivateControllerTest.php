@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,25 +19,31 @@ use Symfony\Component\HttpFoundation\Response;
  * Fixtures: "test" owns decks 1-4, decklists 1-4 and one custom pack; "admin" owns nothing.
  * Neither shares their decks.
  */
-class ApiPrivateControllerTest extends WebTestCase {
+class ApiPrivateControllerTest extends WebTestCase
+{
     use JsonSnapshotTrait;
 
-    const LAST_MODIFIED = 'Sun, 16 Aug 2015 00:00:00 GMT';
+    public const LAST_MODIFIED = 'Sun, 16 Aug 2015 00:00:00 GMT';
 
-    protected function tearDown(): void {
-        static::createClient()->getContainer()->get('doctrine')->getConnection()
+    private KernelBrowser $client;
+
+    protected function setUp(): void
+    {
+        $this->client = static::createClient();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->client->getContainer()->get('doctrine')->getConnection()
             ->update('user', ['is_share_decks' => 0], ['username' => 'test']);
         parent::tearDown();
     }
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @param mixed $username
-     * @return \Symfony\Bundle\FrameworkBundle\Client
-     */
-    private function createAuthenticatedClient($username) {
-        $client = static::createClient();
+    private function createAuthenticatedClient(string $username): KernelBrowser
+    {
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $username]));
         $this->assertTrue($client->getResponse()->isRedirect(), "Login as $username failed");
@@ -44,10 +52,10 @@ class ApiPrivateControllerTest extends WebTestCase {
     }
 
     /**
-     * @param mixed $uri
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param array<string, string> $headers
      */
-    private function ajax(Client $client, $uri, array $headers = []) {
+    private function ajax(KernelBrowser $client, string $uri, array $headers = []): Response
+    {
         $client->request('GET', $uri, [], [], $headers + ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
         return $client->getResponse();
@@ -60,14 +68,16 @@ class ApiPrivateControllerTest extends WebTestCase {
      * session "max-age=0, must-revalidate, private" (it was "private, must-revalidate" with data,
      * "no-cache" without).
      */
-    private function assertCacheableJson(Response $response): void {
+    private function assertCacheableJson(Response $response): void
+    {
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
         $this->assertSame('max-age=0, must-revalidate, private', $response->headers->get('Cache-Control'));
         $this->assertSame(self::LAST_MODIFIED, $response->headers->get('Last-Modified'));
     }
 
-    private function assertUncachedJson(Response $response): void {
+    private function assertUncachedJson(Response $response): void
+    {
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
         $this->assertSame('max-age=0, must-revalidate, private', $response->headers->get('Cache-Control'));
@@ -75,28 +85,27 @@ class ApiPrivateControllerTest extends WebTestCase {
     }
 
     /* ------------------------------------------------------- JSON bodies */
-
     /**
-     * [user, uri, snapshot name]
-     * @return array
+     * [user, uri, snapshot name].
+     *
+     * @return array<string, string[]>
      */
-    public function cacheableEndpointProvider() {
+    public function cacheableEndpointProvider(): array
+    {
         return [
             'my decks: decklists then decks' => ['test', '/api/private/decks', 'private/decks_test'],
             'my decks by username' => ['test', '/api/private/decks_by_user/test', 'private/decks_test'],
             // private decks are only listed for their owner, even when they are shared
-            'another user\'s decklists only' => ['admin', '/api/private/decks_by_user/test', 'private/decklists_test'],
+            "another user's decklists only" => ['admin', '/api/private/decks_by_user/test', 'private/decklists_test'],
             'own deck' => ['test', '/api/private/deck/load/1', 'private/deck_1'],
         ];
     }
 
     /**
      * @dataProvider cacheableEndpointProvider
-     * @param mixed $user
-     * @param mixed $uri
-     * @param mixed $snapshot
      */
-    public function testCacheableEndpoint($user, $uri, $snapshot): void {
+    public function testCacheableEndpoint(string $user, string $uri, string $snapshot): void
+    {
         $client = $this->createAuthenticatedClient($user);
         $response = $this->ajax($client, $uri);
 
@@ -105,10 +114,12 @@ class ApiPrivateControllerTest extends WebTestCase {
     }
 
     /**
-     * [user, uri, expected JSON]
-     * @return array
+     * [user, uri, expected JSON].
+     *
+     * @return array<string, string[]|never[][]|array<string, bool|string>[]>
      */
-    public function uncachedEndpointProvider() {
+    public function uncachedEndpointProvider(): array
+    {
         $notShared = 'You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.';
 
         return [
@@ -125,11 +136,9 @@ class ApiPrivateControllerTest extends WebTestCase {
      * Errors are answered with a 200 and {"success": false, "error": ...}.
      *
      * @dataProvider uncachedEndpointProvider
-     * @param mixed $user
-     * @param mixed $uri
-     * @param mixed $expected
      */
-    public function testUncachedEndpoint($user, $uri, $expected): void {
+    public function testUncachedEndpoint(string $user, string $uri, array $expected): void
+    {
         $client = $this->createAuthenticatedClient($user);
         $response = $this->ajax($client, $uri);
 
@@ -137,7 +146,8 @@ class ApiPrivateControllerTest extends WebTestCase {
         $this->assertSame($expected, json_decode($response->getContent(), true));
     }
 
-    public function testCustomPacks(): void {
+    public function testCustomPacks(): void
+    {
         $client = $this->createAuthenticatedClient('test');
         $response = $this->ajax($client, '/api/private/custom-packs');
 
@@ -145,7 +155,8 @@ class ApiPrivateControllerTest extends WebTestCase {
         $this->assertMatchesJsonSnapshot('private/custom_packs_test', $response->getContent());
     }
 
-    public function testSharedDeckCanBeLoadedByAnotherUser(): void {
+    public function testSharedDeckCanBeLoadedByAnotherUser(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
         $client->getContainer()->get('doctrine')->getConnection()->update('user', ['is_share_decks' => 1], ['username' => 'test']);
 
@@ -162,10 +173,9 @@ class ApiPrivateControllerTest extends WebTestCase {
 
     /**
      * @dataProvider cacheableEndpointProvider
-     * @param mixed $user
-     * @param mixed $uri
      */
-    public function testNotModifiedSince($user, $uri): void {
+    public function testNotModifiedSince(string $user, string $uri): void
+    {
         $client = $this->createAuthenticatedClient($user);
 
         $response = $this->ajax($client, $uri, ['HTTP_IF_MODIFIED_SINCE' => self::LAST_MODIFIED]);
@@ -177,11 +187,11 @@ class ApiPrivateControllerTest extends WebTestCase {
     }
 
     /* ----------------------------------------------------------- security */
-
     /**
-     * @return array
+     * @return array<string, string[]>
      */
-    public function privateUriProvider() {
+    public function privateUriProvider(): array
+    {
         return [
             'my decks' => ['/api/private/decks'],
             'decks by user' => ['/api/private/decks_by_user/test'],
@@ -192,10 +202,10 @@ class ApiPrivateControllerTest extends WebTestCase {
 
     /**
      * @dataProvider privateUriProvider
-     * @param mixed $uri
      */
-    public function testAnonymousAjaxIsDenied($uri): void {
-        $client = static::createClient();
+    public function testAnonymousAjaxIsDenied(string $uri): void
+    {
+        $client = $this->client;
         $response = $this->ajax($client, $uri);
 
         $this->assertSame(403, $response->getStatusCode());
@@ -205,17 +215,18 @@ class ApiPrivateControllerTest extends WebTestCase {
 
     /**
      * @dataProvider privateUriProvider
-     * @param mixed $uri
      */
-    public function testAnonymousIsRedirectedToLogin($uri): void {
-        $client = static::createClient();
+    public function testAnonymousIsRedirectedToLogin(string $uri): void
+    {
+        $client = $this->client;
         $client->request('GET', $uri);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('http://localhost/login', $client->getResponse()->headers->get('Location'));
     }
 
-    public function testPostIsNotAllowed(): void {
+    public function testPostIsNotAllowed(): void
+    {
         $client = $this->createAuthenticatedClient('test');
         $client->request('POST', '/api/private/decks');
 

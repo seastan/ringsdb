@@ -1,141 +1,131 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Model;
 
-use App\Repository\CardRepository;
 use App\Entity\Card;
+use App\Entity\Questlog;
+use App\Entity\User;
+use App\Repository\CardRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use App\Entity\User;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * The job of this class is to find and return questlogs
- * @author seastan
- * @property integer $maxcount Number of found rows for last request
+ * The job of this class is to find and return questlogs.
  *
+ * @author seastan
+ *
+ * @property int $maxcount Number of found rows for last request
  */
-class QuestLogManager {
-	/**
-	 * @var int
-	 */
-	protected $page = 1;
-	/**
-	 * @var int
-	 */
-	protected $start = 0;
-	/**
-	 * @var int
-	 */
-	protected $limit = 30;
-	/**
-	 * @var int
-	 */
-	protected $maxcount = 0;
-	/**
-	 * @var \App\Entity\User|null
-	 */
-	protected $user = null;
-
-	/**
-	 * @var EntityManagerInterface
-	 */
-	private $doctrine;
-
-	/**
-	 * @var RequestStack
-	 */
-	private $request_stack;
-
-	/**
-	 * @var UrlGeneratorInterface
-	 */
-	private $router;
+class QuestLogManager
+{
+    /**
+     * @var int
+     */
+    protected $page = 1;
 
     /**
-     * @var CardRepository
+     * @var int
      */
-    private $cardRepository;
+    protected $start = 0;
 
-	public function __construct(EntityManagerInterface $doctrine, RequestStack $request_stack, UrlGeneratorInterface $router, CardRepository $cardRepository) {
-		$this->doctrine = $doctrine;
-		$this->request_stack = $request_stack;
-		$this->router = $router;
+    /**
+     * @var int
+     */
+    protected $limit = 30;
+
+    /**
+     * @var int
+     */
+    protected $maxcount = 0;
+
+    /**
+     * @var User|null
+     */
+    protected $user;
+
+    private EntityManagerInterface $doctrine;
+
+    private RequestStack $request_stack;
+
+    private UrlGeneratorInterface $router;
+
+    private CardRepository $cardRepository;
+
+    public function __construct(EntityManagerInterface $doctrine, RequestStack $request_stack, UrlGeneratorInterface $router, CardRepository $cardRepository)
+    {
+        $this->doctrine = $doctrine;
+        $this->request_stack = $request_stack;
+        $this->router = $router;
         $this->cardRepository = $cardRepository;
-	}
+    }
 
-	/**
-	 * The current request: the searches and the pagination read its parameters.
-	 */
-	private function currentRequest(): Request {
-		$request = $this->request_stack->getCurrentRequest();
-		if ($request === null) {
-			throw new \LogicException('No current request.');
-		}
+    /**
+     * The current request: the searches and the pagination read its parameters.
+     */
+    private function currentRequest(): Request
+    {
+        $request = $this->request_stack->getCurrentRequest();
+        if (null === $request) {
+            throw new \LogicException('No current request.');
+        }
 
-		return $request;
-	}
+        return $request;
+    }
 
-	/**
-	 * @param mixed $user
-	 * @return void
-	 */
-	public function setUser($user) {
-		$this->user = $user;
-	}
+    public function setUser(?User $user): void
+    {
+        $this->user = $user;
+    }
 
-	/**
-	 * @param mixed $limit
-	 * @return void
-	 */
-	public function setLimit($limit) {
-		$this->limit = $limit;
-	}
+    public function setLimit(int $limit): void
+    {
+        $this->limit = $limit;
+    }
 
-	/**
-	 * @param mixed $page
-	 * @return void
-	 */
-	public function setPage($page) {
-		$this->page = max($page, 1);
-		$this->start = ($this->page - 1) * $this->limit;
-	}
+    public function setPage(int $page): void
+    {
+        $this->page = max($page, 1);
+        $this->start = ($this->page - 1) * $this->limit;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getMaxCount() {
-		return $this->maxcount;
-	}
+    public function getMaxCount(): int
+    {
+        return $this->maxcount;
+    }
 
-	/**
-	 * creates the basic query builder and initializes it
-	 * @return \Doctrine\ORM\QueryBuilder
-	 */
-	private function getQueryBuilder() {
-		$qb = $this->doctrine->createQueryBuilder();
-		$qb->select('d');
-		$qb->from('App:Questlog', 'd');
+    /**
+     * creates the basic query builder and initializes it.
+     */
+    private function getQueryBuilder(): QueryBuilder
+    {
+        $qb = $this->doctrine->createQueryBuilder();
+        $qb->select('d');
+        $qb->from('App:Questlog', 'd');
         $qb->andWhere('d.isPublic = 1');
         $qb->setFirstResult($this->start);
-		$qb->setMaxResults($this->limit);
-		$qb->distinct();
+        $qb->setMaxResults($this->limit);
+        $qb->distinct();
 
-		return $qb;
-	}
+        return $qb;
+    }
 
     /**
-     * creates the paginator around the query
+     * creates the paginator around the query.
      *
-     * @param Query $query
-     * @param \Doctrine\ORM\Query<mixed, \App\Entity\Questlog> $query
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Questlog>
+     * @param Query<mixed, Questlog> $query
+     *
+     * @return Paginator<Questlog>
      */
-    private function getPaginator(Query $query) {
+    private function getPaginator(Query $query): Paginator
+    {
         $paginator = new Paginator($query, $fetchJoinCollection = false);
         $this->maxcount = $paginator->count();
 
@@ -143,18 +133,20 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\Common\Collections\ArrayCollection<int, \App\Entity\Questlog>
+     * @return ArrayCollection<int, Questlog>
      */
-    public function getEmptyList() {
+    public function getEmptyList(): ArrayCollection
+    {
         $this->maxcount = 0;
 
         return new ArrayCollection([]);
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Questlog>
+     * @return Paginator<Questlog>
      */
-    public function findQuestLogsByPopularity() {
+    public function findQuestLogsByPopularity(): Paginator
+    {
         $qb = $this->getQueryBuilder();
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.datePublish), 2)) AS HIDDEN popularity');
         $qb->orderBy('popularity', 'DESC');
@@ -166,9 +158,10 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Questlog>
+     * @return Paginator<Questlog>
      */
-    public function findQuestLogsByAge() {
+    public function findQuestLogsByAge(): Paginator
+    {
         $qb = $this->getQueryBuilder();
 
         $qb->orderBy('d.datePublish', 'DESC');
@@ -180,9 +173,10 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Questlog>
+     * @return Paginator<Questlog>
      */
-    public function findQuestLogsByFavorite(User $user) {
+    public function findQuestLogsByFavorite(User $user): Paginator
+    {
         $qb = $this->getQueryBuilder();
 
         $qb->leftJoin('d.favorites', 'u');
@@ -197,9 +191,10 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Questlog>
+     * @return Paginator<Questlog>
      */
-    public function findQuestLogsByAuthor(User $user) {
+    public function findQuestLogsByAuthor(User $user): Paginator
+    {
         $qb = $this->getQueryBuilder();
 
         $qb->andWhere('d.user = :user');
@@ -213,9 +208,10 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Questlog>
+     * @return Paginator<Questlog>
      */
-    public function findQuestLogsInHallOfFame() {
+    public function findQuestLogsInHallOfFame(): Paginator
+    {
         $qb = $this->getQueryBuilder();
 
         $qb->andWhere('d.nbVotes > 10');
@@ -228,9 +224,10 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Questlog>
+     * @return Paginator<Questlog>
      */
-    public function findQuestLogsInHotTopic() {
+    public function findQuestLogsInHotTopic(): Paginator
+    {
         $qb = $this->getQueryBuilder();
 
         $qb->addSelect('(SELECT count(c) FROM App:QuestlogComment c WHERE c.questlog=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
@@ -244,27 +241,22 @@ class QuestLogManager {
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<\App\Entity\Questlog>
+     * @return Paginator<Questlog>
      */
-    public function findQuestLogsWithComplexSearch() {
+    public function findQuestLogsWithComplexSearch(): Paginator
+    {
         $request = $this->currentRequest();
 
-        $cards_code = $request->query->get('cards');
-        if (!is_array($cards_code)) {
-            $cards_code = [];
-        }
+        $cards_code = $request->query->all('cards');
 
         $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
         $questlog_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
         $nb_decks = intval(filter_var($request->query->get('nb_decks'), FILTER_SANITIZE_NUMBER_INT));
 
         $sort = $request->query->get('sort');
-        $packs = $request->query->get('packs');
-        if (!is_array($packs)) {
-            $packs = [];
-        }
+        $packs = $request->query->all('packs');
 
-        $customPackCodes = array_values(array_filter((array) $request->query->get('custom_packs', []), 'is_string'));
+        $customPackCodes = array_values(array_filter($request->query->all('custom_packs'), 'is_string'));
 
         $qb = $this->getQueryBuilder();
         $joinTables = [];
@@ -286,15 +278,15 @@ class QuestLogManager {
             $qb->setParameter('nbdecks', $nb_decks);
         }
 
-        $useCustomPacks = !empty($customPackCodes) && $this->user;
+        $useCustomPacks = [] !== $customPackCodes && $this->user;
 
-        if (!empty($cards_code) || !empty($packs) || $useCustomPacks) {
-            $qb->innerJoin('d.decks', "l");
-            $qb->innerJoin('l.deck', "ld");
+        if (count($cards_code) > 0 || count($packs) > 0 || $useCustomPacks) {
+            $qb->innerJoin('d.decks', 'l');
+            $qb->innerJoin('l.deck', 'ld');
 
-            if (!empty($cards_code)) {
+            if (count($cards_code) > 0) {
                 foreach ($cards_code as $i => $card_code) {
-                    /* @var $card \App\Entity\Card */
+                    /* @var $card Card */
                     $card = $this->cardRepository->findOneBy(['code' => $card_code]);
                     if (!$card) {
                         continue;
@@ -304,30 +296,31 @@ class QuestLogManager {
                     $qb->andWhere("s$i.card = :card$i");
                     $qb->setParameter("card$i", $card);
 
-                    //$packs[] = $card->getPack()->getId();
+                    // $packs[] = $card->getPack()->getId();
                 }
             }
-            if (!empty($packs) || $useCustomPacks) {
+
+            if (count($packs) > 0 || $useCustomPacks) {
                 $sub = $this->doctrine->createQueryBuilder();
-                $sub->select("c");
-                $sub->from("App:Card", "c");
+                $sub->select('c');
+                $sub->from('App:Card', 'c');
                 $sub->innerJoin('App:Deckslot', 's', 'WITH', 's.card = c');
                 $sub->where('s.deck = ld');
 
-                if (!empty($packs)) {
-                    $sub->andWhere("NOT EXISTS (SELECT cpqlm.id FROM App:CardPrinting cpqlm WHERE cpqlm.card = c AND cpqlm.pack IN (:qlm_packs))");
+                if (count($packs) > 0) {
+                    $sub->andWhere('NOT EXISTS (SELECT cpqlm.id FROM App:CardPrinting cpqlm WHERE cpqlm.card = c AND cpqlm.pack IN (:qlm_packs))');
                     $qb->setParameter('qlm_packs', $packs);
                 }
 
                 if ($useCustomPacks) {
                     $sub->andWhere(
-                        "NOT EXISTS (" .
-                            "SELECT ucpcqlm.id FROM App:UserCustomPackCard ucpcqlm " .
-                            "JOIN ucpcqlm.customPack ucpqlm " .
-                            "WHERE ucpcqlm.card = c " .
-                            "AND ucpqlm.code IN (:qlm_custom_codes) " .
-                            "AND ucpqlm.user = :qlm_custom_user" .
-                        ")"
+                        'NOT EXISTS ('.
+                            'SELECT ucpcqlm.id FROM App:UserCustomPackCard ucpcqlm '.
+                            'JOIN ucpcqlm.customPack ucpqlm '.
+                            'WHERE ucpcqlm.card = c '.
+                            'AND ucpqlm.code IN (:qlm_custom_codes) '.
+                            'AND ucpqlm.user = :qlm_custom_user'.
+                        ')'
                     );
                     $qb->setParameter('qlm_custom_codes', $customPackCodes);
                     $qb->setParameter('qlm_custom_user', $this->user);
@@ -347,9 +340,10 @@ class QuestLogManager {
                 break;
 
             case 'reputation':
-                if (!in_array('d.user', $joinTables)) {
+                if (!in_array('d.user', $joinTables, true)) {
                     $qb->innerJoin('d.user', 'u');
                 }
+
                 // with DISTINCT, MySQL 5.7+ only sorts on selected columns
                 $qb->addSelect('u.reputation AS HIDDEN reputation');
                 $qb->orderBy('reputation', 'DESC');
@@ -368,17 +362,16 @@ class QuestLogManager {
         return $this->getPaginator($qb->getQuery());
     }
 
-    /**
-     * @return int
-     */
-    public function getNumberOfPages() {
+    public function getNumberOfPages(): int
+    {
         return intval(ceil($this->maxcount / $this->limit));
     }
 
     /**
      * @return list<array{numero: int, url: string, current: bool}>
      */
-    public function getAllPages() {
+    public function getAllPages(): array
+    {
         $request = $this->currentRequest();
         $route = $request->get('_route');
         $route_params = $request->get('_route_params');
@@ -388,11 +381,11 @@ class QuestLogManager {
 
         $number_of_pages = $this->getNumberOfPages();
         $pages = [];
-        for ($page = 1; $page <= $number_of_pages; $page++) {
+        for ($page = 1; $page <= $number_of_pages; ++$page) {
             $pages[] = [
-                "numero" => $page,
-                "url" => $this->router->generate($route, ["page" => $page] + $params),
-                "current" => $page == $this->page
+                'numero' => $page,
+                'url' => $this->router->generate($route, ['page' => $page] + $params),
+                'current' => $page == $this->page,
             ];
         }
 
@@ -402,12 +395,13 @@ class QuestLogManager {
     /**
      * @return array<int, mixed>
      */
-    public function getClosePages() {
+    public function getClosePages(): array
+    {
         $allPages = $this->getAllPages();
         $numero_courant = $this->page - 1;
         $pages = [];
         foreach ($allPages as $numero => $page) {
-            if ($numero === 0 || $numero === count($allPages) - 1 || abs($numero - $numero_courant) <= 2) {
+            if (0 === $numero || $numero === count($allPages) - 1 || abs($numero - $numero_courant) <= 2) {
                 $pages[] = $page;
             }
         }
@@ -415,11 +409,9 @@ class QuestLogManager {
         return $pages;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getPreviousUrl() {
-        if ($this->page === 1) {
+    public function getPreviousUrl(): ?string
+    {
+        if (1 === $this->page) {
             return null;
         }
 
@@ -436,10 +428,8 @@ class QuestLogManager {
         return $this->router->generate($route, $params);
     }
 
-    /**
-     * @return string|null
-     */
-    public function getNextUrl() {
+    public function getNextUrl(): ?string
+    {
         if ($this->page === $this->getNumberOfPages()) {
             return null;
         }

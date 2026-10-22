@@ -46,11 +46,15 @@ services:
     App\Model\QuestLogManager:
         shared: false
 
-    # FOSUserBundle 2 declares no autowiring alias for its mailer
-    FOS\UserBundle\Mailer\MailerInterface: '@fos_user.mailer'
+    App\Security\LoginManager:
+        arguments:
+            $userChecker: '@App\Security\UserChecker'
+            $sessionStrategy: '@security.authentication.session_strategy'
 
-    fos_user.doctrine_registry:
-        alias: doctrine
+    App\Security\UserMailer:
+        arguments:
+            $senderAddress: '%env(EMAIL_SENDER_ADDRESS)%'
+            $senderName: '%env(EMAIL_SENDER_NAME)%'
 
     # the historical ids, still fetched with get() by the fixtures and the tests
     decks: { alias: App\Services\Decks, public: true }
@@ -59,9 +63,3 @@ services:
     decklist_factory: { alias: App\Model\DecklistFactory, public: true }
     fellowship_manager: { alias: App\Model\FellowshipManager, public: true }
     questlog_manager: { alias: App\Model\QuestLogManager, public: true }
-
-    Nelmio\ApiDocBundle\Command\SwaggerDumpCommand:
-        tags: ['console.command']
-
-    Nelmio\ApiDocBundle\Command\DumpCommand:
-        tags: ['console.command']

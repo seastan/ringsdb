@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Controller;
 
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -11,15 +14,22 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * A term in capitals (2 letters or more) is also searched as an acronym: the initials of the words
  * of the name, dashes counting as spaces (REPLACE, App\DQL\ReplaceFunction).
  */
-class CardSearchTest extends WebTestCase {
+class CardSearchTest extends WebTestCase
+{
+    private KernelBrowser $client;
+
+    protected function setUp(): void
+    {
+        $this->client = static::createClient();
+    }
 
     /**
      * @return string[] the names of the cards found by the API
-     * @param mixed $q
      */
-    private function search($q) {
-        $client = static::createClient();
-        $client->request('GET', '/api/public/cards/search/' . rawurlencode($q));
+    private function search(string $q): array
+    {
+        $client = $this->client;
+        $client->request('GET', '/api/public/cards/search/'.rawurlencode($q));
         $this->assertSame(200, $client->getResponse()->getStatusCode(), "search $q");
 
         return array_column(json_decode($client->getResponse()->getContent(), true), 'name');
@@ -27,9 +37,9 @@ class CardSearchTest extends WebTestCase {
 
     /**
      * @dataProvider acronymProvider
-     * @param mixed $acronym
      */
-    public function testAcronym($acronym, array $expected): void {
+    public function testAcronym(string $acronym, array $expected): void
+    {
         $names = $this->search($acronym);
         sort($names);
 
@@ -37,9 +47,10 @@ class CardSearchTest extends WebTestCase {
     }
 
     /**
-     * @return array
+     * @return array<string, string[]|string[][]>
      */
-    public function acronymProvider() {
+    public function acronymProvider(): array
+    {
         return [
             'initials' => ['LOS', ['Longbeard Orc Slayer']],
             // small words count: the initials are matched case-insensitively
@@ -50,20 +61,22 @@ class CardSearchTest extends WebTestCase {
         ];
     }
 
-    public function testAcronymsAreCaseSensitive(): void {
+    public function testAcronymsAreCaseSensitive(): void
+    {
         // in lower case, "los" is only searched in the names, case-insensitively
         $names = $this->search('los');
         $this->assertNotContains('Longbeard Orc Slayer', $names);
         foreach ($names as $name) {
-            $this->assertContains('los', strtolower($name));
+            $this->assertStringContainsString('los', strtolower($name));
         }
     }
 
-    public function testSiteSearch(): void {
-        $client = static::createClient();
+    public function testSiteSearch(): void
+    {
+        $client = $this->client;
         $crawler = $client->request('GET', '/find?q=LOS');
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertContains('Longbeard Orc Slayer', $crawler->filter('body')->text());
+        $this->assertStringContainsString('Longbeard Orc Slayer', $crawler->filter('body')->text());
     }
 }

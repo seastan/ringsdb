@@ -1,152 +1,170 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+
 /**
- * Deckchange
+ * @ORM\Entity(repositoryClass="App\Repository\DeckchangeRepository")
+ * @ORM\Table(name="deckchange")
  */
-class Deckchange {
+class Deckchange
+{
     /**
-     * @var integer
+     * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-    /**
-     * @var \DateTime
-     */
-    private $dateCreation;
-    /**
-     * @var string
-     */
-    private $variation;
-    /**
-     * @var boolean
-     */
-    private $isSaved;
-    /**
-     * @var string|null
-     */
-    private $version;
-    /**
-     * @var \App\Entity\Deck
-     */
-    private $deck;
 
     /**
-     * Get id
+     * @var \DateTime
      *
-     * @return integer
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
      */
-    public function getId() {
+    private $dateCreation;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=1024)
+     */
+    private $variation;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_saved", type="boolean")
+     */
+    private $isSaved;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(type="string", length=8, nullable=true)
+     */
+    private $version;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Deck", inversedBy="changes")
+     * @ORM\JoinColumn(name="deck_id", referencedColumnName="id", nullable=false)
+     */
+    private Deck $deck;
+
+    public function __construct(Deck $deck)
+    {
+        $this->deck = $deck;
+    }
+
+    /**
+     * Get id.
+     */
+    public function getId(): ?int
+    {
         return $this->id;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return Deckchange
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation): Deckchange
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
-     *
-     * @return \DateTime
+     * Get dateCreation.
      */
-    public function getDateCreation() {
+    public function getDateCreation(): \DateTime
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set variation
+     * Set variation.
      *
      * @param string $variation
-     *
-     * @return Deckchange
      */
-    public function setVariation($variation) {
+    public function setVariation($variation): Deckchange
+    {
         $this->variation = $variation;
 
         return $this;
     }
 
     /**
-     * Get variation
-     *
-     * @return string
+     * Get variation.
      */
-    public function getVariation() {
+    public function getVariation(): string
+    {
         return $this->variation;
     }
 
     /**
-     * Set isSaved
+     * Set isSaved.
      *
-     * @param boolean $isSaved
-     *
-     * @return Deckchange
+     * @param bool $isSaved
      */
-    public function setIsSaved($isSaved) {
+    public function setIsSaved($isSaved): Deckchange
+    {
         $this->isSaved = $isSaved;
 
         return $this;
     }
 
     /**
-     * Get isSaved
-     *
-     * @return boolean
+     * Get isSaved.
      */
-    public function getIsSaved() {
+    public function getIsSaved(): bool
+    {
         return $this->isSaved;
     }
 
     /**
-     * Set deck
-     *
-     * @param \App\Entity\Deck $deck
-     *
-     * @return Deckchange
+     * Set deck.
      */
-    public function setDeck(\App\Entity\Deck $deck) {
+    public function setDeck(Deck $deck): Deckchange
+    {
         $this->deck = $deck;
 
         return $this;
     }
 
     /**
-     * Get deck
-     *
-     * @return \App\Entity\Deck
+     * Get deck.
      */
-    public function getDeck() {
+    public function getDeck(): Deck
+    {
         return $this->deck;
     }
 
     /**
-     * Set version
+     * Set version.
      *
      * @param string|null $version
-     *
-     * @return Deckchange
      */
-    public function setVersion($version) {
+    public function setVersion($version): Deckchange
+    {
         $this->version = $version;
 
         return $this;
     }
 
     /**
-     * Get version
-     *
-     * @return string|null
+     * Get version.
      */
-    public function getVersion() {
+    public function getVersion(): ?string
+    {
         return $this->version;
     }
 }

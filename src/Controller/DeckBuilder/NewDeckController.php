@@ -1,0 +1,43 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controller\DeckBuilder;
+
+use App\Controller\CurrentUserTrait;
+use App\Entity\Deck;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Routing\Annotation\Route;
+
+class NewDeckController extends AbstractController
+{
+    use CurrentUserTrait;
+
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(
+        EntityManagerInterface $entityManager
+    ) {
+        $this->entityManager = $entityManager;
+    }
+
+    /**
+     * @Route("/deck/new", name="deck_buildform", methods={"GET"})
+     */
+    public function __invoke(): RedirectResponse
+    {
+        $deck = new Deck($this->currentUser());
+        $deck->setName('New Deck');
+        $deck->setDescriptionMd('');
+        $deck->setLastPack();
+        $deck->setProblem('too_few_heroes');
+        $deck->setTags('');
+
+        $this->entityManager->persist($deck);
+        $this->entityManager->flush();
+
+        return $this->redirect($this->generateUrl('deck_edit', ['deck_id' => $deck->getId()]));
+    }
+}

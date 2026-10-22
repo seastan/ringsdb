@@ -1,59 +1,96 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-use App\Entity\Card;
-use App\Entity\UserCustomPack;
+use Doctrine\ORM\Mapping as ORM;
 
-class UserCustomPackCard {
-
+/**
+ * @ORM\Entity
+ * @ORM\Table(
+ *     name="user_custom_pack_card",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(name="ucpc_pack_card_idx", columns={"custom_pack_id", "card_id"})
+ *     },
+ *     indexes={
+ *         @ORM\Index(name="fk_ucpc_card", columns={"card_id"})
+ *     }
+ * )
+ */
+class UserCustomPackCard
+{
     /**
-     * @var int
+     * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-    /**
-     * @var \App\Entity\UserCustomPack
-     */
-    private $customPack;
-    /**
-     * @var \App\Entity\Card
-     */
-    private $card;
-    /**
-     * @var int
-     */
-    private $quantity = 1;
 
     /**
-     * @return int
+     * @ORM\ManyToOne(targetEntity="App\Entity\UserCustomPack", inversedBy="cards")
+     * @ORM\JoinColumn(name="custom_pack_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
-    public function getId() { return $this->id; }
+    private UserCustomPack $customPack;
 
     /**
-     * @return \App\Entity\UserCustomPack
+     * @ORM\ManyToOne(targetEntity="App\Entity\Card")
+     * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
-    public function getCustomPack() { return $this->customPack; }
-    /**
-     * @return $this
-     */
-    public function setCustomPack(UserCustomPack $customPack) { $this->customPack = $customPack; return $this; }
+    private Card $card;
 
     /**
-     * @return \App\Entity\Card
+     * @ORM\Column(type="smallint", nullable=false, options={"default": 1, "unsigned": true})
      */
-    public function getCard() { return $this->card; }
-    /**
-     * @return $this
-     */
-    public function setCard(Card $card) { $this->card = $card; return $this; }
+    public int $quantity;
 
-    /**
-     * @return int
-     */
-    public function getQuantity() { return $this->quantity; }
-    /**
-     * @param mixed $quantity
-     * @return $this
-     */
-    public function setQuantity($quantity) { $this->quantity = max(1, (int)$quantity); return $this; }
+    public function __construct(UserCustomPack $customPack, Card $card, int $quantity)
+    {
+        $this->customPack = $customPack;
+        $this->card = $card;
+        $this->quantity = $quantity;
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getCustomPack(): UserCustomPack
+    {
+        return $this->customPack;
+    }
+
+    public function setCustomPack(UserCustomPack $customPack): self
+    {
+        $this->customPack = $customPack;
+
+        return $this;
+    }
+
+    public function getCard(): Card
+    {
+        return $this->card;
+    }
+
+    public function setCard(Card $card): self
+    {
+        $this->card = $card;
+
+        return $this;
+    }
+
+    public function getQuantity(): int
+    {
+        return $this->quantity;
+    }
+
+    public function setQuantity(int $quantity): self
+    {
+        $this->quantity = max(1, $quantity);
+
+        return $this;
+    }
 }

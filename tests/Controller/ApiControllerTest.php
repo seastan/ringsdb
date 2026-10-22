@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,28 +16,32 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * Relies on ringsdb_bootstrap.sql (cards, packs, scenarios) and on the fixtures (decklists).
  */
-class ApiControllerTest extends WebTestCase {
+class ApiControllerTest extends WebTestCase
+{
     use JsonSnapshotTrait;
 
-    const CACHE_CONTROL = 'max-age=600, public';
+    private KernelBrowser $client;
+
+    public const CACHE_CONTROL = 'max-age=600, public';
+
+    protected function setUp(): void
+    {
+        $this->client = static::createClient();
+    }
 
     /* ------------------------------------------------------------ helpers */
-
     /**
-     * @param mixed $uri
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param array<string, string> $headers
      */
-    private function get(Client $client, $uri, array $headers = []) {
+    private function get(KernelBrowser $client, string $uri, array $headers = []): Response
+    {
         $client->request('GET', $uri, [], [], $headers);
 
         return $client->getResponse();
     }
 
-    /**
-     * @param mixed $contentType
-     * @param mixed $lastModified
-     */
-    private function assertApiHeaders(Response $response, $contentType, $lastModified): void {
+    private function assertApiHeaders(Response $response, string $contentType, ?string $lastModified): void
+    {
         $this->assertSame($contentType, $response->headers->get('Content-Type'));
         $this->assertSame(self::CACHE_CONTROL, $response->headers->get('Cache-Control'));
         $this->assertSame('*', $response->headers->get('Access-Control-Allow-Origin'));
@@ -43,12 +49,13 @@ class ApiControllerTest extends WebTestCase {
     }
 
     /* ------------------------------------------------------- JSON bodies */
-
     /**
-     * [snapshot name, uri, expected Last-Modified header (null if none)]
-     * @return array
+     * [snapshot name, uri, expected Last-Modified header (null if none)].
+     *
+     * @return array<string, string[]|string[]|null[]>
      */
-    public function jsonEndpointProvider() {
+    public function jsonEndpointProvider(): array
+    {
         return [
             'packs' => ['packs', '/api/public/packs/', 'Wed, 25 Mar 2026 16:18:09 GMT'],
             'card' => ['card_01001', '/api/public/card/01001', 'Sat, 17 Nov 2018 19:42:24 GMT'],
@@ -71,28 +78,28 @@ class ApiControllerTest extends WebTestCase {
 
     /**
      * @dataProvider jsonEndpointProvider
-     * @param mixed $snapshot
-     * @param mixed $uri
-     * @param mixed $lastModified
      */
-    public function testJsonEndpoint($snapshot, $uri, $lastModified): void {
-        $client = static::createClient();
+    public function testJsonEndpoint(string $snapshot, string $uri, ?string $lastModified): void
+    {
+        $client = $this->client;
         $response = $this->get($client, $uri);
 
         $this->assertSame(200, $response->getStatusCode());
         // search: Last-Modified depends on the matching cards, it is only checked when there are some
-        if ($lastModified !== null || $response->getContent() === '[]') {
+        if (null !== $lastModified || '[]' === $response->getContent()) {
             $this->assertApiHeaders($response, 'application/json', $lastModified);
         } else {
             $this->assertSame('application/json', $response->headers->get('Content-Type'));
             $this->assertSame(self::CACHE_CONTROL, $response->headers->get('Cache-Control'));
             $this->assertSame('*', $response->headers->get('Access-Control-Allow-Origin'));
         }
+
         $this->assertMatchesJsonSnapshot($snapshot, $response->getContent());
     }
 
-    public function testSearchLastModified(): void {
-        $client = static::createClient();
+    public function testSearchLastModified(): void
+    {
+        $client = $this->client;
         $response = $this->get($client, '/api/public/cards/search/Aragorn');
 
         $this->assertApiHeaders($response, 'application/json', 'Fri, 09 Sep 2022 12:59:33 GMT');
@@ -102,12 +109,11 @@ class ApiControllerTest extends WebTestCase {
 
     /**
      * @dataProvider jsonpEndpointProvider
-     * @param mixed $snapshot
-     * @param mixed $uri
      */
-    public function testJsonp($snapshot, $uri): void {
-        $client = static::createClient();
-        $response = $this->get($client, $uri . '?jsonp=myCallback');
+    public function testJsonp(string $snapshot, string $uri): void
+    {
+        $client = $this->client;
+        $response = $this->get($client, $uri.'?jsonp=myCallback');
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('application/javascript', $response->headers->get('Content-Type'));
@@ -123,20 +129,22 @@ class ApiControllerTest extends WebTestCase {
      *
      * @dataProvider invalidJsonpProvider
      */
-    public function testInvalidJsonpCallbackIsRefused(string $callback): void {
-        $client = static::createClient();
-        $response = $this->get($client, '/api/public/card/01001?jsonp=' . urlencode($callback));
+    public function testInvalidJsonpCallbackIsRefused(string $callback): void
+    {
+        $client = $this->client;
+        $response = $this->get($client, '/api/public/card/01001?jsonp='.urlencode($callback));
 
         $this->assertSame(400, $response->getStatusCode());
         // not a script: the callback is not echoed as code
         $this->assertNotSame('application/javascript', $response->headers->get('Content-Type'));
-        $this->assertNotContains('/**/', (string) $response->getContent());
+        $this->assertStringNotContainsString('/**/', (string) $response->getContent());
     }
 
     /**
      * @return array<string, array{string}>
      */
-    public function invalidJsonpProvider() {
+    public function invalidJsonpProvider(): array
+    {
         return [
             'script injection' => ['alert(document.cookie)//'],
             'markup' => ['<script>alert(1)</script>'],
@@ -144,8 +152,9 @@ class ApiControllerTest extends WebTestCase {
         ];
     }
 
-    public function testJsonpCallbackWithDots(): void {
-        $client = static::createClient();
+    public function testJsonpCallbackWithDots(): void
+    {
+        $client = $this->client;
         $response = $this->get($client, '/api/public/card/01001?jsonp=jQuery123.cb_4');
 
         $this->assertSame(200, $response->getStatusCode());
@@ -155,8 +164,9 @@ class ApiControllerTest extends WebTestCase {
     /**
      * An empty callback is ignored: plain JSON.
      */
-    public function testEmptyJsonpCallbackIsIgnored(): void {
-        $client = static::createClient();
+    public function testEmptyJsonpCallbackIsIgnored(): void
+    {
+        $client = $this->client;
         $response = $this->get($client, '/api/public/card/01001?jsonp=');
 
         $this->assertSame(200, $response->getStatusCode());
@@ -165,9 +175,10 @@ class ApiControllerTest extends WebTestCase {
     }
 
     /**
-     * @return array
+     * @return array<string, string[]>
      */
-    public function jsonpEndpointProvider() {
+    public function jsonpEndpointProvider(): array
+    {
         return [
             'packs' => ['packs', '/api/public/packs/'],
             'card' => ['card_01001', '/api/public/card/01001'],
@@ -184,11 +195,10 @@ class ApiControllerTest extends WebTestCase {
 
     /**
      * @dataProvider cachedEndpointProvider
-     * @param mixed $uri
-     * @param mixed $lastModified
      */
-    public function testNotModifiedSince($uri, $lastModified): void {
-        $client = static::createClient();
+    public function testNotModifiedSince(string $uri, string $lastModified): void
+    {
+        $client = $this->client;
 
         $response = $this->get($client, $uri, ['HTTP_IF_MODIFIED_SINCE' => $lastModified]);
         $this->assertSame(304, $response->getStatusCode());
@@ -200,9 +210,10 @@ class ApiControllerTest extends WebTestCase {
     }
 
     /**
-     * @return array
+     * @return array<string, string[]>
      */
-    public function cachedEndpointProvider() {
+    public function cachedEndpointProvider(): array
+    {
         return [
             'packs' => ['/api/public/packs/', 'Wed, 25 Mar 2026 16:18:09 GMT'],
             'card' => ['/api/public/card/01001', 'Sat, 17 Nov 2018 19:42:24 GMT'],
@@ -219,20 +230,20 @@ class ApiControllerTest extends WebTestCase {
 
     /**
      * @dataProvider errorProvider
-     * @param mixed $uri
-     * @param mixed $expectedStatus
      */
-    public function testErrors($uri, $expectedStatus): void {
-        $client = static::createClient();
+    public function testErrors(string $uri, int $expectedStatus): void
+    {
+        $client = $this->client;
         $response = $this->get($client, $uri);
 
         $this->assertSame($expectedStatus, $response->getStatusCode());
     }
 
     /**
-     * @return array
+     * @return array<string, array<int, string|int>>
      */
-    public function errorProvider() {
+    public function errorProvider(): array
+    {
         return [
             'unknown pack' => ['/api/public/cards/nope', 404],
             'unknown decklist' => ['/api/public/decklist/999', 404],
@@ -246,12 +257,11 @@ class ApiControllerTest extends WebTestCase {
 
     /**
      * @dataProvider unsupportedFormatProvider
-     * @param mixed $format
-     * @param mixed $contentType
      */
-    public function testUnsupportedFormatOnCardsByPack($format, $contentType): void {
-        $client = static::createClient();
-        $response = $this->get($client, '/api/public/cards/Core.' . $format);
+    public function testUnsupportedFormatOnCardsByPack(string $format, string $contentType): void
+    {
+        $client = $this->client;
+        $response = $this->get($client, '/api/public/cards/Core.'.$format);
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame($contentType, $response->headers->get('Content-Type'));
@@ -259,9 +269,10 @@ class ApiControllerTest extends WebTestCase {
     }
 
     /**
-     * @return array
+     * @return array<string, string[]>
      */
-    public function unsupportedFormatProvider() {
+    public function unsupportedFormatProvider(): array
+    {
         return [
             'xml' => ['xml', 'text/xml; charset=UTF-8'],
             'xls' => ['xls', 'text/html; charset=UTF-8'],
@@ -269,8 +280,9 @@ class ApiControllerTest extends WebTestCase {
         ];
     }
 
-    public function testPostIsNotAllowed(): void {
-        $client = static::createClient();
+    public function testPostIsNotAllowed(): void
+    {
+        $client = $this->client;
         $client->request('POST', '/api/public/card/01001');
 
         $this->assertSame(405, $client->getResponse()->getStatusCode());
@@ -278,8 +290,9 @@ class ApiControllerTest extends WebTestCase {
 
     /* ------------------------------------------ endpoints outside ApiController */
 
-    public function testPublishedCustomPacks(): void {
-        $client = static::createClient();
+    public function testPublishedCustomPacks(): void
+    {
+        $client = $this->client;
         $response = $this->get($client, '/api/public/custom-packs/published');
 
         $this->assertSame(200, $response->getStatusCode());
@@ -287,16 +300,18 @@ class ApiControllerTest extends WebTestCase {
         $this->assertMatchesJsonSnapshot('custom_packs_published', $response->getContent());
     }
 
-    public function testUserInfoAnonymous(): void {
-        $client = static::createClient();
+    public function testUserInfoAnonymous(): void
+    {
+        $client = $this->client;
         $response = $this->get($client, '/api/private/user/info');
 
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame('http://localhost/login', $client->getResponse()->headers->get('Location'));
     }
 
-    public function testUserInfoAuthenticated(): void {
-        $client = static::createClient();
+    public function testUserInfoAuthenticated(): void
+    {
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => 'test', '_password' => 'test']));
         $this->assertTrue($client->getResponse()->isRedirect());

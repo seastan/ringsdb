@@ -1,30 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Model;
 
+use App\Entity\Card;
+
 /**
- * Interface for an entity with a Card and a Quantity
+ * Interface for an entity with a Card and a Quantity.
  */
-interface SlotInterface {
+interface SlotInterface
+{
     /**
-     * Get card
-     *
-     * @return \App\Entity\Card
+     * Get card.
      */
-    public function getCard();
+    public function getCard(): Card;
 
     /**
-     * Get quantity
-     *
-     * @return integer
+     * Get quantity.
      */
-    public function getQuantity();
+    public function getQuantity(): int;
 
     /**
-     * Set quantity
+     * Set quantity.
      *
-     * @param integer $quantity
-     * @return self
+     * @param int $quantity
      */
-    public function setQuantity($quantity);
+    public function setQuantity($quantity): self;
 }

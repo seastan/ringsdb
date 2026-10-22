@@ -1,152 +1,168 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+
 /**
- * Reviewcomment
+ * Reviewcomment.
+ *
+ * @ORM\Entity
+ * @ORM\Table(name="reviewcomment")
  */
-class Reviewcomment {
+class Reviewcomment
+{
     /**
-     * @var integer
+     * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-    /**
-     * @var \DateTime
-     */
-    private $dateCreation;
-    /**
-     * @var \DateTime
-     */
-    private $dateUpdate;
-    /**
-     * @var string
-     */
-    private $text;
-    /**
-     * @var \App\Entity\User
-     */
-    private $user;
-    /**
-     * @var \App\Entity\Review
-     */
-    private $review;
 
     /**
-     * Get id
+     * @var \DateTime
      *
-     * @return integer
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
      */
-    public function getId() {
+    private $dateCreation;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="date_update", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="update")
+     */
+    private $dateUpdate;
+
+    /**
+     * @ORM\Column(type="text", nullable=false)
+     */
+    private string $text;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     */
+    private User $user;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Review", inversedBy="comments")
+     * @ORM\JoinColumn(name="review_id", referencedColumnName="id", nullable=false)
+     */
+    private Review $review;
+
+    public function __construct(User $user, Review $review, string $text)
+    {
+        $this->user = $user;
+        $this->review = $review;
+        $this->text = $text;
+    }
+
+    /**
+     * Get id.
+     */
+    public function getId(): ?int
+    {
         return $this->id;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return Reviewcomment
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation): Reviewcomment
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
-     *
-     * @return \DateTime
+     * Get dateCreation.
      */
-    public function getDateCreation() {
+    public function getDateCreation(): \DateTime
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
+     * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return Reviewcomment
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate($dateUpdate): Reviewcomment
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
-     *
-     * @return \DateTime
+     * Get dateUpdate.
      */
-    public function getDateUpdate() {
+    public function getDateUpdate(): \DateTime
+    {
         return $this->dateUpdate;
     }
 
     /**
-     * Set text
-     *
-     * @param string $text
-     *
-     * @return Reviewcomment
+     * Set text.
      */
-    public function setText($text) {
+    public function setText(string $text): Reviewcomment
+    {
         $this->text = $text;
 
         return $this;
     }
 
     /**
-     * Get text
-     *
-     * @return string
+     * Get text.
      */
-    public function getText() {
+    public function getText(): string
+    {
         return $this->text;
     }
 
     /**
-     * Set user
-     *
-     * @param \App\Entity\User $user
-     *
-     * @return Reviewcomment
+     * Set user.
      */
-    public function setUser(\App\Entity\User $user) {
+    public function setUser(User $user): Reviewcomment
+    {
         $this->user = $user;
 
         return $this;
     }
 
     /**
-     * Get user
-     *
-     * @return \App\Entity\User
+     * Get user.
      */
-    public function getUser() {
+    public function getUser(): User
+    {
         return $this->user;
     }
 
     /**
-     * Set review
-     *
-     * @param \App\Entity\Review $review
-     *
-     * @return Reviewcomment
+     * Set review.
      */
-    public function setReview(\App\Entity\Review $review) {
+    public function setReview(Review $review): Reviewcomment
+    {
         $this->review = $review;
 
         return $this;
     }
 
     /**
-     * Get review
-     *
-     * @return \App\Entity\Review
+     * Get review.
      */
-    public function getReview() {
+    public function getReview(): Review
+    {
         return $this->review;
     }
 }

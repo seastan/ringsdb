@@ -31,7 +31,7 @@
         }
 
         var QuestLog = {{ questlog | json_encode | raw }};
-        
+
         app.deck_selection && app.deck_selection.init(Decks);
     </script>
 {% endblock %}

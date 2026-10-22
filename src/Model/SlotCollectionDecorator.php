@@ -1,66 +1,79 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Model;
 
+use App\Entity\Card;
+use App\Entity\Sphere;
+use App\Entity\Type;
 use Doctrine\Common\Collections\ArrayCollection;
-use App\Model\SlotCollectionInterface;
-use App\Model\SlotInterface;
+use Doctrine\Common\Collections\Collection;
 
 /**
- * Decorator for a collection of SlotInterface
+ * Decorator for a collection of SlotInterface.
  *
  * @template T of SlotInterface
+ *
  * @implements SlotCollectionInterface<T>
  */
-class SlotCollectionDecorator implements \App\Model\SlotCollectionInterface {
+class SlotCollectionDecorator implements SlotCollectionInterface
+{
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, T>
+     * @var Collection<int, T>
      */
     protected $slots;
 
     /**
-     * @param \Doctrine\Common\Collections\Collection<int, T> $slots
+     * @param Collection<int, T> $slots
      */
-    public function __construct(\Doctrine\Common\Collections\Collection $slots) {
+    public function __construct(Collection $slots)
+    {
         $this->slots = $slots;
     }
 
-    public function add($element) {
+    public function add($element): bool
+    {
         return $this->slots->add($element);
     }
 
-    public function removeElement($element) {
+    public function removeElement($element): bool
+    {
         return $this->slots->removeElement($element);
     }
 
-    /**
-     * @param mixed $mode
-     */
-    public function count($mode = null) {
+    public function count()
+    {
         return $this->slots->count();
     }
 
-    public function getIterator() {
+    public function getIterator()
+    {
         return $this->slots->getIterator();
     }
 
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         return $this->slots->offsetExists($offset);
     }
 
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return $this->slots->offsetGet($offset);
     }
 
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value): void
+    {
         $this->slots->offsetSet($offset, $value);
     }
 
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset): void
+    {
         $this->slots->offsetUnset($offset);
     }
 
-    public function countCards() {
+    public function countCards(): int
+    {
         $count = 0;
         foreach ($this->slots as $slot) {
             $count += $slot->getQuantity();
@@ -69,12 +82,15 @@ class SlotCollectionDecorator implements \App\Model\SlotCollectionInterface {
         return $count;
     }
 
-    public function getIncludedPacks() {
+    public function getIncludedPacks(): array
+    {
         $packs = [];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
             $pack = $card->getPack();
-            if (!$pack) continue;
+            if (!$pack) {
+                continue;
+            }
 
             if ($pack->getDateRelease()) {
                 $pos = $pack->getDateRelease()->format('c');
@@ -82,14 +98,12 @@ class SlotCollectionDecorator implements \App\Model\SlotCollectionInterface {
                 $pos = 'U';
             }
 
-            $pos = $pos . $pack->getPosition();
+            $pos .= $pack->getPosition();
 
-            if (!isset($packs[$pos])) {
-                $packs[$pos] = [
-                    'pack' => $pack,
-                    'nb' => 0
-                ];
-            }
+            $packs[$pos] ??= [
+                'pack' => $pack,
+                'nb' => 0,
+            ];
 
             $qty = $card->getQuantity();
             if ($qty) {
@@ -99,16 +113,19 @@ class SlotCollectionDecorator implements \App\Model\SlotCollectionInterface {
                 }
             }
         }
+
         ksort($packs);
 
         return array_values($packs);
     }
 
-    public function getSlotsByType() {
+    public function getSlotsByType(): array
+    {
         $slotsByType = ['hero' => [], 'ally' => [], 'attachment' => [], 'event' => [], 'player-side-quest' => [], 'player-objective' => [], 'contract' => [], 'treasure' => []];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if (array_key_exists($card->getType()->getCode(), $slotsByType)) {
+            if ($card->getType() instanceof Type
+                && array_key_exists($card->getType()->getCode(), $slotsByType)) {
                 $slotsByType[$card->getType()->getCode()][] = $slot;
             }
         }
@@ -116,11 +133,16 @@ class SlotCollectionDecorator implements \App\Model\SlotCollectionInterface {
         return $slotsByType;
     }
 
-    public function getCountByType() {
+    /**
+     * @return array<string, int>
+     */
+    public function getCountByType(): array
+    {
         $countByType = ['hero' => 0, 'ally' => 0, 'attachment' => 0, 'event' => 0, 'player-side-quest' => 0, 'player-objective' => 0, 'contract' => 0, 'treasure' => 0];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if (array_key_exists($card->getType()->getCode(), $countByType)) {
+            if ($card->getType() instanceof Type
+                && array_key_exists($card->getType()->getCode(), $countByType)) {
                 $countByType[$card->getType()->getCode()] += $slot->getQuantity();
             }
         }
@@ -128,11 +150,16 @@ class SlotCollectionDecorator implements \App\Model\SlotCollectionInterface {
         return $countByType;
     }
 
-    public function getCountBySphere() {
+    /**
+     * @return array<string, int>
+     */
+    public function getCountBySphere(): array
+    {
         $countBySphere = ['spirit' => 0, 'tactics' => 0, 'leadership' => 0, 'lore' => 0];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if (array_key_exists($card->getSphere()->getCode(), $countBySphere)) {
+            if ($card->getSphere() instanceof Sphere
+                && array_key_exists($card->getSphere()->getCode(), $countBySphere)) {
                 $countBySphere[$card->getSphere()->getCode()] += $slot->getQuantity();
             }
         }
@@ -140,11 +167,12 @@ class SlotCollectionDecorator implements \App\Model\SlotCollectionInterface {
         return $countBySphere;
     }
 
-    public function getHeroDeck() {
+    public function getHeroDeck(): SlotCollectionInterface
+    {
         $heroDeck = [];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if ($card->getType()->getCode() === 'hero') {
+            if ($card->getType() instanceof Type && 'hero' === $card->getType()->getCode()) {
                 $heroDeck[] = $slot;
             }
         }
@@ -152,11 +180,12 @@ class SlotCollectionDecorator implements \App\Model\SlotCollectionInterface {
         return new SlotCollectionDecorator(new ArrayCollection($heroDeck));
     }
 
-    public function getDrawDeck() {
+    public function getDrawDeck(): SlotCollectionInterface
+    {
         $drawDeck = [];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            if (in_array($card->getType()->getCode(), ['ally', 'attachment', 'event', 'player-side-quest', 'player-objective', 'contract', 'treasure'])) {
+            if ($card->getType() instanceof Type && in_array($card->getType()->getCode(), ['ally', 'attachment', 'event', 'player-side-quest', 'player-objective', 'contract', 'treasure'], true)) {
                 $drawDeck[] = $slot;
             }
         }
@@ -164,60 +193,65 @@ class SlotCollectionDecorator implements \App\Model\SlotCollectionInterface {
         return new SlotCollectionDecorator(new ArrayCollection($drawDeck));
     }
 
-    public function getStartingThreat() {
+    public function getStartingThreat(): int
+    {
         $heroDeck = $this->getHeroDeck();
         $threat = 0;
         $mirlonde = false;
         $folco = false;
 
         foreach ($heroDeck->getSlots() as $slot) {
-            /* @var $card \App\Entity\Card */
+            /* @var $card Card */
             $card = $slot->getCard();
             $threat += $card->getThreat();
 
-            if ($card->getName() == 'Mirlonde' && $card->getPack() && $card->getPack()->getCode() == 'TDF') {
+            if ('Mirlonde' == $card->getName() && $card->getPack() && 'TDF' == $card->getPack()->getCode()) {
                 $mirlonde = true;
             }
-            if ($card->getName() == 'Folco Boffin' && $card->getPack() && $card->getPack()->getCode() == 'DoCG') {
+
+            if ('Folco Boffin' == $card->getName() && $card->getPack() && 'DoCG' == $card->getPack()->getCode()) {
                 $folco = true;
-            }            
+            }
         }
 
         if ($mirlonde) {
             foreach ($heroDeck->getSlots() as $slot) {
                 $card = $slot->getCard();
 
-                if ($card->getSphere()->getCode() == 'lore') {
-                    $threat--;
+                if ($card->getSphere() instanceof Sphere && 'lore' === $card->getSphere()->getCode()) {
+                    --$threat;
                 }
             }
         }
+
         if ($folco) {
             foreach ($heroDeck->getSlots() as $slot) {
                 $card = $slot->getCard();
 
-                if (strpos((string) $card->getTraits(), 'Hobbit') !== false) {
-                    $threat--;
+                if (false !== strpos((string) $card->getTraits(), 'Hobbit')) {
+                    --$threat;
                 }
             }
         }
+
         return $threat;
     }
 
     /**
      * @return array<string, array{copies: int, deck_limit: int}>
      */
-    public function getCopiesAndDeckLimit() {
+    public function getCopiesAndDeckLimit(): array
+    {
         $copiesAndDeckLimit = [];
         foreach ($this->slots as $slot) {
             $card = $slot->getCard();
-            $cardName = $card->getName();
+            $cardName = $card->getName() ?? '';
 
-            if ($card->getType()->getCode() === 'hero') {
-                $cardName = $cardName . 'Hero';
+            if ($card->getType() instanceof Type && 'hero' === $card->getType()->getCode()) {
+                $cardName .= 'Hero';
             }
 
-            if (!key_exists($cardName, $copiesAndDeckLimit)) {
+            if (!array_key_exists($cardName, $copiesAndDeckLimit)) {
                 $copiesAndDeckLimit[$cardName] = [
                     'copies' => $slot->getQuantity(),
                     'deck_limit' => $card->getDeckLimit(),
@@ -231,15 +265,21 @@ class SlotCollectionDecorator implements \App\Model\SlotCollectionInterface {
         return $copiesAndDeckLimit;
     }
 
-    public function getSlots() {
+    public function getSlots(): Collection
+    {
         return $this->slots;
     }
 
-    public function getContent() {
+    /**
+     * @return array<string, int>
+     */
+    public function getContent(): array
+    {
         $arr = [];
         foreach ($this->slots as $slot) {
-            $arr [$slot->getCard()->getCode()] = $slot->getQuantity();
+            $arr[$slot->getCard()->getCode()] = $slot->getQuantity();
         }
+
         ksort($arr);
 
         return $arr;

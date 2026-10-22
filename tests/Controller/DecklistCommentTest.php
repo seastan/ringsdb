@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Mime\Address;
 
 /**
  * Comments on a decklist: posting (POST /user/comment) and hiding (POST /user/hidecomment).
@@ -15,47 +18,48 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * to "test" and have no comment. Everything created here is removed in tearDown(), and the
  * decklists' counters and dates (used by the API's Last-Modified) are restored.
  */
-class DecklistCommentTest extends WebTestCase {
+class DecklistCommentTest extends WebTestCase
+{
     use SentEmailsTrait;
 
-    const DECKLIST_1_URL = '/decklist/view/1/dwarfloreleadershiptactics-1.0';
+    public const DECKLIST_1_URL = '/decklist/view/1/dwarfloreleadershiptactics-1.0';
 
-    /** @var int */
-    private $maxCommentId;
-    /** @var array */
-    private $decklists;
+    private KernelBrowser $client;
 
-    protected function setUp(): void {
-        $connection = $this->db(static::createClient());
+    private int $maxCommentId;
+
+    private array $decklists;
+
+    protected function setUp(): void
+    {
+        $this->client = static::createClient();
+        $connection = $this->db();
         $this->maxCommentId = (int) $connection->fetchColumn('SELECT MAX(id) FROM comment');
         $this->decklists = $connection->fetchAll('SELECT id, nb_comments, date_update, date_last_comment FROM decklist');
     }
 
-    protected function tearDown(): void {
-        $connection = $this->db(static::createClient());
+    protected function tearDown(): void
+    {
+        $connection = $this->db();
         $connection->executeUpdate('DELETE FROM comment WHERE id > ?', [$this->maxCommentId]);
         $connection->executeUpdate('UPDATE comment SET is_hidden = 0');
         foreach ($this->decklists as $decklist) {
             $connection->update('decklist', $decklist, ['id' => $decklist['id']]);
         }
+
         parent::tearDown();
     }
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db(Client $client) {
-        return $client->getContainer()->get('doctrine')->getConnection();
+    private function db(): \Doctrine\DBAL\Connection
+    {
+        return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    /**
-     * @param mixed $username
-     * @return \Symfony\Bundle\FrameworkBundle\Client
-     */
-    private function createAuthenticatedClient($username) {
-        $client = static::createClient();
+    private function createAuthenticatedClient(string $username): KernelBrowser
+    {
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $username]));
         $this->assertTrue($client->getResponse()->isRedirect(), "Login as $username failed");
@@ -66,22 +70,18 @@ class DecklistCommentTest extends WebTestCase {
     /**
      * Posts the comment form as the JavaScript does it (AJAX), with the profiler enabled to
      * inspect the notification emails.
-     * @param mixed $decklistId
-     * @param mixed $text
-     * @return \Symfony\Component\HttpFoundation\Response
      */
-    private function postComment(Client $client, $decklistId, $text) {
+    private function postComment(KernelBrowser $client, int $decklistId, string $text): \Symfony\Component\HttpFoundation\Response
+    {
         $client->enableProfiler();
         $client->request('POST', '/user/comment', ['id' => $decklistId, 'comment' => $text], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
         return $client->getResponse();
     }
 
-    /**
-     * @return mixed
-     */
-    private function newComments(Client $client) {
-        return $this->db($client)->fetchAll(
+    private function newComments()
+    {
+        return $this->db()->fetchAll(
             'SELECT c.decklist_id, u.username, c.text, c.is_hidden FROM comment c JOIN user u ON u.id = c.user_id WHERE c.id > ? ORDER BY c.id',
             [$this->maxCommentId]
         );
@@ -90,12 +90,14 @@ class DecklistCommentTest extends WebTestCase {
     /**
      * @return array [recipient => subject]
      */
-    private function sentEmails(Client $client) {
+    private function sentEmails(KernelBrowser $client): array
+    {
         $emails = [];
-        /** @var \Swift_Message $message */
         foreach ($this->sentMessages($client) as $message) {
-            $this->assertSame(['seastan@ringsdb.com'], array_keys($message->getFrom()));
-            $emails[key($message->getTo())] = $message->getSubject();
+            $this->assertEquals('seastan@ringsdb.com', $message->getFrom()[0]->getAddress());
+            /** @var Address $address */
+            $address = $message->getTo()[0];
+            $emails[$address->getAddress()] = $message->getSubject();
         }
 
         return $emails;
@@ -103,10 +105,11 @@ class DecklistCommentTest extends WebTestCase {
 
     /* ------------------------------------------------------------ posting */
 
-    public function testCommentOnAnotherUsersDecklist(): void {
+    public function testCommentOnAnotherUsersDecklist(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
 
-        $response = $this->postComment($client, 1, "Nice **deck**!");
+        $response = $this->postComment($client, 1, 'Nice **deck**!');
 
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame(self::DECKLIST_1_URL, $response->headers->get('Location'));
@@ -115,9 +118,9 @@ class DecklistCommentTest extends WebTestCase {
             'username' => 'admin',
             'text' => '<p>Nice <strong>deck</strong>!</p>',
             'is_hidden' => '0',
-        ]], $this->newComments($client));
+        ]], $this->newComments());
 
-        $decklist = $this->db($client)->fetchAssoc('SELECT nb_comments, date_update, date_last_comment FROM decklist WHERE id = 1');
+        $decklist = $this->db()->fetchAssoc('SELECT nb_comments, date_update, date_last_comment FROM decklist WHERE id = 1');
         $this->assertNotFalse($decklist);
         $this->assertSame('2', $decklist['nb_comments']);
         $this->assertSame($decklist['date_update'], $decklist['date_last_comment']);
@@ -126,8 +129,8 @@ class DecklistCommentTest extends WebTestCase {
         // the author is notified; the commenter is never notified of their own comment
         $message = $this->sentMessages($client)[0];
         $this->assertSame(['test@example.com' => '[ringsdb] New comment'], $this->sentEmails($client));
-        $this->assertSame(['seastan@ringsdb.com' => 'admin'], $message->getFrom());
-        $this->assertContains('<p>Nice <strong>deck</strong>!</p>', $message->getBody());
+        $this->assertEquals('seastan@ringsdb.com', $message->getFrom()[0]->getAddress());
+        $this->assertStringContainsString('<p>Nice <strong>deck</strong>!</p>', $message->getBody()->toString());
 
         // the comment is displayed on the decklist page
         $crawler = $client->request('GET', self::DECKLIST_1_URL);
@@ -140,7 +143,8 @@ class DecklistCommentTest extends WebTestCase {
         $this->assertSame('2 comments', trim($crawler->filter('th:contains("comments")')->text()));
     }
 
-    public function testCommentOnOwnDecklistNotifiesMentionedUsers(): void {
+    public function testCommentOnOwnDecklistNotifiesMentionedUsers(): void
+    {
         $client = $this->createAuthenticatedClient('test');
 
         // mentions are written `@username` (the autocomplete of the form inserts the backticks)
@@ -153,11 +157,12 @@ class DecklistCommentTest extends WebTestCase {
             'username' => 'test',
             'text' => '<p>What do you think, <code>@admin</code>?</p>',
             'is_hidden' => '0',
-        ]], $this->newComments($client));
+        ]], $this->newComments());
         $this->assertSame(['admin@example.com' => '[ringsdb] New comment'], $this->sentEmails($client));
     }
 
-    public function testPreviousCommentersAreNotified(): void {
+    public function testPreviousCommentersAreNotified(): void
+    {
         // decklist 2 is commented by admin, then by test (its author): admin is notified as a commenter
         $client = $this->createAuthenticatedClient('admin');
         $this->postComment($client, 2, 'First');
@@ -168,9 +173,10 @@ class DecklistCommentTest extends WebTestCase {
         $this->assertSame(['admin@example.com' => '[ringsdb] New comment'], $this->sentEmails($client));
     }
 
-    public function testNotificationsCanBeDisabled(): void {
+    public function testNotificationsCanBeDisabled(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
-        $connection = $this->db($client);
+        $connection = $this->db();
         try {
             // "test" is both the author of decklist 1 and a commenter on it (fixture comment)
             $connection->update('user', ['is_notif_author' => 0], ['username' => 'test']);
@@ -187,22 +193,22 @@ class DecklistCommentTest extends WebTestCase {
 
     /**
      * @dataProvider markdownProvider
-     * @param mixed $text
-     * @param mixed $expectedHtml
      */
-    public function testCommentMarkdown($text, $expectedHtml): void {
+    public function testCommentMarkdown(string $text, string $expectedHtml): void
+    {
         $client = $this->createAuthenticatedClient('test');
         $this->postComment($client, 1, $text);
 
-        $comments = $this->newComments($client);
+        $comments = $this->newComments();
         $this->assertCount(1, $comments);
         $this->assertSame($expectedHtml, $comments[0]['text']);
     }
 
     /**
-     * @return array
+     * @return array<string, string[]>
      */
-    public function markdownProvider() {
+    public function markdownProvider(): array
+    {
         return [
             'bare URLs become links' => ['See http://example.com/page', '<p>See <a href="http://example.com/page">example.com</a></p>'],
             'markdown links are kept' => ['[a link](http://example.com)', '<p><a href="http://example.com">a link</a></p>'],
@@ -211,47 +217,51 @@ class DecklistCommentTest extends WebTestCase {
         ];
     }
 
-    public function testEmptyCommentIsIgnored(): void {
+    public function testEmptyCommentIsIgnored(): void
+    {
         $client = $this->createAuthenticatedClient('test');
 
         $response = $this->postComment($client, 1, "   \n  ");
 
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame(self::DECKLIST_1_URL, $response->headers->get('Location'));
-        $this->assertSame([], $this->newComments($client));
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT nb_comments FROM decklist WHERE id = 1'));
+        $this->assertSame([], $this->newComments());
+        $this->assertSame('1', $this->db()->fetchColumn('SELECT nb_comments FROM decklist WHERE id = 1'));
         $this->assertSame([], $this->sentEmails($client));
     }
 
-    public function testAnonymousCannotComment(): void {
-        $client = static::createClient();
+    public function testAnonymousCannotComment(): void
+    {
+        $client = $this->client;
         $client->request('POST', '/user/comment', ['id' => 1, 'comment' => 'Anonymous']);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('http://localhost/login', $client->getResponse()->headers->get('Location'));
-        $this->assertSame([], $this->newComments($client));
+        $this->assertSame([], $this->newComments());
     }
 
-    public function testCommentOnUnknownDecklist(): void {
+    public function testCommentOnUnknownDecklist(): void
+    {
         $client = $this->createAuthenticatedClient('test');
         $client->request('POST', '/user/comment', ['id' => 999, 'comment' => 'Lost']);
 
         $this->assertSame(400, $client->getResponse()->getStatusCode());
-        $this->assertSame([], $this->newComments($client));
+        $this->assertSame([], $this->newComments());
     }
 
     /**
      * BUG: for AJAX requests, CoreExceptionListener takes the status from getCode() instead of
      * getStatusCode(): every HTTP exception (400, 403, 404...) becomes a 500. The JSON body is right.
      */
-    public function testCommentOnUnknownDecklistWithAjax(): void {
+    public function testCommentOnUnknownDecklistWithAjax(): void
+    {
         $client = $this->createAuthenticatedClient('test');
         $client->request('POST', '/user/comment', ['id' => 999, 'comment' => 'Lost'], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
         $this->assertSame(500, $client->getResponse()->getStatusCode());
         $this->assertSame('application/json', $client->getResponse()->headers->get('Content-Type'));
         $this->assertSame(['success' => false, 'message' => 'Wrong decklist id'], json_decode($client->getResponse()->getContent(), true));
-        $this->assertSame([], $this->newComments($client));
+        $this->assertSame([], $this->newComments());
     }
 
     /* --------------------------------------------------------- hot topics */
@@ -259,17 +269,16 @@ class DecklistCommentTest extends WebTestCase {
     /**
      * Hot Topics: decklists with comments of the day first, then by number of comments.
      */
-    public function testHotTopicsFavourRecentComments(): void {
+    public function testHotTopicsFavourRecentComments(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
         // decklist 1: 5 comments, none recent; decklist 3: 1 comment, posted now
-        $this->db($client)->update('decklist', ['nb_comments' => 5], ['id' => 1]);
+        $this->db()->update('decklist', ['nb_comments' => 5], ['id' => 1]);
         $this->postComment($client, 3, 'Fresh');
 
         $crawler = $client->request('GET', '/decklists/hottopics');
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $links = array_unique($crawler->filter('a[href^="/decklist/view/"]')->each(function ($link) {
-            return $link->attr('href');
-        }));
+        $links = array_unique($crawler->filter('a[href^="/decklist/view/"]')->each(fn ($link) => $link->attr('href')));
 
         $this->assertSame([
             '/decklist/view/3/noldorrohanlorespirit-1.0',
@@ -281,16 +290,17 @@ class DecklistCommentTest extends WebTestCase {
 
     /* ------------------------------------------------------------- hiding */
 
-    public function testDecklistAuthorCanHideAndShowAComment(): void {
+    public function testDecklistAuthorCanHideAndShowAComment(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
         $this->postComment($client, 1, 'Hide me');
-        $commentId = (int) $this->db($client)->fetchColumn('SELECT MAX(id) FROM comment');
+        $commentId = (int) $this->db()->fetchColumn('SELECT MAX(id) FROM comment');
 
         $client = $this->createAuthenticatedClient('test');
         $client->request('POST', "/user/hidecomment/$commentId/1");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertSame('true', $client->getResponse()->getContent());
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT is_hidden FROM comment WHERE id = ?', [$commentId]));
+        $this->assertSame('1', $this->db()->fetchColumn('SELECT is_hidden FROM comment WHERE id = ?', [$commentId]));
 
         // hidden comments are still in the page, collapsed
         $crawler = $client->request('GET', self::DECKLIST_1_URL);
@@ -298,20 +308,22 @@ class DecklistCommentTest extends WebTestCase {
 
         $client->request('POST', "/user/hidecomment/$commentId/0");
         $this->assertSame('true', $client->getResponse()->getContent());
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT is_hidden FROM comment WHERE id = ?', [$commentId]));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT is_hidden FROM comment WHERE id = ?', [$commentId]));
     }
 
-    public function testOnlyTheDecklistAuthorCanHideComments(): void {
+    public function testOnlyTheDecklistAuthorCanHideComments(): void
+    {
         // comment 1 of the fixtures: by test, on test's decklist 1
         $client = $this->createAuthenticatedClient('admin');
         $client->request('POST', '/user/hidecomment/1/1');
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertSame('"You don\'t have permission to edit this comment."', $client->getResponse()->getContent());
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT is_hidden FROM comment WHERE id = 1'));
+        $this->assertSame('"You don\u0027t have permission to edit this comment."', $client->getResponse()->getContent());
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT is_hidden FROM comment WHERE id = 1'));
     }
 
-    public function testHidingAnUnknownComment(): void {
+    public function testHidingAnUnknownComment(): void
+    {
         $client = $this->createAuthenticatedClient('test');
         $client->request('POST', '/user/hidecomment/999/1');
 

@@ -1,179 +1,191 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
- * QuestlogDeck
+ * QuestlogDeck.
+ *
+ * @ORM\Entity
+ * @ORM\Table(name="questlog_deck")
  */
-class QuestlogDeck {
+class QuestlogDeck
+{
     /**
-     * @var integer
+     * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-    /**
-     * @var integer
-     */
-    private $deckNumber;
-    /**
-     * @var string
-     */
-    private $content;
-    /**
-     * @var \App\Entity\Questlog
-     */
-    private $questlog;
-    /**
-     * @var \App\Entity\Deck|null
-     */
-    private $deck;
-    /**
-     * @var \App\Entity\Decklist|null
-     */
-    private $decklist;
 
     /**
-     * Get id
+     * @var int
      *
-     * @return integer
+     * @ORM\Column(name="deck_number", type="smallint", nullable=false)
      */
-    public function getId() {
+    private $deckNumber;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="text", nullable=false)
+     */
+    private $content;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Questlog", inversedBy="decks")
+     * @ORM\JoinColumn(name="questlog_id", referencedColumnName="id", nullable=false)
+     */
+    private Questlog $questlog;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Deck", inversedBy="questlogs")
+     * @ORM\JoinColumn(name="deck_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    private ?Deck $deck = null;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Decklist", inversedBy="questlogs")
+     * @ORM\JoinColumn(name="decklist_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    private ?Decklist $decklist = null;
+
+    public function __construct(Questlog $questlog)
+    {
+        $this->questlog = $questlog;
+    }
+
+    /**
+     * Get id.
+     */
+    public function getId(): ?int
+    {
         return $this->id;
     }
 
     /**
-     * Set deckNumber
+     * Set deckNumber.
      *
-     * @param integer $deckNumber
-     *
-     * @return QuestlogDeck
+     * @param int $deckNumber
      */
-    public function setDeckNumber($deckNumber) {
+    public function setDeckNumber($deckNumber): QuestlogDeck
+    {
         $this->deckNumber = $deckNumber;
 
         return $this;
     }
 
     /**
-     * Get deckNumber
-     *
-     * @return integer
+     * Get deckNumber.
      */
-    public function getDeckNumber() {
+    public function getDeckNumber(): int
+    {
         return $this->deckNumber;
     }
 
     /**
-     * Set content
+     * Set content.
      *
      * @param string $content
-     *
-     * @return QuestlogDeck
      */
-    public function setContent($content) {
+    public function setContent($content): QuestlogDeck
+    {
         $this->content = $content;
 
         return $this;
     }
 
     /**
-     * Get content
-     *
-     * @return string
+     * Get content.
      */
-    public function getContent() {
+    public function getContent(): string
+    {
         return $this->content;
     }
 
     /**
-     * Set questlog
-     *
-     * @param \App\Entity\Questlog $questlog
-     *
-     * @return QuestlogDeck
+     * Set questlog.
      */
-    public function setQuestlog(\App\Entity\Questlog $questlog) {
+    public function setQuestlog(Questlog $questlog): QuestlogDeck
+    {
         $this->questlog = $questlog;
 
         return $this;
     }
 
     /**
-     * Get questlog
-     *
-     * @return \App\Entity\Questlog
+     * Get questlog.
      */
-    public function getQuestlog() {
+    public function getQuestlog(): Questlog
+    {
         return $this->questlog;
     }
 
     /**
-     * Set deck
-     *
-     * @param \App\Entity\Deck $deck
-     *
-     * @return QuestlogDeck
+     * Set deck.
      */
-    public function setDeck(\App\Entity\Deck $deck = null) {
+    public function setDeck(?Deck $deck = null): QuestlogDeck
+    {
         $this->deck = $deck;
 
         return $this;
     }
 
     /**
-     * Get deck
-     *
-     * @return \App\Entity\Deck|null
+     * Get deck.
      */
-    public function getDeck() {
+    public function getDeck(): ?Deck
+    {
         return $this->deck;
     }
 
     /**
-     * Set decklist
-     *
-     * @param \App\Entity\Decklist $decklist
-     *
-     * @return QuestlogDeck
+     * Set decklist.
      */
-    public function setDecklist(\App\Entity\Decklist $decklist = null) {
+    public function setDecklist(?Decklist $decklist = null): QuestlogDeck
+    {
         $this->decklist = $decklist;
 
         return $this;
     }
 
     /**
-     * Get decklist
-     *
-     * @return \App\Entity\Decklist|null
+     * Get decklist.
      */
-    public function getDecklist() {
+    public function getDecklist(): ?Decklist
+    {
         return $this->decklist;
     }
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(type="string", length=80, nullable=true)
      */
     private $player;
 
     /**
-     * Set player
+     * Set player.
      *
      * @param string|null $player
-     *
-     * @return QuestlogDeck
      */
-    public function setPlayer($player) {
+    public function setPlayer($player): QuestlogDeck
+    {
         $this->player = $player;
 
         return $this;
     }
 
     /**
-     * Get player
-     *
-     * @return string|null
+     * Get player.
      */
-    public function getPlayer() {
+    public function getPlayer(): ?string
+    {
         return $this->player;
     }
 }

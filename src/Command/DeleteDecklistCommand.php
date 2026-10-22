@@ -1,44 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
+use App\Entity\Deck;
+use App\Entity\Decklist;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
-use App\Entity\Decklist;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DeleteDecklistCommand extends Command {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
+class DeleteDecklistCommand extends Command
+{
+    private EntityManagerInterface $entityManager;
 
-    /**
-     * @var DeckRepository
-     */
-    private $deckRepository;
+    private DeckRepository $deckRepository;
 
-    /**
-     * @var DecklistRepository
-     */
-    private $decklistRepository;
+    private DecklistRepository $decklistRepository;
 
-    public function __construct(EntityManagerInterface $em, DeckRepository $deckRepository, DecklistRepository $decklistRepository) {
+    public function __construct(EntityManagerInterface $entityManager, DeckRepository $deckRepository, DecklistRepository $decklistRepository)
+    {
         parent::__construct();
-        $this->em = $em;
+        $this->entityManager = $entityManager;
         $this->deckRepository = $deckRepository;
         $this->decklistRepository = $decklistRepository;
     }
 
-    /**
-     * @return void
-     */
-    protected function configure() {
+    protected function configure(): void
+    {
         $this
             ->setName('app:decklist:delete')
             ->setDescription('Delete one decklist')
@@ -49,39 +42,39 @@ class DeleteDecklistCommand extends Command {
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
-        $em = $this->em;
-        
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $decklist_id = $input->getArgument('decklist_id');
         $decklist = $this->decklistRepository->find($decklist_id);
         if (!$decklist) {
-            $output->writeln("Decklist not found");
+            $output->writeln('Decklist not found');
+
             return 1;
         }
-        
-        $successors = $this->decklistRepository->findBy(array(
-            'precedent' => $decklist
-        ));
-        
-        foreach($successors as $successor) {
-            /* @var $successor \App\Entity\Decklist */
-            $successor->setPrecedent(null);
-        }
-        
-        $children = $this->deckRepository->findBy(array(
-            'parent' => $decklist
-        ));
 
-        foreach($children as $child) {
-            /* @var $child \App\Entity\Deck */
-            $child->setParent(null);
+        $successors = $this->decklistRepository->findBy([
+            'precedent' => $decklist,
+        ]);
+
+        foreach ($successors as $successor) {
+            /* @var $successor Decklist */
+            $successor->setPrecedent();
         }
-        
-        $em->flush();
-        $em->remove($decklist);
-        $em->flush();
-        
-        $output->writeln("Decklist deleted");
+
+        $children = $this->deckRepository->findBy([
+            'parent' => $decklist,
+        ]);
+
+        foreach ($children as $child) {
+            /* @var $child Deck */
+            $child->setParent();
+        }
+
+        $this->entityManager->flush();
+        $this->entityManager->remove($decklist);
+        $this->entityManager->flush();
+
+        $output->writeln('Decklist deleted');
 
         return 0;
     }

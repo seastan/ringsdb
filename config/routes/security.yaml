@@ -1,0 +1,9 @@
+# handled by the firewall (security.yaml): the submission of the login form (LoginController)
+# and the logout
+fos_user_security_check:
+    path: /login_check
+    methods: [POST]
+
+fos_user_security_logout:
+    path: /logout
+    methods: [GET, POST]

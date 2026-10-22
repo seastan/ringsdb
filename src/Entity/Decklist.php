@@ -1,760 +1,808 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-use App\Entity\Decklistsideslot;
-use App\Entity\Decklistslot;
-use App\Entity\FellowshipDecklist;
-use App\Entity\QuestlogDeck;
+use App\Model\ExportableDeck;
+use App\Model\SlotCollectionDecorator;
+use App\Model\SlotCollectionInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
-class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable {
-    public function jsonSerialize() {
-        $array = parent::getArrayExport();
-        $array['is_published'] = true;
-        $array['nb_votes'] = $this->getNbVotes();
-        $array['nb_favorites'] = $this->getNbFavorites();
-        $array['nb_comments'] = $this->getNbComments();
-        $array['starting_threat'] = $this->getStartingThreat();
-
-        return $array;
-    }
-
+/**
+ * @ORM\Entity(repositoryClass="App\Repository\DecklistRepository")
+ * @ORM\Table(
+ *     name="decklist",
+ *     indexes={
+ *         @ORM\Index(name="idx_decklist_date_creation", columns={"date_creation"})
+ *     }
+ * )
+ */
+class Decklist extends ExportableDeck implements \JsonSerializable
+{
     /**
-     * @var integer
+     * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=255)
      */
     private $name;
+
     /**
      * @var string
+     *
+     * @ORM\Column(name="name_canonical", type="string", length=255)
      */
     private $nameCanonical;
+
     /**
-     * @var \DateTime
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
      */
-    private $dateCreation;
+    private \DateTime $dateCreation;
+
     /**
-     * @var \DateTime
+     * @ORM\Column(name="date_update", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="update")
      */
-    private $dateUpdate;
+    private \DateTime $dateUpdate;
+
     /**
      * @var \DateTime|null
+     *
+     * @ORM\Column(name="date_last_comment", type="datetime", nullable=true)
+     * @Gedmo\Timestampable(on="update")
      */
     private $dateLastComment;
+
     /**
      * @var string|null
+     *
+     * @ORM\Column(name="description_md", type="text", nullable=true)
      */
     private $descriptionMd;
+
     /**
      * @var string|null
+     *
+     * @ORM\Column(name="description_html", type="text", nullable=true)
      */
     private $descriptionHtml;
+
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=32)
      */
     private $signature;
+
     /**
-     * @var integer
+     * @var int
+     *
+     * @ORM\Column(name="nb_votes", type="integer")
      */
-    private $nbVotes;
+    private $nbVotes = 0;
+
     /**
-     * @var integer
+     * @var int
+     *
+     * @ORM\Column(name="nb_favorites", type="integer")
      */
-    private $nbFavorites;
+    private $nbFavorites = 0;
+
     /**
-     * @var integer
+     * @var int
+     *
+     * @ORM\Column(name="nb_comments", type="integer")
      */
-    private $nbComments;
+    private $nbComments = 0;
+
     /**
      * @var bool|null
+     *
+     * @ORM\Column(name="freeze_comments", type="boolean", nullable=true)
      */
     private $freezeComments;
+
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=8)
      */
     private $version;
+
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Decklistslot>
+     * @var Collection<int, Decklistslot>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Decklistslot", mappedBy="decklist", cascade={"persist", "remove"})
      */
     private $slots;
+
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Decklistsideslot>
+     * @var Collection<int, Decklistsideslot>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Decklistsideslot", mappedBy="decklist", cascade={"persist", "remove"})
      */
     private $sideslots;
+
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Comment>
+     * @var Collection<int, Comment>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="decklist", cascade={"persist", "remove"})
+     * @ORM\OrderBy({"dateCreation"="ASC"})
      */
     private $comments;
+
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Decklist>
+     * @var Collection<int, Decklist>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Decklist", mappedBy="precedent")
+     * @ORM\OrderBy({"dateCreation"="ASC"})
      */
     private $successors;
+
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Deck>
+     * @var Collection<int, Deck>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Deck", mappedBy="parent")
      */
     private $children;
+
     /**
-     * @var \App\Entity\User
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="decklists")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */
-    private $user;
+    private User $user;
+
     /**
-     * @var \App\Entity\Pack|null
+     * @ORM\ManyToOne(targetEntity="App\Entity\Pack")
+     * @ORM\JoinColumn(name="last_pack_id", referencedColumnName="id")
      */
-    private $lastPack;
+    private ?Pack $lastPack = null;
+
     /**
-     * @var \App\Entity\Deck|null
+     * @ORM\ManyToOne(targetEntity="App\Entity\Deck", inversedBy="children")
+     * @ORM\JoinColumn(name="parent_deck_id", referencedColumnName="id")
      */
-    private $parent;
+    private ?Deck $parent = null;
+
     /**
-     * @var \App\Entity\Decklist|null
+     * @ORM\ManyToOne(targetEntity="App\Entity\Decklist", inversedBy="successors")
+     * @ORM\JoinColumn(name="precedent_decklist_id", referencedColumnName="id")
      */
-    private $precedent;
+    private ?Decklist $precedent = null;
+
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @var Collection<int, User>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="favorites")
+     * @ORM\JoinTable(
+     *     name="favorite",
+     *     joinColumns={@ORM\JoinColumn(name="decklist_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     * )
      */
     private $favorites;
+
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @var Collection<int, User>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="votes")
+     * @ORM\JoinTable(
+     *     name="vote",
+     *     joinColumns={@ORM\JoinColumn(name="decklist_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     * )
      */
     private $votes;
 
     /**
-     * Constructor
+     * @var Collection<int, QuestlogDeck>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\QuestlogDeck", mappedBy="decklist", cascade={"persist"})
      */
-    public function __construct() {
-        $this->slots = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->sideslots = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->comments = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->successors = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->children = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->favorites = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->votes = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->spheres = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->fellowships = new \Doctrine\Common\Collections\ArrayCollection();
+    private $questlogs;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="starting_threat", type="smallint", nullable=false)
+     */
+    private $startingThreat;
+
+    /**
+     * @var Collection<int, FellowshipDecklist>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\FellowshipDecklist", mappedBy="decklist", cascade={"persist", "remove"})
+     */
+    private $fellowships;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Sphere")
+     * @ORM\JoinColumn(name="predominant_sphere_id", referencedColumnName="id")
+     */
+    private ?Sphere $predominantSphere = null;
+
+    /**
+     * @var Collection<int, Sphere>
+     *
+     * @ORM\ManyToMany(targetEntity="App\Entity\Sphere")
+     * @ORM\JoinTable(
+     *     name="decklist_spheres",
+     *     joinColumns={@ORM\JoinColumn(name="decklist_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="sphere_id", referencedColumnName="id")}
+     * )
+     */
+    private $spheres;
+
+    /**
+     * Constructor.
+     */
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+        $this->slots = new ArrayCollection();
+        $this->sideslots = new ArrayCollection();
+        $this->comments = new ArrayCollection();
+        $this->successors = new ArrayCollection();
+        $this->children = new ArrayCollection();
+        $this->favorites = new ArrayCollection();
+        $this->votes = new ArrayCollection();
+        $this->spheres = new ArrayCollection();
+        $this->fellowships = new ArrayCollection();
+        $this->questlogs = new ArrayCollection();
+        $this->dateCreation = new \DateTime();
+        $this->dateUpdate = new \DateTime();
     }
 
     /**
-     * Get id
-     *
-     * @return integer
+     * Get id.
      */
-    public function getId() {
+    public function getId(): ?int
+    {
         return $this->id;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
-     *
-     * @return Decklist
      */
-    public function setName($name) {
+    public function setName($name): Decklist
+    {
         $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get name
-     *
-     * @return string
+     * Get name.
      */
-    public function getName() {
+    public function getName(): string
+    {
         return $this->name;
     }
 
     /**
-     * Set nameCanonical
+     * Set nameCanonical.
      *
      * @param string $nameCanonical
-     *
-     * @return Decklist
      */
-    public function setNameCanonical($nameCanonical) {
+    public function setNameCanonical($nameCanonical): Decklist
+    {
         $this->nameCanonical = $nameCanonical;
 
         return $this;
     }
 
     /**
-     * Get nameCanonical
-     *
-     * @return string
+     * Get nameCanonical.
      */
-    public function getNameCanonical() {
+    public function getNameCanonical(): string
+    {
         return $this->nameCanonical;
     }
 
     /**
-     * Set dateCreation
-     *
-     * @param \DateTime $dateCreation
-     *
-     * @return Decklist
+     * Set dateCreation.
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation(\DateTime $dateCreation): Decklist
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
-     *
-     * @return \DateTime
+     * Get dateCreation.
      */
-    public function getDateCreation() {
+    public function getDateCreation(): \DateTime
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
-     *
-     * @param \DateTime $dateUpdate
-     *
-     * @return Decklist
+     * Set dateUpdate.
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate(\DateTime $dateUpdate): Decklist
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
-     *
-     * @return \DateTime
+     * Get dateUpdate.
      */
-    public function getDateUpdate() {
+    public function getDateUpdate(): \DateTime
+    {
         return $this->dateUpdate;
     }
 
-     /**
-     * Set dateLastComment
+    /**
+     * Set dateLastComment.
      *
      * @param \DateTime|null $dateLastComment
-     *
-     * @return Decklist
      */
-    public function setDateLastComment($dateLastComment) {
+    public function setDateLastComment($dateLastComment): Decklist
+    {
         $this->dateLastComment = $dateLastComment;
 
         return $this;
     }
 
     /**
-     * Get dateLastComment
-     *
-     * @return \DateTime|null
+     * Get dateLastComment.
      */
-    public function getDateLastComment() {
+    public function getDateLastComment(): ?\DateTime
+    {
         return $this->dateLastComment;
     }
 
     /**
-     * Set descriptionMd
+     * Set descriptionMd.
      *
      * @param string|null $descriptionMd
-     *
-     * @return Decklist
      */
-    public function setDescriptionMd($descriptionMd) {
+    public function setDescriptionMd($descriptionMd): Decklist
+    {
         $this->descriptionMd = $descriptionMd;
 
         return $this;
     }
 
     /**
-     * Get descriptionMd
-     *
-     * @return string|null
+     * Get descriptionMd.
      */
-    public function getDescriptionMd() {
+    public function getDescriptionMd(): ?string
+    {
         return $this->descriptionMd;
     }
 
     /**
-     * Set descriptionHtml
+     * Set descriptionHtml.
      *
      * @param string|null $descriptionHtml
-     *
-     * @return Decklist
      */
-    public function setDescriptionHtml($descriptionHtml) {
+    public function setDescriptionHtml($descriptionHtml): Decklist
+    {
         $this->descriptionHtml = $descriptionHtml;
 
         return $this;
     }
 
     /**
-     * Get descriptionHtml
-     *
-     * @return string|null
+     * Get descriptionHtml.
      */
-    public function getDescriptionHtml() {
+    public function getDescriptionHtml(): ?string
+    {
         return $this->descriptionHtml;
     }
 
     /**
-     * Set signature
+     * Set signature.
      *
      * @param string $signature
-     *
-     * @return Decklist
      */
-    public function setSignature($signature) {
+    public function setSignature($signature): Decklist
+    {
         $this->signature = $signature;
 
         return $this;
     }
 
     /**
-     * Get signature
-     *
-     * @return string
+     * Get signature.
      */
-    public function getSignature() {
+    public function getSignature(): string
+    {
         return $this->signature;
     }
 
     /**
-     * Set nbVotes
+     * Set nbVotes.
      *
-     * @param integer $nbVotes
-     *
-     * @return Decklist
+     * @param int $nbVotes
      */
-    public function setNbVotes($nbVotes) {
+    public function setNbVotes($nbVotes): Decklist
+    {
         $this->nbVotes = $nbVotes;
 
         return $this;
     }
 
     /**
-     * Get nbVotes
-     *
-     * @return integer
+     * Get nbVotes.
      */
-    public function getNbVotes() {
+    public function getNbVotes(): int
+    {
         return $this->nbVotes;
     }
 
     /**
-     * Set nbFavorites
+     * Set nbFavorites.
      *
-     * @param integer $nbFavorites
-     *
-     * @return Decklist
+     * @param int $nbFavorites
      */
-    public function setNbFavorites($nbFavorites) {
+    public function setNbFavorites($nbFavorites): Decklist
+    {
         $this->nbFavorites = $nbFavorites;
 
         return $this;
     }
 
     /**
-     * Get nbFavorites
-     *
-     * @return integer
+     * Get nbFavorites.
      */
-    public function getNbFavorites() {
+    public function getNbFavorites(): int
+    {
         return $this->nbFavorites;
     }
 
     /**
-     * Set nbComments
+     * Set nbComments.
      *
-     * @param integer $nbComments
-     *
-     * @return Decklist
+     * @param int $nbComments
      */
-    public function setNbComments($nbComments) {
+    public function setNbComments($nbComments): Decklist
+    {
         $this->nbComments = $nbComments;
 
         return $this;
     }
 
     /**
-     * Get nbComments
-     *
-     * @return integer
+     * Get nbComments.
      */
-    public function getNbComments() {
+    public function getNbComments(): int
+    {
         return $this->nbComments;
     }
 
     /**
-     * Set freezeComments
+     * Set freezeComments.
      *
      * @param bool|null $freezeComments
-     *
-     * @return Decklist
      */
-    public function setFreezeComments($freezeComments) {
+    public function setFreezeComments($freezeComments): Decklist
+    {
         $this->freezeComments = $freezeComments;
 
         return $this;
     }
 
     /**
-     * Get freezeComments
-     *
-     * @return bool|null
+     * Get freezeComments.
      */
-    public function getFreezeComments() {
+    public function getFreezeComments(): ?bool
+    {
         return $this->freezeComments;
     }
 
     /**
-     * Add slot
-     *
-     * @param \App\Entity\Decklistslot $slot
-     *
-     * @return Decklist
+     * Add slot.
      */
-    public function addSlot(\App\Entity\Decklistslot $slot) {
+    public function addSlot(Decklistslot $slot): Decklist
+    {
         $this->slots[] = $slot;
 
         return $this;
     }
 
     /**
-     * Remove slot
-     *
-     * @param \App\Entity\Decklistslot $slot
-     * @return void
+     * Remove slot.
      */
-    public function removeSlot(\App\Entity\Decklistslot $slot) {
+    public function removeSlot(Decklistslot $slot): void
+    {
         $this->slots->removeElement($slot);
     }
 
     /**
-     * Get slots
+     * Get slots.
      *
-     * @return \App\Model\SlotCollectionInterface<Decklistslot>
+     * @return SlotCollectionInterface<Decklistslot>
      */
-    public function getSlots() {
-        return new \App\Model\SlotCollectionDecorator($this->slots);
+    public function getSlots(): SlotCollectionInterface
+    {
+        return new SlotCollectionDecorator($this->slots);
     }
 
     /**
-     * Add sideslot
-     *
-     * @param \App\Entity\Decklistsideslot $sideslots
-     *
-     * @return Decklist
+     * Add sideslot.
      */
-    public function addSideslot(\App\Entity\Decklistsideslot $sideslots) {
+    public function addSideslot(Decklistsideslot $sideslots): Decklist
+    {
         $this->sideslots[] = $sideslots;
 
         return $this;
     }
 
     /**
-     * Remove sideslot
-     *
-     * @param \App\Entity\Decklistsideslot $sideslots
-     * @return void
+     * Remove sideslot.
      */
-    public function removeSideslot(\App\Entity\Decklistsideslot $sideslots) {
+    public function removeSideslot(Decklistsideslot $sideslots): void
+    {
         $this->sideslots->removeElement($sideslots);
     }
 
     /**
-     * Get slots
+     * Get slots.
      *
-     * @return \App\Model\SlotCollectionInterface<Decklistsideslot>
+     * @return SlotCollectionInterface<Decklistsideslot>
      */
-    public function getSideslots() {
-        return new \App\Model\SlotCollectionDecorator($this->sideslots);
+    public function getSideslots(): SlotCollectionInterface
+    {
+        return new SlotCollectionDecorator($this->sideslots);
     }
 
     /**
-     * Add comment
-     *
-     * @param \App\Entity\Comment $comment
-     *
-     * @return Decklist
+     * Add comment.
      */
-    public function addComment(\App\Entity\Comment $comment) {
+    public function addComment(Comment $comment): Decklist
+    {
         $this->comments[] = $comment;
 
         return $this;
     }
 
     /**
-     * Remove comment
-     *
-     * @param \App\Entity\Comment $comment
-     * @return void
+     * Remove comment.
      */
-    public function removeComment(\App\Entity\Comment $comment) {
+    public function removeComment(Comment $comment): void
+    {
         $this->comments->removeElement($comment);
     }
 
     /**
-     * Get comments
+     * Get comments.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Comment>
+     * @return Collection<int, Comment>
      */
-    public function getComments() {
+    public function getComments(): Collection
+    {
         return $this->comments;
     }
 
     /**
-     * Add successor
-     *
-     * @param \App\Entity\Decklist $successor
-     *
-     * @return Decklist
+     * Add successor.
      */
-    public function addSuccessor(\App\Entity\Decklist $successor) {
+    public function addSuccessor(Decklist $successor): Decklist
+    {
         $this->successors[] = $successor;
 
         return $this;
     }
 
     /**
-     * Remove successor
-     *
-     * @param \App\Entity\Decklist $successor
-     * @return void
+     * Remove successor.
      */
-    public function removeSuccessor(\App\Entity\Decklist $successor) {
+    public function removeSuccessor(Decklist $successor): void
+    {
         $this->successors->removeElement($successor);
     }
 
     /**
-     * Get successors
+     * Get successors.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Decklist>
+     * @return Collection<int, Decklist>
      */
-    public function getSuccessors() {
+    public function getSuccessors(): Collection
+    {
         return $this->successors;
     }
 
     /**
-     * Add child
-     *
-     * @param \App\Entity\Deck $child
-     *
-     * @return Decklist
+     * Add child.
      */
-    public function addChild(\App\Entity\Deck $child) {
+    public function addChild(Deck $child): Decklist
+    {
         $this->children[] = $child;
 
         return $this;
     }
 
     /**
-     * Remove child
-     *
-     * @param \App\Entity\Deck $child
-     * @return void
+     * Remove child.
      */
-    public function removeChild(\App\Entity\Deck $child) {
+    public function removeChild(Deck $child): void
+    {
         $this->children->removeElement($child);
     }
 
     /**
-     * Get children
+     * Get children.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Deck>
+     * @return Collection<int, Deck>
      */
-    public function getChildren() {
+    public function getChildren(): Collection
+    {
         return $this->children;
     }
 
     /**
-     * Set user
-     *
-     * @param \App\Entity\User $user
-     *
-     * @return Decklist
+     * Set user.
      */
-    public function setUser(\App\Entity\User $user) {
+    public function setUser(User $user): Decklist
+    {
         $this->user = $user;
 
         return $this;
     }
 
     /**
-     * Get user
-     *
-     * @return \App\Entity\User
+     * Get user.
      */
-    public function getUser() {
+    public function getUser(): User
+    {
         return $this->user;
     }
 
     /**
-     * Set lastPack
-     *
-     * @param \App\Entity\Pack $lastPack
-     *
-     * @return Decklist
+     * Set lastPack.
      */
-    public function setLastPack(\App\Entity\Pack $lastPack = null) {
+    public function setLastPack(?Pack $lastPack = null): Decklist
+    {
         $this->lastPack = $lastPack;
 
         return $this;
     }
 
     /**
-     * Get lastPack
-     *
-     * @return \App\Entity\Pack|null
+     * Get lastPack.
      */
-    public function getLastPack() {
+    public function getLastPack(): ?Pack
+    {
         return $this->lastPack;
     }
 
     /**
-     * Set parent
-     *
-     * @param \App\Entity\Deck $parent
-     *
-     * @return Decklist
+     * Set parent.
      */
-    public function setParent(\App\Entity\Deck $parent = null) {
+    public function setParent(?Deck $parent = null): Decklist
+    {
         $this->parent = $parent;
 
         return $this;
     }
 
     /**
-     * Get parent
-     *
-     * @return \App\Entity\Deck|null
+     * Get parent.
      */
-    public function getParent() {
+    public function getParent(): ?Deck
+    {
         return $this->parent;
     }
 
     /**
-     * Set precedent
-     *
-     * @param \App\Entity\Decklist $precedent
-     *
-     * @return Decklist
+     * Set precedent.
      */
-    public function setPrecedent(\App\Entity\Decklist $precedent = null) {
+    public function setPrecedent(?Decklist $precedent = null): Decklist
+    {
         $this->precedent = $precedent;
 
         return $this;
     }
 
     /**
-     * Get precedent
-     *
-     * @return \App\Entity\Decklist|null
+     * Get precedent.
      */
-    public function getPrecedent() {
+    public function getPrecedent(): ?Decklist
+    {
         return $this->precedent;
     }
 
     /**
-     * Add favorite
-     *
-     * @param \App\Entity\User $favorite
-     *
-     * @return Decklist
+     * Add favorite.
      */
-    public function addFavorite(\App\Entity\User $favorite) {
+    public function addFavorite(User $favorite): Decklist
+    {
         $this->favorites[] = $favorite;
 
         return $this;
     }
 
     /**
-     * Remove favorite
-     *
-     * @param \App\Entity\User $favorite
-     * @return void
+     * Remove favorite.
      */
-    public function removeFavorite(\App\Entity\User $favorite) {
+    public function removeFavorite(User $favorite): void
+    {
         $this->favorites->removeElement($favorite);
     }
 
     /**
-     * Get favorites
+     * Get favorites.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @return Collection<int, User>
      */
-    public function getFavorites() {
+    public function getFavorites(): Collection
+    {
         return $this->favorites;
     }
 
     /**
-     * Add vote
-     *
-     * @param \App\Entity\User $vote
-     *
-     * @return Decklist
+     * Add vote.
      */
-    public function addVote(\App\Entity\User $vote) {
+    public function addVote(User $vote): Decklist
+    {
         $this->votes[] = $vote;
 
         return $this;
     }
 
     /**
-     * Remove vote
-     *
-     * @param \App\Entity\User $vote
-     * @return void
+     * Remove vote.
      */
-    public function removeVote(\App\Entity\User $vote) {
+    public function removeVote(User $vote): void
+    {
         $this->votes->removeElement($vote);
     }
 
     /**
-     * Get votes
+     * Get votes.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\User>
+     * @return Collection<int, User>
      */
-    public function getVotes() {
+    public function getVotes(): Collection
+    {
         return $this->votes;
     }
 
     /**
-     * Set version
+     * Set version.
      *
      * @param string $version
-     *
-     * @return Decklist
      */
-    public function setVersion($version) {
+    public function setVersion($version): Decklist
+    {
         $this->version = $version;
 
         return $this;
     }
 
     /**
-     * Get version
-     *
-     * @return string
+     * Get version.
      */
-    public function getVersion() {
+    public function getVersion(): string
+    {
         return $this->version;
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\Sphere>
+     * Add sphere.
      */
-    private $spheres;
-
-    /**
-     * Add sphere
-     *
-     * @param \App\Entity\Sphere $sphere
-     *
-     * @return Decklist
-     */
-    public function addSphere(\App\Entity\Sphere $sphere) {
+    public function addSphere(Sphere $sphere): Decklist
+    {
         if (!$this->spheres->contains($sphere)) {
             $this->spheres[] = $sphere;
         }
@@ -763,197 +811,156 @@ class Decklist extends \App\Model\ExportableDeck implements \JsonSerializable {
     }
 
     /**
-     * Remove sphere
-     *
-     * @param \App\Entity\Sphere $sphere
-     * @return void
+     * Remove sphere.
      */
-    public function removeSphere(\App\Entity\Sphere $sphere) {
+    public function removeSphere(Sphere $sphere): void
+    {
         $this->spheres->removeElement($sphere);
     }
 
     /**
-     * Get spheres
+     * Get spheres.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Sphere>
+     * @return Collection<int, Sphere>
      */
-    public function getSpheres() {
+    public function getSpheres(): Collection
+    {
         return $this->spheres;
     }
 
     /**
-     * @var \App\Entity\Sphere|null
+     * Set predominantSphere.
      */
-    private $predominantSphere;
-
-    /**
-     * Set predominantSphere
-     *
-     * @param \App\Entity\Sphere $predominantSphere
-     *
-     * @return Decklist
-     */
-    public function setPredominantSphere(\App\Entity\Sphere $predominantSphere = null) {
+    public function setPredominantSphere(?Sphere $predominantSphere = null): Decklist
+    {
         $this->predominantSphere = $predominantSphere;
 
         return $this;
     }
 
     /**
-     * Get predominantSphere
-     *
-     * @return \App\Entity\Sphere|null
+     * Get predominantSphere.
      */
-    public function getPredominantSphere() {
+    public function getPredominantSphere(): ?Sphere
+    {
         return $this->predominantSphere;
     }
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\FellowshipDecklist>
+     * Add fellowship.
      */
-    private $fellowships;
-
-    /**
-     * Add fellowship
-     *
-     * @param \App\Entity\FellowshipDecklist $fellowship
-     *
-     * @return Decklist
-     */
-    public function addFellowship(\App\Entity\FellowshipDecklist $fellowship) {
+    public function addFellowship(FellowshipDecklist $fellowship): Decklist
+    {
         $this->fellowships[] = $fellowship;
 
         return $this;
     }
 
     /**
-     * Remove fellowship
-     *
-     * @param \App\Entity\FellowshipDecklist $fellowship
-     * @return void
+     * Remove fellowship.
      */
-    public function removeFellowship(\App\Entity\FellowshipDecklist $fellowship) {
+    public function removeFellowship(FellowshipDecklist $fellowship): void
+    {
         $this->fellowships->removeElement($fellowship);
     }
 
     /**
-     * Get fellowships
+     * Get fellowships.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\FellowshipDecklist>
+     * @return Collection<int, FellowshipDecklist>
      */
-    public function getFellowships() {
+    public function getFellowships(): Collection
+    {
         return $this->fellowships;
     }
 
     /**
-     * Get allFellowships
+     * Get allFellowships.
      *
      * @return array<int, FellowshipDecklist>
      */
-    public function getAllFellowships() {
+    public function getAllFellowships(): array
+    {
         $allFellowships = $this->getFellowships()->toArray();
 
-        return array_filter($allFellowships, function($k) {
-            return $k->getFellowship()->getIsPublic();
-        });
+        return array_filter($allFellowships, fn (FellowshipDecklist $k): bool => $k->getFellowship()->getIsPublic());
     }
 
     /**
-     * @var integer
-     */
-    private $startingThreat;
-
-    /**
-     * Set startingThreat
+     * Set startingThreat.
      *
-     * @param integer $startingThreat
-     *
-     * @return Decklist
+     * @param int $startingThreat
      */
-    public function setStartingThreat($startingThreat) {
+    public function setStartingThreat($startingThreat): Decklist
+    {
         $this->startingThreat = $startingThreat;
 
         return $this;
     }
 
     /**
-     * Get startingThreat
-     *
-     * @return integer
+     * Get startingThreat.
      */
-    public function getStartingThreat() {
+    public function getStartingThreat(): int
+    {
         return $this->startingThreat;
     }
-    /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\QuestlogDeck>
-     */
-    private $questlogs;
 
     /**
-     * Add questlog
-     *
-     * @param \App\Entity\QuestlogDeck $questlog
-     *
-     * @return Decklist
+     * Add questlog.
      */
-    public function addQuestlog(\App\Entity\QuestlogDeck $questlog) {
+    public function addQuestlog(QuestlogDeck $questlog): Decklist
+    {
         $this->questlogs[] = $questlog;
 
         return $this;
     }
 
     /**
-     * Remove questlog
-     *
-     * @param \App\Entity\QuestlogDeck $questlog
-     * @return void
+     * Remove questlog.
      */
-    public function removeQuestlog(\App\Entity\QuestlogDeck $questlog) {
+    public function removeQuestlog(QuestlogDeck $questlog): void
+    {
         $this->questlogs->removeElement($questlog);
     }
 
     /**
-     * Get questlogs
+     * Get questlogs.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\QuestlogDeck>
+     * @return Collection<int, QuestlogDeck>
      */
-    public function getQuestlogs() {
+    public function getQuestlogs(): Collection
+    {
         return $this->questlogs;
     }
 
     /**
-     * Get allQuestlogs
+     * Get allQuestlogs.
      *
      * @return array<int, QuestlogDeck>
      */
-    public function getAllQuestlogs() {
+    public function getAllQuestlogs(): array
+    {
         $theseLogs = $this->getQuestlogs()->toArray();
         $parentLogs = [];
-        if ($this->getParent()) $parentLogs = $this->getParent()->getQuestlogs()->toArray();
+        if ($this->getParent() instanceof Deck) {
+            $parentLogs = $this->getParent()->getQuestlogs()->toArray();
+        }
+
         $allQuestlogs = array_unique(array_merge($theseLogs, $parentLogs), SORT_REGULAR);
-        return array_filter($allQuestlogs, function($k) {
-            return $k->getQuestlog()->getIsPublic();
-        });
+
+        return array_filter($allQuestlogs, fn (QuestlogDeck $k): bool => $k->getQuestlog()->getIsPublic());
     }
 
-    /**
-     * @return array{main: array<int|string, int>, side: array<int|string, int>}
-     */
-    public function getContent()
+    public function jsonSerialize()
     {
-        $content = [
-            'main' => [],
-            'side' => []
-        ];
+        $array = parent::getArrayExport();
+        $array['is_published'] = true;
+        $array['nb_votes'] = $this->getNbVotes();
+        $array['nb_favorites'] = $this->getNbFavorites();
+        $array['nb_comments'] = $this->getNbComments();
+        $array['starting_threat'] = $this->getStartingThreat();
 
-        foreach ($this->getSlots() as $slot) {
-            $content['main'][$slot->getCard()->getCode()] = $slot->getQuantity();
-        }
-
-        foreach ($this->getSideslots() as $slot) {
-            $content['side'][$slot->getCard()->getCode()] = $slot->getQuantity();
-        }
-
-        return $content;
+        return $array;
     }
 }

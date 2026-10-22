@@ -1,27 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Helper;
 
-class FellowshipValidationHelper {
-    public function __construct() {
-    }
+use App\Entity\Fellowship;
+use App\Entity\FellowshipDeck;
+use App\Entity\FellowshipDecklist;
+use App\Model\SlotCollectionInterface;
+use App\Model\SlotInterface;
 
-    /**
-     * @param mixed $fellowship
-     * @return string|null
-     */
-    public function findProblem($fellowship) {
+class FellowshipValidationHelper
+{
+    public function findProblem(Fellowship $fellowship): ?string
+    {
         $heroes = [];
         $count = 0;
 
-        /* @var $fellowship_decks \App\Entity\FellowshipDeck[] */
+        /* @var $fellowship_decks FellowshipDeck[] */
         $fellowship_decks = $fellowship->getDecks();
         foreach ($fellowship_decks as $fellowship_deck) {
-            $count++;
+            ++$count;
             $deck = $fellowship_deck->getDeck();
 
             foreach ($deck->getSlots()->getHeroDeck() as &$hero) {
-                /* @var $hero \App\Model\SlotCollectionInterface<covariant \App\Model\SlotInterface> */
+                /* @var $hero SlotCollectionInterface<covariant SlotInterface> */
                 if (isset($heroes[$hero->getCard()->getName()])) {
                     return 'hero_conflicts';
                 }
@@ -30,14 +33,14 @@ class FellowshipValidationHelper {
             }
         }
 
-        /* @var $fellowship_decks \App\Entity\FellowshipDecklist[] */
+        /* @var $fellowship_decks FellowshipDecklist[] */
         $fellowship_decklists = $fellowship->getDecklists();
         foreach ($fellowship_decklists as $fellowship_decklist) {
-            $count++;
+            ++$count;
             $deck = $fellowship_decklist->getDecklist();
 
             foreach ($deck->getSlots()->getHeroDeck() as &$hero) {
-                /* @var $hero \App\Model\SlotCollectionInterface<covariant \App\Model\SlotInterface> */
+                /* @var $hero SlotCollectionInterface<covariant SlotInterface> */
                 if (isset($heroes[$hero->getCard()->getName()])) {
                     return 'hero_conflicts';
                 }
@@ -46,31 +49,24 @@ class FellowshipValidationHelper {
             }
         }
 
-        if ($count == 0) {
+        if (0 === $count) {
             return 'too_few_decks';
         }
 
         return null;
     }
 
-    /**
-     * @param mixed $problem
-     * @return string
-     */
-    public function getProblemLabel($problem) {
+    public function getProblemLabel(string $problem): string
+    {
         if (!$problem) {
             return '';
         }
+
         $labels = [
-            'too_few_decks' => "Too few decks selectsd",
-            'hero_conflicts' => "MHero conflicts between selected decks",
+            'too_few_decks' => 'Too few decks selectsd',
+            'hero_conflicts' => 'MHero conflicts between selected decks',
         ];
 
-        if (isset($labels[$problem])) {
-            return $labels[$problem];
-        }
-
-        return '';
+        return $labels[$problem] ?? '';
     }
-
 }

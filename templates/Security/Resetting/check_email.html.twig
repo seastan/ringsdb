@@ -1,0 +1,10 @@
+{% extends "Security/layout.html.twig" %}
+
+{% block security_content %}
+<p>
+An email has been sent. It contains a link you must click to reset your password.<br />
+Note: You can only request a new password once within {{ tokenLifetime }} hours.<br />
+<br />
+If you don't get an email check your spam folder or try again.<br />
+</p>
+{% endblock security_content %}

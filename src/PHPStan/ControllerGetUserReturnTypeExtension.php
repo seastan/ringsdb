@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\PHPStan;
 
 use PhpParser\Node\Expr\MethodCall;
@@ -13,18 +15,22 @@ use PHPStan\Type\TypeCombinator;
 
 /**
  * Controller::getUser() returns the logged in user, an App\Entity\User (the only user
- * class, FOSUserBundle's user provider), or null for an anonymous visitor.
+ * class, the entity user provider of security.yaml), or null for an anonymous visitor.
  */
-class ControllerGetUserReturnTypeExtension implements DynamicMethodReturnTypeExtension {
-    public function getClass(): string {
-        return 'Symfony\Bundle\FrameworkBundle\Controller\AbstractController';
+class ControllerGetUserReturnTypeExtension implements DynamicMethodReturnTypeExtension
+{
+    public function getClass(): string
+    {
+        return \Symfony\Bundle\FrameworkBundle\Controller\AbstractController::class;
     }
 
-    public function isMethodSupported(MethodReflection $methodReflection): bool {
-        return $methodReflection->getName() === 'getUser';
+    public function isMethodSupported(MethodReflection $methodReflection): bool
+    {
+        return 'getUser' === $methodReflection->getName();
     }
 
-    public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): Type {
-        return TypeCombinator::union(new ObjectType('App\Entity\User'), new NullType());
+    public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): Type
+    {
+        return TypeCombinator::union(new ObjectType(\App\Entity\User::class), new NullType());
     }
 }

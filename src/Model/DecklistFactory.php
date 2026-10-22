@@ -1,48 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Model;
 
-use App\Repository\SphereRepository;
-use App\Entity\Decklist;
 use App\Entity\Deck;
-use App\Helper\DeckValidationHelper;
-use App\Services\Texts;
-use App\Entity\Decklistslot;
+use App\Entity\Decklist;
 use App\Entity\Decklistsideslot;
+use App\Entity\Decklistslot;
+use App\Entity\Pack;
+use App\Entity\Sphere;
+use App\Helper\DeckValidationHelper;
+use App\Repository\SphereRepository;
+use App\Services\Texts;
 
-class DecklistFactory {
-    /**
-     * @var DeckValidationHelper
-     */
-    private $deckValidationHelper;
+class DecklistFactory
+{
+    private DeckValidationHelper $deckValidationHelper;
 
-    /**
-     * @var Texts
-     */
-    private $texts;
+    private Texts $texts;
 
-    /**
-     * @var SphereRepository
-     */
-    private $sphereRepository;
+    private SphereRepository $sphereRepository;
 
-    public function __construct(DeckValidationHelper $deckValidationHelper, Texts $texts, SphereRepository $sphereRepository) {
+    public function __construct(DeckValidationHelper $deckValidationHelper, Texts $texts, SphereRepository $sphereRepository)
+    {
         $this->deckValidationHelper = $deckValidationHelper;
         $this->texts = $texts;
         $this->sphereRepository = $sphereRepository;
     }
 
-    /**
-     * @param mixed $name
-     * @param mixed $descriptionMd
-     * @return \App\Entity\Decklist
-     */
-    public function createDecklistFromDeck(Deck $deck, $name = null, $descriptionMd = null) {
-        /* @var $lastPack \App\Entity\Pack */
-        $lastPack = $deck->getLastPack();
+    public function createDecklistFromDeck(Deck $deck, ?string $name = null, ?string $descriptionMd = null): Decklist
+    {
+        /* @var $lastPack Pack */
+        $deck->getLastPack();
         $problem = $this->deckValidationHelper->findProblem($deck, true);
         if ($problem) {
-            throw new \Exception('This deck cannot be published  because it is invalid: "' . $this->deckValidationHelper->getProblemLabel($problem) . '".');
+            throw new \Exception('This deck cannot be published  because it is invalid: "'.$this->deckValidationHelper->getProblemLabel($problem).'".');
         }
 
         // all good for decklist publication
@@ -58,16 +51,18 @@ class DecklistFactory {
                 $name = 'Untitled Deck';
             }
         }
+
         $name = substr($name, 0, 60);
 
         if (empty($descriptionMd)) {
             $descriptionMd = $deck->getDescriptionMd();
         }
-        $description = $this->texts->markdown($descriptionMd);
+
+        $description = $this->texts->markdown($descriptionMd ?? '');
 
         $countBySphere = $deck->getSlots()->getCountBySphere();
-        $predominantSphere = array_keys($countBySphere, max($countBySphere))[0];
-        $predominantSphere = $this->sphereRepository->findOneBy(["code" => $predominantSphere]);
+        $predominantSphere = array_keys($countBySphere, max(...array_values($countBySphere)))[0];
+        $predominantSphere = $this->sphereRepository->findOneBy(['code' => $predominantSphere]);
 
         $heroes = $deck->getSlots()->getHeroDeck();
 
@@ -78,34 +73,22 @@ class DecklistFactory {
         $new_content = (string) json_encode($content);
         $new_signature = md5($new_content);
 
-        $decklist = new Decklist();
+        $decklist = new Decklist($deck->getUser());
         $decklist->setName($name);
         $decklist->setVersion($deck->getVersion());
-        $decklist->setNameCanonical($this->texts->slugify($name) . '-' . $decklist->getVersion());
+        $decklist->setNameCanonical($this->texts->slugify($name).'-'.$decklist->getVersion());
         $decklist->setDescriptionMd($descriptionMd);
         $decklist->setDescriptionHtml($description);
-        $decklist->setDateCreation(new \DateTime());
-        $decklist->setDateUpdate(new \DateTime());
         $decklist->setSignature($new_signature);
         $decklist->setLastPack($deck->getLastPack());
-        $decklist->setNbVotes(0);
-        $decklist->setNbfavorites(0);
-        $decklist->setNbcomments(0);
-        $decklist->setUser($deck->getUser());
 
         foreach ($deck->getSlots() as $slot) {
-            $decklistslot = new Decklistslot();
-            $decklistslot->setQuantity($slot->getQuantity());
-            $decklistslot->setCard($slot->getCard());
-            $decklistslot->setDecklist($decklist);
+            $decklistslot = new Decklistslot($decklist, $slot->getCard(), $slot->getQuantity());
             $decklist->getSlots()->add($decklistslot);
         }
 
         foreach ($deck->getSideslots() as $slot) {
-            $decklistslot = new Decklistsideslot();
-            $decklistslot->setQuantity($slot->getQuantity());
-            $decklistslot->setCard($slot->getCard());
-            $decklistslot->setDecklist($decklist);
+            $decklistslot = new Decklistsideslot($decklist, $slot->getCard(), $slot->getQuantity());
             $decklist->getSideslots()->add($decklistslot);
         }
 
@@ -113,14 +96,17 @@ class DecklistFactory {
         $decklist->setStartingThreat($decklist->getSlots()->getStartingThreat());
 
         foreach ($heroes as $hero) {
-            $decklist->addSphere($hero->getCard()->getSphere());
+            if ($hero->getCard()->getSphere() instanceof Sphere) {
+                $decklist->addSphere($hero->getCard()->getSphere());
+            }
         }
 
         if (count($deck->getChildren())) {
             $decklist->setPrecedent($deck->getChildren()[0]);
-        } else if ($deck->getParent()) {
+        } elseif ($deck->getParent() instanceof Decklist) {
             $decklist->setPrecedent($deck->getParent());
         }
+
         $decklist->setParent($deck);
 
         $deck->setMinorVersion(1);

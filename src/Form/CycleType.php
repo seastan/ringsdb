@@ -1,39 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
+use App\Entity\Cycle;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 /**
- * @extends AbstractType<\App\Entity\Cycle>
+ * @extends AbstractType<Cycle>
  */
-class CycleType extends AbstractType {
-    /**
-     * @return void
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options) {
+class CycleType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
         $builder
             ->add('code')
             ->add('name')
             ->add('position')
-            ->add('isBox', CheckboxType::class, array('required'  => false))
-            ->add('isSaga', CheckboxType::class, array('required'  => false))
+            ->add('isBox', CheckboxType::class, ['required' => false])
+            ->add('isSaga', CheckboxType::class, ['required' => false])
         ;
     }
 
-    /**
-     * @return void
-     */
-    public function configureOptions(OptionsResolver $resolver) {
+    public function configureOptions(OptionsResolver $resolver): void
+    {
         $resolver->setDefaults([
-            'data_class' => 'App\Entity\Cycle'
+            'data_class' => Cycle::class,
         ]);
     }
 
-    public function getBlockPrefix() {
+    public function getBlockPrefix()
+    {
         return 'appbundle_cycletype';
     }
 }

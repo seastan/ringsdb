@@ -1,67 +1,48 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
-use App\Repository\TypeRepository;
-use App\Repository\SphereRepository;
-use App\Repository\PackRepository;
-use App\Repository\CardPrintingRepository;
-use App\Entity\Type;
 use App\Entity\Sphere;
-use App\Command\StringInputTrait;
-use Symfony\Component\Asset\Packages;
+use App\Entity\Type;
+use App\Repository\CardPrintingRepository;
+use App\Repository\PackRepository;
+use App\Repository\SphereRepository;
+use App\Repository\TypeRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\VarDumper\VarDumper;
 
-
-class ScrapBeornCardDataCommand extends Command {
+class ScrapBeornCardDataCommand extends Command
+{
     use StringInputTrait;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
+    private EntityManagerInterface $entityManager;
 
-    /**
-     * @var Packages
-     */
-    private $packages;
+    private Packages $packages;
 
-    /**
-     * @var string
-     */
-    private $publicDir;
+    private string $publicDir;
 
-    /**
-     * @var CardPrintingRepository
-     */
-    private $cardPrintingRepository;
+    private CardPrintingRepository $cardPrintingRepository;
 
-    /**
-     * @var PackRepository
-     */
-    private $packRepository;
+    private PackRepository $packRepository;
 
-    /**
-     * @var SphereRepository
-     */
-    private $sphereRepository;
+    private SphereRepository $sphereRepository;
 
-    /**
-     * @var TypeRepository
-     */
-    private $typeRepository;
+    private TypeRepository $typeRepository;
 
-    public function __construct(EntityManagerInterface $em, Packages $packages, string $publicDir, CardPrintingRepository $cardPrintingRepository, PackRepository $packRepository, SphereRepository $sphereRepository, TypeRepository $typeRepository) {
+    public function __construct(EntityManagerInterface $entityManager, Packages $packages, string $publicDir, CardPrintingRepository $cardPrintingRepository, PackRepository $packRepository, SphereRepository $sphereRepository, TypeRepository $typeRepository)
+    {
         parent::__construct();
-        $this->em = $em;
+        $this->entityManager = $entityManager;
         $this->packages = $packages;
         $this->publicDir = $publicDir;
         $this->cardPrintingRepository = $cardPrintingRepository;
@@ -70,11 +51,8 @@ class ScrapBeornCardDataCommand extends Command {
         $this->typeRepository = $typeRepository;
     }
 
-
-    /**
-     * @return void
-     */
-    protected function configure() {
+    protected function configure(): void
+    {
         $this->setName('app:beorn:html')
              ->setDescription('Download new card data from Hall of Beorn')
              ->addArgument(
@@ -105,7 +83,7 @@ class ScrapBeornCardDataCommand extends Command {
                  null,
                  InputOption::VALUE_NONE,
                  'Show card text and flavor'
-	     )
+             )
              ->addOption(
                  'skip-data',
                  null,
@@ -114,9 +92,8 @@ class ScrapBeornCardDataCommand extends Command {
              );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
-        $em = $this->em;
-
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $questionHelper = $this->getHelper('question');
 
         $assets_helper = $this->packages;
@@ -130,7 +107,7 @@ class ScrapBeornCardDataCommand extends Command {
         $forceData = $input->getOption('force-data');
         $forceImage = $input->getOption('force-image');
         $showTexts = $input->getOption('show-texts');
-        $skipData = $input->getOption('skip-data');
+        $input->getOption('skip-data');
 
         $sets = [];
         if ($setname) {
@@ -147,7 +124,7 @@ class ScrapBeornCardDataCommand extends Command {
                 'Foundations of Stone',
                 'Shadow and Flame',
                 'Heirs of Númenor',
-                'The Steward\'s Fear',
+                "The Steward's Fear",
                 'The Drúadan Forest',
                 'Encounter at Amon Dîn',
                 'Assault on Osgiliath',
@@ -158,7 +135,7 @@ class ScrapBeornCardDataCommand extends Command {
                 'The Three Trials',
                 'Trouble in Tharbad',
                 'The Nîn-in-Eilph',
-                'Celebrimbor\'s Secret',
+                "Celebrimbor's Secret",
                 'The Antlered Crown',
                 'The Lost Realm',
                 'The Wastes of Eriador',
@@ -169,29 +146,29 @@ class ScrapBeornCardDataCommand extends Command {
                 'The Dread Realm',
                 'The Grey Havens',
                 'Flight of the Stormcaller',
-		'The Thing in the Depths',
-		'Temple of the Deceived',
-		'The Drowned Ruins',
-		'A Storm on Cobas Haven',
-		'The City of Corsairs',
-		'The Sands of Harad',
-		'Race Across Harad',
-		'Beneath the Sands',
-		'The Black Serpent',
-		'The Dungeons of Cirith Gurat',
-		'The Crossings of Poros',
-		'The Wilds of Rhovanion',
-		'The Withered Heath',
-		'Roam Across Rhovanion',
-		'Fire in the Night',
+                'The Thing in the Depths',
+                'Temple of the Deceived',
+                'The Drowned Ruins',
+                'A Storm on Cobas Haven',
+                'The City of Corsairs',
+                'The Sands of Harad',
+                'Race Across Harad',
+                'Beneath the Sands',
+                'The Black Serpent',
+                'The Dungeons of Cirith Gurat',
+                'The Crossings of Poros',
+                'The Wilds of Rhovanion',
+                'The Withered Heath',
+                'Roam Across Rhovanion',
+                'Fire in the Night',
                 'The Hobbit: Over Hill and Under Hill',
                 'The Hobbit: On the Doorstep',
                 'The Black Riders',
                 'The Road Darkens',
                 'The Treason of Saruman',
                 'The Land of Shadow',
-		'The Flame of the West',
-		'The Mountain of Fire'
+                'The Flame of the West',
+                'The Mountain of Fire',
             ];
         }
 
@@ -199,173 +176,178 @@ class ScrapBeornCardDataCommand extends Command {
             $pack = $this->packRepository->findOneBy(['name' => $set]);
 
             if (!$pack) {
-                $output->writeln("<error>Cannot find pack [" . $set . "]</error>");
-                die();
+                $output->writeln('<error>Cannot find pack ['.$set.']</error>');
+                exit;
+            }
+
+            if (!$pack->getCycle()) {
+                throw new \RuntimeException('Pack must be part of a cycle');
             }
 
             $beornset = str_replace([' '], ['%20'], $set);
             $html = file_get_contents("http://hallofbeorn.com/LotR?Sort=Set_Number&CardSet=$beornset");
-            $output->writeln("a");
+            $output->writeln('a');
 
             $crawler = new Crawler((string) $html);
-            $output->writeln("b");
+            $output->writeln('b');
 
             $cardsUrls = $crawler->filter('a[href^="/LotR/Details"][style]')->extract(['href']);
-            $output->writeln("c");
+            $output->writeln('c');
 
             $i = 0;
 
             $question = new ConfirmationQuestion("Shall I import the cards from the set =< $set >= ?");
             if (!$questionHelper->ask($input, $output, $question)) {
-            	break;
+                break;
             }
 
             foreach ($cardsUrls as $url) {
-	        $output->writeln("Grabbing image from: http://hallofbeorn.com$url");
+                $output->writeln("Grabbing image from: http://hallofbeorn.com$url");
                 if ($skip > $i++) {
                     continue;
                 }
 
                 $cardCrawler = new Crawler((string) file_get_contents("http://hallofbeorn.com$url"));
-		$output->writeln("1");
+                $output->writeln('1');
 
                 // Type and Sphere
                 $c = $cardCrawler->filter('div.statTypeBox')->first();
                 $type = $c->filter('div > div')->last()->text();
                 $sphere = null;
-		$output->writeln("2");
+                $output->writeln('2');
 
                 if ($c->filter('img')->count() > 0) {
                     $sphere = basename((string) $c->filter('img')->attr('src'), '.png');
-		    $sphere = substr( $sphere, 0, (int) strrpos( $sphere, '-' ) );
+                    $sphere = substr($sphere, 0, (int) strrpos($sphere, '-'));
                 } else {
                     $sphere = 'Neutral';
                 }
-		$output->writeln("3");
+
+                $output->writeln('3');
 
                 // Name and Uniqueness
                 $c = $cardCrawler->filter('div.titleNameBox > div')->first();
                 $name = $c->text();
                 $isUnique = $c->filter('img[src="/Images/unique-card.png"]')->count() > 0;
-		$output->writeln("4");
+                $output->writeln('4');
 
                 VarDumper::dump("Importing card number $i: $name");
-		$output->writeln("5");
+                $output->writeln('5');
 
                 // Set, Number and Quantity
                 $c = $cardCrawler->filter('div.titleNameBox > div')->last();
-		$output->writeln("6");
+                $output->writeln('6');
 
                 $t = $c->filter('span')->last()->text();
                 preg_match('/^#(\d+) \(x(\d+)\)$/', $t, $matches);
                 $position = $matches[1] ?? '';
                 $quantity = $matches[2] ?? '';
-		$output->writeln("7");
+                $output->writeln('7');
 
                 // Image URL
                 $imageurl = (string) $cardCrawler->filter('div.titleBox > img')->last()->attr('src');
-		$output->writeln("8");
+                $output->writeln('8');
 
                 // Threat, Willpower, Attack, Defense, Hit Points
                 $c = $cardCrawler->filter('div.statValueBox')->first();
-		$output->writeln("9");
-
-                $cost = $threat = $c->filter('span')->eq(1)->text();
-		$output->writeln("9a");
-                $limit = ($type == 'Hero') ? 1 : 3;
-		$output->writeln("9b");
+                $output->writeln('9');
+                $cost = $c->filter('span')->eq(1)->text();
+                $threat = $cost;
+                $output->writeln('9a');
+                $limit = ('Hero' == $type) ? 1 : 3;
+                $output->writeln('9b');
                 $willpower = null;
-		$output->writeln("9c");
+                $output->writeln('9c');
                 $attack = null;
-		$output->writeln("9d");
+                $output->writeln('9d');
                 $defense = null;
-		$output->writeln("9e");
+                $output->writeln('9e');
                 $health = null;
-		$output->writeln("9f");
+                $output->writeln('9f');
                 $victory = null;
-		$output->writeln("9g");
+                $output->writeln('9g');
                 $quest = null;
-		$output->writeln("9h");
+                $output->writeln('9h');
 
-                if ($type == 'Hero' || $type == 'Ally') {
-		$output->writeln("9i");
+                if ('Hero' == $type || 'Ally' == $type) {
+                    $output->writeln('9i');
                     $willpower = $c->filter('img[src="/Images/willpower-med.png"]')->previousAll()->last()->text();
-		$output->writeln("9j");
+                    $output->writeln('9j');
                     $attack = $c->filter('img[src="/Images/attack-med.png"]')->previousAll()->last()->text();
-		$output->writeln("9k");
+                    $output->writeln('9k');
                     $defense = $c->filter('img[src="/Images/defense-med.png"]')->previousAll()->last()->text();
-		$output->writeln("9l");
+                    $output->writeln('9l');
                     $health = $c->filter('img[src="/Images/heart-med.png"]')->previousAll()->last()->text();
-		$output->writeln("9m");
-                } else if ($type == 'Player-Side-Quest') {
+                    $output->writeln('9m');
+                } elseif ('Player-Side-Quest' == $type) {
                     $type = 'Player Side Quest';
-		$output->writeln("9n");
+                    $output->writeln('9n');
                     $quest = $c->filter('span')->eq(4)->text();
-		$output->writeln("9o");
+                    $output->writeln('9o');
                 }
-		$output->writeln("10");
+
+                $output->writeln('10');
 
                 // Traits, text and flavor
                 $c = $cardCrawler->filter('div.statTextBox')->first();
                 $traits = $c->filter('a[title="Trait Search"] i')->extract(['_text']);
                 $traits = implode(' ', $traits);
-		$output->writeln("11");
+                $output->writeln('11');
 
-                $text = $c->filter('p:not(.flavor-text)')->each(function(Crawler $node, $i) {
-                    return $node->html();
-                });
-		$output->writeln("12");
+                $text = $c->filter('p:not(.flavor-text)')->each(fn (Crawler $node, $i) => $node->html());
+                $output->writeln('12');
 
-                $text = implode("<br>", $text);
-		$output->writeln("13");
+                $text = implode('<br>', $text);
+                $output->writeln('13');
 
-                $flavor = $c->filter('p.flavor-text')->each(function(Crawler $node, $i) {
-                    return $node->html();
-                });
-		$output->writeln("14");
+                $flavor = $c->filter('p.flavor-text')->each(fn (Crawler $node, $i) => $node->html());
+                $output->writeln('14');
 
-                $flavor = implode("<br>", $flavor);
-		$output->writeln("15");
+                $flavor = implode('<br>', $flavor);
+                $output->writeln('15');
 
-                //if ($type == 'Boon') {
+                // if ($type == 'Boon') {
                 //    $type = 'Attachment';
                 //    $sphere = 'Boon';
-                //}
+                // }
 
                 // OCTGN
-                //$octgn = substr($cardCrawler->filter('img[title^="OCTGN"]')->attr('title'), -36);
+                // $octgn = substr($cardCrawler->filter('img[title^="OCTGN"]')->attr('title'), -36);
 
-		// Get matching RingsDB card
+                // Get matching RingsDB card
                 $bcPrinting = $this->cardPrintingRepository->createQueryBuilder('cp')
                     ->join('cp.card', 'c')->where('c.name = :n')->andWhere('cp.pack = :p')
                     ->setParameter('n', $name)->setParameter('p', $pack)->setMaxResults(1)->getQuery()->getOneOrNullResult();
                 $card = $bcPrinting ? $bcPrinting->getCard() : null;
                 if (!$card) {
-		   $output->writeln("Card not found in RingsDB database.");
-		   continue;
-		}
-		$output->writeln("15b");		
+                    $output->writeln('Card not found in RingsDB database.');
+                    continue;
+                }
+
+                $output->writeln('15b');
                 if (!$forceData && !$forceImage) {
                     // shortcut: we already know this card
                     continue;
                 }
-		$output->writeln("16");
+
+                $output->writeln('16');
 
                 if ($forceData) {
-
                     $objSphere = null;
                     foreach ($allSpheres as $oneSphere) {
                         if ($sphere === $oneSphere->getName()) {
                             $objSphere = $oneSphere;
                         }
                     }
-		    $output->writeln("17");
+
+                    $output->writeln('17');
 
                     if (!$objSphere) {
                         $output->writeln("<error>Cannot find sphere [$sphere] for this card</error>");
-                        die();
+                        exit;
                     }
-		    $output->writeln("18");
+
+                    $output->writeln('18');
 
                     $objType = null;
                     foreach ($allTypes as $oneType) {
@@ -373,138 +355,141 @@ class ScrapBeornCardDataCommand extends Command {
                             $objType = $oneType;
                         }
                     }
-    		$output->writeln("19");
-    
+
+                    $output->writeln('19');
+
                     if (!$objType) {
                         $output->writeln("<error>Cannot find type [$type] for this card</error>");
-                        die();
+                        exit;
                     }
-    		$output->writeln("20");
-    
-                    $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', '\'', '\''], $text);
+
+                    $output->writeln('20');
+
+                    $text = str_replace(['“', '”', '’', '&rsquo;'], ['"', '"', "'", "'"], $text);
                     $text = (string) preg_replace('/<a title="Search:.*?>(.*?)<\/a>/', '\\1', $text);
                     $text = (string) preg_replace('/<a title="Keyword:.*?>(.*?)<\/a>/', '\\1', $text);
-                    $text = (string) preg_replace_callback('/<img .*?src="\/Images\/(.*?)\..*?>/', function($m) {
-                        return strtolower("[$m[1]]");
-                    }, $text);
+                    $text = (string) preg_replace_callback('/<img .*?src="\/Images\/(.*?)\..*?>/', fn ($m): string => strtolower("[$m[1]]"), $text);
                     $text = str_replace(['<br />', '<br>'], ["\n", "\n"], $text);
-                    $text = str_replace("</b><b>", " ", $text);
-                    $text = str_replace("</b>: ", ":</b> ", $text);
-                    $text = (string) preg_replace("/ +/", " ", $text);
+                    $text = str_replace('</b><b>', ' ', $text);
+                    $text = str_replace('</b>: ', ':</b> ', $text);
+                    $text = (string) preg_replace('/ +/', ' ', $text);
                     $text = (string) preg_replace("/\n+/", "\n", $text);
                     $text = trim($text);
-    		$output->writeln("21");
-    
+                    $output->writeln('21');
+
                     if ($text && $showTexts) {
-                        $output->writeln("Card text:");
+                        $output->writeln('Card text:');
                         VarDumper::dump($text);
                     }
-    		$output->writeln("22");
-    
+
+                    $output->writeln('22');
+
                     $flavor = str_replace(['<br />', '<br>'], ["\n", "\n"], $flavor);
                     $flavor = (string) preg_replace('/([a-z])–/s', '\\1-', $flavor);
                     $flavor = (string) preg_replace('/–(.*)$/s', '<cite>\\1</cite>', $flavor);
-                    $flavor = (string) preg_replace("/ +/", " ", $flavor);
+                    $flavor = (string) preg_replace('/ +/', ' ', $flavor);
                     $flavor = (string) preg_replace("/\n+/", "\n", $flavor);
-    		$output->writeln("23");
-    
-    
+                    $output->writeln('23');
+
                     if ($flavor && $showTexts) {
-                        $output->writeln("Card flavor:");
+                        $output->writeln('Card flavor:');
                         VarDumper::dump($flavor);
                     }
-    		$output->writeln("24");
-    
-                    $question = new ConfirmationQuestion("Shall I import this card?");
+
+                    $output->writeln('24');
+
+                    $question = new ConfirmationQuestion('Shall I import this card?');
                     if (!$questionHelper->ask($input, $output, $question)) {
                         continue;
                     }
-    		$output->writeln("25");
-    
-    		$output->writeln("26");
-    
+
+                    $output->writeln('25');
+
+                    $output->writeln('26');
+
                     $card->setPosition($position);
                     if ($pack->getCycle()->getIsSaga()) {
-                        $card->setCode(sprintf("%02d%d%03d", $pack->getCycle()->getPosition(), $pack->getPosition(), $position));
+                        $card->setCode(sprintf('%02d%d%03d', $pack->getCycle()->getPosition(), $pack->getPosition(), $position));
                     } else {
-                        $card->setCode(sprintf("%02d%03d", $pack->getCycle()->getPosition(), $position));
+                        $card->setCode(sprintf('%02d%03d', $pack->getCycle()->getPosition(), $position));
                     }
-    		$output->writeln("27");
-    
-    
+
+                    $output->writeln('27');
+
                     $card->setType($objType);
                     $card->setSphere($objSphere);
                     $card->setPack($pack);
-    
+
                     $card->setName($name);
                     $card->setTraits($traits);
                     $card->setText($text);
                     $card->setFlavor($flavor);
                     $card->setIsUnique($isUnique);
-    		$output->writeln("28");
-    
-                    if ($type === 'Hero') {
+                    $output->writeln('28');
+
+                    if ('Hero' === $type) {
                         $cost = null;
                     } else {
                         $threat = null;
                     }
-    
-    		$output->writeln("29");
-                    $card->setCost($cost !== '' ? $cost : null);
-                    $card->setThreat($threat !== '' ? $threat : null);
-                    $card->setWillpower($willpower !== '' ? $willpower : null);
-                    $card->setAttack($attack !== '' ? $attack : null);
-                    $card->setDefense($defense !== '' ? $defense : null);
-                    $card->setHealth($health !== '' ? $health : null);
+
+                    $output->writeln('29');
+                    $card->setCost('' !== $cost ? $cost : null);
+                    $card->setThreat('' !== $threat ? $threat : null);
+                    $card->setWillpower('' !== $willpower ? $willpower : null);
+                    $card->setAttack('' !== $attack ? $attack : null);
+                    $card->setDefense('' !== $defense ? $defense : null);
+                    $card->setHealth('' !== $health ? $health : null);
                     $card->setVictory($victory);
-                    $card->setQuest($quest !== '' ? $quest : null);
-    
+                    $card->setQuest('' !== $quest ? $quest : null);
+
                     $card->setQuantity($quantity);
                     $card->setDeckLimit($limit);
                     $card->setHasErrata(false);
-    
-                    //$card->setIllustrator(trim($data['illustrator']));
-    
-		} // end of force-data
 
-		$output->writeln("30");
-                $em->persist($card);
+                    // $card->setIllustrator(trim($data['illustrator']));
+                } // end of force-data
 
-		$output->writeln("31");
+                $output->writeln('30');
+                $this->entityManager->persist($card);
+
+                $output->writeln('31');
                 // trying to download image file
                 $card_code = $card->getCode();
-                $asseturl = $assets_helper->getUrl('bundles/cards/' . $card_code . '.png');
-                $imagepath = $publicDir . preg_replace('/\?.*/', '', $asseturl);
+                $asseturl = $assets_helper->getUrl('bundles/cards/'.$card_code.'.png');
+                $imagepath = $publicDir.preg_replace('/\?.*/', '', $asseturl);
                 $dirname = dirname($imagepath);
-                $outputfile = $dirname . DIRECTORY_SEPARATOR . $card_code . ".png";
+                $outputfile = $dirname.DIRECTORY_SEPARATOR.$card_code.'.png';
 
-		$output->writeln("32");
+                $output->writeln('32');
                 if (!file_exists($outputfile) || $forceImage) {
- 		    $output->writeln("33");
+                    $output->writeln('33');
                     $imageurl = (string) preg_replace('/û/', '%C3%BB', $imageurl);
-                    $u = dirname($imageurl) . '/' . urlencode(basename($imageurl, '.jpg')) . '.jpg';
-		    $output->writeln("34");
+                    $u = dirname($imageurl).'/'.urlencode(basename($imageurl, '.jpg')).'.jpg';
+                    $output->writeln('34');
 
                     $image = file_get_contents($u);
 
-		    $output->writeln("35");
+                    $output->writeln('35');
                     if (!$image) {
-                        $output->writeln("<error>Cannot download image for this card</error>");
-                        die();
+                        $output->writeln('<error>Cannot download image for this card</error>');
+                        exit;
                     }
-		    $output->writeln("36");
+
+                    $output->writeln('36');
 
                     file_put_contents($outputfile, $image);
-		    $output->writeln("37");
+                    $output->writeln('37');
                 }
-		$output->writeln("38");
-                $em->flush();
-		$output->writeln("39");
+
+                $output->writeln('38');
+                $this->entityManager->flush();
+                $output->writeln('39');
             }
         }
 
-        $em->flush();
-        $output->writeln("Done.");
+        $this->entityManager->flush();
+        $output->writeln('Done.');
 
         return 0;
     }

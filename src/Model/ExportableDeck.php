@@ -1,71 +1,56 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Model;
+
+use App\Entity\Deck;
+use App\Entity\Pack;
+use App\Entity\User;
 
 /**
  * Base class of Deck and Decklist, which implement the getters used by the exports.
  */
-abstract class ExportableDeck {
-    /**
-     * @return int
-     */
-    abstract public function getId();
+abstract class ExportableDeck
+{
+    abstract public function getId(): ?int;
+
+    abstract public function getName(): string;
+
+    abstract public function getDateCreation(): \DateTime;
+
+    abstract public function getDateUpdate(): \DateTime;
+
+    abstract public function getDescriptionMd(): ?string;
+
+    abstract public function getUser(): User;
+
+    abstract public function getVersion(): string;
+
+    abstract public function getLastPack(): ?Pack;
 
     /**
-     * @return string
+     * @return SlotCollectionInterface<covariant \App\Model\SlotInterface>
      */
-    abstract public function getName();
+    abstract public function getSlots(): SlotCollectionInterface;
 
     /**
-     * @return \DateTime
+     * @return SlotCollectionInterface<covariant \App\Model\SlotInterface>
      */
-    abstract public function getDateCreation();
-
-    /**
-     * @return \DateTime
-     */
-    abstract public function getDateUpdate();
-
-    /**
-     * @return string
-     */
-    abstract public function getDescriptionMd();
-
-    /**
-     * @return \App\Entity\User
-     */
-    abstract public function getUser();
-
-    /**
-     * @return string
-     */
-    abstract public function getVersion();
-
-    /**
-     * @return \App\Entity\Pack|null
-     */
-    abstract public function getLastPack();
-
-    /**
-     * @return \App\Model\SlotCollectionInterface<covariant \App\Model\SlotInterface>
-     */
-    abstract public function getSlots();
-
-    /**
-     * @return \App\Model\SlotCollectionInterface<covariant \App\Model\SlotInterface>
-     */
-    abstract public function getSideslots();
+    abstract public function getSideslots(): SlotCollectionInterface;
 
     /**
      * @param bool $withUnsavedChanges
+     *
      * @return array<string, mixed>
      */
-    public function getArrayExport($withUnsavedChanges = false) {
-        /* @var $this \App\Entity\Deck */
+    public function getArrayExport($withUnsavedChanges = false): array
+    {
+        /* @var $this Deck */
         $slots = $this->getSlots();
         $sideslots = $this->getSideslots();
         $last_pack = '';
-        if ($this->getLastPack()) {
+        if ($this->getLastPack() instanceof Pack) {
             $last_pack = $this->getLastPack()->getName();
         }
 
@@ -80,9 +65,9 @@ abstract class ExportableDeck {
             'slots' => $slots->getContent(),
             'sideslots' => $sideslots->getContent(),
             'version' => $this->getVersion(),
-            'last_pack' => $last_pack
+            'last_pack' => $last_pack,
         ];
-        if (method_exists($this,'getFreezeComments')) {
+        if (method_exists($this, 'getFreezeComments')) {
             $array['freeze_comments'] = $this->getFreezeComments();
         }
 
@@ -92,8 +77,9 @@ abstract class ExportableDeck {
     /**
      * @return array<string, mixed>
      */
-    public function getTextExport() {
-        /* @var $this \App\Entity\Deck */
+    public function getTextExport(): array
+    {
+        /* @var $this Deck */
         $slots = $this->getSlots();
         $sideslots = $this->getSideslots();
 
@@ -106,5 +92,26 @@ abstract class ExportableDeck {
             'has_sideboard' => count($sideslots) > 0,
             'sideslots_by_type' => $sideslots->getSlotsByType(),
         ];
+    }
+
+    /**
+     * @return array{main: array<string, int>, side: array<string, int>}
+     */
+    public function getContent(): array
+    {
+        $content = [
+            'main' => [],
+            'side' => [],
+        ];
+
+        foreach ($this->getSlots() as $slot) {
+            $content['main'][$slot->getCard()->getCode()] = $slot->getQuantity();
+        }
+
+        foreach ($this->getSideslots() as $slot) {
+            $content['side'][$slot->getCard()->getCode()] = $slot->getQuantity();
+        }
+
+        return $content;
     }
 }

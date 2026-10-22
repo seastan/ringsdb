@@ -1,56 +1,49 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
+use App\Entity\Decklist;
 use App\Repository\DecklistRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class FixThreatCommand extends Command {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
+class FixThreatCommand extends Command
+{
+    private EntityManagerInterface $entityManager;
 
-    /**
-     * @var DecklistRepository
-     */
-    private $decklistRepository;
+    private DecklistRepository $decklistRepository;
 
-    public function __construct(EntityManagerInterface $em, DecklistRepository $decklistRepository) {
+    public function __construct(EntityManagerInterface $entityManager, DecklistRepository $decklistRepository)
+    {
         parent::__construct();
-        $this->em = $em;
+        $this->entityManager = $entityManager;
         $this->decklistRepository = $decklistRepository;
     }
 
-    /**
-     * @return void
-     */
-    protected function configure() {
+    protected function configure(): void
+    {
         $this->setName('app:fix-threat')
              ->setDescription('Fix starting threat for decklists');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
-        /* @var $em \Doctrine\ORM\EntityManager */
-        $em = $this->em;
-
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $count = 0;
 
-        /* @var $decklists \App\Entity\Decklist[] */
+        /* @var $decklists Decklist[] */
         $decklists = $this->decklistRepository->findAll();
         foreach ($decklists as $decklist) {
-            /* @var $decklist \App\Entity\Decklist */
+            /* @var $decklist Decklist */
             $decklist->setStartingThreat($decklist->getSlots()->getStartingThreat());
-            $count++;
+            ++$count;
         }
 
-        $em->flush();
-        $output->writeln(date('c') . " Fixed $count starting threats.");
+        $this->entityManager->flush();
+        $output->writeln(date('c')." Fixed $count starting threats.");
 
         return 0;
     }

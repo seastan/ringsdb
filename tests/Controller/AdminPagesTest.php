@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -13,18 +15,23 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * PageSnapshotTrait). The card and card printing lists (1300+ rows) are only checked by their
  * number of rows.
  */
-class AdminPagesTest extends WebTestCase {
+class AdminPagesTest extends WebTestCase
+{
     use PageSnapshotTrait;
     use JsonSnapshotTrait;
 
+    private KernelBrowser $client;
+
+    protected function setUp(): void
+    {
+        $this->client = static::createClient();
+    }
+
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @param mixed $username
-     * @return \Symfony\Bundle\FrameworkBundle\Client
-     */
-    private function createAuthenticatedClient($username) {
-        $client = static::createClient();
+    private function createAuthenticatedClient(string $username): KernelBrowser
+    {
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $username]));
         $this->assertTrue($client->getResponse()->isRedirect(), "Login as $username failed");
@@ -32,18 +39,16 @@ class AdminPagesTest extends WebTestCase {
         return $client;
     }
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db(Client $client) {
-        return $client->getContainer()->get('doctrine')->getConnection();
+    private function db(): \Doctrine\DBAL\Connection
+    {
+        return static::getContainer()->get('doctrine')->getConnection();
     }
 
     /**
-     * GET pages of the admin area: [uri, snapshot name or null]
-     * @return array
+     * GET pages of the admin area: [uri, snapshot name or null].
      */
-    public function adminPageProvider() {
+    public function adminPageProvider(): array
+    {
         $pages = [
             'home' => ['/admin/', 'index'],
             // JSON, see testStatistics
@@ -60,7 +65,7 @@ class AdminPagesTest extends WebTestCase {
             'user comments' => ['/admin/user/comments/1', 'user_comments_1'],
         ];
         foreach (['cycle', 'pack', 'type', 'sphere', 'card', 'card-printing', 'scenario', 'encounter'] as $entity) {
-            $big = in_array($entity, ['card', 'card-printing']);
+            $big = in_array($entity, ['card', 'card-printing'], true);
             $pages["$entity list"] = ["/admin/$entity/", $big ? null : "{$entity}_list"];
             $pages["$entity show"] = ["/admin/$entity/1/show", "{$entity}_show_1"];
             $pages["$entity new form"] = ["/admin/$entity/new", "{$entity}_new"];
@@ -74,10 +79,10 @@ class AdminPagesTest extends WebTestCase {
 
     /**
      * @dataProvider adminPageProvider
-     * @param mixed $uri
      */
-    public function testAnonymousIsRedirectedToLogin($uri): void {
-        $client = static::createClient();
+    public function testAnonymousIsRedirectedToLogin(string $uri): void
+    {
+        $client = $this->client;
         $client->request('GET', $uri);
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
@@ -86,9 +91,9 @@ class AdminPagesTest extends WebTestCase {
 
     /**
      * @dataProvider adminPageProvider
-     * @param mixed $uri
      */
-    public function testUsersAreDenied($uri): void {
+    public function testUsersAreDenied(string $uri): void
+    {
         $client = $this->createAuthenticatedClient('test');
         $client->request('GET', $uri);
 
@@ -99,23 +104,23 @@ class AdminPagesTest extends WebTestCase {
      * Write routes are denied to users before anything is done.
      *
      * @dataProvider writeRouteProvider
-     * @param mixed $method
-     * @param mixed $uri
      */
-    public function testUsersCannotWrite($method, $uri, array $parameters): void {
+    public function testUsersCannotWrite(string $method, string $uri, array $parameters): void
+    {
         $client = $this->createAuthenticatedClient('test');
-        $before = $this->db($client)->fetchAll('SELECT id, name FROM cycle ORDER BY id');
+        $before = $this->db()->fetchAll('SELECT id, name FROM cycle ORDER BY id');
 
         $client->request($method, $uri, $parameters);
 
         $this->assertSame(403, $client->getResponse()->getStatusCode());
-        $this->assertSame($before, $this->db($client)->fetchAll('SELECT id, name FROM cycle ORDER BY id'));
+        $this->assertSame($before, $this->db()->fetchAll('SELECT id, name FROM cycle ORDER BY id'));
     }
 
     /**
-     * @return array
+     * @return array<string, mixed[]>
      */
-    public function writeRouteProvider() {
+    public function writeRouteProvider(): array
+    {
         return [
             'create' => ['POST', '/admin/cycle/create', ['appbundle_cycle' => ['code' => 'X', 'name' => 'Hacked', 'position' => 99]]],
             'update' => ['POST', '/admin/cycle/1/update', ['appbundle_cycle' => ['name' => 'Hacked']]],
@@ -127,24 +132,20 @@ class AdminPagesTest extends WebTestCase {
     }
 
     /* ------------------------------------------------------ admin pages */
-
     /**
      * The pages with a text snapshot (the big lists are checked by testBigLists, the statistics
      * by testStatistics).
-     * @return (array|null)
      */
-    public function snapshotPageProvider() {
-        return array_filter($this->adminPageProvider(), function (array $page) {
-            return $page[1] !== null;
-        });
+    public function snapshotPageProvider(): array
+    {
+        return array_filter($this->adminPageProvider(), fn (array $page): bool => null !== $page[1]);
     }
 
     /**
      * @dataProvider snapshotPageProvider
-     * @param mixed $uri
-     * @param mixed $snapshot
      */
-    public function testAdminPage($uri, $snapshot): void {
+    public function testAdminPage(string $uri, $snapshot): void
+    {
         $client = $this->createAuthenticatedClient('admin');
         $crawler = $client->request('GET', $uri);
 
@@ -154,21 +155,21 @@ class AdminPagesTest extends WebTestCase {
 
     /**
      * @dataProvider bigListProvider
-     * @param mixed $uri
-     * @param mixed $table
      */
-    public function testBigLists($uri, $table): void {
+    public function testBigLists(string $uri, string $table): void
+    {
         $client = $this->createAuthenticatedClient('admin');
         $crawler = $client->request('GET', $uri);
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertCount((int) $this->db($client)->fetchColumn("SELECT COUNT(*) FROM $table"), $crawler->filter('table tbody tr'));
+        $this->assertCount((int) $this->db()->fetchColumn("SELECT COUNT(*) FROM $table"), $crawler->filter('table tbody tr'));
     }
 
     /**
-     * @return array
+     * @return array<string, string[]>
      */
-    public function bigListProvider() {
+    public function bigListProvider(): array
+    {
         return [
             'cards' => ['/admin/card/', 'card'],
             'card printings' => ['/admin/card-printing/', 'card_printing'],
@@ -179,10 +180,9 @@ class AdminPagesTest extends WebTestCase {
      * The statistics are JSON, for a month (default: last month, so the tests give one).
      *
      * @dataProvider statisticsProvider
-     * @param mixed $uri
-     * @param mixed $snapshot
      */
-    public function testStatistics($uri, $snapshot): void {
+    public function testStatistics(string $uri, string $snapshot): void
+    {
         $client = $this->createAuthenticatedClient('admin');
         $client->request('GET', $uri);
 
@@ -192,16 +192,18 @@ class AdminPagesTest extends WebTestCase {
     }
 
     /**
-     * @return array
+     * @return array<string, string[]>
      */
-    public function statisticsProvider() {
+    public function statisticsProvider(): array
+    {
         return [
             'decks and users by cycle' => ['/admin/stat?month=2015-08', 'stat_2015-08'],
             'packs' => ['/admin/stat_packs?month=2015-08', 'stat_packs_2015-08'],
         ];
     }
 
-    public function testUnknownEntity(): void {
+    public function testUnknownEntity(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
         $crawler = $client->request('GET', '/admin/cycle/999/show');
 
@@ -213,7 +215,8 @@ class AdminPagesTest extends WebTestCase {
      * The per-card statistics are precomputed by a cron (app:stats:precompute-cards) into
      * stat_cards_cache, which is empty in the test database.
      */
-    public function testCardStatisticsNotPrecomputed(): void {
+    public function testCardStatisticsNotPrecomputed(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
         $client->request('GET', '/admin/stat_cards?month=2015-08');
 
@@ -225,7 +228,8 @@ class AdminPagesTest extends WebTestCase {
      * The user's last update date is changed by each login (last_login, then Gedmo
      * timestampable): it is masked in the snapshot.
      */
-    public function testUserPage(): void {
+    public function testUserPage(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
         $crawler = $client->request('GET', '/admin/user/show/1');
 
@@ -237,31 +241,32 @@ class AdminPagesTest extends WebTestCase {
     /**
      * "Block" / "Unblock" on the user page (a GET route that writes).
      */
-    public function testBlockAndUnblockAUser(): void {
+    public function testBlockAndUnblockAUser(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
         try {
             $client->request('GET', '/admin/user/toggle_locked/1');
             $this->assertSame(302, $client->getResponse()->getStatusCode());
             $this->assertSame('/admin/user/show/1', $client->getResponse()->headers->get('Location'));
-            $this->assertSame('1', $this->db($client)->fetchColumn('SELECT locked FROM user WHERE id = 1'));
+            $this->assertSame('1', $this->db()->fetchColumn('SELECT locked FROM user WHERE id = 1'));
 
             $crawler = $client->followRedirect();
             $this->assertSame('Unblock', trim($crawler->filter('a[href="/admin/user/toggle_locked/1"]')->text()));
 
             $client->request('GET', '/admin/user/toggle_locked/1');
-            $this->assertSame('0', $this->db($client)->fetchColumn('SELECT locked FROM user WHERE id = 1'));
+            $this->assertSame('0', $this->db()->fetchColumn('SELECT locked FROM user WHERE id = 1'));
         } finally {
-            $this->db($client)->update('user', ['locked' => 0], ['id' => 1]);
+            $this->db()->update('user', ['locked' => 0], ['id' => 1]);
         }
     }
 
     /**
-     * A blocked user cannot log in: User::isAccountNonLocked() reads the "locked" column
-     * (FOSUserBundle 2's own version always returns true).
+     * A blocked user cannot log in: App\Security\UserChecker reads the "locked" column.
      */
-    public function testBlockedUserCannotLogIn(): void {
-        $client = static::createClient();
-        $this->db($client)->update('user', ['locked' => 1], ['username' => 'test']);
+    public function testBlockedUserCannotLogIn(): void
+    {
+        $client = $this->client;
+        $this->db()->update('user', ['locked' => 1], ['username' => 'test']);
         try {
             $crawler = $client->request('GET', '/login');
             $client->submit($crawler->selectButton('_submit')->form(['_username' => 'test', '_password' => 'test']));
@@ -272,7 +277,7 @@ class AdminPagesTest extends WebTestCase {
             $this->assertSame(302, $client->getResponse()->getStatusCode());
             $this->assertSame('/login', parse_url((string) $client->getResponse()->headers->get('Location'), PHP_URL_PATH));
         } finally {
-            $this->db($client)->update('user', ['locked' => 0], ['username' => 'test']);
+            $this->db()->update('user', ['locked' => 0], ['username' => 'test']);
         }
     }
 }

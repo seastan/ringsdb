@@ -36,9 +36,8 @@ Each removal reduces what has to be ported.
 - **`/admin/stat_cards` and the `app:stats:precompute-cards` cron**: nothing in the repository
   consumes that JSON, probably an external report. Ask the maintainers / check the nginx logs
   (see "Card statistics").
-- **User blocking**: FOSUserBundle 2 no longer enforces the `locked` column; `User` now
-  overrides `isAccountNonLocked()` (and the expiry checks) so the admin "Block" button works
-  again. Move this to a `UserChecker` when replacing FOSUser (see "Admin area").
+- Done: **User blocking**, the admin "Block" button works again (`App\Security\UserChecker`, see
+  "Admin area").
 - Done: **JSONP on the public API**, the callback is validated (see "Public API").
 - **Card scraping commands**: `app:beorn:html` (`ScrapBeornCardDataCommand`, scrapes the Hall of
   Beorn HTML pages, still full of debug output), `app:beorn:json` and `app:download-images`
@@ -171,7 +170,9 @@ Details:
 - **Controllers in the routes**: `'App\Controller\XController::yAction'` (and in the
   `forward()` calls) instead of `AppBundle:X:y`.
 - **Doctrine**: the mappings are declared (`is_bundle: false`, `src/Resources/config/doctrine`,
-  alias `App`, so the `App:Card` aliases of DQL still work until ORM 3).
+  alias `App`, so the `App:Card` aliases of DQL still work until ORM 3). The YAML mappings were
+  later converted to docblock annotations in `src/Entity` (`type: annotation`; `User` redeclares
+  the `$id` of the FOSUserBundle base class so that it can carry its mapping).
 - **Paths**: the services that built `%kernel.root_dir%/../web` get `$publicDir`
   (`%kernel.project_dir%/public`); `kernel.root_dir` is deprecated in 4.2.
 - **Application assets**: `src/Resources/public/` is no longer installed by `assets:install` (there
@@ -222,7 +223,7 @@ are deprecated. Done by hand (no Rector):
 
 | Package | Status | Replacement / action |
 |---|---|---|
-| `friendsofsymfony/user-bundle` 2.0 | to be replaced (decided) | Symfony Security, see "Removing FOSUserBundle" |
+| `friendsofsymfony/user-bundle` 3.4 | done | removed: Symfony Security and the application's own controllers, see "Removing FOSUserBundle" |
 | `symfony/assetic-bundle`, `leafo/scssphp`, `patchwork/jsqueeze` | abandoned, blocked Symfony 4 | done: replaced by `app:assets` and `scssphp/scssphp`, see "Front-end assets" (packages to remove) |
 | `symfony/swiftmailer-bundle` 3.3 (SwiftMailer 6) | abandoned | Symfony Mailer (`new \Swift_Message()` in the comment notifications, FOSUser emails) |
 | `liuggio/excelbundle` (PHPExcel) | done | replaced by PhpSpreadsheet (admin Excel export / import) |
@@ -285,8 +286,8 @@ are no longer analysed), with the official extensions (loaded by `phpstan/extens
 - `phpstan-symfony`: the service types, read from the container dumped in `var/cache/test`
   (hence the `cache:warmup` of `make phpstan`), and the console helpers
   (`src/PHPStan/console-application.php`);
-- `phpstan-doctrine`: the entity metadata, from the YAML mappings through the entity manager of the
-  test environment (`src/PHPStan/object-manager.php`): the repositories, the fields,
+- `phpstan-doctrine`: the entity metadata, from the entity annotations through the entity manager
+  of the test environment (`src/PHPStan/object-manager.php`): the repositories, the fields,
   the collections, the DQL. It needs the class names: `getRepository(Card::class)`, the
   `'AppBundle:Card'` aliases were replaced (they are gone in ORM 3; the aliases inside DQL strings
   remain, still valid in ORM 2.7). phpstan's result cache does not know the mappings: after
@@ -547,12 +548,34 @@ While in maintenance mode (the users' data has not changed since the snapshot):
 
 ## Removing FOSUserBundle / rewriting the Security layer
 
-Covered by `tests/Controller/SecurityControllerTest.php` (registration, email
-confirmation, login, remember-me, logout).
+Done with the Symfony 5.4 step. Covered by `tests/Controller/SecurityControllerTest.php`
+(registration, email confirmation, login, remember-me, logout) and
+`tests/Controller/UserProfileTest.php` (account, password change and reset, see "Profile").
+
+What replaced the bundle:
+
+- `App\Entity\User` no longer extends FOSUser's `User`: it carries the fields and mappings of the
+  former base class (same columns, `doctrine:schema:update` has nothing to do) and implements
+  `UserInterface`, `LegacyPasswordAuthenticatedUserInterface` and `EquatableInterface`. Its
+  `__serialize()` keeps the format of the base class, so the sessions opened before the deployment
+  stay valid. `setUsername()` / `setEmail()` set the canonical (lowercased) columns, which the
+  bundle's Doctrine listener did. The validation constraints are on the entity, with the
+  bundle's validation groups and English messages.
+- The controllers are in `src/Controller/Security` (one per route), the forms in
+  `src/Form/Security`, the templates in `templates/Security`, the services in `src/Security`:
+  `UserChecker`, `UserPasswordUpdater` (hashing and salt), `LoginManager` (login after the
+  confirmation and the reset), `UserMailer`, `TokenGenerator`, `LastLoginListener`.
+- Kept on purpose, so that nothing visible changes: the URLs, the route names (`fos_user_*`, used
+  by the templates and `app.user.js` through FOSJsRoutingBundle), the form names
+  (`fos_user_registration_form[...]`...), the texts (the bundle's English translations, written in
+  the templates and forms). Renaming the routes and forms can come later.
+- The user provider is the `entity` provider, through `UserRepository::loadUserByIdentifier()`.
+- The `FOSUserBundle` translation domain is gone (the site is English only); the `security`
+  domain is Symfony's.
 
 ### Password hashing
 
-Current algorithm (`security.yml` → `encoders: FOS\UserBundle\Model\UserInterface: sha512`):
+The algorithm of FOSUserBundle (formerly `encoders: FOS\UserBundle\Model\UserInterface: sha512`):
 `MessageDigestPasswordEncoder` with its default settings, i.e. SHA-512, 5000 iterations,
 base64 output (88 characters).
 
@@ -565,66 +588,68 @@ for ($i = 1; $i < 5000; $i++) {
 $hash = base64_encode($digest);
 ```
 
-- The salt is per user and stored in the database (`salt` column). FOSUser 2.0 generates it
-  with `rtrim(str_replace('+', '.', base64_encode(random_bytes(32))), '=')` (43 characters).
-  Existing salts are reused as is: how they were generated does not matter for the migration.
-- A single encoder is configured for the whole user class, so every account that can log in
-  today has a hash in this format. No extra check on production data is needed.
+- The salt is per user and stored in the database (`salt` column). FOSUser generated it with
+  `rtrim(str_replace('+', '.', base64_encode(random_bytes(32))), '=')` (43 characters);
+  `UserPasswordUpdater` does the same for new passwords.
+- A single encoder was configured for the whole user class, so every account that can log in
+  has a hash in this format.
 
-In Symfony 7.4:
+Now: `security.yaml` declares the same hasher (`password_hashers`, `algorithm: sha512`,
+`encode_as_base64: true`, `iterations: 5000`), and `User` implements
+`LegacyPasswordAuthenticatedUserInterface` (`getSalt()`). **Without it the salt is not passed to
+the hasher and every login fails.**
 
-- Declare an identical legacy hasher:
-  ```yaml
-  security:
-      password_hashers:
-          legacy_sha512:
-              algorithm: sha512
-              encode_as_base64: true
-              iterations: 5000
-          App\Entity\User:
-              algorithm: auto
-              migrate_from:
-                  - legacy_sha512
-  ```
-- The `User` entity must implement `LegacyPasswordAuthenticatedUserInterface` (to expose
-  `getSalt()`). **Otherwise the salt is not passed to the hasher and every login fails.**
-- Implement `PasswordUpgraderInterface` on the user provider (or repository) so passwords are
-  re-hashed with bcrypt/argon as users log in. New hashes have no separate salt (`salt` column
-  set to `null`).
+To decide: re-hashing the passwords with bcrypt/argon as users log in:
 
-### Behaviour to reproduce without FOSUser
+```yaml
+security:
+    password_hashers:
+        legacy_sha512:
+            algorithm: sha512
+            encode_as_base64: true
+            iterations: 5000
+        App\Entity\User:
+            algorithm: auto
+            migrate_from:
+                - legacy_sha512
+```
 
-- **Login by username OR email**: the current provider is
-  `fos_user.user_provider.username_email`. The new user provider must accept both (covered by
-  `testLoginWithUsername` / `testLoginWithEmail`).
-- **Registration with email confirmation** (`fos_user.registration.confirmation.enabled:
-  true`): account created disabled with a `confirmationToken`, email containing the
-  `/register/confirm/{token}` link, activation + automatic login, single-use token.
-- **Login refused for an unconfirmed account** with the `Account is disabled.` message: the
-  login template relies on this `messageKey` to display the `/user/remind/{username}` link.
-  In Symfony 7, use a `UserChecker` and keep a recognisable message (or update the template
-  and the test).
+with `PasswordUpgraderInterface` on `UserRepository` (new hashes have no salt, `salt` set to
+`null`). Not done with the removal: once a password is re-hashed, the code of the previous
+deployment can no longer check it, so a rollback would lock those users out.
+
+### Behaviour reproduced
+
+- **Login by username OR email** (FOSUser's `username_email` provider), case-insensitive
+  (canonical columns): `UserRepository::findOneByUsernameOrEmail()`.
+- **Registration with email confirmation**: account created disabled with a `confirmationToken`,
+  email containing the `/register/confirm/{token}` link, activation + automatic login,
+  single-use token.
+- **Login refused for an unconfirmed, blocked or expired account**: `UserChecker` throws a
+  `DisabledException`, `LockedException`, `AccountExpiredException` or
+  `CredentialsExpiredException` (the checks of Symfony 3.4's `UserChecker`);
+  `hide_user_not_found: true` turns them into "Invalid credentials." (pinned by
+  `testFullRegistrationWorkflow` and `testBlockedUserCannotLogIn`). The login template still has the `/user/remind/{username}`
+  link for the `Account is disabled.` message, which is therefore never shown.
 - **Registration validation**: unique username and email, valid email format, username of at
   least 2 characters, password confirmation, CSRF protection.
 - **Remember-me**: 365-day lifetime, `REMEMBERME` cookie.
 - **Redirect after login** to the originally requested page, otherwise `index`.
-- **FOSUser routes still in use**: `/login`, `/login_check`, `/logout`, `/register/*`,
-  `/resetting/*`, `/profile/*` (see `config/routes/routes.yaml`). Password reset (`/resetting`)
-  is not covered by the tests yet.
+- **Password reset**: a new request is ignored for 2 hours (`retry_ttl`), the link is valid
+  24 hours (`token_ttl`), the user is logged in after the reset.
+- **Last login date** (`last_login`), at each login (form, remember-me cookie, confirmation,
+  reset).
+- The success flash messages of the bundle (registration, account update, password change and
+  reset).
 
 ### Configuration issues found
 
-- `hide_user_not_found: false` (`security.yml`, since Symfony 3.4, see "Progress") keeps the
-  "Account is disabled." message; the translation of "Username could not be found." into
-  "Invalid credentials." (`app/Resources/translations/security.en.yml`) keeps unknown usernames
-  indistinguishable from wrong passwords. Both are to reproduce in the new login.
-- `config.yml` declares `fos_user.firewall_name: main`, but the firewall is named `default`.
-  It works today (automatic login after confirmation is tested), but it should be fixed in the
-  new configuration.
-- Removed: the FOSUserBundle overrides named after FOSUser 1.x templates, which FOSUser 2 does not
-  load (it renders `check_email`, `change_password`...): `Registration/checkEmail.html.twig`,
+- `config.yml` declared `fos_user.firewall_name: main` while the firewall was named `default`
+  (since renamed `main`); `LoginManager` now uses `main`.
+- Removed before: the FOSUserBundle overrides named after FOSUser 1.x templates, which FOSUser 2 did
+  not load (it rendered `check_email`, `change_password`...): `Registration/checkEmail.html.twig`,
   `Resetting/checkEmail.html.twig`, `Resetting/passwordAlreadyRequested.html.twig` and
-  `ChangePassword/changePassword*.html.twig`. The pages already used FOSUser's templates.
+  `ChangePassword/changePassword*.html.twig`.
 
 ## Public API (`/api/public/*`)
 
@@ -1058,8 +1083,8 @@ hasErrata`. Pinned by `AdminCsvTest`:
 - Fixed: blocking a user had no effect, FOSUser 2's `isAccountNonLocked()` always returns
   `true` (production's FOSUser dev-master still honoured it). `User` overrides
   `isAccountNonLocked()`, `isAccountNonExpired()` and `isCredentialsNonExpired()` to read the
-  columns again (covered by `testBlockedUserCannotLogIn`). Move to a `UserChecker` when
-  replacing FOSUser.
+  columns again (covered by `testBlockedUserCannotLogIn`); since FOSUserBundle's removal,
+  `App\Security\UserChecker` calls them, as Symfony 3.4's checker did.
 - The user's "Date of last update" changes at each login (`last_login`, then Gedmo
   timestampable); it is masked in the admin user page snapshot.
 - `StatController` concatenates the `month` query parameter into its SQL
@@ -1128,18 +1153,18 @@ migration rebuilt the `card` table and MySQL returned the ties in another order)
 ## Profile
 
 Covered by `tests/Controller/UserProfileTest.php`: the site's profile form
-(`/user/profile_edit` → `/user/profile_save`) and the FOSUserBundle forms (account
+(`/user/profile_edit` → `/user/profile_save`) and the former FOSUserBundle forms (account
 `/profile/edit`, password change `/profile/change-password`, password reset `/resetting/*`),
-which have to be reimplemented when FOSUserBundle is removed.
+reimplemented in `src/Controller/Security` (see "Removing FOSUserBundle").
 
 ### Current behaviour pinned by the tests
 
 - Profile form: username (unique, checked), email, resume (tags stripped by
   `FILTER_SANITIZE_STRING`), sphere color, notification and sharing checkboxes (unticked =
   false), dark mode (also stored in a non-HttpOnly `dark_mode` cookie for 1 year, to apply the
-  theme before the page is loaded). Renaming updates `username_canonical` (FOSUser listener):
+  theme before the page is loaded). Renaming updates `username_canonical` (`User::setUsername()`):
   the user logs in with the new name. Redirects to the form with a flash message.
-- FOSUser account and password forms require the current password ("The entered password is
+- The account and password forms require the current password ("The entered password is
   invalid."); password confirmation must match.
 - Password reset: an email with a `/resetting/reset/{token}` link; a second request is ignored
   while the first one is recent (`retry_ttl`); no hint when the user does not exist; the token

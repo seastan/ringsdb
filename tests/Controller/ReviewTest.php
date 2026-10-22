@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Controller;
 
 use App\Listener\CoreExceptionListener;
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,29 +21,36 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @see CoreExceptionListener for the status codes of the errors (500 for most of them)
  */
-class ReviewTest extends WebTestCase {
-    const CARD_URL = '/card/01001';
+class ReviewTest extends WebTestCase
+{
+    public const CARD_URL = '/card/01001';
+
+    private KernelBrowser $client;
 
     /** @var int[] */
-    private $maxIds = [];
-    /** @var array */
-    private $fixtureReview;
-    /** @var array */
-    private $fixtureUsers;
+    private array $maxIds = [];
 
-    protected function setUp(): void {
-        $connection = $this->db(static::createClient());
+    private array $fixtureReview;
+
+    private array $fixtureUsers;
+
+    protected function setUp(): void
+    {
+        $this->client = static::createClient();
+        $connection = $this->db();
         foreach (['review', 'reviewcomment'] as $table) {
             $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
         }
+
         $review = $connection->fetchAssoc('SELECT * FROM review WHERE id = 1');
         $this->assertNotFalse($review);
         $this->fixtureReview = $review;
         $this->fixtureUsers = $connection->fetchAll('SELECT id, reputation, roles FROM user');
     }
 
-    protected function tearDown(): void {
-        $connection = $this->db(static::createClient());
+    protected function tearDown(): void
+    {
+        $connection = $this->db();
         $connection->exec("DELETE FROM reviewcomment WHERE id > {$this->maxIds['reviewcomment']}");
         $connection->exec("DELETE FROM reviewvote WHERE review_id > {$this->maxIds['review']} OR review_id = 1");
         $connection->exec("DELETE FROM review WHERE id > {$this->maxIds['review']}");
@@ -50,27 +59,24 @@ class ReviewTest extends WebTestCase {
         } else {
             $connection->update('review', $this->fixtureReview, ['id' => 1]);
         }
+
         foreach ($this->fixtureUsers as $user) {
             $connection->update('user', $user, ['id' => $user['id']]);
         }
+
         parent::tearDown();
     }
 
     /* ------------------------------------------------------------ helpers */
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function db(Client $client) {
-        return $client->getContainer()->get('doctrine')->getConnection();
+    private function db(): \Doctrine\DBAL\Connection
+    {
+        return static::getContainer()->get('doctrine')->getConnection();
     }
 
-    /**
-     * @param mixed $username
-     * @return \Symfony\Bundle\FrameworkBundle\Client
-     */
-    private function createAuthenticatedClient($username) {
-        $client = static::createClient();
+    private function createAuthenticatedClient(string $username): KernelBrowser
+    {
+        $client = $this->client;
         $crawler = $client->request('GET', '/login');
         $client->submit($crawler->selectButton('_submit')->form(['_username' => $username, '_password' => $username]));
         $this->assertTrue($client->getResponse()->isRedirect(), "Login as $username failed");
@@ -79,48 +85,45 @@ class ReviewTest extends WebTestCase {
     }
 
     /**
-     * @param mixed $uri
-     * @param string $method
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param array<string, string>|array<string, int> $parameters
      */
-    private function ajax(Client $client, $uri, array $parameters, $method = 'POST') {
+    private function ajax(KernelBrowser $client, string $uri, array $parameters, string $method = 'POST'): Response
+    {
         $client->request($method, $uri, $parameters, [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
         return $client->getResponse();
     }
 
     /**
-     * @param mixed $status
+     * @param array<string, bool>|array<string, string>|array<string, int> $expected
      */
-    private function assertJsonAnswer(Response $response, $status, array $expected): void {
+    private function assertJsonAnswer(Response $response, int $status, array $expected): void
+    {
         $this->assertSame($status, $response->getStatusCode());
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
         $this->assertSame($expected, json_decode($response->getContent(), true));
     }
 
-    /**
-     * @return mixed
-     */
-    private function newReviews(Client $client) {
-        return $this->db($client)->fetchAll(
+    private function newReviews()
+    {
+        return $this->db()->fetchAll(
             'SELECT c.code, u.username, r.text_md, r.text_html, r.nb_votes FROM review r JOIN card c ON c.id = r.card_id JOIN user u ON u.id = r.user_id WHERE r.id > ? ORDER BY r.id',
             [$this->maxIds['review']]
         );
     }
 
-    /**
-     * @return string
-     */
-    private static function reviewText() {
+    private function reviewText(): string
+    {
         return "Théodred is a **cheap** hero: he gives a resource to a questing hero.\n\nSee http://example.com/theodred";
     }
 
     /* ------------------------------------------------------------- write */
 
-    public function testWriteAReview(): void {
+    public function testWriteAReview(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
 
-        $response = $this->ajax($client, '/review/post', ['card_id' => 2, 'review_id' => '', 'review' => self::reviewText()]);
+        $response = $this->ajax($client, '/review/post', ['card_id' => 2, 'review_id' => '', 'review' => $this->reviewText()]);
 
         $this->assertJsonAnswer($response, 200, ['success' => true]);
         $this->assertSame([[
@@ -129,38 +132,37 @@ class ReviewTest extends WebTestCase {
             'text_md' => "Théodred is a **cheap** hero: he gives a resource to a questing hero.\n\nSee [example.com](http://example.com/theodred)",
             'text_html' => "<p>Théodred is a <strong>cheap</strong> hero: he gives a resource to a questing hero.</p>\n<p>See <a href=\"http://example.com/theodred\">example.com</a></p>",
             'nb_votes' => '0',
-        ]], $this->newReviews($client));
+        ]], $this->newReviews());
 
         $crawler = $client->request('GET', '/card/01002');
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertContains('is a cheap hero', $crawler->filter('.review-text')->text());
+        $this->assertStringContainsString('is a cheap hero', $crawler->filter('.review-text')->text());
         $crawler = $client->request('GET', '/reviews');
-        $this->assertContains('is a cheap hero', $crawler->filter('body')->text());
+        $this->assertStringContainsString('is a cheap hero', $crawler->filter('body')->text());
     }
 
     /**
      * Errors are generic exceptions: 500, with the message in the JSON answer.
      *
      * @dataProvider refusedReviewProvider
-     * @param mixed $username
-     * @param mixed $reputation
-     * @param mixed $message
      */
-    public function testRefusedReview($username, $reputation, array $parameters, $message): void {
+    public function testRefusedReview(string $username, int $reputation, array $parameters, string $message): void
+    {
         $client = $this->createAuthenticatedClient($username);
-        $this->db($client)->update('user', ['reputation' => $reputation], ['username' => $username]);
+        $this->db()->update('user', ['reputation' => $reputation], ['username' => $username]);
 
         $response = $this->ajax($client, '/review/post', $parameters + ['review_id' => '']);
 
         $this->assertJsonAnswer($response, 500, ['success' => false, 'message' => $message]);
-        $this->assertSame([], $this->newReviews($client));
+        $this->assertSame([], $this->newReviews());
     }
 
     /**
-     * @return array
+     * @return array<string, string[]|int[]|array<string, int|string>[]>
      */
-    public function refusedReviewProvider() {
-        $text = self::reviewText();
+    public function refusedReviewProvider(): array
+    {
+        $text = $this->reviewText();
 
         return [
             // "test" already wrote 1 review, with a reputation of 1
@@ -175,41 +177,46 @@ class ReviewTest extends WebTestCase {
      * The release date is the one of the card's primary printing: card 02001 (id 74) is only
      * printed in The Hunt for Gollum, whose release date is removed for the test.
      */
-    public function testNoReviewOnUnreleasedCards(): void {
+    public function testNoReviewOnUnreleasedCards(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
-        $connection = $this->db($client);
+        $connection = $this->db();
         $releaseDate = $connection->fetchColumn("SELECT date_release FROM pack WHERE code = 'HfG'");
         try {
             $connection->update('pack', ['date_release' => null], ['code' => 'HfG']);
-            $response = $this->ajax($client, '/review/post', ['card_id' => 74, 'review_id' => '', 'review' => self::reviewText()]);
+            $response = $this->ajax($client, '/review/post', ['card_id' => 74, 'review_id' => '', 'review' => $this->reviewText()]);
             $this->assertJsonAnswer($response, 500, ['success' => false, 'message' => 'You may not write a review for an unreleased card.']);
         } finally {
             $connection->update('pack', ['date_release' => $releaseDate], ['code' => 'HfG']);
         }
-        $this->assertSame([], $this->newReviews($client));
+
+        $this->assertSame([], $this->newReviews());
     }
 
-    public function testAnonymousCannotWriteAReview(): void {
-        $client = static::createClient();
-        $response = $this->ajax($client, '/review/post', ['card_id' => 2, 'review' => self::reviewText()]);
+    public function testAnonymousCannotWriteAReview(): void
+    {
+        $client = $this->client;
+        $response = $this->ajax($client, '/review/post', ['card_id' => 2, 'review' => $this->reviewText()]);
 
         $this->assertJsonAnswer($response, 403, ['success' => false, 'message' => 'You are not logged in.']);
-        $this->assertSame([], $this->newReviews($client));
+        $this->assertSame([], $this->newReviews());
     }
 
     /* -------------------------------------------------------------- edit */
 
-    public function testEditOwnReview(): void {
+    public function testEditOwnReview(): void
+    {
         $client = $this->createAuthenticatedClient('test');
 
         $response = $this->ajax($client, '/review/edit', ['card_id' => 1, 'review_id' => 1, 'review' => 'Aragorn is *still* great.']);
 
         $this->assertJsonAnswer($response, 200, ['success' => true]);
-        $review = $this->db($client)->fetchAssoc('SELECT text_md, text_html FROM review WHERE id = 1');
+        $review = $this->db()->fetchAssoc('SELECT text_md, text_html FROM review WHERE id = 1');
         $this->assertSame(['text_md' => 'Aragorn is *still* great.', 'text_html' => '<p>Aragorn is <em>still</em> great.</p>'], $review);
     }
 
-    public function testEditWithAnEmptyReview(): void {
+    public function testEditWithAnEmptyReview(): void
+    {
         $client = $this->createAuthenticatedClient('test');
 
         $response = $this->ajax($client, '/review/edit', ['review_id' => 1, 'review' => '']);
@@ -217,62 +224,64 @@ class ReviewTest extends WebTestCase {
         // not JSON, unlike the other answers
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('Your review is empty.', $response->getContent());
-        $this->assertSame($this->fixtureReview['text_md'], $this->db($client)->fetchColumn('SELECT text_md FROM review WHERE id = 1'));
+        $this->assertSame($this->fixtureReview['text_md'], $this->db()->fetchColumn('SELECT text_md FROM review WHERE id = 1'));
     }
 
     /**
      * @dataProvider refusedEditProvider
-     * @param mixed $username
-     * @param mixed $reviewId
-     * @param mixed $message
      */
-    public function testRefusedEdit($username, $reviewId, $message): void {
+    public function testRefusedEdit(string $username, int $reviewId, string $message): void
+    {
         $client = $this->createAuthenticatedClient($username);
 
         $response = $this->ajax($client, '/review/edit', ['review_id' => $reviewId, 'review' => 'Hacked']);
 
         // BUG (CoreExceptionListener): the 403 / 400 HTTP exceptions become 500s for AJAX requests
         $this->assertJsonAnswer($response, 500, ['success' => false, 'message' => $message]);
-        $this->assertSame($this->fixtureReview['text_md'], $this->db($client)->fetchColumn('SELECT text_md FROM review WHERE id = 1'));
+        $this->assertSame($this->fixtureReview['text_md'], $this->db()->fetchColumn('SELECT text_md FROM review WHERE id = 1'));
     }
 
     /**
-     * @return array
+     * @return array<string, string[]|int[]>
      */
-    public function refusedEditProvider() {
+    public function refusedEditProvider(): array
+    {
         return [
-            'another user\'s review' => ['admin', 1, 'You cannot edit this review.'],
+            "another user's review" => ['admin', 1, 'You cannot edit this review.'],
             'unknown review' => ['test', 999, 'Unable to find review.'],
         ];
     }
 
     /* -------------------------------------------------------------- like */
 
-    public function testLikeAReview(): void {
+    public function testLikeAReview(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
 
         $this->assertJsonAnswer($this->ajax($client, '/review/like', ['id' => 1]), 200, ['success' => true, 'nbVotes' => 1]);
 
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT nb_votes FROM review WHERE id = 1'));
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
+        $this->assertSame('1', $this->db()->fetchColumn('SELECT nb_votes FROM review WHERE id = 1'));
+        $this->assertSame('1', $this->db()->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
         // the author earns 1 reputation point
-        $this->assertSame('2', $this->db($client)->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
+        $this->assertSame('2', $this->db()->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
 
         // liking twice does nothing
         $this->assertJsonAnswer($this->ajax($client, '/review/like', ['id' => 1]), 200, ['success' => true, 'nbVotes' => 1]);
-        $this->assertSame('2', $this->db($client)->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
+        $this->assertSame('2', $this->db()->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
     }
 
-    public function testCannotLikeOwnReview(): void {
+    public function testCannotLikeOwnReview(): void
+    {
         $client = $this->createAuthenticatedClient('test');
 
         $this->assertJsonAnswer($this->ajax($client, '/review/like', ['id' => 1]), 200, ['success' => true, 'nbVotes' => 0]);
 
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
-        $this->assertSame('1', $this->db($client)->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
+        $this->assertSame('1', $this->db()->fetchColumn("SELECT reputation FROM user WHERE username = 'test'"));
     }
 
-    public function testLikeAnUnknownReview(): void {
+    public function testLikeAnUnknownReview(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
 
         $this->assertJsonAnswer($this->ajax($client, '/review/like', ['id' => 999]), 500, ['success' => false, 'message' => 'Unable to find review.']);
@@ -280,41 +289,43 @@ class ReviewTest extends WebTestCase {
 
     /* ----------------------------------------------------------- comment */
 
-    public function testCommentAReview(): void {
+    public function testCommentAReview(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
 
         $response = $this->ajax($client, '/review/comment', ['comment_review_id' => 1, 'comment' => 'Agreed <b>100%</b>']);
 
         $this->assertJsonAnswer($response, 200, ['success' => true]);
         // comments are plain text, HTML-escaped
-        $comment = $this->db($client)->fetchAssoc('SELECT c.text, u.username FROM reviewcomment c JOIN user u ON u.id = c.user_id WHERE c.review_id = 1');
+        $comment = $this->db()->fetchAssoc('SELECT c.text, u.username FROM reviewcomment c JOIN user u ON u.id = c.user_id WHERE c.review_id = 1');
         $this->assertSame(['text' => 'Agreed &lt;b&gt;100%&lt;/b&gt;', 'username' => 'admin'], $comment);
-        $this->assertGreaterThan('2015-08-16 00:00:00', $this->db($client)->fetchColumn('SELECT date_last_comment FROM review WHERE id = 1'));
+        $this->assertGreaterThan('2015-08-16 00:00:00', $this->db()->fetchColumn('SELECT date_last_comment FROM review WHERE id = 1'));
 
         // BUG: escaped once more by Twig when displayed, the entities are shown as is
         $crawler = $client->request('GET', self::CARD_URL);
         $node = $crawler->filter('#review-1 .review-comment')->first()->getNode(0);
-        $this->assertNotNull($node);
-        $this->assertNotNull($node->firstChild);
+        $this->assertInstanceOf(\DOMNode::class, $node);
+        $this->assertInstanceOf(\DOMNode::class, $node->firstChild);
         $text = (string) $node->firstChild->nodeValue;
         $this->assertSame('Agreed &lt;b&gt;100%&lt;/b&gt; —', trim((string) preg_replace('/\s+/u', ' ', $text)));
     }
 
     /**
      * @dataProvider refusedCommentProvider
-     * @param mixed $message
      */
-    public function testRefusedComment(array $parameters, $message): void {
+    public function testRefusedComment(array $parameters, string $message): void
+    {
         $client = $this->createAuthenticatedClient('admin');
 
         $this->assertJsonAnswer($this->ajax($client, '/review/comment', $parameters), 500, ['success' => false, 'message' => $message]);
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM reviewcomment'));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM reviewcomment'));
     }
 
     /**
-     * @return array
+     * @return array<string, string[]|array<string, int|string>[]>
      */
-    public function refusedCommentProvider() {
+    public function refusedCommentProvider(): array
+    {
         return [
             'empty comment' => [['comment_review_id' => 1, 'comment' => ' '], 'Your comment is empty.'],
             'unknown review' => [['comment_review_id' => 999, 'comment' => 'Hello'], 'Unable to find review.'],
@@ -326,18 +337,19 @@ class ReviewTest extends WebTestCase {
     /**
      * Removing a review requires ROLE_SUPER_ADMIN: the fixture admin (ROLE_ADMIN) cannot.
      */
-    public function testOnlySuperAdminsCanRemoveReviews(): void {
+    public function testOnlySuperAdminsCanRemoveReviews(): void
+    {
         $client = $this->createAuthenticatedClient('admin');
         $this->assertJsonAnswer($this->ajax($client, '/review/remove/1', []), 403, ['success' => false, 'message' => 'No user or not admin']);
-        $this->assertSame('1', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM review WHERE id = 1'));
+        $this->assertSame('1', $this->db()->fetchColumn('SELECT COUNT(*) FROM review WHERE id = 1'));
 
-        $this->db($client)->update('user', ['roles' => serialize(['ROLE_SUPER_ADMIN'])], ['username' => 'admin']);
+        $this->db()->update('user', ['roles' => serialize(['ROLE_SUPER_ADMIN'])], ['username' => 'admin']);
         $client = $this->createAuthenticatedClient('admin');
         $this->ajax($client, '/review/like', ['id' => 1]);
 
         // the route accepts any method, GET included
         $this->assertJsonAnswer($this->ajax($client, '/review/remove/1', [], 'GET'), 200, ['success' => true]);
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM review WHERE id = 1'));
-        $this->assertSame('0', $this->db($client)->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM review WHERE id = 1'));
+        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM reviewvote WHERE review_id = 1'));
     }
 }

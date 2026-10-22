@@ -1,34 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Entity\Scenario;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
-use App\Entity\Card;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\VarDumper\VarDumper;
 
-class ScrapBeornScenarioDataCommand extends Command {
+class ScrapBeornScenarioDataCommand extends Command
+{
+    private EntityManagerInterface $entityManager;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
-    public function __construct(EntityManagerInterface $em) {
+    public function __construct(EntityManagerInterface $entityManager)
+    {
         parent::__construct();
-        $this->em = $em;
+        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @return void
-     */
-    protected function configure() {
+    protected function configure(): void
+    {
         $this->setName('app:beorn:scenario')
             ->setDescription('Download scenario statistics data from Hall of Beorn')
             ->addOption(
@@ -51,108 +46,105 @@ class ScrapBeornScenarioDataCommand extends Command {
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
-        $name = $input->getOption('name');
-        $skip = $input->getOption('skip');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $name = (string) $input->getOption('name');
+        $skip = (int) $input->getOption('skip');
         $customjson = $input->getOption('customjson');
 
-        /* @var $em \Doctrine\ORM\EntityManager */
-        $em = $this->em;
-
-        $this->command($em, $name, $skip, $customjson);
-        $output->writeln("Done.");
+        static::command($this->entityManager, $name, $skip, $customjson);
+        $output->writeln('Done.');
 
         return 0;
     }
 
-	/**
-	 * @param mixed $em
-	 * @param mixed $name
-	 * @param mixed $skip
-	 * @param mixed $customjson
-	 * @return string
-	 */
-	public static function command($em, $name, $skip, $customjson) {
-		$res = '';
-		$name = $name ?: null;
-		$skip = $skip ?: 0;
-		$customjson = $customjson ?: null;
+    public static function command(EntityManagerInterface $em, string $name, ?int $skip, ?string $customjson): string
+    {
+        $res = '';
+        $name = $name ?: null;
+        $skip = $skip ?: 0;
+        $customjson = $customjson ?: null;
 
-		if ($name) {
-			/* @var $allScenarios \App\Entity\Scenario[] */
-			$allScenarios = [$em->getRepository(Scenario::class)->findOneBy(['name' => $name])];
-		}
-		else {
-			/* @var $allScenarios \App\Entity\Scenario[] */
-			$allScenarios = $em->getRepository(Scenario::class)->findAll();
-		}
+        if ($name) {
+            /* @var $allScenarios \App\Entity\Scenario[] */
+            $scenario = $em->getRepository(Scenario::class)->findOneBy(['name' => $name]);
+            if (null === $scenario) {
+                throw new \RuntimeException(sprintf('Scenario with name "%s" not found.', $name));
+            }
 
-		$i = 0;
-		foreach ($allScenarios as $scenario) {
-			if ($skip > $i++) {
-				continue;
-			}
+            $allScenarios = [$scenario];
+        } else {
+            /* @var $allScenarios \App\Entity\Scenario[] */
+            $allScenarios = $em->getRepository(Scenario::class)->findAll();
+        }
 
-			$beornscenario = strtr($scenario->getName(), ['ALeP - ' => '', ' ' => '-', 'ú' => '%C3%BA', 'î' => '%C3%AE', 'û' => '%C3%BB', ',' => '']);
-			$output_line = $beornscenario;
-			VarDumper::dump($output_line);
-			$res .= $output_line . "\n<br>";
-			$url = 'http://hallofbeorn.com/LotR/ScenarioDetails/';
-			if ($customjson) {
-				$json = $customjson;
-			}
-			else {
-				$json = file_get_contents($url.$beornscenario);
-			}
+        $i = 0;
+        foreach ($allScenarios as $scenario) {
+            if ($skip > $i++) {
+                continue;
+            }
 
-			if (!$json || $json == '{}') {
-				$output_line = 'Could not find scenario ' . $scenario->getName();
-				VarDumper::dump($output_line);
-				$res .= $output_line . "\n<br>";
-				continue;
-			}
-			$beorn = json_decode($json);
+            $beornscenario = strtr($scenario->getName(), ['ALeP - ' => '', ' ' => '-', 'ú' => '%C3%BA', 'î' => '%C3%AE', 'û' => '%C3%BB', ',' => '']);
+            $output_line = $beornscenario;
+            VarDumper::dump($output_line);
+            $res .= $output_line."\n<br>";
+            $url = 'http://hallofbeorn.com/LotR/ScenarioDetails/';
+            if ($customjson) {
+                $json = $customjson;
+            } else {
+                $json = file_get_contents($url.$beornscenario);
+            }
 
-			$scenario->setHasEasy($beorn->HasEasy);
-			$scenario->setHasNightmare($beorn->HasNightmare);
-			$scenario->setEasyCards($beorn->EasyCards);
-			$scenario->setEasyEnemies($beorn->EasyEnemies);
-			$scenario->setEasyLocations($beorn->EasyLocations);
-			$scenario->setEasyTreacheries($beorn->EasyTreacheries);
-			$scenario->setEasyShadows($beorn->EasyShadows);
-			$scenario->setEasyObjectives($beorn->EasyObjectives);
-			$scenario->setEasyObjectiveAllies($beorn->EasyObjectiveAllies);
-			$scenario->setEasyObjectiveLocations($beorn->EasyObjectiveLocations);
-			$scenario->setEasySurges($beorn->EasySurges);
-			$scenario->setEasyEncounterSideQuests($beorn->EasyEncounterSideQuests);
+            if (!$json || '{}' === $json) {
+                $output_line = 'Could not find scenario '.$scenario->getName();
+                VarDumper::dump($output_line);
+                $res .= $output_line."\n<br>";
+                continue;
+            }
 
-			$scenario->setNormalCards($beorn->NormalCards);
-			$scenario->setNormalEnemies($beorn->NormalEnemies);
-			$scenario->setNormalLocations($beorn->NormalLocations);
-			$scenario->setNormalTreacheries($beorn->NormalTreacheries);
-			$scenario->setNormalShadows($beorn->NormalShadows);
-			$scenario->setNormalObjectives($beorn->NormalObjectives);
-			$scenario->setNormalObjectiveAllies($beorn->NormalObjectiveAllies);
-			$scenario->setNormalObjectiveLocations($beorn->NormalObjectiveLocations);
-			$scenario->setNormalSurges($beorn->NormalSurges);
-			$scenario->setNormalEncounterSideQuests($beorn->NormalEncounterSideQuests);
+            $beorn = json_decode($json);
 
-			$scenario->setNightmareCards($beorn->NightmareCards);
-			$scenario->setNightmareEnemies($beorn->NightmareEnemies);
-			$scenario->setNightmareLocations($beorn->NightmareLocations);
-			$scenario->setNightmareTreacheries($beorn->NightmareTreacheries);
-			$scenario->setNightmareShadows($beorn->NightmareShadows);
-			$scenario->setNightmareObjectives($beorn->NightmareObjectives);
-			$scenario->setNightmareObjectiveAllies($beorn->NightmareObjectiveAllies);
-			$scenario->setNightmareObjectiveLocations($beorn->NightmareObjectiveLocations);
-			$scenario->setNightmareSurges($beorn->NightmareSurges);
-			$scenario->setNightmareEncounterSideQuests($beorn->NightmareEncounterSideQuests);
+            $scenario->setHasEasy($beorn->HasEasy);
+            $scenario->setHasNightmare($beorn->HasNightmare);
+            $scenario->setEasyCards($beorn->EasyCards);
+            $scenario->setEasyEnemies($beorn->EasyEnemies);
+            $scenario->setEasyLocations($beorn->EasyLocations);
+            $scenario->setEasyTreacheries($beorn->EasyTreacheries);
+            $scenario->setEasyShadows($beorn->EasyShadows);
+            $scenario->setEasyObjectives($beorn->EasyObjectives);
+            $scenario->setEasyObjectiveAllies($beorn->EasyObjectiveAllies);
+            $scenario->setEasyObjectiveLocations($beorn->EasyObjectiveLocations);
+            $scenario->setEasySurges($beorn->EasySurges);
+            $scenario->setEasyEncounterSideQuests($beorn->EasyEncounterSideQuests);
 
-			$em->flush();
-		}
+            $scenario->setNormalCards($beorn->NormalCards);
+            $scenario->setNormalEnemies($beorn->NormalEnemies);
+            $scenario->setNormalLocations($beorn->NormalLocations);
+            $scenario->setNormalTreacheries($beorn->NormalTreacheries);
+            $scenario->setNormalShadows($beorn->NormalShadows);
+            $scenario->setNormalObjectives($beorn->NormalObjectives);
+            $scenario->setNormalObjectiveAllies($beorn->NormalObjectiveAllies);
+            $scenario->setNormalObjectiveLocations($beorn->NormalObjectiveLocations);
+            $scenario->setNormalSurges($beorn->NormalSurges);
+            $scenario->setNormalEncounterSideQuests($beorn->NormalEncounterSideQuests);
 
-		$em->flush();
-		$res .= 'Done';
-		return $res;
-	}
+            $scenario->setNightmareCards($beorn->NightmareCards);
+            $scenario->setNightmareEnemies($beorn->NightmareEnemies);
+            $scenario->setNightmareLocations($beorn->NightmareLocations);
+            $scenario->setNightmareTreacheries($beorn->NightmareTreacheries);
+            $scenario->setNightmareShadows($beorn->NightmareShadows);
+            $scenario->setNightmareObjectives($beorn->NightmareObjectives);
+            $scenario->setNightmareObjectiveAllies($beorn->NightmareObjectiveAllies);
+            $scenario->setNightmareObjectiveLocations($beorn->NightmareObjectiveLocations);
+            $scenario->setNightmareSurges($beorn->NightmareSurges);
+            $scenario->setNightmareEncounterSideQuests($beorn->NightmareEncounterSideQuests);
+
+            $em->flush();
+        }
+
+        $em->flush();
+        $res .= 'Done';
+
+        return $res;
+    }
 }

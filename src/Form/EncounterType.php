@@ -1,42 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
+use App\Entity\Encounter;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 /**
- * @extends AbstractType<\App\Entity\Encounter>
+ * @extends AbstractType<Encounter>
  */
-class EncounterType extends AbstractType {
+class EncounterType extends AbstractType
+{
     /**
-     * @param FormBuilderInterface<\App\Entity\Encounter|null> $builder
-     * @param array<string, mixed> $options
-     * @return void
+     * @param FormBuilderInterface<Encounter|null> $builder
+     * @param array<string, mixed>                 $options
      */
-    public function buildForm(FormBuilderInterface $builder, array $options) {
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
         $builder
             ->add('code')
             ->add('name')
-            ->add('pack', EntityType::class, array('class' => 'App:Pack', 'choice_label' => 'name'));
+            ->add('pack', EntityType::class, ['class' => 'App:Pack', 'choice_label' => 'name']);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     * @return void
-     */
-    public function configureOptions(OptionsResolver $resolver) {
+    public function configureOptions(OptionsResolver $resolver): void
+    {
         $resolver->setDefaults([
-            'data_class' => 'App\Entity\Encounter'
+            'data_class' => Encounter::class,
         ]);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix() {
+    public function getBlockPrefix(): string
+    {
         return 'appbundle_encounter';
     }
 }

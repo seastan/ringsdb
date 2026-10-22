@@ -1,97 +1,112 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-class Decklistsideslot implements \App\Model\SlotInterface {
+use App\Model\SlotInterface;
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="decklistsideslot")
+ */
+class Decklistsideslot implements SlotInterface
+{
     /**
-     * @var integer
+     * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-    /**
-     * @var integer
-     */
-    private $quantity;
-    /**
-     * @var \App\Entity\Decklist
-     */
-    private $decklist;
-    /**
-     * @var \App\Entity\Card
-     */
-    private $card;
 
     /**
-     * Get id
-     *
-     * @return integer
+     * @ORM\Column(type="smallint")
      */
-    public function getId() {
+    private int $quantity;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Decklist", inversedBy="sideslots")
+     * @ORM\JoinColumn(name="decklist_id", referencedColumnName="id", nullable=false)
+     */
+    private Decklist $decklist;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Card")
+     * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false)
+     */
+    private Card $card;
+
+    public function __construct(Decklist $decklist, Card $card, int $quantity)
+    {
+        $this->decklist = $decklist;
+        $this->card = $card;
+        $this->quantity = $quantity;
+    }
+
+    /**
+     * Get id.
+     */
+    public function getId(): ?int
+    {
         return $this->id;
     }
 
     /**
-     * Set quantity
+     * Set quantity.
      *
-     * @param integer $quantity
-     *
-     * @return Decklistsideslot
+     * @param int $quantity
      */
-    public function setQuantity($quantity) {
+    public function setQuantity($quantity): Decklistsideslot
+    {
         $this->quantity = $quantity;
 
         return $this;
     }
 
     /**
-     * Get quantity
-     *
-     * @return integer
+     * Get quantity.
      */
-    public function getQuantity() {
+    public function getQuantity(): int
+    {
         return $this->quantity;
     }
 
     /**
-     * Set decklist
-     *
-     * @param \App\Entity\Decklist $decklist
-     *
-     * @return Decklistsideslot
+     * Set decklist.
      */
-    public function setDecklist(\App\Entity\Decklist $decklist) {
+    public function setDecklist(Decklist $decklist): Decklistsideslot
+    {
         $this->decklist = $decklist;
 
         return $this;
     }
 
     /**
-     * Get decklist
-     *
-     * @return \App\Entity\Decklist
+     * Get decklist.
      */
-    public function getDecklist() {
+    public function getDecklist(): Decklist
+    {
         return $this->decklist;
     }
 
     /**
-     * Set card
-     *
-     * @param \App\Entity\Card $card
-     *
-     * @return Decklistsideslot
+     * Set card.
      */
-    public function setCard(\App\Entity\Card $card) {
+    public function setCard(Card $card): Decklistsideslot
+    {
         $this->card = $card;
 
         return $this;
     }
 
     /**
-     * Get card
-     *
-     * @return \App\Entity\Card
+     * Get card.
      */
-    public function getCard() {
+    public function getCard(): Card
+    {
         return $this->card;
     }
 }

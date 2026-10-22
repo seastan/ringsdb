@@ -1,303 +1,364 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-class Pack {
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+
+/**
+ * @ORM\Entity(repositoryClass="App\Repository\PackRepository")
+ * @ORM\Table(
+ *     name="pack",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(name="pack_code_idx", columns={"code"})
+ *     },
+ *     indexes={
+ *         @ORM\Index(name="idx_pack_date_release", columns={"date_release"})
+ *     }
+ * )
+ * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="entity_region")
+ */
+class Pack
+{
     /**
-     * @var integer
+     * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-    /**
-     * @var string
-     */
-    private $code;
-    /**
-     * @var string
-     */
-    private $name;
-    /**
-     * @var integer
-     */
-    private $position;
-    /**
-     * @var integer
-     */
-    private $size;
-    /**
-     * @var \DateTime
-     */
-    private $dateCreation;
-    /**
-     * @var \DateTime
-     */
-    private $dateUpdate;
-    /**
-     * @var \DateTime|null
-     */
-    private $dateRelease;
-    /**
-     * @var boolean
-     */
-    private $isRepackaged = false;
-    /**
-     * @var \Doctrine\Common\Collections\Collection<int, \App\Entity\CardPrinting>
-     */
-    private $printings;
-    /**
-     * @var \App\Entity\Cycle
-     */
-    private $cycle;
 
     /**
-     * Constructor
+     * @var string
+     *
+     * @ORM\Column(type="string", length=255, nullable=false)
      */
-    public function __construct() {
-        $this->printings = new \Doctrine\Common\Collections\ArrayCollection();
+    private $code;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=1024, nullable=false)
+     */
+    private $name;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(type="smallint", nullable=false)
+     */
+    private $position;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(type="smallint", nullable=false)
+     */
+    private $size;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
+     */
+    private $dateCreation;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="date_update", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="update")
+     */
+    private $dateUpdate;
+
+    /**
+     * @var \DateTime|null
+     *
+     * @ORM\Column(name="date_release", type="date", nullable=true)
+     */
+    private $dateRelease;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_repackaged", type="boolean", nullable=false, options={"default": false})
+     */
+    private $isRepackaged = false;
+
+    /**
+     * @var Collection<int, CardPrinting>
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\CardPrinting", mappedBy="pack")
+     * @ORM\OrderBy({"position"="ASC"})
+     */
+    private $printings;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Cycle", inversedBy="packs")
+     * @ORM\JoinColumn(name="cycle_id", referencedColumnName="id", nullable=false)
+     */
+    private ?Cycle $cycle = null;
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        $this->printings = new ArrayCollection();
     }
 
     /**
-     * Set isRepackaged
+     * Set isRepackaged.
      *
-     * @param boolean $isRepackaged
-     *
-     * @return Pack
+     * @param bool $isRepackaged
      */
-    public function setIsRepackaged($isRepackaged) {
+    public function setIsRepackaged($isRepackaged): Pack
+    {
         $this->isRepackaged = $isRepackaged;
 
         return $this;
     }
 
     /**
-     * Get isRepackaged
-     *
-     * @return boolean
+     * Get isRepackaged.
      */
-    public function getIsRepackaged() {
+    public function getIsRepackaged(): bool
+    {
         return $this->isRepackaged;
     }
 
     /**
-     * Get id
-     *
-     * @return integer
+     * Get id.
      */
-    public function getId() {
+    public function getId(): ?int
+    {
         return $this->id;
     }
 
     /**
-     * Set code
+     * Set code.
      *
      * @param string $code
-     *
-     * @return Pack
      */
-    public function setCode($code) {
+    public function setCode($code): Pack
+    {
         $this->code = $code;
 
         return $this;
     }
 
     /**
-     * Get code
-     *
-     * @return string
+     * Get code.
      */
-    public function getCode() {
+    public function getCode(): string
+    {
         return $this->code;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
-     *
-     * @return Pack
      */
-    public function setName($name) {
+    public function setName($name): Pack
+    {
         $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get name
-     *
-     * @return string
+     * Get name.
      */
-    public function getName() {
+    public function getName(): string
+    {
         return $this->name;
     }
 
     /**
-     * Set position
+     * Set position.
      *
-     * @param integer $position
-     *
-     * @return Pack
+     * @param int $position
      */
-    public function setPosition($position) {
+    public function setPosition($position): Pack
+    {
         $this->position = $position;
 
         return $this;
     }
 
     /**
-     * Get position
-     *
-     * @return integer
+     * Get position.
      */
-    public function getPosition() {
+    public function getPosition(): int
+    {
         return $this->position;
     }
 
     /**
-     * Set size
+     * Set size.
      *
-     * @param integer $size
-     *
-     * @return Pack
+     * @param int $size
      */
-    public function setSize($size) {
+    public function setSize($size): Pack
+    {
         $this->size = $size;
 
         return $this;
     }
 
     /**
-     * Get size
-     *
-     * @return integer
+     * Get size.
      */
-    public function getSize() {
+    public function getSize(): int
+    {
         return $this->size;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return Pack
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation): Pack
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
-     *
-     * @return \DateTime
+     * Get dateCreation.
      */
-    public function getDateCreation() {
+    public function getDateCreation(): \DateTime
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
+     * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return Pack
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate($dateUpdate): Pack
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
-     *
-     * @return \DateTime
+     * Get dateUpdate.
      */
-    public function getDateUpdate() {
+    public function getDateUpdate(): \DateTime
+    {
         return $this->dateUpdate;
     }
 
     /**
-     * Set dateRelease
+     * Set dateRelease.
      *
      * @param \DateTime|null $dateRelease
-     *
-     * @return Pack
      */
-    public function setDateRelease($dateRelease) {
+    public function setDateRelease($dateRelease): Pack
+    {
         $this->dateRelease = $dateRelease;
 
         return $this;
     }
 
     /**
-     * Get dateRelease
-     *
-     * @return \DateTime|null
+     * Get dateRelease.
      */
-    public function getDateRelease() {
+    public function getDateRelease(): ?\DateTime
+    {
         return $this->dateRelease;
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Card>
+     * @return Collection<int, Card>
      */
-    public function getCards() {
-        return $this->printings->map(function($p) { return $p->getCard(); });
+    public function getCards(): Collection
+    {
+        /* @phpstan-ignore-next-line return.type */
+        return $this->printings->filter(fn ($p): bool => $p->getCard() instanceof Card)->map(fn ($p) => $p->getCard());
     }
 
     /**
-     * Add printing
-     *
-     * @param \App\Entity\CardPrinting $printing
-     *
-     * @return Pack
+     * Add printing.
      */
-    public function addPrinting(\App\Entity\CardPrinting $printing) {
+    public function addPrinting(CardPrinting $printing): Pack
+    {
         $this->printings[] = $printing;
 
         return $this;
     }
 
     /**
-     * Remove printing
-     *
-     * @param \App\Entity\CardPrinting $printing
-     * @return void
+     * Remove printing.
      */
-    public function removePrinting(\App\Entity\CardPrinting $printing) {
+    public function removePrinting(CardPrinting $printing): void
+    {
         $this->printings->removeElement($printing);
     }
 
     /**
-     * Get printings
+     * Get printings.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\CardPrinting>
+     * @return Collection<int, CardPrinting>
      */
-    public function getPrintings() {
+    public function getPrintings(): Collection
+    {
         return $this->printings;
     }
 
     /**
-     * Set cycle
-     *
-     * @param \App\Entity\Cycle $cycle
-     *
-     * @return Pack
+     * Set cycle.
      */
-    public function setCycle(\App\Entity\Cycle $cycle) {
+    public function setCycle(Cycle $cycle): Pack
+    {
         $this->cycle = $cycle;
 
         return $this;
     }
 
     /**
-     * Get cycle
-     *
-     * @return \App\Entity\Cycle
+     * Get cycle.
      */
-    public function getCycle() {
+    public function getCycle(): ?Cycle
+    {
         return $this->cycle;
+    }
+
+    /**
+     * Returns true is self is later than the argument.
+     */
+    public function isLaterThan(Pack $latestPack): bool
+    {
+        if (!$latestPack->getCycle() instanceof Cycle
+            || !$this->getCycle() instanceof Cycle) {
+            throw new \LogicException('Pack should be an instance of Cycle to be sorted');
+        }
+
+        if (!$latestPack->getDateRelease()
+            && !$this->getDateRelease()) {
+            if ($latestPack->getCycle()->getPosition() === $this->getCycle()->getPosition()) {
+                return $latestPack->getCycle()->getPosition() < $this->getCycle()->getPosition();
+            }
+
+            return $latestPack->getCycle()->getPosition() < $this->getCycle()->getPosition();
+        }
+
+        if ($latestPack->getDateRelease() instanceof \DateTime && $this->getDateRelease() instanceof \DateTime) {
+            return $latestPack->getDateRelease() < $this->getDateRelease();
+        }
+
+        return !$this->getDateRelease();
     }
 }

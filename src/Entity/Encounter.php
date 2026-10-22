@@ -1,172 +1,188 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+
 /**
- * Encounter
+ * Encounter.
+ *
+ * @ORM\Entity(repositoryClass="App\Repository\EncounterRepository")
+ * @ORM\Table(
+ *     name="encounter",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(name="encounter_code_idx", columns={"code"})
+ *     }
+ * )
+ * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="entity_region")
  */
-class Encounter implements \JsonSerializable {
-    public function jsonSerialize() {
-        $array = [
+class Encounter implements \JsonSerializable
+{
+    public function jsonSerialize()
+    {
+        return [
             'id' => $this->getId(),
             'code' => $this->getCode(),
-            'name' => $this->getName()
+            'name' => $this->getName(),
         ];
-
-        return $array;
     }
 
     /**
-     * @var integer
+     * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=255, nullable=false)
      */
     private $code;
+
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=1024, nullable=false)
      */
     private $name;
+
     /**
      * @var \DateTime
+     *
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
      */
     private $dateCreation;
+
     /**
      * @var \DateTime
+     *
+     * @ORM\Column(name="date_update", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="update")
      */
     private $dateUpdate;
-    /**
-     * @var \App\Entity\Pack|null
-     */
-    private $pack;
-    /**
-     * Constructor
-     */
-    public function __construct() {
-    }
-
-    public function __toString() {
-        return (string)$this->getName();
-    }
 
     /**
-     * Get id
-     *
-     * @return integer
+     * @ORM\ManyToOne(targetEntity="App\Entity\Pack")
+     * @ORM\JoinColumn(name="pack_id", referencedColumnName="id")
      */
-    public function getId() {
+    private ?Pack $pack = null;
+
+    public function __toString()
+    {
+        return $this->getName();
+    }
+
+    /**
+     * Get id.
+     */
+    public function getId(): ?int
+    {
         return $this->id;
     }
 
     /**
-     * Set code
+     * Set code.
      *
      * @param string $code
-     *
-     * @return Encounter
      */
-    public function setCode($code) {
+    public function setCode($code): Encounter
+    {
         $this->code = $code;
 
         return $this;
     }
 
     /**
-     * Get code
-     *
-     * @return string
+     * Get code.
      */
-    public function getCode() {
+    public function getCode(): string
+    {
         return $this->code;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
-     *
-     * @return Encounter
      */
-    public function setName($name) {
+    public function setName($name): Encounter
+    {
         $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get name
-     *
-     * @return string
+     * Get name.
      */
-    public function getName() {
+    public function getName(): string
+    {
         return $this->name;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return Encounter
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation): Encounter
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
-     *
-     * @return \DateTime
+     * Get dateCreation.
      */
-    public function getDateCreation() {
+    public function getDateCreation(): \DateTime
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
+     * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return Encounter
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate($dateUpdate): Encounter
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
-     *
-     * @return \DateTime
+     * Get dateUpdate.
      */
-    public function getDateUpdate() {
+    public function getDateUpdate(): \DateTime
+    {
         return $this->dateUpdate;
     }
 
     /**
-     * Set pack
-     *
-     * @param \App\Entity\Pack $pack
-     *
-     * @return Encounter
+     * Set pack.
      */
-    public function setPack(\App\Entity\Pack $pack = null) {
+    public function setPack(?Pack $pack = null): Encounter
+    {
         $this->pack = $pack;
 
         return $this;
     }
 
     /**
-     * Get pack
-     *
-     * @return \App\Entity\Pack|null
+     * Get pack.
      */
-    public function getPack() {
+    public function getPack(): ?Pack
+    {
         return $this->pack;
     }
 }
-

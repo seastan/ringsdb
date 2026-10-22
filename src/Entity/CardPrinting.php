@@ -1,513 +1,548 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-class CardPrinting {
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+
+/**
+ * @ORM\Entity(repositoryClass="App\Repository\CardPrintingRepository")
+ * @ORM\Table(
+ *     name="card_printing",
+ *     indexes={
+ *         @ORM\Index(name="card_printing_card_idx", columns={"card_id"}),
+ *         @ORM\Index(name="card_printing_pack_idx", columns={"pack_id"})
+ *     }
+ * )
+ * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="entity_region")
+ */
+class CardPrinting
+{
     /**
-     * @var integer
+     * @var int|null
+     *
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-    /**
-     * @var integer
-     */
-    private $position;
-    /**
-     * @var integer
-     */
-    private $quantity;
-    /**
-     * @var string|null
-     */
-    private $illustrator;
-    /**
-     * @var string|null
-     */
-    private $octgnid;
-    /**
-     * @var string
-     */
-    private $imageCode;
-    /**
-     * @var string|null
-     */
-    private $traits;
-    /**
-     * @var string|null
-     */
-    private $text;
-    /**
-     * @var string|null
-     */
-    private $cost;
-    /**
-     * @var int|null
-     */
-    private $threat;
-    /**
-     * @var int|null
-     */
-    private $willpower;
-    /**
-     * @var int|null
-     */
-    private $attack;
-    /**
-     * @var int|null
-     */
-    private $defense;
-    /**
-     * @var int|null
-     */
-    private $health;
-    /**
-     * @var int|null
-     */
-    private $victory;
-    /**
-     * @var int|null
-     */
-    private $quest;
-    /**
-     * @var \DateTime
-     */
-    private $dateCreation;
-    /**
-     * @var \DateTime
-     */
-    private $dateUpdate;
-    /**
-     * @var \App\Entity\Card
-     */
-    private $card;
-    /**
-     * @var \App\Entity\Pack
-     */
-    private $pack;
 
     /**
-     * Get id
+     * @var int
      *
-     * @return integer
+     * @ORM\Column(type="smallint", nullable=false)
      */
-    public function getId() {
+    private $position;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(type="smallint", nullable=false)
+     */
+    private $quantity;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $illustrator;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $octgnid;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="image_code", type="string", length=255, nullable=false)
+     */
+    private $imageCode;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $traits;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $text;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(type="string", length=3, nullable=true)
+     */
+    private $cost;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $threat;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $willpower;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $attack;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $defense;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $health;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $victory;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $quest;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
+     */
+    private $dateCreation;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="date_update", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="update")
+     */
+    private $dateUpdate;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Card", inversedBy="printings")
+     * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false)
+     */
+    private ?Card $card = null;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Pack", inversedBy="printings")
+     * @ORM\JoinColumn(name="pack_id", referencedColumnName="id", nullable=false)
+     */
+    private ?Pack $pack = null;
+
+    /**
+     * Get id.
+     */
+    public function getId(): ?int
+    {
         return $this->id;
     }
 
     /**
-     * Set position
+     * Set position.
      *
-     * @param integer $position
-     *
-     * @return CardPrinting
+     * @param int $position
      */
-    public function setPosition($position) {
+    public function setPosition($position): CardPrinting
+    {
         $this->position = $position;
 
         return $this;
     }
 
     /**
-     * Get position
-     *
-     * @return integer
+     * Get position.
      */
-    public function getPosition() {
+    public function getPosition(): int
+    {
         return $this->position;
     }
 
     /**
-     * Set quantity
+     * Set quantity.
      *
-     * @param integer $quantity
-     *
-     * @return CardPrinting
+     * @param int $quantity
      */
-    public function setQuantity($quantity) {
+    public function setQuantity($quantity): CardPrinting
+    {
         $this->quantity = $quantity;
 
         return $this;
     }
 
     /**
-     * Get quantity
-     *
-     * @return integer
+     * Get quantity.
      */
-    public function getQuantity() {
+    public function getQuantity(): int
+    {
         return $this->quantity;
     }
 
     /**
-     * Set illustrator
+     * Set illustrator.
      *
      * @param string|null $illustrator
-     *
-     * @return CardPrinting
      */
-    public function setIllustrator($illustrator) {
+    public function setIllustrator($illustrator): CardPrinting
+    {
         $this->illustrator = $illustrator;
 
         return $this;
     }
 
     /**
-     * Get illustrator
-     *
-     * @return string|null
+     * Get illustrator.
      */
-    public function getIllustrator() {
+    public function getIllustrator(): ?string
+    {
         return $this->illustrator;
     }
 
     /**
-     * Set octgnid
+     * Set octgnid.
      *
      * @param string|null $octgnid
-     *
-     * @return CardPrinting
      */
-    public function setOctgnid($octgnid) {
+    public function setOctgnid($octgnid): CardPrinting
+    {
         $this->octgnid = $octgnid;
 
         return $this;
     }
 
     /**
-     * Get octgnid
-     *
-     * @return string|null
+     * Get octgnid.
      */
-    public function getOctgnid() {
+    public function getOctgnid(): ?string
+    {
         return $this->octgnid;
     }
 
     /**
-     * Set imageCode
+     * Set imageCode.
      *
      * @param string $imageCode
-     *
-     * @return CardPrinting
      */
-    public function setImageCode($imageCode) {
+    public function setImageCode($imageCode): CardPrinting
+    {
         $this->imageCode = $imageCode;
 
         return $this;
     }
 
     /**
-     * Get imageCode
-     *
-     * @return string
+     * Get imageCode.
      */
-    public function getImageCode() {
+    public function getImageCode(): string
+    {
         return $this->imageCode;
     }
 
     /**
-     * Set traits
+     * Set traits.
      *
      * @param string|null $traits
-     *
-     * @return CardPrinting
      */
-    public function setTraits($traits) {
+    public function setTraits($traits): CardPrinting
+    {
         $this->traits = $traits;
 
         return $this;
     }
 
     /**
-     * Get traits
-     *
-     * @return string|null
+     * Get traits.
      */
-    public function getTraits() {
+    public function getTraits(): ?string
+    {
         return $this->traits;
     }
 
     /**
-     * Set text
+     * Set text.
      *
      * @param string|null $text
-     *
-     * @return CardPrinting
      */
-    public function setText($text) {
+    public function setText($text): CardPrinting
+    {
         $this->text = $text;
 
         return $this;
     }
 
     /**
-     * Get text
-     *
-     * @return string|null
+     * Get text.
      */
-    public function getText() {
+    public function getText(): ?string
+    {
         return $this->text;
     }
 
     /**
-     * Set cost
+     * Set cost.
      *
      * @param string|null $cost
-     *
-     * @return CardPrinting
      */
-    public function setCost($cost) {
+    public function setCost($cost): CardPrinting
+    {
         $this->cost = $cost;
 
         return $this;
     }
 
     /**
-     * Get cost
-     *
-     * @return string|null
+     * Get cost.
      */
-    public function getCost() {
+    public function getCost(): ?string
+    {
         return $this->cost;
     }
 
     /**
-     * Set threat
+     * Set threat.
      *
      * @param int|null $threat
-     *
-     * @return CardPrinting
      */
-    public function setThreat($threat) {
+    public function setThreat($threat): CardPrinting
+    {
         $this->threat = $threat;
 
         return $this;
     }
 
     /**
-     * Get threat
-     *
-     * @return int|null
+     * Get threat.
      */
-    public function getThreat() {
+    public function getThreat(): ?int
+    {
         return $this->threat;
     }
 
     /**
-     * Set willpower
+     * Set willpower.
      *
      * @param int|null $willpower
-     *
-     * @return CardPrinting
      */
-    public function setWillpower($willpower) {
+    public function setWillpower($willpower): CardPrinting
+    {
         $this->willpower = $willpower;
 
         return $this;
     }
 
     /**
-     * Get willpower
-     *
-     * @return int|null
+     * Get willpower.
      */
-    public function getWillpower() {
+    public function getWillpower(): ?int
+    {
         return $this->willpower;
     }
 
     /**
-     * Set attack
+     * Set attack.
      *
      * @param int|null $attack
-     *
-     * @return CardPrinting
      */
-    public function setAttack($attack) {
+    public function setAttack($attack): CardPrinting
+    {
         $this->attack = $attack;
 
         return $this;
     }
 
     /**
-     * Get attack
-     *
-     * @return int|null
+     * Get attack.
      */
-    public function getAttack() {
+    public function getAttack(): ?int
+    {
         return $this->attack;
     }
 
     /**
-     * Set defense
+     * Set defense.
      *
      * @param int|null $defense
-     *
-     * @return CardPrinting
      */
-    public function setDefense($defense) {
+    public function setDefense($defense): CardPrinting
+    {
         $this->defense = $defense;
 
         return $this;
     }
 
     /**
-     * Get defense
-     *
-     * @return int|null
+     * Get defense.
      */
-    public function getDefense() {
+    public function getDefense(): ?int
+    {
         return $this->defense;
     }
 
     /**
-     * Set health
+     * Set health.
      *
      * @param int|null $health
-     *
-     * @return CardPrinting
      */
-    public function setHealth($health) {
+    public function setHealth($health): CardPrinting
+    {
         $this->health = $health;
 
         return $this;
     }
 
     /**
-     * Get health
-     *
-     * @return int|null
+     * Get health.
      */
-    public function getHealth() {
+    public function getHealth(): ?int
+    {
         return $this->health;
     }
 
     /**
-     * Set victory
+     * Set victory.
      *
      * @param int|null $victory
-     *
-     * @return CardPrinting
      */
-    public function setVictory($victory) {
+    public function setVictory($victory): CardPrinting
+    {
         $this->victory = $victory;
 
         return $this;
     }
 
     /**
-     * Get victory
-     *
-     * @return int|null
+     * Get victory.
      */
-    public function getVictory() {
+    public function getVictory(): ?int
+    {
         return $this->victory;
     }
 
     /**
-     * Set quest
+     * Set quest.
      *
      * @param int|null $quest
-     *
-     * @return CardPrinting
      */
-    public function setQuest($quest) {
+    public function setQuest($quest): CardPrinting
+    {
         $this->quest = $quest;
 
         return $this;
     }
 
     /**
-     * Get quest
-     *
-     * @return int|null
+     * Get quest.
      */
-    public function getQuest() {
+    public function getQuest(): ?int
+    {
         return $this->quest;
     }
 
     /**
-     * Set dateCreation
+     * Set dateCreation.
      *
      * @param \DateTime $dateCreation
-     *
-     * @return CardPrinting
      */
-    public function setDateCreation($dateCreation) {
+    public function setDateCreation($dateCreation): CardPrinting
+    {
         $this->dateCreation = $dateCreation;
 
         return $this;
     }
 
     /**
-     * Get dateCreation
-     *
-     * @return \DateTime
+     * Get dateCreation.
      */
-    public function getDateCreation() {
+    public function getDateCreation(): \DateTime
+    {
         return $this->dateCreation;
     }
 
     /**
-     * Set dateUpdate
+     * Set dateUpdate.
      *
      * @param \DateTime $dateUpdate
-     *
-     * @return CardPrinting
      */
-    public function setDateUpdate($dateUpdate) {
+    public function setDateUpdate($dateUpdate): CardPrinting
+    {
         $this->dateUpdate = $dateUpdate;
 
         return $this;
     }
 
     /**
-     * Get dateUpdate
-     *
-     * @return \DateTime
+     * Get dateUpdate.
      */
-    public function getDateUpdate() {
+    public function getDateUpdate(): \DateTime
+    {
         return $this->dateUpdate;
     }
 
     /**
-     * Set card
-     *
-     * @param \App\Entity\Card $card
-     *
-     * @return CardPrinting
+     * Set card.
      */
-    public function setCard(\App\Entity\Card $card) {
+    public function setCard(Card $card): CardPrinting
+    {
         $this->card = $card;
 
         return $this;
     }
 
     /**
-     * Get card
-     *
-     * @return \App\Entity\Card
+     * Get card.
      */
-    public function getCard() {
+    public function getCard(): ?Card
+    {
         return $this->card;
     }
 
     /**
-     * Set pack
-     *
-     * @param \App\Entity\Pack $pack
-     *
-     * @return CardPrinting
+     * Set pack.
      */
-    public function setPack(\App\Entity\Pack $pack) {
+    public function setPack(Pack $pack): CardPrinting
+    {
         $this->pack = $pack;
 
         return $this;
     }
 
     /**
-     * Get pack
-     *
-     * @return \App\Entity\Pack
+     * Get pack.
      */
-    public function getPack() {
+    public function getPack(): ?Pack
+    {
         return $this->pack;
     }
 }
