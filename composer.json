@@ -71,7 +71,7 @@
         "symfony/validator": "*",
         "symfony/var-dumper": "*",
         "symfony/yaml": "*",
-        "twig/twig": "^2.10"
+        "twig/twig": "^3.27"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.4.5",
