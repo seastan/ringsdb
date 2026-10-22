@@ -42,22 +42,22 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         return $this->slots->removeElement($element);
     }
 
-    public function count()
+    public function count(): int
     {
         return $this->slots->count();
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return $this->slots->getIterator();
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->slots->offsetExists($offset);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->slots->offsetGet($offset);
     }

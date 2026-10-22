@@ -1177,7 +1177,10 @@ class Scenario implements \JsonSerializable
         return $this->nameCanonical;
     }
 
-    public function jsonSerialize()
+    /**
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): array
     {
         $encounters = $this->getEncounters()->toArray();
         $pack = $this->getPack();

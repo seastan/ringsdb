@@ -21,7 +21,10 @@ use Gedmo\Mapping\Annotation as Gedmo;
  */
 class Encounter implements \JsonSerializable
 {
-    public function jsonSerialize()
+    /**
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): array
     {
         return [
             'id' => $this->getId(),

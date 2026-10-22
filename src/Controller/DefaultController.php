@@ -278,8 +278,10 @@ class DefaultController extends AbstractController
             $text = $comment['text'];
             if (is_string($text) && strlen($text) > 300) {
                 $text = (string) preg_replace('/\\s+?(\\S+)?$/', '', substr($text.' ', 0, 301));
-                if (strrpos($text, '<') > strrpos($text, '>')) {
-                    $text = substr($text.' ', 0, strrpos($text, '<'));
+                $ltPos = strrpos($text, '<');
+                $gtPos = strrpos($text, '>');
+                if ($ltPos !== false && ($gtPos === false || $ltPos > $gtPos)) {
+                    $text = substr($text.' ', 0, $ltPos);
                 }
 
                 $text = (string) preg_replace('/\\s+?(\\S+)?$/', '', $text);
