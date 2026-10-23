@@ -11,11 +11,6 @@ doctrine:
         password:       '%env(DATABASE_PASSWORD)%'
         charset:        UTF8
         schema_filter: '~^(?!stat_cards_cache$)~'
-        # PHP 8.1+ PDO-MySQL returns native int/float for numeric columns instead of
-        # strings (as 7.4 did). Force strings to preserve the pre-8.x API/JSON contract
-        # ("1" not 1) and keep behaviour identical across PHP versions.
-        options:
-            !php/const PDO::ATTR_STRINGIFY_FETCHES: true
 
     orm:
         enable_native_lazy_objects: true
