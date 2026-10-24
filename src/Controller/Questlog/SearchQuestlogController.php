@@ -53,7 +53,7 @@ class SearchQuestlogController extends AbstractController
         $on = 0;
         $off = 0;
         $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
-        $list_cycles = $this->cycleRepository->findBy([], ['position' => \SortDirection::Ascending]);
+        $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
         foreach ($list_cycles as $cycle) {
             /* @var $cycle Cycle */
             $size = count($cycle->getPacks());

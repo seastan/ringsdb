@@ -22,6 +22,9 @@ class QuestlogComment
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
+    #[ORM\Column(type: 'text')]
+    private string $text;
+
     #[Gedmo\Timestampable(on: 'create')]
     #[ORM\Column(name: 'date_creation', type: 'datetime', nullable: false)]
     private \DateTime $dateCreation;
@@ -32,16 +35,19 @@ class QuestlogComment
     #[ORM\Column(name: 'is_hidden', type: 'boolean')]
     private $isHidden = false;
 
-    public function __construct(
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'questlog_comments')]
-        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
-        private User $user,
-        #[ORM\ManyToOne(targetEntity: Questlog::class, inversedBy: 'comments')]
-        #[ORM\JoinColumn(name: 'questlog_id', referencedColumnName: 'id', nullable: false)]
-        private Questlog $questlog,
-        #[ORM\Column(type: 'text')]
-        private string $text
-    ) {
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'questlog_comments')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    private User $user;
+
+    #[ORM\ManyToOne(targetEntity: Questlog::class, inversedBy: 'comments')]
+    #[ORM\JoinColumn(name: 'questlog_id', referencedColumnName: 'id', nullable: false)]
+    private Questlog $questlog;
+
+    public function __construct(User $user, Questlog $questlog, string $text)
+    {
+        $this->user = $user;
+        $this->questlog = $questlog;
+        $this->text = $text;
         $this->dateCreation = new \DateTime();
     }
 

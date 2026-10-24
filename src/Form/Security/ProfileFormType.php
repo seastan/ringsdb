@@ -29,7 +29,7 @@ class ProfileFormType extends AbstractType
                 'label' => 'Current password',
                 'mapped' => false,
                 'constraints' => [
-                    new NotBlank(['groups' => ['Profile']]),
+                    new NotBlank(groups: ['Profile']),
                     new UserPassword(['message' => 'The entered password is invalid.', 'groups' => ['Profile']]),
                 ],
                 'attr' => ['autocomplete' => 'current-password'],

@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
- * CSV import of a pack (CSVController, POST /admin/csv/upload, admin only): fields "code",
+ * CSV import of a pack (CsvUploadProcessController, POST /admin/csv/upload, admin only): fields "code",
  * "old_code" (to rename a pack) and "name" of the pack, and the CSV file "upfile", as produced by
  * BeornJSONtoRingsDBcsv.py from a Hall of Beorn export: a header line, then one card per line.
  * The lines end with CRLF, the line breaks in the texts are LF.

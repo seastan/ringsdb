@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Precomputes the heavy per-card monthly stats into stat_cards_cache so the
- * admin endpoint (StatController::getStatCardsAction) is a light table read.
+ * admin endpoint (GetStatCardsController) is a light table read.
  * MUST be run from cron / CLI -- it scans a whole month of decklistslot/deckslot
  * and would saturate the shared php-fpm pool if run on a web worker.
  *

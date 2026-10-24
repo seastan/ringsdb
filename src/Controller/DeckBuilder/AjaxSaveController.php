@@ -5,16 +5,13 @@ declare(strict_types=1);
 namespace App\Controller\DeckBuilder;
 
 use App\Controller\CurrentUserTrait;
-use App\Entity\Deck;
-use App\Entity\User;
-use App\Helper\StringSanitizer;
+use App\Exception\TooManyDecksException;
+use App\Model\SaveDeckDto;
 use App\Repository\DeckRepository;
-use App\Services\Decks;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Services\DeckSaver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AjaxSaveController extends AbstractController
@@ -22,55 +19,44 @@ class AjaxSaveController extends AbstractController
     use CurrentUserTrait;
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private DeckRepository $deckRepository,
-        private Decks $decks
+        private readonly DeckRepository $deckRepository,
+        private readonly DeckSaver $deckSaver
     ) {
     }
 
     #[Route(path: '/deck/save-ajax', name: 'deck_save_ajax', methods: ['POST'])]
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(#[MapRequestPayload] SaveDeckDto $payload = new SaveDeckDto()): JsonResponse
     {
-        /* @var $user User */
         $user = $this->currentUser();
-        if (count($user->getDecks()) > $user->getMaxNbDecks()) {
-            return new JsonResponse(['success' => false, 'error' => 'You have reached the maximum number of decks allowed.'], 422);
-        }
 
-        $id = filter_var($request->get('id'), FILTER_SANITIZE_NUMBER_INT);
+        $id = filter_var($payload->id, FILTER_SANITIZE_NUMBER_INT);
         $deck = null;
-        $source_deck = null;
         if ($id) {
             /* @var $deck \App\Entity\Deck */
             $deck = $this->deckRepository->find($id);
             if (!$deck || !$deck->getUser()->isEqualTo($user)) {
                 return new JsonResponse(['success' => false, 'error' => "You don't have access to this deck."], 403);
             }
-
-            $source_deck = $deck;
-        } else {
-            $deck = new Deck($user);
         }
 
-        $content = json_decode($request->get('content'), true);
+        $content = json_decode($payload->content, true);
         if (!isset($content['main']) || empty($content['main'])) {
             return new JsonResponse(['success' => false, 'error' => 'Cannot save an empty deck.'], 422);
         }
 
-        $name = StringSanitizer::sanitize($request->get('name'), false);
-        if (empty($name)) {
-            $name = 'Untitled Deck';
+        try {
+            $deck = $this->deckSaver->save(
+                $user,
+                $content,
+                $payload->name,
+                $payload->description,
+                $payload->tags,
+                deck: $deck,
+                sourceDeck: $deck,
+            );
+        } catch (TooManyDecksException) {
+            return new JsonResponse(['success' => false, 'error' => 'You have reached the maximum number of decks allowed.'], 422);
         }
-
-        $decklist_id = filter_var($request->get('decklist_id'), FILTER_SANITIZE_NUMBER_INT);
-        if (false === $decklist_id) {
-            throw new BadRequestHttpException('Wrong decklist_id');
-        }
-
-        $description = trim($request->get('description') ?? '');
-        $tags = StringSanitizer::sanitize($request->get('tags'), false);
-        $this->decks->saveDeck($user, $deck, (int) $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);
-        $this->entityManager->flush();
 
         return new JsonResponse(['success' => true, 'id' => $deck->getId()]);
     }

@@ -6,8 +6,8 @@ namespace App\Controller\Decklist;
 
 use App\Entity\Deck;
 use App\Entity\Decklist;
-use App\Repository\DecklistRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -16,8 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class DeleteDecklistController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly DecklistRepository $decklistRepository
+        private readonly EntityManagerInterface $entityManager
     ) {
     }
 
@@ -25,15 +24,14 @@ class DeleteDecklistController extends AbstractController
      * deletes a decklist if it has no comment, no vote, no favorite.
      */
     #[Route(path: '/decklist/delete/{decklist_id}', name: 'decklist_delete', requirements: ['decklist_id' => '\d+'], methods: ['POST'])]
-    public function __invoke(int $decklist_id): RedirectResponse
+    public function __invoke(#[MapEntity(id: 'decklist_id', message: 'Decklist not found.')] Decklist $decklist): RedirectResponse
     {
         $user = $this->getUser();
         if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
 
-        $decklist = $this->decklistRepository->find($decklist_id);
-        if (!$decklist || !$decklist->getUser()->isEqualTo($user)) {
+        if (!$decklist->getUser()->isEqualTo($user)) {
             throw new AccessDeniedHttpException("You don't have access to this decklist.");
         }
 

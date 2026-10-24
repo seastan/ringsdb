@@ -22,6 +22,9 @@ class Comment
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
+    #[ORM\Column(type: 'text')]
+    private string $text;
+
     #[Gedmo\Timestampable(on: 'create')]
     #[ORM\Column(name: 'date_creation', type: 'datetime', nullable: false)]
     private \DateTime $dateCreation;
@@ -32,16 +35,19 @@ class Comment
     #[ORM\Column(name: 'is_hidden', type: 'boolean')]
     private $isHidden = false;
 
-    public function __construct(
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'comments')]
-        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
-        private User $user,
-        #[ORM\ManyToOne(targetEntity: Decklist::class, inversedBy: 'comments')]
-        #[ORM\JoinColumn(name: 'decklist_id', referencedColumnName: 'id', nullable: false)]
-        private Decklist $decklist,
-        #[ORM\Column(type: 'text')]
-        private string $text
-    ) {
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'comments')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    private User $user;
+
+    #[ORM\ManyToOne(targetEntity: Decklist::class, inversedBy: 'comments')]
+    #[ORM\JoinColumn(name: 'decklist_id', referencedColumnName: 'id', nullable: false)]
+    private Decklist $decklist;
+
+    public function __construct(User $user, Decklist $decklist, string $text)
+    {
+        $this->user = $user;
+        $this->decklist = $decklist;
+        $this->text = $text;
         $this->dateCreation = new \DateTime();
     }
 

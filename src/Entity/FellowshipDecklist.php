@@ -27,14 +27,18 @@ class FellowshipDecklist
     #[ORM\Column(name: 'deck_number', type: 'smallint')]
     private $deckNumber;
 
-    public function __construct(
-        #[ORM\ManyToOne(targetEntity: Decklist::class, inversedBy: 'fellowships')]
-        #[ORM\JoinColumn(name: 'decklist_id', referencedColumnName: 'id', nullable: false)]
-        private Decklist $decklist,
-        #[ORM\ManyToOne(targetEntity: Fellowship::class, inversedBy: 'decklists')]
-        #[ORM\JoinColumn(name: 'fellowship_id', referencedColumnName: 'id', nullable: false)]
-        private Fellowship $fellowship
-    ) {
+    #[ORM\ManyToOne(targetEntity: Fellowship::class, inversedBy: 'decklists')]
+    #[ORM\JoinColumn(name: 'fellowship_id', referencedColumnName: 'id', nullable: false)]
+    private Fellowship $fellowship;
+
+    #[ORM\ManyToOne(targetEntity: Decklist::class, inversedBy: 'fellowships')]
+    #[ORM\JoinColumn(name: 'decklist_id', referencedColumnName: 'id', nullable: false)]
+    private Decklist $decklist;
+
+    public function __construct(Decklist $decklist, Fellowship $fellowship)
+    {
+        $this->decklist = $decklist;
+        $this->fellowship = $fellowship;
     }
 
     /**

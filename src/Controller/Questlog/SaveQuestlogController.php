@@ -12,16 +12,17 @@ use App\Entity\QuestlogDeck;
 use App\Entity\Scenario;
 use App\Entity\User;
 use App\Helper\StringSanitizer;
+use App\Model\SaveQuestlogDto;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use App\Repository\QuestlogRepository;
 use App\Repository\ScenarioRepository;
-use App\Services\Decks;
+use App\Services\DeckSaver;
 use App\Services\Texts;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -38,20 +39,20 @@ class SaveQuestlogController extends AbstractController
         private ScenarioRepository $scenarioRepository,
         private DeckRepository $deckRepository,
         private DecklistRepository $decklistRepository,
-        private Decks $decks
+        private DeckSaver $deckSaver
     ) {
     }
 
     #[Route(path: '/questlog/save', name: 'questlog_save', methods: ['POST'])]
-    public function __invoke(Request $request): Response
+    public function __invoke(#[MapRequestPayload] SaveQuestlogDto $payload = new SaveQuestlogDto()): Response
     {
         /* @var $user User */
         $user = $this->currentUser();
-        $questlog_id = intval(filter_var($request->request->get('questlog_id'), FILTER_SANITIZE_NUMBER_INT));
+        $questlog_id = intval(filter_var($payload->questlogId, FILTER_SANITIZE_NUMBER_INT));
         if ($questlog_id) {
             /* @var $questlog \App\Entity\Questlog */
             $questlog = $this->questlogRepository->find($questlog_id);
-            if (!$questlog) {
+            if (!$questlog instanceof Questlog) {
                 throw new NotFoundHttpException('This questlog does not exist.');
             }
 
@@ -66,25 +67,25 @@ class SaveQuestlogController extends AbstractController
             $questlog->setNbDecks(0);
         }
 
-        $name = trim(StringSanitizer::sanitize($request->request->get('name'), false));
+        $name = trim(StringSanitizer::sanitize($payload->name, false));
         $name = substr($name, 0, 250);
         if (empty($name)) {
             $name = 'Untitled Questlog';
         }
 
-        $descriptionMd = trim((string) $request->request->get('descriptionMd'));
+        $descriptionMd = trim((string) $payload->descriptionMd);
         $descriptionHtml = $this->texts->markdown($descriptionMd);
-        $quest = intval(filter_var($request->request->get('quest'), FILTER_SANITIZE_NUMBER_INT));
-        $date = trim(StringSanitizer::sanitize($request->request->get('date'), false));
-        $difficulty = trim(StringSanitizer::sanitize($request->request->get('difficulty'), false));
-        $victory = trim(StringSanitizer::sanitize($request->request->get('victory'), false));
-        $score = intval(filter_var($request->request->get('score'), FILTER_SANITIZE_NUMBER_INT));
-        $public = boolval(filter_var($request->request->get('public'), FILTER_SANITIZE_NUMBER_INT));
+        $quest = intval(filter_var($payload->quest, FILTER_SANITIZE_NUMBER_INT));
+        $date = trim(StringSanitizer::sanitize($payload->date, false));
+        $difficulty = trim(StringSanitizer::sanitize($payload->difficulty, false));
+        $victory = trim(StringSanitizer::sanitize($payload->victory, false));
+        $score = intval(filter_var($payload->score, FILTER_SANITIZE_NUMBER_INT));
+        $public = boolval(filter_var($payload->public, FILTER_SANITIZE_NUMBER_INT));
         $victory = 'no' !== $victory;
         $difficulty = in_array($difficulty, ['normal', 'easy', 'nightmare'], true) ? $difficulty : 'normal';
         /* @var $scenario Scenario */
         $scenario = $this->scenarioRepository->find($quest);
-        if (!$scenario) {
+        if (!$scenario instanceof Scenario) {
             throw new NotFoundHttpException('This scenario does not exists.');
         }
 
@@ -115,16 +116,17 @@ class SaveQuestlogController extends AbstractController
 
             $nb_decks = 0;
             $skip = 0;
-            for ($i = 1; $i <= 4; ++$i) {
-                $deck_id = intval(filter_var($request->request->get('deck'.$i.'_id'), FILTER_SANITIZE_NUMBER_INT));
-                $is_decklist = 'true' === StringSanitizer::sanitize($request->get('deck'.$i.'_is_decklist'));
-                $player = trim(StringSanitizer::sanitize($request->get('questlogdeck'.$i.'_player_name'), false));
-                $content = (array) json_decode($request->get('questlogdeck'.$i.'_content'), true);
+            for ($i = 1; $i <= SaveQuestlogDto::NB_DECKS; ++$i) {
+                $slot = $payload->deck($i);
+                $deck_id = intval(filter_var($slot['id'], FILTER_SANITIZE_NUMBER_INT));
+                $is_decklist = 'true' === StringSanitizer::sanitize($slot['isDecklist']);
+                $player = trim(StringSanitizer::sanitize($slot['playerName'], false));
+                $content = (array) json_decode($slot['questlogdeckContent'], true);
                 if ($deck_id) {
                     if (!$is_decklist) {
                         /* @var $deck \App\Entity\Deck */
                         $deck = $this->deckRepository->find($deck_id);
-                        if (!$deck) {
+                        if (!$deck instanceof Deck) {
                             throw new NotFoundHttpException('One of the selected decks does not exist.');
                         }
 
@@ -134,7 +136,7 @@ class SaveQuestlogController extends AbstractController
                         }
 
                         if (!$is_owner) {
-                            $deck = $this->decks->cloneDeck($deck, $user);
+                            $deck = $this->deckSaver->cloneDeck($user, $deck);
                         }
 
                         // $content = (array) json_decode($request->get("deck".$i."_content"));
@@ -151,7 +153,7 @@ class SaveQuestlogController extends AbstractController
                     } else {
                         /* @var $decklist Decklist */
                         $decklist = $this->decklistRepository->find($deck_id);
-                        if (!$decklist) {
+                        if (!$decklist instanceof Decklist) {
                             throw new NotFoundHttpException('One of the selected decks does not exist.');
                         }
 
@@ -174,7 +176,7 @@ class SaveQuestlogController extends AbstractController
                     // deck_id == 0 occurs if:
                     // 1. the deck slot in the builder is empty
                     // 2. the deck being referenced was deleted
-                    $content = json_decode($request->get('deck'.$i.'_content') ?? '', true);
+                    $content = json_decode($slot['deckContent'], true);
                     if (!isset($content['main']) || empty($content['main'])) {
                         // Deck slot was empty
                         ++$skip;

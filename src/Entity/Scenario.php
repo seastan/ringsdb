@@ -67,7 +67,7 @@ class Scenario implements \JsonSerializable
     /**
      * @var Collection<int, Questlog>
      */
-    #[ORM\OneToMany(mappedBy: 'scenario', targetEntity: Questlog::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: Questlog::class, mappedBy: 'scenario', cascade: ['persist', 'remove'])]
     private $questlogs;
 
     /**

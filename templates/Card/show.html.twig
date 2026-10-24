@@ -39,7 +39,7 @@
             </tr>
             <tr>
                 <th>Image</th>
-                <td><img src="{{ asset('/bundles/cards/' ~ entity.code ~ '.png') }}"></td>
+                <td><img src="{{ card_image_locator.cardImageUrl(entity) }}"></td>
             </tr>
         </tbody>
     </table>

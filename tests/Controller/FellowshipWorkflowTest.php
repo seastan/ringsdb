@@ -374,7 +374,7 @@ class FellowshipWorkflowTest extends WebTestCase
         $this->assertGreaterThan($this->maxIds['deck'], $cloneId);
         $clone = $this->db()->fetchAssociative('SELECT d.name, u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$cloneId]);
         $this->assertNotFalse($clone);
-        $this->assertSame(['Dwarf Lore/Leadership/Tactics', 'admin'], [$clone['name'], $clone['username']]);
+        $this->assertSame(['Dwarf Lore/Leadership/Tactics (clone)', 'admin'], [$clone['name'], $clone['username']]);
     }
 
     public function testCannotChangeAnotherUsersFellowship(): void

@@ -113,15 +113,19 @@ class Questlog
     /**
      * @var Collection<int, QuestlogDeck>
      */
-    #[ORM\OneToMany(mappedBy: 'questlog', targetEntity: QuestlogDeck::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: QuestlogDeck::class, mappedBy: 'questlog', cascade: ['persist', 'remove'])]
     private $decks;
 
     /**
      * @var Collection<int, QuestlogComment>
      */
-    #[ORM\OneToMany(mappedBy: 'questlog', targetEntity: QuestlogComment::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: QuestlogComment::class, mappedBy: 'questlog', cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['dateCreation' => \SortDirection::Ascending])]
     private $comments;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'questlogs')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    private User $user;
 
     #[ORM\ManyToOne(targetEntity: Scenario::class, inversedBy: 'questlogs')]
     #[ORM\JoinColumn(name: 'scenario_id', referencedColumnName: 'id', nullable: false)]
@@ -144,11 +148,9 @@ class Questlog
     /**
      * Constructor.
      */
-    public function __construct(
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'questlogs')]
-        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
-        private User $user
-    ) {
+    public function __construct(User $user)
+    {
+        $this->user = $user;
         $this->decks = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->favorites = new ArrayCollection();

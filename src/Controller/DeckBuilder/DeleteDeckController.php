@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Controller\DeckBuilder;
 
 use App\Controller\CurrentUserTrait;
+use App\Model\DeckIdDto;
 use App\Repository\DeckRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -24,12 +25,12 @@ class DeleteDeckController extends AbstractController
     }
 
     #[Route(path: '/deck/delete', name: 'deck_delete', methods: ['POST'])]
-    public function __invoke(Request $request): RedirectResponse
+    public function __invoke(#[MapRequestPayload] DeckIdDto $payload = new DeckIdDto()): RedirectResponse
     {
-        $deck_id = filter_var($request->get('deck_id'), FILTER_SANITIZE_NUMBER_INT);
+        $deck_id = filter_var($payload->deckId, FILTER_SANITIZE_NUMBER_INT);
         /* @var $deck \App\Entity\Deck */
         $deck = $this->deckRepository->find($deck_id);
-        if (!$deck) {
+        if (!$deck instanceof \App\Entity\Deck) {
             return $this->redirect($this->generateUrl('decks_list'));
         }
 

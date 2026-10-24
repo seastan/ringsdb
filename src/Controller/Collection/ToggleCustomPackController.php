@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Collection;
 
 use App\Controller\CurrentUserTrait;
-use App\Services\CustomPackManager;
+use App\Entity\UserCustomPack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -17,16 +17,14 @@ class ToggleCustomPackController extends AbstractController
     use CurrentUserTrait;
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private CustomPackManager $customPackManager
+        private EntityManagerInterface $entityManager
     ) {
     }
 
     #[Route(path: '/collection/custom-pack/{id}/toggle', name: 'collection_custom_pack_toggle', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function __invoke(Request $request, int $id): RedirectResponse
+    public function __invoke(Request $request, UserCustomPack $pack): RedirectResponse
     {
-        $pack = $this->customPackManager->loadOwnedPack($this->currentUser(), $id);
-        if (!$pack instanceof \App\Entity\UserCustomPack) {
+        if (!$pack->getUser()->isEqualTo($this->currentUser())) {
             throw $this->createNotFoundException();
         }
 

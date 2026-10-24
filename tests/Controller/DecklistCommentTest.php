@@ -326,6 +326,6 @@ class DecklistCommentTest extends WebTestCase
         $client = $this->createAuthenticatedClient('test');
         $client->request('POST', '/user/hidecomment/999/1');
 
-        $this->assertSame(400, $client->getResponse()->getStatusCode());
+        $this->assertSame(404, $client->getResponse()->getStatusCode());
     }
 }

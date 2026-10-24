@@ -20,7 +20,7 @@ class ListReviewsController extends AbstractController
     }
 
     #[Route(path: '/reviews/{page}', name: 'card_reviews_list', requirements: ['page' => '\d+'], defaults: ['page' => 1])]
-    public function listAction(Request $request, int $page = 1): Response
+    public function __invoke(Request $request, int $page = 1): Response
     {
         $response = new Response();
         $response->setPublic();
@@ -49,7 +49,7 @@ class ListReviewsController extends AbstractController
         $prevpage = max(1, $currpage - 1);
         $nbpages = min(10, ceil($maxcount / $limit));
         $nextpage = min($nbpages, $currpage + 1);
-        $route = $request->get('_route');
+        $route = $request->attributes->get('_route');
         $params = $request->query->all();
         $pages = [];
         for ($page = 1; $page <= $nbpages; ++$page) {

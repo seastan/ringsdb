@@ -42,7 +42,7 @@ class CardStatsCalculatorTest extends KernelTestCase
     {
         static::bootKernel();
         $this->connection = static::$kernel->getContainer()->get('doctrine')->getConnection();
-        $this->calculator = static::$kernel->getContainer()->get('app.card_stats');
+        $this->calculator = static::getContainer()->get(CardStatsCalculator::class);
         foreach (['deck', 'decklist'] as $table) {
             $this->maxIds[$table] = (int) $this->connection->fetchOne("SELECT MAX(id) FROM $table");
         }

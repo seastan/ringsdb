@@ -4,22 +4,17 @@ declare(strict_types=1);
 
 namespace App\DataFixtures;
 
-use App\Entity\Deck;
 use App\Entity\User;
-use App\Services\Decks;
+use App\Services\DeckSaver;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DeckFixtures extends Fixture implements ContainerAwareInterface, DependentFixtureInterface
+class DeckFixtures extends Fixture implements DependentFixtureInterface
 {
-    private ?ContainerInterface $container = null;
-
-    public function setContainer(?ContainerInterface $container = null): void
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly DeckSaver $deckSaver
+    ) {
     }
 
     /**
@@ -34,13 +29,6 @@ class DeckFixtures extends Fixture implements ContainerAwareInterface, Dependent
 
     public function load(ObjectManager $manager): void
     {
-        if (!$this->container instanceof ContainerInterface) {
-            throw new \LogicException('The container is not set.');
-        }
-
-        /** @var Decks $deckService */
-        $deckService = $this->container->get('decks');
-
         /** @var User $user */
         $user = $this->getReference('test-user', User::class);
 
@@ -177,16 +165,11 @@ class DeckFixtures extends Fixture implements ContainerAwareInterface, Dependent
         ];
 
         foreach ($deckData as $i => $data) {
-            $deck = new Deck($user);
-            $deckService->saveDeck(
+            $deck = $this->deckSaver->save(
                 $user,
-                $deck,
-                null,
-                $data['name'],
-                'Description',
-                null,
                 $data['content'],
-                null
+                $data['name'],
+                'Description'
             );
             $deck->setDateCreation(new \DateTime('2015-08-16'));
             $deck->setDateUpdate(new \DateTime('2015-08-16'));

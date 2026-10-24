@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Entity\Deck;
+use App\Entity\Questlog;
 use App\Entity\User;
-use App\Repository\QuestlogRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -14,21 +14,14 @@ class QuestlogArchiver
 {
     public function __construct(
         private readonly string $cacheDir,
-        private readonly QuestlogRepository $questlogRepository,
-        private readonly Decks $decks,
         private readonly Environment $twig,
-        private readonly Texts $texts
+        private readonly Texts $texts,
+        private readonly SnapshotManager $snapshotManager
     ) {
     }
 
-    public function downloadFromSelection(User $user, int $questlog_id, bool $octgn): Response
+    public function downloadFromSelection(User $user, Questlog $questlog, bool $octgn): Response
     {
-        /* @var $questlog \App\Entity\QuestLog */
-        $questlog = $this->questlogRepository->find($questlog_id);
-        if (!$questlog) {
-            throw new AccessDeniedHttpException("You don't have access to this questlog.");
-        }
-
         $questlog_user = $questlog->getUser();
         $is_public = $questlog->getIsPublic();
         if (!$questlog_user->isEqualTo($user)
@@ -52,7 +45,7 @@ class QuestlogArchiver
             foreach ($questlog_decks as $questlog_deck) {
                 $deck = $questlog_deck->getDeck();
                 if ($deck instanceof Deck) {
-                    $this->decks->setSlots($deck, json_decode($questlog_deck->getContent(), true));
+                    $this->snapshotManager->applySnapshot($deck, $questlog_deck);
                     $decks[] = $deck;
                 }
             }
@@ -76,7 +69,7 @@ class QuestlogArchiver
         $response = new Response();
         $response->headers->set('Content-Type', 'application/zip');
         $response->headers->set('Content-Length', (string) filesize($file));
-        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->texts->slugify('RingsDB - Quest Log '.$questlog_id).'.zip'));
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $this->texts->slugify('RingsDB - Quest Log '.$questlog->getId()).'.zip'));
 
         $contents = file_get_contents($file);
         if (false === $contents) {

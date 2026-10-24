@@ -33,6 +33,10 @@ class QuestlogDeck
     #[ORM\Column(type: 'text', nullable: false)]
     private $content;
 
+    #[ORM\ManyToOne(targetEntity: Questlog::class, inversedBy: 'decks')]
+    #[ORM\JoinColumn(name: 'questlog_id', referencedColumnName: 'id', nullable: false)]
+    private Questlog $questlog;
+
     #[ORM\ManyToOne(targetEntity: Deck::class, inversedBy: 'questlogs')]
     #[ORM\JoinColumn(name: 'deck_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     private ?Deck $deck = null;
@@ -41,11 +45,9 @@ class QuestlogDeck
     #[ORM\JoinColumn(name: 'decklist_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     private ?Decklist $decklist = null;
 
-    public function __construct(
-        #[ORM\ManyToOne(targetEntity: Questlog::class, inversedBy: 'decks')]
-        #[ORM\JoinColumn(name: 'questlog_id', referencedColumnName: 'id', nullable: false)]
-        private Questlog $questlog
-    ) {
+    public function __construct(Questlog $questlog)
+    {
+        $this->questlog = $questlog;
     }
 
     /**
