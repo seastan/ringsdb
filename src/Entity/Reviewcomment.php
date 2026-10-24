@@ -9,59 +9,43 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Reviewcomment.
- *
- * @ORM\Entity
- * @ORM\Table(name="reviewcomment")
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'reviewcomment')]
 class Reviewcomment
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
-     * @Gedmo\Timestampable(on="create")
      */
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name: 'date_creation', type: 'datetime', nullable: false)]
     private $dateCreation;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="date_update", type="datetime", nullable=false)
-     * @Gedmo\Timestampable(on="update")
      */
+    #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(name: 'date_update', type: 'datetime', nullable: false)]
     private $dateUpdate;
 
-    /**
-     * @ORM\Column(type="text", nullable=false)
-     */
-    private string $text;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
-     */
-    private User $user;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Review", inversedBy="comments")
-     * @ORM\JoinColumn(name="review_id", referencedColumnName="id", nullable=false)
-     */
-    private Review $review;
-
-    public function __construct(User $user, Review $review, string $text)
-    {
-        $this->user = $user;
-        $this->review = $review;
-        $this->text = $text;
+    public function __construct(
+        #[ORM\ManyToOne(targetEntity: User::class)]
+        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+        private User $user,
+        #[ORM\ManyToOne(targetEntity: Review::class, inversedBy: 'comments')]
+        #[ORM\JoinColumn(name: 'review_id', referencedColumnName: 'id', nullable: false)]
+        private Review $review,
+        #[ORM\Column(type: 'text', nullable: false)]
+        private string $text
+    ) {
     }
 
     /**

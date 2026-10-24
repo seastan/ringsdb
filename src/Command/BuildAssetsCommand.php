@@ -19,12 +19,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class BuildAssetsCommand extends Command
 {
-    private string $publicDir;
-
-    public function __construct(string $publicDir)
-    {
+    public function __construct(
+        private readonly string $publicDir
+    ) {
         parent::__construct();
-        $this->publicDir = $publicDir;
     }
 
     protected function configure(): void
@@ -33,7 +31,7 @@ class BuildAssetsCommand extends Command
              ->setDescription('Build the JavaScript and CSS files loaded by every page into public/');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $sourceDir = __DIR__.'/../Resources/public';
         $bundles = [];
@@ -43,7 +41,7 @@ class BuildAssetsCommand extends Command
 
         foreach (AssetBundles::STYLESHEETS as $target => $sources) {
             $bundles[$target] = function (string $source, string $content) use ($sourceDir, $target): string {
-                if ('.scss' === substr($source, -5)) {
+                if (str_ends_with($source, '.scss')) {
                     $compiler = new Compiler();
                     $compiler->setImportPaths(dirname("$sourceDir/$source"));
                     $compiler->setOutputStyle(OutputStyle::EXPANDED);

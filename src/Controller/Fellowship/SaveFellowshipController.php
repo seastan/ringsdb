@@ -11,6 +11,7 @@ use App\Entity\Fellowship;
 use App\Entity\FellowshipDeck;
 use App\Entity\FellowshipDecklist;
 use App\Entity\User;
+use App\Helper\StringSanitizer;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use App\Repository\FellowshipRepository;
@@ -23,43 +24,23 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SaveFellowshipController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private EntityManagerInterface $entityManager;
-
-    private Texts $texts;
-
-    private Decks $decks;
-
-    private DeckRepository $deckRepository;
-
-    private DecklistRepository $decklistRepository;
-
-    private FellowshipRepository $fellowshipRepository;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        Texts $texts,
-        Decks $decks,
-        DeckRepository $deckRepository,
-        DecklistRepository $decklistRepository,
-        FellowshipRepository $fellowshipRepository
+        private EntityManagerInterface $entityManager,
+        private Texts $texts,
+        private Decks $decks,
+        private DeckRepository $deckRepository,
+        private DecklistRepository $decklistRepository,
+        private FellowshipRepository $fellowshipRepository
     ) {
-        $this->entityManager = $entityManager;
-        $this->texts = $texts;
-        $this->decks = $decks;
-        $this->deckRepository = $deckRepository;
-        $this->decklistRepository = $decklistRepository;
-        $this->fellowshipRepository = $fellowshipRepository;
     }
 
-    /**
-     * @Route("/fellowship/save", name="fellowship_save", methods={"POST"})
-     */
+    #[Route(path: '/fellowship/save', name: 'fellowship_save', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         /* @var $user User */
@@ -79,7 +60,7 @@ class SaveFellowshipController extends AbstractController
             $fellowship = new Fellowship($user);
         }
 
-        $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $name = trim(StringSanitizer::sanitize($request->request->get('name'), false));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = 'Untitled Fellowship';
@@ -110,7 +91,7 @@ class SaveFellowshipController extends AbstractController
             $skip = 0;
             for ($i = 1; $i <= 4; ++$i) {
                 $deck_id = intval(filter_var($request->request->get('deck'.$i.'_id'), FILTER_SANITIZE_NUMBER_INT));
-                $is_decklist = 'true' == filter_var($request->get('deck'.$i.'_is_decklist'), FILTER_SANITIZE_STRING);
+                $is_decklist = 'true' === StringSanitizer::sanitize($request->get('deck'.$i.'_is_decklist'));
                 if ($deck_id) {
                     if (!$is_decklist) {
                         /* @var $deck Deck */

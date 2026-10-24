@@ -9,27 +9,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ViewQuestlogController extends AbstractController
 {
-    private QuestlogRepository $questlogRepository;
-
     public function __construct(
-        QuestlogRepository $questlogRepository
+        private readonly QuestlogRepository $questlogRepository
     ) {
-        $this->questlogRepository = $questlogRepository;
     }
 
-    /**
-     * @Route(
-     *     "/questlog/view/{questlog_id}/{questlog_name}",
-     *     name="questlog_view",
-     *     methods={"GET"},
-     *     requirements={"questlog_id"="\d+"},
-     *     defaults={"questlog_name"=null}
-     * )
-     */
+    #[Route(path: '/questlog/view/{questlog_id}/{questlog_name}', name: 'questlog_view', requirements: ['questlog_id' => '\d+'], defaults: ['questlog_name' => null], methods: ['GET'])]
     public function __invoke(int $questlog_id): Response
     {
         /* @var $questlog \App\Entity\Questlog */
@@ -38,7 +27,7 @@ class ViewQuestlogController extends AbstractController
             throw new NotFoundHttpException('This questlog does not exists.');
         }
 
-        $is_owner = $this->getUser() && $this->getUser()->getId() == $questlog->getUser()->getId();
+        $is_owner = $this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface && $this->getUser()->getId() == $questlog->getUser()->getId();
         $is_public = $questlog->getIsPublic();
         if (!$questlog->getUser()->getIsShareDecks() && !$is_owner && !$is_public) {
             throw new AccessDeniedHttpException('You are not allowed to view this questlog. To get access, you can ask it\'s owner to enable "Share my decks" on their account.');
@@ -47,7 +36,7 @@ class ViewQuestlogController extends AbstractController
         if ($is_public) {
             $commenters = array_map(
                 /* @var $comment \App\Entity\QuestlogComment */
-                fn (\App\Entity\QuestlogComment $comment) => $comment->getUser()->getUsername(),
+                fn (\App\Entity\QuestlogComment $comment): string => $comment->getUser()->getUsername(),
                 $questlog->getComments()->getValues()
             );
             $commenters[] = $questlog->getUser()->getUsername();

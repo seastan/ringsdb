@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Entity\Card;
+use App\Entity\CardPrinting;
+use App\Entity\Deckslot;
 use App\Entity\Questlog;
+use App\Entity\QuestlogComment;
 use App\Entity\User;
+use App\Entity\UserCustomPackCard;
+use App\Helper\StringSanitizer;
 use App\Repository\CardRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -51,20 +56,12 @@ class QuestLogManager
      */
     protected $user;
 
-    private EntityManagerInterface $doctrine;
-
-    private RequestStack $request_stack;
-
-    private UrlGeneratorInterface $router;
-
-    private CardRepository $cardRepository;
-
-    public function __construct(EntityManagerInterface $doctrine, RequestStack $request_stack, UrlGeneratorInterface $router, CardRepository $cardRepository)
-    {
-        $this->doctrine = $doctrine;
-        $this->request_stack = $request_stack;
-        $this->router = $router;
-        $this->cardRepository = $cardRepository;
+    public function __construct(
+        private readonly EntityManagerInterface $doctrine,
+        private readonly RequestStack $request_stack,
+        private readonly UrlGeneratorInterface $router,
+        private readonly CardRepository $cardRepository
+    ) {
     }
 
     /**
@@ -73,7 +70,7 @@ class QuestLogManager
     private function currentRequest(): Request
     {
         $request = $this->request_stack->getCurrentRequest();
-        if (null === $request) {
+        if (!$request instanceof Request) {
             throw new \LogicException('No current request.');
         }
 
@@ -108,7 +105,7 @@ class QuestLogManager
     {
         $qb = $this->doctrine->createQueryBuilder();
         $qb->select('d');
-        $qb->from('App:Questlog', 'd');
+        $qb->from(Questlog::class, 'd');
         $qb->andWhere('d.isPublic = 1');
         $qb->setFirstResult($this->start);
         $qb->setMaxResults($this->limit);
@@ -149,10 +146,10 @@ class QuestLogManager
     {
         $qb = $this->getQueryBuilder();
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.datePublish), 2)) AS HIDDEN popularity');
-        $qb->orderBy('popularity', 'DESC');
+        $qb->orderBy('popularity', \SortDirection::Descending);
 
         // tie-breaker, for a stable order and pagination
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -164,10 +161,10 @@ class QuestLogManager
     {
         $qb = $this->getQueryBuilder();
 
-        $qb->orderBy('d.datePublish', 'DESC');
+        $qb->orderBy('d.datePublish', \SortDirection::Descending);
 
         // tie-breaker, for a stable order and pagination
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -182,10 +179,10 @@ class QuestLogManager
         $qb->leftJoin('d.favorites', 'u');
         $qb->andWhere('u = :user');
         $qb->setParameter('user', $user);
-        $qb->orderBy('d.datePublish', 'DESC');
+        $qb->orderBy('d.datePublish', \SortDirection::Descending);
 
         // tie-breaker, for a stable order and pagination
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -199,10 +196,10 @@ class QuestLogManager
 
         $qb->andWhere('d.user = :user');
         $qb->setParameter('user', $user);
-        $qb->orderBy('d.datePublish', 'DESC');
+        $qb->orderBy('d.datePublish', \SortDirection::Descending);
 
         // tie-breaker, for a stable order and pagination
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -215,10 +212,10 @@ class QuestLogManager
         $qb = $this->getQueryBuilder();
 
         $qb->andWhere('d.nbVotes > 10');
-        $qb->orderBy('d.nbVotes', 'DESC');
+        $qb->orderBy('d.nbVotes', \SortDirection::Descending);
 
         // tie-breaker, for a stable order and pagination
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -230,12 +227,12 @@ class QuestLogManager
     {
         $qb = $this->getQueryBuilder();
 
-        $qb->addSelect('(SELECT count(c) FROM App:QuestlogComment c WHERE c.questlog=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
-        $qb->orderBy('nbRecentComments', 'DESC');
-        $qb->addOrderBy('d.nbComments', 'DESC');
+        $qb->addSelect('(SELECT count(c) FROM '.QuestlogComment::class.' c WHERE c.questlog=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
+        $qb->orderBy('nbRecentComments', \SortDirection::Descending);
+        $qb->addOrderBy('d.nbComments', \SortDirection::Descending);
 
         // tie-breaker, for a stable order and pagination
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -249,14 +246,14 @@ class QuestLogManager
 
         $cards_code = $request->query->all('cards');
 
-        $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
-        $questlog_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
+        $author_name = StringSanitizer::sanitize($request->query->get('author'));
+        $questlog_name = StringSanitizer::sanitize($request->query->get('name'));
         $nb_decks = intval(filter_var($request->query->get('nb_decks'), FILTER_SANITIZE_NUMBER_INT));
 
         $sort = $request->query->get('sort');
         $packs = $request->query->all('packs');
 
-        $customPackCodes = array_values(array_filter($request->query->all('custom_packs'), 'is_string'));
+        $customPackCodes = array_values(array_filter($request->query->all('custom_packs'), is_string(...)));
 
         $qb = $this->getQueryBuilder();
         $joinTables = [];
@@ -303,19 +300,19 @@ class QuestLogManager
             if (count($packs) > 0 || $useCustomPacks) {
                 $sub = $this->doctrine->createQueryBuilder();
                 $sub->select('c');
-                $sub->from('App:Card', 'c');
-                $sub->innerJoin('App:Deckslot', 's', 'WITH', 's.card = c');
+                $sub->from(Card::class, 'c');
+                $sub->innerJoin(Deckslot::class, 's', Query\Expr\Join::ON, 's.card = c');
                 $sub->where('s.deck = ld');
 
                 if (count($packs) > 0) {
-                    $sub->andWhere('NOT EXISTS (SELECT cpqlm.id FROM App:CardPrinting cpqlm WHERE cpqlm.card = c AND cpqlm.pack IN (:qlm_packs))');
+                    $sub->andWhere('NOT EXISTS (SELECT cpqlm.id FROM '.CardPrinting::class.' cpqlm WHERE cpqlm.card = c AND cpqlm.pack IN (:qlm_packs))');
                     $qb->setParameter('qlm_packs', $packs);
                 }
 
                 if ($useCustomPacks) {
                     $sub->andWhere(
                         'NOT EXISTS ('.
-                            'SELECT ucpcqlm.id FROM App:UserCustomPackCard ucpcqlm '.
+                            'SELECT ucpcqlm.id FROM '.UserCustomPackCard::class.' ucpcqlm '.
                             'JOIN ucpcqlm.customPack ucpqlm '.
                             'WHERE ucpcqlm.card = c '.
                             'AND ucpqlm.code IN (:qlm_custom_codes) '.
@@ -332,11 +329,11 @@ class QuestLogManager
 
         switch ($sort) {
             case 'date':
-                $qb->orderBy('d.datePublish', 'DESC');
+                $qb->orderBy('d.datePublish', \SortDirection::Descending);
                 break;
 
             case 'likes':
-                $qb->orderBy('d.nbVotes', 'DESC');
+                $qb->orderBy('d.nbVotes', \SortDirection::Descending);
                 break;
 
             case 'reputation':
@@ -346,18 +343,18 @@ class QuestLogManager
 
                 // with DISTINCT, MySQL 5.7+ only sorts on selected columns
                 $qb->addSelect('u.reputation AS HIDDEN reputation');
-                $qb->orderBy('reputation', 'DESC');
+                $qb->orderBy('reputation', \SortDirection::Descending);
                 break;
 
             case 'popularity':
             default:
                 $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
-                $qb->orderBy('popularity', 'DESC');
+                $qb->orderBy('popularity', \SortDirection::Descending);
                 break;
         }
 
         // tie-breaker, for a stable order and pagination
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         return $this->getPaginator($qb->getQuery());
     }

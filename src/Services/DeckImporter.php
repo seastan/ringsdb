@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Card;
+use App\Entity\CardPrinting;
 use App\Entity\Pack;
 use App\Repository\CardRepository;
 use App\Repository\PackRepository;
@@ -11,17 +12,11 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class DeckImporter
 {
-    private EntityManagerInterface $entityManager;
-
-    private CardRepository $cardRepository;
-
-    private PackRepository $packRepository;
-
-    public function __construct(EntityManagerInterface $entityManager, CardRepository $cardRepository, PackRepository $packRepository)
-    {
-        $this->entityManager = $entityManager;
-        $this->packRepository = $packRepository;
-        $this->cardRepository = $cardRepository;
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly CardRepository $cardRepository,
+        private readonly PackRepository $packRepository
+    ) {
     }
 
     /**
@@ -67,7 +62,7 @@ class DeckImporter
             if ($pack) {
                 // a card belongs to its packs through its printings
                 /* @var $card \App\Entity\Card */
-                $card = $this->entityManager->createQuery('SELECT c FROM App:Card c JOIN c.printings p WHERE c.name = :name AND p.pack = :pack ORDER BY c.code')->setParameter('name', $name)->setParameter('pack', $pack)->setMaxResults(1)->getOneOrNullResult();
+                $card = $this->entityManager->createQuery('SELECT c FROM '.Card::class.' c JOIN c.printings p WHERE c.name = :name AND p.pack = :pack ORDER BY c.code')->setParameter('name', $name)->setParameter('pack', $pack)->setMaxResults(1)->getOneOrNullResult();
             } else {
                 /* @var $pack \App\Entity\Card */
                 $card = $this->cardRepository->findOneBy(['name' => $name]);
@@ -144,9 +139,19 @@ class DeckImporter
      *
      * @param string $octgnid
      */
-    private function findCardByOctgnid($octgnid): ?Card
+    private function findCardByOctgnid(int|string $octgnid): ?Card
     {
-        $printing = $this->entityManager->createQueryBuilder()->select('cp')->from('App:CardPrinting', 'cp')->join('cp.card', 'c')->where('cp.octgnid = :octgnid')->setParameter('octgnid', $octgnid)->orderBy('c.id', 'ASC')->setMaxResults(1)->getQuery()->getOneOrNullResult();
+        $printing = $this->entityManager
+            ->createQueryBuilder()
+            ->select('cp')
+            ->from(CardPrinting::class, 'cp')
+            ->join('cp.card', 'c')
+            ->where('cp.octgnid = :octgnid')
+            ->setParameter('octgnid', $octgnid)
+            ->orderBy('c.id', \SortDirection::Ascending)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
 
         return $printing ? $printing->getCard() : null;
     }

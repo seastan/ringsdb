@@ -10,7 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * The account form: username and email, confirmed by the current password.
@@ -19,9 +19,7 @@ class ProfileEditController extends AbstractController
 {
     use CurrentUserTrait;
 
-    /**
-     * @Route("/profile/edit", name="fos_user_profile_edit", methods={"GET", "POST"})
-     */
+    #[Route(path: '/profile/edit', name: 'fos_user_profile_edit', methods: ['GET', 'POST'])]
     public function __invoke(Request $request, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ProfileFormType::class, $this->currentUser());

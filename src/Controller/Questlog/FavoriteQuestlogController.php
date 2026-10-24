@@ -6,36 +6,30 @@ namespace App\Controller\Questlog;
 
 use App\Entity\User;
 use App\Repository\QuestlogRepository;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class FavoriteQuestlogController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private QuestlogRepository $questlogRepository;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        QuestlogRepository $questlogRepository
+        private readonly EntityManagerInterface $entityManager,
+        private readonly QuestlogRepository $questlogRepository,
+        private readonly Connection $connection
     ) {
-        $this->entityManager = $entityManager;
-        $this->questlogRepository = $questlogRepository;
     }
 
-    /**
-     * @Route("/user/questlog_favorite", name="questlog_favorite", methods={"POST"})
-     */
+    #[Route(path: '/user/questlog_favorite', name: 'questlog_favorite', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
         /* @var $user User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 
@@ -48,8 +42,7 @@ class FavoriteQuestlogController extends AbstractController
 
         /* @var $author User */
         $author = $questlog->getUser();
-        $dbh = $this->getDoctrine()->getConnection();
-        $is_favorite = $dbh->executeQuery("SELECT\n\t\t\t\tcount(*)\n\t\t\t\tFROM questlog d\n\t\t\t\tJOIN questlog_favorite f ON f.questlog_id = d.id\n\t\t\t\tWHERE f.user_id = ?\n\t\t\t\tAND d.id = ?", [$user->getId(), $questlog_id])->fetch(\PDO::FETCH_NUM)[0];
+        $is_favorite = $this->connection->executeQuery("SELECT\n\t\t\t\tcount(*)\n\t\t\t\tFROM questlog d\n\t\t\t\tJOIN questlog_favorite f ON f.questlog_id = d.id\n\t\t\t\tWHERE f.user_id = ?\n\t\t\t\tAND d.id = ?", [$user->getId(), $questlog_id])->fetchOne();
         if ($is_favorite) {
             $questlog->setNbfavorites($questlog->getNbFavorites() - 1);
             $questlog->removeFavorite($user);

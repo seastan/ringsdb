@@ -10,27 +10,19 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class DeleteListController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private EntityManagerInterface $entityManager;
-
-    private DeckRepository $deckRepository;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        DeckRepository $deckRepository
+        private EntityManagerInterface $entityManager,
+        private DeckRepository $deckRepository
     ) {
-        $this->entityManager = $entityManager;
-        $this->deckRepository = $deckRepository;
     }
 
-    /**
-     * @Route("/deck/delete_list", name="deck_delete_list", methods={"POST"})
-     */
+    #[Route(path: '/deck/delete_list', name: 'deck_delete_list', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         $list_id = explode('-', $request->get('ids'));
@@ -53,7 +45,7 @@ class DeleteListController extends AbstractController
         }
 
         $this->entityManager->flush();
-        $this->get('session')->getFlashBag()->set('notice', 'Decks deleted.');
+        $this->addFlash('notice', 'Decks deleted.');
 
         return $this->redirect($this->generateUrl('decks_list'));
     }

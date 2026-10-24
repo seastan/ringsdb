@@ -15,31 +15,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class AutosaveController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private DeckRepository $deckRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    private LoggerInterface $logger;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        DeckRepository $deckRepository,
-        LoggerInterface $logger
+        private EntityManagerInterface $entityManager,
+        private DeckRepository $deckRepository,
+        private LoggerInterface $logger
     ) {
-        $this->entityManager = $entityManager;
-        $this->deckRepository = $deckRepository;
-        $this->logger = $logger;
     }
 
-    /**
-     * @Route("/deck/autosave", name="deck_autosave", methods={"POST"})
-     */
+    #[Route(path: '/deck/autosave', name: 'deck_autosave', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
         /* @var $user User */

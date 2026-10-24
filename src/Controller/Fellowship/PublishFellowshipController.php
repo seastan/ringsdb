@@ -7,6 +7,7 @@ namespace App\Controller\Fellowship;
 use App\Entity\FellowshipDecklist;
 use App\Entity\User;
 use App\Helper\FellowshipValidationHelper;
+use App\Helper\StringSanitizer;
 use App\Model\DecklistFactory;
 use App\Repository\DecklistRepository;
 use App\Repository\FellowshipRepository;
@@ -17,46 +18,26 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class PublishFellowshipController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private FellowshipValidationHelper $fellowshipValidationHelper;
-
-    private Texts $texts;
-
-    private DecklistFactory $decklistFactory;
-
-    private DecklistRepository $decklistRepository;
-
-    private FellowshipRepository $fellowshipRepository;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        FellowshipValidationHelper $fellowshipValidationHelper,
-        Texts $texts,
-        DecklistFactory $decklistFactory,
-        DecklistRepository $decklistRepository,
-        FellowshipRepository $fellowshipRepository
+        private readonly EntityManagerInterface $entityManager,
+        private readonly FellowshipValidationHelper $fellowshipValidationHelper,
+        private readonly Texts $texts,
+        private readonly DecklistFactory $decklistFactory,
+        private readonly DecklistRepository $decklistRepository,
+        private readonly FellowshipRepository $fellowshipRepository
     ) {
-        $this->entityManager = $entityManager;
-        $this->fellowshipValidationHelper = $fellowshipValidationHelper;
-        $this->texts = $texts;
-        $this->decklistFactory = $decklistFactory;
-        $this->decklistRepository = $decklistRepository;
-        $this->fellowshipRepository = $fellowshipRepository;
     }
 
-    /**
-     * @Route("/fellowship/publish", name="fellowship_publish", methods={"POST"})
-     */
+    #[Route(path: '/fellowship/publish', name: 'fellowship_publish', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         /* @var $user User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
 
@@ -68,12 +49,12 @@ class PublishFellowshipController extends AbstractController
         }
 
         if ($fellowship->getIsPublic()) {
-            $this->get('session')->getFlashBag()->set('error', 'This fellowship is already published.');
+            $this->addFlash('error', 'This fellowship is already published.');
 
             return $this->redirect($this->generateUrl('fellowship_view', ['fellowship_id' => $fellowship->getId()]));
         }
 
-        $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $name = trim(StringSanitizer::sanitize($request->request->get('name'), false));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = 'Untitled Fellowship';
@@ -112,7 +93,7 @@ class PublishFellowshipController extends AbstractController
         // Validate fellowship
         $problem = $this->fellowshipValidationHelper->findProblem($fellowship);
         if ($problem) {
-            $this->get('session')->getFlashBag()->set('error', 'This fellowship cannot be published because it is invalid.');
+            $this->addFlash('error', 'This fellowship cannot be published because it is invalid.');
 
             return $this->redirect($this->generateUrl('fellowship_view', ['fellowship_id' => $fellowship->getId()]));
         }

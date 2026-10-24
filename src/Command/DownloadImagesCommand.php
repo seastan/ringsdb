@@ -12,18 +12,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DownloadImagesCommand extends Command
 {
-    private Packages $packages;
-
-    private string $publicDir;
-
-    private CardRepository $cardRepository;
-
-    public function __construct(Packages $packages, string $publicDir, CardRepository $cardRepository)
-    {
+    public function __construct(
+        private readonly Packages $packages,
+        private readonly string $publicDir,
+        private readonly CardRepository $cardRepository
+    ) {
         parent::__construct();
-        $this->packages = $packages;
-        $this->publicDir = $publicDir;
-        $this->cardRepository = $cardRepository;
     }
 
     protected function configure(): void
@@ -34,7 +28,7 @@ class DownloadImagesCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $assets_helper = $this->packages;
 
@@ -43,7 +37,7 @@ class DownloadImagesCommand extends Command
         $publicDir = $this->publicDir;
         $output->writeln($publicDir);
 
-        $cards = $repo->findBy([], ['code' => 'ASC']);
+        $cards = $repo->findBy([], ['code' => \SortDirection::Ascending]);
         foreach ($cards as $card) {
             if (!$card->getPack()) {
                 continue;

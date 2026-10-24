@@ -15,7 +15,7 @@ use Symfony\Component\Dotenv\Dotenv;
 require __DIR__.'/../vendor/autoload.php';
 
 $projectDir = dirname(__DIR__);
-$dotenv = new Dotenv(false);
+$dotenv = new Dotenv();
 
 if (is_file("$projectDir/.env")) {
     $dotenv->load("$projectDir/.env");

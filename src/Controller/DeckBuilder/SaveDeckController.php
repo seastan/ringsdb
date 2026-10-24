@@ -6,6 +6,7 @@ namespace App\Controller\DeckBuilder;
 
 use App\Controller\CurrentUserTrait;
 use App\Entity\Deck;
+use App\Helper\StringSanitizer;
 use App\Repository\DeckRepository;
 use App\Services\Decks;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,31 +16,20 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SaveDeckController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private DeckRepository $deckRepository;
-
-    private EntityManagerInterface $entityManager;
-
-    private Decks $decks;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        DeckRepository $deckRepository,
-        Decks $decks
+        private EntityManagerInterface $entityManager,
+        private DeckRepository $deckRepository,
+        private Decks $decks
     ) {
-        $this->deckRepository = $deckRepository;
-        $this->entityManager = $entityManager;
-        $this->decks = $decks;
     }
 
-    /**
-     * @Route("/deck/save", name="deck_save", methods={"POST"})
-     */
+    #[Route(path: '/deck/save', name: 'deck_save', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
         $user = $this->currentUser();
@@ -81,7 +71,7 @@ class SaveDeckController extends AbstractController
             return new Response('Cannot import an empty deck');
         }
 
-        $name = filter_var($request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+        $name = StringSanitizer::sanitize($request->get('name'), false);
         if (empty($name)) {
             $name = 'Untitled Deck';
         }
@@ -92,7 +82,7 @@ class SaveDeckController extends AbstractController
         }
 
         $description = trim($request->get('description') ?? '');
-        $tags = filter_var($request->get('tags'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES) ?: '';
+        $tags = StringSanitizer::sanitize($request->get('tags'), false);
         $this->decks->saveDeck($user, $deck, (int) $decklist_id, $name, $description, $tags, $content, $source_deck ?: null);
         $this->entityManager->flush();
 

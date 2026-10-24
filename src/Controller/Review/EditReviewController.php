@@ -12,34 +12,23 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class EditReviewController extends AbstractController
 {
-    private ReviewRepository $reviewRepository;
-
-    private Texts $texts;
-
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        ReviewRepository $reviewRepository,
-        Texts $texts
+        private readonly EntityManagerInterface $entityManager,
+        private readonly ReviewRepository $reviewRepository,
+        private readonly Texts $texts
     ) {
-        $this->reviewRepository = $reviewRepository;
-        $this->texts = $texts;
-        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @Route("/review/edit", name="card_review_edit", methods={"POST"})
-     */
+    #[Route(path: '/review/edit', name: 'card_review_edit', methods: ['POST'])]
     public function editAction(Request $request): Response
     {
         /* @var $user \App\Entity\User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You are not logged in.');
         }
 

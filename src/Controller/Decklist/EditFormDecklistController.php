@@ -8,28 +8,24 @@ use App\Entity\Decklist;
 use App\Repository\DecklistRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class EditFormDecklistController extends AbstractController
 {
-    private DecklistRepository $decklistRepository;
-
     public function __construct(
-        DecklistRepository $decklistRepository
+        private readonly DecklistRepository $decklistRepository
     ) {
-        $this->decklistRepository = $decklistRepository;
     }
 
     /**
      * Displays the decklist edit form.
-     *
-     * @Route("/decklist/edit/{decklist_id}", name="decklist_edit", requirements={"decklist_id"="\d+"})
      */
+    #[Route(path: '/decklist/edit/{decklist_id}', name: 'decklist_edit', requirements: ['decklist_id' => '\d+'])]
     public function __invoke(int $decklist_id): Response
     {
         /* @var $user \App\Entity\User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw $this->createAccessDeniedException('Anonymous access denied');
         }
 

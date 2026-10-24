@@ -12,36 +12,25 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class HideCommentFellowshipController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private FellowshipCommentRepository $fellowshipCommentRepository;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        FellowshipCommentRepository $fellowshipCommentRepository
+        private readonly EntityManagerInterface $entityManager,
+        private readonly FellowshipCommentRepository $fellowshipCommentRepository
     ) {
-        $this->entityManager = $entityManager;
-        $this->fellowshipCommentRepository = $fellowshipCommentRepository;
     }
 
     /**
      * hides a comment, or if $hidden is false, unhide a comment.
-     *
-     * @Route(
-     *     "/user/fellowship_hidecomment/{comment_id}/{hidden}",
-     *     name="fellowship_comment_hide",
-     *     methods={"POST"}
-     * )
      */
+    #[Route(path: '/user/fellowship_hidecomment/{comment_id}/{hidden}', name: 'fellowship_comment_hide', methods: ['POST'])]
     public function __invoke(int $comment_id, int $hidden): Response
     {
         /* @var $user User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 

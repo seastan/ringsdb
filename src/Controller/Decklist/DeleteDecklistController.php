@@ -11,36 +11,24 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class DeleteDecklistController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private DecklistRepository $decklistRepository;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        DecklistRepository $decklistRepository
+        private readonly EntityManagerInterface $entityManager,
+        private readonly DecklistRepository $decklistRepository
     ) {
-        $this->entityManager = $entityManager;
-        $this->decklistRepository = $decklistRepository;
     }
 
     /**
      * deletes a decklist if it has no comment, no vote, no favorite.
-     *
-     * @Route(
-     *     "/decklist/delete/{decklist_id}",
-     *     name="decklist_delete",
-     *     methods={"POST"},
-     *     requirements={"decklist_id"="\d+"}
-     * )
      */
+    #[Route(path: '/decklist/delete/{decklist_id}', name: 'decklist_delete', requirements: ['decklist_id' => '\d+'], methods: ['POST'])]
     public function __invoke(int $decklist_id): RedirectResponse
     {
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
 

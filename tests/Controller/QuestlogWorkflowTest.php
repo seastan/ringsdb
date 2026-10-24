@@ -30,15 +30,18 @@ class QuestlogWorkflowTest extends WebTestCase
 
     private array $fixtureQuestlog;
 
+    private array $fixtureUsers;
+
     protected function setUp(): void
     {
         $this->client = static::createClient();
         $connection = $this->db();
         foreach (['questlog', 'questlog_deck', 'deck'] as $table) {
-            $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
+            $this->maxIds[$table] = (int) $connection->fetchOne("SELECT MAX(id) FROM $table");
         }
 
         $this->fixtureQuestlog = $this->questlogOneState($connection);
+        $this->fixtureUsers = $connection->fetchAllAssociative('SELECT id, reputation FROM user');
     }
 
     /**
@@ -47,8 +50,8 @@ class QuestlogWorkflowTest extends WebTestCase
     private function questlogOneState(\Doctrine\DBAL\Connection $connection): array
     {
         return [
-            $connection->fetchAssoc('SELECT * FROM questlog WHERE id = 1'),
-            $connection->fetchAll('SELECT * FROM questlog_deck WHERE questlog_id = 1 ORDER BY id'),
+            $connection->fetchAssociative('SELECT * FROM questlog WHERE id = 1'),
+            $connection->fetchAllAssociative('SELECT * FROM questlog_deck WHERE questlog_id = 1 ORDER BY id'),
         ];
     }
 
@@ -57,6 +60,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $connection = $this->db();
         $max = $this->maxIds;
         foreach ([
+            'DELETE FROM questlog_favorite',
             "DELETE FROM questlog_deck WHERE id > {$max['questlog_deck']} OR questlog_id > {$max['questlog']}",
             "DELETE FROM questlog WHERE id > {$max['questlog']}",
             "DELETE FROM deckchange WHERE deck_id > {$max['deck']}",
@@ -64,16 +68,20 @@ class QuestlogWorkflowTest extends WebTestCase
             "DELETE FROM decksideslot WHERE deck_id > {$max['deck']}",
             "DELETE FROM deck WHERE id > {$max['deck']}",
         ] as $sql) {
-            $connection->exec($sql);
+            $connection->executeStatement($sql);
         }
 
         if ($this->questlogOneState($connection) != $this->fixtureQuestlog) {
             [$questlog, $decks] = $this->fixtureQuestlog;
             $connection->update('questlog', $questlog, ['id' => 1]);
-            $connection->exec('DELETE FROM questlog_deck WHERE questlog_id = 1');
+            $connection->executeStatement('DELETE FROM questlog_deck WHERE questlog_id = 1');
             foreach ($decks as $row) {
                 $connection->insert('questlog_deck', $row);
             }
+        }
+
+        foreach ($this->fixtureUsers as $user) {
+            $connection->update('user', $user, ['id' => $user['id']]);
         }
 
         $connection->update('user', ['is_share_decks' => 0], ['username' => 'test']);
@@ -99,14 +107,12 @@ class QuestlogWorkflowTest extends WebTestCase
 
     /**
      * The cards of a deck, as the deck picker serializes them.
-     *
-     * @return bool|string
      */
-    private function deckContent(int $deckId)
+    private function deckContent(int $deckId): string|false
     {
-        $rows = $this->db()->fetchAll('SELECT c.code, s.quantity FROM deckslot s JOIN card c ON c.id = s.card_id WHERE s.deck_id = ? ORDER BY c.code', [$deckId]);
+        $rows = $this->db()->fetchAllAssociative('SELECT c.code, s.quantity FROM deckslot s JOIN card c ON c.id = s.card_id WHERE s.deck_id = ? ORDER BY c.code', [$deckId]);
 
-        return json_encode(['main' => array_map('intval', array_column($rows, 'quantity', 'code')), 'side' => []]);
+        return json_encode(['main' => array_map(intval(...), array_column($rows, 'quantity', 'code')), 'side' => []]);
     }
 
     /**
@@ -138,14 +144,14 @@ class QuestlogWorkflowTest extends WebTestCase
     {
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $location = self::location($client->getResponse());
-        $this->assertRegExp('#^/questlog/view/\d+/#', $location);
+        $this->assertMatchesRegularExpression('#^/questlog/view/\d+/#', $location);
 
         return (int) explode('/', $location)[3];
     }
 
     private function fetchQuestlog(int $id)
     {
-        return $this->db()->fetchAssoc(
+        return $this->db()->fetchAssociative(
             'SELECT q.name, q.name_canonical, q.description_md, q.description_html, s.name AS scenario, q.date_played, q.quest_mode,
                     q.success, q.score, q.nb_decks, q.is_public, q.date_publish IS NOT NULL AS published, u.username
              FROM questlog q JOIN scenario s ON s.id = q.scenario_id JOIN user u ON u.id = q.user_id WHERE q.id = ?',
@@ -153,9 +159,9 @@ class QuestlogWorkflowTest extends WebTestCase
         );
     }
 
-    private function fetchQuestlogDecks(int $id)
+    private function fetchQuestlogDecks(int $id): array
     {
-        return $this->db()->fetchAll('SELECT deck_number, deck_id, decklist_id, player, content FROM questlog_deck WHERE questlog_id = ? ORDER BY deck_number', [$id]);
+        return $this->db()->fetchAllAssociative('SELECT deck_number, deck_id, decklist_id, player, content FROM questlog_deck WHERE questlog_id = ? ORDER BY deck_number', [$id]);
     }
 
     /* -------------------------------------------------------------- tests */
@@ -198,16 +204,16 @@ class QuestlogWorkflowTest extends WebTestCase
             'scenario' => 'Journey Along the Anduin',
             'date_played' => '2020-05-17 00:00:00',
             'quest_mode' => 'nightmare',
-            'success' => '0',
-            'score' => '142',
-            'nb_decks' => '2',
-            'is_public' => '0',
-            'published' => '0',
+            'success' => 0,
+            'score' => 142,
+            'nb_decks' => 2,
+            'is_public' => 0,
+            'published' => 0,
             'username' => 'test',
         ], $this->fetchQuestlog($id));
         $this->assertSame([
-            ['deck_number' => '1', 'deck_id' => '1', 'decklist_id' => null, 'player' => 'Alice', 'content' => $deck1],
-            ['deck_number' => '2', 'deck_id' => '2', 'decklist_id' => null, 'player' => 'Bob', 'content' => $deck2],
+            ['deck_number' => 1, 'deck_id' => 1, 'decklist_id' => null, 'player' => 'Alice', 'content' => $deck1],
+            ['deck_number' => 2, 'deck_id' => 2, 'decklist_id' => null, 'player' => 'Bob', 'content' => $deck2],
         ], $this->fetchQuestlogDecks($id));
 
         $crawler = $client->request('GET', "/questlog/view/$id/phpunitquest");
@@ -240,11 +246,11 @@ class QuestlogWorkflowTest extends WebTestCase
 
         $this->assertSame($id, $this->questlogIdFromRedirect($client));
         $questlog = $this->fetchQuestlog($id);
-        $this->assertSame(['1', '2', '1', '1'], [$questlog['success'], $questlog['nb_decks'], $questlog['is_public'], $questlog['published']]);
+        $this->assertSame([1, 2, 1, 1], [$questlog['success'], $questlog['nb_decks'], $questlog['is_public'], $questlog['published']]);
         // a decklist is logged with its parent deck; slots are compacted
         $this->assertSame([
-            ['deck_number' => '1', 'deck_id' => '1', 'decklist_id' => null, 'player' => 'Alice', 'content' => $deck1],
-            ['deck_number' => '2', 'deck_id' => '3', 'decklist_id' => '3', 'player' => 'Carol', 'content' => $deck3],
+            ['deck_number' => 1, 'deck_id' => 1, 'decklist_id' => null, 'player' => 'Alice', 'content' => $deck1],
+            ['deck_number' => 2, 'deck_id' => 3, 'decklist_id' => 3, 'player' => 'Carol', 'content' => $deck3],
         ], $this->fetchQuestlogDecks($id));
 
         // 3. public quest logs are listed, and visible to other users
@@ -262,7 +268,7 @@ class QuestlogWorkflowTest extends WebTestCase
     public function testSnapshotWithTheCodeOfAMergedCard(): void
     {
         $client = $this->client;
-        $content = (string) $this->db()->fetchColumn('SELECT content FROM questlog_deck WHERE id = 1');
+        $content = (string) $this->db()->fetchOne('SELECT content FROM questlog_deck WHERE id = 1');
         try {
             $data = json_decode($content, true);
             $data['main']['31031'] = 1;
@@ -328,7 +334,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $client->request('POST', '/questlog/save', $values);
 
         $questlog = $this->fetchQuestlog($this->questlogIdFromRedirect($client));
-        $this->assertSame(['normal', '1', '0'], [$questlog['quest_mode'], $questlog['success'], $questlog['score']]);
+        $this->assertSame(['normal', 1, 0], [$questlog['quest_mode'], $questlog['success'], $questlog['score']]);
     }
 
     /* ------------------------------------------------------------ refused */
@@ -342,7 +348,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $client->submit($form);
 
         $this->assertSame(422, $client->getResponse()->getStatusCode());
-        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM questlog WHERE id > ?', [$this->maxIds['questlog']]));
+        $this->assertSame(0, $this->db()->fetchOne('SELECT COUNT(*) FROM questlog WHERE id > ?', [$this->maxIds['questlog']]));
     }
 
     public function testDeckWithoutContentIsRefused(): void
@@ -355,7 +361,7 @@ class QuestlogWorkflowTest extends WebTestCase
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertSame('Cannot save a questlog with an empty deck', $client->getResponse()->getContent());
-        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM questlog WHERE id > ?', [$this->maxIds['questlog']]));
+        $this->assertSame(0, $this->db()->fetchOne('SELECT COUNT(*) FROM questlog WHERE id > ?', [$this->maxIds['questlog']]));
     }
 
     public function testUnknownScenarioIsRefused(): void
@@ -385,7 +391,7 @@ class QuestlogWorkflowTest extends WebTestCase
 
         $id = $this->questlogIdFromRedirect($client);
         $this->assertCount(1, $this->fetchQuestlogDecks($id));
-        $this->assertSame('1', $this->fetchQuestlog($id)['nb_decks']);
+        $this->assertSame(1, $this->fetchQuestlog($id)['nb_decks']);
     }
 
     /* --------------------------------------------------- locked quest logs */
@@ -404,7 +410,7 @@ class QuestlogWorkflowTest extends WebTestCase
 
         $this->assertSame(1, $this->questlogIdFromRedirect($client));
         $questlog = $this->fetchQuestlog(1);
-        $this->assertSame(['PHPUnit Renamed', '1', '4'], [$questlog['name'], $questlog['is_public'], $questlog['nb_decks']]);
+        $this->assertSame(['PHPUnit Renamed', 1, 4], [$questlog['name'], $questlog['is_public'], $questlog['nb_decks']]);
         $this->assertSame($decks, $this->fetchQuestlogDecks(1));
     }
 
@@ -427,8 +433,8 @@ class QuestlogWorkflowTest extends WebTestCase
         $id = $this->questlogIdFromRedirect($client);
         $decks = $this->fetchQuestlogDecks($id);
         $this->assertGreaterThan($this->maxIds['deck'], (int) $decks[0]['deck_id']);
-        $this->assertSame('admin', $this->db()->fetchColumn('SELECT u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$decks[0]['deck_id']]));
-        $this->assertSame(['2', '2'], [$decks[1]['deck_id'], $decks[1]['decklist_id']]);
+        $this->assertSame('admin', $this->db()->fetchOne('SELECT u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$decks[0]['deck_id']]));
+        $this->assertSame([2, 2], [$decks[1]['deck_id'], $decks[1]['decklist_id']]);
     }
 
     public function testPrivateQuestlogVisibility(): void
@@ -484,7 +490,7 @@ class QuestlogWorkflowTest extends WebTestCase
         $this->assertSame('/myquestlogs', $client->getResponse()->headers->get('Location'));
         $this->assertFalse($this->fetchQuestlog($id));
         $this->assertSame([], $this->fetchQuestlogDecks($id));
-        $this->assertSame('1', $this->db()->fetchColumn('SELECT COUNT(*) FROM deck WHERE id = 1'));
+        $this->assertSame(1, $this->db()->fetchOne('SELECT COUNT(*) FROM deck WHERE id = 1'));
     }
 
     public function testQuestlogWithSocialActivityCannotBeDeleted(): void
@@ -535,5 +541,28 @@ class QuestlogWorkflowTest extends WebTestCase
 
         $client->request('POST', '/user/questlog_like', ['id' => 999]);
         $this->assertSame(400, $client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * Favorite is a toggle (POST /user/questlog_favorite, answers the new count as plain text);
+     * the author gains (then loses) 5 reputation points.
+     */
+    public function testFavoriteAndUnfavorite(): void
+    {
+        $client = $this->createAuthenticatedClient('admin');
+        $state = fn () => $this->db()->fetchAssociative(
+            'SELECT q.nb_favorites, (SELECT COUNT(*) FROM questlog_favorite WHERE questlog_id = 1) AS favorites, u.reputation AS author_reputation
+            FROM questlog q JOIN user u ON u.id = q.user_id WHERE q.id = 1'
+        );
+
+        $client->request('POST', '/user/questlog_favorite', ['id' => 1]);
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame('1', $client->getResponse()->getContent());
+        $this->assertSame(['nb_favorites' => 1, 'favorites' => 1, 'author_reputation' => 6], $state());
+        $this->assertGreaterThan('2015-08-16 00:00:00', $this->db()->fetchOne('SELECT date_update FROM questlog WHERE id = 1'));
+
+        $client->request('POST', '/user/questlog_favorite', ['id' => 1]);
+        $this->assertSame('0', $client->getResponse()->getContent());
+        $this->assertSame(['nb_favorites' => 0, 'favorites' => 0, 'author_reputation' => 1], $state());
     }
 }

@@ -34,7 +34,7 @@ class LoadSharedDeckTest extends WebTestCase
     /**
      * @return array<string, mixed>
      */
-    private function load(string $id)
+    private function load(string $id): mixed
     {
         $this->client->request('GET', '/api/oauth2/deck/load/'.$id);
         $response = $this->client->getResponse();

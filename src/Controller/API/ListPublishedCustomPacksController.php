@@ -7,28 +7,19 @@ namespace App\Controller\API;
 use App\Repository\UserCustomPackRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ListPublishedCustomPacksController extends AbstractController
 {
-    private UserCustomPackRepository $userCustomPackRepository;
-
     public function __construct(
-        UserCustomPackRepository $userCustomPackRepository
+        private readonly UserCustomPackRepository $userCustomPackRepository
     ) {
-        $this->userCustomPackRepository = $userCustomPackRepository;
     }
 
-    /**
-     * @Route(
-     *     "/api/public/custom-packs/published",
-     *     name="api_public_custom_packs_published",
-     *     methods={"GET"}
-     * )
-     */
+    #[Route(path: '/api/public/custom-packs/published', name: 'api_public_custom_packs_published', methods: ['GET'])]
     public function __invoke(): JsonResponse
     {
-        $packs = $this->userCustomPackRepository->findBy(['isPublished' => true], ['createdAt' => 'ASC', 'id' => 'ASC']);
+        $packs = $this->userCustomPackRepository->findBy(['isPublished' => true], ['createdAt' => \SortDirection::Ascending, 'id' => \SortDirection::Ascending]);
         $result = [];
         foreach ($packs as $pack) {
             $cards = [];

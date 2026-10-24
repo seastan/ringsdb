@@ -13,34 +13,23 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class FavoriteFellowshipController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private Connection $connection;
-
-    private FellowshipRepository $fellowshipRepository;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        Connection $connection,
-        FellowshipRepository $fellowshipRepository
+        private readonly EntityManagerInterface $entityManager,
+        private readonly Connection $connection,
+        private readonly FellowshipRepository $fellowshipRepository
     ) {
-        $this->entityManager = $entityManager;
-        $this->connection = $connection;
-        $this->fellowshipRepository = $fellowshipRepository;
     }
 
-    /**
-     * @Route("/user/fellowship_favorite", name="fellowship_favorite", methods={"POST"})
-     */
+    #[Route(path: '/user/fellowship_favorite', name: 'fellowship_favorite', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
         /* @var $user User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 
@@ -53,7 +42,7 @@ class FavoriteFellowshipController extends AbstractController
 
         /* @var $author User */
         $author = $fellowship->getUser();
-        $is_favorite = $this->connection->executeQuery("SELECT\n\t\t\t\tcount(*)\n\t\t\t\tFROM fellowship d\n\t\t\t\tJOIN fellowship_favorite f ON f.fellowship_id = d.id\n\t\t\t\tWHERE f.user_id = ?\n\t\t\t\tAND d.id = ?", [$user->getId(), $fellowship_id])->fetch(\PDO::FETCH_NUM)[0];
+        $is_favorite = $this->connection->executeQuery("SELECT\n\t\t\t\tcount(*)\n\t\t\t\tFROM fellowship d\n\t\t\t\tJOIN fellowship_favorite f ON f.fellowship_id = d.id\n\t\t\t\tWHERE f.user_id = ?\n\t\t\t\tAND d.id = ?", [$user->getId(), $fellowship_id])->fetchOne();
         if ($is_favorite) {
             $fellowship->setNbfavorites($fellowship->getNbFavorites() - 1);
             $fellowship->removeFavorite($user);

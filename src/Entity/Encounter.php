@@ -9,19 +9,17 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Encounter.
- *
- * @ORM\Entity(repositoryClass="App\Repository\EncounterRepository")
- * @ORM\Table(
- *     name="encounter",
- *     uniqueConstraints={
- *         @ORM\UniqueConstraint(name="encounter_code_idx", columns={"code"})
- *     }
- * )
- * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="entity_region")
  */
-class Encounter implements \JsonSerializable
+#[ORM\Entity(repositoryClass: \App\Repository\EncounterRepository::class)]
+#[ORM\Cache(usage: 'NONSTRICT_READ_WRITE', region: 'entity_region')]
+#[ORM\Table(name: 'encounter')]
+#[ORM\UniqueConstraint(name: 'encounter_code_idx', columns: ['code'])]
+class Encounter implements \JsonSerializable, \Stringable
 {
-    public function jsonSerialize()
+    /**
+     * @return array{id: int|null, code: string, name: string}
+     */
+    public function jsonSerialize(): array
     {
         return [
             'id' => $this->getId(),
@@ -32,50 +30,43 @@ class Encounter implements \JsonSerializable
 
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", length=255, nullable=false)
      */
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
     private $code;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", length=1024, nullable=false)
      */
+    #[ORM\Column(type: 'string', length: 1024, nullable: false)]
     private $name;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
-     * @Gedmo\Timestampable(on="create")
      */
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name: 'date_creation', type: 'datetime', nullable: false)]
     private $dateCreation;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="date_update", type="datetime", nullable=false)
-     * @Gedmo\Timestampable(on="update")
      */
+    #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(name: 'date_update', type: 'datetime', nullable: false)]
     private $dateUpdate;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Pack")
-     * @ORM\JoinColumn(name="pack_id", referencedColumnName="id")
-     */
+    #[ORM\ManyToOne(targetEntity: Pack::class)]
+    #[ORM\JoinColumn(name: 'pack_id', referencedColumnName: 'id')]
     private ?Pack $pack = null;
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getName();
     }

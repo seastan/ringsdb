@@ -11,6 +11,7 @@ use App\Entity\Questlog;
 use App\Entity\QuestlogDeck;
 use App\Entity\Scenario;
 use App\Entity\User;
+use App\Helper\StringSanitizer;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use App\Repository\QuestlogRepository;
@@ -24,47 +25,24 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SaveQuestlogController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private EntityManagerInterface $entityManager;
-
-    private QuestlogRepository $questlogRepository;
-
-    private Texts $texts;
-
-    private ScenarioRepository $scenarioRepository;
-
-    private DeckRepository $deckRepository;
-
-    private Decks $decks;
-
-    private DecklistRepository $decklistRepository;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        QuestlogRepository $questlogRepository,
-        Texts $texts,
-        ScenarioRepository $scenarioRepository,
-        DeckRepository $deckRepository,
-        DecklistRepository $decklistRepository,
-        Decks $decks
+        private EntityManagerInterface $entityManager,
+        private QuestlogRepository $questlogRepository,
+        private Texts $texts,
+        private ScenarioRepository $scenarioRepository,
+        private DeckRepository $deckRepository,
+        private DecklistRepository $decklistRepository,
+        private Decks $decks
     ) {
-        $this->entityManager = $entityManager;
-        $this->questlogRepository = $questlogRepository;
-        $this->texts = $texts;
-        $this->scenarioRepository = $scenarioRepository;
-        $this->deckRepository = $deckRepository;
-        $this->decks = $decks;
-        $this->decklistRepository = $decklistRepository;
     }
 
-    /**
-     * @Route("/questlog/save", name="questlog_save", methods={"POST"})
-     */
+    #[Route(path: '/questlog/save', name: 'questlog_save', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
         /* @var $user User */
@@ -88,7 +66,7 @@ class SaveQuestlogController extends AbstractController
             $questlog->setNbDecks(0);
         }
 
-        $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $name = trim(StringSanitizer::sanitize($request->request->get('name'), false));
         $name = substr($name, 0, 250);
         if (empty($name)) {
             $name = 'Untitled Questlog';
@@ -97,9 +75,9 @@ class SaveQuestlogController extends AbstractController
         $descriptionMd = trim((string) $request->request->get('descriptionMd'));
         $descriptionHtml = $this->texts->markdown($descriptionMd);
         $quest = intval(filter_var($request->request->get('quest'), FILTER_SANITIZE_NUMBER_INT));
-        $date = trim((string) filter_var($request->request->get('date'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
-        $difficulty = trim((string) filter_var($request->request->get('difficulty'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
-        $victory = trim((string) filter_var($request->request->get('victory'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $date = trim(StringSanitizer::sanitize($request->request->get('date'), false));
+        $difficulty = trim(StringSanitizer::sanitize($request->request->get('difficulty'), false));
+        $victory = trim(StringSanitizer::sanitize($request->request->get('victory'), false));
         $score = intval(filter_var($request->request->get('score'), FILTER_SANITIZE_NUMBER_INT));
         $public = boolval(filter_var($request->request->get('public'), FILTER_SANITIZE_NUMBER_INT));
         $victory = 'no' !== $victory;
@@ -139,8 +117,8 @@ class SaveQuestlogController extends AbstractController
             $skip = 0;
             for ($i = 1; $i <= 4; ++$i) {
                 $deck_id = intval(filter_var($request->request->get('deck'.$i.'_id'), FILTER_SANITIZE_NUMBER_INT));
-                $is_decklist = 'true' == filter_var($request->get('deck'.$i.'_is_decklist'), FILTER_SANITIZE_STRING);
-                $player = trim((string) filter_var($request->get('questlogdeck'.$i.'_player_name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+                $is_decklist = 'true' === StringSanitizer::sanitize($request->get('deck'.$i.'_is_decklist'));
+                $player = trim(StringSanitizer::sanitize($request->get('questlogdeck'.$i.'_player_name'), false));
                 $content = (array) json_decode($request->get('questlogdeck'.$i.'_content'), true);
                 if ($deck_id) {
                     if (!$is_decklist) {

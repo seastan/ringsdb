@@ -5,42 +5,35 @@ declare(strict_types=1);
 namespace App\Controller\UserProfile;
 
 use App\Controller\CurrentUserTrait;
+use App\Helper\StringSanitizer;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SaveProfileController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private UserRepository $userRepository;
-
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        UserRepository $userRepository
+        private EntityManagerInterface $entityManager,
+        private UserRepository $userRepository
     ) {
-        $this->userRepository = $userRepository;
-        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @Route("/user/profile_save", name="user_profile_save", methods={"POST"})
-     */
+    #[Route(path: '/user/profile_save', name: 'user_profile_save', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         /* @var $user \App\Entity\User */
         $user = $this->currentUser();
-        $username = (string) filter_var($request->get('username'), FILTER_SANITIZE_STRING);
+        $username = StringSanitizer::sanitize($request->get('username'));
         if ($username !== $user->getUsername()) {
             $user_existing = $this->userRepository->findOneBy(['username' => $username]);
             if ($user_existing) {
-                $this->get('session')->getFlashBag()->set('error', "Username {$username} is already taken.");
+                $this->addFlash('error', "Username {$username} is already taken.");
 
                 return $this->redirect($this->generateUrl('user_profile_edit'));
             }
@@ -48,13 +41,13 @@ class SaveProfileController extends AbstractController
             $user->setUsername($username);
         }
 
-        $email = (string) filter_var($request->get('email'), FILTER_SANITIZE_STRING);
+        $email = StringSanitizer::sanitize($request->get('email'));
         if ($email !== $user->getEmail()) {
             $user->setEmail($email);
         }
 
-        $resume = (string) filter_var($request->get('resume'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
-        $sphere_code = (string) filter_var($request->get('user_sphere_code'), FILTER_SANITIZE_STRING);
+        $resume = StringSanitizer::sanitize($request->get('resume'), false);
+        $sphere_code = StringSanitizer::sanitize($request->get('user_sphere_code'));
         $notifAuthor = (bool) $request->get('notif_author');
         $notifCommenter = (bool) $request->get('notif_commenter');
         $notifMention = (bool) $request->get('notif_mention');
@@ -69,7 +62,7 @@ class SaveProfileController extends AbstractController
         $user->setDarkMode($darkMode);
 
         $this->entityManager->flush();
-        $this->get('session')->getFlashBag()->set('notice', 'Successfully saved your profile.');
+        $this->addFlash('notice', 'Successfully saved your profile.');
         $response = $this->redirect($this->generateUrl('user_profile_edit'));
         // Persist the preference in a long-lived cookie so the theme can be applied
         // immediately (without a flash of the wrong theme) on this device, even though

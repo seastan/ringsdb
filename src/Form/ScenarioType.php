@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Form;
 
+use App\Entity\Encounter;
+use App\Entity\Pack;
 use App\Entity\Scenario;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -25,8 +27,8 @@ class ScenarioType extends AbstractType
             ->add('code')
             ->add('name')
             ->add('position')
-            ->add('pack', EntityType::class, ['class' => 'App:Pack', 'choice_label' => 'name'])
-            ->add('encounters', EntityType::class, ['class' => 'App:Encounter', 'choice_label' => 'name', 'expanded' => true, 'multiple' => true]);
+            ->add('pack', EntityType::class, ['class' => Pack::class, 'choice_label' => 'name'])
+            ->add('encounters', EntityType::class, ['class' => Encounter::class, 'choice_label' => 'name', 'expanded' => true, 'multiple' => true]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

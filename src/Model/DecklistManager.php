@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Entity\Card;
+use App\Entity\CardPrinting;
+use App\Entity\Comment;
 use App\Entity\Decklist;
+use App\Entity\Decklistslot;
 use App\Entity\Sphere;
 use App\Entity\User;
+use App\Entity\UserCustomPackCard;
+use App\Helper\StringSanitizer;
 use App\Repository\CardRepository;
 use App\Repository\SphereRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -58,23 +63,13 @@ class DecklistManager
      */
     protected $user;
 
-    private EntityManagerInterface $doctrine;
-
-    private RequestStack $request_stack;
-
-    private UrlGeneratorInterface $router;
-
-    private CardRepository $cardRepository;
-
-    private SphereRepository $sphereRepository;
-
-    public function __construct(EntityManagerInterface $doctrine, RequestStack $request_stack, UrlGeneratorInterface $router, CardRepository $cardRepository, SphereRepository $sphereRepository)
-    {
-        $this->doctrine = $doctrine;
-        $this->request_stack = $request_stack;
-        $this->router = $router;
-        $this->cardRepository = $cardRepository;
-        $this->sphereRepository = $sphereRepository;
+    public function __construct(
+        private readonly EntityManagerInterface $doctrine,
+        private readonly RequestStack $request_stack,
+        private readonly UrlGeneratorInterface $router,
+        private readonly CardRepository $cardRepository,
+        private readonly SphereRepository $sphereRepository
+    ) {
     }
 
     /**
@@ -83,7 +78,7 @@ class DecklistManager
     private function currentRequest(): Request
     {
         $request = $this->request_stack->getCurrentRequest();
-        if (null === $request) {
+        if (!$request instanceof Request) {
             throw new \LogicException('No current request.');
         }
 
@@ -123,7 +118,7 @@ class DecklistManager
     {
         $qb = $this->doctrine->createQueryBuilder();
         $qb->select('d');
-        $qb->from('App:Decklist', 'd');
+        $qb->from(Decklist::class, 'd');
 
         if ($this->predominantSphere) {
             $qb->where('d.predominantSphere = :predominantSphere');
@@ -167,10 +162,10 @@ class DecklistManager
     {
         $qb = $this->getQueryBuilder();
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
-        $qb->orderBy('popularity', 'DESC');
+        $qb->orderBy('popularity', \SortDirection::Descending);
 
         // tie-breaker, for a stable order and pagination
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -182,10 +177,10 @@ class DecklistManager
     {
         $qb = $this->getQueryBuilder();
 
-        $qb->orderBy('d.dateCreation', 'DESC');
+        $qb->orderBy('d.dateCreation', \SortDirection::Descending);
 
         // tie-breaker, for a stable order and pagination
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -198,9 +193,9 @@ class DecklistManager
         $qb = $this->getQueryBuilder();
 
         $qb->andWhere('d.nbComments > 0');
-        $qb->orderBy('d.dateLastComment', 'DESC');
+        $qb->orderBy('d.dateLastComment', \SortDirection::Descending);
         // tie-breaker, for a stable order and pagination
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -215,10 +210,10 @@ class DecklistManager
         $qb->leftJoin('d.favorites', 'u');
         $qb->andWhere('u = :user');
         $qb->setParameter('user', $user);
-        $qb->orderBy('d.dateCreation', 'DESC');
+        $qb->orderBy('d.dateCreation', \SortDirection::Descending);
 
         // tie-breaker, for a stable order and pagination
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -232,10 +227,10 @@ class DecklistManager
 
         $qb->andWhere('d.user = :user');
         $qb->setParameter('user', $user);
-        $qb->orderBy('d.dateCreation', 'DESC');
+        $qb->orderBy('d.dateCreation', \SortDirection::Descending);
 
         // tie-breaker, for a stable order and pagination
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -248,10 +243,10 @@ class DecklistManager
         $qb = $this->getQueryBuilder();
 
         $qb->andWhere('d.nbVotes > 10');
-        $qb->orderBy('d.nbVotes', 'DESC');
+        $qb->orderBy('d.nbVotes', \SortDirection::Descending);
 
         // tie-breaker, for a stable order and pagination
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -263,12 +258,12 @@ class DecklistManager
     {
         $qb = $this->getQueryBuilder();
 
-        $qb->addSelect('(SELECT count(c) FROM App:Comment c WHERE c.decklist=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
-        $qb->orderBy('nbRecentComments', 'DESC');
-        $qb->addOrderBy('d.nbComments', 'DESC');
+        $qb->addSelect('(SELECT count(c) FROM '.Comment::class.' c WHERE c.decklist=d AND DATE_DIFF(CURRENT_TIMESTAMP(), c.dateCreation)<1) AS HIDDEN nbRecentComments');
+        $qb->orderBy('nbRecentComments', \SortDirection::Descending);
+        $qb->addOrderBy('d.nbComments', \SortDirection::Descending);
 
         // tie-breaker, for a stable order and pagination
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         return $this->getPaginator($qb->getQuery());
     }
@@ -283,22 +278,22 @@ class DecklistManager
         $cards_code = $request->query->all('cards');
         $cards_to_exclude = $request->query->all('cards_to_exclude');
 
-        $sphere_code = filter_var($request->query->get('sphere'), FILTER_SANITIZE_STRING);
+        $sphere_code = StringSanitizer::sanitize($request->query->get('sphere'));
         if ($sphere_code) {
             $sphere = $this->sphereRepository->findOneBy(['code' => $sphere_code]);
         }
 
         $numcores = $request->query->get('numcores');
 
-        $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
+        $author_name = StringSanitizer::sanitize($request->query->get('author'));
 
-        $decklist_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
+        $decklist_name = StringSanitizer::sanitize($request->query->get('name'));
 
         $sort = $request->query->get('sort');
 
         $packs = $request->query->all('packs');
 
-        $customPackCodes = array_values(array_filter((array) $request->query->all('custom_packs'), 'is_string'));
+        $customPackCodes = array_values(array_filter((array) $request->query->all('custom_packs'), is_string(...)));
 
         $threat_op = $request->query->get('threato');
         $threat = $request->query->get('threat');
@@ -397,10 +392,10 @@ class DecklistManager
                 // filtered out — this keeps the short-circuit table-free with no per-request scan.
                 $skipBuildable = false;
                 if (count($packs) > 0 && !$useCustomPacks) {
-                    $packsWithCards = array_map('intval', $this->doctrine->getConnection()
+                    $packsWithCards = array_map(intval(...), $this->doctrine->getConnection()
                         ->executeQuery('SELECT DISTINCT pack_id FROM card_printing')
-                        ->fetchAll(\PDO::FETCH_COLUMN));
-                    $skipBuildable = 0 === count(array_diff($packsWithCards, array_map('intval', $packs)));
+                        ->fetchFirstColumn());
+                    $skipBuildable = 0 === count(array_diff($packsWithCards, array_map(intval(...), $packs)));
                 }
 
                 if (!$skipBuildable) {
@@ -421,7 +416,7 @@ class DecklistManager
                     if (count($packs) > 0) {
                         $officialSubquery =
                             '(SELECT COALESCE(SUM(CASE WHEN cp.pack = 1 THEN cp.quantity * :numcores ELSE cp.quantity END), 0) '.
-                            'FROM App:CardPrinting cp '.
+                            'FROM '.CardPrinting::class.' cp '.
                             'WHERE cp.card = s.card AND cp.pack IN (:packs))';
                         $qb->setParameter('packs', $packs);
                         $qb->setParameter('numcores', $cores);
@@ -436,8 +431,8 @@ class DecklistManager
                         // Inner version of the official subquery uses alias cp2 so it doesn't
                         // collide with cp from the outer official-check occurrence.
                         $officialSubquery2 = str_replace(
-                            ['FROM App:CardPrinting cp ', 'cp.pack', 'cp.card', 'cp.quantity'],
-                            ['FROM App:CardPrinting cp2 ', 'cp2.pack', 'cp2.card', 'cp2.quantity'],
+                            ['FROM '.CardPrinting::class.' cp ', 'cp.pack', 'cp.card', 'cp.quantity'],
+                            ['FROM '.CardPrinting::class.' cp2 ', 'cp2.pack', 'cp2.card', 'cp2.quantity'],
                             $officialSubquery
                         );
 
@@ -448,7 +443,7 @@ class DecklistManager
                         $uncoveredCondition =
                             's.quantity > '.$officialSubquery.
                             ' AND NOT EXISTS ('.
-                                'SELECT ucpc.id FROM App:UserCustomPackCard ucpc '.
+                                'SELECT ucpc.id FROM '.UserCustomPackCard::class.' ucpc '.
                                 'JOIN ucpc.customPack ucp '.
                                 'WHERE ucpc.card = s.card '.
                                 'AND ucp.code IN (:customPackCodes) '.
@@ -461,7 +456,7 @@ class DecklistManager
                         // Custom-only: custom pack must fully supply the slot on its own.
                         $uncoveredCondition =
                             'NOT EXISTS ('.
-                                'SELECT ucpc.id FROM App:UserCustomPackCard ucpc '.
+                                'SELECT ucpc.id FROM '.UserCustomPackCard::class.' ucpc '.
                                 'JOIN ucpc.customPack ucp '.
                                 'WHERE ucpc.card = s.card '.
                                 'AND ucp.code IN (:customPackCodes) '.
@@ -472,7 +467,7 @@ class DecklistManager
 
                     $qb->andWhere(
                         'NOT EXISTS ('.
-                            'SELECT s.id FROM App:Decklistslot s '.
+                            'SELECT s.id FROM '.Decklistslot::class.' s '.
                             'WHERE s.decklist = d AND '.$uncoveredCondition.
                         ')'
                     );
@@ -482,8 +477,8 @@ class DecklistManager
             if (count($cards_to_exclude) > 0) {
                 $sub = $this->doctrine->createQueryBuilder();
                 $sub->select('k');
-                $sub->from('App:Card', 'k');
-                $sub->innerJoin('App:Decklistslot', 't', 'WITH', 't.card = k');
+                $sub->from(Card::class, 'k');
+                $sub->innerJoin(Decklistslot::class, 't', Query\Expr\Join::ON, 't.card = k');
                 $sub->where('t.decklist = d');
                 $sub->andWhere($sub->expr()->in('k.code', $cards_to_exclude));
                 $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())));
@@ -495,15 +490,15 @@ class DecklistManager
 
         switch ($sort) {
             case 'date':
-                $qb->orderBy('d.dateCreation', 'DESC');
+                $qb->orderBy('d.dateCreation', \SortDirection::Descending);
                 break;
 
             case 'likes':
-                $qb->orderBy('d.nbVotes', 'DESC');
+                $qb->orderBy('d.nbVotes', \SortDirection::Descending);
                 break;
 
             case 'threat':
-                $qb->orderBy('d.startingThreat', 'ASC');
+                $qb->orderBy('d.startingThreat', \SortDirection::Ascending);
                 break;
 
             case 'reputation':
@@ -513,18 +508,18 @@ class DecklistManager
 
                 // with DISTINCT, MySQL 5.7+ only sorts on selected columns
                 $qb->addSelect('u.reputation AS HIDDEN reputation');
-                $qb->orderBy('reputation', 'DESC');
+                $qb->orderBy('reputation', \SortDirection::Descending);
                 break;
 
             case 'popularity':
             default:
                 $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
-                $qb->orderBy('popularity', 'DESC');
+                $qb->orderBy('popularity', \SortDirection::Descending);
                 break;
         }
 
         // tie-breaker, for a stable order and pagination
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
 
         return $this->getPaginator($qb->getQuery());
     }

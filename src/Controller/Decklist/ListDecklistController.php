@@ -5,43 +5,29 @@ declare(strict_types=1);
 namespace App\Controller\Decklist;
 
 use App\Entity\Cycle;
+use App\Helper\StringSanitizer;
 use App\Model\DecklistManager;
 use App\Repository\CycleRepository;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ListDecklistController extends AbstractController
 {
-    private DecklistManager $decklistManager;
-
-    private int $cacheExpiration;
-
-    private CycleRepository $cycleRepository;
-
     public function __construct(
-        int $cacheExpiration,
-        DecklistManager $decklistManager,
-        CycleRepository $cycleRepository
+        private readonly int $cacheExpiration,
+        private readonly DecklistManager $decklistManager,
+        private readonly CycleRepository $cycleRepository,
+        private readonly Connection $connection
     ) {
-        $this->decklistManager = $decklistManager;
-        $this->cacheExpiration = $cacheExpiration;
-        $this->cycleRepository = $cycleRepository;
     }
 
     /**
      * displays the lists of decklists.
-     *
-     * @Route(
-     *     "/decklists/{type}/{page}",
-     *     name="decklists_list",
-     *     methods={"GET"},
-     *     requirements={"page"="\d+"},
-     *     defaults={"type"="popular", "page"=1}
-     * )
      */
+    #[Route(path: '/decklists/{type}/{page}', name: 'decklists_list', requirements: ['page' => '\d+'], defaults: ['type' => 'popular', 'page' => 1], methods: ['GET'])]
     public function __invoke(Request $request, string $type, int $page = 1): Response
     {
         $response = new Response();
@@ -62,7 +48,7 @@ class ListDecklistController extends AbstractController
             case 'favorites':
                 $response->setPrivate();
                 $user = $this->getUser();
-                if ($user) {
+                if ($user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
                     $paginator = $this->decklistManager->findDecklistsByFavorite($user);
                 } else {
                     $paginator = $this->decklistManager->getEmptyList();
@@ -73,7 +59,7 @@ class ListDecklistController extends AbstractController
             case 'mine':
                 $response->setPrivate();
                 $user = $this->getUser();
-                if ($user) {
+                if ($user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
                     $paginator = $this->decklistManager->findDecklistsByAuthor($user);
                 } else {
                     $paginator = $this->decklistManager->getEmptyList();
@@ -105,12 +91,11 @@ class ListDecklistController extends AbstractController
 
     private function searchForm(Request $request): string
     {
-        $dbh = $this->getDoctrine()->getConnection();
         $cards_code = $request->query->all('cards');
         $cards_to_exclude = $request->query->all('cards_to_exclude');
-        $sphere_code = filter_var($request->query->get('sphere'), FILTER_SANITIZE_STRING);
-        $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
-        $decklist_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
+        $sphere_code = StringSanitizer::sanitize($request->query->get('sphere'));
+        $author_name = StringSanitizer::sanitize($request->query->get('author'));
+        $decklist_name = StringSanitizer::sanitize($request->query->get('name'));
         $starting_threat = intval(filter_var($request->query->get('threat'), FILTER_SANITIZE_NUMBER_INT));
         $starting_threat_o = $request->query->get('threato');
         $author_reputation = intval(filter_var($request->query->get('reputation'), FILTER_SANITIZE_NUMBER_INT));
@@ -120,14 +105,14 @@ class ListDecklistController extends AbstractController
         $sort = $request->query->get('sort');
         $packs = $request->query->all('packs');
         if (0 === count($packs)) {
-            $packs = $dbh->executeQuery('SELECT id FROM pack')->fetchAll(\PDO::FETCH_COLUMN);
+            $packs = $this->connection->executeQuery('SELECT id FROM pack')->fetchFirstColumn();
         }
 
         $categories = [];
         $on = 0;
         $off = 0;
         $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
-        $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
+        $list_cycles = $this->cycleRepository->findBy([], ['position' => \SortDirection::Ascending]);
         foreach ($list_cycles as $cycle) {
             /* @var $cycle Cycle */
             $size = count($cycle->getPacks());
@@ -164,10 +149,10 @@ class ListDecklistController extends AbstractController
 
         $params = ['allowed' => $categories, 'on' => $on, 'off' => $off, 'author' => $author_name, 'name' => $decklist_name, 'threat' => $starting_threat, 'threato' => $starting_threat_o, 'reputation' => $author_reputation, 'reputationo' => $author_reputation_o, 'numcores' => $numcores, 'require_description' => $require_description];
         $params['sort_'.$sort] = ' selected="selected"';
-        $params['spheres'] = $dbh->executeQuery("SELECT\n                s.name,\n                s.code\n                FROM sphere s\n                ORDER BY s.name ASC")->fetchAll();
+        $params['spheres'] = $this->connection->executeQuery("SELECT\n                s.name,\n                s.code\n                FROM sphere s\n                ORDER BY s.name ASC")->fetchAllAssociative();
         $params['sphere_selected'] = $sphere_code;
         if (count($cards_code) > 0) {
-            $cards = $dbh->executeQuery("SELECT\n    \t\t\t\tc.name,\n    \t\t\t\tc.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card c\n                    INNER JOIN sphere s ON s.id = c.sphere_id\n                    INNER JOIN type t ON t.id = c.type_id\n                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 JOIN pack pp ON pp.id = cp2.pack_id WHERE cp2.card_id = c.id ORDER BY (pp.date_release IS NULL), pp.date_release, cp2.position, cp2.id LIMIT 1)\n                    INNER JOIN pack p ON p.id = cpr.pack_id\n                    WHERE c.code IN (?)\n    \t\t\t\tORDER BY c.code DESC", [$cards_code], [Connection::PARAM_INT_ARRAY])->fetchAll();
+            $cards = $this->connection->executeQuery("SELECT\n    \t\t\t\tc.name,\n    \t\t\t\tc.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card c\n                    INNER JOIN sphere s ON s.id = c.sphere_id\n                    INNER JOIN type t ON t.id = c.type_id\n                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 JOIN pack pp ON pp.id = cp2.pack_id WHERE cp2.card_id = c.id ORDER BY (pp.date_release IS NULL), pp.date_release, cp2.position, cp2.id LIMIT 1)\n                    INNER JOIN pack p ON p.id = cpr.pack_id\n                    WHERE c.code IN (?)\n    \t\t\t\tORDER BY c.code DESC", [$cards_code], [Connection::PARAM_INT_ARRAY])->fetchAllAssociative();
             $params['cards'] = '';
             foreach ($cards as $card) {
                 $params['cards'] .= $this->renderView('Search/card.html.twig', $card);
@@ -175,7 +160,7 @@ class ListDecklistController extends AbstractController
         }
 
         if (count($cards_to_exclude) > 0) {
-            $cards_to_exclude = $dbh->executeQuery("SELECT\n    \t\t\t\tk.name,\n    \t\t\t\tk.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card k\n                    INNER JOIN sphere s ON s.id = k.sphere_id\n                    INNER JOIN type t ON t.id = k.type_id\n                    INNER JOIN card_printing kpr ON kpr.id = (SELECT cp2.id FROM card_printing cp2 JOIN pack pp ON pp.id = cp2.pack_id WHERE cp2.card_id = k.id ORDER BY (pp.date_release IS NULL), pp.date_release, cp2.position, cp2.id LIMIT 1)\n                    INNER JOIN pack p ON p.id = kpr.pack_id\n                    WHERE k.code IN (?)\n    \t\t\t\tORDER BY k.code DESC", [$cards_to_exclude], [Connection::PARAM_INT_ARRAY])->fetchAll();
+            $cards_to_exclude = $this->connection->executeQuery("SELECT\n    \t\t\t\tk.name,\n    \t\t\t\tk.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card k\n                    INNER JOIN sphere s ON s.id = k.sphere_id\n                    INNER JOIN type t ON t.id = k.type_id\n                    INNER JOIN card_printing kpr ON kpr.id = (SELECT cp2.id FROM card_printing cp2 JOIN pack pp ON pp.id = cp2.pack_id WHERE cp2.card_id = k.id ORDER BY (pp.date_release IS NULL), pp.date_release, cp2.position, cp2.id LIMIT 1)\n                    INNER JOIN pack p ON p.id = kpr.pack_id\n                    WHERE k.code IN (?)\n    \t\t\t\tORDER BY k.code DESC", [$cards_to_exclude], [Connection::PARAM_INT_ARRAY])->fetchAllAssociative();
             $params['cards_to_exclude'] = '';
             foreach ($cards_to_exclude as $card_to_exclude) {
                 $params['cards_to_exclude'] .= $this->renderView('Search/card-to-exclude.html.twig', $card_to_exclude);

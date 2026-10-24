@@ -8,28 +8,18 @@ use App\Controller\CurrentUserTrait;
 use App\Services\QuestlogArchiver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class TextExportController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private QuestlogArchiver $questlogArchiver;
-
     public function __construct(
-        QuestlogArchiver $questlogArchiver
+        private QuestlogArchiver $questlogArchiver
     ) {
-        $this->questlogArchiver = $questlogArchiver;
     }
 
-    /**
-     * @Route(
-     *     "/questlog/export/text/{questlog_id}",
-     *     name="questlog_export_text",
-     *     methods={"GET"},
-     *     requirements={"questlog_id"="\d+"}
-     * )
-     */
+    #[Route(path: '/questlog/export/text/{questlog_id}', name: 'questlog_export_text', requirements: ['questlog_id' => '\d+'], methods: ['GET'])]
     public function __invoke(int $questlog_id): Response
     {
         return $this->questlogArchiver->downloadFromSelection($this->currentUser(), $questlog_id, false);

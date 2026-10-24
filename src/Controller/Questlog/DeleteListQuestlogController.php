@@ -11,30 +11,22 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class DeleteListQuestlogController extends AbstractController
 {
-    private QuestlogRepository $questlogRepository;
-
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        QuestlogRepository $questlogRepository
+        private readonly EntityManagerInterface $entityManager,
+        private readonly QuestlogRepository $questlogRepository
     ) {
-        $this->questlogRepository = $questlogRepository;
-        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @Route("/questlog/delete_list", name="questlog_delete_list", methods={"POST"})
-     */
+    #[Route(path: '/questlog/delete_list', name: 'questlog_delete_list', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         /* @var $user User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
 
@@ -65,7 +57,7 @@ class DeleteListQuestlogController extends AbstractController
         }
 
         $this->entityManager->flush();
-        $this->get('session')->getFlashBag()->set('notice', $message ?: 'Quest Logs deleted.');
+        $this->addFlash('notice', $message ?: 'Quest Logs deleted.');
 
         return $this->redirect($this->generateUrl('myquestlogs_list'));
     }

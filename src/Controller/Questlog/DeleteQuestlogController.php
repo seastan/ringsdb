@@ -11,30 +11,22 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class DeleteQuestlogController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private QuestlogRepository $questlogRepository;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        QuestlogRepository $questlogRepository
+        private readonly EntityManagerInterface $entityManager,
+        private readonly QuestlogRepository $questlogRepository
     ) {
-        $this->entityManager = $entityManager;
-        $this->questlogRepository = $questlogRepository;
     }
 
-    /**
-     * @Route("/questlog/delete", name="questlog_delete", methods={"POST"})
-     */
+    #[Route(path: '/questlog/delete', name: 'questlog_delete', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         /* @var $user User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
 
@@ -50,7 +42,7 @@ class DeleteQuestlogController extends AbstractController
         }
 
         if ($questlog->getNbVotes() || $questlog->getNbfavorites() || $questlog->getNbcomments()) {
-            $this->get('session')->getFlashBag()->set('error', "You can't delete a published quest log.");
+            $this->addFlash('error', "You can't delete a published quest log.");
         } else {
             /* @var $decks \App\Entity\QuestlogDeck[] */
             $decks = $questlog->getDecks();

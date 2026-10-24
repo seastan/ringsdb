@@ -15,48 +15,29 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class MyListQuestlogController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private ScenarioRepository $scenarioRepository;
-
-    private Connection $connection;
-
-    private QuestlogRepository $questlogRepository;
-
-    private SnapshotManager $snapshotManager;
-
     public function __construct(
-        Connection $connection,
-        ScenarioRepository $scenarioRepository,
-        QuestlogRepository $questlogRepository,
-        SnapshotManager $snapshotManager
+        private Connection $connection,
+        private ScenarioRepository $scenarioRepository,
+        private QuestlogRepository $questlogRepository,
+        private SnapshotManager $snapshotManager
     ) {
-        $this->scenarioRepository = $scenarioRepository;
-        $this->connection = $connection;
-        $this->questlogRepository = $questlogRepository;
-        $this->snapshotManager = $snapshotManager;
     }
 
-    /**
-     * @Route(
-     *     "/myquestlogs/{scenario_name_canonical}/{quest_mode}",
-     *     name="myquestlogs_list",
-     *     methods={"GET"},
-     *     defaults={"scenario_name_canonical"=null, "quest_mode"="normal"}
-     * )
-     */
+    #[Route(path: '/myquestlogs/{scenario_name_canonical}/{quest_mode}', name: 'myquestlogs_list', defaults: ['scenario_name_canonical' => null, 'quest_mode' => 'normal'], methods: ['GET'])]
     public function __invoke(?string $scenario_name_canonical, ?string $quest_mode): Response
     {
         // $quest_mode = 'normal';
         /* @var $quests Scenario[] */
-        $quests = $this->scenarioRepository->findBy([], ['position' => 'ASC']);
+        $quests = $this->scenarioRepository->findBy([], ['position' => \SortDirection::Ascending]);
         /* @var $user User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
 
@@ -64,7 +45,7 @@ class MyListQuestlogController extends AbstractController
         $playedEasy = [];
         $playedNormal = [];
         $playedNightmare = [];
-        $played = $this->connection->executeQuery('SELECT DISTINCT scenario_id, quest_mode, sum(success) as victory FROM questlog WHERE user_id = ? GROUP BY scenario_id, quest_mode', [$user->getId()])->fetchAll(\PDO::FETCH_NAMED);
+        $played = $this->connection->executeQuery('SELECT DISTINCT scenario_id, quest_mode, sum(success) as victory FROM questlog WHERE user_id = ? GROUP BY scenario_id, quest_mode', [$user->getId()])->fetchAllAssociative();
         foreach ($played as $c) {
             if ('easy' == $c['quest_mode']) {
                 $playedEasy[$c['scenario_id']] = $c['victory'];
@@ -97,9 +78,9 @@ class MyListQuestlogController extends AbstractController
 
         /* @var $questlogs \App\Entity\Questlog[] */
         if ($show_all) {
-            $questlogs = $this->questlogRepository->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
+            $questlogs = $this->questlogRepository->findBy(['user' => $user], ['dateCreation' => \SortDirection::Descending, 'id' => \SortDirection::Descending]);
         } else {
-            $questlogs = $this->questlogRepository->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => 'DESC', 'id' => 'DESC']);
+            $questlogs = $this->questlogRepository->findBy(['user' => $user, 'scenario' => $scenario, 'questMode' => $quest_mode], ['dateCreation' => \SortDirection::Descending, 'id' => \SortDirection::Descending]);
         }
 
         $this->snapshotManager->setSnapshots($questlogs);

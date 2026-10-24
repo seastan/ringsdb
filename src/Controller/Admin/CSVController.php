@@ -17,29 +17,22 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class CSVController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager
     ) {
-        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @Route("/admin/csv/upload", name="csv_upload_form", methods={"GET"})
-     */
+    #[Route(path: '/admin/csv/upload', name: 'csv_upload_form', methods: ['GET'])]
     public function uploadFormAction(): Response
     {
         return $this->render('CSV/upload_form.html.twig');
     }
 
-    /**
-     * @Route("/admin/csv/upload", name="csv_upload_process", methods={"POST"})
-     */
+    #[Route(path: '/admin/csv/upload', name: 'csv_upload_process', methods: ['POST'])]
     public function uploadProcessAction(Request $request, CardRepository $cardRepository, CardPrintingRepository $cardPrintingRepository, CycleRepository $cycleRepository, PackRepository $packRepository): Response
     {
         $inputCode = (string) $request->request->get('code');
@@ -55,7 +48,7 @@ class CSVController extends AbstractController
             return new Response('No cards found in the CSV file');
         }
 
-        $columns = str_getcsv(array_shift($content_array));
+        $columns = str_getcsv(array_shift($content_array), escape: '\\');
         $cards = [];
         // Codes present in the CSV. Cards are identified by their unique `code`,
         // NOT by octgnid: a MotK hero (e.g. "(MotK) Ori", 99311006) and its base
@@ -67,7 +60,7 @@ class CSVController extends AbstractController
 
         foreach ($content_array as $row) {
             $card = [];
-            $row = str_getcsv($row);
+            $row = str_getcsv($row, escape: '\\');
 
             for ($i = 0; $i < count($row); ++$i) {
                 $card[$columns[$i]] = str_replace('<br/>', "\n", (string) $row[$i]);
@@ -86,7 +79,7 @@ class CSVController extends AbstractController
             $cycleRepo = $cycleRepository;
             // 'ALeP' cycle code doesn't exist; fall back to the most recent cycle.
             $cycle = $cycleRepo->findOneBy(['code' => 'ALeP'])
-                ?? $cycleRepo->findOneBy([], ['id' => 'DESC']);
+                ?? $cycleRepo->findOneBy([], ['id' => \SortDirection::Descending]);
 
             if (!$cycle) {
                 return new Response('Error: no cycle found to assign to new pack');
@@ -136,7 +129,7 @@ class CSVController extends AbstractController
             if ($existingCard
                 && !array_key_exists((string) $existingCard->getCode(), $newCodes)
                 && !array_key_exists((string) $printing->getOctgnid(), $newOctgnids)
-                && false === strpos($existingCard->getName() ?? '', '[deleted]')) {
+                && !str_contains($existingCard->getName() ?? '', '[deleted]')) {
                 $deletedCards[] = $existingCard->getCode();
                 ++$summary['deleted'];
                 $existingCard->setName('[deleted] '.$existingCard->getName());

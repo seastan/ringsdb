@@ -13,31 +13,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ImportAllController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private EntityManagerInterface $entityManager;
-
-    private DeckImporter $deckImporter;
-
-    private Decks $decks;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        DeckImporter $deckImporter,
-        Decks $decks
+        private EntityManagerInterface $entityManager,
+        private DeckImporter $deckImporter,
+        private Decks $decks
     ) {
-        $this->entityManager = $entityManager;
-        $this->deckImporter = $deckImporter;
-        $this->decks = $decks;
     }
 
-    /**
-     * @Route("/deck/import/all", name="decks_upload_all", methods={"POST"})
-     */
+    #[Route(path: '/deck/import/all', name: 'decks_upload_all', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         $user = $this->currentUser();
@@ -55,7 +44,7 @@ class ImportAllController extends AbstractController
             $finfo = finfo_open(FILEINFO_MIME);
             $mime = false !== $finfo ? (string) finfo_file($finfo, $filename) : '';
             // check to see if the mime-type is 'zip'
-            if ('application/zip' !== substr($mime, 0, 15)) {
+            if (!str_starts_with($mime, 'application/zip')) {
                 throw new UnprocessableEntityHttpException('Bad file');
             }
         }
@@ -86,7 +75,7 @@ class ImportAllController extends AbstractController
 
         $zip->close();
         $this->entityManager->flush();
-        $this->get('session')->getFlashBag()->set('notice', 'Decks imported.');
+        $this->addFlash('notice', 'Decks imported.');
 
         return $this->redirect($this->generateUrl('decks_list'));
     }

@@ -17,37 +17,24 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class UserAdminController extends AbstractController
 {
-    private CommentRepository $commentRepository;
-
-    private UserRepository $userRepository;
-
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        CommentRepository $commentRepository,
-        UserRepository $userRepository
+        private readonly EntityManagerInterface $entityManager,
+        private readonly CommentRepository $commentRepository,
+        private readonly UserRepository $userRepository
     ) {
-        $this->commentRepository = $commentRepository;
-        $this->userRepository = $userRepository;
-        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @Route("/admin/user/find", name="admin_find_user", methods={"GET"})
-     */
+    #[Route(path: '/admin/user/find', name: 'admin_find_user', methods: ['GET'])]
     public function findAction(): Response
     {
         return $this->render('Admin/find_user.html.twig', ['pagetitle' => 'Admin']);
     }
 
-    /**
-     * @Route("/admin/user/find_process", name="admin_find_user_process", methods={"POST"})
-     */
+    #[Route(path: '/admin/user/find_process', name: 'admin_find_user_process', methods: ['POST'])]
     public function processAction(Request $request): RedirectResponse
     {
         $user = null;
@@ -68,9 +55,7 @@ class UserAdminController extends AbstractController
         return $this->redirect($this->generateUrl('admin_show_user', ['user_id' => $user->getId()]));
     }
 
-    /**
-     * @Route("/admin/user/show/{user_id}", name="admin_show_user", methods={"GET"})
-     */
+    #[Route(path: '/admin/user/show/{user_id}', name: 'admin_show_user', methods: ['GET'])]
     public function showAction(int $user_id): Response
     {
         /* @var $user User */
@@ -82,9 +67,7 @@ class UserAdminController extends AbstractController
         return $this->render('Admin/user_admin.html.twig', ['pagetitle' => 'User Admin', 'user' => $user]);
     }
 
-    /**
-     * @Route("/admin/user/toggle_locked/{user_id}", name="admin_user_locked_toggle", methods={"GET"})
-     */
+    #[Route(path: '/admin/user/toggle_locked/{user_id}', name: 'admin_user_locked_toggle', methods: ['GET'])]
     public function toggleLockedAction(int $user_id): RedirectResponse
     {
         /* @var $user User */
@@ -99,9 +82,7 @@ class UserAdminController extends AbstractController
         return $this->redirect($this->generateUrl('admin_show_user', ['user_id' => $user->getId()]));
     }
 
-    /**
-     * @Route("/admin/user/decklists/{user_id}", name="admin_user_decklists_show", methods={"GET"})
-     */
+    #[Route(path: '/admin/user/decklists/{user_id}', name: 'admin_user_decklists_show', methods: ['GET'])]
     public function decklistsAction(int $user_id): Response
     {
         /* @var $user User */
@@ -113,9 +94,7 @@ class UserAdminController extends AbstractController
         return $this->render('Admin/user_decklists.html.twig', ['pagetitle' => 'User Admin', 'user' => $user]);
     }
 
-    /**
-     * @Route("/admin/decklist/delete/{decklist_id}", name="admin_decklist_delete", methods={"GET"})
-     */
+    #[Route(path: '/admin/decklist/delete/{decklist_id}', name: 'admin_decklist_delete', methods: ['GET'])]
     public function deleteDecklistAction(int $decklist_id, DeckRepository $deckRepository, DecklistRepository $decklistRepository): RedirectResponse
     {
         /* @var $decklist Decklist */
@@ -145,9 +124,7 @@ class UserAdminController extends AbstractController
         return $this->redirect($this->generateUrl('admin_user_decklists_show', ['user_id' => $decklist->getUser()->getId()]));
     }
 
-    /**
-     * @Route("/admin/user/comments/{user_id}", name="admin_user_comments_show", methods={"GET"})
-     */
+    #[Route(path: '/admin/user/comments/{user_id}', name: 'admin_user_comments_show', methods: ['GET'])]
     public function commentsAction(int $user_id): Response
     {
         /* @var $user User */
@@ -159,13 +136,7 @@ class UserAdminController extends AbstractController
         return $this->render('Admin/user_comments.html.twig', ['pagetitle' => 'User Admin', 'user' => $user]);
     }
 
-    /**
-     * @Route(
-     *     "/admin/comment/toggle_hidden/{comment_id}",
-     *     name="admin_comment_hidden_toggle",
-     *     methods={"GET"}
-     * )
-     */
+    #[Route(path: '/admin/comment/toggle_hidden/{comment_id}', name: 'admin_comment_hidden_toggle', methods: ['GET'])]
     public function toggleHiddenCommentAction(int $comment_id): RedirectResponse
     {
         /* @var $comment Comment */
@@ -180,9 +151,7 @@ class UserAdminController extends AbstractController
         return $this->redirect($this->generateUrl('admin_user_comments_show', ['user_id' => $comment->getUser()->getId()]));
     }
 
-    /**
-     * @Route("/admin/comment/delete/{comment_id}", name="admin_comment_delete", methods={"GET"})
-     */
+    #[Route(path: '/admin/comment/delete/{comment_id}', name: 'admin_comment_delete', methods: ['GET'])]
     public function deleteCommentAction(int $comment_id): RedirectResponse
     {
         /* @var $comment Comment */

@@ -12,15 +12,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DeleteInactiveCommand extends Command
 {
-    private EntityManagerInterface $entityManager;
-
-    private UserRepository $userRepository;
-
-    public function __construct(EntityManagerInterface $entityManager, UserRepository $userRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly UserRepository $userRepository
+    ) {
         parent::__construct();
-        $this->entityManager = $entityManager;
-        $this->userRepository = $userRepository;
     }
 
     protected function configure(): void
@@ -30,7 +26,7 @@ class DeleteInactiveCommand extends Command
             ->setDescription('Delete users inactive since 48 hours');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $limit = new \DateTime();
         $limit->sub(new \DateInterval('PT48H'));

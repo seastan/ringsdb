@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -32,10 +33,10 @@ class DecklistEditTest extends WebTestCase
     {
         $this->client = static::createClient();
         $connection = $this->db();
-        $this->fixtureDecklists = $connection->fetchAll('SELECT id, name, name_canonical, description_md, description_html, precedent_decklist_id, date_update FROM decklist');
-        $this->fixtureUsers = $connection->fetchAll('SELECT id, roles FROM user');
+        $this->fixtureDecklists = $connection->fetchAllAssociative('SELECT id, name, name_canonical, description_md, description_html, precedent_decklist_id, date_update FROM decklist');
+        $this->fixtureUsers = $connection->fetchAllAssociative('SELECT id, roles FROM user');
         foreach (['decklist', 'deck', 'fellowship'] as $table) {
-            $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
+            $this->maxIds[$table] = (int) $connection->fetchOne("SELECT MAX(id) FROM $table");
         }
     }
 
@@ -53,7 +54,7 @@ class DecklistEditTest extends WebTestCase
             "DELETE FROM decklistslot WHERE decklist_id > {$max['decklist']}",
             "DELETE FROM decklist WHERE id > {$max['decklist']}",
         ] as $sql) {
-            $connection->exec($sql);
+            $connection->executeStatement($sql);
         }
 
         foreach ($this->fixtureDecklists as $decklist) {
@@ -86,7 +87,7 @@ class DecklistEditTest extends WebTestCase
 
     private function fetchDecklist(int $id)
     {
-        return $this->db()->fetchAssoc('SELECT name, name_canonical, description_md, description_html, precedent_decklist_id, date_update FROM decklist WHERE id = ?', [$id]);
+        return $this->db()->fetchAssociative('SELECT name, name_canonical, description_md, description_html, precedent_decklist_id, date_update FROM decklist WHERE id = ?', [$id]);
     }
 
     /**
@@ -97,12 +98,12 @@ class DecklistEditTest extends WebTestCase
     private function insertDecklist(string $name, array $values = []): int
     {
         $connection = $this->db();
-        $row = $connection->fetchAssoc('SELECT * FROM decklist WHERE id = 2');
+        $row = $connection->fetchAssociative('SELECT * FROM decklist WHERE id = 2');
         $this->assertNotFalse($row);
         unset($row['id']);
         $connection->insert('decklist', $values + ['name' => $name] + $row);
         $id = (int) $connection->lastInsertId();
-        $connection->exec("INSERT INTO decklistslot (decklist_id, card_id, quantity) SELECT $id, card_id, quantity FROM decklistslot WHERE decklist_id = 2");
+        $connection->executeStatement("INSERT INTO decklistslot (decklist_id, card_id, quantity) SELECT $id, card_id, quantity FROM decklistslot WHERE decklist_id = 2");
 
         return $id;
     }
@@ -147,7 +148,7 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame('/decklist/view/1/phpunitrenamed-1.0', $response->headers->get('Location'));
         $decklist = $this->fetchDecklist(1);
         $this->assertSame(
-            ['PHPUnit Renamed', 'phpunitrenamed-1.0', 'Now **bold**', '<p>Now <strong>bold</strong></p>', '2'],
+            ['PHPUnit Renamed', 'phpunitrenamed-1.0', 'Now **bold**', '<p>Now <strong>bold</strong></p>', 2],
             [$decklist['name'], $decklist['name_canonical'], $decklist['description_md'], $decklist['description_html'], $decklist['precedent_decklist_id']]
         );
         $this->assertGreaterThan('2015-08-16 00:00:00', $decklist['date_update']);
@@ -156,9 +157,7 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame('PHPUnit Renamed · RingsDB', trim($crawler->filter('title')->text()));
     }
 
-    /**
-     * @dataProvider nameProvider
-     */
+    #[DataProvider('nameProvider')]
     public function testName(string $name, string $expected): void
     {
         $client = $this->createAuthenticatedClient();
@@ -170,7 +169,7 @@ class DecklistEditTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function nameProvider(): array
+    public static function nameProvider(): array
     {
         return [
             'empty' => ['  ', 'Untitled'],
@@ -181,10 +180,9 @@ class DecklistEditTest extends WebTestCase
 
     /**
      * The predecessor ("Derived from") is given as an id or as a decklist URL.
-     *
-     * @dataProvider precedentProvider
      */
-    public function testPrecedent(string $precedent, ?string $expected): void
+    #[DataProvider('precedentProvider')]
+    public function testPrecedent(string $precedent, ?int $expected): void
     {
         $client = $this->createAuthenticatedClient();
         $this->saveForm($client, 1, ['precedent' => $precedent]);
@@ -195,11 +193,11 @@ class DecklistEditTest extends WebTestCase
     /**
      * @return array<string, string[]|string[]|null[]>
      */
-    public function precedentProvider(): array
+    public static function precedentProvider(): array
     {
         return [
-            'id' => ['3', '3'],
-            'decklist URL' => ['https://ringsdb.com/decklist/view/4/gondorrohansilvantactics-1.0', '4'],
+            'id' => ['3', 3],
+            'decklist URL' => ['https://ringsdb.com/decklist/view/4/gondorrohansilvantactics-1.0', 4],
             'empty' => ['', null],
             'itself' => ['1', null],
             'unknown decklist' => ['999', null],
@@ -208,10 +206,7 @@ class DecklistEditTest extends WebTestCase
     }
 
     /* ------------------------------------------------------ access to edit */
-
-    /**
-     * @dataProvider editRouteProvider
-     */
+    #[DataProvider('editRouteProvider')]
     public function testAnotherUserCannotEdit(string $method, string $uri): void
     {
         $client = $this->createAuthenticatedClient('admin');
@@ -224,7 +219,7 @@ class DecklistEditTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function editRouteProvider(): array
+    public static function editRouteProvider(): array
     {
         return [
             'edit form' => ['GET', '/decklist/edit/1'],
@@ -247,9 +242,7 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame('Moderated', $this->fetchDecklist(1)['name']);
     }
 
-    /**
-     * @dataProvider editRouteProvider
-     */
+    #[DataProvider('editRouteProvider')]
     public function testAnonymousIsRedirectedToLogin(string $method, string $uri): void
     {
         $client = $this->client;
@@ -278,7 +271,7 @@ class DecklistEditTest extends WebTestCase
         $client = $this->createAuthenticatedClient();
         $id = $this->insertDecklist('PHPUnit To Delete', ['precedent_decklist_id' => 1]);
         $successor = $this->insertDecklist('PHPUnit Successor', ['precedent_decklist_id' => $id]);
-        $deck = $this->db()->fetchAssoc('SELECT * FROM deck WHERE id = 3');
+        $deck = $this->db()->fetchAssociative('SELECT * FROM deck WHERE id = 3');
         $this->assertNotFalse($deck);
         unset($deck['id']);
         $this->db()->insert('deck', ['name' => 'PHPUnit Child', 'parent_decklist_id' => $id] + $deck);
@@ -289,30 +282,29 @@ class DecklistEditTest extends WebTestCase
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertSame('/decklists/mine', $client->getResponse()->headers->get('Location'));
         $this->assertFalse($this->fetchDecklist($id));
-        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM decklistslot WHERE decklist_id = ?', [$id]));
-        $this->assertSame('1', $this->fetchDecklist($successor)['precedent_decklist_id']);
-        $this->assertSame('1', $this->db()->fetchColumn('SELECT parent_decklist_id FROM deck WHERE id = ?', [$child]));
+        $this->assertSame(0, $this->db()->fetchOne('SELECT COUNT(*) FROM decklistslot WHERE decklist_id = ?', [$id]));
+        $this->assertSame(1, $this->fetchDecklist($successor)['precedent_decklist_id']);
+        $this->assertSame(1, $this->db()->fetchOne('SELECT parent_decklist_id FROM deck WHERE id = ?', [$child]));
     }
 
     /**
      * Refusals are 403 (AccessDeniedHttpException): anonymous users are not redirected to the
      * login page, unlike on the edit routes.
-     *
-     * @dataProvider refusedDeleteProvider
      */
+    #[DataProvider('refusedDeleteProvider')]
     public function testRefusedDelete(?string $username, int $decklist): void
     {
         $client = $username ? $this->createAuthenticatedClient($username) : $this->client;
         $client->request('POST', "/decklist/delete/$decklist");
 
         $this->assertSame(403, $client->getResponse()->getStatusCode());
-        $this->assertSame('4', $this->db()->fetchColumn('SELECT COUNT(*) FROM decklist'));
+        $this->assertSame(4, $this->db()->fetchOne('SELECT COUNT(*) FROM decklist'));
     }
 
     /**
      * @return array<string, string[]|int[]|null[]>
      */
-    public function refusedDeleteProvider(): array
+    public static function refusedDeleteProvider(): array
     {
         return [
             'with a comment' => ['test', 1],
@@ -342,10 +334,10 @@ class DecklistEditTest extends WebTestCase
 
         $this->assertSame(302, $client->getResponse()->getStatusCode());
         $this->assertFalse($this->fetchDecklist($id));
-        $this->assertSame(['1', '1'], [
-            $connection->fetchColumn('SELECT is_public FROM fellowship WHERE id = ?', [$fellowshipId]),
-            $connection->fetchColumn('SELECT nb_decks FROM fellowship WHERE id = ?', [$fellowshipId]),
+        $this->assertSame([1, 1], [
+            $connection->fetchOne('SELECT is_public FROM fellowship WHERE id = ?', [$fellowshipId]),
+            $connection->fetchOne('SELECT nb_decks FROM fellowship WHERE id = ?', [$fellowshipId]),
         ]);
-        $this->assertSame('0', $connection->fetchColumn('SELECT COUNT(*) FROM fellowship_decklist WHERE fellowship_id = ?', [$fellowshipId]));
+        $this->assertSame(0, $connection->fetchOne('SELECT COUNT(*) FROM fellowship_decklist WHERE fellowship_id = ?', [$fellowshipId]));
     }
 }

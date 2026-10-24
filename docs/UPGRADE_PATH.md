@@ -28,6 +28,7 @@ composer/composer:
 
 doctrine/doctrine-migrations-bundle:
 - 2.2.3 requires php: ^7.1|^8.0 and symfony/framework-bundle: ~3.4|~4.0|~5.0
+- 3.7.1 requires php: ^7.2 || ^8.0 and symfony/framework-bundle: ^5.4 || ^6.0 || ^7.0 || ^8.0
 
 friendsofsymfony/user-bundle:
 - 3.1.0 requires symfony/security-bundle: ^4.4 || ^5.0 || ^6.0

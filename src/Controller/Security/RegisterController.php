@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * The account is created disabled, and enabled by the link of the confirmation email
@@ -21,29 +21,15 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class RegisterController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private UserPasswordUpdater $passwordUpdater;
-
-    private TokenGenerator $tokenGenerator;
-
-    private UserMailer $mailer;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        UserPasswordUpdater $passwordUpdater,
-        TokenGenerator $tokenGenerator,
-        UserMailer $mailer
+        private readonly EntityManagerInterface $entityManager,
+        private readonly UserPasswordUpdater $passwordUpdater,
+        private readonly TokenGenerator $tokenGenerator,
+        private readonly UserMailer $mailer
     ) {
-        $this->entityManager = $entityManager;
-        $this->passwordUpdater = $passwordUpdater;
-        $this->tokenGenerator = $tokenGenerator;
-        $this->mailer = $mailer;
     }
 
-    /**
-     * @Route("/register/", name="fos_user_registration_register", methods={"GET", "POST"})
-     */
+    #[Route(path: '/register/', name: 'fos_user_registration_register', methods: ['GET', 'POST'])]
     public function __invoke(Request $request): Response
     {
         $user = new User();

@@ -16,18 +16,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DeleteDecklistCommand extends Command
 {
-    private EntityManagerInterface $entityManager;
-
-    private DeckRepository $deckRepository;
-
-    private DecklistRepository $decklistRepository;
-
-    public function __construct(EntityManagerInterface $entityManager, DeckRepository $deckRepository, DecklistRepository $decklistRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly DeckRepository $deckRepository,
+        private readonly DecklistRepository $decklistRepository
+    ) {
         parent::__construct();
-        $this->entityManager = $entityManager;
-        $this->deckRepository = $deckRepository;
-        $this->decklistRepository = $decklistRepository;
     }
 
     protected function configure(): void
@@ -42,7 +36,7 @@ class DeleteDecklistCommand extends Command
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $decklist_id = $input->getArgument('decklist_id');
         $decklist = $this->decklistRepository->find($decklist_id);

@@ -7,6 +7,7 @@ namespace App\Tests\Model;
 use App\Entity\User;
 use App\Model\FellowshipManager;
 use Doctrine\DBAL\Connection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -41,12 +42,12 @@ class FellowshipManagerTest extends KernelTestCase
         static::bootKernel();
         $this->connection = static::$kernel->getContainer()->get('doctrine')->getConnection();
         foreach (['fellowship', 'fellowshipcomment', 'decklist'] as $table) {
-            $this->maxIds[$table] = (int) $this->connection->fetchColumn("SELECT MAX(id) FROM $table");
+            $this->maxIds[$table] = (int) $this->connection->fetchOne("SELECT MAX(id) FROM $table");
         }
 
-        $this->fixtureUsers = $this->connection->fetchAll('SELECT id, reputation FROM user');
+        $this->fixtureUsers = $this->connection->fetchAllAssociative('SELECT id, reputation FROM user');
 
-        $admin = (int) $this->connection->fetchColumn("SELECT id FROM user WHERE username = 'admin'");
+        $admin = (int) $this->connection->fetchOne("SELECT id FROM user WHERE username = 'admin'");
         $this->ids = ['F1' => 1];
         $this->ids['F2'] = $this->insertFellowship('PHPUnit Dwarves and Gondor', 1, [1, 2], ['nb_votes' => 12, 'nb_comments' => 3,
             'date_creation' => '2019-12-01 00:00:00', 'date_publish' => '2020-01-01 00:00:00', 'date_last_comment' => '2020-02-01 00:00:00']);
@@ -72,7 +73,7 @@ class FellowshipManagerTest extends KernelTestCase
             "DELETE FROM decklistslot WHERE decklist_id > {$max['decklist']}",
             "DELETE FROM decklist WHERE id > {$max['decklist']}",
         ] as $sql) {
-            $this->connection->exec($sql);
+            $this->connection->executeStatement($sql);
         }
 
         foreach ($this->fixtureUsers as $user) {
@@ -109,7 +110,7 @@ class FellowshipManagerTest extends KernelTestCase
      */
     private function insertDecklist(array $slots): int
     {
-        $row = $this->connection->fetchAssoc('SELECT * FROM decklist WHERE id = 2');
+        $row = $this->connection->fetchAssociative('SELECT * FROM decklist WHERE id = 2');
         $this->assertNotFalse($row);
         unset($row['id']);
         $this->connection->insert('decklist', ['name' => 'PHPUnit Decklist'] + $row);
@@ -196,10 +197,7 @@ class FellowshipManagerTest extends KernelTestCase
     }
 
     /* ------------------------------------------------------------- search */
-
-    /**
-     * @dataProvider searchProvider
-     */
+    #[DataProvider('searchProvider')]
     public function testComplexSearch(array $query, array $expected, ?string $username = null): void
     {
         $this->assertSame($expected, $this->names($this->manager($query, $username)->findFellowshipsWithComplexSearch()));
@@ -208,7 +206,7 @@ class FellowshipManagerTest extends KernelTestCase
     /**
      * @return array<string, mixed[]>
      */
-    public function searchProvider(): array
+    public static function searchProvider(): array
     {
         return [
             'no criteria' => [[], ['F2', 'F3', 'F5', 'F1']],

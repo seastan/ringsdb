@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Form;
 
 use App\Entity\Encounter;
+use App\Entity\Pack;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -24,7 +25,7 @@ class EncounterType extends AbstractType
         $builder
             ->add('code')
             ->add('name')
-            ->add('pack', EntityType::class, ['class' => 'App:Pack', 'choice_label' => 'name']);
+            ->add('pack', EntityType::class, ['class' => Pack::class, 'choice_label' => 'name']);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -10,23 +10,18 @@ use App\Services\Decks;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ListDecksController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private Decks $decks;
-
     public function __construct(
-        Decks $decks
+        private Decks $decks
     ) {
-        $this->decks = $decks;
     }
 
-    /**
-     * @Route("/decks", name="decks_list", methods={"GET"})
-     */
+    #[Route(path: '/decks', name: 'decks_list', methods: ['GET'])]
     public function __invoke(Request $request): Response
     {
         /* @var $user User */

@@ -12,32 +12,24 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class VoteFellowshipController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private FellowshipRepository $fellowshipRepository;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        FellowshipRepository $fellowshipRepository
+        private readonly EntityManagerInterface $entityManager,
+        private readonly FellowshipRepository $fellowshipRepository
     ) {
-        $this->entityManager = $entityManager;
-        $this->fellowshipRepository = $fellowshipRepository;
     }
 
     /*
      * records a user's vote
      */
-    /**
-     * @Route("/user/fellowship_like", name="fellowship_like", methods={"POST"})
-     */
+    #[Route(path: '/user/fellowship_like', name: 'fellowship_like', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 

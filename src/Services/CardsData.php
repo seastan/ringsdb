@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\CardImageLocator\CardImageLocatorInterface;
 use App\Entity\Card;
+use App\Entity\CardPrinting;
 use App\Entity\Review;
 use App\Entity\Sphere;
 use App\Repository\CardRepository;
@@ -14,54 +16,30 @@ use App\Repository\SphereRepository;
 use App\Search\SearchKeys;
 use App\Search\SearchTypes;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Asset\Packages;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CardsData
 {
-    private EntityManagerInterface $entityManager;
-
-    private UrlGeneratorInterface $router;
-
-    private Packages $assets_packages;
-
-    private string $publicDir;
-
-    private CardRepository $cardRepository;
-
-    private CycleRepository $cycleRepository;
-
-    private ReviewRepository $reviewRepository;
-
-    private SphereRepository $sphereRepository;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        UrlGeneratorInterface $router,
-        Packages $assets_packages,
-        string $publicDir,
-        CardRepository $cardRepository,
-        CycleRepository $cycleRepository,
-        ReviewRepository $reviewRepository,
-        SphereRepository $sphereRepository
+        private readonly EntityManagerInterface $entityManager,
+        private readonly UrlGeneratorInterface $router,
+        private readonly CardRepository $cardRepository,
+        private readonly CycleRepository $cycleRepository,
+        private readonly ReviewRepository $reviewRepository,
+        private readonly SphereRepository $sphereRepository,
+        private readonly CardImageLocatorInterface $cardImageLocator
     ) {
-        $this->entityManager = $entityManager;
-        $this->router = $router;
-        $this->assets_packages = $assets_packages;
-        $this->publicDir = $publicDir;
-        $this->cardRepository = $cardRepository;
-        $this->cycleRepository = $cycleRepository;
-        $this->reviewRepository = $reviewRepository;
-        $this->sphereRepository = $sphereRepository;
     }
 
     /**
      * Searches for and replaces symbol tokens with markup in a given text.
-     *
-     * @param string $text
      */
-    public function replaceSymbols($text): string
+    public function replaceSymbols(?string $text): string
     {
+        if (null === $text) {
+            return '';
+        }
+
         /** @var array<string, string> $displayTextReplacements */
         static $displayTextReplacements = [
             '[willpower]' => '<span class="icon-willpower"></span>',
@@ -78,7 +56,7 @@ class CardsData
             '[unique]' => '<span class="icon-unique"></span>',
         ];
 
-        return str_replace(array_keys($displayTextReplacements), array_values($displayTextReplacements), $text);
+        return str_replace(array_keys($displayTextReplacements), array_values($displayTextReplacements), $text ?? '');
     }
 
     public function splitInParagraphs(string $text): string
@@ -95,7 +73,7 @@ class CardsData
      */
     public function allSetsData(): array
     {
-        $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
+        $list_cycles = $this->cycleRepository->findBy([], ['position' => \SortDirection::Ascending]);
         $cycles = [];
 
         foreach ($list_cycles as $cycle) {
@@ -146,7 +124,7 @@ class CardsData
      */
     public function getPrimarySpheres(): array
     {
-        return $this->sphereRepository->findBy(['is_primary' => true], ['code' => 'ASC']);
+        return $this->sphereRepository->findBy(['is_primary' => true], ['code' => \SortDirection::Ascending]);
     }
 
     /**
@@ -218,7 +196,7 @@ class CardsData
                             // cycle filter: card has a printing in a pack of this cycle (any printing)
                             $or = [];
                             foreach ($condition as $arg) {
-                                $sub = "SELECT cpc{$i}.id FROM App:CardPrinting cpc{$i} JOIN cpc{$i}.pack ppc{$i} JOIN ppc{$i}.cycle yc{$i} WHERE cpc{$i}.card = c AND yc{$i}.code = ?$i";
+                                $sub = "SELECT cpc{$i}.id FROM ".CardPrinting::class." cpc{$i} JOIN cpc{$i}.pack ppc{$i} JOIN ppc{$i}.cycle yc{$i} WHERE cpc{$i}.card = c AND yc{$i}.code = ?$i";
                                 switch ($operator) {
                                     case ':':
                                         $or[] = "EXISTS ($sub)";
@@ -238,7 +216,7 @@ class CardsData
                             // pack filter: card has a printing in this pack (any printing)
                             $or = [];
                             foreach ($condition as $arg) {
-                                $base = "SELECT cpe{$i}.id FROM App:CardPrinting cpe{$i} JOIN cpe{$i}.pack ppe{$i} WHERE cpe{$i}.card = c";
+                                $base = "SELECT cpe{$i}.id FROM ".CardPrinting::class." cpe{$i} JOIN cpe{$i}.pack ppe{$i} WHERE cpe{$i}.card = c";
                                 switch ($operator) {
                                     case ':':
                                         $or[] = "EXISTS ($base AND ppe{$i}.code = ?$i)";
@@ -247,10 +225,10 @@ class CardsData
                                         $or[] = "NOT EXISTS ($base AND ppe{$i}.code = ?$i)";
                                         break;
                                     case '<':
-                                        $or[] = "EXISTS ($base AND ppe{$i}.dateRelease < (SELECT p2{$i}.dateRelease FROM App:Pack p2{$i} WHERE p2{$i}.code = ?$i))";
+                                        $or[] = "EXISTS ($base AND ppe{$i}.dateRelease < (SELECT p2{$i}.dateRelease FROM '.Pack::class.' p2{$i} WHERE p2{$i}.code = ?$i))";
                                         break;
                                     case '>':
-                                        $or[] = "EXISTS ($base AND ppe{$i}.dateRelease > (SELECT p3{$i}.dateRelease FROM App:Pack p3{$i} WHERE p3{$i}.code = ?$i))";
+                                        $or[] = "EXISTS ($base AND ppe{$i}.dateRelease > (SELECT p3{$i}.dateRelease FROM '.Pack::class.' p3{$i} WHERE p3{$i}.code = ?$i))";
                                         break;
                                 }
 
@@ -376,7 +354,7 @@ class CardsData
                             // illustrator — search via CardPrinting (field moved off Card in Phase 9)
                             $or = [];
                             foreach ($condition as $arg) {
-                                $sub = "SELECT cpi{$i}.id FROM App:CardPrinting cpi{$i} WHERE cpi{$i}.card = c AND cpi{$i}.illustrator = ?$i";
+                                $sub = "SELECT cpi{$i}.id FROM ".CardPrinting::class." cpi{$i} WHERE cpi{$i}.card = c AND cpi{$i}.illustrator = ?$i";
                                 switch ($operator) {
                                     case ':':
                                         $or[] = "EXISTS ($sub)";
@@ -396,7 +374,7 @@ class CardsData
                             // release: card has a printing released by / after this date (any printing)
                             $or = [];
                             foreach ($condition as $arg) {
-                                $base = "SELECT cpr{$i}.id FROM App:CardPrinting cpr{$i} JOIN cpr{$i}.pack ppr{$i} WHERE cpr{$i}.card = c";
+                                $base = "SELECT cpr{$i}.id FROM ".CardPrinting::class." cpr{$i} JOIN cpr{$i}.pack ppr{$i} WHERE cpr{$i}.card = c";
                                 switch ($operator) {
                                     case '<':
                                         $or[] = "EXISTS ($base AND ppr{$i}.dateRelease <= ?$i)";
@@ -439,16 +417,16 @@ class CardsData
                 $qb->orderBy('c.cost')->addOrderBy('c.threat');
                 break;
             case 'attack':
-                $qb->orderBy('c.attack', 'DESC');
+                $qb->orderBy('c.attack', \SortDirection::Descending);
                 break;
             case 'willpower':
-                $qb->orderBy('c.willpower', 'DESC');
+                $qb->orderBy('c.willpower', \SortDirection::Descending);
                 break;
             case 'defense':
-                $qb->orderBy('c.defense', 'DESC');
+                $qb->orderBy('c.defense', \SortDirection::Descending);
                 break;
             case 'health':
-                $qb->orderBy('c.health', 'DESC');
+                $qb->orderBy('c.health', \SortDirection::Descending);
                 break;
         }
 
@@ -461,12 +439,11 @@ class CardsData
     }
 
     /**
-     * @param Card $card
      * @param bool $api
      *
      * @return array<string, mixed>
      */
-    public function getCardInfo($card, $api = false): array
+    public function getCardInfo(Card $card, $api = false): array
     {
         $cardinfo = [];
 
@@ -505,22 +482,15 @@ class CardsData
 
         // Fields removed from Card ORM in Phase 9 — supply from the primary printing.
         $primaryPrinting = $card->getPrimaryPrinting();
-        $primaryPack = $primaryPrinting ? $primaryPrinting->getPack() : null;
-        $cardinfo['pack_code'] = $primaryPack ? $primaryPack->getCode() : null;
-        $cardinfo['pack_name'] = $primaryPack ? $primaryPack->getName() : null;
-        $cardinfo['illustrator'] = $primaryPrinting ? $primaryPrinting->getIllustrator() : null;
-        $cardinfo['octgnid'] = $primaryPrinting ? $primaryPrinting->getOctgnid() : null;
-        $cardinfo['quantity'] = $primaryPrinting ? intval($primaryPrinting->getQuantity()) : null;
+        $primaryPack = $primaryPrinting instanceof CardPrinting ? $primaryPrinting->getPack() : null;
+        $cardinfo['pack_code'] = $primaryPack instanceof \App\Entity\Pack ? $primaryPack->getCode() : null;
+        $cardinfo['pack_name'] = $primaryPack instanceof \App\Entity\Pack ? $primaryPack->getName() : null;
+        $cardinfo['illustrator'] = $primaryPrinting instanceof CardPrinting ? $primaryPrinting->getIllustrator() : null;
+        $cardinfo['octgnid'] = $primaryPrinting instanceof CardPrinting ? $primaryPrinting->getOctgnid() : null;
+        $cardinfo['quantity'] = $primaryPrinting instanceof CardPrinting ? intval($primaryPrinting->getQuantity()) : null;
 
         $cardinfo['url'] = $this->router->generate('cards_zoom', ['card_code' => $card->getCode()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $imageurl = $this->assets_packages->getUrl('bundles/cards/'.$card->getCode().'.png');
-        $imagepath = $this->publicDir.preg_replace('/\?.*/', '', $imageurl);
-
-        if (file_exists($imagepath)) {
-            $cardinfo['imagesrc'] = $imageurl;
-        } else {
-            $cardinfo['imagesrc'] = null;
-        }
+        $cardinfo['imagesrc'] = $this->cardImageLocator->getCardImageUrl($card);
 
         // All printings of this card (one per pack it appears in). pack_code/pack_name
         // above stay as the canonical/primary printing for backward compatibility.
@@ -531,8 +501,6 @@ class CardsData
                 continue;
             }
 
-            $prImageUrl = $this->assets_packages->getUrl('bundles/cards/'.$printing->getImageCode().'.png');
-            $prImagePath = $this->publicDir.preg_replace('/\?.*/', '', $prImageUrl);
             $dateRelease = $pack->getDateRelease();
 
             $cardinfo['packs'][] = [
@@ -543,7 +511,7 @@ class CardsData
                 'image_code' => $printing->getImageCode(),
                 'illustrator' => $printing->getIllustrator(),
                 'octgnid' => $printing->getOctgnid(),
-                'imagesrc' => file_exists($prImagePath) ? $prImageUrl : null,
+                'imagesrc' => $this->cardImageLocator->getPrintingImageUrl($printing),
                 'date_release' => $dateRelease ? $dateRelease->format('Y-m-d') : null,
             ];
         }
@@ -709,7 +677,7 @@ class CardsData
      */
     public function getReviews(Card $card): array
     {
-        return $this->reviewRepository->findBy(['card' => $card], ['nbVotes' => 'DESC', 'id' => 'ASC']);
+        return $this->reviewRepository->findBy(['card' => $card], ['nbVotes' => \SortDirection::Descending, 'id' => \SortDirection::Ascending]);
     }
 
     /**
@@ -718,7 +686,7 @@ class CardsData
     public function getDistinctTraits(): array
     {
         $qb = $this->entityManager->createQueryBuilder();
-        $qb->from('App:Card', 'c');
+        $qb->from(Card::class, 'c');
         $qb->select('c.traits');
         $qb->distinct();
 

@@ -11,11 +11,9 @@ use Doctrine\Persistence\ObjectManager;
 
 class UserFixtures extends Fixture
 {
-    private UserPasswordUpdater $passwordUpdater;
-
-    public function __construct(UserPasswordUpdater $passwordUpdater)
-    {
-        $this->passwordUpdater = $passwordUpdater;
+    public function __construct(
+        private readonly UserPasswordUpdater $passwordUpdater
+    ) {
     }
 
     public function load(ObjectManager $manager): void

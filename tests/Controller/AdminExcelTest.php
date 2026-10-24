@@ -14,8 +14,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  * Excel export / import of the cards (ExcelController, admin only): the tests download a pack,
  * change the file with PhpSpreadsheet, and upload it back.
  *
- * - the download is a StreamedResponse, sent by Symfony's StreamedResponseListener as soon as
- *   the controller returns it: it is captured with an output buffer around the request;
+ * - the download is a StreamedResponse: the test client sends it and keeps its output as the
+ *   content of the internal response;
  * - the upload echoes an HTML report of the changes before returning its response: also
  *   captured.
  *
@@ -41,14 +41,14 @@ class AdminExcelTest extends WebTestCase
     {
         $this->client = static::createClient();
         $connection = $this->db();
-        $this->maxCardId = (int) $connection->fetchColumn('SELECT MAX(id) FROM card');
-        $this->coreCards = $connection->fetchAll('SELECT c.* FROM card c JOIN card_printing cp ON cp.card_id = c.id WHERE cp.pack_id = 1');
+        $this->maxCardId = (int) $connection->fetchOne('SELECT MAX(id) FROM card');
+        $this->coreCards = $connection->fetchAllAssociative('SELECT c.* FROM card c JOIN card_printing cp ON cp.card_id = c.id WHERE cp.pack_id = 1');
     }
 
     protected function tearDown(): void
     {
         $connection = $this->db();
-        $connection->exec("DELETE FROM card WHERE id > {$this->maxCardId}");
+        $connection->executeStatement("DELETE FROM card WHERE id > {$this->maxCardId}");
         foreach ($this->coreCards as $card) {
             $connection->update('card', $card, ['id' => $card['id']]);
         }
@@ -82,9 +82,8 @@ class AdminExcelTest extends WebTestCase
      */
     private function download(KernelBrowser $client, int $packId): string
     {
-        ob_start();
         $client->request('POST', '/admin/excel/download', ['pack' => $packId]);
-        $content = ob_get_clean();
+        $content = $client->getInternalResponse()->getContent();
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $file = self::temporaryFile('excel').'.xlsx';
@@ -136,7 +135,7 @@ class AdminExcelTest extends WebTestCase
 
     private function fetchCard(string $code)
     {
-        return $this->db()->fetchAssoc('SELECT c.name, c.cost, c.text, t.name AS type, s.name AS sphere FROM card c JOIN type t ON t.id = c.type_id JOIN sphere s ON s.id = c.sphere_id WHERE c.code = ?', [$code]);
+        return $this->db()->fetchAssociative('SELECT c.name, c.cost, c.text, t.name AS type, s.name AS sphere FROM card c JOIN type t ON t.id = c.type_id JOIN sphere s ON s.id = c.sphere_id WHERE c.code = ?', [$code]);
     }
 
     /* ----------------------------------------------------------- download */
@@ -166,7 +165,7 @@ class AdminExcelTest extends WebTestCase
         $file = $this->download($client, 0);
 
         $this->assertSame('attachment; filename=lotrlcgcards.xlsx', $client->getResponse()->headers->get('Content-Disposition'));
-        $this->assertCount(1 + (int) $this->db()->fetchColumn('SELECT COUNT(*) FROM card'), $this->rows($file));
+        $this->assertCount(1 + (int) $this->db()->fetchOne('SELECT COUNT(*) FROM card'), $this->rows($file));
     }
 
     /* ------------------------------------------------------------- upload */
@@ -185,7 +184,7 @@ class AdminExcelTest extends WebTestCase
         [$response, $report] = $this->upload($client, $file);
         $this->assertSame('7 cards changed or added', $response);
         $this->assertStringContainsString('Legolas: field [text] changed; field [flavor] changed;', $report);
-        $this->assertStringNotContainsString("\r", $this->db()->fetchColumn("SELECT text FROM card WHERE code = '01005'"));
+        $this->assertStringNotContainsString("\r", $this->db()->fetchOne("SELECT text FROM card WHERE code = '01005'"));
 
         [$response] = $this->upload($client, $file);
         $this->assertSame('0 cards changed or added', $response);

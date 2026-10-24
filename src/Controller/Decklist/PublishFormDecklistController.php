@@ -11,41 +11,28 @@ use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class PublishFormDecklistController extends AbstractController
 {
-    private DeckRepository $deckRepository;
-
-    private DecklistRepository $decklistRepository;
-
-    private DecklistFactory $decklistFactory;
-
-    private DeckValidationHelper $deckValidationHelper;
-
     public function __construct(
-        DeckRepository $deckRepository,
-        DecklistRepository $decklistRepository,
-        DecklistFactory $decklistFactory,
-        DeckValidationHelper $deckValidationHelper
+        private readonly DeckRepository $deckRepository,
+        private readonly DecklistRepository $decklistRepository,
+        private readonly DecklistFactory $decklistFactory,
+        private readonly DeckValidationHelper $deckValidationHelper
     ) {
-        $this->deckRepository = $deckRepository;
-        $this->decklistRepository = $decklistRepository;
-        $this->decklistFactory = $decklistFactory;
-        $this->deckValidationHelper = $deckValidationHelper;
     }
 
     /**
      * Checks to see if a deck can be published in its current saved state
      * If it is, displays the decklist edit form for initial publication of a deck.
-     *
-     * @Route("/deck/publish/{deck_id}", name="deck_publish_form", methods={"GET"})
      */
+    #[Route(path: '/deck/publish/{deck_id}', name: 'deck_publish_form', methods: ['GET'])]
     public function __invoke(int $deck_id): Response
     {
         /* @var $user \App\Entity\User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw $this->createAccessDeniedException('You must be logged in for this operation.');
         }
 
@@ -56,7 +43,7 @@ class PublishFormDecklistController extends AbstractController
 
         $problem = $this->deckValidationHelper->findProblem($deck, true);
         if ($problem) {
-            $this->get('session')->getFlashBag()->set('error', 'This deck cannot be published because it is invalid.');
+            $this->addFlash('error', 'This deck cannot be published because it is invalid.');
 
             return $this->redirect($this->generateUrl('deck_view', ['deck_id' => $deck->getId()]));
         }
@@ -70,7 +57,7 @@ class PublishFormDecklistController extends AbstractController
             $deck_content = ['main' => $decklist->getSlots()->getContent(), 'side' => $decklist->getSideslots()->getContent()];
             if (json_encode($deck_content) == $new_content) {
                 $url = $this->generateUrl('decklist_detail', ['decklist_id' => $decklist->getId(), 'decklist_name' => $decklist->getNameCanonical()]);
-                $this->get('session')->getFlashBag()->set('warning', "This deck <a href=\"{$url}\">has already been published</a> before. You are going to create a duplicate.");
+                $this->addFlash('warning', "This deck <a href=\"{$url}\">has already been published</a> before. You are going to create a duplicate.");
             }
         }
 

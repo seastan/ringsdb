@@ -5,46 +5,32 @@ declare(strict_types=1);
 namespace App\Controller\Decklist;
 
 use App\Entity\Decklist;
+use App\Helper\StringSanitizer;
 use App\Repository\DecklistRepository;
 use App\Services\Texts;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SaveDecklistController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private DecklistRepository $decklistRepository;
-
-    private Texts $texts;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        DecklistRepository $decklistRepository,
-        Texts $texts
+        private readonly EntityManagerInterface $entityManager,
+        private readonly DecklistRepository $decklistRepository,
+        private readonly Texts $texts
     ) {
-        $this->entityManager = $entityManager;
-        $this->decklistRepository = $decklistRepository;
-        $this->texts = $texts;
     }
 
     /**
      * save the name and description of a decklist by its publisher.
-     *
-     * @Route(
-     *     "/decklist/save/{decklist_id}",
-     *     name="decklist_save",
-     *     methods={"POST"},
-     *     requirements={"decklist_id"="\d+"}
-     * )
      */
+    #[Route(path: '/decklist/save/{decklist_id}', name: 'decklist_save', requirements: ['decklist_id' => '\d+'], methods: ['POST'])]
     public function __invoke(Request $request, int $decklist_id): RedirectResponse
     {
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw $this->createAccessDeniedException('Anonymous access denied');
         }
 
@@ -57,7 +43,7 @@ class SaveDecklistController extends AbstractController
             throw $this->createAccessDeniedException('Access denied');
         }
 
-        $name = trim((string) filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+        $name = trim(StringSanitizer::sanitize($request->request->get('name'), false));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = 'Untitled';

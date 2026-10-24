@@ -15,15 +15,11 @@ class PatronCommand extends Command
 {
     use StringInputTrait;
 
-    private EntityManagerInterface $entityManager;
-
-    private UserRepository $userRepository;
-
-    public function __construct(EntityManagerInterface $entityManager, UserRepository $userRepository)
-    {
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private UserRepository $userRepository
+    ) {
         parent::__construct();
-        $this->entityManager = $entityManager;
-        $this->userRepository = $userRepository;
     }
 
     protected function configure(): void
@@ -43,7 +39,7 @@ class PatronCommand extends Command
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $email = self::stringArgument($input, 'email');
         $donation = (int) $input->getArgument('donation');

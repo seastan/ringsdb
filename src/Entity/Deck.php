@@ -12,16 +12,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\DeckRepository")
- * @ORM\Table(
- *     name="deck",
- *     indexes={
- *         @ORM\Index(name="idx_deck_date_creation", columns={"date_creation"}),
- *         @ORM\Index(name="idx_deck_date_update", columns={"date_update"})
- *     }
- * )
- */
+#[ORM\Entity(repositoryClass: \App\Repository\DeckRepository::class)]
+#[ORM\Table(name: 'deck')]
+#[ORM\Index(name: 'idx_deck_date_creation', columns: ['date_creation'])]
+#[ORM\Index(name: 'idx_deck_date_update', columns: ['date_update'])]
 class Deck extends ExportableDeck implements \JsonSerializable
 {
     /**
@@ -171,13 +165,31 @@ class Deck extends ExportableDeck implements \JsonSerializable
         return $snapshots;
     }
 
-    public function jsonSerialize()
+    /**
+     * @return array{
+     *     id: int|null,
+     *     name: string,
+     *     date_creation: string,
+     *     date_update: string,
+     *     description_md: string|null,
+     *     user_id: int|null,
+     *     heroes: array<int|string, int>,
+     *     slots: array<int|string, int>,
+     *     sideslots: array<int|string, int>,
+     *     version: string,
+     *     freeze_comments?: bool|null,
+     *     is_published: false,
+     *     problem: string|null,
+     *     tags: string|null,
+     *     history: list<array<string, mixed>>,
+     * }
+     */
+    public function jsonSerialize(): array
     {
         $array = parent::getArrayExport();
         $array['is_published'] = false;
         $array['problem'] = $this->getProblem();
         $array['tags'] = $this->getTags();
-        $array['last_pack'] = $this->getLastPack();
         $array['history'] = $this->getHistory();
 
         return $array;
@@ -198,135 +210,110 @@ class Deck extends ExportableDeck implements \JsonSerializable
 
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", length=255)
      */
+    #[ORM\Column(type: 'string', length: 255)]
     private $name;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
-     * @Gedmo\Timestampable(on="create")
      */
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name: 'date_creation', type: 'datetime', nullable: false)]
     private $dateCreation;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="date_update", type="datetime", nullable=false)
-     * @Gedmo\Timestampable(on="update")
      */
+    #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(name: 'date_update', type: 'datetime', nullable: false)]
     private $dateUpdate;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(name="description_md", type="text", nullable=true)
      */
+    #[ORM\Column(name: 'description_md', type: 'text', nullable: true)]
     private $descriptionMd;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="string", length=255, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $problem;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="string", length=4000, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 4000, nullable: true)]
     private $tags;
 
-    /**
-     * @ORM\Column(name="major_version", type="integer", nullable=false)
-     */
+    #[ORM\Column(name: 'major_version', type: 'integer', nullable: false)]
     private int $majorVersion;
 
-    /**
-     * @ORM\Column(name="minor_version", type="integer", nullable=false)
-     */
+    #[ORM\Column(name: 'minor_version', type: 'integer', nullable: false)]
     private int $minorVersion;
 
     /**
      * @var Collection<int, Deckslot>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Deckslot", mappedBy="deck", cascade={"persist", "remove"})
      */
+    #[ORM\OneToMany(targetEntity: Deckslot::class, mappedBy: 'deck', cascade: ['persist', 'remove'])]
     private $slots;
 
     /**
      * @var Collection<int, Decksideslot>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Decksideslot", mappedBy="deck", cascade={"persist", "remove"})
      */
+    #[ORM\OneToMany(targetEntity: Decksideslot::class, mappedBy: 'deck', cascade: ['persist', 'remove'])]
     private $sideslots;
 
     /**
      * @var Collection<int, Decklist>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Decklist", mappedBy="parent")
-     * @ORM\OrderBy({"dateCreation"="DESC"})
      */
+    #[ORM\OneToMany(targetEntity: Decklist::class, mappedBy: 'parent')]
+    #[ORM\OrderBy(['dateCreation' => \SortDirection::Descending])]
     private $children;
 
     /**
      * @var Collection<int, Deckchange>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\Deckchange", mappedBy="deck", cascade={"persist", "remove"})
-     * @ORM\OrderBy({"dateCreation"="DESC", "isSaved"="DESC"})
      */
+    #[ORM\OneToMany(targetEntity: Deckchange::class, mappedBy: 'deck', cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['dateCreation' => \SortDirection::Descending, 'isSaved' => \SortDirection::Descending])]
     private $changes;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="decks")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
-     */
-    private User $user;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Pack")
-     * @ORM\JoinColumn(name="last_pack_id", referencedColumnName="id")
-     */
+    #[ORM\ManyToOne(targetEntity: Pack::class)]
+    #[ORM\JoinColumn(name: 'last_pack_id', referencedColumnName: 'id')]
     private ?Pack $lastPack = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Decklist", inversedBy="children")
-     * @ORM\JoinColumn(name="parent_decklist_id", referencedColumnName="id")
-     */
+    #[ORM\ManyToOne(targetEntity: Decklist::class, inversedBy: 'children')]
+    #[ORM\JoinColumn(name: 'parent_decklist_id', referencedColumnName: 'id')]
     private ?Decklist $parent = null;
 
     /**
      * @var Collection<int, QuestlogDeck>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\QuestlogDeck", mappedBy="deck", cascade={"persist"})
      */
+    #[ORM\OneToMany(targetEntity: QuestlogDeck::class, mappedBy: 'deck', cascade: ['persist'])]
     private $questlogs;
 
     /**
      * @var Collection<int, FellowshipDeck>
-     *
-     * @ORM\OneToMany(targetEntity="App\Entity\FellowshipDeck", mappedBy="deck", cascade={"persist", "remove"})
      */
+    #[ORM\OneToMany(targetEntity: FellowshipDeck::class, mappedBy: 'deck', cascade: ['persist', 'remove'])]
     private $fellowships;
 
     /**
      * Constructor.
      */
-    public function __construct(User $user)
-    {
-        $this->user = $user;
+    public function __construct(
+        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'decks')]
+        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+        private User $user
+    ) {
         $this->slots = new ArrayCollection();
         $this->sideslots = new ArrayCollection();
         $this->children = new ArrayCollection();

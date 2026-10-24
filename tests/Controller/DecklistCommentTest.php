@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Mime\Address;
@@ -34,15 +35,15 @@ class DecklistCommentTest extends WebTestCase
     {
         $this->client = static::createClient();
         $connection = $this->db();
-        $this->maxCommentId = (int) $connection->fetchColumn('SELECT MAX(id) FROM comment');
-        $this->decklists = $connection->fetchAll('SELECT id, nb_comments, date_update, date_last_comment FROM decklist');
+        $this->maxCommentId = (int) $connection->fetchOne('SELECT MAX(id) FROM comment');
+        $this->decklists = $connection->fetchAllAssociative('SELECT id, nb_comments, date_update, date_last_comment FROM decklist');
     }
 
     protected function tearDown(): void
     {
         $connection = $this->db();
-        $connection->executeUpdate('DELETE FROM comment WHERE id > ?', [$this->maxCommentId]);
-        $connection->executeUpdate('UPDATE comment SET is_hidden = 0');
+        $connection->executeStatement('DELETE FROM comment WHERE id > ?', [$this->maxCommentId]);
+        $connection->executeStatement('UPDATE comment SET is_hidden = 0');
         foreach ($this->decklists as $decklist) {
             $connection->update('decklist', $decklist, ['id' => $decklist['id']]);
         }
@@ -79,9 +80,9 @@ class DecklistCommentTest extends WebTestCase
         return $client->getResponse();
     }
 
-    private function newComments()
+    private function newComments(): array
     {
-        return $this->db()->fetchAll(
+        return $this->db()->fetchAllAssociative(
             'SELECT c.decklist_id, u.username, c.text, c.is_hidden FROM comment c JOIN user u ON u.id = c.user_id WHERE c.id > ? ORDER BY c.id',
             [$this->maxCommentId]
         );
@@ -114,15 +115,15 @@ class DecklistCommentTest extends WebTestCase
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame(self::DECKLIST_1_URL, $response->headers->get('Location'));
         $this->assertSame([[
-            'decklist_id' => '1',
+            'decklist_id' => 1,
             'username' => 'admin',
             'text' => '<p>Nice <strong>deck</strong>!</p>',
-            'is_hidden' => '0',
+            'is_hidden' => 0,
         ]], $this->newComments());
 
-        $decklist = $this->db()->fetchAssoc('SELECT nb_comments, date_update, date_last_comment FROM decklist WHERE id = 1');
+        $decklist = $this->db()->fetchAssociative('SELECT nb_comments, date_update, date_last_comment FROM decklist WHERE id = 1');
         $this->assertNotFalse($decklist);
-        $this->assertSame('2', $decklist['nb_comments']);
+        $this->assertSame(2, $decklist['nb_comments']);
         $this->assertSame($decklist['date_update'], $decklist['date_last_comment']);
         $this->assertGreaterThan('2015-08-16 00:00:00', $decklist['date_update']);
 
@@ -153,10 +154,10 @@ class DecklistCommentTest extends WebTestCase
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame('/decklist/view/2/gondordunedainleadershipspirit-1.0', $response->headers->get('Location'));
         $this->assertSame([[
-            'decklist_id' => '2',
+            'decklist_id' => 2,
             'username' => 'test',
             'text' => '<p>What do you think, <code>@admin</code>?</p>',
-            'is_hidden' => '0',
+            'is_hidden' => 0,
         ]], $this->newComments());
         $this->assertSame(['admin@example.com' => '[ringsdb] New comment'], $this->sentEmails($client));
     }
@@ -191,9 +192,7 @@ class DecklistCommentTest extends WebTestCase
         }
     }
 
-    /**
-     * @dataProvider markdownProvider
-     */
+    #[DataProvider('markdownProvider')]
     public function testCommentMarkdown(string $text, string $expectedHtml): void
     {
         $client = $this->createAuthenticatedClient('test');
@@ -207,7 +206,7 @@ class DecklistCommentTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function markdownProvider(): array
+    public static function markdownProvider(): array
     {
         return [
             'bare URLs become links' => ['See http://example.com/page', '<p>See <a href="http://example.com/page">example.com</a></p>'],
@@ -226,7 +225,7 @@ class DecklistCommentTest extends WebTestCase
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame(self::DECKLIST_1_URL, $response->headers->get('Location'));
         $this->assertSame([], $this->newComments());
-        $this->assertSame('1', $this->db()->fetchColumn('SELECT nb_comments FROM decklist WHERE id = 1'));
+        $this->assertSame(1, $this->db()->fetchOne('SELECT nb_comments FROM decklist WHERE id = 1'));
         $this->assertSame([], $this->sentEmails($client));
     }
 
@@ -294,13 +293,13 @@ class DecklistCommentTest extends WebTestCase
     {
         $client = $this->createAuthenticatedClient('admin');
         $this->postComment($client, 1, 'Hide me');
-        $commentId = (int) $this->db()->fetchColumn('SELECT MAX(id) FROM comment');
+        $commentId = (int) $this->db()->fetchOne('SELECT MAX(id) FROM comment');
 
         $client = $this->createAuthenticatedClient('test');
         $client->request('POST', "/user/hidecomment/$commentId/1");
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertSame('true', $client->getResponse()->getContent());
-        $this->assertSame('1', $this->db()->fetchColumn('SELECT is_hidden FROM comment WHERE id = ?', [$commentId]));
+        $this->assertSame(1, $this->db()->fetchOne('SELECT is_hidden FROM comment WHERE id = ?', [$commentId]));
 
         // hidden comments are still in the page, collapsed
         $crawler = $client->request('GET', self::DECKLIST_1_URL);
@@ -308,7 +307,7 @@ class DecklistCommentTest extends WebTestCase
 
         $client->request('POST', "/user/hidecomment/$commentId/0");
         $this->assertSame('true', $client->getResponse()->getContent());
-        $this->assertSame('0', $this->db()->fetchColumn('SELECT is_hidden FROM comment WHERE id = ?', [$commentId]));
+        $this->assertSame(0, $this->db()->fetchOne('SELECT is_hidden FROM comment WHERE id = ?', [$commentId]));
     }
 
     public function testOnlyTheDecklistAuthorCanHideComments(): void
@@ -319,7 +318,7 @@ class DecklistCommentTest extends WebTestCase
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertSame('"You don\u0027t have permission to edit this comment."', $client->getResponse()->getContent());
-        $this->assertSame('0', $this->db()->fetchColumn('SELECT is_hidden FROM comment WHERE id = 1'));
+        $this->assertSame(0, $this->db()->fetchOne('SELECT is_hidden FROM comment WHERE id = 1'));
     }
 
     public function testHidingAnUnknownComment(): void

@@ -10,21 +10,16 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class CommandController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager
     ) {
-        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @Route("/admin/command/", name="command_form", methods={"GET"})
-     */
+    #[Route(path: '/admin/command/', name: 'command_form', methods: ['GET'])]
     public function formAction(ScenarioRepository $scenarioRepository): Response
     {
         $entities = $scenarioRepository->findAll();
@@ -32,9 +27,7 @@ class CommandController extends AbstractController
         return $this->render('Command/form.html.twig', ['entities' => $entities]);
     }
 
-    /**
-     * @Route("/admin/command/", name="command_run", methods={"POST"})
-     */
+    #[Route(path: '/admin/command/', name: 'command_run', methods: ['POST'])]
     public function runAction(Request $request): Response
     {
         $command = $request->request->get('command');

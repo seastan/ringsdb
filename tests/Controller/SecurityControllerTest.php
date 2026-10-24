@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Controller;
 
 use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 
 /**
  * Registration / login / logout workflow (src/Controller/Security + security firewall "main").
@@ -31,6 +34,7 @@ class SecurityControllerTest extends WebTestCase
     protected function tearDown(): void
     {
         $client = $this->client;
+        /** @var EntityManagerInterface $em */
         $em = $client->getContainer()->get('doctrine')->getManager();
         $em->createQuery('DELETE FROM App\Entity\User u WHERE u.username LIKE :prefix')
             ->setParameter('prefix', self::PREFIX.'%')
@@ -85,7 +89,7 @@ class SecurityControllerTest extends WebTestCase
     {
         $response = $client->getResponse();
         $this->assertTrue($response->isRedirect(), 'Expected a redirect, got '.$response->getStatusCode());
-        $this->assertRegExp($pathPattern, self::location($response));
+        $this->assertMatchesRegularExpression($pathPattern, self::location($response));
     }
 
     private function assertAnonymous(KernelBrowser $client): void
@@ -115,7 +119,7 @@ class SecurityControllerTest extends WebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $form = $crawler->filter('form.fos_user_registration_register');
         $this->assertCount(1, $form);
-        $this->assertEquals('/register/', $form->attr('action'));
+        $this->assertSame('/register/', $form->attr('action'));
         foreach (['email', 'username', 'plainPassword_first', 'plainPassword_second', '_token'] as $field) {
             $this->assertCount(1, $crawler->filter('#fos_user_registration_form_'.$field), "Missing field $field");
         }
@@ -181,9 +185,7 @@ class SecurityControllerTest extends WebTestCase
         $this->assertAuthenticatedAs($client, $username);
     }
 
-    /**
-     * @dataProvider invalidRegistrationProvider
-     */
+    #[DataProvider('invalidRegistrationProvider')]
     public function testRegistrationValidationErrors(string $username, string $email, string $password, ?string $confirmation, string $expectedError): void
     {
         $client = $this->client;
@@ -201,7 +203,7 @@ class SecurityControllerTest extends WebTestCase
     /**
      * @return array<string, string[]|string[]|null[]>
      */
-    public function invalidRegistrationProvider(): array
+    public static function invalidRegistrationProvider(): array
     {
         return [
             'password mismatch' => [self::PREFIX.'sam', 'phpunit_sam@example.com', 'secret123', 'other123', 'The entered passwords don'],
@@ -270,9 +272,7 @@ class SecurityControllerTest extends WebTestCase
         $this->assertRedirectsTo($client, '#^http://localhost/decks$#');
     }
 
-    /**
-     * @dataProvider invalidCredentialsProvider
-     */
+    #[DataProvider('invalidCredentialsProvider')]
     public function testLoginWithInvalidCredentials(string $username, string $password): void
     {
         $client = $this->client;
@@ -281,14 +281,14 @@ class SecurityControllerTest extends WebTestCase
         $this->assertRedirectsTo($client, '#/login$#');
         $crawler = $client->followRedirect();
         $this->assertStringContainsString('Invalid credentials.', $crawler->filter('.alert-danger')->text());
-        $this->assertEquals($username, $crawler->filter('#username')->attr('value'));
+        $this->assertSame($username, $crawler->filter('#username')->attr('value'));
         $this->assertAnonymous($client);
     }
 
     /**
      * @return array<string, string[]>
      */
-    public function invalidCredentialsProvider(): array
+    public static function invalidCredentialsProvider(): array
     {
         return [
             'wrong password' => ['test', 'wrong'],
@@ -320,8 +320,8 @@ class SecurityControllerTest extends WebTestCase
         // drop the session: the remember-me cookie alone must authenticate the user
         $client->getCookieJar()->clear();
         $client->getCookieJar()->set($cookie);
-        $client->getContainer()->get('session')->invalidate();
         $this->assertAuthenticatedAs($client, 'test');
+        $this->assertInstanceOf(RememberMeToken::class, static::getContainer()->get('security.token_storage')->getToken());
     }
 
     /* ------------------------------------------------------------- logout */

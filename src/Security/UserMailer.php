@@ -17,28 +17,13 @@ use Twig\Environment;
  */
 class UserMailer
 {
-    private MailerInterface $mailer;
-
-    private UrlGeneratorInterface $router;
-
-    private Environment $twig;
-
-    private string $senderAddress;
-
-    private string $senderName;
-
     public function __construct(
-        MailerInterface $mailer,
-        UrlGeneratorInterface $router,
-        Environment $twig,
-        string $senderAddress,
-        string $senderName
+        private readonly MailerInterface $mailer,
+        private readonly UrlGeneratorInterface $router,
+        private readonly Environment $twig,
+        private readonly string $senderAddress,
+        private readonly string $senderName
     ) {
-        $this->mailer = $mailer;
-        $this->router = $router;
-        $this->twig = $twig;
-        $this->senderAddress = $senderAddress;
-        $this->senderName = $senderName;
     }
 
     public function sendConfirmationEmailMessage(User $user): void
@@ -58,7 +43,7 @@ class UserMailer
         $context = ['user' => $user, 'confirmationUrl' => $confirmationUrl];
         $template = $this->twig->load($templateName);
 
-        $message = (new Email())
+        $message = new Email()
             ->subject($template->renderBlock('subject', $context))
             ->from(new Address($this->senderAddress, $this->senderName))
             ->to((string) $user->getEmail())

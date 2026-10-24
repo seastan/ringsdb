@@ -7,13 +7,11 @@ namespace App\Controller\UserProfile;
 use App\Repository\SphereRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class EditProfileController extends AbstractController
 {
-    /**
-     * @Route("/user/profile_edit", name="user_profile_edit", methods={"GET"})
-     */
+    #[Route(path: '/user/profile_edit', name: 'user_profile_edit', methods: ['GET'])]
     public function __invoke(SphereRepository $sphereRepository): Response
     {
         $user = $this->getUser();

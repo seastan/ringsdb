@@ -7,23 +7,19 @@ use App\Search\SearchKeys;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ProcessSearchController extends AbstractController
 {
-    private SphereRepository $sphereRepository;
-
     public function __construct(
-        SphereRepository $sphereRepository
+        private readonly SphereRepository $sphereRepository
     ) {
-        $this->sphereRepository = $sphereRepository;
     }
 
     /**
      * Processes the action of the card search form.
-     *
-     * @Route("/process", name="cards_processSearchForm")
      */
+    #[Route(path: '/process', name: 'cards_processSearchForm')]
     public function processAction(Request $request): RedirectResponse
     {
         $view = $request->query->get('view') ?: 'list';
@@ -39,7 +35,7 @@ class ProcessSearchController extends AbstractController
             if ('sphere' === $searchName) {
                 $val = $request->query->all($key);
                 if (count($val) > 0 && count($val) < count($spheres)) {
-                    $params[] = $key.':'.implode('|', array_map(fn ($s) => false !== strstr($s, ' ') ? "\"{$s}\"" : $s, $val));
+                    $params[] = $key.':'.implode('|', array_map(fn ($s) => str_contains($s, ' ') ? "\"{$s}\"" : $s, $val));
                 }
 
                 continue;

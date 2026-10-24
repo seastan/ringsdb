@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -47,7 +48,7 @@ class AdminPagesTest extends WebTestCase
     /**
      * GET pages of the admin area: [uri, snapshot name or null].
      */
-    public function adminPageProvider(): array
+    public static function adminPageProvider(): array
     {
         $pages = [
             'home' => ['/admin/', 'index'],
@@ -76,11 +77,8 @@ class AdminPagesTest extends WebTestCase
     }
 
     /* ----------------------------------------------------- access control */
-
-    /**
-     * @dataProvider adminPageProvider
-     */
-    public function testAnonymousIsRedirectedToLogin(string $uri): void
+    #[DataProvider('adminPageProvider')]
+    public function testAnonymousIsRedirectedToLogin(string $uri, ?string $snapshot): void
     {
         $client = $this->client;
         $client->request('GET', $uri);
@@ -89,10 +87,8 @@ class AdminPagesTest extends WebTestCase
         $this->assertSame('http://localhost/login', $client->getResponse()->headers->get('Location'));
     }
 
-    /**
-     * @dataProvider adminPageProvider
-     */
-    public function testUsersAreDenied(string $uri): void
+    #[DataProvider('adminPageProvider')]
+    public function testUsersAreDenied(string $uri, ?string $snapshot): void
     {
         $client = $this->createAuthenticatedClient('test');
         $client->request('GET', $uri);
@@ -102,24 +98,23 @@ class AdminPagesTest extends WebTestCase
 
     /**
      * Write routes are denied to users before anything is done.
-     *
-     * @dataProvider writeRouteProvider
      */
+    #[DataProvider('writeRouteProvider')]
     public function testUsersCannotWrite(string $method, string $uri, array $parameters): void
     {
         $client = $this->createAuthenticatedClient('test');
-        $before = $this->db()->fetchAll('SELECT id, name FROM cycle ORDER BY id');
+        $before = $this->db()->fetchAllAssociative('SELECT id, name FROM cycle ORDER BY id');
 
         $client->request($method, $uri, $parameters);
 
         $this->assertSame(403, $client->getResponse()->getStatusCode());
-        $this->assertSame($before, $this->db()->fetchAll('SELECT id, name FROM cycle ORDER BY id'));
+        $this->assertSame($before, $this->db()->fetchAllAssociative('SELECT id, name FROM cycle ORDER BY id'));
     }
 
     /**
      * @return array<string, mixed[]>
      */
-    public function writeRouteProvider(): array
+    public static function writeRouteProvider(): array
     {
         return [
             'create' => ['POST', '/admin/cycle/create', ['appbundle_cycle' => ['code' => 'X', 'name' => 'Hacked', 'position' => 99]]],
@@ -136,14 +131,12 @@ class AdminPagesTest extends WebTestCase
      * The pages with a text snapshot (the big lists are checked by testBigLists, the statistics
      * by testStatistics).
      */
-    public function snapshotPageProvider(): array
+    public static function snapshotPageProvider(): array
     {
-        return array_filter($this->adminPageProvider(), fn (array $page): bool => null !== $page[1]);
+        return array_filter(self::adminPageProvider(), fn (array $page): bool => null !== $page[1]);
     }
 
-    /**
-     * @dataProvider snapshotPageProvider
-     */
+    #[DataProvider('snapshotPageProvider')]
     public function testAdminPage(string $uri, $snapshot): void
     {
         $client = $this->createAuthenticatedClient('admin');
@@ -153,22 +146,20 @@ class AdminPagesTest extends WebTestCase
         $this->assertMatchesSnapshot("admin/$snapshot.txt", self::pageText($crawler));
     }
 
-    /**
-     * @dataProvider bigListProvider
-     */
+    #[DataProvider('bigListProvider')]
     public function testBigLists(string $uri, string $table): void
     {
         $client = $this->createAuthenticatedClient('admin');
         $crawler = $client->request('GET', $uri);
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertCount((int) $this->db()->fetchColumn("SELECT COUNT(*) FROM $table"), $crawler->filter('table tbody tr'));
+        $this->assertCount((int) $this->db()->fetchOne("SELECT COUNT(*) FROM $table"), $crawler->filter('table tbody tr'));
     }
 
     /**
      * @return array<string, string[]>
      */
-    public function bigListProvider(): array
+    public static function bigListProvider(): array
     {
         return [
             'cards' => ['/admin/card/', 'card'],
@@ -178,9 +169,8 @@ class AdminPagesTest extends WebTestCase
 
     /**
      * The statistics are JSON, for a month (default: last month, so the tests give one).
-     *
-     * @dataProvider statisticsProvider
      */
+    #[DataProvider('statisticsProvider')]
     public function testStatistics(string $uri, string $snapshot): void
     {
         $client = $this->createAuthenticatedClient('admin');
@@ -194,7 +184,7 @@ class AdminPagesTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function statisticsProvider(): array
+    public static function statisticsProvider(): array
     {
         return [
             'decks and users by cycle' => ['/admin/stat?month=2015-08', 'stat_2015-08'],
@@ -248,13 +238,13 @@ class AdminPagesTest extends WebTestCase
             $client->request('GET', '/admin/user/toggle_locked/1');
             $this->assertSame(302, $client->getResponse()->getStatusCode());
             $this->assertSame('/admin/user/show/1', $client->getResponse()->headers->get('Location'));
-            $this->assertSame('1', $this->db()->fetchColumn('SELECT locked FROM user WHERE id = 1'));
+            $this->assertSame(1, $this->db()->fetchOne('SELECT locked FROM user WHERE id = 1'));
 
             $crawler = $client->followRedirect();
             $this->assertSame('Unblock', trim($crawler->filter('a[href="/admin/user/toggle_locked/1"]')->text()));
 
             $client->request('GET', '/admin/user/toggle_locked/1');
-            $this->assertSame('0', $this->db()->fetchColumn('SELECT locked FROM user WHERE id = 1'));
+            $this->assertSame(0, $this->db()->fetchOne('SELECT locked FROM user WHERE id = 1'));
         } finally {
             $this->db()->update('user', ['locked' => 0], ['id' => 1]);
         }

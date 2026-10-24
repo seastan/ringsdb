@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -36,11 +37,11 @@ class DeckManagementTest extends WebTestCase
         $this->client = static::createClient();
         $connection = $this->db();
         foreach (['deck', 'deckchange', 'fellowship', 'questlog'] as $table) {
-            $this->maxIds[$table] = (int) $connection->fetchColumn("SELECT MAX(id) FROM $table");
+            $this->maxIds[$table] = (int) $connection->fetchOne("SELECT MAX(id) FROM $table");
         }
 
-        $this->fixtureDecklists = $connection->fetchAll('SELECT * FROM decklist');
-        $this->fixtureUsers = $connection->fetchAll('SELECT id, is_share_decks FROM user');
+        $this->fixtureDecklists = $connection->fetchAllAssociative('SELECT * FROM decklist');
+        $this->fixtureUsers = $connection->fetchAllAssociative('SELECT id, is_share_decks FROM user');
     }
 
     protected function tearDown(): void
@@ -61,7 +62,7 @@ class DeckManagementTest extends WebTestCase
             "DELETE FROM decksideslot WHERE deck_id > {$max['deck']}",
             "DELETE FROM deck WHERE id > {$max['deck']}",
         ] as $sql) {
-            $connection->exec($sql);
+            $connection->executeStatement($sql);
         }
 
         foreach ($this->fixtureUsers as $user) {
@@ -96,12 +97,12 @@ class DeckManagementTest extends WebTestCase
     private function insertDeck(string $name, array $values = []): int
     {
         $connection = $this->db();
-        $row = $connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
+        $row = $connection->fetchAssociative('SELECT * FROM deck WHERE id = 2');
         $this->assertNotFalse($row);
         unset($row['id']);
         $connection->insert('deck', $values + ['name' => $name] + $row);
         $id = (int) $connection->lastInsertId();
-        $connection->exec("INSERT INTO deckslot (deck_id, card_id, quantity) SELECT $id, card_id, quantity FROM deckslot WHERE deck_id = 2");
+        $connection->executeStatement("INSERT INTO deckslot (deck_id, card_id, quantity) SELECT $id, card_id, quantity FROM deckslot WHERE deck_id = 2");
         $connection->insert('decksideslot', ['deck_id' => $id, 'card_id' => 34, 'quantity' => 2]);
 
         return $id;
@@ -112,12 +113,12 @@ class DeckManagementTest extends WebTestCase
      */
     private function slots(string $table, $deckId): array
     {
-        return array_column($this->db()->fetchAll("SELECT card_id, quantity FROM $table WHERE deck_id = ? ORDER BY card_id", [$deckId]), 'quantity', 'card_id');
+        return array_column($this->db()->fetchAllAssociative("SELECT card_id, quantity FROM $table WHERE deck_id = ? ORDER BY card_id", [$deckId]), 'quantity', 'card_id');
     }
 
     private function deckExists(int $id): bool
     {
-        return (bool) $this->db()->fetchColumn('SELECT COUNT(*) FROM deck WHERE id = ?', [$id]);
+        return (bool) $this->db()->fetchOne('SELECT COUNT(*) FROM deck WHERE id = ?', [$id]);
     }
 
     /**
@@ -125,7 +126,7 @@ class DeckManagementTest extends WebTestCase
      */
     private function newDeckIds(): array
     {
-        return array_map('intval', array_column($this->db()->fetchAll('SELECT id FROM deck WHERE id > ? ORDER BY id', [$this->maxIds['deck']]), 'id'));
+        return array_map(intval(...), array_column($this->db()->fetchAllAssociative('SELECT id FROM deck WHERE id > ? ORDER BY id', [$this->maxIds['deck']]), 'id'));
     }
 
     private function flashMessages(KernelBrowser $client): array
@@ -148,11 +149,11 @@ class DeckManagementTest extends WebTestCase
         $this->assertSame('/decks', $client->getResponse()->headers->get('Location'));
         $clone = array_values(array_diff($this->newDeckIds(), [$source]));
         $this->assertCount(1, $clone);
-        $deck = $this->db()->fetchAssoc('SELECT d.name, d.parent_decklist_id, d.major_version, d.minor_version, u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$clone[0]]);
+        $deck = $this->db()->fetchAssociative('SELECT d.name, d.parent_decklist_id, d.major_version, d.minor_version, u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$clone[0]]);
         // a new deck, derived from the same decklist as its source
-        $this->assertSame(['name' => 'PHPUnit Source (clone)', 'parent_decklist_id' => '2', 'major_version' => '0', 'minor_version' => '1', 'username' => 'test'], $deck);
+        $this->assertSame(['name' => 'PHPUnit Source (clone)', 'parent_decklist_id' => 2, 'major_version' => 0, 'minor_version' => 1, 'username' => 'test'], $deck);
         $this->assertSame($this->slots('deckslot', $source), $this->slots('deckslot', $clone[0]));
-        $this->assertSame([34 => '2'], $this->slots('decksideslot', $clone[0]));
+        $this->assertSame([34 => 2], $this->slots('decksideslot', $clone[0]));
     }
 
     public function testCloneAnotherUsersDeck(): void
@@ -170,7 +171,7 @@ class DeckManagementTest extends WebTestCase
         $client->request('GET', "/deck/clone/$source");
         $this->assertSame('/decks', $client->getResponse()->headers->get('Location'));
         $clone = array_values(array_diff($this->newDeckIds(), [$source]))[0];
-        $this->assertSame('admin', $this->db()->fetchColumn('SELECT u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$clone]));
+        $this->assertSame('admin', $this->db()->fetchOne('SELECT u.username FROM deck d JOIN user u ON u.id = d.user_id WHERE d.id = ?', [$clone]));
     }
 
     public function testCloneUnknownDeck(): void
@@ -198,9 +199,9 @@ class DeckManagementTest extends WebTestCase
         $this->assertFalse($this->deckExists($id));
         $this->assertSame([], $this->slots('deckslot', $id));
         $this->assertSame([], $this->slots('decksideslot', $id));
-        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
+        $this->assertSame(0, $this->db()->fetchOne('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
         // the decklist stays, detached from the deck
-        $this->assertNull($this->db()->fetchColumn('SELECT parent_deck_id FROM decklist WHERE id = 4'));
+        $this->assertNull($this->db()->fetchOne('SELECT parent_deck_id FROM decklist WHERE id = 4'));
         $client->followRedirect();
         $this->assertSame([['success', 'Deck deleted.']], $this->flashMessages($client));
     }
@@ -286,8 +287,8 @@ class DeckManagementTest extends WebTestCase
 
         $this->assertSame('/decks', $client->getResponse()->headers->get('Location'));
         $this->assertFalse($this->deckExists($id));
-        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM fellowship_deck WHERE fellowship_id = ?', [$fellowship]));
-        $this->assertSame('1', $this->db()->fetchColumn('SELECT nb_decks FROM fellowship WHERE id = ?', [$fellowship]));
+        $this->assertSame(0, $this->db()->fetchOne('SELECT COUNT(*) FROM fellowship_deck WHERE fellowship_id = ?', [$fellowship]));
+        $this->assertSame(1, $this->db()->fetchOne('SELECT nb_decks FROM fellowship WHERE id = ?', [$fellowship]));
     }
 
     /* ----------------------------------------------------------- autosave */
@@ -307,9 +308,9 @@ class DeckManagementTest extends WebTestCase
 
         // the answer is the date of the change
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d:\d\d$/', $client->getResponse()->getContent());
-        $changes = $this->db()->fetchAll('SELECT variation, is_saved FROM deckchange WHERE deck_id = ?', [$id]);
-        $this->assertSame([['variation' => json_encode($diff), 'is_saved' => '0']], $changes);
+        $this->assertMatchesRegularExpression('/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d:\d\d$/', $client->getResponse()->getContent());
+        $changes = $this->db()->fetchAllAssociative('SELECT variation, is_saved FROM deckchange WHERE deck_id = ?', [$id]);
+        $this->assertSame([['variation' => json_encode($diff), 'is_saved' => 0]], $changes);
         // the deck itself is not changed
         $this->assertSame($this->slots('deckslot', 2), $this->slots('deckslot', $id));
 
@@ -318,17 +319,16 @@ class DeckManagementTest extends WebTestCase
         $form = $crawler->filter('#save_form')->form();
         $form['content'] = (string) json_encode(['main' => ['01001' => 1, '01002' => 1, '01003' => 1], 'side' => []]);
         $client->submit($form);
-        $changes = $this->db()->fetchAll('SELECT is_saved FROM deckchange WHERE deck_id = ?', [$id]);
-        $this->assertSame([['is_saved' => '1']], $changes);
+        $changes = $this->db()->fetchAllAssociative('SELECT is_saved FROM deckchange WHERE deck_id = ?', [$id]);
+        $this->assertSame([['is_saved' => 1]], $changes);
     }
 
     /**
      * An empty diff creates no history entry (the builder does not send empty diffs). It did
      * before PHP 7.4: the diff was decoded as objects, and count() of an object was always 1; an
      * empty diff in 2 parts read the missing parts 3 and 4 (undefined offset).
-     *
-     * @dataProvider emptyDiffProvider
      */
+    #[DataProvider('emptyDiffProvider')]
     public function testAutosaveEmptyDiff(string $diff): void
     {
         $client = $this->createAuthenticatedClient();
@@ -338,13 +338,13 @@ class DeckManagementTest extends WebTestCase
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertSame('', $client->getResponse()->getContent());
-        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
+        $this->assertSame(0, $this->db()->fetchOne('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
     }
 
     /**
      * @return array<string, string[]>
      */
-    public function emptyDiffProvider(): array
+    public static function emptyDiffProvider(): array
     {
         return [
             'in 4 parts' => ['[{},{},{},{}]'],
@@ -360,12 +360,10 @@ class DeckManagementTest extends WebTestCase
         $client->request('POST', '/deck/autosave', ['deck_id' => $id, 'diff' => '[{"01001":1},[]]'], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertSame('[{"01001":1},[]]', $this->db()->fetchColumn('SELECT variation FROM deckchange WHERE deck_id = ?', [$id]));
+        $this->assertSame('[{"01001":1},[]]', $this->db()->fetchOne('SELECT variation FROM deckchange WHERE deck_id = ?', [$id]));
     }
 
-    /**
-     * @dataProvider invalidAutosaveProvider
-     */
+    #[DataProvider('invalidAutosaveProvider')]
     public function testInvalidAutosave(string $username, ?int $deckId, string $diff, int $status, string $message): void
     {
         $client = $this->createAuthenticatedClient($username);
@@ -376,13 +374,13 @@ class DeckManagementTest extends WebTestCase
         // BUG (CoreExceptionListener): the 422 / 403 HTTP exceptions become 500s for AJAX requests
         $this->assertSame($status, $client->getResponse()->getStatusCode());
         $this->assertSame(['success' => false, 'message' => $message], json_decode($client->getResponse()->getContent(), true));
-        $this->assertSame('0', $this->db()->fetchColumn('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
+        $this->assertSame(0, $this->db()->fetchOne('SELECT COUNT(*) FROM deckchange WHERE deck_id = ?', [$id]));
     }
 
     /**
      * @return array<string, string[]|int[]|null[]>
      */
-    public function invalidAutosaveProvider(): array
+    public static function invalidAutosaveProvider(): array
     {
         return [
             'unknown deck' => ['test', 999, '[[],[],[],[]]', 500, 'Cannot find deck 999'],
@@ -442,9 +440,9 @@ class DeckManagementTest extends WebTestCase
 
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame('/decks', $response->headers->get('Location'));
-        $decks = $this->db()->fetchAll('SELECT id, name, user_id FROM deck WHERE id > ? ORDER BY id', [$this->maxIds['deck']]);
+        $decks = $this->db()->fetchAllAssociative('SELECT id, name, user_id FROM deck WHERE id > ? ORDER BY id', [$this->maxIds['deck']]);
         $this->assertSame(['Dwarves', 'Gondor', 'Nothing'], array_column($decks, 'name'));
-        $this->assertSame(['1', '1', '1'], array_column($decks, 'user_id'));
+        $this->assertSame([1, 1, 1], array_column($decks, 'user_id'));
         // the cards of the exported decks come back; a file without any card gives an empty deck
         $this->assertSame($this->slots('deckslot', 1), $this->slots('deckslot', $decks[0]['id']));
         $this->assertSame($this->slots('deckslot', 2), $this->slots('deckslot', $decks[1]['id']));
@@ -467,7 +465,7 @@ class DeckManagementTest extends WebTestCase
         ]);
 
         $this->assertSame(302, $response->getStatusCode());
-        $decks = $this->db()->fetchAll('SELECT id, name FROM deck WHERE id > ? ORDER BY id', [$this->maxIds['deck']]);
+        $decks = $this->db()->fetchAllAssociative('SELECT id, name FROM deck WHERE id > ? ORDER BY id', [$this->maxIds['deck']]);
         $this->assertSame(['Dwarves', 'Noldor'], array_column($decks, 'name'));
         $this->assertSame($this->slots('deckslot', 1), $this->slots('deckslot', $decks[0]['id']));
         $this->assertSame($this->slots('deckslot', 3), $this->slots('deckslot', $decks[1]['id']));
@@ -490,10 +488,7 @@ class DeckManagementTest extends WebTestCase
     }
 
     /* ------------------------------------------------------------ access */
-
-    /**
-     * @dataProvider anonymousRouteProvider
-     */
+    #[DataProvider('anonymousRouteProvider')]
     public function testAnonymousIsRedirectedToLogin(string $method, string $uri): void
     {
         $client = $this->client;
@@ -507,7 +502,7 @@ class DeckManagementTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function anonymousRouteProvider(): array
+    public static function anonymousRouteProvider(): array
     {
         return [
             'clone' => ['GET', '/deck/clone/1'],

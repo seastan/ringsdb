@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * The link of the password reset email: the new password form. The token can only be used once;
@@ -23,31 +23,17 @@ class ResettingResetController extends AbstractController
     /**
      * How long the link of the email is valid, in seconds.
      */
-    private const TOKEN_TTL = 86400;
-
-    private UserRepository $userRepository;
-
-    private UserPasswordUpdater $passwordUpdater;
-
-    private EntityManagerInterface $entityManager;
-
-    private LoginManager $loginManager;
+    private const int TOKEN_TTL = 86400;
 
     public function __construct(
-        UserRepository $userRepository,
-        UserPasswordUpdater $passwordUpdater,
-        EntityManagerInterface $entityManager,
-        LoginManager $loginManager
+        private readonly UserRepository $userRepository,
+        private readonly UserPasswordUpdater $passwordUpdater,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly LoginManager $loginManager
     ) {
-        $this->userRepository = $userRepository;
-        $this->passwordUpdater = $passwordUpdater;
-        $this->entityManager = $entityManager;
-        $this->loginManager = $loginManager;
     }
 
-    /**
-     * @Route("/resetting/reset/{token}", name="fos_user_resetting_reset", methods={"GET", "POST"})
-     */
+    #[Route(path: '/resetting/reset/{token}', name: 'fos_user_resetting_reset', methods: ['GET', 'POST'])]
     public function __invoke(Request $request, string $token): Response
     {
         $user = $this->userRepository->findOneByConfirmationToken($token);

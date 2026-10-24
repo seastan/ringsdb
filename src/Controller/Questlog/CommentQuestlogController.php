@@ -18,35 +18,24 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CommentQuestlogController extends AbstractController
 {
-    private QuestlogRepository $questlogRepository;
-
-    private Texts $texts;
-
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        QuestlogRepository $questlogRepository,
-        Texts $texts
+        private readonly EntityManagerInterface $entityManager,
+        private readonly QuestlogRepository $questlogRepository,
+        private readonly Texts $texts
     ) {
-        $this->questlogRepository = $questlogRepository;
-        $this->texts = $texts;
-        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @Route("/user/questlog_comment", name="questlog_comment", methods={"POST"})
-     */
+    #[Route(path: '/user/questlog_comment', name: 'questlog_comment', methods: ['POST'])]
     public function __invoke(Request $request, MailerInterface $mailer, UserRepository $userRepository): RedirectResponse
     {
         /* @var $user User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 
@@ -96,7 +85,7 @@ class CommentQuestlogController extends AbstractController
             unset($spool[$user->getEmail()]);
             $email_data = ['username' => $user->getUsername(), 'questlog_name' => $questlog->getName(), 'url' => $this->generateUrl('questlog_view', ['questlog_id' => $questlog->getId(), 'questlog_name' => $questlog->getNameCanonical()], UrlGeneratorInterface::ABSOLUTE_URL).'#'.$comment->getId(), 'comment' => $comment_html, 'profile' => $this->generateUrl('user_profile_edit', [], UrlGeneratorInterface::ABSOLUTE_URL)];
             foreach ($spool as $email => $view) {
-                $message = (new Email())->subject('[ringsdb] New comment')->from(new Address('seastan@ringsdb.com', 'Seastan'))->to(new Address($email, $user->getUsername()))->html($this->renderView($view, $email_data));
+                $message = new Email()->subject('[ringsdb] New comment')->from(new Address('seastan@ringsdb.com', 'Seastan'))->to(new Address($email, $user->getUsername()))->html($this->renderView($view, $email_data));
                 $mailer->send($message);
             }
         }

@@ -16,35 +16,29 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ApiPrivateController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private DeckRepository $deckRepository;
-
-    private DecklistRepository $decklistRepository;
-
-    public function __construct(DeckRepository $deckRepository, DecklistRepository $decklistRepository)
-    {
-        $this->deckRepository = $deckRepository;
-        $this->decklistRepository = $decklistRepository;
+    public function __construct(
+        private DeckRepository $deckRepository,
+        private DecklistRepository $decklistRepository
+    ) {
     }
 
-    /**
-     * @Route("/api/private/decks", name="api_private_my_decks", methods={"GET"})
-     */
+    #[Route(path: '/api/private/decks', name: 'api_private_my_decks', methods: ['GET'])]
     public function listDecksAction(Request $request): Response
     {
         /* @var $decklists Decklist[] */
-        $decklists = $this->decklistRepository->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC', 'id' => 'DESC']);
+        $decklists = $this->decklistRepository->findBy(['user' => $this->getUser()], ['dateCreation' => \SortDirection::Descending, 'id' => \SortDirection::Descending]);
         foreach ($decklists as &$decklist) {
             $decklist->setDescriptionMd('');
         }
 
         /* @var $decks \App\Entity\Deck[] */
-        $decks = $this->deckRepository->findBy(['user' => $this->getUser()], ['dateCreation' => 'DESC', 'id' => 'DESC']);
+        $decks = $this->deckRepository->findBy(['user' => $this->getUser()], ['dateCreation' => \SortDirection::Descending, 'id' => \SortDirection::Descending]);
         foreach ($decks as &$deck) {
             $deck->setDescriptionMd('');
         }
@@ -53,7 +47,7 @@ class ApiPrivateController extends AbstractController
 
         $dateUpdates = array_map(
             /* @var $deck \App\Entity\Deck */
-            fn ($deck) => $deck->getDateUpdate(),
+            fn (\App\Entity\Decklist|Deck $deck): \DateTime => $deck->getDateUpdate(),
             $decklists
         );
 
@@ -71,9 +65,7 @@ class ApiPrivateController extends AbstractController
         return $response;
     }
 
-    /**
-     * @Route("/api/private/decks_by_user/{username}", name="api_private_user_decks", methods={"GET"})
-     */
+    #[Route(path: '/api/private/decks_by_user/{username}', name: 'api_private_user_decks', methods: ['GET'])]
     public function listUserDecksAction(Request $request, UserRepository $userRepository, string $username): Response
     {
         /* @var $em EntityManager */
@@ -85,14 +77,14 @@ class ApiPrivateController extends AbstractController
 
         $show_private_decks = $this->currentUser()->isEqualTo($user);
         /* @var $decklists Decklist[] */
-        $decklists = $this->decklistRepository->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
+        $decklists = $this->decklistRepository->findBy(['user' => $user], ['dateCreation' => \SortDirection::Descending, 'id' => \SortDirection::Descending]);
         foreach ($decklists as &$decklist) {
             $decklist->setDescriptionMd('');
         }
 
         if ($show_private_decks) {
             /* @var $decks \App\Entity\Deck[] */
-            $decks = $this->deckRepository->findBy(['user' => $user], ['dateCreation' => 'DESC', 'id' => 'DESC']);
+            $decks = $this->deckRepository->findBy(['user' => $user], ['dateCreation' => \SortDirection::Descending, 'id' => \SortDirection::Descending]);
             foreach ($decks as &$deck) {
                 $deck->setDescriptionMd('');
             }
@@ -102,7 +94,7 @@ class ApiPrivateController extends AbstractController
 
         $dateUpdates = array_map(
             /* @var $deck \App\Entity\Deck */
-            fn ($deck) => $deck->getDateUpdate(),
+            fn (\App\Entity\Decklist|Deck $deck): \DateTime => $deck->getDateUpdate(),
             $decklists
         );
 
@@ -123,14 +115,7 @@ class ApiPrivateController extends AbstractController
     /*
      * Get the description of one Deck of the authenticated user
      */
-    /**
-     * @Route(
-     *     "/api/private/deck/load/{id}",
-     *     name="api_private_load_deck",
-     *     methods={"GET"},
-     *     requirements={"id"="\d+"}
-     * )
-     */
+    #[Route(path: '/api/private/deck/load/{id}', name: 'api_private_load_deck', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function loadDeckAction(Request $request, int $id): Response
     {
         /* @var $deck \App\Entity\Deck */

@@ -12,42 +12,25 @@ use App\Repository\DeckRepository;
 use App\Repository\ScenarioRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class NewQuestlogController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private ScenarioRepository $scenarioRepository;
-
-    private DecklistRepository $decklistRepository;
-
-    private DeckRepository $deckRepository;
-
     public function __construct(
-        ScenarioRepository $scenarioRepository,
-        DecklistRepository $decklistRepository,
-        DeckRepository $deckRepository
+        private ScenarioRepository $scenarioRepository,
+        private DecklistRepository $decklistRepository,
+        private DeckRepository $deckRepository
     ) {
-        $this->scenarioRepository = $scenarioRepository;
-        $this->decklistRepository = $decklistRepository;
-        $this->deckRepository = $deckRepository;
     }
 
-    /**
-     * @Route(
-     *     "/questlog/new/{public}/{deck1_id}/{deck2_id}/{deck3_id}/{deck4_id}",
-     *     name="questlog_new",
-     *     methods={"GET"},
-     *     requirements={"public"="\d+", "deck1_id"="\d+", "deck2_id"="\d+", "deck3_id"="\d+", "deck4_id"="\d+"},
-     *     defaults={"public"=0, "deck1_id"=null, "deck2_id"=null, "deck3_id"=null, "deck4_id"=null}
-     * )
-     */
+    #[Route(path: '/questlog/new/{public}/{deck1_id}/{deck2_id}/{deck3_id}/{deck4_id}', name: 'questlog_new', requirements: ['public' => '\d+', 'deck1_id' => '\d+', 'deck2_id' => '\d+', 'deck3_id' => '\d+', 'deck4_id' => '\d+'], defaults: ['public' => 0, 'deck1_id' => null, 'deck2_id' => null, 'deck3_id' => null, 'deck4_id' => null], methods: ['GET'])]
     public function __invoke(int $deck1_id, int $deck2_id, int $deck3_id, int $deck4_id, int $public): Response
     {
         $response = new Response();
         /* @var $quests Scenario[] */
-        $quests = $this->scenarioRepository->findBy([], ['position' => 'ASC']);
+        $quests = $this->scenarioRepository->findBy([], ['position' => \SortDirection::Ascending]);
         /* @var $decks \App\Entity\Deck[] */
         $decks = [];
         $deck_ids = func_get_args();

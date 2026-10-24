@@ -18,21 +18,12 @@ use Symfony\Component\VarDumper\VarDumper;
 
 class ScrapBeornJsonDataCommand extends Command
 {
-    private EntityManagerInterface $entityManager;
-
-    private CardPrintingRepository $cardPrintingRepository;
-
-    private PackRepository $packRepository;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        CardPrintingRepository $cardPrintingRepository,
-        PackRepository $packRepository
+        private readonly EntityManagerInterface $entityManager,
+        private readonly CardPrintingRepository $cardPrintingRepository,
+        private readonly PackRepository $packRepository
     ) {
         parent::__construct();
-        $this->entityManager = $entityManager;
-        $this->cardPrintingRepository = $cardPrintingRepository;
-        $this->packRepository = $packRepository;
     }
 
     protected function configure(): void
@@ -47,7 +38,7 @@ class ScrapBeornJsonDataCommand extends Command
              );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $questionHelper = $this->getHelper('question');
 

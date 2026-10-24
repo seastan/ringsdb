@@ -8,33 +8,20 @@ use App\Entity\Decklist;
 use App\Repository\DecklistRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ViewDecklistController extends AbstractController
 {
-    private int $cacheExpiration;
-
-    private DecklistRepository $decklistRepository;
-
     public function __construct(
-        int $cacheExpiration,
-        DecklistRepository $decklistRepository
+        private readonly int $cacheExpiration,
+        private readonly DecklistRepository $decklistRepository
     ) {
-        $this->cacheExpiration = $cacheExpiration;
-        $this->decklistRepository = $decklistRepository;
     }
 
     /**
      * displays the content of a decklist along with comments, siblings, similar, etc..
-     *
-     * @Route(
-     *     "/decklist/view/{decklist_id}/{decklist_name}",
-     *     name="decklist_detail",
-     *     methods={"GET"},
-     *     requirements={"decklist_id"="\d+"},
-     *     defaults={"decklist_name"=null}
-     * )
      */
+    #[Route(path: '/decklist/view/{decklist_id}/{decklist_name}', name: 'decklist_detail', requirements: ['decklist_id' => '\d+'], defaults: ['decklist_name' => null], methods: ['GET'])]
     public function __invoke(int $decklist_id): Response
     {
         $response = new Response();
@@ -53,11 +40,11 @@ class ViewDecklistController extends AbstractController
 
         $commenters = array_map(
             /* @var $comment \App\Entity\Comment */
-            fn (\App\Entity\Comment $comment) => $comment->getUser()->getUsername(),
+            fn (\App\Entity\Comment $comment): string => $comment->getUser()->getUsername(),
             $decklist->getComments()->getValues()
         );
         $commenters[] = $decklist->getUser()->getUsername();
-        $versions = $this->decklistRepository->findBy(['parent' => $decklist->getParent()], ['version' => 'DESC', 'id' => 'DESC']);
+        $versions = $this->decklistRepository->findBy(['parent' => $decklist->getParent()], ['version' => \SortDirection::Descending, 'id' => \SortDirection::Descending]);
 
         return $this->render('Decklist/decklist.html.twig', ['pagetitle' => $decklist->getName(), 'decklist' => $decklist, 'duplicate' => $duplicate, 'commenters' => $commenters, 'versions' => $versions], $response);
     }

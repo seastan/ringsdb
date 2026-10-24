@@ -9,56 +9,39 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Comment.
- *
- * @ORM\Entity(repositoryClass="App\Repository\CommentRepository")
- * @ORM\Table(name="comment")
  */
+#[ORM\Entity(repositoryClass: \App\Repository\CommentRepository::class)]
+#[ORM\Table(name: 'comment')]
 class Comment
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
-    /**
-     * @ORM\Column(type="text")
-     */
-    private string $text;
-
-    /**
-     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
-     * @Gedmo\Timestampable(on="create")
-     */
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name: 'date_creation', type: 'datetime', nullable: false)]
     private \DateTime $dateCreation;
 
     /**
      * @var bool
-     *
-     * @ORM\Column(name="is_hidden", type="boolean")
      */
+    #[ORM\Column(name: 'is_hidden', type: 'boolean')]
     private $isHidden = false;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="comments")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
-     */
-    private User $user;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Decklist", inversedBy="comments")
-     * @ORM\JoinColumn(name="decklist_id", referencedColumnName="id", nullable=false)
-     */
-    private Decklist $decklist;
-
-    public function __construct(User $user, Decklist $decklist, string $text)
-    {
-        $this->user = $user;
-        $this->decklist = $decklist;
-        $this->text = $text;
+    public function __construct(
+        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'comments')]
+        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+        private User $user,
+        #[ORM\ManyToOne(targetEntity: Decklist::class, inversedBy: 'comments')]
+        #[ORM\JoinColumn(name: 'decklist_id', referencedColumnName: 'id', nullable: false)]
+        private Decklist $decklist,
+        #[ORM\Column(type: 'text')]
+        private string $text
+    ) {
         $this->dateCreation = new \DateTime();
     }
 

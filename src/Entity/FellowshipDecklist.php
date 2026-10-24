@@ -8,44 +8,33 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * FellowshipDecklist.
- *
- * @ORM\Entity
- * @ORM\Table(name="fellowship_decklist")
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'fellowship_decklist')]
 class FellowshipDecklist
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var int
-     *
-     * @ORM\Column(name="deck_number", type="smallint")
      */
+    #[ORM\Column(name: 'deck_number', type: 'smallint')]
     private $deckNumber;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Fellowship", inversedBy="decklists")
-     * @ORM\JoinColumn(name="fellowship_id", referencedColumnName="id", nullable=false)
-     */
-    private Fellowship $fellowship;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Decklist", inversedBy="fellowships")
-     * @ORM\JoinColumn(name="decklist_id", referencedColumnName="id", nullable=false)
-     */
-    private Decklist $decklist;
-
-    public function __construct(Decklist $decklist, Fellowship $fellowship)
-    {
-        $this->decklist = $decklist;
-        $this->fellowship = $fellowship;
+    public function __construct(
+        #[ORM\ManyToOne(targetEntity: Decklist::class, inversedBy: 'fellowships')]
+        #[ORM\JoinColumn(name: 'decklist_id', referencedColumnName: 'id', nullable: false)]
+        private Decklist $decklist,
+        #[ORM\ManyToOne(targetEntity: Fellowship::class, inversedBy: 'decklists')]
+        #[ORM\JoinColumn(name: 'fellowship_id', referencedColumnName: 'id', nullable: false)]
+        private Fellowship $fellowship
+    ) {
     }
 
     /**

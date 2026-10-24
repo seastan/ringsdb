@@ -2,40 +2,25 @@
 
 namespace App\Controller\Review;
 
+use App\Entity\Review;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ByAuthorController extends AbstractController
 {
-    private int $cacheExpiration;
-
-    private UserRepository $userRepository;
-
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        int $cacheExpiration,
-        UserRepository $userRepository,
-        EntityManagerInterface $entityManager
+        private readonly int $cacheExpiration,
+        private readonly UserRepository $userRepository,
+        private readonly EntityManagerInterface $entityManager
     ) {
-        $this->cacheExpiration = $cacheExpiration;
-        $this->userRepository = $userRepository;
-        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @Route(
-     *     "/user/reviews/{user_id}/{page}",
-     *     name="card_reviews_list_byauthor",
-     *     requirements={"page"="\d+", "user_id"="\d+"},
-     *     defaults={"page"=1}
-     * )
-     */
+    #[Route(path: '/user/reviews/{user_id}/{page}', name: 'card_reviews_list_byauthor', requirements: ['page' => '\d+', 'user_id' => '\d+'], defaults: ['page' => 1])]
     public function byauthorAction(Request $request, int $user_id, int $page = 1): Response
     {
         $response = new Response();
@@ -54,7 +39,7 @@ class ByAuthorController extends AbstractController
         }
 
         $pagetitle = 'Card Reviews by '.$user->getUsername();
-        $dql = 'SELECT r FROM App:Review r WHERE r.user=:USER ORDER BY r.dateCreation DESC, r.id DESC';
+        $dql = 'SELECT r FROM '.Review::class.' r WHERE r.user=:USER ORDER BY r.dateCreation DESC, r.id DESC';
         $query = $this->entityManager->createQuery($dql)->setFirstResult($start)->setMaxResults($limit)->setParameter('USER', $user);
         $paginator = new Paginator($query, false);
         $maxcount = count($paginator);

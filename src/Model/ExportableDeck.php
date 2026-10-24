@@ -10,6 +10,21 @@ use App\Entity\User;
 
 /**
  * Base class of Deck and Decklist, which implement the getters used by the exports.
+ *
+ * @phpstan-type ArrayExport array{
+ *     id: int|null,
+ *     name: string,
+ *     date_creation: string,
+ *     date_update: string,
+ *     description_md: string|null,
+ *     user_id: int|null,
+ *     heroes: array<int|string, int>,
+ *     slots: array<int|string, int>,
+ *     sideslots: array<int|string, int>,
+ *     version: string,
+ *     last_pack: string,
+ *     freeze_comments?: bool|null,
+ * }
  */
 abstract class ExportableDeck
 {
@@ -42,7 +57,7 @@ abstract class ExportableDeck
     /**
      * @param bool $withUnsavedChanges
      *
-     * @return array<string, mixed>
+     * @return ArrayExport
      */
     public function getArrayExport($withUnsavedChanges = false): array
     {

@@ -8,29 +8,21 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class LikeReviewController extends AbstractController
 {
-    private ReviewRepository $reviewRepository;
-
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        ReviewRepository $reviewRepository
+        private readonly EntityManagerInterface $entityManager,
+        private readonly ReviewRepository $reviewRepository
     ) {
-        $this->reviewRepository = $reviewRepository;
-        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @Route("/review/like", name="card_review_like", methods={"POST"})
-     */
+    #[Route(path: '/review/like', name: 'card_review_like', methods: ['POST'])]
     public function likeAction(Request $request): JsonResponse
     {
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw $this->createAccessDeniedException('You are not logged in.');
         }
 

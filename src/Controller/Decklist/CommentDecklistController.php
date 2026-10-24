@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Repository\DecklistRepository;
 use App\Repository\UserRepository;
 use App\Services\Texts;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,41 +19,29 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CommentDecklistController extends AbstractController
 {
-    private MailerInterface $mailer;
-
-    private UserRepository $userRepository;
-
-    private DecklistRepository $decklistRepository;
-
-    private Texts $texts;
-
     public function __construct(
-        MailerInterface $mailer,
-        UserRepository $userRepository,
-        DecklistRepository $decklistRepository,
-        Texts $texts
+        private readonly MailerInterface $mailer,
+        private readonly UserRepository $userRepository,
+        private readonly DecklistRepository $decklistRepository,
+        private readonly Texts $texts,
+        private readonly EntityManagerInterface $entityManager
     ) {
-        $this->mailer = $mailer;
-        $this->userRepository = $userRepository;
-        $this->decklistRepository = $decklistRepository;
-        $this->texts = $texts;
     }
 
     /**
      * records a user's comment.
-     *
-     * @Route("/user/comment", name="decklist_comment", methods={"POST"})
      */
+    #[Route(path: '/user/comment', name: 'decklist_comment', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         /* @var $user User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in to comment.');
         }
 
@@ -74,11 +63,11 @@ class CommentDecklistController extends AbstractController
             $comment_html = $this->texts->markdown($comment_text);
             $now = new \DateTime();
             $comment = new Comment($user, $decklist, $comment_html);
-            $this->getDoctrine()->getManager()->persist($comment);
+            $this->entityManager->persist($comment);
             $decklist->setDateUpdate($now);
             $decklist->setDateLastComment($comment->getDateCreation());
             $decklist->setNbcomments($decklist->getNbcomments() + 1);
-            $this->getDoctrine()->getManager()->flush();
+            $this->entityManager->flush();
             // send emails
             $spool = [];
             if ($decklist->getUser()->getIsNotifAuthor()) {
@@ -104,7 +93,7 @@ class CommentDecklistController extends AbstractController
             unset($spool[$user->getEmail()]);
             $email_data = ['username' => $user->getUsername(), 'decklist_name' => $decklist->getName(), 'url' => $this->generateUrl('decklist_detail', ['decklist_id' => $decklist->getId(), 'decklist_name' => $decklist->getNameCanonical()], UrlGeneratorInterface::ABSOLUTE_URL).'#'.$comment->getId(), 'comment' => $comment_html, 'profile' => $this->generateUrl('user_profile_edit', [], UrlGeneratorInterface::ABSOLUTE_URL)];
             foreach ($spool as $email => $view) {
-                $message = (new Email())->subject('[ringsdb] New comment')->from(new Address('seastan@ringsdb.com', 'Seastan'))->to(new Address($email, $user->getUsername()))->html($this->renderView($view, $email_data));
+                $message = new Email()->subject('[ringsdb] New comment')->from(new Address('seastan@ringsdb.com', 'Seastan'))->to(new Address($email, $user->getUsername()))->html($this->renderView($view, $email_data));
                 $this->mailer->send($message);
             }
         }

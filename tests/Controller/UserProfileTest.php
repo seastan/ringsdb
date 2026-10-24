@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
@@ -29,7 +30,7 @@ class UserProfileTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $this->fixtureUsers = $this->db()->fetchAll('SELECT * FROM user ORDER BY id');
+        $this->fixtureUsers = $this->db()->fetchAllAssociative('SELECT * FROM user ORDER BY id');
     }
 
     protected function tearDown(): void
@@ -73,7 +74,7 @@ class UserProfileTest extends WebTestCase
      */
     private function fetchUser($id = 1)
     {
-        return $this->db()->fetchAssoc('SELECT * FROM user WHERE id = ?', [$id]);
+        return $this->db()->fetchAssociative('SELECT * FROM user WHERE id = ?', [$id]);
     }
 
     private function checkbox(Form $form, string $name): ChoiceFormField
@@ -136,8 +137,8 @@ class UserProfileTest extends WebTestCase
             'username' => 'test', 'email' => 'test@example.com',
             // FILTER_SANITIZE_STRING strips the tags
             'resume' => 'I play Dwarves.', 'color' => 'lore',
-            'is_notif_author' => '0', 'is_notif_commenter' => '1', 'is_notif_mention' => '0',
-            'is_share_decks' => '1', 'dark_mode' => '1',
+            'is_notif_author' => 0, 'is_notif_commenter' => 1, 'is_notif_mention' => 0,
+            'is_share_decks' => 1, 'dark_mode' => 1,
         ], array_intersect_key($user, array_flip(['username', 'email', 'resume', 'color', 'is_notif_author', 'is_notif_commenter', 'is_notif_mention', 'is_share_decks', 'dark_mode'])));
 
         $crawler = $client->followRedirect();
@@ -150,7 +151,7 @@ class UserProfileTest extends WebTestCase
         $form = $this->profileForm($client);
         $this->checkbox($form, 'dark_mode')->untick();
         $client->submit($form);
-        $this->assertSame('0', $this->fetchUser()['dark_mode']);
+        $this->assertSame(0, $this->fetchUser()['dark_mode']);
         $cookie = $client->getCookieJar()->get('dark_mode');
         $this->assertInstanceOf(\Symfony\Component\BrowserKit\Cookie::class, $cookie);
         $this->assertSame('0', $cookie->getValue());
@@ -238,10 +239,7 @@ class UserProfileTest extends WebTestCase
     }
 
     /* -------------------------------------------------- change password */
-
-    /**
-     * @dataProvider invalidPasswordChangeProvider
-     */
+    #[DataProvider('invalidPasswordChangeProvider')]
     public function testInvalidPasswordChange(string $current, string $first, string $second, string $error): void
     {
         $client = $this->createAuthenticatedClient();
@@ -260,7 +258,7 @@ class UserProfileTest extends WebTestCase
     /**
      * @return array<string, string[]>
      */
-    public function invalidPasswordChangeProvider(): array
+    public static function invalidPasswordChangeProvider(): array
     {
         return [
             'wrong current password' => ['wrong', 'secret123', 'secret123', 'The entered password is invalid.'],

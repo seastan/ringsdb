@@ -13,15 +13,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class FixSignaturesCommand extends Command
 {
-    private EntityManagerInterface $entityManager;
-
-    private DecklistRepository $decklistRepository;
-
-    public function __construct(EntityManagerInterface $entityManager, DecklistRepository $decklistRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly DecklistRepository $decklistRepository
+    ) {
         parent::__construct();
-        $this->entityManager = $entityManager;
-        $this->decklistRepository = $decklistRepository;
     }
 
     protected function configure(): void
@@ -30,7 +26,7 @@ class FixSignaturesCommand extends Command
              ->setDescription('Fix canonical names for decklists');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $count = 0;
 

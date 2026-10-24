@@ -9,35 +9,28 @@ use App\Repository\CycleRepository;
 use App\Repository\UserCustomPackRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class GetPacksController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private CycleRepository $cycleRepository;
-
-    private UserCustomPackRepository $userCustomPackRepository;
-
     public function __construct(
-        CycleRepository $cycleRepository,
-        UserCustomPackRepository $userCustomPackRepository
+        private CycleRepository $cycleRepository,
+        private UserCustomPackRepository $userCustomPackRepository
     ) {
-        $this->cycleRepository = $cycleRepository;
-        $this->userCustomPackRepository = $userCustomPackRepository;
     }
 
     /**
      * @param bool $reloaduser
-     *
-     * @Route("/collection/packs", name="collection_packs", methods={"GET"})
      */
+    #[Route(path: '/collection/packs', name: 'collection_packs', methods: ['GET'])]
     public function __invoke($reloaduser = false): Response
     {
         $categories = [];
         $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
         $repackaged = ['label' => 'Repackaged', 'packs' => []];
-        $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
+        $list_cycles = $this->cycleRepository->findBy([], ['position' => \SortDirection::Ascending]);
         // owned_packs is a per-pack COUNT map encoded as "id" / "id:count" tokens
         // (legacy "id-2"/"id-3" core copies each count as +1).
         $owned_packs = $this->currentUser()->getOwnedPacks();
@@ -97,7 +90,7 @@ class GetPacksController extends AbstractController
             $categories[] = $repackaged;
         }
 
-        $customPacks = $this->userCustomPackRepository->findBy(['user' => $this->getUser()], ['createdAt' => 'ASC', 'id' => 'ASC']);
+        $customPacks = $this->userCustomPackRepository->findBy(['user' => $this->getUser()], ['createdAt' => \SortDirection::Ascending, 'id' => \SortDirection::Ascending]);
 
         return $this->render('Collection/packs.html.twig', ['pagetitle' => 'My Collection', 'categories' => $categories, 'reloaduser' => $reloaduser, 'customPacks' => $customPacks]);
     }

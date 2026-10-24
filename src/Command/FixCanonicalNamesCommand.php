@@ -13,18 +13,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class FixCanonicalNamesCommand extends Command
 {
-    private EntityManagerInterface $entityManager;
-
-    private Texts $texts;
-
-    private ScenarioRepository $scenarioRepository;
-
-    public function __construct(EntityManagerInterface $entityManager, Texts $texts, ScenarioRepository $scenarioRepository)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly Texts $texts,
+        private readonly ScenarioRepository $scenarioRepository
+    ) {
         parent::__construct();
-        $this->entityManager = $entityManager;
-        $this->texts = $texts;
-        $this->scenarioRepository = $scenarioRepository;
     }
 
     protected function configure(): void
@@ -33,7 +27,7 @@ class FixCanonicalNamesCommand extends Command
              ->setDescription('Fix canonical names for scenarios');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $texts = $this->texts;
         $count = 0;

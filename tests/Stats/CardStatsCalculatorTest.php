@@ -7,6 +7,7 @@ namespace App\Tests\Stats;
 use App\Stats\CardStatsCalculator;
 use App\Tests\Controller\JsonSnapshotTrait;
 use Doctrine\DBAL\Connection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -43,7 +44,7 @@ class CardStatsCalculatorTest extends KernelTestCase
         $this->connection = static::$kernel->getContainer()->get('doctrine')->getConnection();
         $this->calculator = static::$kernel->getContainer()->get('app.card_stats');
         foreach (['deck', 'decklist'] as $table) {
-            $this->maxIds[$table] = (int) $this->connection->fetchColumn("SELECT MAX(id) FROM $table");
+            $this->maxIds[$table] = (int) $this->connection->fetchOne("SELECT MAX(id) FROM $table");
         }
     }
 
@@ -58,7 +59,7 @@ class CardStatsCalculatorTest extends KernelTestCase
             "DELETE FROM deck WHERE id > {$max['deck']}",
             "DELETE FROM stat_cards_cache WHERE month IN ('2015-07', '2015-08', '2023-05')",
         ] as $sql) {
-            $this->connection->exec($sql);
+            $this->connection->executeStatement($sql);
         }
 
         parent::tearDown();
@@ -74,7 +75,7 @@ class CardStatsCalculatorTest extends KernelTestCase
      */
     private function insertDeck(array $values, array $main, array $side = []): int
     {
-        $row = $this->connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
+        $row = $this->connection->fetchAssociative('SELECT * FROM deck WHERE id = 2');
         $this->assertNotFalse($row);
         unset($row['id']);
         $this->connection->insert('deck', $values + ['last_pack_id' => self::WAR_OF_DALE, 'problem' => null] + $row);
@@ -98,7 +99,7 @@ class CardStatsCalculatorTest extends KernelTestCase
      */
     private function insertDecklist(array $values, array $main): int
     {
-        $row = $this->connection->fetchAssoc('SELECT * FROM decklist WHERE id = 2');
+        $row = $this->connection->fetchAssociative('SELECT * FROM decklist WHERE id = 2');
         $this->assertNotFalse($row);
         unset($row['id']);
         $this->connection->insert('decklist', $values + ['last_pack_id' => self::WAR_OF_DALE] + $row);
@@ -142,10 +143,7 @@ class CardStatsCalculatorTest extends KernelTestCase
     }
 
     /* --------------------------------------------------------- fixtures */
-
-    /**
-     * @dataProvider stepProvider
-     */
+    #[DataProvider('stepProvider')]
     public function testFixtureMonthSnapshot(string $step): void
     {
         $this->assertMatchesJsonSnapshot("stats/cards_2015-08_step$step", json_encode($this->calculator->computeCards('2015-08', $step)));
@@ -154,7 +152,7 @@ class CardStatsCalculatorTest extends KernelTestCase
     /**
      * @return array<string, string[]>
      */
-    public function stepProvider(): array
+    public static function stepProvider(): array
     {
         return ['full decks' => ['1'], 'limited decks' => ['2'], 'sideboards and totals' => ['3']];
     }
@@ -165,13 +163,13 @@ class CardStatsCalculatorTest extends KernelTestCase
         // are all published, so they are not counted twice
         $cards = $this->compute('2015-08', '2')['cards'];
         $this->assertSame([
-            '01001' => ['limited_decks' => '1', 'limited_deck_copies' => '1.00'],
-            '01004' => ['limited_decks' => '1', 'limited_deck_copies' => '1.00'],
-            '01028' => ['limited_decks' => '1', 'limited_deck_copies' => '3.00'],
+            '01001' => ['limited_decks' => 1, 'limited_deck_copies' => '1.00'],
+            '01004' => ['limited_decks' => 1, 'limited_deck_copies' => '1.00'],
+            '01028' => ['limited_decks' => 1, 'limited_deck_copies' => '3.00'],
         ], $this->byCode($cards, ['01001', '01004', '01028'], ['limited_decks', 'limited_deck_copies']));
 
         $step3 = $this->compute('2015-08', '3');
-        $this->assertSame(['full_decks' => '0', 'limited_decks' => '4', 'sides' => '4'], $step3['total']);
+        $this->assertSame(['full_decks' => 0, 'limited_decks' => 4, 'sides' => 4], $step3['total']);
         $this->assertSame(['Core Set' => ['2000-01-01', '2011-07-21']], array_slice($step3['pack_rules'], 0, 1));
         $this->assertSame(['name' => 'Core Set', 'date_release' => '2011-04-20'], $step3['packs'][0]);
         // cards released after the month are not listed
@@ -213,42 +211,41 @@ class CardStatsCalculatorTest extends KernelTestCase
         $full = $this->compute('2023-05', '1')['cards'];
         $this->assertSame([
             // counted once per deck
-            '01001' => ['full_decks' => '1', 'full_deck_copies' => '1.00'],
+            '01001' => ['full_decks' => 1, 'full_deck_copies' => '1.00'],
             // more than 3 copies count as 3: (3 + 2) / 2
-            '01013' => ['full_decks' => '2', 'full_deck_copies' => '2.50'],
+            '01013' => ['full_decks' => 2, 'full_deck_copies' => '2.50'],
             // the MotK hero counts as the card it copies, and implies the contract
-            '01014' => ['full_decks' => '2', 'full_deck_copies' => '1.00'],
-            '22134' => ['full_decks' => '1', 'full_deck_copies' => '1.00'],
+            '01014' => ['full_decks' => 2, 'full_deck_copies' => '1.00'],
+            '22134' => ['full_decks' => 1, 'full_deck_copies' => '1.00'],
         ], $this->byCode($full, ['01001', '01013', '01014', '22134'], ['full_decks', 'full_deck_copies']));
         // MotK cards themselves are not listed
         $this->assertSame([], $this->byCode($full, ['9901014'], ['code']));
 
         $limited = $this->compute('2023-05', '2')['cards'];
-        $this->assertSame(['01001' => ['limited_decks' => '1']], $this->byCode($limited, ['01001'], ['limited_decks']));
+        $this->assertSame(['01001' => ['limited_decks' => 1]], $this->byCode($limited, ['01001'], ['limited_decks']));
 
         $step3 = $this->compute('2023-05', '3');
-        $this->assertSame(['01020' => ['sides' => '1', 'side_copies' => '2.00']], $this->byCode($step3['cards'], ['01020'], ['sides', 'side_copies']));
-        $this->assertSame(['full_decks' => '2', 'limited_decks' => '1', 'sides' => '3'], $step3['total']);
+        $this->assertSame(['01020' => ['sides' => 1, 'side_copies' => '2.00']], $this->byCode($step3['cards'], ['01020'], ['sides', 'side_copies']));
+        $this->assertSame(['full_decks' => 2, 'limited_decks' => 1, 'sides' => 3], $step3['total']);
     }
 
     /**
      * Which private decks belong to a month changed in 2022: the update date before July 2022,
      * the creation or update date in July 2022, the creation date from August 2022.
-     *
-     * @dataProvider monthRuleProvider
      */
+    #[DataProvider('monthRuleProvider')]
     public function testMonthRuleForPrivateDecks(string $month, string $created, string $updated, bool $counted): void
     {
         $this->insertDeck(['date_creation' => $created, 'date_update' => $updated], [1 => 1]);
 
         $cards = $this->compute($month, '1')['cards'];
-        $this->assertSame(['01001' => ['full_decks' => $counted ? '1' : '0']], $this->byCode($cards, ['01001'], ['full_decks']));
+        $this->assertSame(['01001' => ['full_decks' => $counted ? 1 : 0]], $this->byCode($cards, ['01001'], ['full_decks']));
     }
 
     /**
      * @return array<string, string[]|bool[]>
      */
-    public function monthRuleProvider(): array
+    public static function monthRuleProvider(): array
     {
         return [
             'before 2022-07: updated in the month' => ['2021-03', '2020-01-01 00:00:00', '2021-03-15 00:00:00', true],
@@ -284,14 +281,14 @@ class CardStatsCalculatorTest extends KernelTestCase
         $this->assertStringContainsString("Computing 2015-08 ...\n", $display);
         $this->assertStringContainsString("Computing 2015-07 ...\n", $display);
         $this->assertStringEndsWith("done\n", $display);
-        $rows = $this->connection->fetchAll("SELECT month, step, payload FROM stat_cards_cache WHERE month IN ('2015-07', '2015-08') ORDER BY month, step");
-        $this->assertSame([['2015-07', '1'], ['2015-07', '2'], ['2015-07', '3'], ['2015-08', '1'], ['2015-08', '2'], ['2015-08', '3']], array_map(fn (array $row): array => [$row['month'], $row['step']], $rows));
+        $rows = $this->connection->fetchAllAssociative("SELECT month, step, payload FROM stat_cards_cache WHERE month IN ('2015-07', '2015-08') ORDER BY month, step");
+        $this->assertSame([['2015-07', 1], ['2015-07', 2], ['2015-07', 3], ['2015-08', 1], ['2015-08', 2], ['2015-08', 3]], array_map(fn (array $row): array => [$row['month'], $row['step']], $rows));
         // the payload is the JSON of computeCards()
         $this->assertSame(json_encode($this->calculator->computeCards('2015-08', '2')), $rows[4]['payload']);
 
         // running it again replaces the rows
         $this->runCommand(['month' => '2015-08']);
-        $this->assertSame('6', $this->connection->fetchColumn("SELECT COUNT(*) FROM stat_cards_cache WHERE month IN ('2015-07', '2015-08')"));
+        $this->assertSame(6, $this->connection->fetchOne("SELECT COUNT(*) FROM stat_cards_cache WHERE month IN ('2015-07', '2015-08')"));
     }
 
     public function testPrecomputeCommandRefusesAnInvalidMonth(): void
@@ -300,6 +297,6 @@ class CardStatsCalculatorTest extends KernelTestCase
 
         $this->assertSame(1, $status);
         $this->assertStringContainsString("month must be YYYY-MM, got '2015-08' OR '1'", $display);
-        $this->assertSame('0', $this->connection->fetchColumn('SELECT COUNT(*) FROM stat_cards_cache'));
+        $this->assertSame(0, $this->connection->fetchOne('SELECT COUNT(*) FROM stat_cards_cache'));
     }
 }

@@ -22,30 +22,15 @@ class LoginManager
     /**
      * The firewall of security.yaml.
      */
-    private const FIREWALL = 'main';
-
-    private TokenStorageInterface $tokenStorage;
-
-    private UserCheckerInterface $userChecker;
-
-    private SessionAuthenticationStrategyInterface $sessionStrategy;
-
-    private RequestStack $requestStack;
-
-    private EntityManagerInterface $entityManager;
+    private const string FIREWALL = 'main';
 
     public function __construct(
-        TokenStorageInterface $tokenStorage,
-        UserCheckerInterface $userChecker,
-        SessionAuthenticationStrategyInterface $sessionStrategy,
-        RequestStack $requestStack,
-        EntityManagerInterface $entityManager
+        private readonly TokenStorageInterface $tokenStorage,
+        private readonly UserCheckerInterface $userChecker,
+        private readonly SessionAuthenticationStrategyInterface $sessionStrategy,
+        private readonly RequestStack $requestStack,
+        private readonly EntityManagerInterface $entityManager
     ) {
-        $this->tokenStorage = $tokenStorage;
-        $this->userChecker = $userChecker;
-        $this->sessionStrategy = $sessionStrategy;
-        $this->requestStack = $requestStack;
-        $this->entityManager = $entityManager;
     }
 
     /**
@@ -55,13 +40,13 @@ class LoginManager
     {
         try {
             $this->userChecker->checkPreAuth($user);
-        } catch (AccountStatusException $accountStatusException) {
+        } catch (AccountStatusException) {
             return;
         }
 
         $token = new UsernamePasswordToken($user, self::FIREWALL, $user->getRoles());
         $request = $this->requestStack->getCurrentRequest();
-        if (null !== $request) {
+        if ($request instanceof \Symfony\Component\HttpFoundation\Request) {
             $this->sessionStrategy->onAuthentication($request, $token);
         }
 
@@ -77,7 +62,7 @@ class LoginManager
     public function getTargetPath(): ?string
     {
         $request = $this->requestStack->getCurrentRequest();
-        if (null === $request || !$request->hasSession()) {
+        if (!$request instanceof \Symfony\Component\HttpFoundation\Request || !$request->hasSession()) {
             return null;
         }
 

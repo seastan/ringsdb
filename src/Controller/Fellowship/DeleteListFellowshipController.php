@@ -11,30 +11,22 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class DeleteListFellowshipController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private FellowshipRepository $fellowshipRepository;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        FellowshipRepository $fellowshipRepository
+        private readonly EntityManagerInterface $entityManager,
+        private readonly FellowshipRepository $fellowshipRepository
     ) {
-        $this->entityManager = $entityManager;
-        $this->fellowshipRepository = $fellowshipRepository;
     }
 
-    /**
-     * @Route("/fellowship/delete_list", name="fellowship_delete_list", methods={"POST"})
-     */
+    #[Route(path: '/fellowship/delete_list', name: 'fellowship_delete_list', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         /* @var $user User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
 
@@ -71,7 +63,7 @@ class DeleteListFellowshipController extends AbstractController
         }
 
         $this->entityManager->flush();
-        $this->get('session')->getFlashBag()->set('notice', $message ?: 'Fellowships deleted.');
+        $this->addFlash('notice', $message ?: 'Fellowships deleted.');
 
         return $this->redirect($this->generateUrl('myfellowships_list'));
     }

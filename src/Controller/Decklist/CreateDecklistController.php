@@ -7,6 +7,7 @@ namespace App\Controller\Decklist;
 use App\Controller\CurrentUserTrait;
 use App\Entity\Deck;
 use App\Entity\Decklist;
+use App\Helper\StringSanitizer;
 use App\Model\DecklistFactory;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
@@ -15,37 +16,24 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class CreateDecklistController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private DeckRepository $deckRepository;
-
-    private DecklistRepository $decklistRepository;
-
-    private DecklistFactory $decklistFactory;
-
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        DeckRepository $deckRepository,
-        DecklistRepository $decklistRepository,
-        DecklistFactory $decklistFactory
+        private EntityManagerInterface $entityManager,
+        private DeckRepository $deckRepository,
+        private DecklistRepository $decklistRepository,
+        private DecklistFactory $decklistFactory
     ) {
-        $this->deckRepository = $deckRepository;
-        $this->decklistRepository = $decklistRepository;
-        $this->decklistFactory = $decklistFactory;
-        $this->entityManager = $entityManager;
     }
 
     /**
      * creates a new decklist from a deck (publish action).
-     *
-     * @Route("/decklist/create", name="decklist_create", methods={"POST"})
      */
+    #[Route(path: '/decklist/create', name: 'decklist_create', methods: ['POST'])]
     public function __invoke(Request $request): Response
     {
         /* @var $user \App\Entity\User */
@@ -62,7 +50,7 @@ class CreateDecklistController extends AbstractController
             throw $this->createAccessDeniedException('Access denied to this object.');
         }
 
-        $name = filter_var($request->request->get('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES) ?: '';
+        $name = StringSanitizer::sanitize($request->request->get('name'), false);
         $descriptionMd = trim((string) $request->request->get('descriptionMd'));
         $precedent_id = trim((string) $request->request->get('precedent'));
         if (!preg_match('/^\\d+$/', $precedent_id)) {

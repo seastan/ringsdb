@@ -10,32 +10,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class TextExportDecklistController extends AbstractController
 {
-    private int $cacheExpiration;
-
-    private DecklistRepository $decklistRepository;
-
     public function __construct(
-        int $cacheExpiration,
-        DecklistRepository $decklistRepository
+        private readonly int $cacheExpiration,
+        private readonly DecklistRepository $decklistRepository
     ) {
-        $this->cacheExpiration = $cacheExpiration;
-        $this->decklistRepository = $decklistRepository;
     }
 
     /**
      * returns a text file with the content of a decklist.
-     *
-     * @Route(
-     *     "/decklist/export/text/{decklist_id}",
-     *     name="decklist_export_text",
-     *     methods={"GET"},
-     *     requirements={"decklist_id"="\d+"}
-     * )
      */
+    #[Route(path: '/decklist/export/text/{decklist_id}', name: 'decklist_export_text', requirements: ['decklist_id' => '\d+'], methods: ['GET'])]
     public function __invoke(int $decklist_id): Response
     {
         $response = new Response();

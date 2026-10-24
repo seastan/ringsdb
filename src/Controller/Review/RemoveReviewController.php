@@ -8,29 +8,21 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class RemoveReviewController extends AbstractController
 {
-    private ReviewRepository $reviewRepository;
-
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        ReviewRepository $reviewRepository,
-        EntityManagerInterface $entityManager
+        private readonly ReviewRepository $reviewRepository,
+        private readonly EntityManagerInterface $entityManager
     ) {
-        $this->reviewRepository = $reviewRepository;
-        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @Route("/review/remove/{id}", name="card_review_remove")
-     */
+    #[Route(path: '/review/remove/{id}', name: 'card_review_remove')]
     public function removeAction(Request $request, int $id): JsonResponse
     {
         $user = $this->getUser();
-        if (!$user || !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface || !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
             throw $this->createAccessDeniedException('No user or not admin');
         }
 

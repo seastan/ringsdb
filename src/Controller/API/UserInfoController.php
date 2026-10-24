@@ -19,18 +19,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class UserInfoController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private Connection $connection;
-
     public function __construct(
-        Connection $connection
+        private Connection $connection
     ) {
-        $this->connection = $connection;
     }
 
     /**
@@ -39,10 +36,9 @@ class UserInfoController extends AbstractController
      * route makes anonymous requests create a session (302 + Set-Cookie), which defeats the
      * anonymous FastCGI cache and saturates php-fpm. infoAction already returns null for
      * anonymous visitors. (api_private_user_info is kept for the API tests.).
-     *
-     * @Route("/api/public/user/info", name="api_public_user_info")
-     * @Route("/api/private/user/info", name="api_private_user_info")
      */
+    #[Route(path: '/api/public/user/info', name: 'api_public_user_info')]
+    #[Route(path: '/api/private/user/info', name: 'api_private_user_info')]
     public function infoAction(Request $request, CardRepository $cardRepository, DecklistRepository $decklistRepository, FellowshipRepository $fellowshipRepository, QuestlogRepository $questlogRepository): Response
     {
         $jsonp = $request->query->get('jsonp');
@@ -61,8 +57,8 @@ class UserInfoController extends AbstractController
                 $decklist = $decklistRepository->find($decklist_id);
                 if ($decklist) {
                     $decklist_id = $decklist->getId();
-                    $content['is_liked'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM decklist d\n        \t\t\t\tJOIN vote v ON v.decklist_id = d.id\n        \t\t\t\tWHERE v.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $decklist_id])->fetch(\PDO::FETCH_NUM)[0];
-                    $content['is_favorite'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM decklist d\n        \t\t\t\tJOIN favorite f ON f.decklist_id = d.id\n        \t\t\t\tWHERE f.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $decklist_id])->fetch(\PDO::FETCH_NUM)[0];
+                    $content['is_liked'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM decklist d\n        \t\t\t\tJOIN vote v ON v.decklist_id = d.id\n        \t\t\t\tWHERE v.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $decklist_id])->fetchOne();
+                    $content['is_favorite'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM decklist d\n        \t\t\t\tJOIN favorite f ON f.decklist_id = d.id\n        \t\t\t\tWHERE f.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $decklist_id])->fetchOne();
                     $content['is_author'] = $user_id == $decklist->getUser()->getId();
                     $content['can_delete'] = 0 == $decklist->getNbcomments() && 0 == $decklist->getNbfavorites() && 0 == $decklist->getNbVotes();
                 }
@@ -73,8 +69,8 @@ class UserInfoController extends AbstractController
                 $fellowship = $fellowshipRepository->find($fellowship_id);
                 if ($fellowship) {
                     $fellowship_id = $fellowship->getId();
-                    $content['is_liked'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM fellowship d\n        \t\t\t\tJOIN fellowship_vote v ON v.fellowship_id = d.id\n        \t\t\t\tWHERE v.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $fellowship_id])->fetch(\PDO::FETCH_NUM)[0];
-                    $content['is_favorite'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM fellowship d\n        \t\t\t\tJOIN fellowship_favorite f ON f.fellowship_id = d.id\n        \t\t\t\tWHERE f.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $fellowship_id])->fetch(\PDO::FETCH_NUM)[0];
+                    $content['is_liked'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM fellowship d\n        \t\t\t\tJOIN fellowship_vote v ON v.fellowship_id = d.id\n        \t\t\t\tWHERE v.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $fellowship_id])->fetchOne();
+                    $content['is_favorite'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM fellowship d\n        \t\t\t\tJOIN fellowship_favorite f ON f.fellowship_id = d.id\n        \t\t\t\tWHERE f.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $fellowship_id])->fetchOne();
                     $content['is_author'] = $user_id == $fellowship->getUser()->getId();
                     $content['can_delete'] = 0 == $fellowship->getNbcomments() && 0 == $fellowship->getNbfavorites() && 0 == $fellowship->getNbVotes();
                 }
@@ -85,8 +81,8 @@ class UserInfoController extends AbstractController
                 $questlog = $questlogRepository->find($questlog_id);
                 if ($questlog) {
                     $questlog_id = $questlog->getId();
-                    $content['is_liked'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM questlog d\n        \t\t\t\tJOIN questlog_vote v ON v.questlog_id = d.id\n        \t\t\t\tWHERE v.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $questlog_id])->fetch(\PDO::FETCH_NUM)[0];
-                    $content['is_favorite'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM questlog d\n        \t\t\t\tJOIN questlog_favorite f ON f.questlog_id = d.id\n        \t\t\t\tWHERE f.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $questlog_id])->fetch(\PDO::FETCH_NUM)[0];
+                    $content['is_liked'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM questlog d\n        \t\t\t\tJOIN questlog_vote v ON v.questlog_id = d.id\n        \t\t\t\tWHERE v.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $questlog_id])->fetchOne();
+                    $content['is_favorite'] = (bool) $this->connection->executeQuery("SELECT\n        \t\t\t\tcount(*)\n        \t\t\t\tFROM questlog d\n        \t\t\t\tJOIN questlog_favorite f ON f.questlog_id = d.id\n        \t\t\t\tWHERE f.user_id = ?\n        \t\t\t\tAND d.id = ?", [$user_id, $questlog_id])->fetchOne();
                     $content['is_author'] = $questlog->getUser()->isEqualTo($user);
                     $content['can_delete'] = 0 == $questlog->getNbcomments() && 0 == $questlog->getNbfavorites() && 0 == $questlog->getNbVotes();
                 }
@@ -112,7 +108,7 @@ class UserInfoController extends AbstractController
         // JSON literal `null`, not `{}`: new JsonResponse(null) turns null into an
         // empty ArrayObject ({}), which app.user.js reads as a truthy (logged-in)
         // user and renders a broken header. The former controller used json_encode().
-        $response = JsonResponse::fromJsonString(json_encode($content));
+        $response = JsonResponse::fromJsonString(json_encode($content, JSON_THROW_ON_ERROR));
         if (isset($jsonp)) {
             $response->setCallback($jsonp);
         }

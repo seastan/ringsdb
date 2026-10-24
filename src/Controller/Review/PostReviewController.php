@@ -11,34 +11,23 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class PostReviewController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
-    private ReviewRepository $reviewRepository;
-
-    private Texts $texts;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        ReviewRepository $reviewRepository,
-        Texts $texts
+        private readonly EntityManagerInterface $entityManager,
+        private readonly ReviewRepository $reviewRepository,
+        private readonly Texts $texts
     ) {
-        $this->entityManager = $entityManager;
-        $this->reviewRepository = $reviewRepository;
-        $this->texts = $texts;
     }
 
-    /**
-     * @Route("/review/post", name="card_review_post", methods={"POST"})
-     */
+    #[Route(path: '/review/post', name: 'card_review_post', methods: ['POST'])]
     public function postAction(Request $request, CardRepository $cardRepository): JsonResponse
     {
         /* @var $user \App\Entity\User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw $this->createAccessDeniedException('You are not logged in.');
         }
 

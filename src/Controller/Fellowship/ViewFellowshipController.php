@@ -9,27 +9,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ViewFellowshipController extends AbstractController
 {
-    private FellowshipRepository $fellowshipRepository;
-
     public function __construct(
-        FellowshipRepository $fellowshipRepository
+        private readonly FellowshipRepository $fellowshipRepository
     ) {
-        $this->fellowshipRepository = $fellowshipRepository;
     }
 
-    /**
-     * @Route(
-     *     "/fellowship/view/{fellowship_id}/{fellowship_name}",
-     *     name="fellowship_view",
-     *     methods={"GET"},
-     *     requirements={"fellowship_id"="\d+"},
-     *     defaults={"fellowship_name"=null}
-     * )
-     */
+    #[Route(path: '/fellowship/view/{fellowship_id}/{fellowship_name}', name: 'fellowship_view', requirements: ['fellowship_id' => '\d+'], defaults: ['fellowship_name' => null], methods: ['GET'])]
     public function __invoke(int $fellowship_id): Response
     {
         /* @var $fellowship \App\Entity\Fellowship */
@@ -38,7 +27,7 @@ class ViewFellowshipController extends AbstractController
             throw new NotFoundHttpException('This fellowship does not exists.');
         }
 
-        $is_owner = $this->getUser() && $this->getUser()->getId() == $fellowship->getUser()->getId();
+        $is_owner = $this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface && $this->getUser()->getId() == $fellowship->getUser()->getId();
         $is_public = $fellowship->getIsPublic();
         if (!$fellowship->getUser()->getIsShareDecks() && !$is_owner && !$is_public) {
             throw new AccessDeniedHttpException('You are not allowed to view this fellowship. To get access, you can ask it\'s owner to enable "Share my decks" on their account.');
@@ -47,7 +36,7 @@ class ViewFellowshipController extends AbstractController
         if ($is_public) {
             $commenters = array_map(
                 /* @var $comment \App\Entity\FellowshipComment */
-                fn (\App\Entity\FellowshipComment $comment) => $comment->getUser()->getUsername(),
+                fn (\App\Entity\FellowshipComment $comment): string => $comment->getUser()->getUsername(),
                 $fellowship->getComments()->getValues()
             );
             $commenters[] = $fellowship->getUser()->getUsername();

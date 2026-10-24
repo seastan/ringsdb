@@ -12,24 +12,12 @@ use Twig\Environment;
 
 class FellowshipArchiver
 {
-    private string $cacheDir;
-
-    private Environment $twig;
-
-    private Texts $texts;
-
-    private FellowshipRepository $fellowshipRepository;
-
     public function __construct(
-        string $cacheDir,
-        FellowshipRepository $fellowshipRepository,
-        Environment $twig,
-        Texts $texts
+        private readonly string $cacheDir,
+        private readonly FellowshipRepository $fellowshipRepository,
+        private readonly Environment $twig,
+        private readonly Texts $texts
     ) {
-        $this->cacheDir = $cacheDir;
-        $this->twig = $twig;
-        $this->texts = $texts;
-        $this->fellowshipRepository = $fellowshipRepository;
     }
 
     public function downloadFromSelection(User $user, int $fellowship_id, bool $octgn): Response

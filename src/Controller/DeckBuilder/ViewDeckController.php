@@ -10,29 +10,18 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ViewDeckController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private DeckRepository $deckRepository;
-
     public function __construct(
-        DeckRepository $deckRepository
+        private DeckRepository $deckRepository
     ) {
-        $this->deckRepository = $deckRepository;
     }
 
-    /**
-     * @Route(
-     *     "/deck/view/{deck_id}",
-     *     name="deck_view",
-     *     methods={"GET"},
-     *     requirements={"deck_id"="\d+"},
-     *     defaults={"deck_id"=0}
-     * )
-     */
+    #[Route(path: '/deck/view/{deck_id}', name: 'deck_view', requirements: ['deck_id' => '\d+'], defaults: ['deck_id' => 0], methods: ['GET'])]
     public function __invoke(int $deck_id): Response
     {
         /* @var $deck \App\Entity\Deck */
@@ -41,7 +30,7 @@ class ViewDeckController extends AbstractController
             throw new NotFoundHttpException("This deck doesn't exist.");
         }
 
-        $is_owner = $this->getUser() && $this->getUser()->getId() == $deck->getUser()->getId();
+        $is_owner = $this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface && $this->getUser()->getId() == $deck->getUser()->getId();
         if (!$deck->getUser()->getIsShareDecks() && !$is_owner) {
             throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
         }

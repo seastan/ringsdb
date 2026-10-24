@@ -14,31 +14,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class TagController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private Decks $decks;
-
-    private DeckRepository $deckRepository;
-
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        Decks $decks,
-        DeckRepository $deckRepository,
-        EntityManagerInterface $entityManager
+        private Decks $decks,
+        private DeckRepository $deckRepository,
+        private EntityManagerInterface $entityManager
     ) {
-        $this->decks = $decks;
-        $this->deckRepository = $deckRepository;
-        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @Route("/tag/add", name="tag_add", methods={"POST"})
-     */
+    #[Route(path: '/tag/add', name: 'tag_add', methods: ['POST'])]
     public function addAction(Request $request): Response
     {
         $list_id = $request->get('ids');
@@ -66,9 +55,7 @@ class TagController extends AbstractController
         return new JsonResponse($response);
     }
 
-    /**
-     * @Route("/tag/remove", name="tag_remove", methods={"POST"})
-     */
+    #[Route(path: '/tag/remove', name: 'tag_remove', methods: ['POST'])]
     public function removeAction(Request $request): Response
     {
         $list_id = $request->get('ids');
@@ -96,9 +83,7 @@ class TagController extends AbstractController
         return new JsonResponse($response);
     }
 
-    /**
-     * @Route("/tag/clear", name="tag_clear", methods={"POST"})
-     */
+    #[Route(path: '/tag/clear', name: 'tag_clear', methods: ['POST'])]
     public function clearAction(Request $request): Response
     {
         $list_id = $request->get('ids');

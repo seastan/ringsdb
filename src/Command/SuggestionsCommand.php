@@ -11,15 +11,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SuggestionsCommand extends Command
 {
-    private Connection $connection;
-
-    private string $publicDir;
-
-    public function __construct(Connection $connection, string $publicDir)
-    {
+    public function __construct(
+        private readonly Connection $connection,
+        private readonly string $publicDir
+    ) {
         parent::__construct();
-        $this->connection = $connection;
-        $this->publicDir = $publicDir;
     }
 
     protected function configure(): void
@@ -29,7 +25,7 @@ class SuggestionsCommand extends Command
             ->setDescription('Compute and save the suggestions matrix');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         ini_set('memory_limit', '512M');
         $webdir = $this->publicDir;
@@ -82,7 +78,7 @@ class SuggestionsCommand extends Command
                 FROM card c
                 JOIN deckslot d ON d.card_id = c.id
                 GROUP BY c.id, c.code, c.sphere_id
-                ORDER BY c.id')->fetchAll();
+                ORDER BY c.id')->fetchAllAssociative();
 
         $cardIndexById = [];
         $maxnbdecks = 0;
@@ -99,18 +95,18 @@ class SuggestionsCommand extends Command
         }
 
         foreach ($cardsByIndex as $index => $card) {
-            $matrix[$index] = $index ? (array_fill(0, $index, 0) ?: []) : [];
+            $matrix[$index] = $index ? (array_fill(0, $index, 0)) : [];
         }
 
-        $decks = $dbh->executeQuery('SELECT d.id FROM deck d ORDER BY d.id')->fetchAll();
+        $decks = $dbh->executeQuery('SELECT d.id FROM deck d ORDER BY d.id')->fetchAllAssociative();
 
         $stmt = $dbh->prepare('SELECT d.card_id FROM deckslot d WHERE d.deck_id = ? ORDER BY d.card_id');
 
         foreach ($decks as $deck_id) {
             $stmt->bindValue(1, $deck_id['id']);
-            $stmt->execute();
+            $result = $stmt->executeQuery();
             /** @var list<array{card_id: int}> $slots */
-            $slots = $stmt->fetchAll();
+            $slots = $result->fetchAllAssociative();
             $pairs = $this->getAllPairs($slots);
             /*
              * $pairs holds all the pairs of card_id seen in deck_id

@@ -32,9 +32,9 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         $this->slots = $slots;
     }
 
-    public function add($element): bool
+    public function add($element): void
     {
-        return $this->slots->add($element);
+        $this->slots->add($element);
     }
 
     public function removeElement($element): bool
@@ -42,22 +42,28 @@ class SlotCollectionDecorator implements SlotCollectionInterface
         return $this->slots->removeElement($element);
     }
 
-    public function count()
+    public function count(): int
     {
         return $this->slots->count();
     }
 
-    public function getIterator()
+    /**
+     * @return \Traversable<int, T>
+     */
+    public function getIterator(): \Traversable
     {
         return $this->slots->getIterator();
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->slots->offsetExists($offset);
     }
 
-    public function offsetGet($offset)
+    /**
+     * @return T|null
+     */
+    public function offsetGet($offset): mixed
     {
         return $this->slots->offsetGet($offset);
     }
@@ -228,7 +234,7 @@ class SlotCollectionDecorator implements SlotCollectionInterface
             foreach ($heroDeck->getSlots() as $slot) {
                 $card = $slot->getCard();
 
-                if (false !== strpos((string) $card->getTraits(), 'Hobbit')) {
+                if (str_contains((string) $card->getTraits(), 'Hobbit')) {
                     --$threat;
                 }
             }

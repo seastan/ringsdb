@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\API;
 
 use App\Entity\Card;
+use App\Entity\CardPrinting;
 use App\Entity\Decklist;
 use App\Entity\Pack;
 use App\Entity\Scenario;
@@ -22,37 +23,19 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ApiController extends AbstractController
 {
-    private CardsData $cardsData;
-
-    private int $cacheExpiration;
-
-    private CardRepository $cardRepository;
-
-    private DecklistRepository $decklistRepository;
-
-    private PackRepository $packRepository;
-
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        CardsData $cardsData,
-        int $cacheExpiration,
-        CardRepository $cardRepository,
-        DecklistRepository $decklistRepository,
-        PackRepository $packRepository,
-        EntityManagerInterface $entityManager
+        private readonly CardsData $cardsData,
+        private readonly int $cacheExpiration,
+        private readonly CardRepository $cardRepository,
+        private readonly DecklistRepository $decklistRepository,
+        private readonly PackRepository $packRepository,
+        private readonly EntityManagerInterface $entityManager
     ) {
-        $this->cardsData = $cardsData;
-        $this->cacheExpiration = $cacheExpiration;
-        $this->cardRepository = $cardRepository;
-        $this->decklistRepository = $decklistRepository;
-        $this->packRepository = $packRepository;
-        $this->entityManager = $entityManager;
     }
 
     /**
@@ -66,9 +49,8 @@ class ApiController extends AbstractController
      *    {"name"="jsonp", "dataType"="string", "required"=false, "description"="JSONP callback"}
      *  },
      * )
-     *
-     * @Route("/api/public/packs/", name="api_packs", methods={"GET"})
      */
+    #[Route(path: '/api/public/packs/', name: 'api_packs', methods: ['GET'])]
     public function listPacksAction(Request $request): Response
     {
         $response = new Response();
@@ -79,7 +61,7 @@ class ApiController extends AbstractController
         $jsonp = $request->query->get('jsonp');
         /* @var $em EntityManager */
         /* @var $list_packs \App\Entity\Pack[] */
-        $list_packs = $this->packRepository->findBy([], ['dateRelease' => 'ASC', 'position' => 'ASC']);
+        $list_packs = $this->packRepository->findBy([], ['dateRelease' => \SortDirection::Ascending, 'position' => \SortDirection::Ascending]);
         // check the last-modified-since header
         $lastModified = null;
         foreach ($list_packs as $pack) {
@@ -143,15 +125,8 @@ class ApiController extends AbstractController
      *      }
      *  },
      * )
-     *
-     * @Route(
-     *     "/api/public/card/{card_code}.{_format}",
-     *     name="api_card",
-     *     methods={"GET"},
-     *     requirements={"_format"="json"},
-     *     defaults={"_format"="json"}
-     * )
      */
+    #[Route(path: '/api/public/card/{card_code}.{_format}', name: 'api_card', requirements: ['_format' => 'json'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function getCardAction(Request $request, string $card_code): Response
     {
         $response = new Response();
@@ -194,9 +169,8 @@ class ApiController extends AbstractController
      *      {"name"="jsonp", "dataType"="string", "required"=false, "description"="JSONP callback"}
      *  },
      * )
-     *
-     * @Route("/api/public/cards/", name="api_cards", methods={"GET"})
      */
+    #[Route(path: '/api/public/cards/', name: 'api_cards', methods: ['GET'])]
     public function listCardsAction(Request $request): Response
     {
         $response = new Response();
@@ -209,7 +183,7 @@ class ApiController extends AbstractController
         /* @var $list_cards \App\Entity\Card[] */
         // Eager-load printings (+ their packs) and the card's pack/type/sphere so
         // getCardInfo doesn't issue N+1 queries while building packs[] for every card.
-        $list_cards = $this->cardRepository->createQueryBuilder('c')->leftJoin('c.printings', 'cp')->addSelect('cp')->leftJoin('cp.pack', 'cpp')->addSelect('cpp')->leftJoin('c.type', 't')->addSelect('t')->leftJoin('c.sphere', 's')->addSelect('s')->orderBy('c.code', 'ASC')->getQuery()->getResult();
+        $list_cards = $this->cardRepository->createQueryBuilder('c')->leftJoin('c.printings', 'cp')->addSelect('cp')->leftJoin('cp.pack', 'cpp')->addSelect('cpp')->leftJoin('c.type', 't')->addSelect('t')->leftJoin('c.sphere', 's')->addSelect('s')->orderBy('c.code', \SortDirection::Ascending)->getQuery()->getResult();
         // check the last-modified-since header (cards AND their printings, so a new
         // printing or repointed art invalidates the cached card list)
         $lastModified = null;
@@ -220,7 +194,9 @@ class ApiController extends AbstractController
             }
         }
 
-        $printingMax = $this->entityManager->createQuery('SELECT MAX(cp.dateUpdate) FROM App:CardPrinting cp')->getSingleScalarResult();
+        $printingMax = $this->entityManager
+            ->createQuery('SELECT MAX(cp.dateUpdate) FROM '.CardPrinting::class.' cp')
+            ->getSingleScalarResult();
         if ($printingMax) {
             $printingMax = new \DateTime((string) $printingMax);
             if (!$lastModified || $lastModified < $printingMax) {
@@ -270,15 +246,8 @@ class ApiController extends AbstractController
      *      }
      *  },
      * )
-     *
-     * @Route(
-     *     "/api/public/cards/{pack_code}.{_format}",
-     *     name="api_cards_pack",
-     *     methods={"GET"},
-     *     requirements={"_format"="json|xml|xlsx|xls"},
-     *     defaults={"_format"="json"}
-     * )
      */
+    #[Route(path: '/api/public/cards/{pack_code}.{_format}', name: 'api_cards_pack', requirements: ['_format' => 'json|xml|xlsx|xls'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function listCardsByPackAction(Request $request, string $pack_code): Response
     {
         $response = new Response();
@@ -356,15 +325,8 @@ class ApiController extends AbstractController
      *      }
      *  },
      * )
-     *
-     * @Route(
-     *     "/api/public/decklist/{decklist_id}.{_format}",
-     *     name="api_decklist",
-     *     methods={"GET"},
-     *     requirements={"_format"="json", "decklist_id"="\d+"},
-     *     defaults={"_format"="json"}
-     * )
      */
+    #[Route(path: '/api/public/decklist/{decklist_id}.{_format}', name: 'api_decklist', requirements: ['_format' => 'json', 'decklist_id' => '\d+'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function getDecklistAction(Request $request, int $decklist_id): Response
     {
         $response = new Response();
@@ -423,15 +385,8 @@ class ApiController extends AbstractController
      *      }
      *  },
      * )
-     *
-     * @Route(
-     *     "/api/public/decklists/by_date/{date}.{_format}",
-     *     name="api_decklists_by_date",
-     *     methods={"GET"},
-     *     requirements={"_format"="json", "date"="\d\d\d\d-\d\d-\d\d"},
-     *     defaults={"_format"="json"}
-     * )
      */
+    #[Route(path: '/api/public/decklists/by_date/{date}.{_format}', name: 'api_decklists_by_date', requirements: ['_format' => 'json', 'date' => '\d\d\d\d-\d\d-\d\d'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function listDecklistsByDateAction(Request $request, UserRepository $userRepository, string $date): Response
     {
         $response = new Response();
@@ -509,15 +464,8 @@ class ApiController extends AbstractController
      *      }
      *  },
      * )
-     *
-     * @Route(
-     *     "/api/public/decklists/top_by_card/{card_code}.{_format}",
-     *     name="api_decklists_by_card",
-     *     methods={"GET"},
-     *     requirements={"_format"="json"},
-     *     defaults={"_format"="json"}
-     * )
      */
+    #[Route(path: '/api/public/decklists/top_by_card/{card_code}.{_format}', name: 'api_decklists_by_card', requirements: ['_format' => 'json'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function listTopDecklistsByCardAction(Request $request, string $card_code): Response
     {
         $response = new Response();
@@ -544,11 +492,11 @@ class ApiController extends AbstractController
         $qb = $this->entityManager->createQueryBuilder();
         // Select decklists
         $qb->select('d.id, d.name, d.nameCanonical, d.dateCreation, d.dateUpdate');
-        $qb->from('App:Decklist', 'd');
+        $qb->from(Decklist::class, 'd');
         // high popularity
         $qb->addSelect('(1+d.nbVotes)/(1+POWER(DATE_DIFF(CURRENT_TIMESTAMP(), d.dateCreation), 2)) AS HIDDEN popularity');
-        $qb->orderBy('popularity', 'DESC');
-        $qb->addOrderBy('d.id', 'DESC');
+        $qb->orderBy('popularity', \SortDirection::Descending);
+        $qb->addOrderBy('d.id', \SortDirection::Descending);
         // containing the card
         $qb->innerJoin('d.slots', 's');
         $qb->andWhere('s.card = :card');
@@ -609,15 +557,8 @@ class ApiController extends AbstractController
      *      }
      *  },
      * )
-     *
-     * @Route(
-     *     "/api/public/scenario/{scenario_id}.{_format}",
-     *     name="api_scenario",
-     *     methods={"GET"},
-     *     requirements={"_format"="json", "scenario_id"="\d+"},
-     *     defaults={"_format"="json"}
-     * )
      */
+    #[Route(path: '/api/public/scenario/{scenario_id}.{_format}', name: 'api_scenario', requirements: ['_format' => 'json', 'scenario_id' => '\d+'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function getScenarioAction(Request $request, ScenarioRepository $scenarioRepository, int $scenario_id): Response
     {
         $response = new Response();
@@ -646,9 +587,7 @@ class ApiController extends AbstractController
         return $response;
     }
 
-    /**
-     * @Route("/api/public/cards/search/{q}", name="api_cards_search", methods={"GET"})
-     */
+    #[Route(path: '/api/public/cards/search/{q}', name: 'api_cards_search', methods: ['GET'])]
     public function searchCardsAction(Request $request, string $q): Response
     {
         $response = new Response();

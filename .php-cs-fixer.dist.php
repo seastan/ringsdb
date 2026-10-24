@@ -18,6 +18,7 @@ return (new PhpCsFixer\Config())
             'import_constants' => false,
             'import_functions' => false,
         ],
+        'multiline_promoted_properties' => true,
         // the groups of @Symfony, plus the Doctrine mapping annotations kept together
         'phpdoc_separation' => [
             'groups' => [

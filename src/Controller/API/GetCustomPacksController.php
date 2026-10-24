@@ -7,29 +7,24 @@ namespace App\Controller\API;
 use App\Repository\UserCustomPackRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class GetCustomPacksController extends AbstractController
 {
-    private UserCustomPackRepository $userCustomPackRepository;
-
     public function __construct(
-        UserCustomPackRepository $userCustomPackRepository
+        private readonly UserCustomPackRepository $userCustomPackRepository
     ) {
-        $this->userCustomPackRepository = $userCustomPackRepository;
     }
 
-    /**
-     * @Route("/api/private/custom-packs", name="api_private_custom_packs", methods={"GET"})
-     */
+    #[Route(path: '/api/private/custom-packs', name: 'api_private_custom_packs', methods: ['GET'])]
     public function __invoke(): JsonResponse
     {
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             return new JsonResponse([], 401);
         }
 
-        $packs = $this->userCustomPackRepository->findBy(['user' => $user], ['createdAt' => 'ASC', 'id' => 'ASC']);
+        $packs = $this->userCustomPackRepository->findBy(['user' => $user], ['createdAt' => \SortDirection::Ascending, 'id' => \SortDirection::Ascending]);
         $result = [];
         foreach ($packs as $pack) {
             $cards = [];

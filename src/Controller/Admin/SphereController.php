@@ -14,30 +14,23 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Sphere controller.
  */
 class SphereController extends AbstractController
 {
-    private SphereRepository $sphereRepository;
-
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        SphereRepository $sphereRepository,
-        EntityManagerInterface $entityManager
+        private readonly SphereRepository $sphereRepository,
+        private readonly EntityManagerInterface $entityManager
     ) {
-        $this->sphereRepository = $sphereRepository;
-        $this->entityManager = $entityManager;
     }
 
     /**
      * Lists all Sphere entities.
-     *
-     * @Route("/admin/sphere/", name="admin_sphere")
      */
+    #[Route(path: '/admin/sphere/', name: 'admin_sphere')]
     public function indexAction(): Response
     {
         $entities = $this->sphereRepository->findAll();
@@ -47,9 +40,8 @@ class SphereController extends AbstractController
 
     /**
      * Creates a new Sphere entity.
-     *
-     * @Route("/admin/sphere/create", name="admin_sphere_create", methods={"POST"})
      */
+    #[Route(path: '/admin/sphere/create', name: 'admin_sphere_create', methods: ['POST'])]
     public function createAction(Request $request): Response
     {
         $entity = new Sphere();
@@ -79,9 +71,8 @@ class SphereController extends AbstractController
 
     /**
      * Displays a form to create a new Sphere entity.
-     *
-     * @Route("/admin/sphere/new", name="admin_sphere_new")
      */
+    #[Route(path: '/admin/sphere/new', name: 'admin_sphere_new')]
     public function newAction(): Response
     {
         $entity = new Sphere();
@@ -92,9 +83,8 @@ class SphereController extends AbstractController
 
     /**
      * Finds and displays a Sphere entity.
-     *
-     * @Route("/admin/sphere/{id}/show", name="admin_sphere_show")
      */
+    #[Route(path: '/admin/sphere/{id}/show', name: 'admin_sphere_show')]
     public function showAction(int $id): Response
     {
         $entity = $this->sphereRepository->find($id);
@@ -109,9 +99,8 @@ class SphereController extends AbstractController
 
     /**
      * Displays a form to edit an existing Sphere entity.
-     *
-     * @Route("/admin/sphere/{id}/edit", name="admin_sphere_edit")
      */
+    #[Route(path: '/admin/sphere/{id}/edit', name: 'admin_sphere_edit')]
     public function editAction(int $id): Response
     {
         $entity = $this->sphereRepository->find($id);
@@ -142,9 +131,8 @@ class SphereController extends AbstractController
 
     /**
      * Edits an existing Sphere entity.
-     *
-     * @Route("/admin/sphere/{id}/update", name="admin_sphere_update", methods={"POST", "PUT"})
      */
+    #[Route(path: '/admin/sphere/{id}/update', name: 'admin_sphere_update', methods: ['POST', 'PUT'])]
     public function updateAction(Request $request, int $id): Response
     {
         $entity = $this->sphereRepository->find($id);
@@ -166,9 +154,8 @@ class SphereController extends AbstractController
 
     /**
      * Deletes a Sphere entity.
-     *
-     * @Route("/admin/sphere/{id}/delete", name="admin_sphere_delete", methods={"POST", "DELETE"})
      */
+    #[Route(path: '/admin/sphere/{id}/delete', name: 'admin_sphere_delete', methods: ['POST', 'DELETE'])]
     public function deleteAction(Request $request, int $id): RedirectResponse
     {
         $form = $this->createDeleteForm($id);

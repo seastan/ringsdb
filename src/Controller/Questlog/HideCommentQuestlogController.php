@@ -11,36 +11,25 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class HideCommentQuestlogController extends AbstractController
 {
-    private QuestlogCommentRepository $questlogCommentRepository;
-
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        QuestlogCommentRepository $questlogCommentRepository
+        private readonly EntityManagerInterface $entityManager,
+        private readonly QuestlogCommentRepository $questlogCommentRepository
     ) {
-        $this->questlogCommentRepository = $questlogCommentRepository;
-        $this->entityManager = $entityManager;
     }
 
     /**
      * hides a comment, or if $hidden is false, unhide a comment.
-     *
-     * @Route(
-     *     "/user/questlog_hidecomment/{comment_id}/{hidden}",
-     *     name="questlog_comment_hide",
-     *     methods={"POST"}
-     * )
      */
+    #[Route(path: '/user/questlog_hidecomment/{comment_id}/{hidden}', name: 'questlog_comment_hide', methods: ['POST'])]
     public function __invoke(int $comment_id, int $hidden): Response
     {
         /* @var $user User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw $this->createAccessDeniedException('You are not logged in.');
         }
 

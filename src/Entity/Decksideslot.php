@@ -7,43 +7,28 @@ namespace App\Entity;
 use App\Model\SlotInterface;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="decksideslot")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'decksideslot')]
 class Decksideslot implements SlotInterface
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
-    /**
-     * @ORM\Column(type="smallint")
-     */
-    private int $quantity;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Deck", inversedBy="sideslots")
-     * @ORM\JoinColumn(name="deck_id", referencedColumnName="id", nullable=false)
-     */
-    private Deck $deck;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Card")
-     * @ORM\JoinColumn(name="card_id", referencedColumnName="id", nullable=false)
-     */
-    private Card $card;
-
-    public function __construct(Deck $deck, Card $card, int $quantity)
-    {
-        $this->deck = $deck;
-        $this->card = $card;
-        $this->quantity = $quantity;
+    public function __construct(
+        #[ORM\ManyToOne(targetEntity: Deck::class, inversedBy: 'sideslots')]
+        #[ORM\JoinColumn(name: 'deck_id', referencedColumnName: 'id', nullable: false)]
+        private Deck $deck,
+        #[ORM\ManyToOne(targetEntity: Card::class)]
+        #[ORM\JoinColumn(name: 'card_id', referencedColumnName: 'id', nullable: false)]
+        private Card $card,
+        #[ORM\Column(type: 'smallint')]
+        private int $quantity
+    ) {
     }
 
     /**

@@ -7,7 +7,7 @@ namespace App\Controller\API;
 use App\Repository\DeckRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * External-integration deck endpoint (used by the DragnCards "Play on DragnCards"
@@ -17,18 +17,15 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class LoadSharedDeckController extends AbstractController
 {
-    private DeckRepository $deckRepository;
-
-    public function __construct(DeckRepository $deckRepository)
-    {
-        $this->deckRepository = $deckRepository;
+    public function __construct(
+        private readonly DeckRepository $deckRepository
+    ) {
     }
 
     /**
      * Return one Deck as JSON, if the owner shares their decks.
-     *
-     * @Route("/api/oauth2/deck/load/{id}", name="api_oauth2_load_deck", methods={"GET"}, requirements={"id"="\d+"})
      */
+    #[Route(path: '/api/oauth2/deck/load/{id}', name: 'api_oauth2_load_deck', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function __invoke(int $id): Response
     {
         $response = new Response();

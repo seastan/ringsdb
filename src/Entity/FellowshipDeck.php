@@ -8,43 +8,29 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * FellowshipDeck.
- *
- * @ORM\Entity
- * @ORM\Table(name="fellowship_deck")
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'fellowship_deck')]
 class FellowshipDeck
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
-    /**
-     * @ORM\Column(name="deck_number", type="smallint")
-     */
-    private int $deckNumber;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Fellowship", inversedBy="decks")
-     * @ORM\JoinColumn(name="fellowship_id", referencedColumnName="id", nullable=false)
-     */
-    private Fellowship $fellowship;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Deck", inversedBy="fellowships")
-     * @ORM\JoinColumn(name="deck_id", referencedColumnName="id", nullable=false)
-     */
-    private Deck $deck;
-
-    public function __construct(Fellowship $fellowship, Deck $deck, int $deckNumber)
-    {
-        $this->fellowship = $fellowship;
-        $this->deck = $deck;
-        $this->deckNumber = $deckNumber;
+    public function __construct(
+        #[ORM\ManyToOne(targetEntity: Fellowship::class, inversedBy: 'decks')]
+        #[ORM\JoinColumn(name: 'fellowship_id', referencedColumnName: 'id', nullable: false)]
+        private Fellowship $fellowship,
+        #[ORM\ManyToOne(targetEntity: Deck::class, inversedBy: 'fellowships')]
+        #[ORM\JoinColumn(name: 'deck_id', referencedColumnName: 'id', nullable: false)]
+        private Deck $deck,
+        #[ORM\Column(name: 'deck_number', type: 'smallint')]
+        private int $deckNumber
+    ) {
     }
 
     /**

@@ -2,36 +2,24 @@
 
 namespace App\Controller\Review;
 
+use App\Entity\Review;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ListReviewsController extends AbstractController
 {
-    private int $cacheExpiration;
-
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        int $cacheExpiration,
-        EntityManagerInterface $entityManager
+        private readonly int $cacheExpiration,
+        private readonly EntityManagerInterface $entityManager
     ) {
-        $this->cacheExpiration = $cacheExpiration;
-        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @Route(
-     *     "/reviews/{page}",
-     *     name="card_reviews_list",
-     *     requirements={"page"="\d+"},
-     *     defaults={"page"=1}
-     * )
-     */
+    #[Route(path: '/reviews/{page}', name: 'card_reviews_list', requirements: ['page' => '\d+'], defaults: ['page' => 1])]
     public function listAction(Request $request, int $page = 1): Response
     {
         $response = new Response();
@@ -46,7 +34,7 @@ class ListReviewsController extends AbstractController
         $start = ($page - 1) * $limit;
         $pagetitle = 'Card Reviews';
         /* @var $em EntityManager */
-        $dql = 'SELECT DISTINCT r FROM App:Review r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC, r.id DESC';
+        $dql = 'SELECT DISTINCT r FROM '.Review::class.' r JOIN r.card c JOIN c.printings cp JOIN cp.pack p WHERE p.dateRelease IS NOT NULL ORDER BY r.dateCreation DESC, r.id DESC';
         $query = $this->entityManager->createQuery($dql)->setFirstResult($start)->setMaxResults($limit);
         $paginator = new Paginator($query, false);
         $maxcount = count($paginator);

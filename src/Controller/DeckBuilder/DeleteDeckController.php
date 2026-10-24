@@ -11,27 +11,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class DeleteDeckController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private EntityManagerInterface $entityManager;
-
-    private DeckRepository $deckRepository;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        DeckRepository $deckRepository
+        private EntityManagerInterface $entityManager,
+        private DeckRepository $deckRepository
     ) {
-        $this->entityManager = $entityManager;
-        $this->deckRepository = $deckRepository;
     }
 
-    /**
-     * @Route("/deck/delete", name="deck_delete", methods={"POST"})
-     */
+    #[Route(path: '/deck/delete', name: 'deck_delete', methods: ['POST'])]
     public function __invoke(Request $request): RedirectResponse
     {
         $deck_id = filter_var($request->get('deck_id'), FILTER_SANITIZE_NUMBER_INT);
@@ -46,7 +38,7 @@ class DeleteDeckController extends AbstractController
         }
 
         if (count($deck->getFellowships())) {
-            $this->get('session')->getFlashBag()->set('error', "You can't delete a deck that is member of a fellowship.");
+            $this->addFlash('error', "You can't delete a deck that is member of a fellowship.");
         } else {
             foreach ($deck->getChildren() as $decklist) {
                 $decklist->setParent();
@@ -54,7 +46,7 @@ class DeleteDeckController extends AbstractController
 
             $this->entityManager->remove($deck);
             $this->entityManager->flush();
-            $this->get('session')->getFlashBag()->set('notice', 'Deck deleted.');
+            $this->addFlash('notice', 'Deck deleted.');
         }
 
         return $this->redirect($this->generateUrl('decks_list'));

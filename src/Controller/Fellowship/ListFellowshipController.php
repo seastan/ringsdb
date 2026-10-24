@@ -5,41 +5,26 @@ declare(strict_types=1);
 namespace App\Controller\Fellowship;
 
 use App\Entity\Cycle;
+use App\Helper\StringSanitizer;
 use App\Model\FellowshipManager;
 use App\Repository\CycleRepository;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ListFellowshipController extends AbstractController
 {
-    private int $cacheExpiration;
-
-    private FellowshipManager $fellowshipManager;
-
-    private CycleRepository $cycleRepository;
-
     public function __construct(
-        int $cacheExpiration,
-        FellowshipManager $fellowshipManager,
-        CycleRepository $cycleRepository
+        private readonly int $cacheExpiration,
+        private readonly FellowshipManager $fellowshipManager,
+        private readonly CycleRepository $cycleRepository,
+        private readonly Connection $connection
     ) {
-        $this->cacheExpiration = $cacheExpiration;
-        $this->fellowshipManager = $fellowshipManager;
-        $this->cycleRepository = $cycleRepository;
     }
 
-    /**
-     * @Route(
-     *     "/fellowships/{type}/{page}",
-     *     name="fellowships_list",
-     *     methods={"GET"},
-     *     requirements={"page"="\d+"},
-     *     defaults={"type"="popular", "page"=1}
-     * )
-     */
+    #[Route(path: '/fellowships/{type}/{page}', name: 'fellowships_list', requirements: ['page' => '\d+'], defaults: ['type' => 'popular', 'page' => 1], methods: ['GET'])]
     public function __invoke(Request $request, string $type, int $page = 1): Response
     {
         $response = new Response();
@@ -60,7 +45,7 @@ class ListFellowshipController extends AbstractController
             case 'favorites':
                 $response->setPrivate();
                 $user = $this->getUser();
-                if ($user) {
+                if ($user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
                     $paginator = $this->fellowshipManager->findFellowshipsByFavorite($user);
                 } else {
                     $paginator = $this->fellowshipManager->getEmptyList();
@@ -71,7 +56,7 @@ class ListFellowshipController extends AbstractController
             case 'mine':
                 $response->setPrivate();
                 $user = $this->getUser();
-                if ($user) {
+                if ($user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
                     $paginator = $this->fellowshipManager->findFellowshipsByAuthor($user);
                 } else {
                     $paginator = $this->fellowshipManager->getEmptyList();
@@ -103,24 +88,23 @@ class ListFellowshipController extends AbstractController
 
     private function searchForm(Request $request): string
     {
-        $dbh = $this->getDoctrine()->getConnection();
         $cards_code = $request->query->all('cards');
-        $author_name = filter_var($request->query->get('author'), FILTER_SANITIZE_STRING);
-        $fellowship_name = filter_var($request->query->get('name'), FILTER_SANITIZE_STRING);
+        $author_name = StringSanitizer::sanitize($request->query->get('author'));
+        $fellowship_name = StringSanitizer::sanitize($request->query->get('name'));
         $nb_decks = intval(filter_var($request->query->get('nb_decks'), FILTER_SANITIZE_NUMBER_INT));
         $numcores = $request->query->get('numcores');
         $numplaysets = $request->query->get('numplaysets');
         $sort = $request->query->get('sort');
         $packs = $request->query->all('packs');
         if (0 === count($packs)) {
-            $packs = $dbh->executeQuery('SELECT id FROM pack')->fetchAll(\PDO::FETCH_COLUMN);
+            $packs = $this->connection->executeQuery('SELECT id FROM pack')->fetchFirstColumn();
         }
 
         $categories = [];
         $on = 0;
         $off = 0;
         $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
-        $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
+        $list_cycles = $this->cycleRepository->findBy([], ['position' => \SortDirection::Ascending]);
         foreach ($list_cycles as $cycle) {
             /* @var $cycle Cycle */
             $size = count($cycle->getPacks());
@@ -159,7 +143,7 @@ class ListFellowshipController extends AbstractController
         $params['sort_'.$sort] = ' selected="selected"';
         $params['nb_decks_selected'] = $nb_decks;
         if (count($cards_code) > 0) {
-            $cards = $dbh->executeQuery("SELECT\n    \t\t\t\tc.name,\n    \t\t\t\tc.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card c\n                    INNER JOIN sphere s ON s.id = c.sphere_id\n                    INNER JOIN type t ON t.id = c.type_id\n                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 WHERE cp2.card_id = c.id ORDER BY cp2.position ASC, cp2.id ASC LIMIT 1)\n                    INNER JOIN pack p ON p.id = cpr.pack_id\n                    WHERE c.code IN (?)\n    \t\t\t\tORDER BY c.code DESC", [$cards_code], [Connection::PARAM_INT_ARRAY])->fetchAll();
+            $cards = $this->connection->executeQuery("SELECT\n    \t\t\t\tc.name,\n    \t\t\t\tc.code,\n                    s.code AS sphere_code,\n                    t.name AS type_name\n    \t\t\t\tFROM card c\n                    INNER JOIN sphere s ON s.id = c.sphere_id\n                    INNER JOIN type t ON t.id = c.type_id\n                    INNER JOIN card_printing cpr ON cpr.id = (SELECT cp2.id FROM card_printing cp2 WHERE cp2.card_id = c.id ORDER BY cp2.position ASC, cp2.id ASC LIMIT 1)\n                    INNER JOIN pack p ON p.id = cpr.pack_id\n                    WHERE c.code IN (?)\n    \t\t\t\tORDER BY c.code DESC", [$cards_code], [Connection::PARAM_INT_ARRAY])->fetchAllAssociative();
             $params['cards'] = '';
             foreach ($cards as $card) {
                 $params['cards'] .= $this->renderView('Search/card.html.twig', $card);

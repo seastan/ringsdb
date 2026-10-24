@@ -7,6 +7,7 @@ namespace App\Tests\Model;
 use App\Entity\User;
 use App\Model\QuestLogManager;
 use Doctrine\DBAL\Connection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -41,12 +42,12 @@ class QuestLogManagerTest extends KernelTestCase
         static::bootKernel();
         $this->connection = static::$kernel->getContainer()->get('doctrine')->getConnection();
         foreach (['questlog', 'questlog_comment', 'deck'] as $table) {
-            $this->maxIds[$table] = (int) $this->connection->fetchColumn("SELECT MAX(id) FROM $table");
+            $this->maxIds[$table] = (int) $this->connection->fetchOne("SELECT MAX(id) FROM $table");
         }
 
-        $this->fixtureUsers = $this->connection->fetchAll('SELECT id, reputation FROM user');
+        $this->fixtureUsers = $this->connection->fetchAllAssociative('SELECT id, reputation FROM user');
 
-        $admin = (int) $this->connection->fetchColumn("SELECT id FROM user WHERE username = 'admin'");
+        $admin = (int) $this->connection->fetchOne("SELECT id FROM user WHERE username = 'admin'");
         $this->ids = ['Q1' => 1];
         $this->ids['Q2'] = $this->insertQuestlog('PHPUnit Dwarves and Gondor', 1, [1, 2], ['nb_votes' => 12, 'nb_comments' => 3,
             'date_creation' => '2019-12-01 00:00:00', 'date_publish' => '2020-01-01 00:00:00']);
@@ -72,7 +73,7 @@ class QuestLogManagerTest extends KernelTestCase
             "DELETE FROM deckslot WHERE deck_id > {$max['deck']}",
             "DELETE FROM deck WHERE id > {$max['deck']}",
         ] as $sql) {
-            $this->connection->exec($sql);
+            $this->connection->executeStatement($sql);
         }
 
         foreach ($this->fixtureUsers as $user) {
@@ -111,7 +112,7 @@ class QuestLogManagerTest extends KernelTestCase
      */
     private function insertDeck(array $slots): int
     {
-        $row = $this->connection->fetchAssoc('SELECT * FROM deck WHERE id = 2');
+        $row = $this->connection->fetchAssociative('SELECT * FROM deck WHERE id = 2');
         $this->assertNotFalse($row);
         unset($row['id']);
         $this->connection->insert('deck', ['name' => 'PHPUnit Deck'] + $row);
@@ -197,10 +198,7 @@ class QuestLogManagerTest extends KernelTestCase
     }
 
     /* ------------------------------------------------------------- search */
-
-    /**
-     * @dataProvider searchProvider
-     */
+    #[DataProvider('searchProvider')]
     public function testComplexSearch(array $query, array $expected, ?string $username = null): void
     {
         $this->assertSame($expected, $this->names($this->manager($query, $username)->findQuestLogsWithComplexSearch()));
@@ -209,7 +207,7 @@ class QuestLogManagerTest extends KernelTestCase
     /**
      * @return array<string, mixed[]>
      */
-    public function searchProvider(): array
+    public static function searchProvider(): array
     {
         return [
             'no criteria' => [[], ['Q2', 'Q3', 'Q5', 'Q1']],

@@ -8,21 +8,16 @@ use App\Repository\CardRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ZoomController extends AbstractController
 {
-    private CardRepository $cardRepository;
-
     public function __construct(
-        CardRepository $cardRepository
+        private readonly CardRepository $cardRepository
     ) {
-        $this->cardRepository = $cardRepository;
     }
 
-    /**
-     * @Route("/card/{card_code}", name="cards_zoom")
-     */
+    #[Route(path: '/card/{card_code}', name: 'cards_zoom')]
     public function zoomAction(Request $request, string $card_code): Response
     {
         $card = $this->cardRepository->findOneBy(['code' => $card_code]);

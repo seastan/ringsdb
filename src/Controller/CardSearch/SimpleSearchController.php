@@ -8,26 +8,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SimpleSearchController extends AbstractController
 {
-    private CardsData $cardsData;
-
     public function __construct(
-        CardsData $cardsData
+        private readonly CardsData $cardsData
     ) {
-        $this->cardsData = $cardsData;
     }
 
     /**
      * Processes the action of the single card search input.
-     *
-     * @return RedirectResponse|Response
-     *
-     * @Route("/find", name="cards_find")
      */
-    public function findAction(Request $request)
+    #[Route(path: '/find', name: 'cards_find')]
+    public function findAction(Request $request): RedirectResponse|Response
     {
         $q = (string) $request->query->get('q');
         $q = str_replace('t:campaign', 't:treasure', $q);

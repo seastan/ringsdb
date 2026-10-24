@@ -26,15 +26,11 @@ class PrecomputeCardStatsCommand extends Command
 {
     use StringInputTrait;
 
-    private Connection $connection;
-
-    private CardStatsCalculator $cardStats;
-
-    public function __construct(Connection $connection, CardStatsCalculator $cardStats)
-    {
+    public function __construct(
+        private Connection $connection,
+        private CardStatsCalculator $cardStats
+    ) {
         parent::__construct();
-        $this->connection = $connection;
-        $this->cardStats = $cardStats;
     }
 
     protected function configure(): void
@@ -46,7 +42,7 @@ class PrecomputeCardStatsCommand extends Command
             ->addOption('months', null, InputOption::VALUE_REQUIRED, 'Number of consecutive months to (re)compute, ending at the given/last month', 1);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         set_time_limit(0);
         ini_set('memory_limit', '1G');
@@ -70,7 +66,7 @@ class PrecomputeCardStatsCommand extends Command
                 $t = microtime(true);
                 $res = $calc->computeCards($m, (string) $step);
                 $payload = (string) json_encode($res);
-                $dbh->executeUpdate(
+                $dbh->executeStatement(
                     'INSERT INTO stat_cards_cache (month, step, payload, computed_at) VALUES (?, ?, ?, NOW())
                      ON DUPLICATE KEY UPDATE payload = VALUES(payload), computed_at = VALUES(computed_at)',
                     [$m, $step, $payload]

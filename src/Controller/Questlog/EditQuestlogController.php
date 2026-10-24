@@ -13,32 +13,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class EditQuestlogController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private QuestlogRepository $questlogRepository;
-
-    private ScenarioRepository $scenarioRepository;
-
     public function __construct(
-        QuestlogRepository $questlogRepository,
-        ScenarioRepository $scenarioRepository
+        private QuestlogRepository $questlogRepository,
+        private ScenarioRepository $scenarioRepository
     ) {
-        $this->questlogRepository = $questlogRepository;
-        $this->scenarioRepository = $scenarioRepository;
     }
 
-    /**
-     * @Route(
-     *     "/questlog/edit/{questlog_id}",
-     *     name="questlog_edit",
-     *     methods={"GET"},
-     *     requirements={"questlog_id"="\d+"}
-     * )
-     */
+    #[Route(path: '/questlog/edit/{questlog_id}', name: 'questlog_edit', requirements: ['questlog_id' => '\d+'], methods: ['GET'])]
     public function __invoke(int $questlog_id): Response
     {
         $response = new Response();
@@ -55,7 +42,7 @@ class EditQuestlogController extends AbstractController
         }
 
         /* @var $quests Scenario[] */
-        $quests = $this->scenarioRepository->findBy([], ['position' => 'ASC']);
+        $quests = $this->scenarioRepository->findBy([], ['position' => \SortDirection::Ascending]);
         $is_locked_as_public = $questlog->getNbVotes() > 0 || $questlog->getNbFavorites() > 0 || $questlog->getNbComments() > 0;
         $data = ['quests' => $quests, 'pagetitle' => 'Edit Quest Log', 'deck1' => null, 'deck2' => null, 'deck3' => null, 'deck4' => null, 'questlogdeck1_content' => null, 'questlogdeck2_content' => null, 'questlogdeck3_content' => null, 'questlogdeck4_content' => null, 'questlogdeck1_player_name' => null, 'questlogdeck2_player_name' => null, 'questlogdeck3_player_name' => null, 'questlogdeck4_player_name' => null, 'questlog' => $questlog, 'is_locked_as_public' => $is_locked_as_public, 'nbDecks' => $questlog->getNbDecks()];
         /* @var $questlog_decks \App\Entity\QuestlogDeck[] */

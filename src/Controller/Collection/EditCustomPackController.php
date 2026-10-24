@@ -8,28 +8,18 @@ use App\Controller\CurrentUserTrait;
 use App\Services\CustomPackManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class EditCustomPackController extends AbstractController
 {
     use CurrentUserTrait;
 
-    private CustomPackManager $customPackManager;
-
     public function __construct(
-        CustomPackManager $customPackManager
+        private CustomPackManager $customPackManager
     ) {
-        $this->customPackManager = $customPackManager;
     }
 
-    /**
-     * @Route(
-     *     "/collection/custom-pack/{id}/edit",
-     *     name="collection_custom_pack_edit",
-     *     methods={"GET"},
-     *     requirements={"id"="\d+"}
-     * )
-     */
+    #[Route(path: '/collection/custom-pack/{id}/edit', name: 'collection_custom_pack_edit', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function __invoke(int $id): Response
     {
         $pack = $this->customPackManager->loadOwnedPack($this->currentUser(), $id);

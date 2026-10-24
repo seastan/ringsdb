@@ -12,39 +12,23 @@ use App\Repository\FellowshipRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class PublishFormFellowshipController extends AbstractController
 {
-    private FellowshipValidationHelper $fellowshipValidationHelper;
-
-    private DecklistRepository $decklistRepository;
-
-    private FellowshipRepository $fellowshipRepository;
-
     public function __construct(
-        FellowshipValidationHelper $fellowshipValidationHelper,
-        DecklistRepository $decklistRepository,
-        FellowshipRepository $fellowshipRepository
+        private readonly FellowshipValidationHelper $fellowshipValidationHelper,
+        private readonly DecklistRepository $decklistRepository,
+        private readonly FellowshipRepository $fellowshipRepository
     ) {
-        $this->fellowshipValidationHelper = $fellowshipValidationHelper;
-        $this->decklistRepository = $decklistRepository;
-        $this->fellowshipRepository = $fellowshipRepository;
     }
 
-    /**
-     * @Route(
-     *     "/fellowship/publish/{fellowship_id}",
-     *     name="fellowship_publish_form",
-     *     methods={"GET"},
-     *     requirements={"fellowship_id"="\d+"}
-     * )
-     */
+    #[Route(path: '/fellowship/publish/{fellowship_id}', name: 'fellowship_publish_form', requirements: ['fellowship_id' => '\d+'], methods: ['GET'])]
     public function __invoke(int $fellowship_id): Response
     {
         /* @var $user User */
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             throw new AccessDeniedHttpException('You must be logged in for this operation.');
         }
 
@@ -56,13 +40,13 @@ class PublishFormFellowshipController extends AbstractController
 
         $problem = $this->fellowshipValidationHelper->findProblem($fellowship);
         if ($problem) {
-            $this->get('session')->getFlashBag()->set('error', 'This fellowship cannot be published because it is invalid.');
+            $this->addFlash('error', 'This fellowship cannot be published because it is invalid.');
 
             return $this->redirect($this->generateUrl('fellowship_view', ['fellowship_id' => $fellowship->getId()]));
         }
 
         if ($fellowship->getIsPublic()) {
-            $this->get('session')->getFlashBag()->set('error', 'This fellowship is already published.');
+            $this->addFlash('error', 'This fellowship is already published.');
 
             return $this->redirect($this->generateUrl('fellowship_view', ['fellowship_id' => $fellowship->getId()]));
         }

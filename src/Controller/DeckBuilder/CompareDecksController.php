@@ -10,30 +10,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class CompareDecksController extends AbstractController
 {
-    private DeckRepository $deckRepository;
-
-    private Diff $diffService;
-
     public function __construct(
-        DeckRepository $deckRepository,
-        Diff $diffService
+        private readonly DeckRepository $deckRepository,
+        private readonly Diff $diffService
     ) {
-        $this->deckRepository = $deckRepository;
-        $this->diffService = $diffService;
     }
 
-    /**
-     * @Route(
-     *     "/deck/compare/{deck1_id}/{deck2_id}",
-     *     name="decks_diff",
-     *     methods={"GET"},
-     *     requirements={"deck1_id"="\d+", "deck2_id"="\d+"}
-     * )
-     */
+    #[Route(path: '/deck/compare/{deck1_id}/{deck2_id}', name: 'decks_diff', requirements: ['deck1_id' => '\d+', 'deck2_id' => '\d+'], methods: ['GET'])]
     public function __invoke(int $deck1_id, int $deck2_id): Response
     {
         /* @var $deck1 \App\Entity\Deck */
@@ -44,12 +31,12 @@ class CompareDecksController extends AbstractController
             throw new NotFoundHttpException("This deck doesn't exist.");
         }
 
-        $is_owner = $this->getUser() && $this->getUser()->getId() == $deck1->getUser()->getId();
+        $is_owner = $this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface && $this->getUser()->getId() == $deck1->getUser()->getId();
         if (!$deck1->getUser()->getIsShareDecks() && !$is_owner) {
             throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
         }
 
-        $is_owner = $this->getUser() && $this->getUser()->getId() == $deck2->getUser()->getId();
+        $is_owner = $this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface && $this->getUser()->getId() == $deck2->getUser()->getId();
         if (!$deck2->getUser()->getIsShareDecks() && !$is_owner) {
             throw new AccessDeniedHttpException('You are not allowed to view this deck. To get access, you can ask the deck owner to enable "Share my decks" on their account.');
         }

@@ -9,25 +9,21 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * FellowshipComment.
- *
- * @ORM\Entity(repositoryClass="App\Repository\FellowshipCommentRepository")
- * @ORM\Table(name="fellowshipcomment")
  */
+#[ORM\Entity(repositoryClass: \App\Repository\FellowshipCommentRepository::class)]
+#[ORM\Table(name: 'fellowshipcomment')]
 class FellowshipComment
 {
     /**
      * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
-    /**
-     * @ORM\Column(name="date_creation", type="datetime", nullable=false)
-     * @Gedmo\Timestampable(on="create")
-     */
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name: 'date_creation', type: 'datetime', nullable: false)]
     private \DateTime $dateCreation;
 
     /**
@@ -36,34 +32,21 @@ class FellowshipComment
     private $dateUpdate;
 
     /**
-     * @ORM\Column(type="text")
-     */
-    private string $text;
-
-    /**
      * @var bool
-     *
-     * @ORM\Column(name="is_hidden", type="boolean")
      */
+    #[ORM\Column(name: 'is_hidden', type: 'boolean')]
     private $isHidden = false;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="fellowship_comments")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
-     */
-    private User $user;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Fellowship", inversedBy="comments")
-     * @ORM\JoinColumn(name="fellowship_id", referencedColumnName="id", nullable=false)
-     */
-    private Fellowship $fellowship;
-
-    public function __construct(User $user, Fellowship $fellowship, string $text)
-    {
-        $this->user = $user;
-        $this->fellowship = $fellowship;
-        $this->text = $text;
+    public function __construct(
+        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'fellowship_comments')]
+        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+        private User $user,
+        #[ORM\ManyToOne(targetEntity: Fellowship::class, inversedBy: 'comments')]
+        #[ORM\JoinColumn(name: 'fellowship_id', referencedColumnName: 'id', nullable: false)]
+        private Fellowship $fellowship,
+        #[ORM\Column(type: 'text')]
+        private string $text
+    ) {
         $this->dateCreation = new \DateTime();
     }
 

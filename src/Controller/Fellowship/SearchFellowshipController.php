@@ -10,38 +10,27 @@ use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SearchFellowshipController extends AbstractController
 {
-    private int $cacheExpiration;
-
-    private Connection $connection;
-
-    private CycleRepository $cycleRepository;
-
     public function __construct(
-        int $cacheExpiration,
-        Connection $connection,
-        CycleRepository $cycleRepository
+        private readonly int $cacheExpiration,
+        private readonly Connection $connection,
+        private readonly CycleRepository $cycleRepository
     ) {
-        $this->cacheExpiration = $cacheExpiration;
-        $this->connection = $connection;
-        $this->cycleRepository = $cycleRepository;
     }
 
-    /**
-     * @Route("/fellowships/search", name="fellowships_searchform", methods={"GET"}, priority="2")
-     */
+    #[Route(path: '/fellowships/search', name: 'fellowships_searchform', methods: ['GET'], priority: 2)]
     public function __invoke(Request $request): Response
     {
         $response = new Response();
         $response->setPublic();
         $response->setMaxAge($this->cacheExpiration);
 
-        $spheres = $this->connection->executeQuery('SELECT s.name, s.code FROM sphere s ORDER BY s.name ASC')->fetchAll();
+        $spheres = $this->connection->executeQuery('SELECT s.name, s.code FROM sphere s ORDER BY s.name ASC')->fetchAllAssociative();
         $owned_packs = '';
-        if ($this->getUser()) {
+        if ($this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             $owned_packs = $this->getUser()->getOwnedPacks();
         }
 
@@ -57,14 +46,14 @@ class SearchFellowshipController extends AbstractController
                 }
             }
         } else {
-            $packs = $this->connection->executeQuery('SELECT id FROM pack WHERE date_release IS NOT NULL')->fetchAll(\PDO::FETCH_COLUMN);
+            $packs = $this->connection->executeQuery('SELECT id FROM pack WHERE date_release IS NOT NULL')->fetchFirstColumn();
         }
 
         $categories = [];
         $on = 0;
         $off = 0;
         $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
-        $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
+        $list_cycles = $this->cycleRepository->findBy([], ['position' => \SortDirection::Ascending]);
         foreach ($list_cycles as $cycle) {
             /* @var $cycle Cycle */
             $size = count($cycle->getPacks());

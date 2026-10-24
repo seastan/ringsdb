@@ -11,15 +11,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ChangePasswordController extends AbstractController
 {
     use CurrentUserTrait;
 
-    /**
-     * @Route("/profile/change-password", name="fos_user_change_password", methods={"GET", "POST"})
-     */
+    #[Route(path: '/profile/change-password', name: 'fos_user_change_password', methods: ['GET', 'POST'])]
     public function __invoke(
         Request $request,
         UserPasswordUpdater $passwordUpdater,
