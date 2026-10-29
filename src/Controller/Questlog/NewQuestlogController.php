@@ -26,7 +26,7 @@ class NewQuestlogController extends AbstractController
     }
 
     #[Route(path: '/questlog/new/{public}/{deck1_id}/{deck2_id}/{deck3_id}/{deck4_id}', name: 'questlog_new', requirements: ['public' => '\d+', 'deck1_id' => '\d+', 'deck2_id' => '\d+', 'deck3_id' => '\d+', 'deck4_id' => '\d+'], defaults: ['public' => 0, 'deck1_id' => null, 'deck2_id' => null, 'deck3_id' => null, 'deck4_id' => null], methods: ['GET'])]
-    public function __invoke(int $deck1_id, int $deck2_id, int $deck3_id, int $deck4_id, int $public): Response
+    public function __invoke(?int $deck1_id, ?int $deck2_id, ?int $deck3_id, ?int $deck4_id, int $public): Response
     {
         $response = new Response();
         /* @var $quests Scenario[] */
