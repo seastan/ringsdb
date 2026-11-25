@@ -42,7 +42,7 @@ class RemoveUserCommand extends Command
         $user_id = $input->getArgument('user_id');
         $user = $this->userRepository->find($user_id);
 
-        if (!$user) {
+        if (!$user instanceof \App\Entity\User) {
             $output->writeln('User not found');
 
             return 1;

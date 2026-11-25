@@ -12,7 +12,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Entity(repositoryClass: \App\Repository\PackRepository::class)]
 #[ORM\Cache(usage: 'NONSTRICT_READ_WRITE', region: 'entity_region')]
 #[ORM\Table(name: 'pack')]
-#[ORM\Index(columns: ['date_release'], name: 'idx_pack_date_release')]
+#[ORM\Index(name: 'idx_pack_date_release', columns: ['date_release'])]
 #[ORM\UniqueConstraint(name: 'pack_code_idx', columns: ['code'])]
 class Pack
 {
@@ -77,7 +77,7 @@ class Pack
     /**
      * @var Collection<int, CardPrinting>
      */
-    #[ORM\OneToMany(mappedBy: 'pack', targetEntity: CardPrinting::class)]
+    #[ORM\OneToMany(targetEntity: CardPrinting::class, mappedBy: 'pack')]
     #[ORM\OrderBy(['position' => \SortDirection::Ascending])]
     private $printings;
 

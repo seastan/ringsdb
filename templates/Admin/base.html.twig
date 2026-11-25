@@ -5,7 +5,7 @@
         <ol class="breadcrumb">
             <li><a href="{{ path('index') }}">Index</a></li>
             <li><a href="{{ path('admin') }}">Admin</a></li>
-            <li class="active">{{ app.request.get('_route') }}</li>
+            <li class="active">{{ app.request.attributes.get('_route') }}</li>
         </ol>
         {% block content %}{% endblock %}
     </div>

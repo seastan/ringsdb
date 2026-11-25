@@ -25,7 +25,7 @@ class ChangePasswordFormType extends AbstractType
                 'label' => 'Current password',
                 'mapped' => false,
                 'constraints' => [
-                    new NotBlank(['groups' => ['ChangePassword']]),
+                    new NotBlank(groups: ['ChangePassword']),
                     new UserPassword(['message' => 'The entered password is invalid.', 'groups' => ['ChangePassword']]),
                 ],
                 'attr' => ['autocomplete' => 'current-password'],

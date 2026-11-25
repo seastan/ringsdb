@@ -275,7 +275,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertSame(405, $client->getResponse()->getStatusCode());
     }
 
-    /* ------------------------------------------ endpoints outside ApiController */
+    /* ------------------------------------------ endpoints outside the public API */
 
     public function testPublishedCustomPacks(): void
     {

@@ -286,6 +286,10 @@ class Deck extends ExportableDeck implements \JsonSerializable
     #[ORM\OrderBy(['dateCreation' => \SortDirection::Descending, 'isSaved' => \SortDirection::Descending])]
     private $changes;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'decks')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    private User $user;
+
     #[ORM\ManyToOne(targetEntity: Pack::class)]
     #[ORM\JoinColumn(name: 'last_pack_id', referencedColumnName: 'id')]
     private ?Pack $lastPack = null;
@@ -309,11 +313,9 @@ class Deck extends ExportableDeck implements \JsonSerializable
     /**
      * Constructor.
      */
-    public function __construct(
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'decks')]
-        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
-        private User $user
-    ) {
+    public function __construct(User $user)
+    {
+        $this->user = $user;
         $this->slots = new ArrayCollection();
         $this->sideslots = new ArrayCollection();
         $this->children = new ArrayCollection();

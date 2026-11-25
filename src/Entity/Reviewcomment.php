@@ -36,16 +36,22 @@ class Reviewcomment
     #[ORM\Column(name: 'date_update', type: 'datetime', nullable: false)]
     private $dateUpdate;
 
-    public function __construct(
-        #[ORM\ManyToOne(targetEntity: User::class)]
-        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
-        private User $user,
-        #[ORM\ManyToOne(targetEntity: Review::class, inversedBy: 'comments')]
-        #[ORM\JoinColumn(name: 'review_id', referencedColumnName: 'id', nullable: false)]
-        private Review $review,
-        #[ORM\Column(type: 'text', nullable: false)]
-        private string $text
-    ) {
+    #[ORM\Column(type: 'text', nullable: false)]
+    private string $text;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    private User $user;
+
+    #[ORM\ManyToOne(targetEntity: Review::class, inversedBy: 'comments')]
+    #[ORM\JoinColumn(name: 'review_id', referencedColumnName: 'id', nullable: false)]
+    private Review $review;
+
+    public function __construct(User $user, Review $review, string $text)
+    {
+        $this->user = $user;
+        $this->review = $review;
+        $this->text = $text;
     }
 
     /**

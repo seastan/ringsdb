@@ -47,11 +47,11 @@ class PatronCommand extends Command
         $repo = $this->userRepository;
         $user = $repo->findOneBy(['email' => $email]);
 
-        if (!$user) {
+        if (!$user instanceof \App\Entity\User) {
             $user = $repo->findOneBy(['username' => $email]);
         }
 
-        if ($user) {
+        if ($user instanceof \App\Entity\User) {
             if ($donation) {
                 $user->setDonation($donation + $user->getDonation());
                 $this->entityManager->flush();

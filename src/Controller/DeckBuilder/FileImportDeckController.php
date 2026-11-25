@@ -4,26 +4,37 @@ declare(strict_types=1);
 
 namespace App\Controller\DeckBuilder;
 
+use App\Controller\CurrentUserTrait;
 use App\Helper\StringSanitizer;
+use App\Model\FileImportDeckDto;
 use App\Services\DeckImporter;
+use App\Services\DeckSaver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Attribute\MapUploadedFile;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 class FileImportDeckController extends AbstractController
 {
+    use CurrentUserTrait;
+
     public function __construct(
-        private readonly DeckImporter $deckImporter
+        private readonly DeckImporter $deckImporter,
+        private readonly DeckSaver $deckSaver
     ) {
     }
 
     #[Route(path: '/deck/fileimport', name: 'deck_fileimport', methods: ['POST'])]
-    public function __invoke(Request $request): Response
-    {
-        $filetype = StringSanitizer::sanitize($request->get('type'));
-        $uploadedFile = $request->files->get('upfile');
+    public function __invoke(
+        #[MapRequestPayload]
+        FileImportDeckDto $payload = new FileImportDeckDto(),
+        #[MapUploadedFile(name: 'upfile')]
+        ?UploadedFile $uploadedFile = null,
+    ): Response {
+        $filetype = StringSanitizer::sanitize($payload->type);
         if (!isset($uploadedFile)) {
             throw new UnprocessableEntityHttpException('No file uploaded');
         }
@@ -47,12 +58,19 @@ class FileImportDeckController extends AbstractController
             throw new \RuntimeException('Cannot read from uploaded file '.$filename);
         }
 
-        if ('octgn' === $filetype || 'auto' === $filetype && 'o8d' == $origext) {
+        if ('octgn' === $filetype || 'auto' === $filetype && 'o8d' === $origext) {
             $parse = $this->deckImporter->parseOctgnImport($contents);
         } else {
             $parse = $this->deckImporter->parseTextImport($contents);
         }
 
-        return $this->forward(SaveDeckController::class, ['name' => str_replace(".{$origext}", '', $origname), 'content' => json_encode($parse['content']), 'description' => $parse['description']]);
+        $this->deckSaver->save(
+            $this->currentUser(),
+            $parse['content'],
+            str_replace(".{$origext}", '', $origname),
+            $parse['description']
+        );
+
+        return $this->redirectToRoute('decks_list');
     }
 }

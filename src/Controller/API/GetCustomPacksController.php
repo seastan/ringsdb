@@ -24,7 +24,7 @@ class GetCustomPacksController extends AbstractController
             return new JsonResponse([], 401);
         }
 
-        $packs = $this->userCustomPackRepository->findBy(['user' => $user], ['createdAt' => \SortDirection::Ascending, 'id' => \SortDirection::Ascending]);
+        $packs = $this->userCustomPackRepository->findBy(['user' => $user], ['createdAt' => 'ASC', 'id' => 'ASC']);
         $result = [];
         foreach ($packs as $pack) {
             $cards = [];

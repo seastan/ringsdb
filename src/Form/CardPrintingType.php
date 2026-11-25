@@ -27,7 +27,7 @@ class CardPrintingType extends AbstractType
             ->add('card', EntityType::class, [
                 'class' => Card::class,
                 'choice_label' => 'adminLabel',
-                'query_builder' => function (EntityRepository $er) use ($filterPack) {
+                'query_builder' => function (EntityRepository $er) use ($filterPack): \Doctrine\ORM\QueryBuilder {
                     $qb = $er->createQueryBuilder('c')
                         ->join('c.sphere', 's')
                         ->join('c.type', 't')

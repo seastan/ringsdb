@@ -95,21 +95,25 @@ class Fellowship
     /**
      * @var Collection<int, FellowshipDeck>
      */
-    #[ORM\OneToMany(mappedBy: 'fellowship', targetEntity: FellowshipDeck::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: FellowshipDeck::class, mappedBy: 'fellowship', cascade: ['persist', 'remove'])]
     private $decks;
 
     /**
      * @var Collection<int, FellowshipDecklist>
      */
-    #[ORM\OneToMany(mappedBy: 'fellowship', targetEntity: FellowshipDecklist::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: FellowshipDecklist::class, mappedBy: 'fellowship', cascade: ['persist', 'remove'])]
     private $decklists;
 
     /**
      * @var Collection<int, FellowshipComment>
      */
-    #[ORM\OneToMany(mappedBy: 'fellowship', targetEntity: FellowshipComment::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: FellowshipComment::class, mappedBy: 'fellowship', cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['dateCreation' => \SortDirection::Ascending])]
     private $comments;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'fellowships')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    private User $user;
 
     /**
      * @var Collection<int, User>
@@ -128,11 +132,9 @@ class Fellowship
     /**
      * Constructor.
      */
-    public function __construct(
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'fellowships')]
-        #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
-        private User $user
-    ) {
+    public function __construct(User $user)
+    {
+        $this->user = $user;
         $this->decks = new ArrayCollection();
         $this->decklists = new ArrayCollection();
         $this->comments = new ArrayCollection();

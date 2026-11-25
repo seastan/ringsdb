@@ -12,15 +12,16 @@ use App\Entity\FellowshipDeck;
 use App\Entity\FellowshipDecklist;
 use App\Entity\User;
 use App\Helper\StringSanitizer;
+use App\Model\SaveFellowshipDto;
 use App\Repository\DecklistRepository;
 use App\Repository\DeckRepository;
 use App\Repository\FellowshipRepository;
-use App\Services\Decks;
+use App\Services\DeckSaver;
 use App\Services\Texts;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -33,7 +34,7 @@ class SaveFellowshipController extends AbstractController
     public function __construct(
         private EntityManagerInterface $entityManager,
         private Texts $texts,
-        private Decks $decks,
+        private DeckSaver $deckSaver,
         private DeckRepository $deckRepository,
         private DecklistRepository $decklistRepository,
         private FellowshipRepository $fellowshipRepository
@@ -41,15 +42,15 @@ class SaveFellowshipController extends AbstractController
     }
 
     #[Route(path: '/fellowship/save', name: 'fellowship_save', methods: ['POST'])]
-    public function __invoke(Request $request): RedirectResponse
+    public function __invoke(#[MapRequestPayload] SaveFellowshipDto $payload = new SaveFellowshipDto()): RedirectResponse
     {
         /* @var $user User */
         $user = $this->currentUser();
-        $fellowship_id = intval(filter_var($request->request->get('fellowship_id'), FILTER_SANITIZE_NUMBER_INT));
+        $fellowship_id = intval(filter_var($payload->fellowshipId, FILTER_SANITIZE_NUMBER_INT));
         if ($fellowship_id) {
             /* @var $fellowship \App\Entity\Fellowship */
             $fellowship = $this->fellowshipRepository->find($fellowship_id);
-            if (!$fellowship) {
+            if (!$fellowship instanceof Fellowship) {
                 throw new NotFoundHttpException('This fellowship does not exists.');
             }
 
@@ -60,14 +61,14 @@ class SaveFellowshipController extends AbstractController
             $fellowship = new Fellowship($user);
         }
 
-        $name = trim(StringSanitizer::sanitize($request->request->get('name'), false));
+        $name = trim(StringSanitizer::sanitize($payload->name, false));
         $name = substr($name, 0, 60);
         if (empty($name)) {
             $name = 'Untitled Fellowship';
         }
 
-        $auto_publish = boolval(filter_var($request->request->get('auto_publish'), FILTER_SANITIZE_NUMBER_INT));
-        $descriptionMd = trim((string) $request->request->get('descriptionMd'));
+        $auto_publish = boolval(filter_var($payload->autoPublish, FILTER_SANITIZE_NUMBER_INT));
+        $descriptionMd = trim((string) $payload->descriptionMd);
         $descriptionHtml = $this->texts->markdown($descriptionMd);
         $fellowship->setName($name);
         $fellowship->setNameCanonical($this->texts->slugify($name));
@@ -90,13 +91,13 @@ class SaveFellowshipController extends AbstractController
             $nb_decks = 0;
             $skip = 0;
             for ($i = 1; $i <= 4; ++$i) {
-                $deck_id = intval(filter_var($request->request->get('deck'.$i.'_id'), FILTER_SANITIZE_NUMBER_INT));
-                $is_decklist = 'true' === StringSanitizer::sanitize($request->get('deck'.$i.'_is_decklist'));
+                $deck_id = intval(filter_var($payload->deckId($i), FILTER_SANITIZE_NUMBER_INT));
+                $is_decklist = 'true' === StringSanitizer::sanitize($payload->deckIsDecklist($i));
                 if ($deck_id) {
                     if (!$is_decklist) {
                         /* @var $deck Deck */
                         $deck = $this->deckRepository->find($deck_id);
-                        if (!$deck) {
+                        if (!$deck instanceof Deck) {
                             throw new NotFoundHttpException('One of the selected decks does not exists.');
                         }
 
@@ -106,7 +107,7 @@ class SaveFellowshipController extends AbstractController
                         }
 
                         if (!$is_owner) {
-                            $deck = $this->decks->cloneDeck($deck, $user);
+                            $deck = $this->deckSaver->cloneDeck($user, $deck);
                         }
 
                         $fellowship_deck = new FellowshipDeck($fellowship, $deck, $i - $skip);
@@ -114,7 +115,7 @@ class SaveFellowshipController extends AbstractController
                     } else {
                         /* @var $decklist Decklist */
                         $decklist = $this->decklistRepository->find($deck_id);
-                        if (!$decklist) {
+                        if (!$decklist instanceof Decklist) {
                             throw new NotFoundHttpException('One of the selected decks does not exists.');
                         }
 

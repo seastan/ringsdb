@@ -73,7 +73,7 @@ class CardsData
      */
     public function allSetsData(): array
     {
-        $list_cycles = $this->cycleRepository->findBy([], ['position' => \SortDirection::Ascending]);
+        $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
         $cycles = [];
 
         foreach ($list_cycles as $cycle) {
@@ -124,7 +124,7 @@ class CardsData
      */
     public function getPrimarySpheres(): array
     {
-        return $this->sphereRepository->findBy(['is_primary' => true], ['code' => \SortDirection::Ascending]);
+        return $this->sphereRepository->findBy(['is_primary' => true], ['code' => 'ASC']);
     }
 
     /**
@@ -677,7 +677,7 @@ class CardsData
      */
     public function getReviews(Card $card): array
     {
-        return $this->reviewRepository->findBy(['card' => $card], ['nbVotes' => \SortDirection::Descending, 'id' => \SortDirection::Ascending]);
+        return $this->reviewRepository->findBy(['card' => $card], ['nbVotes' => 'DESC', 'id' => 'ASC']);
     }
 
     /**

@@ -10,8 +10,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Entity(repositoryClass: \App\Repository\CardPrintingRepository::class)]
 #[ORM\Cache(usage: 'NONSTRICT_READ_WRITE', region: 'entity_region')]
 #[ORM\Table(name: 'card_printing')]
-#[ORM\Index(columns: ['card_id'], name: 'card_printing_card_idx')]
-#[ORM\Index(columns: ['pack_id'], name: 'card_printing_pack_idx')]
+#[ORM\Index(name: 'card_printing_card_idx', columns: ['card_id'])]
+#[ORM\Index(name: 'card_printing_pack_idx', columns: ['pack_id'])]
 class CardPrinting
 {
     /**

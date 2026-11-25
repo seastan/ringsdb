@@ -177,27 +177,27 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
     /**
      * @var Collection<int, Deck>
      */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Deck::class, cascade: ['remove'])]
+    #[ORM\OneToMany(targetEntity: Deck::class, mappedBy: 'user', cascade: ['remove'])]
     #[ORM\OrderBy(['dateUpdate' => \SortDirection::Descending])]
     private $decks;
 
     /**
      * @var Collection<int, Decklist>
      */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Decklist::class)]
+    #[ORM\OneToMany(targetEntity: Decklist::class, mappedBy: 'user')]
     private $decklists;
 
     /**
      * @var Collection<int, Comment>
      */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Comment::class)]
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'user')]
     #[ORM\OrderBy(['dateCreation' => \SortDirection::Descending])]
     private $comments;
 
     /**
      * @var Collection<int, Review>
      */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Review::class)]
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'user')]
     #[ORM\OrderBy(['dateCreation' => \SortDirection::Descending])]
     private $reviews;
 
@@ -299,7 +299,11 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
 
     public function getUserIdentifier(): string
     {
-        return (string) $this->username;
+        if (null === $this->username || '' === $this->username) {
+            throw new \LogicException('The user has no username.');
+        }
+
+        return $this->username;
     }
 
     public function getUsername(): string
@@ -1069,7 +1073,7 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
     /**
      * @var Collection<int, Fellowship>
      */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Fellowship::class, cascade: ['remove'])]
+    #[ORM\OneToMany(targetEntity: Fellowship::class, mappedBy: 'user', cascade: ['remove'])]
     #[ORM\OrderBy(['dateUpdate' => \SortDirection::Descending])]
     private $fellowships;
 
@@ -1121,7 +1125,7 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
     /**
      * @var Collection<int, FellowshipComment>
      */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: FellowshipComment::class)]
+    #[ORM\OneToMany(targetEntity: FellowshipComment::class, mappedBy: 'user')]
     #[ORM\OrderBy(['dateCreation' => \SortDirection::Descending])]
     private $fellowship_comments;
 
@@ -1224,14 +1228,14 @@ class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface, E
     /**
      * @var Collection<int, Questlog>
      */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Questlog::class, cascade: ['remove'])]
+    #[ORM\OneToMany(targetEntity: Questlog::class, mappedBy: 'user', cascade: ['remove'])]
     #[ORM\OrderBy(['dateUpdate' => \SortDirection::Descending])]
     private $questlogs;
 
     /**
      * @var Collection<int, QuestlogComment>
      */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: QuestlogComment::class)]
+    #[ORM\OneToMany(targetEntity: QuestlogComment::class, mappedBy: 'user')]
     #[ORM\OrderBy(['dateCreation' => \SortDirection::Descending])]
     private $questlog_comments;
 

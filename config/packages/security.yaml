@@ -30,8 +30,19 @@ security:
             # logged-in user. `context: main` shares the session login token with the main
             # firewall (which does the form-login / remember-me). `lazy: true` keeps anonymous
             # requests session-free (no Set-Cookie) so they stay anonymous-FastCGI-cacheable.
+            # `remember_me` (same secret as main) lets the user/info call authenticate a visitor
+            # who has only a long-lived REMEMBERME cookie but no session yet (e.g. a new browser
+            # session): it validates the cookie, bootstraps the shared `main` session, and the
+            # header/dark-mode then render logged-in on the cached homepage. Anonymous visitors
+            # carry no REMEMBERME cookie, so the authenticator never fires for them and they stay
+            # session-free / FastCGI-cacheable.
             context: main
             lazy:    true
+            remember_me:
+                secret:   '%env(APP_SECRET)%'
+                lifetime: 31536000 # 365 days, matching the main firewall so the same cookie validates
+                path:     /
+                domain:   ~
 
         main:
             pattern:    ^/

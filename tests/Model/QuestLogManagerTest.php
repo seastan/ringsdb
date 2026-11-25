@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Model;
 
 use App\Entity\User;
-use App\Model\QuestLogManager;
+use App\Services\QuestLogManager;
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -131,7 +131,7 @@ class QuestLogManagerTest extends KernelTestCase
     {
         $container = static::$kernel->getContainer();
         $container->get('request_stack')->push(Request::create('/questlogs/find', 'GET', $query));
-        $manager = $container->get('questlog_manager');
+        $manager = self::getContainer()->get(QuestLogManager::class);
         if ($username) {
             $manager->setUser($this->user($username));
         }

@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Controller\DeckBuilder;
 
 use App\Controller\CurrentUserTrait;
+use App\Model\DeleteListDto;
 use App\Repository\DeckRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
 class DeleteListController extends AbstractController
@@ -23,13 +24,13 @@ class DeleteListController extends AbstractController
     }
 
     #[Route(path: '/deck/delete_list', name: 'deck_delete_list', methods: ['POST'])]
-    public function __invoke(Request $request): RedirectResponse
+    public function __invoke(#[MapRequestPayload] DeleteListDto $payload = new DeleteListDto()): RedirectResponse
     {
-        $list_id = explode('-', $request->get('ids'));
+        $list_id = explode('-', $payload->ids);
         foreach ($list_id as $id) {
             /* @var $deck \App\Entity\Deck */
             $deck = $this->deckRepository->find($id);
-            if (!$deck) {
+            if (!$deck instanceof \App\Entity\Deck) {
                 continue;
             }
 
