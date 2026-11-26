@@ -1,6 +1,9 @@
 # Quest log deck snapshots are rebuilt on every request
 
-Status: open, deferred to a later rework of quest logs.
+Status: open, deferred to a later rework of quest logs. The performance part is mitigated: the
+snapshots of a list page are now rebuilt in 4 queries in all, and only for the quest log decks
+without a decklist (see [questlog-list-optimization.md](questlog-list-optimization.md)). The
+description below is the state before that change.
 
 ## Problem
 
@@ -28,7 +31,9 @@ only use the **heroes** of each deck (thumbnail, name, sphere), through
 The public lists are HTTP-cached (`max-age`), which limits the cost on popular / recent; the
 private lists (favorites, mine, `myquestlogs_list`) are not.
 
-These figures come from reading the code, not from a measurement.
+These figures come from reading the code. Measured since on the test fixtures: about 3,050 of the
+3,218 queries of `/questlogs/popular` came from the snapshots
+([questlog-list-optimization.md](questlog-list-optimization.md)).
 
 The work is also partly useless: when the `QuestlogDeck` points to a `Decklist`, the template
 displays the `Decklist` and ignores `deck`, which `setSlots()` has just rewritten.

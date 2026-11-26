@@ -77,6 +77,7 @@ class Pack
     /**
      * @var Collection<int, CardPrinting>
      */
+    #[ORM\Cache(usage: 'NONSTRICT_READ_WRITE')]
     #[ORM\OneToMany(targetEntity: CardPrinting::class, mappedBy: 'pack')]
     #[ORM\OrderBy(['position' => \SortDirection::Ascending])]
     private $printings;

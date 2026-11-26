@@ -24,6 +24,8 @@ use Symfony\Component\HttpFoundation\Request;
  * Unlike fellowships, the search by card or pack goes through the quest log's decks (not
  * decklists). Popularity is (1 + votes) / (1 + days since publication²): the order of these
  * items does not change over time.
+ *
+ * The quest logs of VolumeFixtures (published in 2014) are left out of the results compared.
  */
 class QuestLogManagerTest extends KernelTestCase
 {
@@ -132,6 +134,8 @@ class QuestLogManagerTest extends KernelTestCase
         $container = static::$kernel->getContainer();
         $container->get('request_stack')->push(Request::create('/questlogs/find', 'GET', $query));
         $manager = self::getContainer()->get(QuestLogManager::class);
+        // a single page, whatever the number of quest logs of VolumeFixtures
+        $manager->setLimit(1000);
         if ($username) {
             $manager->setUser($this->user($username));
         }
@@ -148,14 +152,16 @@ class QuestLogManagerTest extends KernelTestCase
     }
 
     /**
-     * @return string[] the names (Q1...Q5) of the quest logs found, in order
+     * @return string[] the names (Q1...Q5) of the quest logs found, in order, without the others
      */
     private function names(\Doctrine\ORM\Tools\Pagination\Paginator $paginator): array
     {
         $names = array_flip($this->ids);
         $result = [];
         foreach ($paginator as $questlog) {
-            $result[] = $names[$questlog->getId()];
+            if (isset($names[$questlog->getId()])) {
+                $result[] = $names[$questlog->getId()];
+            }
         }
 
         return $result;
@@ -186,8 +192,10 @@ class QuestLogManagerTest extends KernelTestCase
         $list = $manager->findQuestLogsByAge();
 
         $this->assertSame(['Q5', 'Q1'], $this->names($list));
-        $this->assertSame(4, $manager->getMaxCount());
-        $this->assertSame(2, $manager->getNumberOfPages());
+        $this->assertCount(2, $list->getIterator());
+        $public = (int) $this->connection->fetchOne('SELECT COUNT(*) FROM questlog WHERE is_public = 1');
+        $this->assertSame($public, $manager->getMaxCount());
+        $this->assertSame((int) ceil($public / 2), $manager->getNumberOfPages());
     }
 
     public function testEmptyList(): void

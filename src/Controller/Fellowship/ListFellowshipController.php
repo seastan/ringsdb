@@ -8,6 +8,8 @@ use App\Entity\Cycle;
 use App\Helper\StringSanitizer;
 use App\Model\FellowshipSearchDto;
 use App\Repository\CycleRepository;
+use App\Repository\DecklistRepository;
+use App\Repository\FellowshipRepository;
 use App\Services\FellowshipManager;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,6 +24,8 @@ class ListFellowshipController extends AbstractController
         private readonly int $cacheExpiration,
         private readonly FellowshipManager $fellowshipManager,
         private readonly CycleRepository $cycleRepository,
+        private readonly FellowshipRepository $fellowshipRepository,
+        private readonly DecklistRepository $decklistRepository,
         private readonly Connection $connection
     ) {
     }
@@ -85,7 +89,11 @@ class ListFellowshipController extends AbstractController
                 break;
         }
 
-        return $this->render('Fellowship/public-fellowships.html.twig', ['pagetitle' => $pagetitle, 'pagedescription' => 'Browse the collection of thousands of premade decks.', 'fellowships' => $paginator, 'url' => $request->getRequestUri(), 'header' => $header, 'type' => $type, 'pages' => $this->fellowshipManager->getClosePages(), 'prevurl' => $this->fellowshipManager->getPreviousUrl(), 'nexturl' => $this->fellowshipManager->getNextUrl()], $response);
+        // iterated once: the Paginator runs its query on every iteration
+        $fellowships = iterator_to_array($paginator);
+        $this->decklistRepository->loadSlots($this->fellowshipRepository->loadDecklists($fellowships));
+
+        return $this->render('Fellowship/public-fellowships.html.twig', ['pagetitle' => $pagetitle, 'pagedescription' => 'Browse the collection of thousands of premade decks.', 'fellowships' => $fellowships, 'url' => $request->getRequestUri(), 'header' => $header, 'type' => $type, 'pages' => $this->fellowshipManager->getClosePages(), 'prevurl' => $this->fellowshipManager->getPreviousUrl(), 'nexturl' => $this->fellowshipManager->getNextUrl()], $response);
     }
 
     private function searchForm(FellowshipSearchDto $query): string
@@ -97,16 +105,14 @@ class ListFellowshipController extends AbstractController
         $numcores = $query->numcores;
         $numplaysets = $query->numplaysets;
         $sort = $query->sort;
+        // no pack selected: every pack is checked
         $packs = $query->packs;
-        if (0 === count($packs)) {
-            $packs = $this->connection->executeQuery('SELECT id FROM pack')->fetchFirstColumn();
-        }
 
         $categories = [];
         $on = 0;
         $off = 0;
         $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
-        $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
+        $list_cycles = $this->cycleRepository->findAllWithPacks();
         foreach ($list_cycles as $cycle) {
             /* @var $cycle Cycle */
             $size = count($cycle->getPacks());

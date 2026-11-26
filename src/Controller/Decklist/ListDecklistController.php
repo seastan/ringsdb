@@ -8,6 +8,7 @@ use App\Entity\Cycle;
 use App\Helper\StringSanitizer;
 use App\Model\DecklistSearchDto;
 use App\Repository\CycleRepository;
+use App\Repository\DecklistRepository;
 use App\Services\DecklistManager;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,6 +23,7 @@ class ListDecklistController extends AbstractController
         private readonly int $cacheExpiration,
         private readonly DecklistManager $decklistManager,
         private readonly CycleRepository $cycleRepository,
+        private readonly DecklistRepository $decklistRepository,
         private readonly Connection $connection
     ) {
     }
@@ -88,7 +90,11 @@ class ListDecklistController extends AbstractController
                 break;
         }
 
-        return $this->render('Decklist/decklists.html.twig', ['pagetitle' => $pagetitle, 'pagedescription' => 'Browse the collection of thousands of premade decks.', 'decklists' => $paginator, 'url' => $request->getRequestUri(), 'header' => $header, 'type' => $type, 'pages' => $this->decklistManager->getClosePages(), 'prevurl' => $this->decklistManager->getPreviousUrl(), 'nexturl' => $this->decklistManager->getNextUrl()], $response);
+        // iterated once: the Paginator runs its query on every iteration
+        $decklists = iterator_to_array($paginator);
+        $this->decklistRepository->loadSlots($decklists);
+
+        return $this->render('Decklist/decklists.html.twig', ['pagetitle' => $pagetitle, 'pagedescription' => 'Browse the collection of thousands of premade decks.', 'decklists' => $decklists, 'url' => $request->getRequestUri(), 'header' => $header, 'type' => $type, 'pages' => $this->decklistManager->getClosePages(), 'prevurl' => $this->decklistManager->getPreviousUrl(), 'nexturl' => $this->decklistManager->getNextUrl()], $response);
     }
 
     private function searchForm(DecklistSearchDto $query): string
@@ -105,16 +111,14 @@ class ListDecklistController extends AbstractController
         $numcores = $query->numcores;
         $require_description = $query->requireDescription;
         $sort = $query->sort;
+        // no pack selected: every pack is checked
         $packs = $query->packs;
-        if (0 === count($packs)) {
-            $packs = $this->connection->executeQuery('SELECT id FROM pack')->fetchFirstColumn();
-        }
 
         $categories = [];
         $on = 0;
         $off = 0;
         $categories[] = ['label' => 'Core / Deluxe', 'packs' => []];
-        $list_cycles = $this->cycleRepository->findBy([], ['position' => 'ASC']);
+        $list_cycles = $this->cycleRepository->findAllWithPacks();
         foreach ($list_cycles as $cycle) {
             /* @var $cycle Cycle */
             $size = count($cycle->getPacks());

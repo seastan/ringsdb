@@ -24,6 +24,8 @@ use Symfony\Component\HttpFoundation\Request;
  *   2015-08-17.
  * Popularity is (1 + votes) / (1 + days since publication²): the order of these items does not
  * change over time.
+ *
+ * The fellowships of VolumeFixtures (published in 2014) are left out of the results compared.
  */
 class FellowshipManagerTest extends KernelTestCase
 {
@@ -130,6 +132,8 @@ class FellowshipManagerTest extends KernelTestCase
         $container = static::$kernel->getContainer();
         $container->get('request_stack')->push(Request::create('/fellowships/find', 'GET', $query));
         $manager = self::getContainer()->get(FellowshipManager::class);
+        // a single page, whatever the number of fellowships of VolumeFixtures
+        $manager->setLimit(1000);
         if ($username) {
             $manager->setUser($container->get('doctrine')->getRepository(User::class)->findOneBy(['username' => $username]));
         }
@@ -146,14 +150,16 @@ class FellowshipManagerTest extends KernelTestCase
     }
 
     /**
-     * @return string[] the names (F1...F5) of the fellowships found, in order
+     * @return string[] the names (F1...F5) of the fellowships found, in order, without the others
      */
     private function names(\Doctrine\ORM\Tools\Pagination\Paginator $paginator): array
     {
         $names = array_flip($this->ids);
         $result = [];
         foreach ($paginator as $fellowship) {
-            $result[] = $names[$fellowship->getId()];
+            if (isset($names[$fellowship->getId()])) {
+                $result[] = $names[$fellowship->getId()];
+            }
         }
 
         return $result;
@@ -185,8 +191,10 @@ class FellowshipManagerTest extends KernelTestCase
         $list = $manager->findFellowshipsByAge();
 
         $this->assertSame(['F5', 'F1'], $this->names($list));
-        $this->assertSame(4, $manager->getMaxCount());
-        $this->assertSame(2, $manager->getNumberOfPages());
+        $this->assertCount(2, $list->getIterator());
+        $public = (int) $this->connection->fetchOne('SELECT COUNT(*) FROM fellowship WHERE is_public = 1');
+        $this->assertSame($public, $manager->getMaxCount());
+        $this->assertSame((int) ceil($public / 2), $manager->getNumberOfPages());
     }
 
     public function testEmptyList(): void

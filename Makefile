@@ -31,7 +31,7 @@ fixtures:
 	# stored function used by the card statistics; created as root (binary logging requires SUPER)
 	$(EXEC_MYSQL) mysql -u root -ppasswd ringsdb < function-source-code.sql
 	$(EXEC_SYMFONY) php bin/console doctrine:migrations:migrate -n
-	$(EXEC_SYMFONY) php bin/console doctrine:fixtures:load --append
+	$(EXEC_SYMFONY) php bin/console doctrine:fixtures:load --append --no-debug
 
 test-fixtures:
 	$(EXEC_SYMFONY) php bin/console doctrine:database:drop --env=test --force --if-exists
@@ -41,7 +41,7 @@ test-fixtures:
 	# stored function used by the card statistics; created as root (binary logging requires SUPER)
 	$(EXEC_MYSQL)_test mysql -u root -ppasswd ringsdb_test < function-source-code.sql
 	$(EXEC_SYMFONY) php bin/console doctrine:migrations:migrate -n --env=test
-	$(EXEC_SYMFONY) php bin/console doctrine:fixtures:load --append --env=test
+	$(EXEC_SYMFONY) php bin/console doctrine:fixtures:load --append --env=test --no-debug
 
 # Xdebug is off: with it (develop mode), PHP segfaults in the middle of the suite
 PHPUNIT := $(EXEC) -it -u www-data -e XDEBUG_MODE=off symfony php vendor/bin/phpunit
@@ -71,6 +71,9 @@ deprecations: test-fixtures
 lint-twig:
 	$(EXEC_SYMFONY) php bin/console lint:twig templates
 
+lint-container:
+	$(EXEC_SYMFONY) php bin/console lint:container
+
 clear-cache:
 	$(EXEC_SYMFONY) php bin/console cache:clear --env=test
 	$(EXEC_SYMFONY) php bin/console cache:clear --env=dev
@@ -79,9 +82,12 @@ cs:
 	$(EXEC_SYMFONY) php vendor/bin/php-cs-fixer fix
 
 rector:
+	$(EXEC_SYMFONY) php vendor/bin/rector --dry-run
+
+rector-fix:
 	$(EXEC_SYMFONY) php vendor/bin/rector
 
-all: install lint-twig rector cs phpstan phpunit
+all: install lint-container lint-twig rector cs phpstan phpunit
 
 reset:
 	rm -rf var/ vendor/ public/bundles public/css public/js

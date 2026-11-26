@@ -120,6 +120,11 @@ class DecklistManager
         $qb->select('d');
         $qb->from(Decklist::class, 'd');
 
+        // the lists display the author and the last pack of every decklist
+        $qb->innerJoin('d.user', 'u');
+        $qb->leftJoin('d.lastPack', 'p');
+        $qb->addSelect('u', 'p');
+
         if ($this->predominantSphere) {
             $qb->where('d.predominantSphere = :predominantSphere');
             $qb->setParameter('predominantSphere', $this->predominantSphere);
@@ -207,8 +212,8 @@ class DecklistManager
     {
         $qb = $this->getQueryBuilder();
 
-        $qb->leftJoin('d.favorites', 'u');
-        $qb->andWhere('u = :user');
+        $qb->innerJoin('d.favorites', 'f');
+        $qb->andWhere('f = :user');
         $qb->setParameter('user', $user);
         $qb->orderBy('d.dateCreation', \SortDirection::Descending);
 
@@ -305,11 +310,8 @@ class DecklistManager
 
         $qb = $this->getQueryBuilder();
 
-        // the author, the reputation filter and the reputation sort all need the user, joined once
+        // the author, the reputation filter and the reputation sort use the user joined as u
         $filterByReputation = !empty($reputation) && is_numeric($reputation);
-        if (!empty($author_name) || $filterByReputation || 'reputation' === $sort) {
-            $qb->innerJoin('d.user', 'u');
-        }
 
         if (!empty($sphere)) {
             $qb->innerJoin('d.spheres', 'w');
@@ -358,13 +360,8 @@ class DecklistManager
         $useCustomPacks = [] !== $customPackCodes && $this->user;
 
         if (count($cards_code) > 0 || count($packs) > 0 || $useCustomPacks) {
-            foreach ($cards_code as $i => $card_code) {
-                /* @var $card \App\Entity\Card */
-                $card = $this->cardRepository->findOneBy(['code' => $card_code]);
-                if (!$card instanceof Card) {
-                    continue;
-                }
-
+            $cards = [] === $cards_code ? [] : $this->cardRepository->findBy(['code' => $cards_code]);
+            foreach ($cards as $i => $card) {
                 $qb->innerJoin('d.slots', "s$i");
                 $qb->andWhere("s$i.card = :card$i");
                 $qb->setParameter("card$i", $card);

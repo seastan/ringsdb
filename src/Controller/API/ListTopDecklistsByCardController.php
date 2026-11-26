@@ -33,7 +33,7 @@ class ListTopDecklistsByCardController extends AbstractController
      *
      * Get the top 10 decklists published containing given card, as an array of JSON objects.
      */
-    #[OA\Parameter(name: 'card_code', in: 'path', description: "The code of the card, e.g. '01001'")]
+    #[OA\Parameter(name: 'card_code', description: "The code of the card, e.g. '01001'", in: 'path')]
     #[Route(path: '/api/public/decklists/top_by_card/{card_code}.{_format}', name: 'api_decklists_by_card', requirements: ['_format' => 'json'], defaults: ['_format' => 'json'], methods: ['GET'])]
     public function __invoke(Request $request, #[MapEntity(mapping: ['card_code' => 'code'])] ?Card $card, #[MapQueryString] JsonpDto $query = new JsonpDto()): Response
     {

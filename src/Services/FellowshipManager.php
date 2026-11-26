@@ -107,6 +107,11 @@ class FellowshipManager
         $qb = $this->doctrine->createQueryBuilder();
         $qb->select('d');
         $qb->from(Fellowship::class, 'd');
+
+        // the lists display the author of every fellowship
+        $qb->innerJoin('d.user', 'u');
+        $qb->addSelect('u');
+
         $qb->andWhere('d.isPublic = 1');
         $qb->setFirstResult($this->start);
         $qb->setMaxResults($this->limit);
@@ -193,8 +198,8 @@ class FellowshipManager
     {
         $qb = $this->getQueryBuilder();
 
-        $qb->leftJoin('d.favorites', 'u');
-        $qb->andWhere('u = :user');
+        $qb->innerJoin('d.favorites', 'f');
+        $qb->andWhere('f = :user');
         $qb->setParameter('user', $user);
         $qb->orderBy('d.datePublish', \SortDirection::Descending);
 
@@ -274,12 +279,10 @@ class FellowshipManager
 
         $customPackCodes = array_values(array_filter($request->query->all('custom_packs'), is_string(...)));
 
+        // the author filter and the reputation sort use the user joined as u
         $qb = $this->getQueryBuilder();
-        $joinTables = [];
 
         if (!empty($author_name)) {
-            $qb->innerJoin('d.user', 'u');
-            $joinTables[] = 'd.user';
             $qb->andWhere('u.username = :username');
             $qb->setParameter('username', $author_name);
         }
@@ -300,13 +303,8 @@ class FellowshipManager
             $qb->innerJoin('d.decklists', 'l');
             $qb->innerJoin('l.decklist', 'ld');
 
-            foreach ($cards_code as $i => $card_code) {
-                /* @var $card \App\Entity\Card */
-                $card = $this->cardRepository->findOneBy(['code' => $card_code]);
-                if (!$card instanceof Card) {
-                    continue;
-                }
-
+            $cards = [] === $cards_code ? [] : $this->cardRepository->findBy(['code' => $cards_code]);
+            foreach ($cards as $i => $card) {
                 $qb->innerJoin('ld.slots', "s$i");
                 $qb->andWhere("s$i.card = :card$i");
                 $qb->setParameter("card$i", $card);
@@ -382,10 +380,6 @@ class FellowshipManager
                 break;
 
             case 'reputation':
-                if (!in_array('d.user', $joinTables, true)) {
-                    $qb->innerJoin('d.user', 'u');
-                }
-
                 // with DISTINCT, MySQL 5.7+ only sorts on selected columns
                 $qb->addSelect('u.reputation AS HIDDEN reputation');
                 $qb->orderBy('reputation', \SortDirection::Descending);

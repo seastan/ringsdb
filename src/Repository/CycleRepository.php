@@ -17,4 +17,20 @@ class CycleRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Cycle::class);
     }
+
+    /**
+     * Every cycle with its packs, in one query.
+     *
+     * @return list<Cycle>
+     */
+    public function findAllWithPacks(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->addSelect('p')
+            ->leftJoin('c.packs', 'p')
+            ->orderBy('c.position', 'ASC')
+            ->addOrderBy('p.position', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
